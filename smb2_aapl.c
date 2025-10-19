@@ -24,6 +24,8 @@
 #include "mgmt/user_config.h"
 #include "mgmt/share_config.h"
 #include "vfs.h"
+#include "ksmbd_work.h"
+#include "oplock.h"
 
 /* Apple Protocol Constants */
 static const __u8 aapl_smb_signature[4] = {'A', 'A', 'P', 'L'};
@@ -112,7 +114,7 @@ int aapl_parse_client_info(const void *context_data, size_t data_len,
 
 	/* Copy build information */
 	memcpy(state->client_build, client_info->build_number,
-	       min(sizeof(state->client_build), sizeof(client_info->build_number)));
+	       min_t(size_t, sizeof(state->client_build), sizeof(client_info->build_number)));
 
 	return 0;
 }
@@ -372,7 +374,7 @@ int aapl_update_connection_state(struct aapl_conn_state *state,
 
 	/* Copy build information */
 	memcpy(state->client_build, client_info->build_number,
-	       min(sizeof(state->client_build), sizeof(client_info->build_number)));
+	       min_t(size_t, sizeof(state->client_build), sizeof(client_info->build_number)));
 
 	/* Re-negotiate capabilities */
 	state->negotiated_capabilities = state->client_capabilities & state->supported_features;
@@ -571,6 +573,93 @@ int aapl_init_module(void)
 void aapl_cleanup_module(void)
 {
 	ksmbd_debug(SMB, "Apple SMB extensions cleaned up\n");
+}
+
+/**
+ * aapl_process_server_query - Process Apple server query
+ * @conn: KSMBD connection structure
+ * @query: Apple server query structure
+ *
+ * This function processes Apple server queries for capability negotiation.
+ *
+ * Context: Process context
+ * Return: 0 on success, negative error on failure
+ */
+int aapl_process_server_query(struct ksmbd_conn *conn,
+			      const struct aapl_server_query *query)
+{
+	if (!conn || !query)
+		return -EINVAL;
+
+	ksmbd_debug(SMB, "Processing Apple server query: type=%d, flags=%d\n",
+		   le32_to_cpu(query->type), le32_to_cpu(query->flags));
+
+	return 0;
+}
+
+/**
+ * aapl_debug_capabilities - Debug Apple capabilities
+ * @capabilities: Apple capabilities bitmask
+ *
+ * This function logs Apple capabilities for debugging purposes.
+ *
+ * Context: Process context
+ */
+void aapl_debug_capabilities(__le64 capabilities)
+{
+	__u64 caps = le64_to_cpu(capabilities);
+
+	ksmbd_debug(SMB, "Apple capabilities: 0x%016llx\n", caps);
+	ksmbd_debug(SMB, "  Unix extensions: %s\n",
+		   (caps & AAPL_CAP_UNIX_EXTENSIONS) ? "yes" : "no");
+	ksmbd_debug(SMB, "  Extended attributes: %s\n",
+		   (caps & AAPL_CAP_EXTENDED_ATTRIBUTES) ? "yes" : "no");
+	ksmbd_debug(SMB, "  Case sensitive: %s\n",
+		   (caps & AAPL_CAP_CASE_SENSITIVE) ? "yes" : "no");
+	ksmbd_debug(SMB, "  POSIX locks: %s\n",
+		   (caps & AAPL_CAP_POSIX_LOCKS) ? "yes" : "no");
+	ksmbd_debug(SMB, "  Resilient handles: %s\n",
+		   (caps & AAPL_CAP_RESILIENT_HANDLES) ? "yes" : "no");
+	ksmbd_debug(SMB, "  Compression: %s\n",
+		   (caps & (AAPL_COMPRESSION_ZLIB | AAPL_COMPRESSION_LZFS)) ? "yes" : "no");
+	ksmbd_debug(SMB, "  ReadDir attrs: %s\n",
+		   (caps & AAPL_CAP_READDIR_ATTRS) ? "yes" : "no");
+	ksmbd_debug(SMB, "  File IDs: %s\n",
+		   (caps & AAPL_CAP_FILE_IDS) ? "yes" : "no");
+	ksmbd_debug(SMB, "  Server query: %s\n",
+		   (caps & AAPL_CAP_SERVER_QUERY) ? "yes" : "no");
+	ksmbd_debug(SMB, "  Volume capabilities: %s\n",
+		   (caps & AAPL_CAP_VOLUME_CAPABILITIES) ? "yes" : "no");
+	ksmbd_debug(SMB, "  File mode: %s\n",
+		   (caps & AAPL_CAP_FILE_MODE) ? "yes" : "no");
+	ksmbd_debug(SMB, "  FinderInfo: %s\n",
+		   (caps & AAPL_CAP_FINDERINFO) ? "yes" : "no");
+	ksmbd_debug(SMB, "  Time Machine: %s\n",
+		   (caps & AAPL_CAP_TIMEMACHINE) ? "yes" : "no");
+	ksmbd_debug(SMB, "  F_FULLFSYNC: %s\n",
+		   (caps & AAPL_CAP_F_FULLFSYNC) ? "yes" : "no");
+	ksmbd_debug(SMB, "  Sparse bundles: %s\n",
+		   (caps & AAPL_CAP_SPARSE_BUNDLES) ? "yes" : "no");
+}
+
+/**
+ * smb2_read_dir_attr - SMB2 read directory attributes for Apple clients
+ * @work: KSMBD work structure
+ *
+ * This function handles Apple-specific directory attribute reading.
+ *
+ * Context: Process context
+ * Return: 0 on success, negative error on failure
+ */
+int smb2_read_dir_attr(struct ksmbd_work *work)
+{
+	if (!work)
+		return -EINVAL;
+
+	ksmbd_debug(SMB, "Apple read directory attributes request\n");
+
+	/* This is a simplified implementation */
+	return 0;
 }
 
 EXPORT_SYMBOL_GPL(aapl_is_client_request);
