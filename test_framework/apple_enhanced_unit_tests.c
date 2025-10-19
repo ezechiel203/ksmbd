@@ -16,7 +16,7 @@
 
 #include "smb2pdu.h"
 #include "connection.h"
-#include "smb2_aapl.h"
+#include "smb2aapl.h"
 #include "test_framework/test_utils.h"
 
 #define ENHANCED_TEST_MODULE "ksmbd_apple_enhanced"

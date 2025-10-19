@@ -15,7 +15,7 @@ gcc -E -I. -I./mgmt -I./vfs_cache -I./unicode -I./auth -I./misc -I./smbacl \
     -I./compat -I./server -I./smb_common -I./connection -I./ksmbd_work \
     -I./oplock -I./transport_tcp -I./transport_rdma -I./transport_ipc \
     -I./glob -I./xattr -I./unicode -I./netmisc -I./nterr -I./oplock \
-    -I./unicode -I./uniupr -I./vfs_cache -I./vfs -I./smb2_aapl.h \
+    -I./unicode -I./uniupr -I./vfs_cache -I./vfs -I./smb2aapl.h \
     smb2pdu.c -o smb2pdu.i 2>&1 | head -20
 
 if [ $? -eq 0 ]; then
@@ -45,8 +45,8 @@ echo
 echo "3. Checking include dependencies..."
 
 # Check if all required includes are present
-echo "Checking smb2_aapl.h include..."
-grep -n "#include.*smb2_aapl" smb2pdu.c
+echo "Checking smb2aapl.h include..."
+grep -n "#include.*smb2aapl" smb2pdu.c
 
 echo
 echo "Checking other required includes..."

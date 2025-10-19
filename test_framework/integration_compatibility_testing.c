@@ -26,7 +26,7 @@
 #include <linux/scatterlist.h>
 
 #include "test_utils.h"
-#include "smb2_aapl.h"
+#include "smb2aapl.h"
 #include "connection.h"
 #include "mgmt/user_config.h"
 #include "mgmt/share_config.h"

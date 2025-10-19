@@ -9,7 +9,7 @@
 
 #include "ntlmssp.h"
 #include "smbacl.h"
-#include "smb2_aapl.h"
+#include "smb2aapl.h"
 
 /*
  * Note that, due to trying to use names similar to the protocol specifications,
