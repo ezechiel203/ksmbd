@@ -366,9 +366,8 @@ static_assert(sizeof(struct aapl_dir_hardlinks) == 12,
 static_assert(sizeof(struct aapl_conn_state) == 120,
               "Apple connection state structure size must be 120 bytes");
 
-/* SMB2 Protocol Compliance: Verify create_context size matches specification */
-static_assert(sizeof(struct create_context) == 24,
-              "SMB2 create_context structure size must be 24 bytes per MS-SMB2");
+/* SMB2 Protocol Compliance: create_context size verification handled in smb2pdu.h
+ * Size should be 24 bytes per MS-SMB2 specification */
 
 /* Verify packing and alignment compliance */
 static_assert(offsetof(struct aapl_client_info, signature) == 0,
