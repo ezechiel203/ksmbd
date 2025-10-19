@@ -3720,12 +3720,6 @@ int smb2_open(struct ksmbd_work *work)
 				const void *context_data;
 				size_t data_len;
 				struct aapl_client_info *client_info;
-				bool verified_apple_client = false;
-
-				/* SECURITY FIX: Do NOT immediately set is_aapl=true.
-				 * We must perform cryptographic validation before
-				 * trusting this connection to be an Apple client.
-				 */
 
 				/* Extract and validate Apple context data */
 				if (le16_to_cpu(context->NameLength) == 4 &&
@@ -3735,79 +3729,47 @@ int smb2_open(struct ksmbd_work *work)
 						le16_to_cpu(context->DataOffset);
 					data_len = le32_to_cpu(context->DataLength);
 
-					/* SECURITY FIX: Validate the create context structure */
 					rc = aapl_validate_create_context(context);
 					if (rc) {
 						ksmbd_debug(SMB, "Invalid AAPL create context: %d\n", rc);
-						/* SECURITY: Do NOT set is_aapl for invalid contexts */
 						rc = 0;
 						goto continue_create;
 					}
 
-					/* SECURITY FIX: Perform cryptographic validation
-					 * of Apple client identity before accepting */
-					if (!aapl_is_client_request(context_data, data_len)) {
-						ksmbd_debug(SMB, "Rejecting non-Apple client with AAPL context\n");
-						rc = -EACCES;
+					client_info = kzalloc(sizeof(struct aapl_client_info),
+							      KSMBD_DEFAULT_GFP);
+					if (!client_info) {
+						ksmbd_debug(SMB, "Failed to allocate memory for Apple client info\n");
+						rc = -ENOMEM;
 						goto err_out1;
 					}
 
-					/* SECURITY FIX: Verify client information is valid */
-					client_info = kzalloc(sizeof(struct aapl_client_info),
-							      KSMBD_DEFAULT_GFP);
-					if (client_info) {
-						size_t copy_len = min(data_len,
-								     sizeof(struct aapl_client_info));
-						memcpy(client_info, context_data, copy_len);
+					size_t copy_len = min(data_len,
+							     sizeof(struct aapl_client_info));
+					memcpy(client_info, context_data, copy_len);
 
-						/* SECURITY FIX: Validate cryptographic signature */
-						rc = aapl_validate_client_signature(conn, client_info);
-						if (rc) {
-							ksmbd_debug(SMB, "Apple client signature validation failed: %d\n", rc);
-							kfree(client_info);
-							/* SECURITY: Do NOT accept unvalidated Apple clients */
-							rc = -EACCES;
-							goto err_out1;
-						}
 
-						/* Debug log the client information */
-						aapl_debug_client_info(client_info);
+					/* Debug log the client information */
+					aapl_debug_client_info(client_info);
 
-						/* SECURITY FIX: Only negotiate capabilities after validation */
-						rc = aapl_negotiate_capabilities(conn, client_info);
-						if (rc) {
-							ksmbd_debug(SMB, "Apple capability negotiation failed: %d\n", rc);
-							kfree(client_info);
-							/* SECURITY: Do NOT continue with invalid capabilities */
-							rc = -EACCES;
-							goto err_out1;
-						}
-
-						/* SECURITY FIX: Only set is_aapl after successful validation */
-						conn->is_aapl = true;
-						verified_apple_client = true;
-
+					rc = aapl_negotiate_capabilities(conn, client_info);
+					if (rc) {
+						ksmbd_debug(SMB, "Apple capability negotiation failed: %d\n", rc);
 						kfree(client_info);
-					} else {
-						ksmbd_debug(SMB, "Failed to allocate memory for Apple client info\n");
+						client_info = NULL;
+						rc = 0;
+						goto continue_create;
 					}
+					/* Mark connection as Apple client */
+					conn->is_aapl = true;
+
+					kfree(client_info);
+					client_info = NULL;
 				} else {
 					ksmbd_debug(SMB, "AAPL context too small: name_len=%u, data_len=%u\n",
 						    le16_to_cpu(context->NameLength),
 						    le32_to_cpu(context->DataLength));
 				}
-			}
-
-			/* SECURITY FIX: Final security check */
-			if (conn->is_aapl && !verified_apple_client) {
-				ksmbd_debug(SMB, "SECURITY: Rejecting unverified Apple client\n");
-				conn->is_aapl = false;
-				rc = -EACCES;
-				goto err_out1;
-			}
-
-			if (verified_apple_client) {
-				ksmbd_debug(SMB, "Apple client verified successfully\n");
 			}
 
 			/* Process FinderInfo context for Apple clients */
@@ -3854,7 +3816,6 @@ int smb2_open(struct ksmbd_work *work)
 								/* Non-fatal error, continue operation */
 								rc = 0;
 							}
-
 							/* Handle Time Machine sparse bundle if detected */
 							rc = aapl_handle_timemachine_bundle(conn, &path, tm_info);
 							if (rc) {
@@ -9898,33 +9859,6 @@ bool smb3_11_final_sess_setup_resp(struct ksmbd_work *work)
 	return false;
 }
 
-/**
- * aapl_is_client_request - Check if this is an Apple client request
- * @buffer: Request buffer to check
- * @len: Length of the buffer
- *
- * Return: true if this appears to be an Apple client request
- */
-bool aapl_is_client_request(const void *buffer, size_t len)
-{
-	const struct smb2_hdr *hdr = buffer;
-
-	if (!hdr || len < sizeof(struct smb2_hdr))
-		return false;
-
-	/* Check for Apple-specific patterns in SMB2 headers */
-	if (le16_to_cpu(hdr->Command) == SMB2_CREATE_HE) {
-		const struct smb2_create_req *req = buffer;
-
-		/* Check if Reserved1 field has Apple's magic value */
-		if (req->Reserved1 == 0xFFFF) {
-			ksmbd_debug(SMB, "Apple client detected via Reserved1 magic\n");
-			return true;
-		}
-	}
-
-	return false;
-}
 
 /**
  * aapl_valid_signature - Validate Apple signature
