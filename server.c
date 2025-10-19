@@ -21,6 +21,7 @@
 #include "mgmt/user_session.h"
 #include "crypto_ctx.h"
 #include "auth.h"
+#include "smb2aapl.h"
 
 int ksmbd_debug_types;
 
@@ -604,6 +605,12 @@ static int __init ksmbd_server_init(void)
 	ret = ksmbd_workqueue_init();
 	if (ret)
 		goto err_crypto_destroy;
+
+	/* Initialize Apple SMB extensions */
+	ret = aapl_init_module();
+	if (ret)
+		goto err_crypto_destroy;
+
 	return 0;
 
 err_crypto_destroy:
@@ -632,6 +639,9 @@ static void __exit ksmbd_server_exit(void)
 	ksmbd_server_shutdown();
 	rcu_barrier();
 	ksmbd_release_inode_hash();
+
+	/* Cleanup Apple SMB extensions */
+	aapl_cleanup_module();
 }
 
 MODULE_AUTHOR("Namjae Jeon <linkinjeon@kernel.org>");
