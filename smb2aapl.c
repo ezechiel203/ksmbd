@@ -560,6 +560,8 @@ int aapl_init_module(void)
 {
 	pr_info("ksmbd: Apple SMB extensions loaded\n");
 	pr_info("ksmbd: Apple capability negotiation enabled\n");
+	pr_info("ksmbd: DEBUG: aapl_init_module() called successfully\n");
+	pr_debug("ksmbd: Apple SMB extensions debug mode active\n");
 	return 0;
 }
 

@@ -566,6 +566,8 @@ static int __init ksmbd_server_init(void)
 {
 	int ret;
 
+	pr_info("ksmbd: DEBUG: Starting ksmbd_server_init() for ARM64\n");
+
 	ret = class_register(&ksmbd_control_class);
 	if (ret) {
 		pr_err("Unable to register ksmbd-control class\n");
@@ -607,9 +609,14 @@ static int __init ksmbd_server_init(void)
 		goto err_crypto_destroy;
 
 	/* Initialize Apple SMB extensions */
+	pr_info("ksmbd: DEBUG: About to call aapl_init_module()\n");
 	ret = aapl_init_module();
-	if (ret)
+	if (ret) {
+		pr_err("ksmbd: Failed to initialize Apple SMB extensions: %d\n", ret);
 		goto err_crypto_destroy;
+	}
+	pr_info("ksmbd: DEBUG: aapl_init_module() returned successfully\n");
+	pr_info("ksmbd: server initialized\n");
 
 	return 0;
 
