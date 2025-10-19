@@ -5,17 +5,19 @@
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/cifsd-team/ksmbd)
 [![Apple Support](https://img.shields.io/badge/Apple%20SMB%20Extensions-red.svg)](#apple-smb-extensions)
 
-KSMBD is an open-source in-kernel CIFS/SMB3 server for Linux Kernel. It provides high-performance file sharing capabilities with complete Apple SMB protocol extensions, enabling seamless integration with macOS and iOS devices.
+KSMBD is an open-source in-kernel CIFS/SMB3 server for Linux Kernel. It provides high-performance file sharing capabilities with Apple® SMB protocol extensions, enabling interoperability with Apple® operating systems.
+
+**Important Notice**: Apple, macOS, iOS, Time Machine, and Finder are trademarks of Apple Inc., registered in the U.S. and other countries. This implementation is provided for interoperability purposes only and is not endorsed or supported by Apple Inc.
 
 ## 🌟 Key Features
 
 ### 🍎 Apple SMB Extensions (NEW!)
-- **Complete macOS Integration**: Native support for all Apple SMB protocol extensions
-- **Time Machine Backup**: Full support for macOS Time Machine network backups
-- **Finder Metadata**: Classic Mac OS file type/creator codes and Finder flags
-- **Performance Optimizations**: 14x faster directory listings for Apple clients
+- **Complete Apple® Integration**: Native support for Apple® SMB protocol extensions
+- **Time Machine® Backup**: Full support for Apple® Time Machine® network backups
+- **Finder® Metadata**: Classic file type/creator codes and Finder® flags
+- **Performance Optimizations**: 14x faster directory listings for Apple® clients
 - **Enterprise Security**: Cryptographic client validation and capability gating
-- **Multi-Platform Support**: macOS, iOS, iPadOS, watchOS, and tvOS
+- **Multi-Platform Support**: macOS®, iOS®, iPadOS®, watchOS®, and tvOS®
 
 ### Core SMB Features
 - **Multi-Protocol Support**: SMB1, SMB2.0, SMB2.1, SMB3.0, SMB3.1.1

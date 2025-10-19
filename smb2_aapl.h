@@ -1,13 +1,16 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- *   Copyright (C) 2024 KSMBD Contributors
+ * Copyright (C) 2025 Alexandre BETRY
  *
- *   Apple SMB/CIFS protocol extensions for KSMBD
+ * Apple SMB/CIFS protocol extensions for KSMBD
  *
- *   This header contains Apple-specific data structures, constants, and
- *   function prototypes required for supporting Apple SMB extensions
- *   including AAPL create contexts, macOS-specific capabilities,
- *   and Apple client version detection.
+ * This header contains Apple-specific data structures, constants, and
+ * function prototypes required for supporting Apple SMB extensions
+ * for interoperability with Apple operating systems.
+ *
+ * Apple, macOS, iOS, Time Machine, and Finder are trademarks of Apple Inc.,
+ * registered in the U.S. and other countries. This implementation is provided
+ * for interoperability purposes only and is not endorsed or supported by Apple Inc.
  */
 
 #ifndef _SMB2_AAPL_H
@@ -95,15 +98,6 @@
  * It is used by Apple clients to query server capabilities and negotiate
  * specific features. The context allows clients to dynamically discover
  * which Apple SMB extensions are available on the server.
- *
- * Query types:
- * - 0: Capabilities query - basic server capabilities
- * - 1: Extensions query - extended attribute support
- * - 2: Compression query - compression algorithm support
- * - 3: Reserved for future use
- *
- * The query_data field contains type-specific information and may be
- * variable length depending on the query type.
  */
 struct aapl_server_query {
 	__le32			type;
@@ -124,18 +118,9 @@ struct aapl_server_query {
  * @reserved: Reserved for future use
  *
  * This structure represents Apple Volume Capabilities SMB2 create context.
- * It describes</think> capabilities and features of an SMB share from Apple's
+ * It describes capabilities and features of an SMB share from Apple's
  * perspective. This context is used to inform Apple clients about what
  * features are available on specific shares and volumes.
- *
- * Capabilities flags correspond to AAPL_CAP_* constants and include:
- * - UNIX Extensions, Extended Attributes, Case Sensitivity
- * - POSIX Locks, Resilient Handles, Compression Support
- * - ReadDir Attributes, File IDs, Query and Volume Capabilities
- * - File Mode, FinderInfo, TimeMachine, F_FULLFSYNC, Sparse Bundles
- *
- * The compression_types field indicates which compression algorithms
- * are supported (bit 0 = ZLIB, bit 1 = LZFS, etc.).
  */
 struct aapl_volume_capabilities {
 	__le64			capability_flags;
@@ -149,10 +134,15 @@ struct aapl_volume_capabilities {
 
 /**
  * struct aapl_file_mode - Apple File Mode context
- * @mode: POSIX-style file mode bits
- * @flags: File mode flags
- * @creator: macOS creator code (4 bytes)
- * @type: macOS file type code (4 bytes)
+ * @mode: POSIX-style file mode bits (permissions)
+ * @flags: Apple-specific file flags (hidden, locked, etc.)
+ * @creator: macOS 4-byte creator code (e.g., 'TEXT' for TextEdit)
+ * @type: macOS 4-byte file type code (e.g., 'TEXT' for text files)
+ *
+ * This structure represents the Apple File Mode SMB2 create context. It contains
+ * both POSIX-style file permissions and Apple-specific metadata including creator
+ * and type codes. These codes are used by macOS applications to identify file
+ * types and maintain compatibility with classic Mac OS applications.
  */
 struct aapl_file_mode {
 	__le32			mode;
@@ -163,12 +153,16 @@ struct aapl_file_mode {
 
 /**
  * struct aapl_client_info - Apple Client Information
- * @signature: Apple signature "AAPL"
- * @version: Apple SMB extension version
- * @client_type: Type of Apple client (macOS, iOS, etc.)
- * @build_number: Build number of the client
- * @capabilities: Client capabilities bitmask
- * @reserved: Reserved for future use
+ * @signature: Apple signature "AAPL" (4 bytes, must be "AAPL")
+ * @version: Apple SMB extension version (e.g., AAPL_VERSION_2_0)
+ * @client_type: Type of Apple client (AAPL_CLIENT_MACOS, etc.)
+ * @build_number: Build number of the client software
+ * @capabilities: Bitmask of requested capabilities (AAPL_CAP_* flags)
+ * @reserved: Reserved for future use (must be zero)
+ *
+ * This structure contains information about the Apple client connecting to the SMB
+ * server. It is used for client identification, capability negotiation, and
+ * feature enablement.
  */
 struct aapl_client_info {
 	__u8			signature[4];	/* "AAPL" */
@@ -181,10 +175,15 @@ struct aapl_client_info {
 
 /**
  * struct aapl_negotiate_context - Apple Negotiation Context
- * @client_info: Client information structure
- * @server_capabilities: Server capabilities to advertise
- * @requested_features: Features client wants to use
- * @reserved: Reserved for future use
+ * @client_info: Client information structure with identification details
+ * @server_capabilities: Server capabilities bitmask to advertise to client
+ * @requested_features: Specific features client wants to enable
+ * @reserved: Reserved for future use (must be zero)
+ *
+ * This structure is used during the initial negotiation phase between Apple
+ * clients and the KSMBD server. It combines client identification with
+ * capability negotiation to establish which Apple SMB extensions will be
+ * available for the connection.
  */
 struct aapl_negotiate_context {
 	struct aapl_client_info	client_info;
@@ -195,10 +194,12 @@ struct aapl_negotiate_context {
 
 /**
  * struct aapl_dir_hardlinks - Apple Directory Hard Links context
- * @flags: Flags for hard link behavior
- * @max_links_per_file: Maximum hard links per file
- * @case_sensitive: Whether directory is case sensitive
- * @reserved: Reserved for future use
+ * @flags: Bitmask of flags controlling hard link behavior (0-3)
+ * @max_links_per_file: Maximum number of hard links allowed per file
+ * @case_sensitive: Boolean indicating if directory is case sensitive
+ * @reserved: Reserved for future use (must be zero)
+ *
+ * This structure configures directory hard link behavior for Apple clients.
  */
 struct aapl_dir_hardlinks {
 	__le32			flags;
@@ -209,12 +210,15 @@ struct aapl_dir_hardlinks {
 
 /**
  * struct aapl_finder_info - Apple FinderInfo context
- * @creator: macOS creator code (4 bytes, e.g., 'TEXT')
- * @type: macOS file type code (4 bytes, e.g., 'TEXT')
- * @flags: Finder flags for file attributes
- * @location: File location in window (X, Y coordinates)
- * @extended_flags: Extended Finder flags
- * @reserved: Reserved for future use
+ * @creator: macOS 4-byte creator code (e.g., 'TEXT' for TextEdit)
+ * @type: macOS 4-byte file type code (e.g., 'TEXT' for text files)
+ * @flags: Finder flags (bitmask of file attributes like hidden, locked)
+ * @location: File location coordinates (X, Y) in Finder window
+ * @extended_flags: Additional extended Finder flags
+ * @reserved: Reserved for future use (must be zero)
+ *
+ * This structure contains macOS Finder metadata including creator and type codes
+ * that are essential for Mac application compatibility.
  */
 struct aapl_finder_info {
 	__u8			creator[4];
@@ -228,12 +232,14 @@ struct aapl_finder_info {
 
 /**
  * struct aapl_timemachine_info - Apple Time Machine context
- * @version: Time Machine protocol version
- * @bundle_id: Time Machine bundle identifier
- * @sparse_caps: Sparse bundle capabilities
- * @validation_seq: Validation sequence number
- * @durable_handle: Durable handle for Time Machine operations
- * @reserved: Reserved for future use
+ * @version: Time Machine protocol version (must be >= 1)
+ * @bundle_id: Unique identifier for Time Machine sparse bundle
+ * @sparse_caps: Bitmask of sparse bundle capability flags
+ * @validation_seq: Anti-replay protection sequence number
+ * @durable_handle: Persistent handle for Time Machine session
+ * @reserved: Reserved for future use (must be zero)
+ *
+ * This structure configures Apple Time Machine backup operations over SMB.
  */
 struct aapl_timemachine_info {
 	__le32			version;
@@ -244,33 +250,48 @@ struct aapl_timemachine_info {
 	__u8			reserved[20];
 } __packed;
 
-/* Apple Connection State Structure */
+/**
+ * struct aapl_conn_state - Apple Connection State
+ * @client_version: Apple SMB extension version from client
+ * @client_type: Type of Apple client (macOS, iOS, etc.)
+ * @client_capabilities: Full bitmask of client-requested capabilities
+ * @client_build: Build number string from client (16 bytes)
+ * @negotiated_capabilities: Final negotiated capability set (client ∩ server)
+ * @supported_features: Server-supported capability bitmask
+ * @enabled_features: Currently enabled features for this connection
+ * @extensions_enabled: Boolean flag for extended attributes support
+ * @compression_supported: Boolean flag for compression support
+ * @resilient_handles_enabled: Boolean flag for resilient handle support
+ * @posix_locks_enabled: Boolean flag for POSIX lock support
+ * @server_queried: Boolean flag indicating if server has been queried
+ * @last_query_type: Last server query type processed
+ * @last_query_time: Timestamp of last query operation (jiffies or sequence)
+ * @reserved: Reserved for future use (must be zero)
+ *
+ * This structure maintains the state of an Apple client connection throughout
+ * its lifetime.
+ */
 struct aapl_conn_state {
-	/* Client Information */
 	__le32			client_version;
 	__le32			client_type;
 	__le64			client_capabilities;
 	__u8			client_build[16];
 
-	/* Negotiated Capabilities */
 	__le64			negotiated_capabilities;
 	__le64			supported_features;
 	__le64			enabled_features;
 
-	/* State Flags */
-	bool			extensions_enabled;
-	bool			compression_supported;
-	bool			resilient_handles_enabled;
-	bool			posix_locks_enabled;
+	__u8			extensions_enabled;
+	__u8			compression_supported;
+	__u8			resilient_handles_enabled;
+	__u8			posix_locks_enabled;
 
-	/* Query State */
-	bool			server_queried;
+	__u8			server_queried;
 	__le32			last_query_type;
 	__le64			last_query_time;
 
-	/* Reserved for future expansion */
 	__u8			reserved[64];
-};
+} __packed;
 
 /* Function Prototypes for Apple SMB Extensions */
 
@@ -284,40 +305,17 @@ int aapl_validate_create_context(const struct create_context *context);
 int aapl_negotiate_capabilities(struct ksmbd_conn *conn,
 				const struct aapl_client_info *client_info);
 bool aapl_supports_capability(struct aapl_conn_state *state, __le64 capability);
-int aapl_enable_capability(struct aapl_conn_state *state, __le64 capability);
 
 /* Apple version detection */
 int aapl_detect_client_version(const void *data, size_t len);
 const char *aapl_get_client_name(__le32 client_type);
 const char *aapl_get_version_string(__le32 version);
 
-/* Apple context handling */
-int aapl_process_server_query(struct ksmbd_conn *conn,
-			      const struct aapl_server_query *query);
-int aapl_process_volume_caps(struct ksmbd_conn *conn,
-			      const struct aapl_volume_capabilities *caps);
-int aapl_process_file_mode(struct ksmbd_conn *conn,
-			    const struct aapl_file_mode *file_mode);
-int aapl_process_dir_hardlinks(struct ksmbd_conn *conn,
-				const struct aapl_dir_hardlinks *hardlinks);
-int aapl_process_finder_info(struct ksmbd_conn *conn,
-			     const struct aapl_finder_info *finder_info);
-int aapl_process_timemachine_info(struct ksmbd_conn *conn,
-				  const struct aapl_timemachine_info *tm_info);
-
-/* Apple-specific file operations */
-int aapl_set_finder_info(struct ksmbd_conn *conn, const struct path *path,
-			  const struct aapl_finder_info *finder_info);
-int aapl_get_finder_info(struct ksmbd_conn *conn, const struct path *path,
-			  struct aapl_finder_info *finder_info);
-int aapl_handle_timemachine_bundle(struct ksmbd_conn *conn,
-				    const struct path *path,
-				    const struct aapl_timemachine_info *tm_info);
-int aapl_validate_timemachine_sequence(struct ksmbd_conn *conn,
-				       const struct aapl_timemachine_info *tm_info);
-
-/* Apple file synchronization support */
-int aapl_fullfsync(struct ksmbd_conn *conn, const struct path *path);
+/* Utility functions */
+bool aapl_valid_signature(const __u8 *signature);
+size_t aapl_get_context_size(const char *context_name);
+int aapl_build_server_response(void **response_data, size_t *response_len,
+			       __le64 capabilities, __le32 query_type);
 
 /* Apple connection state management */
 int aapl_init_connection_state(struct aapl_conn_state *state);
@@ -327,13 +325,53 @@ int aapl_update_connection_state(struct aapl_conn_state *state,
 
 /* Debug and logging helpers */
 void aapl_debug_client_info(const struct aapl_client_info *info);
-void aapl_debug_capabilities(__le64 capabilities);
-void aapl_debug_negotiation(struct aapl_conn_state *state);
 
-/* Utility functions */
-bool aapl_valid_signature(const __u8 *signature);
-size_t aapl_get_context_size(const char *context_name);
-int aapl_build_server_response(void **response_data, size_t *response_len,
-			       __le64 capabilities, __le32 query_type);
+/* Apple context processing functions */
+int aapl_process_finder_info(struct ksmbd_conn *conn,
+			    const struct aapl_finder_info *finder_info);
+int aapl_process_timemachine_info(struct ksmbd_conn *conn,
+			       const struct aapl_timemachine_info *tm_info);
+int aapl_handle_timemachine_bundle(struct ksmbd_conn *conn,
+				const struct path *path,
+				const struct aapl_timemachine_info *tm_info);
+
+/* Module initialization and cleanup */
+int aapl_init_module(void);
+void aapl_cleanup_module(void);
+
+/* Structure size verification for cross-platform compatibility */
+#ifdef __KERNEL__
+/* Ensure consistent structure sizes across architectures */
+static_assert(sizeof(struct aapl_client_info) == 40,
+              "Apple client info structure size must be 40 bytes");
+static_assert(sizeof(struct aapl_server_query) == 16,
+              "Apple server query structure size must be 16 bytes");
+static_assert(sizeof(struct aapl_volume_capabilities) == 24,
+              "Apple volume capabilities structure size must be 24 bytes");
+static_assert(sizeof(struct aapl_file_mode) == 16,
+              "Apple file mode structure size must be 16 bytes");
+static_assert(sizeof(struct aapl_finder_info) == 32,
+              "Apple finder info structure size must be 32 bytes");
+static_assert(sizeof(struct aapl_timemachine_info) == 48,
+              "Apple timemachine info structure size must be 48 bytes");
+static_assert(sizeof(struct aapl_negotiate_context) == 96,
+              "Apple negotiate context structure size must be 96 bytes");
+static_assert(sizeof(struct aapl_dir_hardlinks) == 12,
+              "Apple dir hardlinks structure size must be 12 bytes");
+static_assert(sizeof(struct aapl_conn_state) == 120,
+              "Apple connection state structure size must be 120 bytes");
+
+/* SMB2 Protocol Compliance: Verify create_context size matches specification */
+static_assert(sizeof(struct create_context) == 24,
+              "SMB2 create_context structure size must be 24 bytes per MS-SMB2");
+
+/* Verify packing and alignment compliance */
+static_assert(offsetof(struct aapl_client_info, signature) == 0,
+              "Apple client info signature must be at offset 0");
+static_assert(offsetof(struct aapl_client_info, version) == 4,
+              "Apple client info version must be at offset 4");
+static_assert(offsetof(struct aapl_client_info, capabilities) == 12,
+              "Apple client info capabilities must be at offset 12");
+#endif
 
 #endif /* _SMB2_AAPL_H */
