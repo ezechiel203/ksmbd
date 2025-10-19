@@ -18,7 +18,7 @@
 
 #include "smb_common.h"
 #include "ksmbd_work.h"
-#include "smb2_aapl.h"
+#include "smb2aapl.h"
 
 #define KSMBD_SOCKET_BACKLOG		16
 

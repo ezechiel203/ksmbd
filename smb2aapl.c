@@ -18,7 +18,7 @@
 #include <linux/slab.h>
 #include <linux/timekeeping.h>
 
-#include "smb2_aapl.h"
+#include "smb2aapl.h"
 #include "smb_common.h"
 #include "connection.h"
 #include "mgmt/user_config.h"
@@ -57,7 +57,6 @@ static const __u8 aapl_smb_signature[4] = {'A', 'A', 'P', 'L'};
  */
 bool aapl_is_client_request(const void *buffer, size_t len)
 {
-	const struct smb2_hdr *hdr = buffer;
 	const struct create_context *context;
 
 	if (len < sizeof(struct smb2_hdr) + sizeof(struct create_context))
@@ -113,7 +112,7 @@ int aapl_parse_client_info(const void *context_data, size_t data_len,
 	state->client_capabilities = le64_to_cpu(client_info->capabilities);
 
 	/* Copy build information */
-	memcpy(state->client_build, client_info->build_number,
+	memcpy(state->client_build, &client_info->build_number,
 	       min_t(size_t, sizeof(state->client_build), sizeof(client_info->build_number)));
 
 	return 0;
@@ -373,7 +372,7 @@ int aapl_update_connection_state(struct aapl_conn_state *state,
 	state->client_capabilities = le64_to_cpu(client_info->capabilities);
 
 	/* Copy build information */
-	memcpy(state->client_build, client_info->build_number,
+	memcpy(state->client_build, &client_info->build_number,
 	       min_t(size_t, sizeof(state->client_build), sizeof(client_info->build_number)));
 
 	/* Re-negotiate capabilities */

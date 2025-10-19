@@ -17,7 +17,7 @@
 #include "connection.h"
 #include "transport_tcp.h"
 #include "transport_rdma.h"
-#include "smb2_aapl.h"
+#include "smb2aapl.h"
 
 static DEFINE_MUTEX(init_lock);
 

@@ -17,7 +17,7 @@ typedef uint32_t __le32;
 typedef uint64_t __le64;
 typedef uint8_t __u8;
 
-/* Apple SMB extension structures (from smb2_aapl.h) */
+/* Apple SMB extension structures (from smb2aapl.h) */
 struct aapl_conn_state {
     __le32 client_version;        /* 4 bytes */
     __le32 client_type;           /* 4 bytes */
