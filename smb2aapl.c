@@ -558,7 +558,8 @@ int aapl_handle_timemachine_bundle(struct ksmbd_conn *conn,
  */
 int aapl_init_module(void)
 {
-	ksmbd_debug(SMB, "Apple SMB extensions initialized\n");
+	pr_info("ksmbd: Apple SMB extensions loaded\n");
+	pr_info("ksmbd: Apple capability negotiation enabled\n");
 	return 0;
 }
 
@@ -571,7 +572,7 @@ int aapl_init_module(void)
  */
 void aapl_cleanup_module(void)
 {
-	ksmbd_debug(SMB, "Apple SMB extensions cleaned up\n");
+	pr_info("ksmbd: Apple SMB extensions unloaded\n");
 }
 
 /**
