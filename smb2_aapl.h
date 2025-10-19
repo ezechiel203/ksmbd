@@ -340,6 +340,12 @@ int aapl_handle_timemachine_bundle(struct ksmbd_conn *conn,
 				const struct path *path,
 				const struct aapl_timemachine_info *tm_info);
 
+/* Apple directory and query processing functions */
+int aapl_process_server_query(struct ksmbd_conn *conn,
+			      const struct aapl_server_query *query);
+void aapl_debug_capabilities(__le64 capabilities);
+int smb2_read_dir_attr(struct ksmbd_work *work);
+
 /* Module initialization and cleanup */
 int aapl_init_module(void);
 void aapl_cleanup_module(void);
