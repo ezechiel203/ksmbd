@@ -19,8 +19,11 @@
 #include <linux/types.h>
 #include <linux/kernel.h>
 
-/* Forward declaration to avoid include dependencies */
+/* Forward declarations to avoid include dependencies */
 struct create_context;
+struct ksmbd_conn;
+struct ksmbd_work;
+struct path;
 
 /* Apple SMB Extension Constants */
 #define AAPL_CONTEXT_NAME			"AAPL"
@@ -357,6 +360,8 @@ void aapl_cleanup_module(void);
 
 /* Structure size verification for cross-platform compatibility */
 #ifdef __KERNEL__
+#include <linux/build_bug.h>
+
 /* Ensure consistent structure sizes across architectures */
 static_assert(sizeof(struct aapl_client_info) == 40,
               "Apple client info structure size must be 40 bytes");
