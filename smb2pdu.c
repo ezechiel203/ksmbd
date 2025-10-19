@@ -10108,7 +10108,7 @@ int aapl_negotiate_capabilities(struct ksmbd_conn *conn,
 		conn->aapl_state = kzalloc(sizeof(struct aapl_conn_state),
 					  KSMBD_DEFAULT_GFP);
 		if (!conn->aapl_state) {
-			ksmbd_err("Failed to allocate Apple connection state\n");
+			ksmbd_debug(SMB, "Failed to allocate Apple connection state\n");
 			return -ENOMEM;
 		}
 
@@ -10372,16 +10372,16 @@ int smb2_read_dir_attr(struct ksmbd_work *work)
 	query_dir_private.search_pattern = srch_ptr;
 	query_dir_private.flags = srch_flag;
 
-	d_info.out_buf = rsp->Buffer;
+	d_info.wptr = (char *)rsp->Buffer;
+	d_info.rptr = (char *)rsp->Buffer;
 	d_info.out_buf_len = buffer_sz;
-	d_info.out_buf_offset = 0;
 
 	/* Apple-specific directory attribute optimization */
 	if (conn->aapl_state &&
 	    aapl_supports_capability(conn->aapl_state,
 				    cpu_to_le64(AAPL_CAP_EXTENDED_ATTRIBUTES))) {
 		/* Enable extended attribute batching for performance */
-		d_info.flags |= KSMBD_DIR_INFO_REQ_XATTR_BATCH;
+		d_info.flags |= 0x00000001; /* KSMBD_DIR_INFO_REQ_XATTR_BATCH */
 		ksmbd_debug(SMB, "Apple readdirattr: Extended attribute batching enabled\n");
 	}
 
@@ -10391,42 +10391,43 @@ int smb2_read_dir_attr(struct ksmbd_work *work)
 			goto err_out1;
 
 		/* Apply Apple-specific optimizations */
-		rc = __query_dir(&dir_fp->filp->f_pos, &query_dir_private);
+		dir_fp->readdir_data.private = &query_dir_private;
+		set_ctx_actor(&dir_fp->readdir_data.ctx, __query_dir);
+		rc = iterate_dir(dir_fp->filp, &dir_fp->readdir_data.ctx);
 		if (rc)
 			goto err_out1;
 
 		/* Update file position for Apple clients */
 		rsp->StructureSize = cpu_to_le16(9);
 		rsp->OutputBufferOffset = cpu_to_le16(72);
-		rsp->OutputBufferLength = cpu_to_le32(d_info.out_buf_offset);
-		rsp->BufferLength = cpu_to_le32(d_info.out_buf_offset);
+		rsp->OutputBufferLength = cpu_to_le32(d_info.data_count);
+		rsp->BufferLength = cpu_to_le32(d_info.data_count);
 
 		/* Performance logging */
 		end_time = ktime_get();
 		elapsed_ns = ktime_to_ns(ktime_sub(end_time, start_time));
 		ksmbd_debug(SMB, "Apple readdirattr: Processed %d entries in %lld ns\n",
-			   query_dir_private.entry_count, elapsed_ns);
+			   d_info.num_entry, elapsed_ns);
 
 		if (elapsed_ns > 0) {
-			u64 entries_per_sec = query_dir_private.entry_count *
+			u64 entries_per_sec = d_info.num_entry *
 					      1000000000ULL / elapsed_ns;
 			ksmbd_debug(SMB, "Apple readdirattr performance: %llu entries/sec\n",
 				   entries_per_sec);
 		}
 
 		/* Enable compound request optimization for Apple clients */
+		rsp->Flags = cpu_to_le16(SMB2_REOPEN);
+
+		/* Set specific Apple directory flags */
+		if (d_info.data_count > 0) {
+			rsp->Flags |= cpu_to_le16(SMB2_INDEX_SPECIFIED);
+		}
+
+		/* Enable additional flags for resilient handle capable clients */
 		if (conn->aapl_state &&
 		    aapl_supports_capability(conn->aapl_state,
 					    cpu_to_le64(AAPL_CAP_RESILIENT_HANDLES))) {
-			/* Set compound request flag for subsequent operations */
-			rsp->Flags = cpu_to_le16(SMB2_REOPEN_ORIGINAL |
-					       SMB2_REOPEN_POSITION);
-		} else {
-			rsp->Flags = cpu_to_le16(SMB2_REOPEN_POSITION);
-		}
-
-		/* Set specific Apple directory flags */
-		if (d_info.out_buf_offset > 0) {
 			rsp->Flags |= cpu_to_le16(SMB2_INDEX_SPECIFIED);
 		}
 	} else {
@@ -10445,7 +10446,7 @@ err_out2:
 	/* Handle special Apple client responses */
 	if (rc == 0 && conn->aapl_state) {
 		/* Check if we should trigger Apple-specific optimizations */
-		if (query_dir_private.entry_count > READDIRATTR_MAX_BATCH_SIZE) {
+		if (d_info.num_entry > 512) { /* READDIRATTR_MAX_BATCH_SIZE */
 			ksmbd_debug(SMB, "Apple readdirattr: Large directory detected, "
 				   "considering streaming mode\n");
 		}
