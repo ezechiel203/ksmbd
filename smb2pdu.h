@@ -9,6 +9,7 @@
 
 #include "ntlmssp.h"
 #include "smbacl.h"
+#include "smb2_aapl.h"
 
 /*
  * Note that, due to trying to use names similar to the protocol specifications,
@@ -580,6 +581,8 @@ struct smb2_tree_disconnect_rsp {
 
 /* Apple Defined Contexts */
 #define	SMB2_CREATE_AAPL			"AAPL"
+#define	SMB2_CREATE_FINDERINFO			"FinderInfo"
+#define	SMB2_CREATE_TIMEMACHINE			"TimeMachine"
 
 struct smb2_create_req {
 	struct smb2_hdr hdr;
@@ -744,6 +747,57 @@ struct create_posix_rsp {
 	__le32 mode;
 	/* SidBuffer contain two sids(Domain sid(28), UNIX group sid(16)) */
 	u8 SidBuffer[44];
+} __packed;
+
+/* Apple SMB Extension Create Context Structures */
+
+struct create_aapl_server_query_req {
+	struct create_context ccontext;
+	__u8   Name[16];
+	struct aapl_server_query query;
+} __packed;
+
+struct create_aapl_server_query_rsp {
+	struct create_context ccontext;
+	__u8   Name[16];
+	__le32 response_size;
+	__u8   response_data[0];
+} __packed;
+
+struct create_aapl_volume_caps_req {
+	struct create_context ccontext;
+	__u8   Name[20];
+	__le32 reserved;
+} __packed;
+
+struct create_aapl_volume_caps_rsp {
+	struct create_context ccontext;
+	__u8   Name[20];
+	struct aapl_volume_capabilities capabilities;
+} __packed;
+
+struct create_aapl_file_mode_req {
+	struct create_context ccontext;
+	__u8   Name[12];
+	struct aapl_file_mode file_mode;
+} __packed;
+
+struct create_aapl_file_mode_rsp {
+	struct create_context ccontext;
+	__u8   Name[12];
+	struct aapl_file_mode file_mode;
+} __packed;
+
+struct create_aapl_dir_hardlinks_req {
+	struct create_context ccontext;
+	__u8   Name[16];
+	__le32 reserved;
+} __packed;
+
+struct create_aapl_dir_hardlinks_rsp {
+	struct create_context ccontext;
+	__u8   Name[16];
+	struct aapl_dir_hardlinks hardlinks;
 } __packed;
 
 #define SMB2_LEASE_NONE_LE			cpu_to_le32(0x00)

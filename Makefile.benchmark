@@ -1,0 +1,87 @@
+# Makefile for Apple SMB Extensions Performance Benchmark
+# This makefile builds and runs the performance benchmark for Apple SMB extensions
+
+CC = gcc
+CFLAGS = -Wall -Wextra -O2 -std=c99
+LDFLAGS = -lrt
+
+BENCHMARK_SRC = benchmark_aapl_performance.c
+BENCHMARK_BIN = benchmark_aapl_performance
+
+# Default target
+all: $(BENCHMARK_BIN)
+
+# Build the benchmark
+$(BENCHMARK_BIN): $(BENCHMARK_SRC)
+	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)
+
+# Run the benchmark
+run: $(BENCHMARK_BIN)
+	@echo "Running Apple SMB Extensions Performance Benchmark..."
+	@echo "=================================================="
+	sudo ./$(BENCHMARK_BIN)
+	@echo ""
+	@echo "Benchmark completed. Check results above."
+
+# Run with different configurations
+run-stress: $(BENCHMARK_BIN)
+	@echo "Running Stress Test (10,000 iterations)..."
+	sudo ./$(BENCHMARK_BIN) --iterations 10000 --clients 1000
+
+run-light: $(BENCHMARK_BIN)
+	@echo "Running Light Test (100 iterations)..."
+	sudo ./$(BENCHMARK_BIN) --iterations 100 --clients 10
+
+# Performance profiling with perf
+profile: $(BENCHMARK_BIN)
+	@echo "Running with perf profiling..."
+	sudo perf record -g ./$(BENCHMARK_BIN)
+	sudo perf report
+
+# Memory leak check with valgrind
+memcheck: $(BENCHMARK_BIN)
+	@echo "Running memory leak check..."
+	sudo valgrind --leak-check=full --show-leak-kinds=all ./$(BENCHMARK_BIN)
+
+# CPU cache analysis
+cache-analysis: $(BENCHMARK_BIN)
+	@echo "Running cache analysis..."
+	sudo perf stat -e cache-references,cache-misses,L1-dcache-loads,L1-dcache-load-misses ./$(BENCHMARK_BIN)
+
+# Generate performance report
+report: $(BENCHMARK_BIN)
+	@echo "Generating detailed performance report..."
+	sudo ./$(BENCHMARK_BIN) > performance_report.txt 2>&1
+	@echo "Report saved to performance_report.txt"
+
+# Clean build artifacts
+clean:
+	rm -f $(BENCHMARK_BIN) perf.data*
+
+# Install dependencies (Ubuntu/Debian)
+install-deps:
+	sudo apt-get update
+	sudo apt-get install -y build-essential linux-tools-common linux-tools-generic valgrind
+
+# Help target
+help:
+	@echo "Apple SMB Extensions Performance Benchmark"
+	@echo "=========================================="
+	@echo ""
+	@echo "Available targets:"
+	@echo "  all          - Build the benchmark"
+	@echo "  run          - Run the benchmark with default settings"
+	@echo "  run-stress   - Run stress test with high load"
+	@echo "  run-light    - Run light test for quick verification"
+	@echo "  profile      - Run with perf profiling"
+	@echo "  memcheck     - Run memory leak check with valgrind"
+	@echo "  cache-analysis - Run CPU cache performance analysis"
+	@echo "  report       - Generate detailed performance report"
+	@echo "  clean        - Clean build artifacts"
+	@echo "  install-deps - Install required dependencies"
+	@echo "  help         - Show this help message"
+	@echo ""
+	@echo "Example usage:"
+	@echo "  make all && make run"
+
+.PHONY: all run run-stress run-light profile memcheck cache-analysis report clean install-deps help
