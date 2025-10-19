@@ -19,6 +19,9 @@
 #include <linux/types.h>
 #include <linux/kernel.h>
 
+/* Forward declaration to avoid include dependencies */
+struct create_context;
+
 /* Apple SMB Extension Constants */
 #define AAPL_CONTEXT_NAME			"AAPL"
 #define AAPL_SERVER_QUERY_CONTEXT		"ServerQuery"
@@ -156,8 +159,8 @@ struct aapl_file_mode {
  * @signature: Apple signature "AAPL" (4 bytes, must be "AAPL")
  * @version: Apple SMB extension version (e.g., AAPL_VERSION_2_0)
  * @client_type: Type of Apple client (AAPL_CLIENT_MACOS, etc.)
- * @build_number: Build number of the client software
  * @capabilities: Bitmask of requested capabilities (AAPL_CAP_* flags)
+ * @build_number: Build number of the client software
  * @reserved: Reserved for future use (must be zero)
  *
  * This structure contains information about the Apple client connecting to the SMB
@@ -168,8 +171,8 @@ struct aapl_client_info {
 	__u8			signature[4];	/* "AAPL" */
 	__le32			version;
 	__le32			client_type;
-	__le32			build_number;
 	__le64			capabilities;
+	__le32			build_number;
 	__u8			reserved[16];
 } __packed;
 
@@ -179,6 +182,7 @@ struct aapl_client_info {
  * @server_capabilities: Server capabilities bitmask to advertise to client
  * @requested_features: Specific features client wants to enable
  * @reserved: Reserved for future use (must be zero)
+ * @reserved2: Additional padding to maintain structure size compatibility
  *
  * This structure is used during the initial negotiation phase between Apple
  * clients and the KSMBD server. It combines client identification with
@@ -189,7 +193,7 @@ struct aapl_negotiate_context {
 	struct aapl_client_info	client_info;
 	__le64			server_capabilities;
 	__le64			requested_features;
-	__u8			reserved[32];
+	__u8			reserved[40];
 } __packed;
 
 /**
@@ -216,6 +220,7 @@ struct aapl_dir_hardlinks {
  * @location: File location coordinates (X, Y) in Finder window
  * @extended_flags: Additional extended Finder flags
  * @reserved: Reserved for future use (must be zero)
+ * @reserved2: Additional padding to maintain structure size compatibility
  *
  * This structure contains macOS Finder metadata including creator and type codes
  * that are essential for Mac application compatibility.
@@ -227,7 +232,7 @@ struct aapl_finder_info {
 	__le16			location_x;
 	__le16			location_y;
 	__le16			extended_flags;
-	__u8			reserved[10];
+	__u8			reserved[16];
 } __packed;
 
 /**
@@ -243,11 +248,11 @@ struct aapl_finder_info {
  */
 struct aapl_timemachine_info {
 	__le32			version;
-	__le64			bundle_id;
 	__le32			sparse_caps;
+	__le64			bundle_id;
 	__le64			validation_seq;
 	__le64			durable_handle;
-	__u8			reserved[20];
+	__u8			reserved[16];
 } __packed;
 
 /**
@@ -290,7 +295,7 @@ struct aapl_conn_state {
 	__le32			last_query_type;
 	__le64			last_query_time;
 
-	__u8			reserved[64];
+	__u8			reserved[47];
 } __packed;
 
 /* Function Prototypes for Apple SMB Extensions */
