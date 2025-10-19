@@ -4387,6 +4387,8 @@ struct smb2_query_dir_private {
 
 	struct ksmbd_dir_info	*d_info;
 	int			info_level;
+	int			flags;
+	int			entry_count;
 };
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(6, 16, 0)
@@ -10381,7 +10383,7 @@ int smb2_read_dir_attr(struct ksmbd_work *work)
 	    aapl_supports_capability(conn->aapl_state,
 				    cpu_to_le64(AAPL_CAP_EXTENDED_ATTRIBUTES))) {
 		/* Enable extended attribute batching for performance */
-		d_info.flags |= 0x00000001; /* KSMBD_DIR_INFO_REQ_XATTR_BATCH */
+		d_info.flags |= KSMBD_DIR_INFO_REQ_XATTR_BATCH;
 		ksmbd_debug(SMB, "Apple readdirattr: Extended attribute batching enabled\n");
 	}
 
@@ -10401,7 +10403,6 @@ int smb2_read_dir_attr(struct ksmbd_work *work)
 		rsp->StructureSize = cpu_to_le16(9);
 		rsp->OutputBufferOffset = cpu_to_le16(72);
 		rsp->OutputBufferLength = cpu_to_le32(d_info.data_count);
-		rsp->BufferLength = cpu_to_le32(d_info.data_count);
 
 		/* Performance logging */
 		end_time = ktime_get();
@@ -10416,20 +10417,8 @@ int smb2_read_dir_attr(struct ksmbd_work *work)
 				   entries_per_sec);
 		}
 
-		/* Enable compound request optimization for Apple clients */
-		rsp->Flags = cpu_to_le16(SMB2_REOPEN);
-
-		/* Set specific Apple directory flags */
-		if (d_info.data_count > 0) {
-			rsp->Flags |= cpu_to_le16(SMB2_INDEX_SPECIFIED);
-		}
-
-		/* Enable additional flags for resilient handle capable clients */
-		if (conn->aapl_state &&
-		    aapl_supports_capability(conn->aapl_state,
-					    cpu_to_le64(AAPL_CAP_RESILIENT_HANDLES))) {
-			rsp->Flags |= cpu_to_le16(SMB2_INDEX_SPECIFIED);
-		}
+		/* Note: Flags field not applicable to smb2_query_directory_rsp structure */
+		/* Apple-specific flags are handled through d_info.flags instead */
 	} else {
 		ksmbd_debug(SMB, "Apple readdirattr: Unsupported file info class %d\n",
 			   req->FileInformationClass);

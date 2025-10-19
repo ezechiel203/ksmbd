@@ -87,6 +87,11 @@ struct create_context;
 #define AAPL_CLIENT_INFO_SIZE			64
 #define AAPL_NEGOTIATE_SIZE			32
 
+/* Apple-specific constants for SMB query directory */
+#define KSMBD_DIR_INFO_REQ_XATTR_BATCH		0x00000001
+#define SMB2_REOPEN_ORIGINAL			0x00000020
+#define SMB2_REOPEN_POSITION			0x00000040
+
 /* Apple-specific SMB2 Create Context Structures */
 
 /**
