@@ -1,0 +1,202 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+#
+# Makefile for cross-compiling KSMBD kernel module for ARM64 on macOS
+#
+# Usage: make -f Makefile.arm64
+#
+
+# Cross-compilation configuration
+ARCH := arm64
+CROSS_COMPILE := aarch64-linux-gnu-
+
+# Compiler detection and configuration
+CC := $(CROSS_COMPILE)gcc
+AR := $(CROSS_COMPILE)ar
+STRIP := $(CROSS_COMPILE)strip
+
+# Check if cross-compiler exists
+ifeq ($(shell which $(CC) 2>/dev/null),)
+$(error Cross-compiler $(CC) not found. Please install aarch64-linux-gnu-gcc)
+endif
+
+# Linux kernel configuration
+KERNEL_VERSION := 6.1.0
+KERNEL_MAJOR := $(shell echo $(KERNEL_VERSION) | cut -d. -f1,2)
+BUILD_DIR := $(PWD)/build-arm64
+KERNEL_HEADERS_DIR := $(BUILD_DIR)/linux-headers-$(KERNEL_VERSION)-arm64
+KDIR := $(KERNEL_HEADERS_DIR)
+
+# Current working directory
+PWD := $(shell pwd)
+
+# Module configuration
+export CONFIG_SMB_SERVER := m
+export CONFIG_SMB_INSECURE_SERVER := y
+export CONFIG_SMB_SERVER_SMBDIRECT := n
+
+# Compiler flags for cross-compilation
+EXTRA_CFLAGS += -I$(PWD)
+EXTRA_CFLAGS += -D__KERNEL__
+EXTRA_CFLAGS += -Wall
+EXTRA_CFLAGS += -Wno-attribute-alias
+EXTRA_CFLAGS += -Wno-gnu-variable-sized-type-not-at-end
+EXTRA_CFLAGS += -Wno-declaration-after-statement
+
+# ARM64 specific flags
+EXTRA_CFLAGS += -mgeneral-regs-only
+EXTRA_CFLAGS += -mstrict-align
+EXTRA_CFLAGS += -fno-omit-frame-pointer
+EXTRA_CFLAGS += -fno-ipa-sra
+EXTRA_CFLAGS += -fno-asynchronous-unwind-tables
+
+# Debug flags (optional)
+ifdef DEBUG
+EXTRA_CFLAGS += -g -DDEBUG
+endif
+
+# Source files (from original Makefile)
+obj-m := ksmbd.o
+
+ksmbd-y := unicode.o auth.o vfs.o vfs_cache.o connection.o crypto_ctx.o \
+		server.o misc.o oplock.o ksmbd_work.o smbacl.o ndr.o\
+		mgmt/ksmbd_ida.o mgmt/user_config.o mgmt/share_config.o \
+		mgmt/tree_connect.o mgmt/user_session.o smb_common.o \
+		transport_tcp.o transport_ipc.o
+
+ksmbd-y += smb2pdu.o smb2ops.o smb2misc.o ksmbd_spnego_negtokeninit.asn1.o \
+		ksmbd_spnego_negtokentarg.asn1.o asn1.o compat.o smb2_aapl.o
+
+ksmbd-$(CONFIG_SMB_INSECURE_SERVER) += smb1pdu.o smb1ops.o smb1misc.o netmisc.o
+ksmbd-$(CONFIG_SMB_SERVER_SMBDIRECT) += transport_rdma.o
+
+# ASN.1 generated files
+$(obj)/asn1.o: $(obj)/ksmbd_spnego_negtokeninit.asn1.h $(obj)/ksmbd_spnego_negtokentarg.asn1.h
+
+$(obj)/ksmbd_spnego_negtokeninit.asn1.o: $(obj)/ksmbd_spnego_negtokeninit.asn1.c $(obj)/ksmbd_spnego_negtokeninit.asn1.h
+$(obj)/ksmbd_spnego_negtokentarg.asn1.o: $(obj)/ksmbd_spnego_negtokentarg.asn1.c $(obj)/ksmbd_spnego_negtokentarg.asn1.h
+
+# Default target
+all: setup-headers kernel-config build-module
+
+# Setup Linux headers for ARM64
+setup-headers:
+	@echo "Setting up Linux ARM64 headers..."
+	@if [ ! -d "$(KERNEL_HEADERS_DIR)" ]; then \
+		echo "Downloading Linux kernel headers for ARM64..."; \
+		$(MAKE) download-headers; \
+	else \
+		echo "Linux headers already present at $(KERNEL_HEADERS_DIR)"; \
+	fi
+
+# Download Linux kernel headers
+download-headers:
+	@echo "Creating build directory..."
+	@mkdir -p $(BUILD_DIR)
+	@echo "Downloading Linux kernel source (v$(KERNEL_VERSION))..."
+	@cd $(BUILD_DIR) && \
+		curl -L "https://cdn.kernel.org/pub/linux/kernel/v$(KERNEL_MAJOR).x/linux-$(KERNEL_VERSION).tar.xz" | tar xJ
+	@echo "Configuring kernel for ARM64..."
+	@cd $(KERNEL_HEADERS_DIR) && \
+		make ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE) defconfig && \
+		make ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE) prepare && \
+		make ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE) modules_prepare
+	@echo "Linux headers setup complete"
+
+# Configure kernel build
+kernel-config:
+	@echo "Configuring kernel build for ARM64..."
+	@mkdir -p $(BUILD_DIR)/build
+	@echo "CONFIG_SMB_SERVER=m" > $(BUILD_DIR)/build/.config
+	@echo "CONFIG_SMB_INSECURE_SERVER=y" >> $(BUILD_DIR)/build/.config
+	@echo "CONFIG_SMB_SERVER_SMBDIRECT=n" >> $(BUILD_DIR)/build/.config
+	@echo "CONFIG_MODULES=y" >> $(BUILD_DIR)/build/.config
+	@echo "CONFIG_MODULE_UNLOAD=y" >> $(BUILD_DIR)/build/.config
+	@echo "CONFIG_NET=y" >> $(BUILD_DIR)/build/.config
+	@echo "CONFIG_INET=y" >> $(BUILD_DIR)/build/.config
+	@echo "CONFIG_FILE_LOCKING=y" >> $(BUILD_DIR)/build/.config
+	@echo "CONFIG_CRYPTO=y" >> $(BUILD_DIR)/build/.config
+	@echo "CONFIG_CRYPTO_MD5=y" >> $(BUILD_DIR)/build/.config
+	@echo "CONFIG_CRYPTO_SHA1=y" >> $(BUILD_DIR)/build/.config
+	@echo "CONFIG_CRYPTO_SHA256=y" >> $(BUILD_DIR)/build/.config
+	@echo "CONFIG_CRYPTO_AES=y" >> $(BUILD_DIR)/build/.config
+	@echo "CONFIG_CRYPTO_CMAC=y" >> $(BUILD_DIR)/build/.config
+	@echo "CONFIG_CRYPTO_HMAC=y" >> $(BUILD_DIR)/build/.config
+	@echo "CONFIG_CRYPTO_ECB=y" >> $(BUILD_DIR)/build/.config
+	@echo "CONFIG_CRYPTO_CBC=y" >> $(BUILD_DIR)/build/.config
+	@echo "CONFIG_CRYPTO_CCM=y" >> $(BUILD_DIR)/build/.config
+	@echo "CONFIG_CRYPTO_GCM=y" >> $(BUILD_DIR)/build/.config
+	@echo "CONFIG_CRYPTO_CFB=y" >> $(BUILD_DIR)/build/.config
+	@echo "CONFIG_CRYPTO_CTR=y" >> $(BUILD_DIR)/build/.config
+	@echo "CONFIG_CRYPTO_XTS=y" >> $(BUILD_DIR)/build/.config
+	@echo "CONFIG_KEYS=y" >> $(BUILD_DIR)/build/.config
+	@echo "CONFIG_DEBUG_INFO_BTF=n" >> $(BUILD_DIR)/build/.config
+	@cp $(BUILD_DIR)/build/.config $(KERNEL_HEADERS_DIR)/.config
+	@cd $(KERNEL_HEADERS_DIR) && \
+		make ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE) olddefconfig
+
+# Build the kernel module
+build-module:
+	@echo "Building KSMBD kernel module for ARM64..."
+	@echo "Using kernel headers: $(KDIR)"
+	@echo "Cross-compiler: $(CC)"
+	@echo "Architecture: $(ARCH)"
+	$(MAKE) -C $(KDIR) M=$(PWD) ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE) CC=$(CC) EXTRA_CFLAGS="$(EXTRA_CFLAGS)" modules
+
+# Clean build artifacts
+clean:
+	@echo "Cleaning build artifacts..."
+	@if [ -f "$(KDIR)/Makefile" ]; then \
+		$(MAKE) -C $(KDIR) M=$(PWD) ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE) clean; \
+	fi
+	@rm -f *.o *.ko *.mod.* .*.cmd *.order *.symvers
+	@rm -rf .tmp_versions
+	@rm -rf $(BUILD_DIR)/build
+
+# Clean everything including headers
+distclean: clean
+	@echo "Removing all build files..."
+	@rm -rf $(BUILD_DIR)
+
+# Install module (for ARM64 target system)
+install: ksmbd.ko
+	@echo "Note: Installation requires ARM64 Linux system"
+	@echo "Copy ksmbd.ko to target ARM64 system and run:"
+	@echo "  sudo insmod ksmbd.ko"
+	@echo "  sudo depmod -a"
+
+# Show build information
+info:
+	@echo "=== KSMBD ARM64 Cross-Compilation Configuration ==="
+	@echo "Target Architecture: $(ARCH)"
+	@echo "Cross-compiler: $(CC)"
+	@echo "Kernel Version: $(KERNEL_VERSION)"
+	@echo "Kernel Headers: $(KDIR)"
+	@echo "Source Directory: $(PWD)"
+	@echo "Build Directory: $(BUILD_DIR)"
+	@echo "Module Config: CONFIG_SMB_SERVER=$(CONFIG_SMB_SERVER)"
+	@echo "Extra Flags: $(EXTRA_CFLAGS)"
+
+# Help target
+help:
+	@echo "KSMBD ARM64 Cross-Compilation Makefile"
+	@echo ""
+	@echo "Targets:"
+	@echo "  all          - Setup headers, configure, and build module"
+	@echo "  setup-headers - Download and setup Linux ARM64 headers"
+	@echo "  kernel-config - Configure kernel build"
+	@echo "  build-module - Build the kernel module"
+	@echo "  clean        - Clean build artifacts"
+	@echo "  distclean    - Remove all build files including headers"
+	@echo "  info         - Show build configuration"
+	@echo "  help         - Show this help"
+	@echo ""
+	@echo "Environment Variables:"
+	@echo "  DEBUG=1      - Enable debug build"
+	@echo "  KERNEL_VERSION - Override kernel version (default: 6.1.0)"
+	@echo ""
+	@echo "Examples:"
+	@echo "  make -f Makefile.arm64                    # Build with defaults"
+	@echo "  make -f Makefile.arm64 DEBUG=1            # Debug build"
+	@echo "  make -f Makefile.arm64 KERNEL_VERSION=5.15 # Use kernel 5.15"
+
+.PHONY: all setup-headers download-headers kernel-config build-module clean distclean install info help
