@@ -17,6 +17,7 @@
 #include "connection.h"
 #include "transport_tcp.h"
 #include "transport_rdma.h"
+#include "smb2_aapl.h"
 
 static DEFINE_MUTEX(init_lock);
 
@@ -42,6 +43,14 @@ void ksmbd_conn_free(struct ksmbd_conn *conn)
 	xa_destroy(&conn->sessions);
 	kvfree(conn->request_buf);
 	kfree(conn->preauth_info);
+
+	/* Clean up Apple SMB extension resources */
+	if (conn->aapl_state) {
+		aapl_cleanup_connection_state(conn->aapl_state);
+		kfree(conn->aapl_state);
+		conn->aapl_state = NULL;
+	}
+
 	if (atomic_dec_and_test(&conn->refcnt)) {
 		conn->transport->ops->free_transport(conn->transport);
 		kfree(conn);
