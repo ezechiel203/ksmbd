@@ -2,7 +2,7 @@
 /*
  *   Copyright (C) 2023 ksmbd Contributors
  *
- *   Test Utilities for Apple SMB Extensions Testing
+ *   Test Utilities for Fruit SMB Extensions Testing
  */
 
 #ifndef _TEST_UTILS_H
@@ -150,14 +150,14 @@ struct test_connection {
     void *private_data;
 };
 
-static inline struct ksmbd_conn *create_test_connection(bool is_apple)
+static inline struct ksmbd_conn *create_test_connection(bool is_fruit_client)
 {
     struct test_connection *test_conn = test_kzalloc(sizeof(struct test_connection), "test_connection");
     if (!test_conn)
         return NULL;
 
     test_conn->is_mock = true;
-    test_conn->base.is_aapl = is_apple;
+    test_conn->base.is_fruit = is_fruit_client;
     test_conn->base.dialect = SMB311_PROT_ID;
     test_conn->base.vals = &smb311_server_values;
     test_conn->base.ops = &smb311_server_ops;
@@ -179,8 +179,8 @@ static inline void free_test_connection(struct ksmbd_conn *conn)
     }
 }
 
-/* Apple client simulation utilities */
-struct apple_client_info {
+/* Fruit client simulation utilities */
+struct fruit_client_info {
     const char *macos_version;
     const char *build_number;
     const char *smb_client_version;
@@ -191,7 +191,7 @@ struct apple_client_info {
     bool supports_compression;
 };
 
-static const struct apple_client_info apple_client_versions[] = {
+static const struct fruit_client_info fruit_client_versions[] = {
     {
         .macos_version = "10.14",
         .build_number = "18G6032",
@@ -245,24 +245,24 @@ static const struct apple_client_info apple_client_versions[] = {
     { NULL }
 };
 
-static inline const struct apple_client_info *get_apple_client_info(const char *version)
+static inline const struct fruit_client_info *get_fruit_client_info(const char *version)
 {
     int i;
 
     if (!version)
         return NULL;
 
-    for (i = 0; apple_client_versions[i].macos_version; i++) {
-        if (strcmp(apple_client_versions[i].macos_version, version) == 0) {
-            return &apple_client_versions[i];
+    for (i = 0; fruit_client_versions[i].macos_version; i++) {
+        if (strcmp(fruit_client_versions[i].macos_version, version) == 0) {
+            return &fruit_client_versions[i];
         }
     }
 
-    return &apple_client_versions[0]; /* Default to 10.14 */
+    return &fruit_client_versions[0]; /* Default to 10.14 */
 }
 
-/* AAPL context creation utilities */
-struct aapl_context_data {
+/* Fruit context creation utilities */
+struct fruit_context_data {
     __le32 capabilities;
     __le32 flags;
     __le32 reserved1;
@@ -271,13 +271,13 @@ struct aapl_context_data {
     char extended_data[256];
 };
 
-static inline struct create_context *create_aapl_context_with_capabilities(__le32 capabilities)
+static inline struct create_context *create_fruit_context_with_capabilities(__le32 capabilities)
 {
     struct create_context *context;
-    struct aapl_context_data *aapl_data;
-    size_t context_size = sizeof(struct create_context) + sizeof(struct aapl_context_data);
+    struct fruit_context_data *fruit_data;
+    size_t context_size = sizeof(struct create_context) + sizeof(struct fruit_context_data);
 
-    context = test_kzalloc(context_size, "AAPL context");
+    context = test_kzalloc(context_size, "Fruit context");
     if (!context)
         return NULL;
 
@@ -285,20 +285,20 @@ static inline struct create_context *create_aapl_context_with_capabilities(__le3
     context->NameOffset = offsetof(struct create_context, Buffer);
     context->NameLength = 4;
     context->DataOffset = cpu_to_le16(context->NameOffset + context->NameLength);
-    context->DataLength = cpu_to_le32(sizeof(struct aapl_context_data));
+    context->DataLength = cpu_to_le32(sizeof(struct fruit_context_data));
 
-    /* Set AAPL name */
+    /* Set Fruit name (wire protocol tag "AAPL") */
     context->Buffer[0] = 'A';
     context->Buffer[1] = 'A';
     context->Buffer[2] = 'P';
     context->Buffer[3] = 'L';
 
-    /* Initialize AAPL data */
-    aapl_data = (struct aapl_context_data *)(context->Buffer + 4);
-    aapl_data->capabilities = capabilities;
-    aapl_data->flags = 0;
-    aapl_data->reserved1 = 0;
-    aapl_data->reserved2 = 0;
+    /* Initialize Fruit data */
+    fruit_data = (struct fruit_context_data *)(context->Buffer + 4);
+    fruit_data->capabilities = capabilities;
+    fruit_data->flags = 0;
+    fruit_data->reserved1 = 0;
+    fruit_data->reserved2 = 0;
 
     return context;
 }

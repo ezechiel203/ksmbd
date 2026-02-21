@@ -9,7 +9,7 @@
 
 #include "ntlmssp.h"
 #include "smbacl.h"
-#include "smb2aapl.h"
+#include "smb2fruit.h"
 
 /*
  * Note that, due to trying to use names similar to the protocol specifications,
@@ -579,10 +579,12 @@ struct smb2_tree_disconnect_rsp {
 #define SVHDX_OPEN_DEVICE_CONTEXT       0x83CE6F1AD851E0986E34401CC9BCFCE9
 #define SMB2_CREATE_TAG_POSIX		"\x93\xAD\x25\x50\x9C\xB4\x11\xE7\xB4\x23\x83\xDE\x96\x8B\xCD\x7C"
 
-/* Apple Defined Contexts */
+/* Fruit Defined Contexts - wire value must remain "AAPL" */
 #define	SMB2_CREATE_AAPL			"AAPL"
-#define	SMB2_CREATE_FINDERINFO			"FinderInfo"
-#define	SMB2_CREATE_TIMEMACHINE			"TimeMachine"
+/*
+ * Note: LookerInfo and Save box are negotiated within the Fruit
+ * create context data, not as separate create contexts.
+ */
 
 struct smb2_create_req {
 	struct smb2_hdr hdr;
@@ -749,55 +751,74 @@ struct create_posix_rsp {
 	u8 SidBuffer[44];
 } __packed;
 
-/* Apple SMB Extension Create Context Structures */
+/* Fruit SMB Extension Create Context Structures */
 
-struct create_aapl_server_query_req {
+struct create_fruit_server_query_req {
 	struct create_context ccontext;
 	__u8   Name[16];
-	struct aapl_server_query query;
+	struct fruit_server_query query;
 } __packed;
 
-struct create_aapl_server_query_rsp {
+struct create_fruit_server_query_rsp {
 	struct create_context ccontext;
 	__u8   Name[16];
 	__le32 response_size;
 	__u8   response_data[0];
 } __packed;
 
-struct create_aapl_volume_caps_req {
+struct create_fruit_volume_caps_req {
 	struct create_context ccontext;
 	__u8   Name[20];
 	__le32 reserved;
 } __packed;
 
-struct create_aapl_volume_caps_rsp {
+struct create_fruit_volume_caps_rsp {
 	struct create_context ccontext;
 	__u8   Name[20];
-	struct aapl_volume_capabilities capabilities;
+	struct fruit_volume_capabilities capabilities;
 } __packed;
 
-struct create_aapl_file_mode_req {
+struct create_fruit_file_mode_req {
 	struct create_context ccontext;
 	__u8   Name[12];
-	struct aapl_file_mode file_mode;
+	struct fruit_file_mode file_mode;
 } __packed;
 
-struct create_aapl_file_mode_rsp {
+struct create_fruit_file_mode_rsp {
 	struct create_context ccontext;
 	__u8   Name[12];
-	struct aapl_file_mode file_mode;
+	struct fruit_file_mode file_mode;
 } __packed;
 
-struct create_aapl_dir_hardlinks_req {
+struct create_fruit_dir_hardlinks_req {
 	struct create_context ccontext;
 	__u8   Name[16];
 	__le32 reserved;
 } __packed;
 
-struct create_aapl_dir_hardlinks_rsp {
+struct create_fruit_dir_hardlinks_rsp {
 	struct create_context ccontext;
 	__u8   Name[16];
-	struct aapl_dir_hardlinks hardlinks;
+	struct fruit_dir_hardlinks hardlinks;
+} __packed;
+
+/*
+ * Fruit create context response — variable-length.
+ * reply_bitmap=0x07 means: server_caps + volume_caps + model_info.
+ * The model string is variable-length UTF-16LE, so we use a
+ * flexible array member. Total size is computed at runtime via
+ * fruit_rsp_size().
+ */
+struct create_fruit_rsp {
+	struct create_context ccontext;
+	__u8   Name[4];		/* "AAPL" on wire */
+	__le32 command_code;	/* 1 = kAAPL_SERVER_QUERY */
+	__le32 reserved;
+	__le64 reply_bitmap;	/* 0x07 = caps + volcaps + model */
+	__le64 server_caps;	/* kAAPL_* capability bits */
+	__le64 volume_caps;	/* kAAPL_SUPPORT_* volume bits */
+	__le32 model_string_len; /* UTF-16LE byte count of model[] */
+	__le16 model[];		/* UTF-16LE model string, no NUL */
 } __packed;
 
 #define SMB2_LEASE_NONE_LE			cpu_to_le32(0x00)

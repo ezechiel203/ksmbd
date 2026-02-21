@@ -18,7 +18,7 @@
 
 #include "smb_common.h"
 #include "ksmbd_work.h"
-#include "smb2aapl.h"
+#include "smb2fruit.h"
 
 #define KSMBD_SOCKET_BACKLOG		16
 
@@ -116,15 +116,10 @@ struct ksmbd_conn {
 	__le16				signing_algorithm;
 	bool				binding;
 	atomic_t			refcnt;
-	bool				is_aapl;
+	bool				is_fruit;
 
-	/* Apple SMB Extension Support */
-	struct aapl_conn_state	*aapl_state;	/* Apple connection state */
-	__le64				aapl_capabilities; /* Supported Apple capabilities */
-	__le32				aapl_version;	/* Negotiated Apple extension version */
-	__le32				aapl_client_type; /* Type of Apple client */
-	__u8				aapl_client_build[16]; /* Client build identifier */
-	bool				aapl_extensions_enabled; /* Whether Apple extensions are active */
+	/* Fruit SMB Extension Support */
+	struct fruit_conn_state	*fruit_state;
 };
 
 struct ksmbd_conn_ops {

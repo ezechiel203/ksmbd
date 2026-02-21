@@ -2,10 +2,10 @@
 /*
  * Copyright (C) 2024 The KSMBD Project
  *
- * Apple SMB Integration and Compatibility Testing Framework
+ * Fruit SMB Integration and Compatibility Testing Framework
  *
  * This framework ensures comprehensive integration testing with existing KSMBD
- * functionality while maintaining Apple SMB interoperability.
+ * functionality while maintaining Fruit SMB interoperability.
  */
 
 #include <linux/kernel.h>
@@ -26,7 +26,7 @@
 #include <linux/scatterlist.h>
 
 #include "test_utils.h"
-#include "smb2aapl.h"
+#include "smb2fruit.h"
 #include "connection.h"
 #include "mgmt/user_config.h"
 #include "mgmt/share_config.h"
@@ -46,7 +46,7 @@
 /* Test scenario definitions */
 enum intg_test_category {
     INTG_CATEGORY_BASIC_PROTOCOL,
-    INTG_CATEGORY_APPLE_EXTENSIONS,
+    INTG_CATEGORY_FRUIT_EXTENSIONS,
     INTG_CATEGORY_MIXED_CLIENTS,
     INTG_CATEGORY_PERFORMANCE,
     INTG_CATEGORY_RELIABILITY,
@@ -89,7 +89,7 @@ struct intg_compatibility_matrix {
     bool supports_compression;
     bool supports_spotlight;
     bool supports_timemachine;
-    bool supports_aapl_extensions;
+    bool supports_fruit_extensions;
     unsigned int expected_ops_per_sec;
     unsigned int expected_max_latency_ms;
 };
@@ -153,7 +153,7 @@ static const struct intg_compatibility_matrix compatibility_matrix[] = {
         .supports_compression = false,
         .supports_spotlight = false,
         .supports_timemachine = false,
-        .supports_aapl_extensions = false,
+        .supports_fruit_extensions = false,
         .expected_ops_per_sec = 5000,
         .expected_max_latency_ms = 50
     },
@@ -166,7 +166,7 @@ static const struct intg_compatibility_matrix compatibility_matrix[] = {
         .supports_compression = false,
         .supports_spotlight = false,
         .supports_timemachine = false,
-        .supports_aapl_extensions = false,
+        .supports_fruit_extensions = false,
         .expected_ops_per_sec = 4000,
         .expected_max_latency_ms = 60
     },
@@ -179,7 +179,7 @@ static const struct intg_compatibility_matrix compatibility_matrix[] = {
         .supports_compression = true,
         .supports_spotlight = true,
         .supports_timemachine = true,
-        .supports_aapl_extensions = true,
+        .supports_fruit_extensions = true,
         .expected_ops_per_sec = 3500,
         .expected_max_latency_ms = 70
     },
@@ -192,7 +192,7 @@ static const struct intg_compatibility_matrix compatibility_matrix[] = {
         .supports_compression = false,
         .supports_spotlight = false,
         .supports_timemachine = true,
-        .supports_aapl_extensions = true,
+        .supports_fruit_extensions = true,
         .expected_ops_per_sec = 2000,
         .expected_max_latency_ms = 100
     },
@@ -205,7 +205,7 @@ static const struct intg_compatibility_matrix compatibility_matrix[] = {
         .supports_compression = false,
         .supports_spotlight = false,
         .supports_timemachine = false,
-        .supports_aapl_extensions = false,
+        .supports_fruit_extensions = false,
         .expected_ops_per_sec = 1500,
         .expected_max_latency_ms = 120
     }
@@ -367,11 +367,11 @@ static struct intg_mixed_session *intg_create_mixed_session(enum intg_client_typ
     }
 
     if (matrix) {
-        if (matrix->supports_aapl_extensions) {
-            conn->aapl_extensions_enabled = true;
-            conn->aapl_state = kzalloc(sizeof(struct aapl_conn_state), GFP_KERNEL);
-            if (conn->aapl_state) {
-                aapl_init_connection_state(conn->aapl_state);
+        if (matrix->supports_fruit_extensions) {
+            conn->is_fruit = true;
+            conn->fruit_state = kzalloc(sizeof(struct fruit_conn_state), GFP_KERNEL);
+            if (conn->fruit_state) {
+                fruit_init_connection_state(conn->fruit_state);
             }
         }
     }
@@ -397,9 +397,9 @@ static void intg_cleanup_mixed_session(struct intg_mixed_session *session)
         return;
 
     if (session->connection) {
-        if (session->connection->aapl_state) {
-            kfree(session->connection->aapl_state);
-            session->connection->aapl_state = NULL;
+        if (session->connection->fruit_state) {
+            kfree(session->connection->fruit_state);
+            session->connection->fruit_state = NULL;
         }
         free_test_connection(session->connection);
     }
@@ -453,13 +453,13 @@ static bool intg_test_basic_protocol_compatibility(struct intg_test_result *resu
     }
 
     /* Test capability negotiation */
-    if (session->connection && session->connection->aapl_state) {
-        /* Test Apple extensions for Apple clients */
+    if (session->connection && session->connection->fruit_state) {
+        /* Test Fruit extensions for Fruit clients */
         if (client_type == INTG_CLIENT_MACOS || client_type == INTG_CLIENT_IOS) {
             session->capability_negotiation_passed = true;
         }
     } else {
-        session->capability_negotiation_passed = true; /* Non-Apple clients */
+        session->capability_negotiation_passed = true; /* Non-Fruit clients */
     }
 
     /* Test basic file operations */
@@ -558,15 +558,15 @@ static bool intg_test_mixed_client_compatibility(struct intg_test_result *result
 
         /* Simulate mixed client operations */
         if (i % 20 == 0) {
-            /* Apple-specific operation */
+            /* Fruit-specific operation */
             if (active_client == INTG_CLIENT_MACOS || active_client == INTG_CLIENT_IOS) {
                 if (sessions[active_client]->connection &&
-                    sessions[active_client]->connection->aapl_state) {
-                    /* Test Time Machine operation for macOS/iOS */
+                    sessions[active_client]->connection->fruit_state) {
+                    /* Test Save box operation for macOS/iOS */
                     op_success = true;
                 }
             } else {
-                /* Non-Apple clients skip Apple-specific operations */
+                /* Non-Fruit clients skip Fruit-specific operations */
                 op_success = true;
             }
         } else {
@@ -600,7 +600,7 @@ static bool intg_test_mixed_client_compatibility(struct intg_test_result *result
              "Mixed Client Compatibility Results:\n"
              "  Test Iterations: %u\n"
              "  Client Types: Windows, Linux, macOS, iOS, Android\n"
-             "  Operations: Mixed Apple and Standard SMB\n"
+             "  Operations: Mixed Fruit and Standard SMB\n"
              "  Test Duration: %llu ms\n"
              "  Status: %s",
              INTG_MIXED_PROTOCOL_TEST_ITERATIONS,
@@ -610,8 +610,8 @@ static bool intg_test_mixed_client_compatibility(struct intg_test_result *result
     return test_passed;
 }
 
-/* Apple extensions regression testing */
-static bool intg_test_apple_extensions_regression(struct intg_test_result *result)
+/* Fruit extensions regression testing */
+static bool intg_test_fruit_extensions_regression(struct intg_test_result *result)
 {
     unsigned long long start_time, end_time;
     struct intg_mixed_session *macos_session, *ios_session;
@@ -620,57 +620,57 @@ static bool intg_test_apple_extensions_regression(struct intg_test_result *resul
 
     start_time = get_time_ns();
 
-    TEST_INFO("Testing Apple extensions regression");
+    TEST_INFO("Testing Fruit extensions regression");
 
-    /* Create Apple client sessions */
+    /* Create Fruit client sessions */
     macos_session = intg_create_mixed_session(INTG_CLIENT_MACOS);
     ios_session = intg_create_mixed_session(INTG_CLIENT_IOS);
 
     if (!macos_session || !ios_session) {
-        strscpy(result->error_message, "Failed to create Apple client sessions",
+        strscpy(result->error_message, "Failed to create Fruit client sessions",
                 sizeof(result->error_message));
         if (macos_session) intg_cleanup_mixed_session(macos_session);
         if (ios_session) intg_cleanup_mixed_session(ios_session);
         return false;
     }
 
-    /* Test Apple extensions functionality */
+    /* Test Fruit extensions functionality */
     for (i = 0; i < INTG_REGRESSION_TEST_ITERATIONS && test_passed; i++) {
         struct intg_mixed_session *active_session = (i % 2 == 0) ? macos_session : ios_session;
         bool op_success = true;
 
-        /* Test various Apple extensions */
+        /* Test various Fruit extensions */
         if (i % 10 == 0) {
-            /* Test FinderInfo operations */
-            if (active_session->connection && active_session->connection->aapl_state) {
-                if (!aapl_supports_capability(active_session->connection->aapl_state,
-                                              cpu_to_le64(AAPL_CAP_FINDERINFO))) {
+            /* Test LookerInfo operations */
+            if (active_session->connection && active_session->connection->fruit_state) {
+                if (!fruit_supports_capability(active_session->connection->fruit_state,
+                                              cpu_to_le64(FRUIT_CAP_FINDERINFO))) {
                     op_success = false;
-                    strscpy(result->error_message, "FinderInfo capability not supported",
+                    strscpy(result->error_message, "LookerInfo capability not supported",
                             sizeof(result->error_message));
                 }
             }
         } else if (i % 7 == 0) {
-            /* Test Time Machine operations */
-            if (active_session->connection && active_session->connection->aapl_state) {
-                if (!aapl_supports_capability(active_session->connection->aapl_state,
-                                              cpu_to_le64(AAPL_CAP_TIMEMACHINE))) {
+            /* Test Save box operations */
+            if (active_session->connection && active_session->connection->fruit_state) {
+                if (!fruit_supports_capability(active_session->connection->fruit_state,
+                                              cpu_to_le64(FRUIT_CAP_TIMEMACHINE))) {
                     op_success = false;
-                    strscpy(result->error_message, "TimeMachine capability not supported",
+                    strscpy(result->error_message, "Save box capability not supported",
                             sizeof(result->error_message));
                 }
             }
         } else if (i % 5 == 0) {
             /* Test compression operations */
-            if (active_session->connection && active_session->connection->aapl_state) {
-                if (!active_session->connection->aapl_state->compression_supported) {
+            if (active_session->connection && active_session->connection->fruit_state) {
+                if (!active_session->connection->fruit_state->compression_supported) {
                     op_success = false;
                     strscpy(result->error_message, "Compression not enabled",
                             sizeof(result->error_message));
                 }
             }
         } else {
-            /* Standard Apple client operations */
+            /* Standard Fruit client operations */
             op_success = true;
         }
 
@@ -687,26 +687,26 @@ static bool intg_test_apple_extensions_regression(struct intg_test_result *resul
     result->duration_ns = end_time - start_time;
 
     snprintf(result->test_details, sizeof(result->test_details),
-             "Apple Extensions Regression Results:\n"
+             "Fruit Extensions Regression Results:\n"
              "  Test Iterations: %u\n"
              "  macOS Operations: %u\n"
              "  iOS Operations: %u\n"
-             "  FinderInfo: %s\n"
-             "  TimeMachine: %s\n"
+             "  LookerInfo: %s\n"
+             "  Save box: %s\n"
              "  Compression: %s\n"
              "  Status: %s",
              INTG_REGRESSION_TEST_ITERATIONS,
              macos_session ? macos_session->operation_count : 0,
              ios_session ? ios_session->operation_count : 0,
-             macos_session && macos_session->connection && macos_session->connection->aapl_state &&
-             aapl_supports_capability(macos_session->connection->aapl_state,
-                                       cpu_to_le64(AAPL_CAP_FINDERINFO)) ? "SUPPORTED" : "NOT SUPPORTED",
-             macos_session && macos_session->connection && macos_session->connection->aapl_state &&
-             aapl_supports_capability(macos_session->connection->aapl_state,
-                                       cpu_to_le64(AAPL_CAP_TIMEMACHINE)) ? "SUPPORTED" : "NOT SUPPORTED",
+             macos_session && macos_session->connection && macos_session->connection->fruit_state &&
+             fruit_supports_capability(macos_session->connection->fruit_state,
+                                       cpu_to_le64(FRUIT_CAP_FINDERINFO)) ? "SUPPORTED" : "NOT SUPPORTED",
+             macos_session && macos_session->connection && macos_session->connection->fruit_state &&
+             fruit_supports_capability(macos_session->connection->fruit_state,
+                                       cpu_to_le64(FRUIT_CAP_TIMEMACHINE)) ? "SUPPORTED" : "NOT SUPPORTED",
              macos_session && macos_session->connection &&
-             macos_session->connection->aapl_state &&
-             macos_session->connection->aapl_state->compression_supported ? "ENABLED" : "DISABLED",
+             macos_session->connection->fruit_state &&
+             macos_session->connection->fruit_state->compression_supported ? "ENABLED" : "DISABLED",
              test_passed ? "PASSED" : "FAILED");
 
     if (macos_session) intg_cleanup_mixed_session(macos_session);
@@ -757,8 +757,8 @@ static bool intg_test_mixed_client_performance(struct intg_test_result *result)
         bool op_success = true;
 
         /* Simulate performance-critical operations */
-        if (active_client == INTG_CLIENT_MACOS && sessions[active_client]->connection->aapl_state) {
-            /* Apple client specific optimizations */
+        if (active_client == INTG_CLIENT_MACOS && sessions[active_client]->connection->fruit_state) {
+            /* Fruit client specific optimizations */
             op_success = true;
         } else if (active_client == INTG_CLIENT_LINUX) {
             /* Linux client operations */
@@ -870,10 +870,10 @@ static bool intg_test_compatibility_regression(struct intg_test_result *result)
             } else if (j % 5 == 0) {
                 /* Protocol-specific operations */
                 if (client_types[i] == INTG_CLIENT_MACOS) {
-                    /* Test Apple extensions don't break standard operations */
+                    /* Test Fruit extensions don't break standard operations */
                     op_success = true;
                 } else {
-                    /* Test non-Apple clients continue to work */
+                    /* Test non-Fruit clients continue to work */
                     op_success = true;
                 }
             } else {
@@ -920,7 +920,7 @@ static int intg_execute_comprehensive_tests(void)
     bool test_result;
     unsigned int compatibility_score, performance_score;
 
-    TEST_INFO("=== Apple SMB Integration and Compatibility Testing Framework ===");
+    TEST_INFO("=== Fruit SMB Integration and Compatibility Testing Framework ===");
 
     /* Initialize test suite */
     mutex_lock(&intg_test_mutex);
@@ -975,16 +975,16 @@ static int intg_execute_comprehensive_tests(void)
                               result.duration_ns);
     }
 
-    /* Test 3: Apple Extensions Regression */
+    /* Test 3: Fruit Extensions Regression */
     {
         struct intg_test_result result = {0};
-        strscpy(result.test_name, "Apple Extensions Regression", sizeof(result.test_name));
+        strscpy(result.test_name, "Fruit Extensions Regression", sizeof(result.test_name));
 
-        test_result = intg_test_apple_extensions_regression(&result);
+        test_result = intg_test_fruit_extensions_regression(&result);
         compatibility_score = test_result ? 95 : 30;
         performance_score = test_result ? 90 : 60;
 
-        intg_record_test_result(&global_test_suite, "Apple Extensions Regression",
+        intg_record_test_result(&global_test_suite, "Fruit Extensions Regression",
                               INTG_CATEGORY_REGRESSION, INTG_CLIENT_MACOS,
                               test_result, result.error_code, result.error_message,
                               result.test_details, compatibility_score, performance_score,
@@ -1065,21 +1065,21 @@ static int intg_execute_comprehensive_tests(void)
 /* Module initialization and cleanup */
 static int __init intg_compatibility_init(void)
 {
-    TEST_INFO("Apple SMB Integration and Compatibility Testing Framework initialized");
+    TEST_INFO("Fruit SMB Integration and Compatibility Testing Framework initialized");
 
     return intg_execute_comprehensive_tests();
 }
 
 static void __exit intg_compatibility_exit(void)
 {
-    TEST_INFO("Apple SMB Integration and Compatibility Testing Framework exited");
+    TEST_INFO("Fruit SMB Integration and Compatibility Testing Framework exited");
 }
 
 module_init(intg_compatibility_init);
 module_exit(intg_compatibility_exit);
 
 MODULE_LICENSE("GPL");
-MODULE_DESCRIPTION("KSMBD Apple SMB Integration and Compatibility Testing Framework");
+MODULE_DESCRIPTION("KSMBD Fruit SMB Integration and Compatibility Testing Framework");
 MODULE_AUTHOR("KSMBD Contributors");
 
 /* Export functions for external integration testing modules */
@@ -1090,7 +1090,7 @@ EXPORT_SYMBOL_GPL(intg_create_mixed_session);
 EXPORT_SYMBOL_GPL(intg_cleanup_mixed_session);
 EXPORT_SYMBOL_GPL(intg_test_basic_protocol_compatibility);
 EXPORT_SYMBOL_GPL(intg_test_mixed_client_compatibility);
-EXPORT_SYMBOL_GPL(intg_test_apple_extensions_regression);
+EXPORT_SYMBOL_GPL(intg_test_fruit_extensions_regression);
 EXPORT_SYMBOL_GPL(intg_test_mixed_client_performance);
 EXPORT_SYMBOL_GPL(intg_test_compatibility_regression);
 EXPORT_SYMBOL_GPL(intg_execute_comprehensive_tests);

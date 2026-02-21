@@ -1,9 +1,9 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * Memory Usage Validator for Apple SMB Extensions
+ * Memory Usage Validator for Fruit SMB Extensions
  *
  * This program validates the memory usage patterns and efficiency
- * of the Apple SMB extensions implementation in ksmbd.
+ * of the Fruit SMB extensions implementation in ksmbd.
  */
 
 #include <stdio.h>
@@ -17,8 +17,8 @@ typedef uint32_t __le32;
 typedef uint64_t __le64;
 typedef uint8_t __u8;
 
-/* Apple SMB extension structures (from smb2aapl.h) */
-struct aapl_conn_state {
+/* Fruit SMB extension structures (from smb2fruit.h) */
+struct fruit_conn_state {
     __le32 client_version;        /* 4 bytes */
     __le32 client_type;           /* 4 bytes */
     __le64 client_capabilities;   /* 8 bytes */
@@ -36,80 +36,68 @@ struct aapl_conn_state {
     __u8 reserved[64];            /* 64 bytes */
 } __attribute__((packed));
 
-struct ksmbd_conn_apple_additions {
-    struct aapl_conn_state *aapl_state;     /* 8 bytes */
-    __le64 aapl_capabilities;               /* 8 bytes */
-    __le32 aapl_version;                    /* 4 bytes */
-    __le32 aapl_client_type;                /* 4 bytes */
-    __u8 aapl_client_build[16];             /* 16 bytes */
-    bool aapl_extensions_enabled;           /* 1 byte */
-    bool is_aapl;                           /* 1 byte */
+struct ksmbd_conn_fruit_additions {
+    struct fruit_conn_state *fruit_state;   /* 8 bytes */
+    __le64 fruit_capabilities;              /* 8 bytes */
+    __le32 fruit_version;                   /* 4 bytes */
+    __le32 fruit_client_type;               /* 4 bytes */
+    __u8 fruit_client_build[16];            /* 16 bytes */
+    bool fruit_extensions_enabled;          /* 1 byte */
+    bool is_fruit;                          /* 1 byte */
     /* Padding: 2 bytes for alignment */
 } __attribute__((packed));
 
-/* Memory usage statistics */
 struct memory_stats {
-    size_t aapl_state_size;
+    size_t fruit_state_size;
     size_t conn_additions_size;
-    size_t total_per_apple_connection;
-    size_t total_per_non_apple_connection;
+    size_t total_per_fruit_connection;
+    size_t total_per_non_fruit_connection;
     size_t alignment_overhead;
     double fragmentation_risk;
 };
 
-/* Calculate memory usage */
 void calculate_memory_usage(struct memory_stats *stats)
 {
-    /* Calculate sizes with alignment considerations */
-    stats->aapl_state_size = sizeof(struct aapl_conn_state);
-    stats->conn_additions_size = sizeof(struct ksmbd_conn_apple_additions);
+    stats->fruit_state_size = sizeof(struct fruit_conn_state);
+    stats->conn_additions_size = sizeof(struct ksmbd_conn_fruit_additions);
 
-    /* Total memory per Apple connection */
-    stats->total_per_apple_connection = stats->aapl_state_size + stats->conn_additions_size;
+    stats->total_per_fruit_connection = stats->fruit_state_size + stats->conn_additions_size;
+    stats->total_per_non_fruit_connection = stats->conn_additions_size;
 
-    /* Total memory per non-Apple connection (only additions) */
-    stats->total_per_non_apple_connection = stats->conn_additions_size;
-
-    /* Calculate alignment overhead */
     stats->alignment_overhead = (8 - (stats->conn_additions_size % 8)) % 8;
-
-    /* Fragmentation risk assessment (0-1 scale) */
-    stats->fragmentation_risk = 0.1; /* Low risk due to consistent allocation size */
+    stats->fragmentation_risk = 0.1;
 }
 
-/* Validate memory efficiency */
 bool validate_memory_efficiency(const struct memory_stats *stats)
 {
-    const size_t MEMORY_LIMIT = 2048; /* 2KB requirement */
-    double efficiency = (double)stats->total_per_apple_connection / MEMORY_LIMIT;
+    const size_t MEMORY_LIMIT = 2048;
+    double efficiency = (double)stats->total_per_fruit_connection / MEMORY_LIMIT;
 
     printf("Memory Efficiency Analysis:\n");
-    printf("  Apple connection state: %zu bytes\n", stats->aapl_state_size);
+    printf("  Fruit connection state: %zu bytes\n", stats->fruit_state_size);
     printf("  Connection additions: %zu bytes\n", stats->conn_additions_size);
-    printf("  Total per Apple connection: %zu bytes\n", stats->total_per_apple_connection);
-    printf("  Total per non-Apple connection: %zu bytes\n", stats->total_per_non_apple_connection);
+    printf("  Total per Fruit connection: %zu bytes\n", stats->total_per_fruit_connection);
+    printf("  Total per non-Fruit connection: %zu bytes\n", stats->total_per_non_fruit_connection);
     printf("  Memory efficiency: %.1f%% of 2KB limit\n", efficiency * 100.0);
     printf("  Alignment overhead: %zu bytes\n", stats->alignment_overhead);
     printf("  Fragmentation risk: %.1f%%\n", stats->fragmentation_risk * 100.0);
 
-    return efficiency <= 1.0; /* Must be under 2KB limit */
+    return efficiency <= 1.0;
 }
 
-/* Test memory allocation patterns */
 void test_allocation_patterns(void)
 {
     printf("\nMemory Allocation Pattern Tests:\n");
 
-    /* Test consistent allocation size */
     const int num_allocations = 1000;
     void *allocations[num_allocations];
     size_t total_allocated = 0;
     int successful_allocations = 0;
 
     for (int i = 0; i < num_allocations; i++) {
-        allocations[i] = malloc(sizeof(struct aapl_conn_state));
+        allocations[i] = malloc(sizeof(struct fruit_conn_state));
         if (allocations[i]) {
-            total_allocated += sizeof(struct aapl_conn_state);
+            total_allocated += sizeof(struct fruit_conn_state);
             successful_allocations++;
         }
     }
@@ -118,25 +106,21 @@ void test_allocation_patterns(void)
            successful_allocations, num_allocations,
            (double)successful_allocations / num_allocations * 100.0);
     printf("  Total memory allocated: %zu KB\n", total_allocated / 1024);
-    printf("  Average allocation size: %zu bytes\n", sizeof(struct aapl_conn_state));
+    printf("  Average allocation size: %zu bytes\n", sizeof(struct fruit_conn_state));
 
-    /* Test cache line efficiency */
     const size_t cache_line_size = 64;
-    size_t cache_lines_used = (sizeof(struct aapl_conn_state) + cache_line_size - 1) / cache_line_size;
-    double cache_efficiency = (double)sizeof(struct aapl_conn_state) / (cache_lines_used * cache_line_size) * 100.0;
+    size_t cache_lines_used = (sizeof(struct fruit_conn_state) + cache_line_size - 1) / cache_line_size;
+    double cache_efficiency = (double)sizeof(struct fruit_conn_state) / (cache_lines_used * cache_line_size) * 100.0;
 
     printf("  Cache lines used: %zu\n", cache_lines_used);
     printf("  Cache efficiency: %.1f%%\n", cache_efficiency);
 
-    /* Cleanup */
     for (int i = 0; i < num_allocations; i++) {
-        if (allocations[i]) {
+        if (allocations[i])
             free(allocations[i]);
-        }
     }
 }
 
-/* Simulate memory usage under load */
 void simulate_memory_load(int concurrent_connections)
 {
     printf("\nMemory Usage Simulation (%d concurrent connections):\n", concurrent_connections);
@@ -144,26 +128,23 @@ void simulate_memory_load(int concurrent_connections)
     struct memory_stats stats;
     calculate_memory_usage(&stats);
 
-    /* Simulate mixed Apple/non-Apple clients */
-    double apple_ratio = 0.4; /* 40% Apple clients */
-    int apple_connections = (int)(concurrent_connections * apple_ratio);
-    int non_apple_connections = concurrent_connections - apple_connections;
+    double fruit_ratio = 0.4;
+    int fruit_connections = (int)(concurrent_connections * fruit_ratio);
+    int non_fruit_connections = concurrent_connections - fruit_connections;
 
-    size_t total_memory = (apple_connections * stats.total_per_apple_connection) +
-                          (non_apple_connections * stats.total_per_non_apple_connection);
+    size_t total_memory = (fruit_connections * stats.total_per_fruit_connection) +
+                          (non_fruit_connections * stats.total_per_non_fruit_connection);
 
-    printf("  Apple connections: %d (%.1f%%)\n", apple_connections, apple_ratio * 100.0);
-    printf("  Non-Apple connections: %d (%.1f%%)\n", non_apple_connections, (1.0 - apple_ratio) * 100.0);
+    printf("  Fruit connections: %d (%.1f%%)\n", fruit_connections, fruit_ratio * 100.0);
+    printf("  Non-Fruit connections: %d (%.1f%%)\n", non_fruit_connections, (1.0 - fruit_ratio) * 100.0);
     printf("  Total memory usage: %zu KB\n", total_memory / 1024);
     printf("  Average per connection: %.1f bytes\n", (double)total_memory / concurrent_connections);
-    printf("  Memory scaling factor: %.2fx\n", (double)total_memory / (concurrent_connections * stats.total_per_apple_connection));
+    printf("  Memory scaling factor: %.2fx\n", (double)total_memory / (concurrent_connections * stats.total_per_fruit_connection));
 
-    /* Check against requirements */
     bool memory_ok = total_memory < (concurrent_connections * 2048);
-    printf("  Memory requirement: %s\n", memory_ok ? "✅ PASS" : "❌ FAIL");
+    printf("  Memory requirement: %s\n", memory_ok ? "PASS" : "FAIL");
 }
 
-/* Test memory pressure scenarios */
 void test_memory_pressure(void)
 {
     printf("\nMemory Pressure Tests:\n");
@@ -173,13 +154,11 @@ void test_memory_pressure(void)
     int successful_allocs = 0;
     int failed_allocs = 0;
 
-    /* Simulate high-frequency allocations/deallocations */
     for (int i = 0; i < stress_iterations; i++) {
-        ptrs[i] = malloc(sizeof(struct aapl_conn_state));
+        ptrs[i] = malloc(sizeof(struct fruit_conn_state));
         if (ptrs[i]) {
             successful_allocs++;
-            /* Initialize with some data to simulate real usage */
-            memset(ptrs[i], 0, sizeof(struct aapl_conn_state));
+            memset(ptrs[i], 0, sizeof(struct fruit_conn_state));
         } else {
             failed_allocs++;
         }
@@ -192,29 +171,23 @@ void test_memory_pressure(void)
     printf("    Failed: %d (%.1f%%)\n", failed_allocs,
            (double)failed_allocs / stress_iterations * 100.0);
 
-    /* Cleanup */
     for (int i = 0; i < stress_iterations; i++) {
-        if (ptrs[i]) {
+        if (ptrs[i])
             free(ptrs[i]);
-        }
     }
 
-    /* Test memory fragmentation */
     printf("  Fragmentation test:\n");
     void *frag_ptrs[1000];
     int frag_successful = 0;
 
-    /* Allocate in random pattern to simulate fragmentation */
     for (int round = 0; round < 10; round++) {
         for (int i = 0; i < 100; i++) {
             int idx = round * 100 + i;
-            frag_ptrs[idx] = malloc(sizeof(struct aapl_conn_state));
-            if (frag_ptrs[idx]) {
+            frag_ptrs[idx] = malloc(sizeof(struct fruit_conn_state));
+            if (frag_ptrs[idx])
                 frag_successful++;
-            }
         }
 
-        /* Free every other allocation */
         for (int i = 0; i < 100; i += 2) {
             int idx = round * 100 + i;
             if (frag_ptrs[idx]) {
@@ -227,29 +200,23 @@ void test_memory_pressure(void)
     printf("    Fragmentation resistance: %d/1000 successful (%.1f%%)\n",
            frag_successful, (double)frag_successful / 1000 * 100.0);
 
-    /* Final cleanup */
     for (int i = 0; i < 1000; i++) {
-        if (frag_ptrs[i]) {
+        if (frag_ptrs[i])
             free(frag_ptrs[i]);
-        }
     }
 }
 
-/* Validate structure packing and alignment */
 void validate_structure_layout(void)
 {
     printf("\nStructure Layout Validation:\n");
 
-    /* Verify aapl_conn_state packing */
-    printf("  aapl_conn_state layout:\n");
-    printf("    Size: %zu bytes\n", sizeof(struct aapl_conn_state));
-    printf("    Alignment: %zu bytes\n", __alignof__(struct aapl_conn_state));
+    printf("  fruit_conn_state layout:\n");
+    printf("    Size: %zu bytes\n", sizeof(struct fruit_conn_state));
+    printf("    Alignment: %zu bytes\n", __alignof__(struct fruit_conn_state));
 
-    /* Check for potential padding issues */
-    struct aapl_conn_state test_state;
+    struct fruit_conn_state test_state;
     memset(&test_state, 0, sizeof(test_state));
 
-    /* Verify that all fields are accessible without gaps */
     size_t offset_client_version = (size_t)&test_state.client_version - (size_t)&test_state;
     size_t offset_client_type = (size_t)&test_state.client_type - (size_t)&test_state;
     size_t offset_capabilities = (size_t)&test_state.client_capabilities - (size_t)&test_state;
@@ -263,30 +230,27 @@ void validate_structure_layout(void)
     printf("      reserved: %zu\n", offset_reserved);
     printf("      struct_end: %zu\n", struct_end);
 
-    /* Verify ksmbd_conn additions */
-    printf("  ksmbd_conn Apple additions:\n");
-    printf("    Size: %zu bytes\n", sizeof(struct ksmbd_conn_apple_additions));
-    printf("    Alignment: %zu bytes\n", __alignof__(struct ksmbd_conn_apple_additions));
+    printf("  ksmbd_conn Fruit additions:\n");
+    printf("    Size: %zu bytes\n", sizeof(struct ksmbd_conn_fruit_additions));
+    printf("    Alignment: %zu bytes\n", __alignof__(struct ksmbd_conn_fruit_additions));
 
-    /* Check pointer alignment */
-    struct ksmbd_conn_apple_additions test_additions;
+    struct ksmbd_conn_fruit_additions test_additions;
     memset(&test_additions, 0, sizeof(test_additions));
 
     printf("    Pointer alignment: %s\n",
-           ((size_t)&test_additions.aapl_state % 8 == 0) ? "✅ OK" : "❌ MISALIGNED");
+           ((size_t)&test_additions.fruit_state % 8 == 0) ? "OK" : "MISALIGNED");
 }
 
 int main(void)
 {
-    printf("=== Apple SMB Extensions Memory Usage Validator ===\n");
+    printf("=== Fruit SMB Extensions Memory Usage Validator ===\n");
 
     struct memory_stats stats;
     calculate_memory_usage(&stats);
 
-    /* Run all validation tests */
     printf("\n1. Memory Efficiency Validation:\n");
     bool efficiency_ok = validate_memory_efficiency(&stats);
-    printf("  Result: %s\n", efficiency_ok ? "✅ PASS" : "❌ FAIL");
+    printf("  Result: %s\n", efficiency_ok ? "PASS" : "FAIL");
 
     printf("\n2. Allocation Pattern Tests:");
     test_allocation_patterns();
@@ -302,30 +266,25 @@ int main(void)
     printf("\n5. Structure Layout Validation:");
     validate_structure_layout();
 
-    /* Final assessment */
     printf("\n=== Final Memory Assessment ===\n");
-    printf("Memory per Apple connection: %zu bytes (%.1f%% of 2KB limit)\n",
-           stats.total_per_apple_connection,
-           (double)stats.total_per_apple_connection / 2048.0 * 100.0);
-    printf("Memory per non-Apple connection: %zu bytes (%.1f%% of 2KB limit)\n",
-           stats.total_per_non_apple_connection,
-           (double)stats.total_per_non_apple_connection / 2048.0 * 100.0);
-    printf("Memory efficiency: %s\n", efficiency_ok ? "✅ EXCELLENT" : "❌ NEEDS ATTENTION");
+    printf("Memory per Fruit connection: %zu bytes (%.1f%% of 2KB limit)\n",
+           stats.total_per_fruit_connection,
+           (double)stats.total_per_fruit_connection / 2048.0 * 100.0);
+    printf("Memory per non-Fruit connection: %zu bytes (%.1f%% of 2KB limit)\n",
+           stats.total_per_non_fruit_connection,
+           (double)stats.total_per_non_fruit_connection / 2048.0 * 100.0);
+    printf("Memory efficiency: %s\n", efficiency_ok ? "EXCELLENT" : "NEEDS ATTENTION");
     printf("Cache line usage: %zu lines (%.1f%% efficient)\n",
-           (sizeof(struct aapl_conn_state) + 63) / 64,
-           (double)sizeof(struct aapl_conn_state) / (((sizeof(struct aapl_conn_state) + 63) / 64) * 64) * 100.0);
+           (sizeof(struct fruit_conn_state) + 63) / 64,
+           (double)sizeof(struct fruit_conn_state) / (((sizeof(struct fruit_conn_state) + 63) / 64) * 64) * 100.0);
     printf("Fragmentation risk: %.1f%% (%s)\n",
            stats.fragmentation_risk * 100.0,
-           stats.fragmentation_risk < 0.2 ? "✅ LOW" : "⚠️ MODERATE");
+           stats.fragmentation_risk < 0.2 ? "LOW" : "MODERATE");
 
     if (efficiency_ok && stats.fragmentation_risk < 0.2) {
-        printf("\n🎯 MEMORY USAGE: PRODUCTION READY\n");
-        printf("   Excellent memory efficiency with minimal overhead\n");
-        printf("   Linear scaling characteristics verified\n");
-        printf("   No fragmentation risks detected\n");
+        printf("\nMEMORY USAGE: PRODUCTION READY\n");
     } else {
-        printf("\n⚠️  MEMORY USAGE: NEEDS OPTIMIZATION\n");
-        printf("   Review memory efficiency metrics\n");
+        printf("\nMEMORY USAGE: NEEDS OPTIMIZATION\n");
     }
 
     return efficiency_ok ? 0 : 1;

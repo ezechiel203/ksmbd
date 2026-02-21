@@ -2,9 +2,9 @@
 /*
  * Copyright (C) 2024 The KSMBD Project
  *
- * Apple SMB Real Client Testing Framework
+ * Fruit SMB Real Client Testing Framework
  *
- * This framework provides comprehensive testing with real Apple clients
+ * This framework provides comprehensive testing with real Fruit clients
  * to ensure production readiness and compatibility validation.
  */
 
@@ -26,7 +26,7 @@
 #include <linux/scatterlist.h>
 
 #include "test_utils.h"
-#include "smb2aapl.h"
+#include "smb2fruit.h"
 #include "connection.h"
 #include "mgmt/user_config.h"
 #include "mgmt/share_config.h"
@@ -34,14 +34,14 @@
 #include "smb_common.h"
 
 /* Test framework configuration */
-#define AAPL_REAL_CLIENT_TEST_PORT 445
-#define AAPL_TEST_TIMEOUT_MS 30000
-#define AAPL_MAX_TEST_CONNECTIONS 100
-#define AAPL_STRESS_TEST_DURATION_MS 300000
-#define AAPL_PERF_TEST_ITERATIONS 1000
+#define FRUIT_REAL_CLIENT_TEST_PORT 445
+#define FRUIT_TEST_TIMEOUT_MS 30000
+#define FRUIT_MAX_TEST_CONNECTIONS 100
+#define FRUIT_STRESS_TEST_DURATION_MS 300000
+#define FRUIT_PERF_TEST_ITERATIONS 1000
 
 /* Test result tracking */
-struct aapl_test_result {
+struct fruit_test_result {
     char test_name[64];
     bool passed;
     int error_code;
@@ -50,8 +50,8 @@ struct aapl_test_result {
     char additional_info[512];
 };
 
-struct aapl_test_suite {
-    struct aapl_test_result *results;
+struct fruit_test_suite {
+    struct fruit_test_result *results;
     unsigned int total_tests;
     unsigned int passed_tests;
     unsigned int failed_tests;
@@ -59,8 +59,8 @@ struct aapl_test_suite {
     bool initialized;
 };
 
-/* Real Apple client simulation data */
-struct aapl_real_client_profile {
+/* Real Fruit client simulation data */
+struct fruit_real_client_profile {
     char client_id[64];
     char macos_version[16];
     char build_number[16];
@@ -75,7 +75,7 @@ struct aapl_real_client_profile {
 };
 
 /* Production environment simulation */
-struct aapl_production_env {
+struct fruit_production_env {
     unsigned int concurrent_connections;
     unsigned int total_files;
     unsigned int total_directories;
@@ -91,7 +91,7 @@ struct aapl_production_env {
 };
 
 /* Network simulation parameters */
-struct aapl_network_simulation {
+struct fruit_network_simulation {
     unsigned int latency_ms;
     unsigned int packet_loss_percent;
     unsigned int bandwidth_limit_mbps;
@@ -102,7 +102,7 @@ struct aapl_network_simulation {
 };
 
 /* Performance monitoring */
-struct aapl_performance_monitor {
+struct fruit_performance_monitor {
     unsigned long long bytes_sent;
     unsigned long long bytes_received;
     unsigned long long requests_processed;
@@ -121,17 +121,17 @@ struct aapl_performance_monitor {
 };
 
 /* Real client test profiles */
-static const struct aapl_real_client_profile aapl_client_profiles[] = {
+static const struct fruit_real_client_profile fruit_client_profiles[] = {
     {
         .client_id = "macOS-Mojave-10.14",
         .macos_version = "10.14.6",
         .build_number = "18G6032",
         .smb_dialect = "3.1.1",
         .supported_capabilities = cpu_to_le64(
-            AAPL_CAP_UNIX_EXTENSIONS |
-            AAPL_CAP_EXTENDED_ATTRIBUTES |
-            AAPL_CAP_CASE_SENSITIVE |
-            AAPL_CAP_POSIX_LOCKS
+            FRUIT_CAP_UNIX_EXTENSIONS |
+            FRUIT_CAP_EXTENDED_ATTRIBUTES |
+            FRUIT_CAP_CASE_SENSITIVE |
+            FRUIT_CAP_POSIX_LOCKS
         ),
         .connection_timeout_ms = 30000,
         .request_timeout_ms = 15000,
@@ -146,13 +146,13 @@ static const struct aapl_real_client_profile aapl_client_profiles[] = {
         .build_number = "20B29",
         .smb_dialect = "3.1.1",
         .supported_capabilities = cpu_to_le64(
-            AAPL_CAP_UNIX_EXTENSIONS |
-            AAPL_CAP_EXTENDED_ATTRIBUTES |
-            AAPL_CAP_CASE_SENSITIVE |
-            AAPL_CAP_POSIX_LOCKS |
-            AAPL_CAP_RESILIENT_HANDLES |
-            AAPL_CAP_FILE_IDS |
-            AAPL_CAP_READDIR_ATTRS
+            FRUIT_CAP_UNIX_EXTENSIONS |
+            FRUIT_CAP_EXTENDED_ATTRIBUTES |
+            FRUIT_CAP_CASE_SENSITIVE |
+            FRUIT_CAP_POSIX_LOCKS |
+            FRUIT_CAP_RESILIENT_HANDLES |
+            FRUIT_CAP_FILE_IDS |
+            FRUIT_CAP_READDIR_ATTRS
         ),
         .connection_timeout_ms = 30000,
         .request_timeout_ms = 15000,
@@ -167,16 +167,16 @@ static const struct aapl_real_client_profile aapl_client_profiles[] = {
         .build_number = "21A558",
         .smb_dialect = "3.1.1",
         .supported_capabilities = cpu_to_le64(
-            AAPL_CAP_UNIX_EXTENSIONS |
-            AAPL_CAP_EXTENDED_ATTRIBUTES |
-            AAPL_CAP_CASE_SENSITIVE |
-            AAPL_CAP_POSIX_LOCKS |
-            AAPL_CAP_RESILIENT_HANDLES |
-            AAPL_COMPRESSION_ZLIB |
-            AAPL_CAP_FILE_IDS |
-            AAPL_CAP_READDIR_ATTRS |
-            AAPL_CAP_FINDERINFO |
-            AAPL_CAP_TIMEMACHINE
+            FRUIT_CAP_UNIX_EXTENSIONS |
+            FRUIT_CAP_EXTENDED_ATTRIBUTES |
+            FRUIT_CAP_CASE_SENSITIVE |
+            FRUIT_CAP_POSIX_LOCKS |
+            FRUIT_CAP_RESILIENT_HANDLES |
+            FRUIT_COMPRESSION_ZLIB |
+            FRUIT_CAP_FILE_IDS |
+            FRUIT_CAP_READDIR_ATTRS |
+            FRUIT_CAP_FINDERINFO |
+            FRUIT_CAP_TIMEMACHINE
         ),
         .connection_timeout_ms = 30000,
         .request_timeout_ms = 15000,
@@ -191,19 +191,19 @@ static const struct aapl_real_client_profile aapl_client_profiles[] = {
         .build_number = "22A380",
         .smb_dialect = "3.1.1",
         .supported_capabilities = cpu_to_le64(
-            AAPL_CAP_UNIX_EXTENSIONS |
-            AAPL_CAP_EXTENDED_ATTRIBUTES |
-            AAPL_CAP_CASE_SENSITIVE |
-            AAPL_CAP_POSIX_LOCKS |
-            AAPL_CAP_RESILIENT_HANDLES |
-            AAPL_COMPRESSION_ZLIB |
-            AAPL_COMPRESSION_LZFS |
-            AAPL_CAP_FILE_IDS |
-            AAPL_CAP_READDIR_ATTRS |
-            AAPL_CAP_FINDERINFO |
-            AAPL_CAP_TIMEMACHINE |
-            AAPL_CAP_F_FULLFSYNC |
-            AAPL_CAP_SPARSE_BUNDLES
+            FRUIT_CAP_UNIX_EXTENSIONS |
+            FRUIT_CAP_EXTENDED_ATTRIBUTES |
+            FRUIT_CAP_CASE_SENSITIVE |
+            FRUIT_CAP_POSIX_LOCKS |
+            FRUIT_CAP_RESILIENT_HANDLES |
+            FRUIT_COMPRESSION_ZLIB |
+            FRUIT_COMPRESSION_LZFS |
+            FRUIT_CAP_FILE_IDS |
+            FRUIT_CAP_READDIR_ATTRS |
+            FRUIT_CAP_FINDERINFO |
+            FRUIT_CAP_TIMEMACHINE |
+            FRUIT_CAP_F_FULLFSYNC |
+            FRUIT_CAP_SPARSE_BUNDLES
         ),
         .connection_timeout_ms = 30000,
         .request_timeout_ms = 15000,
@@ -218,20 +218,20 @@ static const struct aapl_real_client_profile aapl_client_profiles[] = {
         .build_number = "23A344",
         .smb_dialect = "3.1.1",
         .supported_capabilities = cpu_to_le64(
-            AAPL_CAP_UNIX_EXTENSIONS |
-            AAPL_CAP_EXTENDED_ATTRIBUTES |
-            AAPL_CAP_CASE_SENSITIVE |
-            AAPL_CAP_POSIX_LOCKS |
-            AAPL_CAP_RESILIENT_HANDLES |
-            AAPL_COMPRESSION_ZLIB |
-            AAPL_COMPRESSION_LZFS |
-            AAPL_CAP_FILE_IDS |
-            AAPL_CAP_READDIR_ATTRS |
-            AAPL_CAP_FINDERINFO |
-            AAPL_CAP_TIMEMACHINE |
-            AAPL_CAP_F_FULLFSYNC |
-            AAPL_CAP_SPARSE_BUNDLES |
-            AAPL_CAP_DIR_HARDLINKS
+            FRUIT_CAP_UNIX_EXTENSIONS |
+            FRUIT_CAP_EXTENDED_ATTRIBUTES |
+            FRUIT_CAP_CASE_SENSITIVE |
+            FRUIT_CAP_POSIX_LOCKS |
+            FRUIT_CAP_RESILIENT_HANDLES |
+            FRUIT_COMPRESSION_ZLIB |
+            FRUIT_COMPRESSION_LZFS |
+            FRUIT_CAP_FILE_IDS |
+            FRUIT_CAP_READDIR_ATTRS |
+            FRUIT_CAP_FINDERINFO |
+            FRUIT_CAP_TIMEMACHINE |
+            FRUIT_CAP_F_FULLFSYNC |
+            FRUIT_CAP_SPARSE_BUNDLES |
+            FRUIT_CAP_DIR_HARDLINKS
         ),
         .connection_timeout_ms = 30000,
         .request_timeout_ms = 15000,
@@ -243,7 +243,7 @@ static const struct aapl_real_client_profile aapl_client_profiles[] = {
 };
 
 /* Production environment configurations */
-static const struct aapl_production_env aapl_production_configs[] = {
+static const struct fruit_production_env fruit_production_configs[] = {
     {
         .concurrent_connections = 10,
         .total_files = 10000,
@@ -289,23 +289,23 @@ static const struct aapl_production_env aapl_production_configs[] = {
 };
 
 /* Test suite management */
-static struct aapl_test_suite global_test_suite;
-static DEFINE_MUTEX(aapl_test_mutex);
+static struct fruit_test_suite global_test_suite;
+static DEFINE_MUTEX(fruit_test_mutex);
 
 /* Performance monitoring */
-static struct aapl_performance_monitor perf_monitor;
+static struct fruit_performance_monitor perf_monitor;
 static DEFINE_SPINLOCK(perf_monitor_lock);
 
 /* Network simulation state */
-static struct aapl_network_simulation net_simulation;
+static struct fruit_network_simulation net_simulation;
 
 /* Test result management */
-static int aapl_init_test_suite(struct aapl_test_suite *suite, unsigned int max_tests)
+static int fruit_init_test_suite(struct fruit_test_suite *suite, unsigned int max_tests)
 {
     if (!suite)
         return -EINVAL;
 
-    suite->results = test_kzalloc(sizeof(struct aapl_test_result) * max_tests,
+    suite->results = test_kzalloc(sizeof(struct fruit_test_result) * max_tests,
                                   "test_suite_results");
     if (!suite->results)
         return -ENOMEM;
@@ -319,7 +319,7 @@ static int aapl_init_test_suite(struct aapl_test_suite *suite, unsigned int max_
     return 0;
 }
 
-static void aapl_cleanup_test_suite(struct aapl_test_suite *suite)
+static void fruit_cleanup_test_suite(struct fruit_test_suite *suite)
 {
     if (!suite || !suite->initialized)
         return;
@@ -329,7 +329,7 @@ static void aapl_cleanup_test_suite(struct aapl_test_suite *suite)
     suite->initialized = false;
 }
 
-static void aapl_record_test_result(struct aapl_test_suite *suite,
+static void fruit_record_test_result(struct fruit_test_suite *suite,
                                    const char *test_name,
                                    bool passed,
                                    int error_code,
@@ -337,12 +337,12 @@ static void aapl_record_test_result(struct aapl_test_suite *suite,
                                    const char *additional_info,
                                    unsigned long long duration_ns)
 {
-    struct aapl_test_result *result;
+    struct fruit_test_result *result;
 
     if (!suite || !suite->initialized || !test_name)
         return;
 
-    if (suite->total_tests >= AAPL_MAX_TEST_CONNECTIONS)
+    if (suite->total_tests >= FRUIT_MAX_TEST_CONNECTIONS)
         return;
 
     result = &suite->results[suite->total_tests];
@@ -372,7 +372,7 @@ static void aapl_record_test_result(struct aapl_test_suite *suite,
 }
 
 /* Network simulation functions */
-static void aapl_init_network_simulation(struct aapl_network_simulation *sim)
+static void fruit_init_network_simulation(struct fruit_network_simulation *sim)
 {
     if (!sim)
         return;
@@ -381,7 +381,7 @@ static void aapl_init_network_simulation(struct aapl_network_simulation *sim)
     sim->mtu_size = 1500; // Standard Ethernet MTU
 }
 
-static void aapl_apply_network_latency(ktime_t *time)
+static void fruit_apply_network_latency(ktime_t *time)
 {
     unsigned int latency_ns;
 
@@ -396,7 +396,7 @@ static void aapl_apply_network_latency(ktime_t *time)
     ndelay(latency_ns);
 }
 
-static bool aapl_should_simulate_packet_loss(void)
+static bool fruit_should_simulate_packet_loss(void)
 {
     if (!net_simulation.enable_throttling || net_simulation.packet_loss_percent == 0)
         return false;
@@ -404,7 +404,7 @@ static bool aapl_should_simulate_packet_loss(void)
     return (get_random_u32() % 100) < net_simulation.packet_loss_percent;
 }
 
-static bool aapl_should_simulate_corruption(void)
+static bool fruit_should_simulate_corruption(void)
 {
     if (!net_simulation.enable_corruption || net_simulation.corruption_percent == 0)
         return false;
@@ -413,7 +413,7 @@ static bool aapl_should_simulate_corruption(void)
 }
 
 /* Performance monitoring functions */
-static void aapl_perf_monitor_init(void)
+static void fruit_perf_monitor_init(void)
 {
     spin_lock(&perf_monitor_lock);
     memset(&perf_monitor, 0, sizeof(perf_monitor));
@@ -422,7 +422,7 @@ static void aapl_perf_monitor_init(void)
     spin_unlock(&perf_monitor_lock);
 }
 
-static void aapl_perf_monitor_record_request(unsigned long long response_time_ns)
+static void fruit_perf_monitor_record_request(unsigned long long response_time_ns)
 {
     spin_lock(&perf_monitor_lock);
     perf_monitor.requests_processed++;
@@ -438,7 +438,7 @@ static void aapl_perf_monitor_record_request(unsigned long long response_time_ns
     spin_unlock(&perf_monitor_lock);
 }
 
-static void aapl_perf_monitor_log_stats(const char *test_name)
+static void fruit_perf_monitor_log_stats(const char *test_name)
 {
     unsigned long long avg_response_time;
     unsigned long long total_duration_ms;
@@ -475,11 +475,11 @@ static void aapl_perf_monitor_log_stats(const char *test_name)
     spin_unlock(&perf_monitor_lock);
 }
 
-/* Real Apple client connection simulation */
-static struct ksmbd_conn *aapl_create_real_client_connection(const struct aapl_real_client_profile *profile)
+/* Real Fruit client connection simulation */
+static struct ksmbd_conn *fruit_create_real_client_connection(const struct fruit_real_client_profile *profile)
 {
     struct ksmbd_conn *conn;
-    struct aapl_conn_state *aapl_state;
+    struct fruit_conn_state *fruit_state;
     int ret;
 
     if (!profile)
@@ -490,40 +490,38 @@ static struct ksmbd_conn *aapl_create_real_client_connection(const struct aapl_r
     if (!conn)
         return NULL;
 
-    /* Initialize Apple-specific state */
-    conn->aapl_state = kzalloc(sizeof(struct aapl_conn_state), GFP_KERNEL);
-    if (!conn->aapl_state) {
+    /* Initialize Fruit-specific state */
+    conn->fruit_state = kzalloc(sizeof(struct fruit_conn_state), GFP_KERNEL);
+    if (!conn->fruit_state) {
         free_test_connection(conn);
         return NULL;
     }
 
-    ret = aapl_init_connection_state(conn->aapl_state);
+    ret = fruit_init_connection_state(conn->fruit_state);
     if (ret) {
-        kfree(conn->aapl_state);
+        kfree(conn->fruit_state);
         free_test_connection(conn);
         return NULL;
     }
 
-    /* Set client-specific parameters */
-    conn->aapl_capabilities = profile->supported_capabilities;
-    conn->aapl_extensions_enabled = true;
-    conn->aapl_state->client_version = cpu_to_le32(0x0200); // Version 2.0
-    conn->aapl_state->client_type = cpu_to_le32(AAPL_CLIENT_MACOS);
-    conn->aapl_state->negotiated_capabilities = profile->supported_capabilities;
+    /* Set client-specific parameters via fruit_state */
+    conn->fruit_state->client_version = 0x0200; /* Version 2.0, host byte order */
+    conn->fruit_state->client_type = FRUIT_CLIENT_MACOS;
+    conn->fruit_state->negotiated_capabilities = profile->supported_capabilities;
 
     /* Enable features based on profile */
-    conn->aapl_state->compression_supported = profile->supports_compression;
-    conn->aapl_state->posix_locks_enabled = true;
-    conn->aapl_state->resilient_handles_enabled =
-        !!(profile->supported_capabilities & cpu_to_le64(AAPL_CAP_RESILIENT_HANDLES));
+    conn->fruit_state->compression_supported = profile->supports_compression;
+    conn->fruit_state->posix_locks_enabled = true;
+    conn->fruit_state->resilient_handles_enabled =
+        !!(profile->supported_capabilities & cpu_to_le64(FRUIT_CAP_RESILIENT_HANDLES));
 
     return conn;
 }
 
 /* End-to-end protocol testing */
-static bool aapl_test_end_to_end_protocol(struct ksmbd_conn *conn,
-                                         const struct aapl_real_client_profile *profile,
-                                         struct aapl_test_result *result)
+static bool fruit_test_end_to_end_protocol(struct ksmbd_conn *conn,
+                                         const struct fruit_real_client_profile *profile,
+                                         struct fruit_test_result *result)
 {
     unsigned long long start_time, end_time;
     bool test_passed = true;
@@ -534,7 +532,7 @@ static bool aapl_test_end_to_end_protocol(struct ksmbd_conn *conn,
     TEST_INFO("Starting end-to-end protocol test with %s", profile->client_id);
 
     /* Test 1: SMB2 Negotiate */
-    ret = aapl_validate_client_signature(conn, profile, sizeof(*profile));
+    ret = fruit_validate_client_signature(conn, profile, sizeof(*profile));
     if (ret) {
         strscpy(result->error_message, "SMB2 Negotiate validation failed",
                 sizeof(result->error_message));
@@ -543,7 +541,7 @@ static bool aapl_test_end_to_end_protocol(struct ksmbd_conn *conn,
     }
 
     /* Test 2: Session Setup */
-    if (!aapl_supports_capability(conn->aapl_state, cpu_to_le64(AAPL_CAP_UNIX_EXTENSIONS))) {
+    if (!fruit_supports_capability(conn->fruit_state, (FRUIT_CAP_UNIX_EXTENSIONS))) {
         strscpy(result->error_message, "UNIX Extensions capability not supported",
                 sizeof(result->error_message));
         test_passed = false;
@@ -551,7 +549,7 @@ static bool aapl_test_end_to_end_protocol(struct ksmbd_conn *conn,
     }
 
     /* Test 3: Tree Connect */
-    if (!aapl_supports_capability(conn->aapl_state, cpu_to_le64(AAPL_CAP_EXTENDED_ATTRIBUTES))) {
+    if (!fruit_supports_capability(conn->fruit_state, (FRUIT_CAP_EXTENDED_ATTRIBUTES))) {
         strscpy(result->error_message, "Extended Attributes capability not supported",
                 sizeof(result->error_message));
         test_passed = false;
@@ -559,17 +557,17 @@ static bool aapl_test_end_to_end_protocol(struct ksmbd_conn *conn,
     }
 
     /* Test 4: Create Request with AAPL context */
-    if (!aapl_supports_capability(conn->aapl_state, cpu_to_le64(AAPL_CAP_FINDERINFO))) {
-        strscpy(result->error_message, "FinderInfo capability not supported",
+    if (!fruit_supports_capability(conn->fruit_state, (FRUIT_CAP_FINDERINFO))) {
+        strscpy(result->error_message, "LookerInfo capability not supported",
                 sizeof(result->error_message));
         test_passed = false;
         goto out;
     }
 
-    /* Test 5: Time Machine support (if available) */
-    if (profile->supported_capabilities & cpu_to_le64(AAPL_CAP_TIMEMACHINE)) {
-        if (!aapl_supports_capability(conn->aapl_state, cpu_to_le64(AAPL_CAP_TIMEMACHINE))) {
-            strscpy(result->error_message, "TimeMachine capability not available",
+    /* Test 5: Save box support (if available) */
+    if (profile->supported_capabilities & cpu_to_le64(FRUIT_CAP_TIMEMACHINE)) {
+        if (!fruit_supports_capability(conn->fruit_state, (FRUIT_CAP_TIMEMACHINE))) {
+            strscpy(result->error_message, "Save box capability not available",
                     sizeof(result->error_message));
             test_passed = false;
             goto out;
@@ -578,7 +576,7 @@ static bool aapl_test_end_to_end_protocol(struct ksmbd_conn *conn,
 
     /* Test 6: Compression support (if available) */
     if (profile->supports_compression) {
-        if (!conn->aapl_state->compression_supported) {
+        if (!conn->fruit_state->compression_supported) {
             strscpy(result->error_message, "Compression not enabled",
                     sizeof(result->error_message));
             test_passed = false;
@@ -600,8 +598,8 @@ out:
 }
 
 /* Production environment simulation testing */
-static bool aapl_test_production_environment(struct aapl_production_env *env,
-                                           struct aapl_test_result *result)
+static bool fruit_test_production_environment(struct fruit_production_env *env,
+                                           struct fruit_test_result *result)
 {
     unsigned long long start_time, end_time;
     unsigned int i, connections_created = 0;
@@ -622,21 +620,21 @@ static bool aapl_test_production_environment(struct aapl_production_env *env,
     }
 
     /* Initialize performance monitoring */
-    aapl_perf_monitor_init();
+    fruit_perf_monitor_init();
 
     /* Create concurrent connections */
     for (i = 0; i < env->concurrent_connections; i++) {
-        const struct aapl_real_client_profile *profile = &aapl_client_profiles[
-            i % ARRAY_SIZE(aapl_client_profiles)];
+        const struct fruit_real_client_profile *profile = &fruit_client_profiles[
+            i % ARRAY_SIZE(fruit_client_profiles)];
 
-        connections[i] = aapl_create_real_client_connection(profile);
+        connections[i] = fruit_create_real_client_connection(profile);
         if (connections[i]) {
             connections_created++;
 
             /* Simulate network conditions */
-            aapl_apply_network_latency(&start_time);
+            fruit_apply_network_latency(&start_time);
 
-            if (aapl_should_simulate_packet_loss()) {
+            if (fruit_should_simulate_packet_loss()) {
                 /* Skip some operations to simulate packet loss */
                 continue;
             }
@@ -648,11 +646,11 @@ static bool aapl_test_production_environment(struct aapl_production_env *env,
         unsigned long long op_start = get_time_ns();
 
         /* Simulate file operations with network simulation */
-        aapl_apply_network_latency(&op_start);
+        fruit_apply_network_latency(&op_start);
 
-        if (!aapl_should_simulate_packet_loss()) {
+        if (!fruit_should_simulate_packet_loss()) {
             /* Simulate successful operation */
-            aapl_perf_monitor_record_request(get_time_ns() - op_start);
+            fruit_perf_monitor_record_request(get_time_ns() - op_start);
         } else {
             /* Simulate failed operation due to packet loss */
             spin_lock(&perf_monitor_lock);
@@ -680,7 +678,7 @@ static bool aapl_test_production_environment(struct aapl_production_env *env,
     result->duration_ns = end_time - start_time;
 
     /* Log performance statistics */
-    aapl_perf_monitor_log_stats("Production Environment Simulation");
+    fruit_perf_monitor_log_stats("Production Environment Simulation");
 
     /* Evaluate test success */
     if (connections_created < (env->concurrent_connections * 9 / 10)) {
@@ -697,33 +695,33 @@ static bool aapl_test_production_environment(struct aapl_production_env *env,
 }
 
 /* Stress testing with real client simulation */
-static bool aapl_test_stress_scenario(struct aapl_test_result *result)
+static bool fruit_test_stress_scenario(struct fruit_test_result *result)
 {
     unsigned long long start_time, end_time;
     unsigned int i, successful_ops = 0;
-    const struct aapl_real_client_profile *profile;
+    const struct fruit_real_client_profile *profile;
     struct ksmbd_conn *conn;
 
     start_time = get_time_ns();
 
-    TEST_INFO("Starting stress test scenario (%u ms duration)", AAPL_STRESS_TEST_DURATION_MS);
+    TEST_INFO("Starting stress test scenario (%u ms duration)", FRUIT_STRESS_TEST_DURATION_MS);
 
     /* Initialize network simulation with stressful conditions */
     net_simulation.latency_ms = 50; // 50ms latency
     net_simulation.packet_loss_percent = 2; // 2% packet loss
     net_simulation.enable_throttling = true;
 
-    aapl_perf_monitor_init();
+    fruit_perf_monitor_init();
 
     /* Use the most recent macOS profile for stress testing */
-    profile = &aapl_client_profiles[ARRAY_SIZE(aapl_client_profiles) - 1];
+    profile = &fruit_client_profiles[ARRAY_SIZE(fruit_client_profiles) - 1];
 
-    for (i = 0; i < AAPL_PERF_TEST_ITERATIONS; i++) {
+    for (i = 0; i < FRUIT_PERF_TEST_ITERATIONS; i++) {
         unsigned long long op_start = get_time_ns();
         bool op_success = true;
 
         /* Create connection per iteration to simulate real client behavior */
-        conn = aapl_create_real_client_connection(profile);
+        conn = fruit_create_real_client_connection(profile);
         if (!conn) {
             spin_lock(&perf_monitor_lock);
             perf_monitor.errors_encountered++;
@@ -738,36 +736,36 @@ static bool aapl_test_stress_scenario(struct aapl_test_result *result)
         spin_unlock(&perf_monitor_lock);
 
         /* Simulate various operations */
-        aapl_apply_network_latency(&op_start);
+        fruit_apply_network_latency(&op_start);
 
-        if (!aapl_should_simulate_packet_loss()) {
+        if (!fruit_should_simulate_packet_loss()) {
             /* Simulate file operations */
             if (i % 10 == 0) {
-                /* Simulate Time Machine operation */
-                if (!aapl_supports_capability(conn->aapl_state,
-                                              cpu_to_le64(AAPL_CAP_TIMEMACHINE))) {
+                /* Simulate Save box operation */
+                if (!fruit_supports_capability(conn->fruit_state,
+                                              cpu_to_le64(FRUIT_CAP_TIMEMACHINE))) {
                     op_success = false;
                 }
             }
 
-            /* Simulate Finder operations */
+            /* Simulate Looker operations */
             if (i % 5 == 0) {
-                if (!aapl_supports_capability(conn->aapl_state,
-                                              cpu_to_le64(AAPL_CAP_FINDERINFO))) {
+                if (!fruit_supports_capability(conn->fruit_state,
+                                              cpu_to_le64(FRUIT_CAP_FINDERINFO))) {
                     op_success = false;
                 }
             }
 
             /* Simulate compression operations */
             if (profile->supports_compression && i % 7 == 0) {
-                if (!conn->aapl_state->compression_supported) {
+                if (!conn->fruit_state->compression_supported) {
                     op_success = false;
                 }
             }
 
             if (op_success) {
                 successful_ops++;
-                aapl_perf_monitor_record_request(get_time_ns() - op_start);
+                fruit_perf_monitor_record_request(get_time_ns() - op_start);
             } else {
                 spin_lock(&perf_monitor_lock);
                 perf_monitor.errors_encountered++;
@@ -783,7 +781,7 @@ static bool aapl_test_stress_scenario(struct aapl_test_result *result)
 
         /* Check if we've exceeded the test duration */
         end_time = get_time_ns();
-        if (ktime_to_ms(end_time - start_time) > AAPL_STRESS_TEST_DURATION_MS) {
+        if (ktime_to_ms(end_time - start_time) > FRUIT_STRESS_TEST_DURATION_MS) {
             break;
         }
     }
@@ -792,7 +790,7 @@ static bool aapl_test_stress_scenario(struct aapl_test_result *result)
     result->duration_ns = end_time - start_time;
 
     /* Log performance statistics */
-    aapl_perf_monitor_log_stats("Stress Test Scenario");
+    fruit_perf_monitor_log_stats("Stress Test Scenario");
 
     snprintf(result->additional_info, sizeof(result->additional_info),
             "Stress test completed: %u/%u operations successful in %llu ms",
@@ -801,49 +799,49 @@ static bool aapl_test_stress_scenario(struct aapl_test_result *result)
     return (successful_ops > (i * 8 / 10)); // 80% success threshold
 }
 
-/* Time Machine specific testing */
-static bool aapl_test_timemachine_functionality(struct aapl_test_result *result)
+/* Save box specific testing */
+static bool fruit_test_timemachine_functionality(struct fruit_test_result *result)
 {
     unsigned long long start_time, end_time;
-    const struct aapl_real_client_profile *profile;
+    const struct fruit_real_client_profile *profile;
     struct ksmbd_conn *conn;
     bool test_passed = true;
 
     start_time = get_time_ns();
 
-    TEST_INFO("Starting Time Machine functionality test");
+    TEST_INFO("Starting Save box functionality test");
 
-    /* Use a profile that supports Time Machine */
-    for (int i = 0; i < ARRAY_SIZE(aapl_client_profiles); i++) {
-        if (aapl_client_profiles[i].supported_capabilities & cpu_to_le64(AAPL_CAP_TIMEMACHINE)) {
-            profile = &aapl_client_profiles[i];
+    /* Use a profile that supports Save box */
+    for (int i = 0; i < ARRAY_SIZE(fruit_client_profiles); i++) {
+        if (fruit_client_profiles[i].supported_capabilities & cpu_to_le64(FRUIT_CAP_TIMEMACHINE)) {
+            profile = &fruit_client_profiles[i];
             break;
         }
     }
 
     if (!profile) {
-        strscpy(result->error_message, "No Time Machine capable profile found",
+        strscpy(result->error_message, "No Save box capable profile found",
                 sizeof(result->error_message));
         return false;
     }
 
-    conn = aapl_create_real_client_connection(profile);
+    conn = fruit_create_real_client_connection(profile);
     if (!conn) {
-        strscpy(result->error_message, "Failed to create Time Machine test connection",
+        strscpy(result->error_message, "Failed to create Save box test connection",
                 sizeof(result->error_message));
         return false;
     }
 
-    /* Test Time Machine capability negotiation */
-    if (!aapl_supports_capability(conn->aapl_state, cpu_to_le64(AAPL_CAP_TIMEMACHINE))) {
-        strscpy(result->error_message, "Time Machine capability negotiation failed",
+    /* Test Save box capability negotiation */
+    if (!fruit_supports_capability(conn->fruit_state, (FRUIT_CAP_TIMEMACHINE))) {
+        strscpy(result->error_message, "Save box capability negotiation failed",
                 sizeof(result->error_message));
         test_passed = false;
         goto cleanup;
     }
 
     /* Test sparse bundle support */
-    if (!aapl_supports_capability(conn->aapl_state, cpu_to_le64(AAPL_CAP_SPARSE_BUNDLES))) {
+    if (!fruit_supports_capability(conn->fruit_state, (FRUIT_CAP_SPARSE_BUNDLES))) {
         strscpy(result->error_message, "Sparse bundle capability not available",
                 sizeof(result->error_message));
         test_passed = false;
@@ -851,7 +849,7 @@ static bool aapl_test_timemachine_functionality(struct aapl_test_result *result)
     }
 
     /* Test F_FULLFSYNC support */
-    if (!aapl_supports_capability(conn->aapl_state, cpu_to_le64(AAPL_CAP_F_FULLFSYNC))) {
+    if (!fruit_supports_capability(conn->fruit_state, (FRUIT_CAP_F_FULLFSYNC))) {
         strscpy(result->error_message, "F_FULLFSYNC capability not available",
                 sizeof(result->error_message));
         test_passed = false;
@@ -859,7 +857,7 @@ static bool aapl_test_timemachine_functionality(struct aapl_test_result *result)
     }
 
     /* Test sequence validation (anti-replay protection) */
-    struct aapl_timemachine_info tm_info = {
+    struct fruit_timemachine_info tm_info = {
         .version = cpu_to_le32(1),
         .bundle_id = cpu_to_le64(0x123456789ABCDEF0ULL),
         .validation_seq = cpu_to_le64(1),
@@ -867,8 +865,8 @@ static bool aapl_test_timemachine_functionality(struct aapl_test_result *result)
         .durable_handle = cpu_to_le64(0x9876543210FEDCBAULL)
     };
 
-    if (aapl_validate_timemachine_sequence(conn, &tm_info) != 0) {
-        strscpy(result->error_message, "Time Machine sequence validation failed",
+    if (fruit_validate_timemachine_sequence(conn, &tm_info) != 0) {
+        strscpy(result->error_message, "Save box sequence validation failed",
                 sizeof(result->error_message));
         test_passed = false;
         goto cleanup;
@@ -883,48 +881,48 @@ cleanup:
 
     if (test_passed) {
         snprintf(result->additional_info, sizeof(result->additional_info),
-                "Time Machine test completed successfully with %s", profile->client_id);
+                "Save box test completed successfully with %s", profile->client_id);
     }
 
     return test_passed;
 }
 
 /* Main test execution function */
-static int aapl_execute_comprehensive_tests(void)
+static int fruit_execute_comprehensive_tests(void)
 {
     unsigned int i;
     bool test_result;
 
-    TEST_INFO("=== Apple SMB Comprehensive Testing Framework ===");
+    TEST_INFO("=== Fruit SMB Comprehensive Testing Framework ===");
 
     /* Initialize test suite */
-    mutex_lock(&aapl_test_mutex);
+    mutex_lock(&fruit_test_mutex);
 
-    if (aapl_init_test_suite(&global_test_suite, AAPL_MAX_TEST_CONNECTIONS) != 0) {
-        mutex_unlock(&aapl_test_mutex);
+    if (fruit_init_test_suite(&global_test_suite, FRUIT_MAX_TEST_CONNECTIONS) != 0) {
+        mutex_unlock(&fruit_test_mutex);
         return -ENOMEM;
     }
 
     /* Initialize network simulation */
-    aapl_init_network_simulation(&net_simulation);
+    fruit_init_network_simulation(&net_simulation);
 
     /* Test 1: End-to-end protocol with different client versions */
-    for (i = 0; i < ARRAY_SIZE(aapl_client_profiles); i++) {
+    for (i = 0; i < ARRAY_SIZE(fruit_client_profiles); i++) {
         struct ksmbd_conn *conn;
-        struct aapl_test_result result = {0};
+        struct fruit_test_result result = {0};
 
-        conn = aapl_create_real_client_connection(&aapl_client_profiles[i]);
+        conn = fruit_create_real_client_connection(&fruit_client_profiles[i]);
         if (!conn) {
-            aapl_record_test_result(&global_test_suite,
+            fruit_record_test_result(&global_test_suite,
                                   "Protocol Test Connection Creation",
                                   false, -ENOMEM, "Failed to create connection",
-                                  aapl_client_profiles[i].client_id, 0);
+                                  fruit_client_profiles[i].client_id, 0);
             continue;
         }
 
-        test_result = aapl_test_end_to_end_protocol(conn, &aapl_client_profiles[i], &result);
+        test_result = fruit_test_end_to_end_protocol(conn, &fruit_client_profiles[i], &result);
 
-        aapl_record_test_result(&global_test_suite,
+        fruit_record_test_result(&global_test_suite,
                               result.test_name, test_result, result.error_code,
                               result.error_message, result.additional_info,
                               result.duration_ns);
@@ -933,40 +931,40 @@ static int aapl_execute_comprehensive_tests(void)
     }
 
     /* Test 2: Production environment simulation */
-    for (i = 0; i < ARRAY_SIZE(aapl_production_configs); i++) {
-        struct aapl_test_result result = {0};
+    for (i = 0; i < ARRAY_SIZE(fruit_production_configs); i++) {
+        struct fruit_test_result result = {0};
         char test_name[64];
 
         snprintf(test_name, sizeof(test_name), "Production Env %u", i);
         strscpy(result.test_name, test_name, sizeof(result.test_name));
 
-        test_result = aapl_test_production_environment(&aapl_production_configs[i], &result);
+        test_result = fruit_test_production_environment(&fruit_production_configs[i], &result);
 
-        aapl_record_test_result(&global_test_suite, test_name, test_result,
+        fruit_record_test_result(&global_test_suite, test_name, test_result,
                               result.error_code, result.error_message,
                               result.additional_info, result.duration_ns);
     }
 
     /* Test 3: Stress testing */
     {
-        struct aapl_test_result result = {0};
+        struct fruit_test_result result = {0};
         strscpy(result.test_name, "Stress Test", sizeof(result.test_name));
 
-        test_result = aapl_test_stress_scenario(&result);
+        test_result = fruit_test_stress_scenario(&result);
 
-        aapl_record_test_result(&global_test_suite, "Stress Test", test_result,
+        fruit_record_test_result(&global_test_suite, "Stress Test", test_result,
                               result.error_code, result.error_message,
                               result.additional_info, result.duration_ns);
     }
 
-    /* Test 4: Time Machine functionality */
+    /* Test 4: Save box functionality */
     {
-        struct aapl_test_result result = {0};
-        strscpy(result.test_name, "Time Machine Test", sizeof(result.test_name));
+        struct fruit_test_result result = {0};
+        strscpy(result.test_name, "Save box Test", sizeof(result.test_name));
 
-        test_result = aapl_test_timemachine_functionality(&result);
+        test_result = fruit_test_timemachine_functionality(&result);
 
-        aapl_record_test_result(&global_test_suite, "Time Machine Test", test_result,
+        fruit_record_test_result(&global_test_suite, "Save box Test", test_result,
                               result.error_code, result.error_message,
                               result.additional_info, result.duration_ns);
     }
@@ -996,42 +994,42 @@ static int aapl_execute_comprehensive_tests(void)
         }
     }
 
-    aapl_cleanup_test_suite(&global_test_suite);
-    mutex_unlock(&aapl_test_mutex);
+    fruit_cleanup_test_suite(&global_test_suite);
+    mutex_unlock(&fruit_test_mutex);
 
     return 0;
 }
 
 /* Module initialization and cleanup */
-static int __init aapl_real_client_test_init(void)
+static int __init fruit_real_client_test_init(void)
 {
-    TEST_INFO("Apple SMB Real Client Testing Framework initialized");
+    TEST_INFO("Fruit SMB Real Client Testing Framework initialized");
 
-    return aapl_execute_comprehensive_tests();
+    return fruit_execute_comprehensive_tests();
 }
 
-static void __exit aapl_real_client_test_exit(void)
+static void __exit fruit_real_client_test_exit(void)
 {
-    TEST_INFO("Apple SMB Real Client Testing Framework exited");
+    TEST_INFO("Fruit SMB Real Client Testing Framework exited");
 }
 
-module_init(aapl_real_client_test_init);
-module_exit(aapl_real_client_test_exit);
+module_init(fruit_real_client_test_init);
+module_exit(fruit_real_client_test_exit);
 
 MODULE_LICENSE("GPL");
-MODULE_DESCRIPTION("KSMBD Apple SMB Real Client Testing Framework");
+MODULE_DESCRIPTION("KSMBD Fruit SMB Real Client Testing Framework");
 MODULE_AUTHOR("KSMBD Contributors");
 
 /* Export functions for external testing modules */
-EXPORT_SYMBOL_GPL(aapl_init_test_suite);
-EXPORT_SYMBOL_GPL(aapl_cleanup_test_suite);
-EXPORT_SYMBOL_GPL(aapl_record_test_result);
-EXPORT_SYMBOL_GPL(aapl_init_network_simulation);
-EXPORT_SYMBOL_GPL(aapl_apply_network_latency);
-EXPORT_SYMBOL_GPL(aapl_should_simulate_packet_loss);
-EXPORT_SYMBOL_GPL(aapl_should_simulate_corruption);
-EXPORT_SYMBOL_GPL(aapl_perf_monitor_init);
-EXPORT_SYMBOL_GPL(aapl_perf_monitor_record_request);
-EXPORT_SYMBOL_GPL(aapl_perf_monitor_log_stats);
-EXPORT_SYMBOL_GPL(aapl_create_real_client_connection);
-EXPORT_SYMBOL_GPL(aapl_execute_comprehensive_tests);
+EXPORT_SYMBOL_GPL(fruit_init_test_suite);
+EXPORT_SYMBOL_GPL(fruit_cleanup_test_suite);
+EXPORT_SYMBOL_GPL(fruit_record_test_result);
+EXPORT_SYMBOL_GPL(fruit_init_network_simulation);
+EXPORT_SYMBOL_GPL(fruit_apply_network_latency);
+EXPORT_SYMBOL_GPL(fruit_should_simulate_packet_loss);
+EXPORT_SYMBOL_GPL(fruit_should_simulate_corruption);
+EXPORT_SYMBOL_GPL(fruit_perf_monitor_init);
+EXPORT_SYMBOL_GPL(fruit_perf_monitor_record_request);
+EXPORT_SYMBOL_GPL(fruit_perf_monitor_log_stats);
+EXPORT_SYMBOL_GPL(fruit_create_real_client_connection);
+EXPORT_SYMBOL_GPL(fruit_execute_comprehensive_tests);

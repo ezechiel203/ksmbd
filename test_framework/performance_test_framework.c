@@ -2,7 +2,7 @@
 /*
  *   Copyright (C) 2023 ksmbd Contributors
  *
- *   Performance Test Framework for Apple SMB Extensions
+ *   Performance Test Framework for Fruit SMB Extensions
  */
 
 #include <linux/module.h>
@@ -23,7 +23,7 @@
 #include "vfs.h"
 #include "test_framework/test_utils.h"
 
-#define PERFORMANCE_TEST_MODULE "ksmbd_apple_performance"
+#define PERFORMANCE_TEST_MODULE "ksmbd_fruit_performance"
 
 /* Performance test definitions */
 #define MAX_CONCURRENT_TESTS 32
@@ -75,7 +75,7 @@ struct perf_test_config {
     unsigned int file_count;
     unsigned int max_file_size_kb;
     unsigned int duration_ms;
-    bool apple_optimized;
+    bool fruit_optimized;
     bool baseline_test;
 };
 
@@ -87,7 +87,7 @@ struct dir_traversal_test_data {
     unsigned int dir_count;
     struct file **open_files;
     struct dentry **dentries;
-    bool apple_optimized;
+    bool fruit_optimized;
 };
 
 /* Performance test context */
@@ -175,7 +175,7 @@ static void update_performance_stats(struct performance_test_context *ctx,
 
     /* Calculate improvement ratio if baseline exists */
     mutex_lock(&perf_stats.stats_lock);
-    if (ctx->config->apple_optimized && !ctx->config->baseline_test) {
+    if (ctx->config->fruit_optimized && !ctx->config->baseline_test) {
         enum performance_test_type test_type = ctx->config->test_type;
         if (perf_stats.baseline_results[test_type].operations_count > 0) {
             struct performance_result *baseline = &perf_stats.baseline_results[test_type];
@@ -183,7 +183,7 @@ static void update_performance_stats(struct performance_test_context *ctx,
                 result->improvement_ratio = (float)baseline->avg_time_ns / result->avg_time_ns;
             }
         }
-    } else if (!ctx->config->apple_optimized && ctx->config->baseline_test) {
+    } else if (!ctx->config->fruit_optimized && ctx->config->baseline_test) {
         /* This is a baseline test, store the result */
         enum performance_test_type test_type = ctx->config->test_type;
         perf_stats.baseline_results[test_type] = *result;
@@ -194,7 +194,7 @@ static void update_performance_stats(struct performance_test_context *ctx,
 /* Directory traversal test implementation */
 static struct dir_traversal_test_data *create_directory_test_data(
     unsigned int directory_depth, unsigned int directory_width, unsigned int file_count,
-    bool apple_optimized)
+    bool fruit_optimized)
 {
     struct dir_traversal_test_data *test_data;
     unsigned int total_dirs = 0;
@@ -220,7 +220,7 @@ static struct dir_traversal_test_data *create_directory_test_data(
 
     test_data->file_count = file_count;
     test_data->dir_count = total_dirs;
-    test_data->apple_optimized = apple_optimized;
+    test_data->fruit_optimized = fruit_optimized;
 
     /* Generate directory structure */
     unsigned int dir_index = 0;
@@ -315,10 +315,10 @@ static int run_single_directory_traversal(struct performance_test_context *ctx,
 
     start_time = get_time_ns();
 
-    if (ctx->test_data->apple_optimized) {
-        /* Simulate Apple-optimized directory traversal */
-        /* This would use Apple-specific optimizations */
-        usleep_range(100, 500); /* Simulate fast Apple-optimized traversal */
+    if (ctx->test_data->fruit_optimized) {
+        /* Simulate Fruit-optimized directory traversal */
+        /* This would use Fruit-specific optimizations */
+        usleep_range(100, 500); /* Simulate fast Fruit-optimized traversal */
     } else {
         /* Simulate standard directory traversal */
         usleep_range(1000, 5000); /* Simulate slower standard traversal */
@@ -326,8 +326,8 @@ static int run_single_directory_traversal(struct performance_test_context *ctx,
 
     /* Simulate processing files in directory */
     for (int i = 0; i < simulated_files; i++) {
-        if (ctx->test_data->apple_optimized) {
-            usleep_range(10, 50); /* Fast processing with Apple optimization */
+        if (ctx->test_data->fruit_optimized) {
+            usleep_range(10, 50); /* Fast processing with Fruit optimization */
         } else {
             usleep_range(50, 200); /* Standard processing time */
         }
@@ -424,7 +424,7 @@ static int concurrent_test_thread(void *data)
             ret = run_single_directory_traversal(ctx, ctx->test_data->directory_paths[i]);
         } else {
             /* Fallback to simulated operation */
-            if (ctx->config->apple_optimized) {
+            if (ctx->config->fruit_optimized) {
                 usleep_range(100, 500);
             } else {
                 usleep_range(1000, 5000);
@@ -483,7 +483,7 @@ static int run_concurrent_access_test(struct performance_test_context *ctx)
     /* Prepare test data */
     if (!ctx->test_data) {
         ctx->test_data = create_directory_test_data(
-            5, 4, ctx->config->file_count, ctx->config->apple_optimized);
+            5, 4, ctx->config->file_count, ctx->config->fruit_optimized);
         if (!ctx->test_data) {
             kfree(thread_data);
             kfree(threads);
@@ -576,7 +576,7 @@ static int run_memory_efficiency_test(struct performance_test_context *ctx)
     memory_before = get_time_ns(); /* In a real implementation, this would get actual memory usage */
 
     /* Create large test data set */
-    large_test_data = create_directory_test_data(10, 8, 1000, ctx->config->apple_optimized);
+    large_test_data = create_directory_test_data(10, 8, 1000, ctx->config->fruit_optimized);
     if (!large_test_data) {
         return -ENOMEM;
     }
@@ -591,8 +591,8 @@ static int run_memory_efficiency_test(struct performance_test_context *ctx)
             break;
         }
 
-        /* Simulate memory pressure cleanup for Apple clients */
-        if (ctx->config->apple_optimized && i % 10 == 0) {
+        /* Simulate memory pressure cleanup for Fruit clients */
+        if (ctx->config->fruit_optimized && i % 10 == 0) {
             usleep_range(100, 300); /* Memory cleanup time */
         }
     }
@@ -627,13 +627,13 @@ static struct perf_test_config perf_configs[] = {
         100,  /* file count */
         1024, /* max file size */
         10000, /* duration ms */
-        false, /* apple optimized (baseline) */
+        false, /* fruit optimized (baseline) */
         true   /* baseline test */
     },
     {
         PERF_DIR_TRAVERSAL_BASIC,
-        "Apple Directory Traversal",
-        "Test Apple-optimized directory traversal performance",
+        "Fruit Directory Traversal",
+        "Test Fruit-optimized directory traversal performance",
         1000,
         1,
         3,
@@ -641,7 +641,7 @@ static struct perf_test_config perf_configs[] = {
         100,
         1024,
         10000,
-        true,  /* apple optimized */
+        true,  /* fruit optimized */
         false  /* baseline test */
     },
     {
@@ -660,8 +660,8 @@ static struct perf_test_config perf_configs[] = {
     },
     {
         PERF_DIR_TRAVERSAL_DEEP,
-        "Apple Deep Directory Traversal",
-        "Test Apple-optimized deep directory traversal",
+        "Fruit Deep Directory Traversal",
+        "Test Fruit-optimized deep directory traversal",
         500,
         1,
         15,
@@ -688,8 +688,8 @@ static struct perf_test_config perf_configs[] = {
     },
     {
         PERF_DIR_TRAVERSAL_WIDE,
-        "Apple Wide Directory Traversal",
-        "Test Apple-optimized wide directory traversal",
+        "Fruit Wide Directory Traversal",
+        "Test Fruit-optimized wide directory traversal",
         800,
         1,
         2,
@@ -716,8 +716,8 @@ static struct perf_test_config perf_configs[] = {
     },
     {
         PERF_CONCURRENT_ACCESS,
-        "Apple Concurrent Directory Access",
-        "Test Apple-optimized concurrent directory access",
+        "Fruit Concurrent Directory Access",
+        "Test Fruit-optimized concurrent directory access",
         2000,
         10,
         5,
@@ -740,7 +740,7 @@ static int run_performance_test(struct perf_test_config *config)
 
     TEST_INFO("=== Starting Performance Test: %s ===", config->name);
     TEST_INFO("Description: %s", config->description);
-    TEST_INFO("Apple optimized: %s", config->apple_optimized ? "Yes" : "No");
+    TEST_INFO("Fruit optimized: %s", config->fruit_optimized ? "Yes" : "No");
     TEST_INFO("Baseline test: %s", config->baseline_test ? "Yes" : "No");
 
     memset(&ctx, 0, sizeof(ctx));
@@ -748,7 +748,7 @@ static int run_performance_test(struct perf_test_config *config)
     init_completion(&ctx.test_complete);
 
     /* Initialize test connection */
-    ctx.conn = create_test_connection(config->apple_optimized);
+    ctx.conn = create_test_connection(config->fruit_optimized);
     if (!ctx.conn) {
         TEST_ERROR("Failed to create test connection");
         return -ENOMEM;
@@ -758,7 +758,7 @@ static int run_performance_test(struct perf_test_config *config)
     if (config->test_type != PERF_MEMORY_EFFICIENCY) {
         ctx.test_data = create_directory_test_data(
             config->directory_depth, config->directory_width, config->file_count,
-            config->apple_optimized);
+            config->fruit_optimized);
         if (!ctx.test_data) {
             ret = -ENOMEM;
             goto cleanup;
@@ -795,11 +795,11 @@ static int run_performance_test(struct perf_test_config *config)
 
     if (ret == 0) {
         /* Store results */
-        if (config->apple_optimized && !config->baseline_test) {
+        if (config->fruit_optimized && !config->baseline_test) {
             mutex_lock(&perf_stats.stats_lock);
             perf_stats.optimized_results[config->test_type] = ctx.result;
             mutex_unlock(&perf_stats.stats_lock);
-        } else if (!config->apple_optimized && config->baseline_test) {
+        } else if (!config->fruit_optimized && config->baseline_test) {
             mutex_lock(&perf_stats.stats_lock);
             perf_stats.baseline_results[config->test_type] = ctx.result;
             mutex_unlock(&perf_stats.stats_lock);
@@ -836,7 +836,7 @@ static int run_all_performance_tests(void)
     int i, failed = 0;
     unsigned long long total_start, total_end;
 
-    TEST_INFO("🚀 Starting Apple SMB Extensions Performance Tests");
+    TEST_INFO("🚀 Starting Fruit SMB Extensions Performance Tests");
     TEST_INFO("=================================================");
 
     memset(&perf_stats, 0, sizeof(perf_stats));
@@ -889,7 +889,7 @@ static int run_all_performance_tests(void)
 }
 
 /* Module initialization */
-static int __init apple_performance_test_init(void)
+static int __init fruit_performance_test_init(void)
 {
     int ret;
 
@@ -906,15 +906,15 @@ static int __init apple_performance_test_init(void)
 }
 
 /* Module cleanup */
-static void __exit apple_performance_test_exit(void)
+static void __exit fruit_performance_test_exit(void)
 {
     TEST_INFO("Unloading %s module", PERFORMANCE_TEST_MODULE);
 }
 
-module_init(apple_performance_test_init);
-module_exit(apple_performance_test_exit);
+module_init(fruit_performance_test_init);
+module_exit(fruit_performance_test_exit);
 
 MODULE_LICENSE("GPL v2");
 MODULE_AUTHOR("ksmbd Contributors");
-MODULE_DESCRIPTION("Performance Test Framework for Apple SMB Extensions");
+MODULE_DESCRIPTION("Performance Test Framework for Fruit SMB Extensions");
 MODULE_VERSION("1.0");

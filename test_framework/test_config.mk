@@ -2,10 +2,10 @@
 #
 # Copyright (C) 2024 The KSMBD Project
 #
-# Configuration for KSMBD Apple SMB Testing Framework
+# Configuration for KSMBD Fruit SMB Testing Framework
 #
 # This configuration file defines all testing parameters, scenarios,
-# and validation criteria for comprehensive Apple SMB testing.
+# and validation criteria for comprehensive Fruit SMB testing.
 
 # ====== TEST CONFIGURATION ======
 
@@ -18,12 +18,12 @@ TEST_CPU_LIMIT ?= 80                   # CPU limit in percent
 
 # ====== CLIENT SIMULATION CONFIGURATION ======
 
-# Apple client versions to test
+# Fruit client versions to test
 TEST_MACOS_VERSIONS ?= 10.14 11.0 12.0 13.0 14.0
 TEST_IOS_VERSIONS ?= 14.0 15.0 16.0 17.0
 TEST_IPADOS_VERSIONS ?= 13.0 14.0 15.0 16.0
 
-# Non-Apple clients for compatibility testing
+# Non-Fruit clients for compatibility testing
 TEST_WINDOWS_VERSIONS ?= 10 11
 TEST_LINUX_DISTRIBUTIONS ?= ubuntu centos debian
 TEST_ANDROID_VERSIONS ?= 11 12 13 14
@@ -94,23 +94,23 @@ PROTOCOL_STRICT_VALIDATION ?= true      # Enable strict protocol validation
 PROTOCOL_BACKWARDS_COMPATIBILITY ?= true # Test backwards compatibility
 PROTOCOL_INTEROPERABILITY ?= true       # Test interoperability
 
-# ====== APPLE-SPECIFIC TESTING ======
+# ====== FRUIT-SPECIFIC TESTING ======
 
-# Apple extensions testing
-AAPL_EXTENSIONS_TESTING ?= true        # Enable Apple extensions testing
-AAPL_FINDERINFO_TESTING ?= true       # Test FinderInfo operations
-AAPL_TIMEMACHINE_TESTING ?= true       # Test Time Machine functionality
-AAPL_COMPRESSION_TESTING ?= true      # Test compression operations
-AAPL_F_FULLFSYNC_TESTING ?= true      # Test F_FULLFSYNC operations
+# Fruit extensions testing
+FRUIT_EXTENSIONS_TESTING ?= true        # Enable Fruit extensions testing
+FRUIT_LOOKERINFO_TESTING ?= true       # Test LookerInfo operations
+FRUIT_SAVEBOX_TESTING ?= true       # Test Save box functionality
+FRUIT_COMPRESSION_TESTING ?= true      # Test compression operations
+FRUIT_F_FULLFSYNC_TESTING ?= true      # Test F_FULLFSYNC operations
 
-# Apple client capabilities
-AAPL_TEST_UNIX_EXTENSIONS ?= true      # Test UNIX extensions
-AAPL_TEST_EXTENDED_ATTRIBUTES ?= true   # Test extended attributes
-AAPL_TEST_CASE_SENSITIVITY ?= true     # Test case sensitivity
-AAPL_TEST_POSIX_LOCKS ?= true         # Test POSIX locks
-AAPL_TEST_RESILIENT_HANDLES ?= true    # Test resilient handles
-AAPL_TEST_READDIR_ATTRS ?= true        # Test readdir attributes
-AAPL_TEST_FILE_IDS ?= true             # Test file IDs
+# Fruit client capabilities
+FRUIT_TEST_UNIX_EXTENSIONS ?= true      # Test UNIX extensions
+FRUIT_TEST_EXTENDED_ATTRIBUTES ?= true   # Test extended attributes
+FRUIT_TEST_CASE_SENSITIVITY ?= true     # Test case sensitivity
+FRUIT_TEST_POSIX_LOCKS ?= true         # Test POSIX locks
+FRUIT_TEST_RESILIENT_HANDLES ?= true    # Test resilient handles
+FRUIT_TEST_READDIR_ATTRS ?= true        # Test readdir attributes
+FRUIT_TEST_FILE_IDS ?= true             # Test file IDs
 
 # ====== TESTING FRAMEWORK CONFIGURATION ======
 

@@ -350,6 +350,8 @@ static int ipc_server_config_on_startup(struct ksmbd_startup_request *req)
 	ret |= ksmbd_set_server_string(req->server_string);
 	ret |= ksmbd_set_work_group(req->work_group);
 	server_conf.bind_interfaces_only = req->bind_interfaces_only;
+	strscpy(server_conf.fruit_model, req->fruit_model,
+		sizeof(server_conf.fruit_model));
 	ret |= ksmbd_tcp_set_interfaces(KSMBD_STARTUP_CONFIG_INTERFACES(req),
 					req->ifc_list_sz);
 out:

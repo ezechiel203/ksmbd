@@ -50,7 +50,7 @@ static const struct smb_sid sid_unix_groups = { 1, 1, {0, 0, 0, 0, 0, 22},
  * See http://technet.microsoft.com/en-us/library/hh509017(v=ws.10).aspx
  */
 
-/* S-1-5-88 MS NFS and Apple style UID/GID/mode */
+/* S-1-5-88 MS NFS and Fruit style UID/GID/mode */
 
 /* S-1-5-88-1 Unix uid */
 static const struct smb_sid sid_unix_NFS_users = { 1, 2, {0, 0, 0, 0, 0, 5},

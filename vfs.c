@@ -19,6 +19,7 @@
 #include <linux/dcache.h>
 #include <linux/slab.h>
 #include <linux/vmalloc.h>
+#include <linux/blkdev.h>
 #include <linux/crc32c.h>
 #include <linux/sched/xacct.h>
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 4, 0)
@@ -1243,7 +1244,7 @@ int ksmbd_vfs_readdir_name(struct ksmbd_work *work,
  *
  * Return:	0 on success, otherwise error
  */
-int ksmbd_vfs_fsync(struct ksmbd_work *work, u64 fid, u64 p_id)
+int ksmbd_vfs_fsync(struct ksmbd_work *work, u64 fid, u64 p_id, bool fullsync)
 {
 	struct ksmbd_file *fp;
 	int err;
@@ -1256,6 +1257,25 @@ int ksmbd_vfs_fsync(struct ksmbd_work *work, u64 fid, u64 p_id)
 	err = vfs_fsync(fp->filp, 0);
 	if (err < 0)
 		pr_err("smb fsync failed, err = %d\n", err);
+
+	/*
+	 * F_FULLFSYNC: flush the block device write cache.
+	 * macOS Time Machine sends Reserved1=0xFFFF in SMB2 FLUSH
+	 * to request this. Without it, data can be lost on power
+	 * failure even though vfs_fsync() returned success.
+	 */
+	if (!err && fullsync) {
+		struct block_device *bdev;
+
+		bdev = fp->filp->f_path.dentry->d_sb->s_bdev;
+		if (bdev) {
+			err = blkdev_issue_flush(bdev);
+			if (err)
+				pr_err("smb fullfsync flush failed, err = %d\n",
+				       err);
+		}
+	}
+
 	ksmbd_fd_put(work, fp);
 	return err;
 }

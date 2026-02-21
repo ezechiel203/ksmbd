@@ -17,7 +17,7 @@
 #include "connection.h"
 #include "transport_tcp.h"
 #include "transport_rdma.h"
-#include "smb2aapl.h"
+#include "smb2fruit.h"
 
 static DEFINE_MUTEX(init_lock);
 
@@ -44,11 +44,11 @@ void ksmbd_conn_free(struct ksmbd_conn *conn)
 	kvfree(conn->request_buf);
 	kfree(conn->preauth_info);
 
-	/* Clean up Apple SMB extension resources */
-	if (conn->aapl_state) {
-		aapl_cleanup_connection_state(conn->aapl_state);
-		kfree(conn->aapl_state);
-		conn->aapl_state = NULL;
+	/* Clean up Fruit SMB extension resources */
+	if (conn->fruit_state) {
+		fruit_cleanup_connection_state(conn->fruit_state);
+		kfree(conn->fruit_state);
+		conn->fruit_state = NULL;
 	}
 
 	if (atomic_dec_and_test(&conn->refcnt)) {

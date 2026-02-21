@@ -3392,7 +3392,7 @@ int smb_flush(struct ksmbd_work *work)
 		if (err)
 			goto out;
 	} else {
-		err = ksmbd_vfs_fsync(work, req->FileID, KSMBD_NO_FID);
+		err = ksmbd_vfs_fsync(work, req->FileID, KSMBD_NO_FID, false);
 		if (err)
 			goto out;
 	}

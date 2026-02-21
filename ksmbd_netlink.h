@@ -79,6 +79,10 @@ struct ksmbd_heartbeat {
 #define KSMBD_GLOBAL_FLAG_SMB3_MULTICHANNEL	BIT(2)
 #define KSMBD_GLOBAL_FLAG_SMB2_ENCRYPTION_OFF	BIT(3)
 #define KSMBD_GLOBAL_FLAG_DURABLE_HANDLE	BIT(4)
+#define KSMBD_GLOBAL_FLAG_FRUIT_EXTENSIONS	BIT(5)
+#define KSMBD_GLOBAL_FLAG_FRUIT_ZERO_FILEID	BIT(6)
+#define KSMBD_GLOBAL_FLAG_FRUIT_NFS_ACES	BIT(7)
+#define KSMBD_GLOBAL_FLAG_FRUIT_COPYFILE	BIT(8)
 
 /*
  * IPC request for ksmbd server startup
@@ -113,7 +117,8 @@ struct ksmbd_startup_request {
 	__u32	max_connections;	/* Number of maximum simultaneous connections */
 	__s8	bind_interfaces_only;
 	__u32	max_ip_connections;	/* Number of maximum connection per ip address */
-	__s8	reserved[499];		/* Reserved room */
+	__s8	fruit_model[64];	/* Fruit model string for AAPL */
+	__s8	reserved[435];		/* Reserved room */
 	__u32	ifc_list_sz;		/* interfaces list size */
 	__s8	____payload[];
 } __packed;
@@ -182,7 +187,8 @@ struct ksmbd_share_config_response {
 	__u16	force_uid;
 	__u16	force_gid;
 	__s8	share_name[KSMBD_REQ_MAX_SHARE_NAME];
-	__u32	reserved[111];		/* Reserved room */
+	__u64	time_machine_max_size;	/* Time Machine max size in bytes */
+	__u32	reserved[109];		/* Reserved room */
 	__u32	payload_sz;
 	__u32	veto_list_sz;
 	__s8	____payload[];
@@ -377,6 +383,10 @@ enum KSMBD_TREE_CONN_STATUS {
 #define KSMBD_SHARE_FLAG_UPDATE				BIT(14)
 #define KSMBD_SHARE_FLAG_CROSSMNT			BIT(15)
 #define KSMBD_SHARE_FLAG_CONTINUOUS_AVAILABILITY	BIT(16)
+#define KSMBD_SHARE_FLAG_FRUIT_TIME_MACHINE		BIT(17)
+#define KSMBD_SHARE_FLAG_FRUIT_FINDER_INFO		BIT(18)
+#define KSMBD_SHARE_FLAG_FRUIT_RFORK_SIZE		BIT(19)
+#define KSMBD_SHARE_FLAG_FRUIT_MAX_ACCESS		BIT(20)
 
 /*
  * Tree connect request flags.

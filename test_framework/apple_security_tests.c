@@ -2,9 +2,9 @@
 /*
  *   Copyright (C) 2024 ksmbd Contributors
  *
- *   Security Testing Framework for Apple SMB Extensions
+ *   Security Testing Framework for Fruit SMB Extensions
  *   Comprehensive security validation including fuzzing, boundary checking,
- *   and vulnerability detection for Apple-specific SMB protocol extensions.
+ *   and vulnerability detection for Fruit-specific SMB protocol extensions.
  */
 
 #include <linux/module.h>
@@ -19,10 +19,10 @@
 
 #include "smb2pdu.h"
 #include "connection.h"
-#include "smb2aapl.h"
+#include "smb2fruit.h"
 #include "test_framework/test_utils.h"
 
-#define SECURITY_TEST_MODULE "ksmbd_apple_security"
+#define SECURITY_TEST_MODULE "ksmbd_fruit_security"
 
 /* Security test statistics */
 struct security_test_stats {
@@ -95,35 +95,35 @@ struct resource_exhaustion_test {
 /* Buffer overflow test cases */
 static struct memory_corruption_test buffer_overflow_tests[] = {
     {
-        "AAPL context with oversized data field",
+        "Fruit context with oversized data field",
         create_oversized_data_field_context,
         sizeof(struct create_context) + 65537, /* Exceeds 16-bit limit */
         false,
         "Should reject oversized data field"
     },
     {
-        "AAPL context with name length overflow",
+        "Fruit context with name length overflow",
         create_name_length_overflow_context,
         sizeof(struct create_context) + 4,
         false,
         "Should reject name length overflow"
     },
     {
-        "AAPL context with data offset overflow",
+        "Fruit context with data offset overflow",
         create_data_offset_overflow_context,
         sizeof(struct create_context) + 32,
         false,
         "Should reject invalid data offset"
     },
     {
-        "AAPL context with nested buffer overflow",
+        "Fruit context with nested buffer overflow",
         create_nested_buffer_overflow_context,
-        sizeof(struct create_context) + sizeof(struct aapl_client_info) + 256,
+        sizeof(struct create_context) + sizeof(struct fruit_client_info) + 256,
         false,
         "Should detect nested buffer overflow"
     },
     {
-        "AAPL context with heap buffer overflow",
+        "Fruit context with heap buffer overflow",
         create_heap_buffer_overflow_context,
         sizeof(struct create_context) + 1024,
         false,
@@ -135,35 +135,35 @@ static struct memory_corruption_test buffer_overflow_tests[] = {
 /* Input validation test cases */
 static struct input_validation_test input_validation_tests[] = {
     {
-        "AAPL context with negative values",
+        "Fruit context with negative values",
         create_negative_values_context,
-        sizeof(struct create_context) + sizeof(struct aapl_client_info),
+        sizeof(struct create_context) + sizeof(struct fruit_client_info),
         false,
         "Should reject negative values in numeric fields"
     },
     {
-        "AAPL context with malformed UTF strings",
+        "Fruit context with malformed UTF strings",
         create_malformed_utf_context,
         sizeof(struct create_context) + 256,
         false,
         "Should reject malformed UTF strings"
     },
     {
-        "AAPL context with invalid bit patterns",
+        "Fruit context with invalid bit patterns",
         create_invalid_bit_patterns_context,
         sizeof(struct create_context) + 32,
         false,
         "Should reject invalid bit patterns"
     },
     {
-        "AAPL context with structure corruption",
+        "Fruit context with structure corruption",
         create_corrupted_structure_context,
         sizeof(struct create_context) + 64,
         false,
         "Should detect structure corruption"
     },
     {
-        "AAPL context with type confusion",
+        "Fruit context with type confusion",
         create_type_confusion_context,
         sizeof(struct create_context) + 32,
         false,
@@ -175,28 +175,28 @@ static struct input_validation_test input_validation_tests[] = {
 /* Resource exhaustion test cases */
 static struct resource_exhaustion_test resource_exhaustion_tests[] = {
     {
-        "AAPL connections limit",
+        "Fruit connections limit",
         100, /* max connections */
         101, /* test limit */
         false,
-        "Should prevent too many Apple connections"
+        "Should prevent too many Fruit connections"
     },
     {
-        "AAPL context size limit",
+        "Fruit context size limit",
         65536, /* max context size */
         65537, /* test limit */
         false,
         "Should enforce size limits"
     },
     {
-        "Apple client capability combinations",
+        "Fruit client capability combinations",
         64, /* max combinations */
         65, /* test limit */
         false,
         "Should limit capability combinations"
     },
     {
-        "Apple client memory allocation",
+        "Fruit client memory allocation",
         1000, /* max allocations */
         1001, /* test limit */
         false,
@@ -250,7 +250,7 @@ static struct vulnerability_assessment {
 } vulnerability_matrix[] = {
     {
         "Buffer Overflow",
-        "Oversized AAPL context testing",
+        "Oversized Fruit context testing",
         SEVERITY_CRITICAL,
         "Strict size validation and bounds checking"
     },
@@ -327,22 +327,22 @@ static void create_data_offset_overflow_context(void *buffer, size_t size)
 static void create_nested_buffer_overflow_context(void *buffer, size_t size)
 {
     struct create_context *ctx = buffer;
-    struct aapl_client_info *info = (struct aapl_client_info *)(ctx->Buffer + 4);
+    struct fruit_client_info *info = (struct fruit_client_info *)(ctx->Buffer + 4);
 
     ctx->NameLength = 4;
-    ctx->DataLength = cpu_to_le32(sizeof(struct aapl_client_info) + 256); /* Extra data */
+    ctx->DataLength = cpu_to_le32(sizeof(struct fruit_client_info) + 256); /* Extra data */
     ctx->DataOffset = cpu_to_le16(offsetof(struct create_context, Buffer) + 4);
 
     memcpy(ctx->Buffer, "AAPL", 4);
 
-    /* Set up valid AAPL client info */
+    /* Set up valid Fruit client info */
     memcpy(info->signature, "AAPL", 4);
-    info->version = cpu_to_le32(AAPL_VERSION_2_0);
-    info->client_type = cpu_to_le32(AAPL_CLIENT_MACOS);
-    info->capabilities = cpu_to_le64(AAPL_DEFAULT_CAPABILITIES);
+    info->version = cpu_to_le32(FRUIT_VERSION_2_0);
+    info->client_type = cpu_to_le32(FRUIT_CLIENT_MACOS);
+    info->capabilities = cpu_to_le64(FRUIT_DEFAULT_CAPABILITIES);
 
     /* Add extra data that could cause overflow */
-    memset((unsigned char *)info + sizeof(struct aapl_client_info), 0xBB, 256);
+    memset((unsigned char *)info + sizeof(struct fruit_client_info), 0xBB, 256);
 }
 
 static void create_heap_buffer_overflow_context(void *buffer, size_t size)
@@ -363,10 +363,10 @@ static void create_heap_buffer_overflow_context(void *buffer, size_t size)
 static void create_negative_values_context(void *buffer, size_t size)
 {
     struct create_context *ctx = buffer;
-    struct aapl_client_info *info = (struct aapl_client_info *)(ctx->Buffer + 4);
+    struct fruit_client_info *info = (struct fruit_client_info *)(ctx->Buffer + 4);
 
     ctx->NameLength = 4;
-    ctx->DataLength = cpu_to_le32(sizeof(struct aapl_client_info));
+    ctx->DataLength = cpu_to_le32(sizeof(struct fruit_client_info));
     ctx->DataOffset = cpu_to_le16(offsetof(struct create_context, Buffer) + 4);
 
     memcpy(ctx->Buffer, "AAPL", 4);
@@ -399,10 +399,10 @@ static void create_malformed_utf_context(void *buffer, size_t size)
 static void create_invalid_bit_patterns_context(void *buffer, size_t size)
 {
     struct create_context *ctx = buffer;
-    struct aapl_client_info *info = (struct aapl_client_info *)(ctx->Buffer + 4);
+    struct fruit_client_info *info = (struct fruit_client_info *)(ctx->Buffer + 4);
 
     ctx->NameLength = 4;
-    ctx->DataLength = cpu_to_le32(sizeof(struct aapl_client_info));
+    ctx->DataLength = cpu_to_le32(sizeof(struct fruit_client_info));
     ctx->DataOffset = cpu_to_le16(offsetof(struct create_context, Buffer) + 4);
 
     memcpy(ctx->Buffer, "AAPL", 4);
@@ -431,10 +431,10 @@ static void create_type_confusion_context(void *buffer, size_t size)
 {
     /* Create a context that looks like one type but contains data for another */
     struct create_context *ctx = buffer;
-    struct aapl_client_info *info = (struct aapl_client_info *)(ctx->Buffer + 4);
+    struct fruit_client_info *info = (struct fruit_client_info *)(ctx->Buffer + 4);
 
     ctx->NameLength = 4;
-    ctx->DataLength = cpu_to_le32(sizeof(struct aapl_client_info));
+    ctx->DataLength = cpu_to_le32(sizeof(struct fruit_client_info));
     ctx->DataOffset = cpu_to_le16(offsetof(struct create_context, Buffer) + 4);
 
     memcpy(ctx->Buffer, "AAPL", 4);
@@ -518,7 +518,7 @@ static void fuzz_structure_aware(void *buffer, size_t size, unsigned int seed)
         ctx->DataOffset = cpu_to_le16(get_random_u16());
         ctx->DataLength = cpu_to_le32(get_random_u32());
 
-        /* Set AAPL signature */
+        /* Set Fruit signature (wire protocol tag "AAPL") */
         if (size >= sizeof(struct create_context) + 4) {
             memcpy(ctx->Buffer, "AAPL", 4);
         }
@@ -591,7 +591,7 @@ static void test_buffer_overflow_protection(void)
 
         test->create_payload(buffer, test->payload_size);
 
-        result = aapl_validate_create_context(buffer);
+        result = fruit_validate_create_context(buffer);
 
         SECURITY_ASSERT_NO_VULNERABILITY(result != 0, test_name,
                                        SEVERITY_CRITICAL, test->expected_error);
@@ -623,7 +623,7 @@ static void test_input_validation(void)
 
         test->create_input(buffer, test->input_size);
 
-        result = aapl_validate_create_context(buffer);
+        result = fruit_validate_create_context(buffer);
 
         if (!test->should_validate) {
             SECURITY_ASSERT_NO_VULNERABILITY(result != 0, test_name,
@@ -695,22 +695,22 @@ static void test_fuzzing_coverage(void)
         for (j = 0; j < config.iterations; j++) {
             unsigned int seed = get_random_u32();
 
-            /* Create base valid AAPL context */
-            create_valid_aapl_context(test_buffer, sizeof(struct create_context) + sizeof(struct aapl_client_info));
+            /* Create base valid Fruit context */
+            create_valid_fruit_context(test_buffer, sizeof(struct create_context) + sizeof(struct fruit_client_info));
 
             /* Apply fuzzing */
             generator->generate_input(test_buffer, config.max_packet_size, seed);
 
             /* Test the fuzzed input */
-            result = aapl_validate_create_context(test_buffer);
+            result = fruit_validate_create_context(test_buffer);
 
             if (result == 0) {
                 /* If validation passes, try to process the context */
-                struct aapl_conn_state state;
+                struct fruit_conn_state state;
                 memset(&state, 0, sizeof(state));
 
-                if (aapl_parse_client_info(test_buffer + sizeof(struct create_context) + 4,
-                                          sizeof(struct aapl_client_info), &state) == 0) {
+                if (fruit_parse_client_info(test_buffer + sizeof(struct create_context) + 4,
+                                          sizeof(struct fruit_client_info), &state) == 0) {
                     /* Valid input, no vulnerability */
                     continue;
                 }
@@ -756,15 +756,15 @@ static void test_memory_leak_detection(void)
             return;
         }
 
-        /* Test Apple connection allocation and cleanup */
-        struct aapl_client_info client_info = {
+        /* Test Fruit connection allocation and cleanup */
+        struct fruit_client_info client_info = {
             .signature = {'A', 'A', 'P', 'L'},
-            .version = cpu_to_le32(AAPL_VERSION_2_0),
-            .client_type = cpu_to_le32(AAPL_CLIENT_MACOS),
-            .capabilities = cpu_to_le64(AAPL_DEFAULT_CAPABILITIES)
+            .version = cpu_to_le32(FRUIT_VERSION_2_0),
+            .client_type = cpu_to_le32(FRUIT_CLIENT_MACOS),
+            .capabilities = cpu_to_le64(FRUIT_DEFAULT_CAPABILITIES)
         };
 
-        aapl_negotiate_capabilities(conn, &client_info);
+        fruit_negotiate_capabilities(conn, &client_info);
         ksmbd_conn_free(conn);
     }
 
@@ -788,14 +788,14 @@ static int race_condition_thread(void *data)
     int i;
 
     for (i = 0; i < 1000; i++) {
-        struct aapl_client_info client_info = {
+        struct fruit_client_info client_info = {
             .signature = {'A', 'A', 'P', 'L'},
-            .version = cpu_to_le32(AAPL_VERSION_2_0),
-            .client_type = cpu_to_le32(AAPL_CLIENT_MACOS),
-            .capabilities = cpu_to_le64(AAPL_DEFAULT_CAPABILITIES)
+            .version = cpu_to_le32(FRUIT_VERSION_2_0),
+            .client_type = cpu_to_le32(FRUIT_CLIENT_MACOS),
+            .capabilities = cpu_to_le64(FRUIT_DEFAULT_CAPABILITIES)
         };
 
-        aapl_negotiate_capabilities(conn, &client_info);
+        fruit_negotiate_capabilities(conn, &client_info);
     }
 
     return 0;
@@ -816,9 +816,9 @@ static void test_race_conditions(void)
         return;
     }
 
-    /* Create multiple threads accessing Apple connection state */
+    /* Create multiple threads accessing Fruit connection state */
     for (i = 0; i < num_threads; i++) {
-        threads[i] = kthread_run(race_condition_thread, conn, "apple_race_%d", i);
+        threads[i] = kthread_run(race_condition_thread, conn, "fruit_race_%d", i);
         if (IS_ERR(threads[i])) {
             pr_err("Failed to create race condition thread %d\n", i);
             threads[i] = NULL;
@@ -842,7 +842,7 @@ static int run_security_tests(void)
 {
     unsigned long long start_time, end_time, total_time;
 
-    pr_info("🔒 Starting Apple SMB Extensions Security Tests\n");
+    pr_info("🔒 Starting Fruit SMB Extensions Security Tests\n");
     pr_info("=================================================\n");
 
     memset(&security_stats, 0, sizeof(security_stats));
@@ -894,37 +894,37 @@ static size_t get_memory_usage(void)
 static int test_resource_limit(const char *resource_type, unsigned int test_limit)
 {
     /* Mock implementation for resource limit testing */
-    if (strcmp(resource_type, "AAPL connections") == 0) {
+    if (strcmp(resource_type, "Fruit connections") == 0) {
         return test_limit > 100 ? -ENOSPC : 0;
-    } else if (strcmp(resource_type, "AAPL context size") == 0) {
+    } else if (strcmp(resource_type, "Fruit context size") == 0) {
         return test_limit > 65536 ? -EMSGSIZE : 0;
-    } else if (strcmp(resource_type, "Apple client capability combinations") == 0) {
+    } else if (strcmp(resource_type, "Fruit client capability combinations") == 0) {
         return test_limit > 64 ? -EINVAL : 0;
     }
     return 0;
 }
 
-/* Valid AAPL context creation for fuzzing base */
-static void create_valid_aapl_context(void *buffer, size_t size)
+/* Valid Fruit context creation for fuzzing base */
+static void create_valid_fruit_context(void *buffer, size_t size)
 {
     struct create_context *ctx = buffer;
-    struct aapl_client_info *info = (struct aapl_client_info *)(ctx->Buffer + 4);
+    struct fruit_client_info *info = (struct fruit_client_info *)(ctx->Buffer + 4);
 
     ctx->NameLength = 4;
-    ctx->DataLength = cpu_to_le32(sizeof(struct aapl_client_info));
+    ctx->DataLength = cpu_to_le32(sizeof(struct fruit_client_info));
     ctx->DataOffset = cpu_to_le16(offsetof(struct create_context, Buffer) + 4);
 
     memcpy(ctx->Buffer, "AAPL", 4);
 
     memcpy(info->signature, "AAPL", 4);
-    info->version = cpu_to_le32(AAPL_VERSION_2_0);
-    info->client_type = cpu_to_le32(AAPL_CLIENT_MACOS);
-    info->capabilities = cpu_to_le64(AAPL_DEFAULT_CAPABILITIES);
+    info->version = cpu_to_le32(FRUIT_VERSION_2_0);
+    info->client_type = cpu_to_le32(FRUIT_CLIENT_MACOS);
+    info->capabilities = cpu_to_le64(FRUIT_DEFAULT_CAPABILITIES);
     memset(info->reserved, 0, sizeof(info->reserved));
 }
 
 /* Module initialization */
-static int __init apple_security_test_init(void)
+static int __init fruit_security_test_init(void)
 {
     int ret;
 
@@ -941,15 +941,15 @@ static int __init apple_security_test_init(void)
 }
 
 /* Module cleanup */
-static void __exit apple_security_test_exit(void)
+static void __exit fruit_security_test_exit(void)
 {
     pr_info("Unloading %s module\n", SECURITY_TEST_MODULE);
 }
 
-module_init(apple_security_test_init);
-module_exit(apple_security_test_exit);
+module_init(fruit_security_test_init);
+module_exit(fruit_security_test_exit);
 
 MODULE_LICENSE("GPL v2");
 MODULE_AUTHOR("ksmbd Contributors");
-MODULE_DESCRIPTION("Security Testing Framework for Apple SMB Extensions");
+MODULE_DESCRIPTION("Security Testing Framework for Fruit SMB Extensions");
 MODULE_VERSION("1.0");

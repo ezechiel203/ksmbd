@@ -15,6 +15,8 @@
 #endif
 #include "smbstatus.h"
 #include "connection.h"
+#include "server.h"
+#include "smb2fruit.h"
 #include "mgmt/user_session.h"
 #include "mgmt/share_config.h"
 #include "mgmt/tree_connect.h"
@@ -2021,6 +2023,81 @@ void create_posix_rsp_buf(char *cc, struct ksmbd_file *fp)
 	id_to_sid(from_kgid_munged(&init_user_ns, inode->i_gid),
 #endif
 		  SIDUNIX_GROUP, (struct smb_sid *)&buf->SidBuffer[28]);
+}
+
+/*
+ * Compute the total byte size of a Fruit AAPL response
+ * including the variable-length model string.
+ */
+static inline size_t fruit_rsp_size(size_t model_utf16_bytes)
+{
+	return offsetof(struct create_fruit_rsp, model) +
+	       model_utf16_bytes;
+}
+
+/*
+ * Build the AAPL create context response with all three sections:
+ *   - server_caps  (computed from global config flags)
+ *   - volume_caps  (case sensitivity + fullsync support)
+ *   - model_info   (server model string as UTF-16LE)
+ *
+ * Returns 0 on success and sets *out_size to the total response size.
+ */
+int create_fruit_rsp_buf(char *cc, struct ksmbd_conn *conn, size_t *out_size)
+{
+	struct create_fruit_rsp *buf = (struct create_fruit_rsp *)cc;
+	const char *model = server_conf.fruit_model;
+	size_t model_ascii_len, model_utf16_bytes, total;
+	u64 caps, vcaps;
+	int i;
+
+	/* Default model if none configured */
+	if (!model[0])
+		model = "MacSamba";
+
+	model_ascii_len = strlen(model);
+	model_utf16_bytes = model_ascii_len * 2;
+	total = fruit_rsp_size(model_utf16_bytes);
+
+	memset(buf, 0, total);
+
+	/* create_context header */
+	buf->ccontext.DataOffset = cpu_to_le16(offsetof(
+			struct create_fruit_rsp, command_code));
+	buf->ccontext.DataLength = cpu_to_le32(total -
+			offsetof(struct create_fruit_rsp, command_code));
+	buf->ccontext.NameOffset = cpu_to_le16(offsetof(
+			struct create_fruit_rsp, Name));
+	buf->ccontext.NameLength = cpu_to_le16(4);
+	/* Wire protocol name must be "AAPL" */
+	buf->Name[0] = 'A';
+	buf->Name[1] = 'A';
+	buf->Name[2] = 'P';
+	buf->Name[3] = 'L';
+
+	buf->command_code = cpu_to_le32(1); /* kAAPL_SERVER_QUERY */
+	buf->reply_bitmap = cpu_to_le64(0x07); /* caps + volcaps + model */
+
+	/* server_caps: computed from global config flags */
+	caps = kAAPL_UNIX_BASED; /* always: Linux is UNIX-based */
+	if (server_conf.flags & KSMBD_GLOBAL_FLAG_FRUIT_COPYFILE)
+		caps |= kAAPL_SUPPORTS_OSX_COPYFILE;
+	if (server_conf.flags & KSMBD_GLOBAL_FLAG_FRUIT_NFS_ACES)
+		caps |= kAAPL_SUPPORTS_NFS_ACE;
+	caps |= kAAPL_SUPPORTS_READ_DIR_ATTR;
+	buf->server_caps = cpu_to_le64(caps);
+
+	/* volume_caps */
+	vcaps = kAAPL_CASE_SENSITIVE | kAAPL_SUPPORTS_FULL_SYNC;
+	buf->volume_caps = cpu_to_le64(vcaps);
+
+	/* model string: ASCII → UTF-16LE */
+	buf->model_string_len = cpu_to_le32(model_utf16_bytes);
+	for (i = 0; i < (int)model_ascii_len; i++)
+		buf->model[i] = cpu_to_le16((u16)model[i]);
+
+	*out_size = total;
+	return 0;
 }
 
 /*

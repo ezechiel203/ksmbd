@@ -1036,7 +1036,7 @@ int ksmbd_file_table_flush(struct ksmbd_work *work)
 
 	read_lock(&work->sess->file_table.lock);
 	idr_for_each_entry(work->sess->file_table.idr, fp, id) {
-		ret = ksmbd_vfs_fsync(work, fp->volatile_id, KSMBD_NO_FID);
+		ret = ksmbd_vfs_fsync(work, fp->volatile_id, KSMBD_NO_FID, false);
 		if (ret)
 			break;
 	}

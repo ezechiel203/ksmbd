@@ -21,7 +21,7 @@
 #include "mgmt/user_session.h"
 #include "crypto_ctx.h"
 #include "auth.h"
-#include "smb2aapl.h"
+#include "smb2fruit.h"
 
 int ksmbd_debug_types;
 
@@ -606,8 +606,8 @@ static int __init ksmbd_server_init(void)
 	if (ret)
 		goto err_crypto_destroy;
 
-	/* Initialize Apple SMB extensions */
-	ret = aapl_init_module();
+	/* Initialize Fruit SMB extensions */
+	ret = fruit_init_module();
 	if (ret)
 		goto err_crypto_destroy;
 
@@ -640,8 +640,8 @@ static void __exit ksmbd_server_exit(void)
 	rcu_barrier();
 	ksmbd_release_inode_hash();
 
-	/* Cleanup Apple SMB extensions */
-	aapl_cleanup_module();
+	/* Cleanup Fruit SMB extensions */
+	fruit_cleanup_module();
 }
 
 MODULE_AUTHOR("Namjae Jeon <linkinjeon@kernel.org>");

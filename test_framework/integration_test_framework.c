@@ -2,7 +2,7 @@
 /*
  *   Copyright (C) 2023 ksmbd Contributors
  *
- *   Integration Test Framework for Apple SMB Extensions
+ *   Integration Test Framework for Fruit SMB Extensions
  */
 
 #include <linux/module.h>
@@ -22,7 +22,7 @@
 #include "mgmt/tree_connect.h"
 #include "test_framework/test_utils.h"
 
-#define INTEGRATION_TEST_MODULE "ksmbd_apple_integration"
+#define INTEGRATION_TEST_MODULE "ksmbd_fruit_integration"
 
 /* Integration test statistics */
 struct integration_test_stats {
@@ -40,7 +40,7 @@ static DEFINE_MUTEX(test_scenario_lock);
 /* Integration test scenarios */
 enum test_scenario {
     SCENARIO_BASIC_CONNECTION,
-    SCENARIO_AAPL_NEGOTIATION,
+    SCENARIO_FRUIT_NEGOTIATION,
     SCENARIO_CAPABILITY_EXCHANGE,
     SCENARIO_DIRECTORY_TRAVERSAL,
     SCENARIO_CONCURRENT_CLIENTS,
@@ -59,16 +59,16 @@ struct test_scenario_config {
     const char *description;
     unsigned int duration_ms;
     unsigned int iterations;
-    bool apple_client_required;
+    bool fruit_client_required;
     bool performance_critical;
 };
 
-/* Apple client simulation state */
-struct apple_client_state {
+/* Fruit client simulation state */
+struct fruit_client_state {
     struct ksmbd_conn *conn;
     struct ksmbd_session *session;
     struct ksmbd_tree_connect *tree_conn;
-    const struct apple_client_info *client_info;
+    const struct fruit_client_info *client_info;
     bool negotiated;
     bool authenticated;
     bool connected;
@@ -78,7 +78,7 @@ struct apple_client_state {
 
 /* Integration test runner */
 struct integration_test_runner {
-    struct apple_client_state *clients;
+    struct fruit_client_state *clients;
     unsigned int client_count;
     struct test_scenario_config *config;
     bool running;
@@ -123,7 +123,7 @@ struct smb2_negotiate_req *generate_negotiate_request(void)
     return req;
 }
 
-struct smb2_session_setup_req *generate_session_setup_request(bool is_apple)
+struct smb2_session_setup_req *generate_session_setup_request(bool is_fruit)
 {
     struct smb2_session_setup_req *req;
     size_t req_size = sizeof(struct smb2_session_setup_req);
@@ -145,7 +145,7 @@ struct smb2_session_setup_req *generate_session_setup_request(bool is_apple)
     req->hdr.Signature = 0;
 
     req->StructureSize = cpu_to_le16(25);
-    req->Flags = is_apple ? cpu_to_le16(SMB2_SESSION_FLAG_BINDING) : 0;
+    req->Flags = is_fruit ? cpu_to_le16(SMB2_SESSION_FLAG_BINDING) : 0;
     req->SecurityMode = cpu_to_le16(0);
     req->Capabilities = cpu_to_le32(0);
     req->Channel = 0;
@@ -194,8 +194,8 @@ struct smb2_tree_connect_req *generate_tree_connect_request(const char *path)
     return req;
 }
 
-/* Apple client simulation functions */
-static int simulate_apple_negotiation(struct apple_client_state *client)
+/* Fruit client simulation functions */
+static int simulate_fruit_negotiation(struct fruit_client_state *client)
 {
     struct smb2_negotiate_req *neg_req;
     unsigned long long start_time;
@@ -208,27 +208,27 @@ static int simulate_apple_negotiation(struct apple_client_state *client)
         return -ENOMEM;
     }
 
-    /* Simulate Apple client negotiation */
-    TEST_INFO("Apple client negotiation started for macOS %s",
+    /* Simulate Fruit client negotiation */
+    TEST_INFO("Fruit client negotiation started for macOS %s",
               client->client_info->macos_version);
 
-    /* Simulate processing time for Apple negotiation */
+    /* Simulate processing time for Fruit negotiation */
     usleep_range(1000, 5000);
 
     client->negotiated = true;
-    client->conn->is_aapl = true;
+    client->conn->is_fruit = true;
     client->conn->dialect = SMB311_PROT_ID;
 
     client->connect_time_ns = end_timer(start_time);
     update_performance_metrics(&client->client_perf, client->connect_time_ns);
 
-    TEST_INFO("Apple client negotiation completed in %lld ns", client->connect_time_ns);
+    TEST_INFO("Fruit client negotiation completed in %lld ns", client->connect_time_ns);
 
     kfree(neg_req);
     return ret;
 }
 
-static int simulate_apple_authentication(struct apple_client_state *client)
+static int simulate_fruit_authentication(struct fruit_client_state *client)
 {
     struct smb2_session_setup_req *sess_req;
     unsigned long long start_time;
@@ -246,7 +246,7 @@ static int simulate_apple_authentication(struct apple_client_state *client)
         return -ENOMEM;
     }
 
-    TEST_INFO("Apple client authentication started");
+    TEST_INFO("Fruit client authentication started");
 
     /* Simulate authentication processing time */
     usleep_range(2000, 8000);
@@ -262,13 +262,13 @@ static int simulate_apple_authentication(struct apple_client_state *client)
     client->authenticated = true;
     update_performance_metrics(&client->client_perf, end_timer(start_time));
 
-    TEST_INFO("Apple client authentication completed");
+    TEST_INFO("Fruit client authentication completed");
 
     kfree(sess_req);
     return ret;
 }
 
-static int simulate_apple_tree_connect(struct apple_client_state *client, const char *share_path)
+static int simulate_fruit_tree_connect(struct fruit_client_state *client, const char *share_path)
 {
     struct smb2_tree_connect_req *tree_req;
     unsigned long long start_time;
@@ -286,7 +286,7 @@ static int simulate_apple_tree_connect(struct apple_client_state *client, const 
         return -ENOMEM;
     }
 
-    TEST_INFO("Apple client tree connect to '%s'", share_path);
+    TEST_INFO("Fruit client tree connect to '%s'", share_path);
 
     /* Simulate tree connect processing time */
     usleep_range(1500, 6000);
@@ -304,7 +304,7 @@ static int simulate_apple_tree_connect(struct apple_client_state *client, const 
 
     update_performance_metrics(&client->client_perf, end_timer(start_time));
 
-    TEST_INFO("Apple client tree connect completed");
+    TEST_INFO("Fruit client tree connect completed");
 
     kfree(tree_req);
     return ret;
@@ -312,26 +312,26 @@ static int simulate_apple_tree_connect(struct apple_client_state *client, const 
 
 /* Integration test scenarios */
 
-/* Scenario 1: Basic Apple Connection */
-static int test_scenario_basic_connection(struct apple_client_state *client)
+/* Scenario 1: Basic Fruit Connection */
+static int test_scenario_basic_connection(struct fruit_client_state *client)
 {
     int ret;
 
-    TEST_INFO("Scenario: Basic Apple Connection");
+    TEST_INFO("Scenario: Basic Fruit Connection");
 
-    ret = simulate_apple_negotiation(client);
+    ret = simulate_fruit_negotiation(client);
     if (ret != 0) {
         TEST_ERROR("Negotiation failed: %d", ret);
         return ret;
     }
 
-    ret = simulate_apple_authentication(client);
+    ret = simulate_fruit_authentication(client);
     if (ret != 0) {
         TEST_ERROR("Authentication failed: %d", ret);
         return ret;
     }
 
-    ret = simulate_apple_tree_connect(client, "/test/share");
+    ret = simulate_fruit_tree_connect(client, "/test/share");
     if (ret != 0) {
         TEST_ERROR("Tree connect failed: %d", ret);
         return ret;
@@ -343,29 +343,29 @@ static int test_scenario_basic_connection(struct apple_client_state *client)
         return -EINVAL;
     }
 
-    TEST_INFO("Basic Apple connection scenario passed");
+    TEST_INFO("Basic Fruit connection scenario passed");
     return 0;
 }
 
-/* Scenario 2: AAPL Capability Negotiation */
-static int test_scenario_aapl_capability_negotiation(struct apple_client_state *client)
+/* Scenario 2: Fruit Capability Negotiation */
+static int test_scenario_fruit_capability_negotiation(struct fruit_client_state *client)
 {
     int ret;
 
-    TEST_INFO("Scenario: AAPL Capability Negotiation");
+    TEST_INFO("Scenario: Fruit Capability Negotiation");
 
-    ret = simulate_apple_negotiation(client);
+    ret = simulate_fruit_negotiation(client);
     if (ret != 0) {
         TEST_ERROR("Negotiation failed: %d", ret);
         return ret;
     }
 
-    /* Test Apple-specific capability flags */
-    __le32 apple_capabilities = cpu_to_le32(
-        AAPL_CAPABILITY_SPOTLIGHT |
-        AAPL_CAPABILITY_DIRECTORY_SPEEDUP |
-        AAPL_CAPABILITY_FILE_CLONING |
-        AAPL_CAPABILITY_COMPRESSION
+    /* Test Fruit-specific capability flags */
+    __le32 fruit_capabilities = cpu_to_le32(
+        FRUIT_CAPABILITY_SPOTLIGHT |
+        FRUIT_CAPABILITY_DIRECTORY_SPEEDUP |
+        FRUIT_CAPABILITY_FILE_CLONING |
+        FRUIT_CAPABILITY_COMPRESSION
     );
 
     /* Simulate capability exchange */
@@ -382,24 +382,24 @@ static int test_scenario_aapl_capability_negotiation(struct apple_client_state *
         TEST_INFO("Client supports compression");
     }
 
-    ret = simulate_apple_authentication(client);
+    ret = simulate_fruit_authentication(client);
     if (ret != 0) {
         TEST_ERROR("Authentication failed: %d", ret);
         return ret;
     }
 
-    ret = simulate_apple_tree_connect(client, "/optimized/share");
+    ret = simulate_fruit_tree_connect(client, "/optimized/share");
     if (ret != 0) {
         TEST_ERROR("Tree connect failed: %d", ret);
         return ret;
     }
 
-    TEST_INFO("AAPL capability negotiation scenario passed");
+    TEST_INFO("Fruit capability negotiation scenario passed");
     return 0;
 }
 
 /* Scenario 3: Directory Traversal Performance */
-static int test_scenario_directory_traversal_performance(struct apple_client_state *client)
+static int test_scenario_directory_traversal_performance(struct fruit_client_state *client)
 {
     int ret, i;
     unsigned long long start_time, total_time;
@@ -411,13 +411,13 @@ static int test_scenario_directory_traversal_performance(struct apple_client_sta
     init_performance_metrics(&traversal_perf);
 
     /* Establish connection */
-    ret = simulate_apple_negotiation(client);
+    ret = simulate_fruit_negotiation(client);
     if (ret != 0) return ret;
 
-    ret = simulate_apple_authentication(client);
+    ret = simulate_fruit_authentication(client);
     if (ret != 0) return ret;
 
-    ret = simulate_apple_tree_connect(client, "/performance/test");
+    ret = simulate_fruit_tree_connect(client, "/performance/test");
     if (ret != 0) return ret;
 
     TEST_INFO("Performing %d directory traversal operations", test_operations);
@@ -432,7 +432,7 @@ static int test_scenario_directory_traversal_performance(struct apple_client_sta
         snprintf(test_path, sizeof(test_path), "/performance/test/dir_%d", i);
 
         /* Simulate directory listing operation */
-        usleep_range(100, 1000); /* Optimized for Apple clients */
+        usleep_range(100, 1000); /* Optimized for Fruit clients */
 
         update_performance_metrics(&traversal_perf, end_timer(op_start));
     }
@@ -443,7 +443,7 @@ static int test_scenario_directory_traversal_performance(struct apple_client_sta
     TEST_INFO("Total traversal time: %lld ns", total_time);
     TEST_INFO("Average time per operation: %lld ns", total_time / test_operations);
 
-    /* Performance validation: should be significantly faster for Apple clients */
+    /* Performance validation: should be significantly faster for Fruit clients */
     unsigned long long avg_time = total_time / test_operations;
     if (avg_time > 1000000) { /* 1ms threshold */
         TEST_WARN("Directory traversal slower than expected: %lld ns per op", avg_time);
@@ -453,17 +453,17 @@ static int test_scenario_directory_traversal_performance(struct apple_client_sta
     return 0;
 }
 
-/* Scenario 4: Concurrent Apple Clients */
+/* Scenario 4: Concurrent Fruit Clients */
 static int test_scenario_concurrent_clients(void)
 {
-    struct apple_client_state *clients;
+    struct fruit_client_state *clients;
     unsigned int client_count = 10;
     unsigned long long start_time, total_time;
     int i, ret = 0;
 
-    TEST_INFO("Scenario: Concurrent Apple Clients (%d clients)", client_count);
+    TEST_INFO("Scenario: Concurrent Fruit Clients (%d clients)", client_count);
 
-    clients = test_kzalloc(client_count * sizeof(struct apple_client_state), "concurrent clients");
+    clients = test_kzalloc(client_count * sizeof(struct fruit_client_state), "concurrent clients");
     if (!clients) {
         TEST_ERROR("Failed to allocate client array");
         return -ENOMEM;
@@ -472,7 +472,7 @@ static int test_scenario_concurrent_clients(void)
     /* Initialize clients */
     for (i = 0; i < client_count; i++) {
         clients[i].conn = create_test_connection(true);
-        clients[i].client_info = &apple_client_versions[i % 5]; /* Cycle through versions */
+        clients[i].client_info = &fruit_client_versions[i % 5]; /* Cycle through versions */
         init_performance_metrics(&clients[i].client_perf);
     }
 
@@ -480,19 +480,19 @@ static int test_scenario_concurrent_clients(void)
 
     /* Start concurrent connections */
     for (i = 0; i < client_count; i++) {
-        ret = simulate_apple_negotiation(&clients[i]);
+        ret = simulate_fruit_negotiation(&clients[i]);
         if (ret != 0) {
             TEST_ERROR("Client %d negotiation failed: %d", i, ret);
             goto cleanup;
         }
 
-        ret = simulate_apple_authentication(&clients[i]);
+        ret = simulate_fruit_authentication(&clients[i]);
         if (ret != 0) {
             TEST_ERROR("Client %d authentication failed: %d", i, ret);
             goto cleanup;
         }
 
-        ret = simulate_apple_tree_connect(&clients[i], "/concurrent/share");
+        ret = simulate_fruit_tree_connect(&clients[i], "/concurrent/share");
         if (ret != 0) {
             TEST_ERROR("Client %d tree connect failed: %d", i, ret);
             goto cleanup;
@@ -513,7 +513,7 @@ static int test_scenario_concurrent_clients(void)
         }
     }
 
-    TEST_INFO("Concurrent Apple clients scenario passed");
+    TEST_INFO("Concurrent Fruit clients scenario passed");
 
 cleanup:
     for (i = 0; i < client_count; i++) {
@@ -527,17 +527,17 @@ cleanup:
 static struct test_scenario_config scenario_configs[] = {
     {
         SCENARIO_BASIC_CONNECTION,
-        "Basic Apple Connection",
-        "Test basic Apple client connection flow",
+        "Basic Fruit Connection",
+        "Test basic Fruit client connection flow",
         5000,  /* 5 seconds */
         1,
         true,
         false
     },
     {
-        SCENARIO_AAPL_NEGOTIATION,
-        "AAPL Capability Negotiation",
-        "Test Apple-specific capability negotiation",
+        SCENARIO_FRUIT_NEGOTIATION,
+        "Fruit Capability Negotiation",
+        "Test Fruit-specific capability negotiation",
         8000,  /* 8 seconds */
         1,
         true,
@@ -554,8 +554,8 @@ static struct test_scenario_config scenario_configs[] = {
     },
     {
         SCENARIO_CONCURRENT_CLIENTS,
-        "Concurrent Apple Clients",
-        "Test multiple concurrent Apple client connections",
+        "Concurrent Fruit Clients",
+        "Test multiple concurrent Fruit client connections",
         20000, /* 20 seconds */
         10,
         true,
@@ -567,7 +567,7 @@ static struct test_scenario_config scenario_configs[] = {
 /* Integration test runner */
 static int run_integration_test(struct test_scenario_config *config)
 {
-    struct apple_client_state client;
+    struct fruit_client_state client;
     int ret = 0;
 
     atomic_inc(&int_stats.total_scenarios);
@@ -578,7 +578,7 @@ static int run_integration_test(struct test_scenario_config *config)
 
     /* Initialize test client */
     memset(&client, 0, sizeof(client));
-    client.conn = create_test_connection(config->apple_client_required);
+    client.conn = create_test_connection(config->fruit_client_required);
     if (!client.conn) {
         TEST_ERROR("Failed to create test client");
         atomic_inc(&int_stats.failed_scenarios);
@@ -586,7 +586,7 @@ static int run_integration_test(struct test_scenario_config *config)
     }
 
     /* Set up client info */
-    client.client_info = &apple_client_versions[2]; /* Default to macOS 12.0 */
+    client.client_info = &fruit_client_versions[2]; /* Default to macOS 12.0 */
     init_performance_metrics(&client.client_perf);
 
     /* Run appropriate scenario */
@@ -596,8 +596,8 @@ static int run_integration_test(struct test_scenario_config *config)
     case SCENARIO_BASIC_CONNECTION:
         ret = test_scenario_basic_connection(&client);
         break;
-    case SCENARIO_AAPL_NEGOTIATION:
-        ret = test_scenario_aapl_capability_negotiation(&client);
+    case SCENARIO_FRUIT_NEGOTIATION:
+        ret = test_scenario_fruit_capability_negotiation(&client);
         break;
     case SCENARIO_DIRECTORY_TRAVERSAL:
         ret = test_scenario_directory_traversal_performance(&client);
@@ -638,7 +638,7 @@ static int run_all_integration_tests(void)
     int i, failed = 0;
     unsigned long long total_start = get_time_ns();
 
-    TEST_INFO("🧪 Starting Apple SMB Extensions Integration Tests");
+    TEST_INFO("🧪 Starting Fruit SMB Extensions Integration Tests");
     TEST_INFO("================================================");
 
     memset(&int_stats, 0, sizeof(int_stats));
@@ -677,7 +677,7 @@ static int run_all_integration_tests(void)
 }
 
 /* Module initialization */
-static int __init apple_integration_test_init(void)
+static int __init fruit_integration_test_init(void)
 {
     int ret;
 
@@ -694,15 +694,15 @@ static int __init apple_integration_test_init(void)
 }
 
 /* Module cleanup */
-static void __exit apple_integration_test_exit(void)
+static void __exit fruit_integration_test_exit(void)
 {
     TEST_INFO("Unloading %s module", INTEGRATION_TEST_MODULE);
 }
 
-module_init(apple_integration_test_init);
-module_exit(apple_integration_test_exit);
+module_init(fruit_integration_test_init);
+module_exit(fruit_integration_test_exit);
 
 MODULE_LICENSE("GPL v2");
 MODULE_AUTHOR("ksmbd Contributors");
-MODULE_DESCRIPTION("Integration Test Framework for Apple SMB Extensions");
+MODULE_DESCRIPTION("Integration Test Framework for Fruit SMB Extensions");
 MODULE_VERSION("1.0");

@@ -46,6 +46,7 @@ struct ksmbd_server_config {
 	unsigned int		max_ip_connections;
 
 	char			*conf[SERVER_CONF_WORK_GROUP + 1];
+	char			fruit_model[64];
 	struct task_struct	*dh_task;
 	bool			bind_interfaces_only;
 };

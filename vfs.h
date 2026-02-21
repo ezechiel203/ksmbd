@@ -150,7 +150,7 @@ int ksmbd_vfs_read(struct ksmbd_work *work, struct ksmbd_file *fp, size_t count,
 int ksmbd_vfs_write(struct ksmbd_work *work, struct ksmbd_file *fp,
 		    char *buf, size_t count, loff_t *pos, bool sync,
 		    ssize_t *written);
-int ksmbd_vfs_fsync(struct ksmbd_work *work, u64 fid, u64 p_id);
+int ksmbd_vfs_fsync(struct ksmbd_work *work, u64 fid, u64 p_id, bool fullsync);
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 4, 0)
 int ksmbd_vfs_remove_file(struct ksmbd_work *work, const struct path *path);
 #else

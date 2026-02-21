@@ -45,7 +45,7 @@
 #include "mgmt/ksmbd_ida.h"
 #include "ndr.h"
 #include "transport_tcp.h"
-#include "smb2aapl.h"
+#include "smb2fruit.h"
 
 static void __wbuf(struct ksmbd_work *work, void **req, void **rsp)
 {
@@ -2968,7 +2968,7 @@ int smb2_open(struct ksmbd_work *work)
 	__le32 *next_ptr = NULL;
 	int req_op_level = 0, open_flags = 0, may_flags = 0, file_info = 0;
 	int rc = 0;
-	int contxt_cnt = 0, query_disk_id = 0;
+	int contxt_cnt = 0, query_disk_id = 0, fruit_ctxt = 0;
 	bool maximal_access_ctxt = false, posix_ctxt = false;
 	int s_type = 0;
 	int next_off = 0;
@@ -3711,7 +3711,8 @@ int smb2_open(struct ksmbd_work *work)
 			query_disk_id = 1;
 		}
 
-		if (conn->is_aapl == false) {
+		if ((server_conf.flags & KSMBD_GLOBAL_FLAG_FRUIT_EXTENSIONS) &&
+		    conn->is_fruit == false) {
 			context = smb2_find_context_vals(req, SMB2_CREATE_AAPL, 4);
 			if (IS_ERR(context)) {
 				rc = PTR_ERR(context);
@@ -3719,114 +3720,56 @@ int smb2_open(struct ksmbd_work *work)
 			} else if (context) {
 				const void *context_data;
 				size_t data_len;
-				struct aapl_client_info *client_info;
+				struct fruit_client_info *client_info;
 
-				/* Extract and validate Apple context data */
 				if (le16_to_cpu(context->NameLength) == 4 &&
-				    le32_to_cpu(context->DataLength) >= sizeof(struct aapl_client_info)) {
+				    le32_to_cpu(context->DataLength) >= sizeof(struct fruit_client_info)) {
 
 					context_data = (const __u8 *)context +
 						le16_to_cpu(context->DataOffset);
 					data_len = le32_to_cpu(context->DataLength);
 
-					rc = aapl_validate_create_context(context);
+					rc = fruit_validate_create_context(context);
 					if (rc) {
-						ksmbd_debug(SMB, "Invalid AAPL create context: %d\n", rc);
+						ksmbd_debug(SMB, "Invalid fruit create context: %d\n", rc);
 						rc = 0;
 						goto continue_create;
 					}
 
-					client_info = kzalloc(sizeof(struct aapl_client_info),
+					client_info = kzalloc(sizeof(struct fruit_client_info),
 							      KSMBD_DEFAULT_GFP);
 					if (!client_info) {
-						ksmbd_debug(SMB, "Failed to allocate memory for Apple client info\n");
 						rc = -ENOMEM;
 						goto err_out1;
 					}
 
 					size_t copy_len = min(data_len,
-							     sizeof(struct aapl_client_info));
+							     sizeof(struct fruit_client_info));
 					memcpy(client_info, context_data, copy_len);
 
+					fruit_debug_client_info(client_info);
 
-					/* Debug log the client information */
-					aapl_debug_client_info(client_info);
-
-					rc = aapl_negotiate_capabilities(conn, client_info);
+					rc = fruit_negotiate_capabilities(conn, client_info);
 					if (rc) {
-						ksmbd_debug(SMB, "Apple capability negotiation failed: %d\n", rc);
+						ksmbd_debug(SMB, "Fruit capability negotiation failed: %d\n", rc);
 						kfree(client_info);
 						client_info = NULL;
 						rc = 0;
 						goto continue_create;
 					}
-					/* Mark connection as Apple client */
-					conn->is_aapl = true;
+					conn->is_fruit = true;
+					fruit_ctxt = 1;
 
 					kfree(client_info);
 					client_info = NULL;
 				} else {
-					ksmbd_debug(SMB, "AAPL context too small: name_len=%u, data_len=%u\n",
+					ksmbd_debug(SMB, "Fruit context too small: name_len=%u, data_len=%u\n",
 						    le16_to_cpu(context->NameLength),
 						    le32_to_cpu(context->DataLength));
 				}
 			}
-
-			/* Process FinderInfo context for Apple clients */
-			if (conn->is_aapl) {
-				struct create_context *finder_context;
-
-				finder_context = smb2_find_context_vals(req,
-								   SMB2_CREATE_FINDERINFO, 4);
-				if (!IS_ERR(finder_context) && finder_context) {
-					struct aapl_finder_info *finder_info =
-						(struct aapl_finder_info *)
-						((const __u8 *)finder_context +
-						 le16_to_cpu(finder_context->DataOffset));
-
-					if (le32_to_cpu(finder_context->DataLength) >=
-					    sizeof(struct aapl_finder_info)) {
-						rc = aapl_process_finder_info(conn, finder_info);
-						if (rc) {
-							ksmbd_debug(SMB, "FinderInfo processing failed: %d\n", rc);
-							/* Non-fatal error, continue operation */
-							rc = 0;
-						}
-					}
-				}
-
-				/* Process TimeMachine context for Apple clients */
-				if (aapl_supports_capability(conn->aapl_state,
-							   cpu_to_le64(AAPL_CAP_TIMEMACHINE))) {
-					struct create_context *tm_context;
-
-					tm_context = smb2_find_context_vals(req,
-									  SMB2_CREATE_TIMEMACHINE, 4);
-					if (!IS_ERR(tm_context) && tm_context) {
-						struct aapl_timemachine_info *tm_info =
-							(struct aapl_timemachine_info *)
-							((const __u8 *)tm_context +
-							 le16_to_cpu(tm_context->DataOffset));
-
-						if (le32_to_cpu(tm_context->DataLength) >=
-						    sizeof(struct aapl_timemachine_info)) {
-							rc = aapl_process_timemachine_info(conn, tm_info);
-							if (rc) {
-								ksmbd_debug(SMB, "TimeMachine processing failed: %d\n", rc);
-								/* Non-fatal error, continue operation */
-								rc = 0;
-							}
-							/* Handle Time Machine sparse bundle if detected */
-							rc = aapl_handle_timemachine_bundle(conn, &path, tm_info);
-							if (rc) {
-								ksmbd_debug(SMB, "TimeMachine bundle handling failed: %d\n", rc);
-								/* Non-fatal error, continue operation */
-								rc = 0;
-							}
-						}
-					}
-				}
-			}
+		} else if (conn->is_fruit) {
+			fruit_ctxt = 1;
 		}
 
 continue_create:
@@ -3990,6 +3933,10 @@ reconnected_fp:
 	}
 
 	if (posix_ctxt) {
+		struct create_context *posix_ccontext;
+
+		posix_ccontext = (struct create_context *)(rsp->Buffer +
+				le32_to_cpu(rsp->CreateContextsLength));
 		contxt_cnt++;
 		create_posix_rsp_buf(rsp->Buffer +
 				le32_to_cpu(rsp->CreateContextsLength),
@@ -3997,6 +3944,24 @@ reconnected_fp:
 		le32_add_cpu(&rsp->CreateContextsLength,
 			     conn->vals->create_posix_size);
 		iov_len += conn->vals->create_posix_size;
+		if (next_ptr)
+			*next_ptr = cpu_to_le32(next_off);
+		next_ptr = &posix_ccontext->Next;
+		next_off = conn->vals->create_posix_size;
+	}
+
+	if (fruit_ctxt) {
+		struct create_context *fruit_ccontext;
+		size_t fruit_size = 0;
+
+		fruit_ccontext = (struct create_context *)(rsp->Buffer +
+				le32_to_cpu(rsp->CreateContextsLength));
+		contxt_cnt++;
+		create_fruit_rsp_buf(rsp->Buffer +
+				le32_to_cpu(rsp->CreateContextsLength),
+				conn, &fruit_size);
+		le32_add_cpu(&rsp->CreateContextsLength, fruit_size);
+		iov_len += fruit_size;
 		if (next_ptr)
 			*next_ptr = cpu_to_le32(next_off);
 	}
@@ -4270,8 +4235,12 @@ static int smb2_populate_readdir_entry(struct ksmbd_conn *conn, int info_level,
 			smb2_get_reparse_tag_special_file(ksmbd_kstat->kstat->mode);
 		if (dinfo->EaSize)
 			dinfo->ExtFileAttributes = ATTR_REPARSE_POINT_LE;
+		if (conn->is_fruit)
+			smb2_read_dir_attr_fill(conn, ksmbd_kstat->kstat,
+						&dinfo->EaSize);
 		dinfo->Reserved = 0;
-		if (conn->is_aapl)
+		if (conn->is_fruit &&
+		    (server_conf.flags & KSMBD_GLOBAL_FLAG_FRUIT_ZERO_FILEID))
 			dinfo->UniqueId = 0;
 		else
 			dinfo->UniqueId = cpu_to_le64(ksmbd_kstat->kstat->ino);
@@ -4291,7 +4260,11 @@ static int smb2_populate_readdir_entry(struct ksmbd_conn *conn, int info_level,
 			smb2_get_reparse_tag_special_file(ksmbd_kstat->kstat->mode);
 		if (fibdinfo->EaSize)
 			fibdinfo->ExtFileAttributes = ATTR_REPARSE_POINT_LE;
-		if (conn->is_aapl)
+		if (conn->is_fruit)
+			smb2_read_dir_attr_fill(conn, ksmbd_kstat->kstat,
+						&fibdinfo->EaSize);
+		if (conn->is_fruit &&
+		    (server_conf.flags & KSMBD_GLOBAL_FLAG_FRUIT_ZERO_FILEID))
 			fibdinfo->UniqueId = 0;
 		else
 			fibdinfo->UniqueId = cpu_to_le64(ksmbd_kstat->kstat->ino);
@@ -7785,15 +7758,25 @@ out:
  */
 int smb2_flush(struct ksmbd_work *work)
 {
+	struct ksmbd_conn *conn = work->conn;
 	struct smb2_flush_req *req;
 	struct smb2_flush_rsp *rsp;
+	bool fullsync = false;
 	int err;
 
 	WORK_BUFFERS(work, req, rsp);
 
 	ksmbd_debug(SMB, "Received smb2 flush request(fid : %llu)\n", req->VolatileFileId);
 
-	err = ksmbd_vfs_fsync(work, req->VolatileFileId, req->PersistentFileId);
+	/*
+	 * Apple F_FULLFSYNC: macOS Time Machine sends
+	 * Reserved1=0xFFFF to request a full device flush.
+	 */
+	if (conn->is_fruit && le16_to_cpu(req->Reserved1) == 0xFFFF)
+		fullsync = true;
+
+	err = ksmbd_vfs_fsync(work, req->VolatileFileId,
+			      req->PersistentFileId, fullsync);
 	if (err)
 		goto out;
 

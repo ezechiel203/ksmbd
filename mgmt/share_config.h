@@ -31,6 +31,7 @@ struct ksmbd_share_config {
 	unsigned short		force_directory_mode;
 	unsigned short		force_uid;
 	unsigned short		force_gid;
+	unsigned long long	time_machine_max_size;
 };
 
 #define KSMBD_SHARE_INVALID_UID	((__u16)-1)

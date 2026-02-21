@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2024 The KSMBD Project
  *
- * Apple SMB Production Readiness Validation Framework
+ * Fruit SMB Production Readiness Validation Framework
  *
  * This framework provides comprehensive production environment validation,
  * disaster recovery testing, and deployment readiness assessment.
@@ -26,7 +26,7 @@
 #include <linux/scatterlist.h>
 
 #include "test_utils.h"
-#include "smb2aapl.h"
+#include "smb2fruit.h"
 #include "connection.h"
 #include "mgmt/user_config.h"
 #include "mgmt/share_config.h"
@@ -395,7 +395,7 @@ static bool prd_performance_benchmark(struct prd_validation_result *result)
 
     prd_monitoring_init();
 
-    /* Simulate Apple SMB operations */
+    /* Simulate Fruit SMB operations */
     for (i = 0; i < PRD_PERF_BENCHMARK_ITERATIONS; i++) {
         unsigned long long op_start = get_time_ns();
         unsigned long long op_end;
@@ -403,7 +403,7 @@ static bool prd_performance_benchmark(struct prd_validation_result *result)
 
         /* Simulate various operations based on production config */
         if (i % 10 == 0) {
-            /* Simulate Time Machine operation (10% of operations) */
+            /* Simulate Save box operation (10% of operations) */
             if (!prod_config.time_machine_enabled) {
                 op_success = false;
             }
@@ -733,10 +733,10 @@ static bool prd_backup_restore_test(struct prd_validation_result *result)
                 sizeof(result->error_message));
     }
 
-    /* Test Time Machine specific backup if enabled */
+    /* Test Save box specific backup if enabled */
     if (prod_config.time_machine_enabled) {
-        /* Simulate Time Machine sparse bundle backup */
-        struct aapl_timemachine_info tm_info = {
+        /* Simulate Save box sparse bundle backup */
+        struct fruit_timemachine_info tm_info = {
             .version = cpu_to_le32(1),
             .bundle_id = cpu_to_le64(0x123456789ABCDEF0ULL),
             .validation_seq = cpu_to_le64(1),
@@ -744,14 +744,14 @@ static bool prd_backup_restore_test(struct prd_validation_result *result)
             .durable_handle = cpu_to_le64(0x9876543210FEDCBAULL)
         };
 
-        /* In real implementation would perform actual Time Machine backup */
+        /* In real implementation would perform actual Save box backup */
         for (i = 0; i < backup_size / 1024; i++) {
-            /* Simulate Time Machine incremental backup verification */
+            /* Simulate Save box incremental backup verification */
             if (i % 1000 == 0) {
                 /* Check backup consistency */
                 if (memcmp(original_data + i * 1024, backup_data + i * 1024, 1024) != 0) {
                     backup_test_passed = false;
-                    strscpy(result->error_message, "Time Machine backup consistency check failed",
+                    strscpy(result->error_message, "Save box backup consistency check failed",
                             sizeof(result->error_message));
                     break;
                 }
@@ -769,7 +769,7 @@ static bool prd_backup_restore_test(struct prd_validation_result *result)
     snprintf(result->detailed_results, sizeof(result->detailed_results),
              "Backup/Restore Test Results:\n"
              "  Backup Size: %u bytes\n"
-             "  Time Machine Enabled: %s\n"
+             "  Save box Enabled: %s\n"
              "  Data Integrity: %s\n"
              "  Backup Duration: %llu ms\n"
              "  Restore Duration: %llu ms",
@@ -793,9 +793,9 @@ static bool prd_security_validation(struct prd_validation_result *result)
     TEST_INFO("Starting security validation");
 
     /* Test authentication implementation */
-    security.authentication_implemented = true; /* Based on Apple client authentication */
+    security.authentication_implemented = true; /* Based on Fruit client authentication */
     security.encryption_supported = true; /* Based on SMB3 encryption support */
-    security.integrity_checking_enabled = true; /* Based on Apple client validation */
+    security.integrity_checking_enabled = true; /* Based on Fruit client validation */
     security.audit_logging_enabled = true; /* Based on kernel logging */
     security.access_control_enforced = true; /* Based on Linux VFS permissions */
 
@@ -877,7 +877,7 @@ static int prd_execute_production_readiness_validation(void)
     bool validation_result;
     unsigned int validation_score;
 
-    TEST_INFO("=== Apple SMB Production Readiness Validation ===");
+    TEST_INFO("=== Fruit SMB Production Readiness Validation ===");
 
     /* Initialize assessment */
     mutex_lock(&prd_assessment_mutex);
@@ -1019,21 +1019,21 @@ static int prd_execute_production_readiness_validation(void)
 /* Module initialization and cleanup */
 static int __init prd_validation_init(void)
 {
-    TEST_INFO("Apple SMB Production Readiness Validation Framework initialized");
+    TEST_INFO("Fruit SMB Production Readiness Validation Framework initialized");
 
     return prd_execute_production_readiness_validation();
 }
 
 static void __exit prd_validation_exit(void)
 {
-    TEST_INFO("Apple SMB Production Readiness Validation Framework exited");
+    TEST_INFO("Fruit SMB Production Readiness Validation Framework exited");
 }
 
 module_init(prd_validation_init);
 module_exit(prd_validation_exit);
 
 MODULE_LICENSE("GPL");
-MODULE_DESCRIPTION("KSMBD Apple SMB Production Readiness Validation Framework");
+MODULE_DESCRIPTION("KSMBD Fruit SMB Production Readiness Validation Framework");
 MODULE_AUTHOR("KSMBD Contributors");
 
 /* Export functions for external validation modules */

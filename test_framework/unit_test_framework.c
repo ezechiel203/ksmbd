@@ -2,7 +2,7 @@
 /*
  *   Copyright (C) 2023 ksmbd Contributors
  *
- *   Unit Test Framework for Apple SMB Extensions
+ *   Unit Test Framework for Fruit SMB Extensions
  */
 
 #include <linux/module.h>
@@ -17,7 +17,7 @@
 #include "connection.h"
 #include "test_framework/test_utils.h"
 
-#define TEST_MODULE_NAME "ksmbd_apple_test"
+#define TEST_MODULE_NAME "ksmbd_fruit_test"
 
 /* Test statistics */
 struct test_stats {
@@ -115,20 +115,20 @@ struct test_smb2_create_request {
     size_t buffer_size;
 };
 
-struct test_aapl_context {
+struct test_fruit_context {
     struct create_context *context;
     char data[256];
     size_t data_size;
 };
 
 /* Mock connection setup */
-static struct ksmbd_conn *create_mock_connection(bool is_apple)
+static struct ksmbd_conn *create_mock_connection(bool is_fruit_client)
 {
     struct ksmbd_conn *conn = kzalloc(sizeof(struct ksmbd_conn), GFP_KERNEL);
     if (!conn)
         return NULL;
 
-    conn->is_aapl = is_apple;
+    conn->is_fruit = is_fruit_client;
     conn->dialect = SMB311_PROT_ID;
     conn->vals = &smb311_server_values;
     conn->ops = &smb311_server_ops;
@@ -171,8 +171,8 @@ static void free_mock_work(struct ksmbd_work *work)
     }
 }
 
-/* AAPL context creation utilities */
-static struct create_context *create_aapl_context(const char *data, size_t data_size)
+/* Fruit context creation utilities */
+static struct create_context *create_fruit_context(const char *data, size_t data_size)
 {
     struct create_context *context;
     size_t total_size = sizeof(struct create_context) + data_size;
@@ -197,70 +197,70 @@ static struct create_context *create_aapl_context(const char *data, size_t data_
     return context;
 }
 
-/* Apple Client Detection Tests */
-static void test_apple_client_detection_new_connection(void)
+/* Fruit Client Detection Tests */
+static void test_fruit_client_detection_new_connection(void)
 {
     struct ksmbd_conn *conn = create_mock_connection(false);
-    const char *test_name = "Apple client detection - new connection";
+    const char *test_name = "Fruit client detection - new connection";
 
     atomic_inc(&test_stats.total_tests);
 
     TEST_ASSERT_PTR_NOT_NULL(conn, test_name, "Failed to create mock connection");
-    TEST_ASSERT_EQ(false, conn->is_aapl, test_name, "New connection should not be Apple client");
+    TEST_ASSERT_EQ(false, conn->is_fruit, test_name, "New connection should not be Fruit client");
 
     free_mock_connection(conn);
     test_pass(test_name);
 }
 
-static void test_apple_client_detection_aapl_context(void)
+static void test_fruit_client_detection_fruit_context(void)
 {
     struct ksmbd_conn *conn = create_mock_connection(false);
-    struct create_context *aapl_context;
-    const char *test_name = "Apple client detection - AAPL context";
+    struct create_context *fruit_context;
+    const char *test_name = "Fruit client detection - Fruit context";
 
     atomic_inc(&test_stats.total_tests);
 
     TEST_ASSERT_PTR_NOT_NULL(conn, test_name, "Failed to create mock connection");
 
-    aapl_context = create_aapl_context(NULL, 0);
-    TEST_ASSERT_PTR_NOT_NULL(aapl_context, test_name, "Failed to create AAPL context");
+    fruit_context = create_fruit_context(NULL, 0);
+    TEST_ASSERT_PTR_NOT_NULL(fruit_context, test_name, "Failed to create Fruit context");
 
-    /* Simulate AAPL context detection */
-    if (!IS_ERR(aapl_context)) {
-        conn->is_aapl = true;
-        TEST_ASSERT_EQ(true, conn->is_aapl, test_name, "Connection should be detected as Apple client");
+    /* Simulate Fruit context detection */
+    if (!IS_ERR(fruit_context)) {
+        conn->is_fruit = true;
+        TEST_ASSERT_EQ(true, conn->is_fruit, test_name, "Connection should be detected as Fruit client");
     }
 
-    kfree(aapl_context);
+    kfree(fruit_context);
     free_mock_connection(conn);
     test_pass(test_name);
 }
 
-static void test_apple_client_detection_preexisting_connection(void)
+static void test_fruit_client_detection_preexisting_connection(void)
 {
     struct ksmbd_conn *conn = create_mock_connection(true);
-    const char *test_name = "Apple client detection - preexisting connection";
+    const char *test_name = "Fruit client detection - preexisting connection";
 
     atomic_inc(&test_stats.total_tests);
 
     TEST_ASSERT_PTR_NOT_NULL(conn, test_name, "Failed to create mock connection");
-    TEST_ASSERT_EQ(true, conn->is_aapl, test_name, "Preexisting Apple connection should remain Apple");
+    TEST_ASSERT_EQ(true, conn->is_fruit, test_name, "Preexisting Fruit connection should remain Fruit");
 
     free_mock_connection(conn);
     test_pass(test_name);
 }
 
-/* AAPL Context Parsing Tests */
-static void test_aapl_context_parsing_valid(void)
+/* Fruit Context Parsing Tests */
+static void test_fruit_context_parsing_valid(void)
 {
     struct create_context *context;
     const char test_data[] = "test_data";
-    const char *test_name = "AAPL context parsing - valid context";
+    const char *test_name = "Fruit context parsing - valid context";
 
     atomic_inc(&test_stats.total_tests);
 
-    context = create_aapl_context(test_data, strlen(test_data));
-    TEST_ASSERT_PTR_NOT_NULL(context, test_name, "Failed to create AAPL context");
+    context = create_fruit_context(test_data, strlen(test_data));
+    TEST_ASSERT_PTR_NOT_NULL(context, test_name, "Failed to create Fruit context");
 
     TEST_ASSERT_EQ(4, context->NameLength, test_name, "Name length should be 4");
     TEST_ASSERT_EQ(0, strncmp(context->Buffer, "AAPL", 4), test_name, "Context name should be 'AAPL'");
@@ -272,15 +272,15 @@ static void test_aapl_context_parsing_valid(void)
     test_pass(test_name);
 }
 
-static void test_aapl_context_parsing_empty_data(void)
+static void test_fruit_context_parsing_empty_data(void)
 {
     struct create_context *context;
-    const char *test_name = "AAPL context parsing - empty data";
+    const char *test_name = "Fruit context parsing - empty data";
 
     atomic_inc(&test_stats.total_tests);
 
-    context = create_aapl_context(NULL, 0);
-    TEST_ASSERT_PTR_NOT_NULL(context, test_name, "Failed to create AAPL context with empty data");
+    context = create_fruit_context(NULL, 0);
+    TEST_ASSERT_PTR_NOT_NULL(context, test_name, "Failed to create Fruit context with empty data");
 
     TEST_ASSERT_EQ(0, le32_to_cpu(context->DataLength), test_name, "Data length should be 0");
     TEST_ASSERT_EQ(4, context->NameLength, test_name, "Name length should still be 4");
@@ -290,11 +290,11 @@ static void test_aapl_context_parsing_empty_data(void)
     test_pass(test_name);
 }
 
-static void test_aapl_context_parsing_large_data(void)
+static void test_fruit_context_parsing_large_data(void)
 {
     struct create_context *context;
     char large_data[1024];
-    const char *test_name = "AAPL context parsing - large data";
+    const char *test_name = "Fruit context parsing - large data";
 
     atomic_inc(&test_stats.total_tests);
 
@@ -302,8 +302,8 @@ static void test_aapl_context_parsing_large_data(void)
     memset(large_data, 'A', sizeof(large_data) - 1);
     large_data[sizeof(large_data) - 1] = '\0';
 
-    context = create_aapl_context(large_data, sizeof(large_data) - 1);
-    TEST_ASSERT_PTR_NOT_NULL(context, test_name, "Failed to create AAPL context with large data");
+    context = create_fruit_context(large_data, sizeof(large_data) - 1);
+    TEST_ASSERT_PTR_NOT_NULL(context, test_name, "Failed to create Fruit context with large data");
 
     TEST_ASSERT_EQ(sizeof(large_data) - 1, le32_to_cpu(context->DataLength),
                    test_name, "Data length should match");
@@ -338,23 +338,23 @@ static void test_connection_memory_management(void)
 
 static void test_connection_flags(void)
 {
-    struct ksmbd_conn *apple_conn, *non_apple_conn;
+    struct ksmbd_conn *fruit_conn, *non_fruit_conn;
     const char *test_name = "Connection flags";
 
     atomic_inc(&test_stats.total_tests);
 
-    apple_conn = create_mock_connection(true);
-    non_apple_conn = create_mock_connection(false);
+    fruit_conn = create_mock_connection(true);
+    non_fruit_conn = create_mock_connection(false);
 
-    TEST_ASSERT_PTR_NOT_NULL(apple_conn, test_name, "Failed to create Apple connection");
-    TEST_ASSERT_PTR_NOT_NULL(non_apple_conn, test_name, "Failed to create non-Apple connection");
+    TEST_ASSERT_PTR_NOT_NULL(fruit_conn, test_name, "Failed to create Fruit connection");
+    TEST_ASSERT_PTR_NOT_NULL(non_fruit_conn, test_name, "Failed to create non-Fruit connection");
 
-    TEST_ASSERT_EQ(true, apple_conn->is_aapl, test_name, "Apple connection should have is_aapl=true");
-    TEST_ASSERT_EQ(false, non_apple_conn->is_aapl, test_name, "Non-Apple connection should have is_aapl=false");
-    TEST_ASSERT_EQ(SMB311_PROT_ID, apple_conn->dialect, test_name, "Connection should have SMB3.1.1 dialect");
+    TEST_ASSERT_EQ(true, fruit_conn->is_fruit, test_name, "Fruit connection should have is_fruit=true");
+    TEST_ASSERT_EQ(false, non_fruit_conn->is_fruit, test_name, "Non-Fruit connection should have is_fruit=false");
+    TEST_ASSERT_EQ(SMB311_PROT_ID, fruit_conn->dialect, test_name, "Connection should have SMB3.1.1 dialect");
 
-    free_mock_connection(apple_conn);
-    free_mock_connection(non_apple_conn);
+    free_mock_connection(fruit_conn);
+    free_mock_connection(non_fruit_conn);
     test_pass(test_name);
 }
 
@@ -362,13 +362,13 @@ static void test_connection_flags(void)
 static struct test_case {
     const char *name;
     void (*test_func)(void);
-} apple_test_cases[] = {
-    {"apple_client_detection_new_connection", test_apple_client_detection_new_connection},
-    {"apple_client_detection_aapl_context", test_apple_client_detection_aapl_context},
-    {"apple_client_detection_preexisting_connection", test_apple_client_detection_preexisting_connection},
-    {"aapl_context_parsing_valid", test_aapl_context_parsing_valid},
-    {"aapl_context_parsing_empty_data", test_aapl_context_parsing_empty_data},
-    {"aapl_context_parsing_large_data", test_aapl_context_parsing_large_data},
+} fruit_test_cases[] = {
+    {"fruit_client_detection_new_connection", test_fruit_client_detection_new_connection},
+    {"fruit_client_detection_fruit_context", test_fruit_client_detection_fruit_context},
+    {"fruit_client_detection_preexisting_connection", test_fruit_client_detection_preexisting_connection},
+    {"fruit_context_parsing_valid", test_fruit_context_parsing_valid},
+    {"fruit_context_parsing_empty_data", test_fruit_context_parsing_empty_data},
+    {"fruit_context_parsing_large_data", test_fruit_context_parsing_large_data},
     {"connection_memory_management", test_connection_memory_management},
     {"connection_flags", test_connection_flags},
     {NULL, NULL}
@@ -380,22 +380,22 @@ static int run_all_tests(void)
     int i;
     unsigned long long start_time, end_time, total_time;
 
-    pr_info("🧪 Starting Apple SMB Extensions Unit Tests\n");
+    pr_info("🧪 Starting Fruit SMB Extensions Unit Tests\n");
     pr_info("===============================================\n");
 
     memset(&test_stats, 0, sizeof(test_stats));
 
     start_time = ktime_get_ns();
 
-    for (i = 0; apple_test_cases[i].name != NULL; i++) {
+    for (i = 0; fruit_test_cases[i].name != NULL; i++) {
         unsigned long long test_start = ktime_get_ns();
 
-        pr_info("Running: %s\n", apple_test_cases[i].name);
-        apple_test_cases[i].test_func();
+        pr_info("Running: %s\n", fruit_test_cases[i].name);
+        fruit_test_cases[i].test_func();
 
         if (atomic_read(&test_stats.failed_tests) == 0) {
             unsigned long long test_duration = ktime_get_ns() - test_start;
-            pr_info("✅ %s completed in %lld ns\n", apple_test_cases[i].name, test_duration);
+            pr_info("✅ %s completed in %lld ns\n", fruit_test_cases[i].name, test_duration);
         }
     }
 
@@ -417,7 +417,7 @@ static int run_all_tests(void)
 }
 
 /* Module initialization */
-static int __init apple_test_init(void)
+static int __init fruit_test_init(void)
 {
     int ret;
 
@@ -434,15 +434,15 @@ static int __init apple_test_init(void)
 }
 
 /* Module cleanup */
-static void __exit apple_test_exit(void)
+static void __exit fruit_test_exit(void)
 {
     pr_info("Unloading %s module\n", TEST_MODULE_NAME);
 }
 
-module_init(apple_test_init);
-module_exit(apple_test_exit);
+module_init(fruit_test_init);
+module_exit(fruit_test_exit);
 
 MODULE_LICENSE("GPL v2");
 MODULE_AUTHOR("ksmbd Contributors");
-MODULE_DESCRIPTION("Unit Test Framework for Apple SMB Extensions");
+MODULE_DESCRIPTION("Unit Test Framework for Fruit SMB Extensions");
 MODULE_VERSION("1.0");
