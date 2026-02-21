@@ -1,6 +1,20 @@
 #ifndef COMPAT_H
 #define COMPAT_H
 
+#include <linux/version.h>
+#include <linux/workqueue.h>
+
+/*
+ * disable_work_sync() was introduced in Linux 6.13.
+ * On older kernels, fall back to cancel_work_sync().
+ */
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 13, 0)
+static inline bool disable_work_sync(struct work_struct *work)
+{
+	return cancel_work_sync(work);
+}
+#endif
+
 struct dentry;
 struct inode;
 struct path;

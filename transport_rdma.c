@@ -19,6 +19,7 @@
 #include <rdma/rw.h>
 
 #include "glob.h"
+#include "compat.h"
 #include "connection.h"
 #include "smb_common.h"
 #include "smbstatus.h"
