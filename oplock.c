@@ -2025,6 +2025,7 @@ void create_posix_rsp_buf(char *cc, struct ksmbd_file *fp)
 		  SIDUNIX_GROUP, (struct smb_sid *)&buf->SidBuffer[28]);
 }
 
+#ifdef CONFIG_KSMBD_FRUIT
 /*
  * Compute the total byte size of a Fruit AAPL response
  * including the variable-length model string.
@@ -2100,6 +2101,7 @@ int create_fruit_rsp_buf(char *cc, struct ksmbd_conn *conn, size_t *out_size)
 	*out_size = total;
 	return 0;
 }
+#endif /* CONFIG_KSMBD_FRUIT */
 
 /*
  * Find lease object(opinfo) for given lease key/fid from lease

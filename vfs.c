@@ -619,6 +619,7 @@ static int ksmbd_vfs_stream_read(struct ksmbd_file *fp, char *buf, loff_t *pos,
 				       fp->stream.size,
 				       &stream_buf);
 	if ((int)v_len <= 0) {
+#ifdef CONFIG_KSMBD_FRUIT
 		/*
 		 * AFP_AfpInfo synthesis: when the DosStream xattr
 		 * doesn't exist, try to build a 60-byte AfpInfo
@@ -641,10 +642,13 @@ static int ksmbd_vfs_stream_read(struct ksmbd_file *fp, char *buf, loff_t *pos,
 			}
 			goto have_data;
 		}
+#endif /* CONFIG_KSMBD_FRUIT */
 		return (int)v_len;
 	}
 
+#ifdef CONFIG_KSMBD_FRUIT
 have_data:
+#endif
 	if (v_len <= *pos) {
 		count = -EINVAL;
 		goto free_buf;
@@ -1927,6 +1931,7 @@ int ksmbd_vfs_truncate(struct ksmbd_work *work,
 	return err;
 }
 
+#ifdef CONFIG_KSMBD_FRUIT
 /**
  * ksmbd_vfs_resolve_fileid() - resolve inode number to path relative to share
  * @share_path:	the share root path
@@ -2048,6 +2053,7 @@ int ksmbd_vfs_copy_xattrs(struct dentry *src_dentry,
 	kvfree(xattr_list);
 	return 0;
 }
+#endif /* CONFIG_KSMBD_FRUIT */
 
 /**
  * ksmbd_vfs_listxattr() - vfs helper for smb list extended attributes

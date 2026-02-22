@@ -118,8 +118,10 @@ struct ksmbd_conn {
 	atomic_t			refcnt;
 	bool				is_fruit;
 
+#ifdef CONFIG_KSMBD_FRUIT
 	/* Fruit SMB Extension Support */
 	struct fruit_conn_state	*fruit_state;
+#endif
 };
 
 struct ksmbd_conn_ops {

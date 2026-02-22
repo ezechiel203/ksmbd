@@ -183,6 +183,12 @@ struct fruit_conn_state {
 	u64			last_query_time;
 };
 
+struct ksmbd_share_config;
+
+#ifdef CONFIG_KSMBD_FRUIT
+
+/* ── Real declarations (feature enabled) ───────────────────── */
+
 bool fruit_is_client_request(const void *buffer, size_t len);
 int fruit_parse_client_info(const void *context_data, size_t data_len,
 			    struct fruit_conn_state *state);
@@ -217,7 +223,6 @@ int fruit_handle_savebox_bundle(struct ksmbd_conn *conn,
 int fruit_process_server_query(struct ksmbd_conn *conn,
 			       const struct fruit_server_query *query);
 void fruit_debug_capabilities(u64 capabilities);
-struct ksmbd_share_config;
 
 int smb2_read_dir_attr(struct ksmbd_work *work);
 void smb2_read_dir_attr_fill(struct ksmbd_conn *conn,
@@ -230,5 +235,75 @@ int fruit_synthesize_afpinfo(struct dentry *dentry, char *buf, size_t bufsize);
 
 int fruit_init_module(void);
 void fruit_cleanup_module(void);
+
+#else /* !CONFIG_KSMBD_FRUIT */
+
+/* ── Stubs (feature disabled — all compile to nothing) ─────── */
+
+static inline bool fruit_is_client_request(const void *buffer, size_t len)
+{ return false; }
+static inline int fruit_parse_client_info(const void *context_data,
+			size_t data_len, struct fruit_conn_state *state)
+{ return -EOPNOTSUPP; }
+static inline int fruit_validate_create_context(
+			const struct create_context *context)
+{ return -EOPNOTSUPP; }
+static inline int fruit_negotiate_capabilities(struct ksmbd_conn *conn,
+			const struct fruit_client_info *client_info)
+{ return -EOPNOTSUPP; }
+static inline bool fruit_supports_capability(struct fruit_conn_state *state,
+			u64 capability)
+{ return false; }
+static inline int fruit_detect_client_version(const void *data, size_t len)
+{ return -EOPNOTSUPP; }
+static inline const char *fruit_get_client_name(__le32 client_type)
+{ return "unknown"; }
+static inline const char *fruit_get_version_string(__le32 version)
+{ return "unknown"; }
+static inline bool fruit_valid_signature(const __u8 *signature)
+{ return false; }
+static inline size_t fruit_get_context_size(const char *context_name)
+{ return 0; }
+static inline int fruit_build_server_response(void **response_data,
+			size_t *response_len, __le64 capabilities,
+			__le32 query_type)
+{ return -EOPNOTSUPP; }
+static inline int fruit_init_connection_state(struct fruit_conn_state *state)
+{ return 0; }
+static inline void fruit_cleanup_connection_state(
+			struct fruit_conn_state *state) {}
+static inline int fruit_update_connection_state(
+			struct fruit_conn_state *state,
+			const struct fruit_client_info *client_info)
+{ return -EOPNOTSUPP; }
+static inline void fruit_debug_client_info(
+			const struct fruit_client_info *info) {}
+static inline int fruit_process_looker_info(struct ksmbd_conn *conn,
+			const struct fruit_looker_info *looker_info)
+{ return -EOPNOTSUPP; }
+static inline int fruit_process_savebox_info(struct ksmbd_conn *conn,
+			const struct fruit_savebox_info *sb_info)
+{ return -EOPNOTSUPP; }
+static inline int fruit_handle_savebox_bundle(struct ksmbd_conn *conn,
+			const struct path *path,
+			const struct fruit_savebox_info *sb_info)
+{ return -EOPNOTSUPP; }
+static inline int fruit_process_server_query(struct ksmbd_conn *conn,
+			const struct fruit_server_query *query)
+{ return -EOPNOTSUPP; }
+static inline void fruit_debug_capabilities(u64 capabilities) {}
+static inline int smb2_read_dir_attr(struct ksmbd_work *work)
+{ return 0; }
+static inline void smb2_read_dir_attr_fill(struct ksmbd_conn *conn,
+			struct dentry *dentry, struct kstat *stat,
+			struct ksmbd_share_config *share,
+			__le32 *ea_size_field) {}
+static inline int fruit_synthesize_afpinfo(struct dentry *dentry,
+			char *buf, size_t bufsize)
+{ return -EOPNOTSUPP; }
+static inline int fruit_init_module(void) { return 0; }
+static inline void fruit_cleanup_module(void) {}
+
+#endif /* CONFIG_KSMBD_FRUIT */
 
 #endif /* _SMB2_FRUIT_H */

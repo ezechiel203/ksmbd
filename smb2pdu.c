@@ -2968,7 +2968,10 @@ int smb2_open(struct ksmbd_work *work)
 	__le32 *next_ptr = NULL;
 	int req_op_level = 0, open_flags = 0, may_flags = 0, file_info = 0;
 	int rc = 0;
-	int contxt_cnt = 0, query_disk_id = 0, fruit_ctxt = 0;
+	int contxt_cnt = 0, query_disk_id = 0;
+#ifdef CONFIG_KSMBD_FRUIT
+	int fruit_ctxt = 0;
+#endif
 	bool maximal_access_ctxt = false, posix_ctxt = false;
 	int s_type = 0;
 	int next_off = 0;
@@ -3711,6 +3714,7 @@ int smb2_open(struct ksmbd_work *work)
 			query_disk_id = 1;
 		}
 
+#ifdef CONFIG_KSMBD_FRUIT
 		if ((server_conf.flags & KSMBD_GLOBAL_FLAG_FRUIT_EXTENSIONS) &&
 		    conn->is_fruit == false) {
 			context = smb2_find_context_vals(req, SMB2_CREATE_AAPL, 4);
@@ -3771,8 +3775,8 @@ int smb2_open(struct ksmbd_work *work)
 		} else if (conn->is_fruit) {
 			fruit_ctxt = 1;
 		}
-
-continue_create:
+continue_create: ;
+#endif /* CONFIG_KSMBD_FRUIT */
 	}
 
 	rc = ksmbd_vfs_getattr(&path, &stat);
@@ -3950,6 +3954,7 @@ reconnected_fp:
 		next_off = conn->vals->create_posix_size;
 	}
 
+#ifdef CONFIG_KSMBD_FRUIT
 	if (fruit_ctxt) {
 		struct create_context *fruit_ccontext;
 		size_t fruit_size = 0;
@@ -3965,6 +3970,7 @@ reconnected_fp:
 		if (next_ptr)
 			*next_ptr = cpu_to_le32(next_off);
 	}
+#endif
 
 	if (contxt_cnt > 0) {
 		rsp->CreateContextsOffset =

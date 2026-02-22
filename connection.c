@@ -44,12 +44,14 @@ void ksmbd_conn_free(struct ksmbd_conn *conn)
 	kvfree(conn->request_buf);
 	kfree(conn->preauth_info);
 
+#ifdef CONFIG_KSMBD_FRUIT
 	/* Clean up Fruit SMB extension resources */
 	if (conn->fruit_state) {
 		fruit_cleanup_connection_state(conn->fruit_state);
 		kfree(conn->fruit_state);
 		conn->fruit_state = NULL;
 	}
+#endif
 
 	if (atomic_dec_and_test(&conn->refcnt)) {
 		conn->transport->ops->free_transport(conn->transport);

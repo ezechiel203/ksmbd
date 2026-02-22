@@ -5,6 +5,8 @@
  *   Fruit SMB extensions for KSMBD
  */
 
+#ifdef CONFIG_KSMBD_FRUIT
+
 #include <linux/kernel.h>
 #include <linux/string.h>
 #include <linux/errno.h>
@@ -471,3 +473,5 @@ void smb2_read_dir_attr_fill(struct ksmbd_conn *conn,
 	/* Pack UNIX mode into EaSize (Apple ReadDirAttr convention) */
 	*ea_size_field = cpu_to_le32(stat->mode);
 }
+
+#endif /* CONFIG_KSMBD_FRUIT */
