@@ -15,3 +15,10 @@
 	browseable = yes
 	guest ok = yes
 	force user = nobody
+
+[ro_share]
+	path = /tmp/ksmbd_test_ro_share
+	read only = yes
+	browseable = yes
+	guest ok = no
+	force user = nobody

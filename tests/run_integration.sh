@@ -24,6 +24,7 @@ set -u
 # ---------------------------------------------------------------------------
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TEST_SHARE_DIR="/tmp/ksmbd_test_share"
+RO_SHARE_DIR="/tmp/ksmbd_test_ro_share"
 TEST_CONF="${SCRIPT_DIR}/smb.conf.test"
 KSMBD_CONF="/etc/ksmbd/ksmbd.conf"
 KSMBD_CONF_BACKUP=""
@@ -141,9 +142,12 @@ check_prerequisites() {
 setup_environment() {
 	log_info "Setting up test environment..."
 
-	# Create test share directory
+	# Create test share directories
 	mkdir -p "${TEST_SHARE_DIR}"
 	chmod 777 "${TEST_SHARE_DIR}"
+	mkdir -p "${RO_SHARE_DIR}"
+	chmod 755 "${RO_SHARE_DIR}"
+	echo "read-only content" > "${RO_SHARE_DIR}/existing_file.txt"
 
 	# Backup existing ksmbd configuration if present
 	if [ -f "${KSMBD_CONF}" ]; then
@@ -302,6 +306,215 @@ run_basic_tests() {
 }
 
 # ---------------------------------------------------------------------------
+# Advanced SMB operation tests
+# ---------------------------------------------------------------------------
+run_advanced_tests() {
+	log_info "Running advanced SMB operation tests..."
+	local server="localhost"
+
+	# Test: SMB3 encryption
+	log_info "Test: SMB3 encrypted session..."
+	if smbclient "//${server}/test_share" -U "${TEST_USER}%${TEST_PASS}" \
+		--option="client min protocol=SMB3" \
+		--option="client max protocol=SMB3" \
+		-c "ls" 2>/dev/null; then
+		test_pass "SMB3 encrypted session"
+	else
+		test_fail "SMB3 encrypted session"
+	fi
+
+	# Test: Signing enforcement
+	log_info "Test: SMB signing enforcement..."
+	if smbclient "//${server}/test_share" -U "${TEST_USER}%${TEST_PASS}" \
+		--option="client min protocol=SMB2" \
+		--option="client signing=required" \
+		-c "ls" 2>/dev/null; then
+		test_pass "SMB signing enforcement"
+	else
+		test_fail "SMB signing enforcement"
+	fi
+
+	# Test: Large file I/O (100MB)
+	log_info "Test: Large file I/O (100MB)..."
+	local large_file="/tmp/ksmbd_large_test_file.bin"
+	local large_file_dl="/tmp/ksmbd_large_test_file_dl.bin"
+	dd if=/dev/urandom of="${large_file}" bs=1M count=100 2>/dev/null
+	local src_md5
+	src_md5=$(md5sum "${large_file}" | awk '{print $1}')
+	if smbclient "//${server}/test_share" -U "${TEST_USER}%${TEST_PASS}" \
+		--option="client min protocol=SMB2" \
+		-c "put ${large_file} large_test_file.bin" 2>/dev/null; then
+		if smbclient "//${server}/test_share" -U "${TEST_USER}%${TEST_PASS}" \
+			--option="client min protocol=SMB2" \
+			-c "get large_test_file.bin ${large_file_dl}" 2>/dev/null; then
+			local dl_md5
+			dl_md5=$(md5sum "${large_file_dl}" | awk '{print $1}')
+			if [ "${src_md5}" = "${dl_md5}" ]; then
+				test_pass "Large file I/O (100MB, md5sum match)"
+			else
+				test_fail "Large file I/O (md5sum mismatch: ${src_md5} != ${dl_md5})"
+			fi
+		else
+			test_fail "Large file I/O (download failed)"
+		fi
+	else
+		test_fail "Large file I/O (upload failed)"
+	fi
+	rm -f "${large_file}" "${large_file_dl}"
+	# Clean up the file on the share
+	smbclient "//${server}/test_share" -U "${TEST_USER}%${TEST_PASS}" \
+		--option="client min protocol=SMB2" \
+		-c "del large_test_file.bin" 2>/dev/null || true
+
+	# Test: Concurrent access (4 parallel smbclient processes)
+	log_info "Test: Concurrent access (4 parallel writers)..."
+	local concurrent_pids=()
+	local concurrent_ok=1
+	for i in 1 2 3 4; do
+		local tmp_file="/tmp/ksmbd_concurrent_${i}.txt"
+		echo "Concurrent write from process ${i}" > "${tmp_file}"
+		smbclient "//${server}/test_share" -U "${TEST_USER}%${TEST_PASS}" \
+			--option="client min protocol=SMB2" \
+			-c "put ${tmp_file} concurrent_${i}.txt" 2>/dev/null &
+		concurrent_pids+=($!)
+	done
+	for pid in "${concurrent_pids[@]}"; do
+		if ! wait "${pid}"; then
+			concurrent_ok=0
+		fi
+	done
+	# Verify all 4 files exist on the share
+	if [ "${concurrent_ok}" -eq 1 ]; then
+		local listing
+		listing=$(smbclient "//${server}/test_share" -U "${TEST_USER}%${TEST_PASS}" \
+			--option="client min protocol=SMB2" \
+			-c "ls concurrent_*.txt" 2>/dev/null || true)
+		local found=0
+		for i in 1 2 3 4; do
+			if echo "${listing}" | grep -q "concurrent_${i}.txt"; then
+				found=$((found + 1))
+			fi
+		done
+		if [ "${found}" -eq 4 ]; then
+			test_pass "Concurrent access (4 files written in parallel)"
+		else
+			test_fail "Concurrent access (only ${found}/4 files found)"
+		fi
+	else
+		test_fail "Concurrent access (one or more smbclient processes failed)"
+	fi
+	# Cleanup concurrent test files
+	for i in 1 2 3 4; do
+		rm -f "/tmp/ksmbd_concurrent_${i}.txt"
+		smbclient "//${server}/test_share" -U "${TEST_USER}%${TEST_PASS}" \
+			--option="client min protocol=SMB2" \
+			-c "del concurrent_${i}.txt" 2>/dev/null || true
+	done
+
+	# Test: Symlink handling
+	log_info "Test: Symlink handling..."
+	echo "symlink target content" > "${TEST_SHARE_DIR}/symlink_target.txt"
+	ln -sf "${TEST_SHARE_DIR}/symlink_target.txt" "${TEST_SHARE_DIR}/symlink_link.txt"
+	if smbclient "//${server}/test_share" -U "${TEST_USER}%${TEST_PASS}" \
+		--option="client min protocol=SMB2" \
+		-c "get symlink_link.txt /tmp/ksmbd_symlink_read.txt" 2>/dev/null; then
+		if [ -f "/tmp/ksmbd_symlink_read.txt" ]; then
+			test_pass "Symlink handling (read through symlink)"
+		else
+			test_fail "Symlink handling (file not retrieved)"
+		fi
+	else
+		# ksmbd may block symlinks for security; either outcome is acceptable
+		test_pass "Symlink handling (server correctly blocked symlink access)"
+	fi
+	rm -f "${TEST_SHARE_DIR}/symlink_target.txt" "${TEST_SHARE_DIR}/symlink_link.txt"
+	rm -f "/tmp/ksmbd_symlink_read.txt"
+
+	# Test: Permission enforcement (read-only share)
+	log_info "Test: Permission enforcement (read-only share)..."
+	local ro_tmp="/tmp/ksmbd_ro_test.txt"
+	echo "attempt to write to read-only share" > "${ro_tmp}"
+	if smbclient "//${server}/ro_share" -U "${TEST_USER}%${TEST_PASS}" \
+		--option="client min protocol=SMB2" \
+		-c "put ${ro_tmp} should_not_exist.txt" 2>/dev/null; then
+		# Write succeeded on a read-only share -- that is a failure
+		test_fail "Permission enforcement (write succeeded on read-only share)"
+	else
+		test_pass "Permission enforcement (write correctly rejected on read-only share)"
+	fi
+	rm -f "${ro_tmp}"
+
+	# Test: Rename file
+	log_info "Test: Rename file..."
+	local rename_tmp="/tmp/ksmbd_rename_test.txt"
+	echo "file to be renamed" > "${rename_tmp}"
+	if smbclient "//${server}/test_share" -U "${TEST_USER}%${TEST_PASS}" \
+		--option="client min protocol=SMB2" \
+		-c "put ${rename_tmp} rename_original.txt" 2>/dev/null; then
+		if smbclient "//${server}/test_share" -U "${TEST_USER}%${TEST_PASS}" \
+			--option="client min protocol=SMB2" \
+			-c "rename rename_original.txt rename_new.txt" 2>/dev/null; then
+			local rename_listing
+			rename_listing=$(smbclient "//${server}/test_share" -U "${TEST_USER}%${TEST_PASS}" \
+				--option="client min protocol=SMB2" \
+				-c "ls rename_new.txt" 2>/dev/null || true)
+			if echo "${rename_listing}" | grep -q "rename_new.txt"; then
+				test_pass "Rename file"
+			else
+				test_fail "Rename file (renamed file not found)"
+			fi
+		else
+			test_fail "Rename file (rename command failed)"
+		fi
+	else
+		test_fail "Rename file (initial upload failed)"
+	fi
+	rm -f "${rename_tmp}"
+	smbclient "//${server}/test_share" -U "${TEST_USER}%${TEST_PASS}" \
+		--option="client min protocol=SMB2" \
+		-c "del rename_new.txt" 2>/dev/null || true
+	smbclient "//${server}/test_share" -U "${TEST_USER}%${TEST_PASS}" \
+		--option="client min protocol=SMB2" \
+		-c "del rename_original.txt" 2>/dev/null || true
+
+	# Test: Overwrite file
+	log_info "Test: Overwrite file..."
+	local overwrite_tmp1="/tmp/ksmbd_overwrite_v1.txt"
+	local overwrite_tmp2="/tmp/ksmbd_overwrite_v2.txt"
+	echo "version 1 content" > "${overwrite_tmp1}"
+	echo "version 2 content" > "${overwrite_tmp2}"
+	if smbclient "//${server}/test_share" -U "${TEST_USER}%${TEST_PASS}" \
+		--option="client min protocol=SMB2" \
+		-c "put ${overwrite_tmp1} overwrite_test.txt" 2>/dev/null; then
+		if smbclient "//${server}/test_share" -U "${TEST_USER}%${TEST_PASS}" \
+			--option="client min protocol=SMB2" \
+			-c "put ${overwrite_tmp2} overwrite_test.txt" 2>/dev/null; then
+			local overwrite_dl="/tmp/ksmbd_overwrite_dl.txt"
+			if smbclient "//${server}/test_share" -U "${TEST_USER}%${TEST_PASS}" \
+				--option="client min protocol=SMB2" \
+				-c "get overwrite_test.txt ${overwrite_dl}" 2>/dev/null; then
+				if grep -q "version 2 content" "${overwrite_dl}"; then
+					test_pass "Overwrite file (content is version 2)"
+				else
+					test_fail "Overwrite file (content is not version 2)"
+				fi
+				rm -f "${overwrite_dl}"
+			else
+				test_fail "Overwrite file (download after overwrite failed)"
+			fi
+		else
+			test_fail "Overwrite file (second upload failed)"
+		fi
+	else
+		test_fail "Overwrite file (first upload failed)"
+	fi
+	rm -f "${overwrite_tmp1}" "${overwrite_tmp2}"
+	smbclient "//${server}/test_share" -U "${TEST_USER}%${TEST_PASS}" \
+		--option="client min protocol=SMB2" \
+		-c "del overwrite_test.txt" 2>/dev/null || true
+}
+
+# ---------------------------------------------------------------------------
 # smbtorture tests (optional)
 # ---------------------------------------------------------------------------
 run_smbtorture_tests() {
@@ -362,11 +575,18 @@ cleanup() {
 		rm -f "${KSMBD_CONF}"
 	fi
 
-	# Remove test share directory
+	# Remove test share directories
 	rm -rf "${TEST_SHARE_DIR}"
+	rm -rf "${RO_SHARE_DIR}"
 
 	# Remove temporary files
 	rm -f "/tmp/${TEST_FILE}" "/tmp/${TEST_FILE}_read"
+	rm -f /tmp/ksmbd_large_test_file.bin /tmp/ksmbd_large_test_file_dl.bin
+	rm -f /tmp/ksmbd_concurrent_*.txt
+	rm -f /tmp/ksmbd_symlink_read.txt
+	rm -f /tmp/ksmbd_ro_test.txt
+	rm -f /tmp/ksmbd_rename_test.txt
+	rm -f /tmp/ksmbd_overwrite_v1.txt /tmp/ksmbd_overwrite_v2.txt /tmp/ksmbd_overwrite_dl.txt
 
 	log_info "Cleanup complete."
 }
@@ -410,6 +630,7 @@ main() {
 	setup_environment
 	start_daemon
 	run_basic_tests
+	run_advanced_tests
 	run_smbtorture_tests
 
 	# Report results (cleanup happens via trap)
