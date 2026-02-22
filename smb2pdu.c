@@ -1566,7 +1566,9 @@ static int ntlm_authenticate(struct ksmbd_work *work,
 	if (prev_id && prev_id != sess->id)
 		destroy_previous_session(conn, user, prev_id);
 
+	down_read(&sess->state_lock);
 	if (sess->state == SMB2_SESSION_VALID) {
+		up_read(&sess->state_lock);
 		/*
 		 * Reuse session if anonymous try to connect
 		 * on reauthetication.
@@ -1582,6 +1584,7 @@ static int ntlm_authenticate(struct ksmbd_work *work,
 		}
 		ksmbd_free_user(user);
 	} else {
+		up_read(&sess->state_lock);
 		sess->user = user;
 	}
 
@@ -1608,11 +1611,14 @@ static int ntlm_authenticate(struct ksmbd_work *work,
 	 * that it is reauthentication. And the user/password
 	 * has been verified, so return it here.
 	 */
+	down_read(&sess->state_lock);
 	if (sess->state == SMB2_SESSION_VALID) {
+		up_read(&sess->state_lock);
 		if (conn->binding)
 			goto binding_session;
 		return 0;
 	}
+	up_read(&sess->state_lock);
 
 	if ((rsp->SessionFlags != SMB2_SESSION_FLAG_IS_GUEST_LE &&
 	     (conn->sign || server_conf.enforced_signing)) ||
@@ -1716,11 +1722,14 @@ static int krb5_authenticate(struct ksmbd_work *work,
 	 * that it is reauthentication. And the user/password
 	 * has been verified, so return it here.
 	 */
+	down_read(&sess->state_lock);
 	if (sess->state == SMB2_SESSION_VALID) {
+		up_read(&sess->state_lock);
 		if (conn->binding)
 			goto binding_session;
 		return 0;
 	}
+	up_read(&sess->state_lock);
 
 	if ((rsp->SessionFlags != SMB2_SESSION_FLAG_IS_GUEST_LE &&
 	    (conn->sign || server_conf.enforced_signing)) ||
@@ -1840,15 +1849,19 @@ int smb2_sess_setup(struct ksmbd_work *work)
 			goto out_err;
 		}
 
+		down_read(&sess->state_lock);
 		if (sess->state == SMB2_SESSION_IN_PROGRESS) {
+			up_read(&sess->state_lock);
 			rc = -EACCES;
 			goto out_err;
 		}
 
 		if (sess->state == SMB2_SESSION_EXPIRED) {
+			up_read(&sess->state_lock);
 			rc = -EFAULT;
 			goto out_err;
 		}
+		up_read(&sess->state_lock);
 
 		if (ksmbd_conn_need_reconnect(conn)) {
 			rc = -EFAULT;
@@ -1882,10 +1895,13 @@ int smb2_sess_setup(struct ksmbd_work *work)
 			goto out_err;
 		}
 
+		down_read(&sess->state_lock);
 		if (sess->state == SMB2_SESSION_EXPIRED) {
+			up_read(&sess->state_lock);
 			rc = -EFAULT;
 			goto out_err;
 		}
+		up_read(&sess->state_lock);
 
 		if (ksmbd_conn_need_reconnect(conn)) {
 			rc = -EFAULT;
@@ -1940,7 +1956,9 @@ int smb2_sess_setup(struct ksmbd_work *work)
 
 			if (!ksmbd_conn_need_reconnect(conn)) {
 				ksmbd_conn_set_good(conn);
+				down_write(&sess->state_lock);
 				sess->state = SMB2_SESSION_VALID;
+				up_write(&sess->state_lock);
 			}
 		} else if (conn->preferred_auth_mech == KSMBD_AUTH_NTLMSSP) {
 			if (negblob->MessageType == NtLmNegotiate) {
@@ -1956,7 +1974,9 @@ int smb2_sess_setup(struct ksmbd_work *work)
 
 				if (!ksmbd_conn_need_reconnect(conn)) {
 					ksmbd_conn_set_good(conn);
+					down_write(&sess->state_lock);
 					sess->state = SMB2_SESSION_VALID;
+					up_write(&sess->state_lock);
 				}
 				if (conn->binding) {
 					struct preauth_session *preauth_sess;
@@ -2023,7 +2043,9 @@ out_err:
 				try_delay = true;
 
 			sess->last_active = jiffies;
+			down_write(&sess->state_lock);
 			sess->state = SMB2_SESSION_EXPIRED;
+			up_write(&sess->state_lock);
 			ksmbd_user_session_put(sess);
 			work->sess = NULL;
 			if (try_delay) {
@@ -2374,7 +2396,9 @@ int smb2_session_logoff(struct ksmbd_work *work)
 	}
 
 	down_write(&conn->session_lock);
+	down_write(&sess->state_lock);
 	sess->state = SMB2_SESSION_EXPIRED;
+	up_write(&sess->state_lock);
 	up_write(&conn->session_lock);
 
 	ksmbd_all_conn_set_status(sess_id, KSMBD_SESS_NEED_SETUP);

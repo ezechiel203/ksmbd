@@ -205,10 +205,15 @@ static void ksmbd_expire_session(struct ksmbd_conn *conn)
 	mutex_lock(&sessions_table_lock);
 	down_write(&conn->session_lock);
 	xa_for_each(&conn->sessions, id, sess) {
+		int state;
+
 		if (nr_expired >= ARRAY_SIZE(expired))
 			break;
+		down_read(&sess->state_lock);
+		state = sess->state;
+		up_read(&sess->state_lock);
 		if (refcount_read(&sess->refcnt) <= 1 &&
-		    (sess->state != SMB2_SESSION_VALID ||
+		    (state != SMB2_SESSION_VALID ||
 		     time_after(jiffies,
 			       sess->last_active + SMB2_SESSION_TIMEOUT))) {
 			xa_erase(&conn->sessions, sess->id);
@@ -407,9 +412,15 @@ struct ksmbd_session *ksmbd_session_lookup_all(struct ksmbd_conn *conn,
 	sess = ksmbd_session_lookup(conn, id);
 	if (!sess && conn->binding)
 		sess = ksmbd_session_lookup_slowpath(id);
-	if (sess && sess->state != SMB2_SESSION_VALID) {
-		ksmbd_user_session_put(sess);
-		sess = NULL;
+	if (sess) {
+		down_read(&sess->state_lock);
+		if (sess->state != SMB2_SESSION_VALID) {
+			up_read(&sess->state_lock);
+			ksmbd_user_session_put(sess);
+			sess = NULL;
+		} else {
+			up_read(&sess->state_lock);
+		}
 	}
 	return sess;
 }
@@ -459,26 +470,36 @@ void destroy_previous_session(struct ksmbd_conn *conn,
 	rcu_read_lock();
 	prev_sess = __session_lookup(id);
 	rcu_read_unlock();
-	if (!prev_sess || prev_sess->state == SMB2_SESSION_EXPIRED)
+	if (!prev_sess)
 		goto out;
+
+	down_write(&prev_sess->state_lock);
+	if (prev_sess->state == SMB2_SESSION_EXPIRED) {
+		up_write(&prev_sess->state_lock);
+		goto out;
+	}
 
 	prev_user = prev_sess->user;
 	if (!prev_user ||
 	    strcmp(user->name, prev_user->name) ||
 	    user->passkey_sz != prev_user->passkey_sz ||
 	    crypto_memneq(user->passkey, prev_user->passkey,
-			  user->passkey_sz))
+			  user->passkey_sz)) {
+		up_write(&prev_sess->state_lock);
 		goto out;
+	}
 
 	ksmbd_all_conn_set_status(id, KSMBD_SESS_NEED_RECONNECT);
 	err = ksmbd_conn_wait_idle_sess_id(conn, id);
 	if (err) {
 		ksmbd_all_conn_set_status(id, KSMBD_SESS_NEED_SETUP);
+		up_write(&prev_sess->state_lock);
 		goto out;
 	}
 
 	ksmbd_destroy_file_table(&prev_sess->file_table);
 	prev_sess->state = SMB2_SESSION_EXPIRED;
+	up_write(&prev_sess->state_lock);
 	ksmbd_all_conn_set_status(id, KSMBD_SESS_NEED_SETUP);
 	ksmbd_launch_ksmbd_durable_scavenger();
 out:
@@ -546,6 +567,7 @@ static struct ksmbd_session *__session_create(int protocol)
 
 	sess->last_active = jiffies;
 	sess->state = SMB2_SESSION_IN_PROGRESS;
+	init_rwsem(&sess->state_lock);
 	set_session_flag(sess, protocol);
 	xa_init(&sess->tree_conns);
 	xa_init(&sess->ksmbd_chann_list);

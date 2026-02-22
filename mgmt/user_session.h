@@ -50,6 +50,7 @@ struct ksmbd_session {
 	bool				is_anonymous;
 
 	int				state;
+	struct rw_semaphore		state_lock; /* Protects state transitions */
 	__u8				*Preauth_HashValue;
 
 	char				sess_key[CIFS_KEY_SIZE];
