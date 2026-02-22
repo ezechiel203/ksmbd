@@ -1022,6 +1022,130 @@ out:
 	return rc;
 }
 
+/**
+ * ksmbd_sign_smb3_pdu_gmac() - generate AES-GMAC packet signature
+ * @conn:	connection
+ * @key:	signing key
+ * @iov:	buffer iov array
+ * @n_vec:	number of iovecs
+ * @sig:	signature value generated for client request packet
+ *
+ * AES-GMAC is GCM mode with zero-length plaintext. The SMB2 message
+ * (with zeroed signature field) is the AAD. The 16-byte authentication
+ * tag becomes the signature. The 12-byte nonce is constructed from the
+ * MessageId field (8 bytes, little-endian) followed by 4 zero bytes.
+ */
+int ksmbd_sign_smb3_pdu_gmac(struct ksmbd_conn *conn, char *key,
+			      struct kvec *iov, int n_vec, char *sig)
+{
+	struct ksmbd_crypto_ctx *ctx;
+	struct crypto_aead *tfm;
+	struct aead_request *req;
+	struct scatterlist *sg;
+	u8 nonce[SMB3_AES_GMAC_NONCE] = {};
+	struct smb2_hdr *hdr;
+	int rc, i;
+	unsigned int total_len = 0;
+	u8 *aad_buf = NULL;
+	u8 tag[SMB2_SIGNATURE_SIZE] = {};
+
+	if (n_vec < 1 || !iov[0].iov_base)
+		return -EINVAL;
+
+	/* Extract the MessageId from the SMB2 header for nonce construction */
+	hdr = (struct smb2_hdr *)iov[0].iov_base;
+	memcpy(nonce, &hdr->MessageId, sizeof(hdr->MessageId));
+	/* Remaining 4 bytes of nonce are already zeroed */
+
+	ctx = ksmbd_crypto_ctx_find_gcm();
+	if (!ctx) {
+		ksmbd_debug(AUTH, "could not crypto alloc gcm for gmac\n");
+		return -ENOMEM;
+	}
+
+	tfm = CRYPTO_GCM(ctx);
+
+	rc = crypto_aead_setkey(tfm, key, SMB2_CMACAES_SIZE);
+	if (rc) {
+		ksmbd_debug(AUTH, "Failed to set aead key for gmac %d\n", rc);
+		goto free_ctx;
+	}
+
+	rc = crypto_aead_setauthsize(tfm, SMB2_SIGNATURE_SIZE);
+	if (rc) {
+		ksmbd_debug(AUTH, "Failed to set authsize for gmac %d\n", rc);
+		goto free_ctx;
+	}
+
+	req = aead_request_alloc(tfm, KSMBD_DEFAULT_GFP);
+	if (!req) {
+		rc = -ENOMEM;
+		goto free_ctx;
+	}
+
+	/* Calculate total AAD length from all iovecs */
+	for (i = 0; i < n_vec; i++)
+		total_len += iov[i].iov_len;
+
+	/*
+	 * Linearize the iov data into a single buffer for the AAD.
+	 * GCM with zero-length plaintext (GMAC) requires the message
+	 * to be passed entirely as AAD.
+	 */
+	aad_buf = kzalloc(total_len, KSMBD_DEFAULT_GFP);
+	if (!aad_buf) {
+		rc = -ENOMEM;
+		goto free_req;
+	}
+
+	{
+		unsigned int offset = 0;
+
+		for (i = 0; i < n_vec; i++) {
+			memcpy(aad_buf + offset, iov[i].iov_base,
+			       iov[i].iov_len);
+			offset += iov[i].iov_len;
+		}
+	}
+
+	/*
+	 * We need 2 scatterlist entries:
+	 *   sg[0] = AAD (the SMB2 message)
+	 *   sg[1] = tag output (authentication tag / signature)
+	 */
+	sg = kmalloc_array(2, sizeof(struct scatterlist), KSMBD_DEFAULT_GFP);
+	if (!sg) {
+		rc = -ENOMEM;
+		goto free_aad;
+	}
+
+	sg_init_table(sg, 2);
+	sg_set_buf(&sg[0], aad_buf, total_len);
+	sg_set_buf(&sg[1], tag, SMB2_SIGNATURE_SIZE);
+
+	aead_request_set_crypt(req, sg, sg, 0, nonce);
+	aead_request_set_ad(req, total_len);
+	aead_request_set_callback(req, CRYPTO_TFM_REQ_MAY_SLEEP, NULL, NULL);
+
+	rc = crypto_aead_encrypt(req);
+	if (rc) {
+		ksmbd_debug(AUTH, "gmac generation error %d\n", rc);
+		goto free_sg;
+	}
+
+	memcpy(sig, tag, SMB2_SIGNATURE_SIZE);
+
+free_sg:
+	kfree(sg);
+free_aad:
+	kfree(aad_buf);
+free_req:
+	aead_request_free(req);
+free_ctx:
+	ksmbd_release_crypto_ctx(ctx);
+	return rc;
+}
+
 struct derivation {
 	struct kvec label;
 	struct kvec context;

@@ -994,6 +994,8 @@ static void decode_sign_cap_ctxt(struct ksmbd_conn *conn,
 {
 	int sign_algo_cnt;
 	int i, sign_alos_size;
+	int best_priority = -1;
+	__le16 best_algo = 0;
 
 	if (sizeof(struct smb2_signing_capabilities) > ctxt_len) {
 		pr_err_ratelimited("Invalid SMB2_SIGNING_CAPABILITIES context length\n");
@@ -1010,16 +1012,31 @@ static void decode_sign_cap_ctxt(struct ksmbd_conn *conn,
 		return;
 	}
 
+	/*
+	 * Select the best mutually supported signing algorithm.
+	 * Priority order: AES-GMAC (highest) > AES-CMAC > HMAC-SHA256.
+	 */
 	for (i = 0; i < sign_algo_cnt; i++) {
-		if (pneg_ctxt->SigningAlgorithms[i] == SIGNING_ALG_HMAC_SHA256 ||
-		    pneg_ctxt->SigningAlgorithms[i] == SIGNING_ALG_AES_CMAC) {
-			ksmbd_debug(SMB, "Signing Algorithm ID = 0x%x\n",
-				    pneg_ctxt->SigningAlgorithms[i]);
-			conn->signing_negotiated = true;
-			conn->signing_algorithm =
-				pneg_ctxt->SigningAlgorithms[i];
-			break;
+		int priority = -1;
+
+		if (pneg_ctxt->SigningAlgorithms[i] == SIGNING_ALG_HMAC_SHA256)
+			priority = 0;
+		else if (pneg_ctxt->SigningAlgorithms[i] == SIGNING_ALG_AES_CMAC)
+			priority = 1;
+		else if (pneg_ctxt->SigningAlgorithms[i] == SIGNING_ALG_AES_GMAC)
+			priority = 2;
+
+		if (priority > best_priority) {
+			best_priority = priority;
+			best_algo = pneg_ctxt->SigningAlgorithms[i];
 		}
+	}
+
+	if (best_priority >= 0) {
+		ksmbd_debug(SMB, "Signing Algorithm ID = 0x%x\n",
+			    le16_to_cpu(best_algo));
+		conn->signing_negotiated = true;
+		conn->signing_algorithm = best_algo;
 	}
 }
 
@@ -10003,8 +10020,14 @@ int smb3_check_sign_req(struct ksmbd_work *work)
 	iov[0].iov_base = (char *)&hdr->ProtocolId;
 	iov[0].iov_len = len;
 
-	if (ksmbd_sign_smb3_pdu(conn, signing_key, iov, 1, signature))
-		return 0;
+	if (conn->signing_algorithm == SIGNING_ALG_AES_GMAC) {
+		if (ksmbd_sign_smb3_pdu_gmac(conn, signing_key, iov, 1,
+					      signature))
+			return 0;
+	} else {
+		if (ksmbd_sign_smb3_pdu(conn, signing_key, iov, 1, signature))
+			return 0;
+	}
 
 	if (crypto_memneq(signature, signature_req, SMB2_SIGNATURE_SIZE)) {
 		pr_err_ratelimited("bad smb2 signature\n");
@@ -10028,6 +10051,7 @@ void smb3_set_sign_rsp(struct ksmbd_work *work)
 	struct kvec *iov;
 	int n_vec = 1;
 	char *signing_key;
+	int rc;
 
 	hdr = ksmbd_resp_buf_curr(work);
 
@@ -10057,8 +10081,13 @@ void smb3_set_sign_rsp(struct ksmbd_work *work)
 		iov = &work->iov[work->iov_idx];
 	}
 
-	if (!ksmbd_sign_smb3_pdu(conn, signing_key, iov, n_vec,
-				 signature))
+	if (conn->signing_algorithm == SIGNING_ALG_AES_GMAC)
+		rc = ksmbd_sign_smb3_pdu_gmac(conn, signing_key, iov, n_vec,
+					       signature);
+	else
+		rc = ksmbd_sign_smb3_pdu(conn, signing_key, iov, n_vec,
+					 signature);
+	if (!rc)
 		memcpy(hdr->Signature, signature, SMB2_SIGNATURE_SIZE);
 }
 

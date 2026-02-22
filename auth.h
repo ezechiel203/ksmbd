@@ -56,6 +56,8 @@ int ksmbd_sign_smb2_pdu(struct ksmbd_conn *conn, char *key, struct kvec *iov,
 			int n_vec, char *sig);
 int ksmbd_sign_smb3_pdu(struct ksmbd_conn *conn, char *key, struct kvec *iov,
 			int n_vec, char *sig);
+int ksmbd_sign_smb3_pdu_gmac(struct ksmbd_conn *conn, char *key,
+			      struct kvec *iov, int n_vec, char *sig);
 int ksmbd_gen_smb30_signingkey(struct ksmbd_session *sess,
 			       struct ksmbd_conn *conn);
 int ksmbd_gen_smb311_signingkey(struct ksmbd_session *sess,

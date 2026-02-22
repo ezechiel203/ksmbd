@@ -160,6 +160,7 @@ struct smb2_pdu {
 
 #define SMB3_AES_CCM_NONCE 11
 #define SMB3_AES_GCM_NONCE 12
+#define SMB3_AES_GMAC_NONCE 12
 
 struct smb2_transform_hdr {
 	__le32 ProtocolId;      /* 0xFD 'S' 'M' 'B' */
