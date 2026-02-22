@@ -118,11 +118,15 @@ static void ctx_free(struct ksmbd_crypto_ctx *ctx)
 	kfree(ctx);
 }
 
+#define KSMBD_CRYPTO_CTX_MAX_RETRIES	3
+#define KSMBD_CRYPTO_CTX_TIMEOUT	(5 * HZ)
+
 static struct ksmbd_crypto_ctx *ksmbd_find_crypto_ctx(void)
 {
 	struct ksmbd_crypto_ctx *ctx;
+	int retries = 0;
 
-	while (1) {
+	while (retries < KSMBD_CRYPTO_CTX_MAX_RETRIES) {
 		spin_lock(&ctx_list.ctx_lock);
 		if (!list_empty(&ctx_list.idle_ctx)) {
 			ctx = list_entry(ctx_list.idle_ctx.next,
@@ -135,26 +139,38 @@ static struct ksmbd_crypto_ctx *ksmbd_find_crypto_ctx(void)
 
 		if (ctx_list.avail_ctx > num_online_cpus()) {
 			spin_unlock(&ctx_list.ctx_lock);
-			wait_event(ctx_list.ctx_wait,
-				   !list_empty(&ctx_list.idle_ctx));
+			if (!wait_event_timeout(ctx_list.ctx_wait,
+						!list_empty(&ctx_list.idle_ctx),
+						KSMBD_CRYPTO_CTX_TIMEOUT)) {
+				retries++;
+				continue;
+			}
 			continue;
 		}
 
 		ctx_list.avail_ctx++;
 		spin_unlock(&ctx_list.ctx_lock);
 
-		ctx = kzalloc(sizeof(struct ksmbd_crypto_ctx), KSMBD_DEFAULT_GFP);
+		ctx = kzalloc(sizeof(struct ksmbd_crypto_ctx),
+			      KSMBD_DEFAULT_GFP);
 		if (!ctx) {
 			spin_lock(&ctx_list.ctx_lock);
 			ctx_list.avail_ctx--;
 			spin_unlock(&ctx_list.ctx_lock);
-			wait_event(ctx_list.ctx_wait,
-				   !list_empty(&ctx_list.idle_ctx));
+			if (!wait_event_timeout(ctx_list.ctx_wait,
+						!list_empty(&ctx_list.idle_ctx),
+						KSMBD_CRYPTO_CTX_TIMEOUT)) {
+				retries++;
+				continue;
+			}
 			continue;
 		}
-		break;
+		return ctx;
 	}
-	return ctx;
+
+	pr_err_ratelimited("Failed to get crypto context after %d retries\n",
+			   KSMBD_CRYPTO_CTX_MAX_RETRIES);
+	return NULL;
 }
 
 void ksmbd_release_crypto_ctx(struct ksmbd_crypto_ctx *ctx)
@@ -183,6 +199,9 @@ static struct ksmbd_crypto_ctx *____crypto_shash_ctx_find(int id)
 		return NULL;
 
 	ctx = ksmbd_find_crypto_ctx();
+	if (!ctx)
+		return NULL;
+
 	if (ctx->desc[id])
 		return ctx;
 
@@ -236,6 +255,9 @@ static struct ksmbd_crypto_ctx *____crypto_aead_ctx_find(int id)
 		return NULL;
 
 	ctx = ksmbd_find_crypto_ctx();
+	if (!ctx)
+		return NULL;
+
 	if (ctx->ccmaes[id])
 		return ctx;
 
