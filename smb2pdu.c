@@ -50,6 +50,8 @@
 #include "smb2fruit.h"
 #include "ksmbd_fsctl.h"
 #include "ksmbd_create_ctx.h"
+#include "ksmbd_vss.h"
+#include "ksmbd_notify.h"
 
 static void __wbuf(struct ksmbd_work *work, void **req, void **rsp)
 {
@@ -2067,6 +2069,18 @@ int smb2_tree_connect(struct ksmbd_work *work)
 		goto out_err1;
 	}
 
+	/*
+	 * When SMB2_FLAGS_DFS_OPERATIONS is set, the tree path may
+	 * contain a DFS prefix.  Log the DFS operation for debugging.
+	 * Full DFS path resolution (stripping the DFS prefix and
+	 * redirecting to the correct share) will be implemented when
+	 * IPC integration with ksmbd.mountd is available.
+	 */
+	if (req->hdr.Flags & SMB2_FLAGS_DFS_OPERATIONS)
+		ksmbd_debug(SMB,
+			    "DFS flag set for tree connect: %s\n",
+			    treename);
+
 	name = ksmbd_extract_sharename(conn->um, treename);
 	if (IS_ERR(name)) {
 		status.ret = KSMBD_TREE_CONN_STATUS_ERROR;
@@ -3599,6 +3613,15 @@ int smb2_open(struct ksmbd_work *work)
 	if (IS_ERR(filp)) {
 		rc = PTR_ERR(filp);
 		pr_err("dentry open for dir failed, rc %d\n", rc);
+		goto err_out;
+	}
+
+	/* Post-open TOCTOU check: verify file is within share root */
+	if (!path_is_under(&filp->f_path,
+			   &work->tcon->share_conf->vfs_path)) {
+		pr_err_ratelimited("open path escapes share root\n");
+		fput(filp);
+		rc = -EACCES;
 		goto err_out;
 	}
 
@@ -9100,12 +9123,6 @@ int smb2_ioctl(struct ksmbd_work *work)
 	/* Fallback to legacy switch for unmigrated handlers */
 	ret = 0;
 	switch (cnt_code) {
-	case FSCTL_DFS_GET_REFERRALS:
-	case FSCTL_DFS_GET_REFERRALS_EX:
-		/* Not support DFS yet */
-		ret = -EOPNOTSUPP;
-		rsp->hdr.Status = STATUS_FS_DRIVER_REQUIRED;
-		goto out2;
 	/* TODO: migrate to registered handler */
 	case FSCTL_QUERY_NETWORK_INTERFACE_INFO:
 		ret = fsctl_query_iface_info_ioctl(conn, rsp, out_buf_len);
@@ -9354,7 +9371,6 @@ out:
 	else if (ret < 0 || rsp->hdr.Status == 0)
 		rsp->hdr.Status = STATUS_INVALID_PARAMETER;
 
-out2:
 	smb2_set_err_rsp(work);
 	return ret;
 }

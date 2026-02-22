@@ -25,6 +25,8 @@
 #include "ksmbd_fsctl.h"
 #include "ksmbd_create_ctx.h"
 #include "ksmbd_info.h"
+#include "ksmbd_dfs.h"
+#include "ksmbd_notify.h"
 
 extern int ksmbd_debugfs_init(void);
 extern void ksmbd_debugfs_exit(void);
@@ -637,6 +639,10 @@ static int __init ksmbd_server_init(void)
 	if (ret)
 		goto err_fsctl;
 
+	ret = ksmbd_dfs_init();
+	if (ret)
+		goto err_dfs;
+
 	ret = ksmbd_create_ctx_init();
 	if (ret)
 		goto err_create_ctx;
@@ -645,11 +651,19 @@ static int __init ksmbd_server_init(void)
 	if (ret)
 		goto err_info;
 
+	ret = ksmbd_notify_init();
+	if (ret)
+		goto err_notify;
+
 	return 0;
 
+err_notify:
+	ksmbd_info_exit();
 err_info:
 	ksmbd_create_ctx_exit();
 err_create_ctx:
+	ksmbd_dfs_exit();
+err_dfs:
 	ksmbd_fsctl_exit();
 err_fsctl:
 	ksmbd_debugfs_exit();
@@ -679,8 +693,10 @@ err_config_exit:
  */
 static void __exit ksmbd_server_exit(void)
 {
+	ksmbd_notify_exit();
 	ksmbd_info_exit();
 	ksmbd_create_ctx_exit();
+	ksmbd_dfs_exit();
 	ksmbd_fsctl_exit();
 	ksmbd_server_shutdown();
 	rcu_barrier();
