@@ -12,6 +12,7 @@
 #include "connection.h"
 #include "smb_common.h"
 #include "server.h"
+#include "ksmbd_dfs.h"
 
 #ifdef CONFIG_SMB_INSECURE_SERVER
 static struct smb_version_values smb20_server_values = {
@@ -265,6 +266,9 @@ int init_smb2_1_server(struct ksmbd_conn *conn)
 	if (server_conf.flags & KSMBD_GLOBAL_FLAG_SMB2_LEASES)
 		conn->vals->capabilities |= SMB2_GLOBAL_CAP_LEASING;
 
+	if (ksmbd_dfs_enabled())
+		conn->vals->capabilities |= SMB2_GLOBAL_CAP_DFS;
+
 	return 0;
 }
 
@@ -296,6 +300,9 @@ int init_smb3_0_server(struct ksmbd_conn *conn)
 
 	if (server_conf.flags & KSMBD_GLOBAL_FLAG_SMB3_MULTICHANNEL)
 		conn->vals->capabilities |= SMB2_GLOBAL_CAP_MULTI_CHANNEL;
+
+	if (ksmbd_dfs_enabled())
+		conn->vals->capabilities |= SMB2_GLOBAL_CAP_DFS;
 
 	return 0;
 }
@@ -332,6 +339,9 @@ int init_smb3_02_server(struct ksmbd_conn *conn)
 	if (server_conf.flags & KSMBD_GLOBAL_FLAG_DURABLE_HANDLE)
 		conn->vals->capabilities |= SMB2_GLOBAL_CAP_PERSISTENT_HANDLES;
 
+	if (ksmbd_dfs_enabled())
+		conn->vals->capabilities |= SMB2_GLOBAL_CAP_DFS;
+
 	return 0;
 }
 
@@ -361,6 +371,9 @@ int init_smb3_11_server(struct ksmbd_conn *conn)
 
 	if (server_conf.flags & KSMBD_GLOBAL_FLAG_DURABLE_HANDLE)
 		conn->vals->capabilities |= SMB2_GLOBAL_CAP_PERSISTENT_HANDLES;
+
+	if (ksmbd_dfs_enabled())
+		conn->vals->capabilities |= SMB2_GLOBAL_CAP_DFS;
 
 	INIT_LIST_HEAD(&conn->preauth_sess_table);
 	return 0;

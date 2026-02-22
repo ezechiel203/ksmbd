@@ -440,7 +440,10 @@ int ksmbd_auth_ntlmv2(struct ksmbd_conn *conn, struct ksmbd_session *sess,
 out:
 	if (ctx)
 		ksmbd_release_crypto_ctx(ctx);
-	kfree(construct);
+	if (construct) {
+		memzero_explicit(construct, len);
+		kfree(construct);
+	}
 	memzero_explicit(ntlmv2_hash, sizeof(ntlmv2_hash));
 	memzero_explicit(ntlmv2_rsp, sizeof(ntlmv2_rsp));
 	return rc;
@@ -855,7 +858,12 @@ int ksmbd_krb5_authenticate(struct ksmbd_session *sess, char *in_blob,
 	*out_len = resp->spnego_blob_len;
 	retval = 0;
 out:
-	kvfree(resp);
+	if (resp) {
+		memzero_explicit(resp->payload,
+				 resp->session_key_len);
+		kvfree(resp);
+	}
+	kvfree(resp_ext);
 	return retval;
 }
 
@@ -1538,6 +1546,7 @@ int ksmbd_crypt_message(struct ksmbd_work *work, struct kvec *iov,
 		memcpy(&tr_hdr->Signature, sign, SMB2_SIGNATURE_SIZE);
 
 free_iv:
+	memzero_explicit(iv, iv_len);
 	kfree(iv);
 free_sg:
 	kfree(sg);
@@ -1546,5 +1555,6 @@ free_req:
 free_ctx:
 	ksmbd_release_crypto_ctx(ctx);
 	memzero_explicit(key, sizeof(key));
+	memzero_explicit(sign, sizeof(sign));
 	return rc;
 }
