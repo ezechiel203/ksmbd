@@ -8,6 +8,7 @@
 
 #include <linux/version.h>
 #include <linux/fs.h>
+#include <linux/overflow.h>
 #include <linux/slab.h>
 #include <linux/string.h>
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 17, 0)
@@ -180,13 +181,36 @@ static void mode_to_access_flags(umode_t mode, umode_t bits_to_use,
 		    mode, *pace_flags);
 }
 
+/**
+ * ksmbd_ace_size() - calculate ACE size for a given SID
+ * @psid:	pointer to the SID
+ *
+ * Return:	size of the ACE in bytes, or 0 on overflow
+ */
+static __u16 ksmbd_ace_size(const struct smb_sid *psid)
+{
+	unsigned int size;
+
+	if (check_add_overflow(1u + 1u + 2u + 4u + 1u + 1u + 6u,
+			       (unsigned int)psid->num_subauth * 4u,
+			       &size))
+		return 0;
+	if (size > U16_MAX)
+		return 0;
+	return (__u16)size;
+}
+
 static __u16 fill_ace_for_sid(struct smb_ace *pntace,
-			      const struct smb_sid *psid, int type, int flags,
-			      umode_t mode, umode_t bits)
+			      const struct smb_sid *psid, int type,
+			      int flags, umode_t mode, umode_t bits)
 {
 	int i;
-	__u16 size = 0;
+	__u16 size;
 	__u32 access_req = 0;
+
+	size = ksmbd_ace_size(psid);
+	if (!size)
+		return 0;
 
 	pntace->type = type;
 	pntace->flags = flags;
@@ -202,7 +226,6 @@ static __u16 fill_ace_for_sid(struct smb_ace *pntace,
 	for (i = 0; i < psid->num_subauth; i++)
 		pntace->sid.sub_auth[i] = psid->sub_auth[i];
 
-	size = 1 + 1 + 2 + 4 + 1 + 1 + 6 + (psid->num_subauth * 4);
 	pntace->size = cpu_to_le16(size);
 
 	return size;
@@ -450,10 +473,16 @@ static void parse_dacl(struct user_namespace *user_ns,
 	if (num_aces <= 0)
 		return;
 
-	if (num_aces > (pdacl->size - sizeof(struct smb_acl)) /
+	/* Validate ACE count against available buffer space */
+	if (num_aces > (le16_to_cpu(pdacl->size) -
+			sizeof(struct smb_acl)) /
 			(offsetof(struct smb_ace, sid) +
-			 offsetof(struct smb_sid, sub_auth) + sizeof(__le16)))
+			 offsetof(struct smb_sid, sub_auth) +
+			 sizeof(__le16))) {
+		pr_err_ratelimited("ACE count %u exceeds buffer capacity\n",
+				   num_aces);
 		return;
+	}
 
 	ret = init_acl_state(&acl_state, num_aces);
 	if (ret)
@@ -638,18 +667,22 @@ static void parse_dacl(struct user_namespace *user_ns,
 }
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
-static void set_posix_acl_entries_dacl(struct mnt_idmap *idmap,
+static int set_posix_acl_entries_dacl(struct mnt_idmap *idmap,
 #else
-static void set_posix_acl_entries_dacl(struct user_namespace *user_ns,
+static int set_posix_acl_entries_dacl(struct user_namespace *user_ns,
 #endif
-				       struct smb_ace *pndace,
-				       struct smb_fattr *fattr, u16 *num_aces,
-				       u16 *size, u32 nt_aces_num)
+				      struct smb_ace *pndace,
+				      struct smb_fattr *fattr,
+				      u16 *num_aces, u16 *size,
+				      u32 nt_aces_num,
+				      unsigned int buf_size)
 {
 	struct posix_acl_entry *pace;
 	struct smb_sid *sid;
 	struct smb_ace *ntace;
 	int i, j;
+	unsigned int new_off;
+	__u16 ace_size;
 
 	if (!fattr->cf_acls)
 		goto posix_default_acl;
@@ -701,23 +734,49 @@ static void set_posix_acl_entries_dacl(struct user_namespace *user_ns,
 		if (S_ISDIR(fattr->cf_mode) && pace->e_tag == ACL_OTHER)
 			flags = 0x03;
 
+		ace_size = ksmbd_ace_size(sid);
+		if (!ace_size ||
+		    check_add_overflow((unsigned int)*size,
+				       (unsigned int)ace_size,
+				       &new_off) ||
+		    new_off > buf_size) {
+			kfree(sid);
+			pr_err_ratelimited("ACL buffer overflow in posix ACE\n");
+			return -ENOSPC;
+		}
+
 		ntace = (struct smb_ace *)((char *)pndace + *size);
-		*size += fill_ace_for_sid(ntace, sid, ACCESS_ALLOWED, flags,
-				pace->e_perm, 0777);
+		*size += fill_ace_for_sid(ntace, sid, ACCESS_ALLOWED,
+				flags, pace->e_perm, 0777);
 		(*num_aces)++;
 		if (pace->e_tag == ACL_USER)
 			ntace->access_req |=
 				FILE_DELETE_LE | FILE_DELETE_CHILD_LE;
 
 		if (S_ISDIR(fattr->cf_mode) &&
-		    (pace->e_tag == ACL_USER || pace->e_tag == ACL_GROUP)) {
-			ntace = (struct smb_ace *)((char *)pndace + *size);
-			*size += fill_ace_for_sid(ntace, sid, ACCESS_ALLOWED,
-					0x03, pace->e_perm, 0777);
+		    (pace->e_tag == ACL_USER ||
+		     pace->e_tag == ACL_GROUP)) {
+			ace_size = ksmbd_ace_size(sid);
+			if (!ace_size ||
+			    check_add_overflow((unsigned int)*size,
+					       (unsigned int)ace_size,
+					       &new_off) ||
+			    new_off > buf_size) {
+				kfree(sid);
+				pr_err_ratelimited("ACL buffer overflow in posix dir ACE\n");
+				return -ENOSPC;
+			}
+
+			ntace = (struct smb_ace *)((char *)pndace +
+					*size);
+			*size += fill_ace_for_sid(ntace, sid,
+					ACCESS_ALLOWED, 0x03,
+					pace->e_perm, 0777);
 			(*num_aces)++;
 			if (pace->e_tag == ACL_USER)
 				ntace->access_req |=
-					FILE_DELETE_LE | FILE_DELETE_CHILD_LE;
+					FILE_DELETE_LE |
+					FILE_DELETE_CHILD_LE;
 		}
 
 pass_same_sid:
@@ -725,11 +784,11 @@ pass_same_sid:
 	}
 
 	if (nt_aces_num)
-		return;
+		return 0;
 
 posix_default_acl:
 	if (!fattr->cf_dacls)
-		return;
+		return 0;
 
 	pace = fattr->cf_dacls->a_entries;
 	for (i = 0; i < fattr->cf_dacls->a_count; i++, pace++) {
@@ -760,110 +819,177 @@ posix_default_acl:
 			continue;
 		}
 
+		ace_size = ksmbd_ace_size(sid);
+		if (!ace_size ||
+		    check_add_overflow((unsigned int)*size,
+				       (unsigned int)ace_size,
+				       &new_off) ||
+		    new_off > buf_size) {
+			kfree(sid);
+			pr_err_ratelimited("ACL buffer overflow in default ACE\n");
+			return -ENOSPC;
+		}
+
 		ntace = (struct smb_ace *)((char *)pndace + *size);
-		*size += fill_ace_for_sid(ntace, sid, ACCESS_ALLOWED, 0x0b,
-				pace->e_perm, 0777);
+		*size += fill_ace_for_sid(ntace, sid, ACCESS_ALLOWED,
+				0x0b, pace->e_perm, 0777);
 		(*num_aces)++;
 		if (pace->e_tag == ACL_USER)
 			ntace->access_req |=
 				FILE_DELETE_LE | FILE_DELETE_CHILD_LE;
 		kfree(sid);
 	}
+	return 0;
 }
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
-static void set_ntacl_dacl(struct mnt_idmap *idmap,
+static int set_ntacl_dacl(struct mnt_idmap *idmap,
 #else
-static void set_ntacl_dacl(struct user_namespace *user_ns,
+static int set_ntacl_dacl(struct user_namespace *user_ns,
 #endif
-			   struct smb_acl *pndacl,
-			   struct smb_acl *nt_dacl,
-			   unsigned int aces_size,
-			   const struct smb_sid *pownersid,
-			   const struct smb_sid *pgrpsid,
-			   struct smb_fattr *fattr)
+			  struct smb_acl *pndacl,
+			  struct smb_acl *nt_dacl,
+			  unsigned int aces_size,
+			  const struct smb_sid *pownersid,
+			  const struct smb_sid *pgrpsid,
+			  struct smb_fattr *fattr,
+			  unsigned int buf_size)
 {
 	struct smb_ace *ntace, *pndace;
-	u16 nt_num_aces = le16_to_cpu(nt_dacl->num_aces), num_aces = 0;
+	u16 nt_num_aces = le16_to_cpu(nt_dacl->num_aces);
+	u16 num_aces = 0;
 	unsigned short size = 0;
-	int i;
+	unsigned int new_off;
+	int i, rc;
 
-	pndace = (struct smb_ace *)((char *)pndacl + sizeof(struct smb_acl));
+	pndace = (struct smb_ace *)((char *)pndacl +
+			sizeof(struct smb_acl));
 	if (nt_num_aces) {
-		ntace = (struct smb_ace *)((char *)nt_dacl + sizeof(struct smb_acl));
+		ntace = (struct smb_ace *)((char *)nt_dacl +
+				sizeof(struct smb_acl));
 		for (i = 0; i < nt_num_aces; i++) {
 			unsigned short nt_ace_size;
 
-			if (offsetof(struct smb_ace, access_req) > aces_size)
+			if (offsetof(struct smb_ace, access_req) >
+			    aces_size)
 				break;
 
 			nt_ace_size = le16_to_cpu(ntace->size);
 			if (nt_ace_size > aces_size)
 				break;
 
-			memcpy((char *)pndace + size, ntace, nt_ace_size);
+			if (check_add_overflow((unsigned int)size,
+					       (unsigned int)nt_ace_size,
+					       &new_off) ||
+			    new_off > buf_size) {
+				pr_err_ratelimited("ACL buffer overflow copying NT ACEs\n");
+				return -ENOSPC;
+			}
+
+			memcpy((char *)pndace + size, ntace,
+			       nt_ace_size);
 			size += nt_ace_size;
 			aces_size -= nt_ace_size;
-			ntace = (struct smb_ace *)((char *)ntace + nt_ace_size);
+			ntace = (struct smb_ace *)((char *)ntace +
+					nt_ace_size);
 			num_aces++;
 		}
 	}
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
-	set_posix_acl_entries_dacl(idmap, pndace, fattr,
+	rc = set_posix_acl_entries_dacl(idmap, pndace, fattr,
 #else
-	set_posix_acl_entries_dacl(user_ns, pndace, fattr,
+	rc = set_posix_acl_entries_dacl(user_ns, pndace, fattr,
 #endif
-				   &num_aces, &size, nt_num_aces);
+					&num_aces, &size,
+					nt_num_aces, buf_size);
+	if (rc)
+		return rc;
+
 	pndacl->num_aces = cpu_to_le32(num_aces);
 	pndacl->size = cpu_to_le16(le16_to_cpu(pndacl->size) + size);
+	return 0;
 }
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
-static void set_mode_dacl(struct mnt_idmap *idmap,
+static int set_mode_dacl(struct mnt_idmap *idmap,
 #else
-static void set_mode_dacl(struct user_namespace *user_ns,
+static int set_mode_dacl(struct user_namespace *user_ns,
 #endif
-			  struct smb_acl *pndacl, struct smb_fattr *fattr)
+			 struct smb_acl *pndacl,
+			 struct smb_fattr *fattr,
+			 unsigned int buf_size)
 {
 	struct smb_ace *pace, *pndace;
 	u16 num_aces = 0;
 	u16 size = 0, ace_size = 0;
+	unsigned int new_off;
 	uid_t uid;
 	const struct smb_sid *sid;
+	int rc;
 
-	pace = pndace = (struct smb_ace *)((char *)pndacl + sizeof(struct smb_acl));
+	pace = pndace = (struct smb_ace *)((char *)pndacl +
+			sizeof(struct smb_acl));
 
 	if (fattr->cf_acls) {
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
-		set_posix_acl_entries_dacl(idmap, pndace, fattr,
+		rc = set_posix_acl_entries_dacl(idmap, pndace, fattr,
 #else
-		set_posix_acl_entries_dacl(user_ns, pndace, fattr,
+		rc = set_posix_acl_entries_dacl(user_ns, pndace, fattr,
 #endif
-					   &num_aces, &size, num_aces);
+						&num_aces, &size,
+						num_aces, buf_size);
+		if (rc)
+			return rc;
 		goto out;
 	}
 
-	/* owner RID */
+	/* owner RID - account for extra sub_auth (+4) appended */
 	uid = from_kuid(&init_user_ns, fattr->cf_uid);
 	if (uid)
 		sid = &server_conf.domain_sid;
 	else
 		sid = &sid_unix_users;
+
+	ace_size = ksmbd_ace_size(sid);
+	if (!ace_size ||
+	    check_add_overflow((unsigned int)ace_size, 4u,
+			       &new_off) ||
+	    check_add_overflow((unsigned int)size, new_off,
+			       &new_off) ||
+	    new_off > buf_size) {
+		pr_err_ratelimited("ACL buffer overflow: owner ACE\n");
+		return -ENOSPC;
+	}
+
 	ace_size = fill_ace_for_sid(pace, sid, ACCESS_ALLOWED, 0,
 				    fattr->cf_mode, 0700);
 	if (pace->sid.num_subauth < SID_MAX_SUB_AUTHORITIES)
-		pace->sid.sub_auth[pace->sid.num_subauth++] = cpu_to_le32(uid);
+		pace->sid.sub_auth[pace->sid.num_subauth++] =
+			cpu_to_le32(uid);
 	pace->size = cpu_to_le16(ace_size + 4);
 	size += le16_to_cpu(pace->size);
 	pace = (struct smb_ace *)((char *)pndace + size);
 
 	/* Group RID */
+	ace_size = ksmbd_ace_size(&sid_unix_groups);
+	if (!ace_size ||
+	    check_add_overflow((unsigned int)ace_size, 4u,
+			       &new_off) ||
+	    check_add_overflow((unsigned int)size, new_off,
+			       &new_off) ||
+	    new_off > buf_size) {
+		pr_err_ratelimited("ACL buffer overflow: group ACE\n");
+		return -ENOSPC;
+	}
+
 	ace_size = fill_ace_for_sid(pace, &sid_unix_groups,
-				    ACCESS_ALLOWED, 0, fattr->cf_mode, 0070);
+				    ACCESS_ALLOWED, 0,
+				    fattr->cf_mode, 0070);
 	if (pace->sid.num_subauth < SID_MAX_SUB_AUTHORITIES)
 		pace->sid.sub_auth[pace->sid.num_subauth++] =
-			cpu_to_le32(from_kgid(&init_user_ns, fattr->cf_gid));
+			cpu_to_le32(from_kgid(&init_user_ns,
+					      fattr->cf_gid));
 	pace->size = cpu_to_le16(ace_size + 4);
 	size += le16_to_cpu(pace->size);
 	pace = (struct smb_ace *)((char *)pndace + size);
@@ -873,24 +999,54 @@ static void set_mode_dacl(struct user_namespace *user_ns,
 		pace = (struct smb_ace *)((char *)pndace + size);
 
 		/* creator owner */
-		size += fill_ace_for_sid(pace, &creator_owner, ACCESS_ALLOWED,
-					 0x0b, fattr->cf_mode, 0700);
+		ace_size = ksmbd_ace_size(&creator_owner);
+		if (!ace_size ||
+		    check_add_overflow((unsigned int)size,
+				       (unsigned int)ace_size,
+				       &new_off) ||
+		    new_off > buf_size) {
+			pr_err_ratelimited("ACL buffer overflow: creator owner\n");
+			return -ENOSPC;
+		}
+		size += fill_ace_for_sid(pace, &creator_owner,
+					ACCESS_ALLOWED, 0x0b,
+					fattr->cf_mode, 0700);
 		pace = (struct smb_ace *)((char *)pndace + size);
 
 		/* creator group */
-		size += fill_ace_for_sid(pace, &creator_group, ACCESS_ALLOWED,
-					 0x0b, fattr->cf_mode, 0070);
+		ace_size = ksmbd_ace_size(&creator_group);
+		if (!ace_size ||
+		    check_add_overflow((unsigned int)size,
+				       (unsigned int)ace_size,
+				       &new_off) ||
+		    new_off > buf_size) {
+			pr_err_ratelimited("ACL buffer overflow: creator group\n");
+			return -ENOSPC;
+		}
+		size += fill_ace_for_sid(pace, &creator_group,
+					ACCESS_ALLOWED, 0x0b,
+					fattr->cf_mode, 0070);
 		pace = (struct smb_ace *)((char *)pndace + size);
 		num_aces = 5;
 	}
 
 	/* other */
-	size += fill_ace_for_sid(pace, &sid_everyone, ACCESS_ALLOWED, 0,
-				 fattr->cf_mode, 0007);
+	ace_size = ksmbd_ace_size(&sid_everyone);
+	if (!ace_size ||
+	    check_add_overflow((unsigned int)size,
+			       (unsigned int)ace_size, &new_off) ||
+	    new_off > buf_size) {
+		pr_err_ratelimited("ACL buffer overflow: everyone ACE\n");
+		return -ENOSPC;
+	}
+	size += fill_ace_for_sid(pace, &sid_everyone,
+				ACCESS_ALLOWED, 0,
+				fattr->cf_mode, 0007);
 
 out:
 	pndacl->num_aces = cpu_to_le16(num_aces);
 	pndacl->size = cpu_to_le16(le16_to_cpu(pndacl->size) + size);
+	return 0;
 }
 
 static int parse_sid(struct smb_sid *psid, char *end_of_acl)
@@ -1020,18 +1176,32 @@ int parse_sec_desc(struct user_namespace *user_ns, struct smb_ntsd *pntsd,
 	return 0;
 }
 
-/* Convert permission bits from mode to equivalent CIFS ACL */
+/**
+ * build_sec_desc() - convert permission bits to equivalent CIFS ACL
+ * @idmap:	idmap of the relevant mount (user_ns on older kernels)
+ * @pntsd:	output NT security descriptor buffer
+ * @ppntsd:	optional parent NT security descriptor
+ * @ppntsd_size:	size of parent security descriptor
+ * @addition_info:	which security info sections to include
+ * @secdesclen:	output total security descriptor length
+ * @fattr:	file attributes with uid/gid/mode/ACLs
+ * @buf_size:	total size of the output buffer pntsd
+ *
+ * Return:	0 on success, negative errno on error
+ */
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
 int build_sec_desc(struct mnt_idmap *idmap,
 #else
 int build_sec_desc(struct user_namespace *user_ns,
 #endif
 		   struct smb_ntsd *pntsd, struct smb_ntsd *ppntsd,
-		   int ppntsd_size, int addition_info, __u32 *secdesclen,
-		   struct smb_fattr *fattr)
+		   int ppntsd_size, int addition_info,
+		   __u32 *secdesclen, struct smb_fattr *fattr,
+		   unsigned int buf_size)
 {
 	int rc = 0;
 	__u32 offset;
+	unsigned int sid_size, new_off;
 	struct smb_sid *owner_sid_ptr, *group_sid_ptr;
 	struct smb_sid *nowner_sid_ptr, *ngroup_sid_ptr;
 	struct smb_acl *dacl_ptr = NULL; /* no need for SACL ptr */
@@ -1039,7 +1209,11 @@ int build_sec_desc(struct user_namespace *user_ns,
 	gid_t gid;
 	unsigned int sid_type = SIDOWNER;
 
-	nowner_sid_ptr = kmalloc(sizeof(struct smb_sid), KSMBD_DEFAULT_GFP);
+	if (buf_size < sizeof(struct smb_ntsd))
+		return -ENOSPC;
+
+	nowner_sid_ptr = kmalloc(sizeof(struct smb_sid),
+				 KSMBD_DEFAULT_GFP);
 	if (!nowner_sid_ptr)
 		return -ENOMEM;
 
@@ -1048,7 +1222,8 @@ int build_sec_desc(struct user_namespace *user_ns,
 		sid_type = SIDUNIX_USER;
 	id_to_sid(uid, sid_type, nowner_sid_ptr);
 
-	ngroup_sid_ptr = kmalloc(sizeof(struct smb_sid), KSMBD_DEFAULT_GFP);
+	ngroup_sid_ptr = kmalloc(sizeof(struct smb_sid),
+				 KSMBD_DEFAULT_GFP);
 	if (!ngroup_sid_ptr) {
 		kfree(nowner_sid_ptr);
 		return -ENOMEM;
@@ -1065,58 +1240,110 @@ int build_sec_desc(struct user_namespace *user_ns,
 		pntsd->type |= ppntsd->type;
 
 	if (addition_info & OWNER_SECINFO) {
+		sid_size = 1 + 1 + 6 +
+			(unsigned int)nowner_sid_ptr->num_subauth * 4;
+		if (check_add_overflow(offset, sid_size, &new_off) ||
+		    new_off > buf_size) {
+			pr_err_ratelimited("SD buffer overflow: owner SID\n");
+			rc = -ENOSPC;
+			goto out;
+		}
 		pntsd->osidoffset = cpu_to_le32(offset);
-		owner_sid_ptr = (struct smb_sid *)((char *)pntsd + offset);
+		owner_sid_ptr = (struct smb_sid *)((char *)pntsd +
+				offset);
 		smb_copy_sid(owner_sid_ptr, nowner_sid_ptr);
-		offset += 1 + 1 + 6 + (nowner_sid_ptr->num_subauth * 4);
+		offset = new_off;
 	}
 
 	if (addition_info & GROUP_SECINFO) {
+		sid_size = 1 + 1 + 6 +
+			(unsigned int)ngroup_sid_ptr->num_subauth * 4;
+		if (check_add_overflow(offset, sid_size, &new_off) ||
+		    new_off > buf_size) {
+			pr_err_ratelimited("SD buffer overflow: group SID\n");
+			rc = -ENOSPC;
+			goto out;
+		}
 		pntsd->gsidoffset = cpu_to_le32(offset);
-		group_sid_ptr = (struct smb_sid *)((char *)pntsd + offset);
+		group_sid_ptr = (struct smb_sid *)((char *)pntsd +
+				offset);
 		smb_copy_sid(group_sid_ptr, ngroup_sid_ptr);
-		offset += 1 + 1 + 6 + (ngroup_sid_ptr->num_subauth * 4);
+		offset = new_off;
 	}
 
 	if (addition_info & DACL_SECINFO) {
+		unsigned int dacl_buf_size;
+
+		if (check_add_overflow(offset,
+				       (unsigned int)sizeof(struct smb_acl),
+				       &new_off) ||
+		    new_off > buf_size) {
+			pr_err_ratelimited("SD buffer overflow: DACL hdr\n");
+			rc = -ENOSPC;
+			goto out;
+		}
+
 		pntsd->type |= cpu_to_le16(DACL_PRESENT);
 		dacl_ptr = (struct smb_acl *)((char *)pntsd + offset);
 		dacl_ptr->revision = cpu_to_le16(2);
 		dacl_ptr->size = cpu_to_le16(sizeof(struct smb_acl));
 		dacl_ptr->num_aces = 0;
 
+		/* Space remaining for ACEs after DACL header */
+		dacl_buf_size = buf_size - new_off;
+
 		if (!ppntsd) {
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
-			set_mode_dacl(idmap, dacl_ptr, fattr);
+			rc = set_mode_dacl(idmap, dacl_ptr, fattr,
 #else
-			set_mode_dacl(user_ns, dacl_ptr, fattr);
+			rc = set_mode_dacl(user_ns, dacl_ptr, fattr,
 #endif
+					   dacl_buf_size);
+			if (rc)
+				goto out;
 		} else {
 			struct smb_acl *ppdacl_ptr;
-			unsigned int dacl_offset = le32_to_cpu(ppntsd->dacloffset);
-			int ppdacl_size, ntacl_size = ppntsd_size - dacl_offset;
+			unsigned int dacl_offset =
+				le32_to_cpu(ppntsd->dacloffset);
+			int ppdacl_size;
+			int ntacl_size = ppntsd_size - dacl_offset;
 
 			if (!dacl_offset ||
-			    (dacl_offset + sizeof(struct smb_acl) > ppntsd_size))
+			    (dacl_offset + sizeof(struct smb_acl) >
+			     (unsigned int)ppntsd_size))
 				goto out;
 
-			ppdacl_ptr = (struct smb_acl *)((char *)ppntsd + dacl_offset);
+			ppdacl_ptr = (struct smb_acl *)((char *)ppntsd +
+					dacl_offset);
 			ppdacl_size = le16_to_cpu(ppdacl_ptr->size);
 			if (ppdacl_size > ntacl_size ||
 			    ppdacl_size < sizeof(struct smb_acl))
 				goto out;
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
-			set_ntacl_dacl(idmap, dacl_ptr, ppdacl_ptr,
+			rc = set_ntacl_dacl(idmap, dacl_ptr,
 #else
-			set_ntacl_dacl(user_ns, dacl_ptr, ppdacl_ptr,
+			rc = set_ntacl_dacl(user_ns, dacl_ptr,
 #endif
-				       ntacl_size - sizeof(struct smb_acl),
-				       nowner_sid_ptr, ngroup_sid_ptr,
-				       fattr);
+					    ppdacl_ptr,
+					    ntacl_size -
+					    sizeof(struct smb_acl),
+					    nowner_sid_ptr,
+					    ngroup_sid_ptr, fattr,
+					    dacl_buf_size);
+			if (rc)
+				goto out;
 		}
 		pntsd->dacloffset = cpu_to_le32(offset);
 		offset += le16_to_cpu(dacl_ptr->size);
+
+		/* Final validation */
+		if (offset > buf_size) {
+			pr_err_ratelimited("SD exceeds buffer: %u > %u\n",
+					   offset, buf_size);
+			rc = -ENOSPC;
+			goto out;
+		}
 	}
 
 out:
@@ -1155,6 +1382,7 @@ int smb_inherit_dacl(struct ksmbd_conn *conn,
 	int rc = 0, pntsd_type, pntsd_size, acl_len, aces_size;
 	unsigned int dacloffset;
 	size_t dacl_struct_end;
+	size_t aces_buf_size;
 	u16 num_aces, ace_cnt = 0;
 	char *aces_base;
 	bool is_dir = S_ISDIR(d_inode(path->dentry)->i_mode);
@@ -1192,8 +1420,8 @@ int smb_inherit_dacl(struct ksmbd_conn *conn,
 		goto free_parent_pntsd;
 	}
 
-	aces_base = kmalloc(sizeof(struct smb_ace) * num_aces * 2,
-			    KSMBD_DEFAULT_GFP);
+	aces_buf_size = sizeof(struct smb_ace) * num_aces * 2;
+	aces_base = kmalloc(aces_buf_size, KSMBD_DEFAULT_GFP);
 	if (!aces_base) {
 		rc = -ENOMEM;
 		goto free_parent_pntsd;
@@ -1246,21 +1474,42 @@ int smb_inherit_dacl(struct ksmbd_conn *conn,
 		}
 
 		if (is_dir && creator && flags & CONTAINER_INHERIT_ACE) {
-			smb_set_ace(aces, psid, parent_aces->type, inherited_flags,
+			__u16 asize = ksmbd_ace_size(psid);
+
+			if (!asize ||
+			    (unsigned int)nt_size + asize > aces_buf_size) {
+				pr_err_ratelimited("inherit ACL overflow\n");
+				break;
+			}
+			smb_set_ace(aces, psid, parent_aces->type,
+				    inherited_flags,
 				    parent_aces->access_req);
 			nt_size += le16_to_cpu(aces->size);
 			ace_cnt++;
-			aces = (struct smb_ace *)((char *)aces + le16_to_cpu(aces->size));
+			aces = (struct smb_ace *)((char *)aces +
+					le16_to_cpu(aces->size));
 			flags |= INHERIT_ONLY_ACE;
 			psid = creator;
-		} else if (is_dir && !(parent_aces->flags & NO_PROPAGATE_INHERIT_ACE)) {
+		} else if (is_dir && !(parent_aces->flags &
+				       NO_PROPAGATE_INHERIT_ACE)) {
 			psid = &parent_aces->sid;
 		}
 
-		smb_set_ace(aces, psid, parent_aces->type, flags | inherited_flags,
+		{
+			__u16 asize = ksmbd_ace_size(psid);
+
+			if (!asize ||
+			    (unsigned int)nt_size + asize > aces_buf_size) {
+				pr_err_ratelimited("inherit ACL overflow\n");
+				break;
+			}
+		}
+		smb_set_ace(aces, psid, parent_aces->type,
+			    flags | inherited_flags,
 			    parent_aces->access_req);
 		nt_size += le16_to_cpu(aces->size);
-		aces = (struct smb_ace *)((char *)aces + le16_to_cpu(aces->size));
+		aces = (struct smb_ace *)((char *)aces +
+				le16_to_cpu(aces->size));
 		ace_cnt++;
 pass:
 		parent_aces = (struct smb_ace *)((char *)parent_aces + pace_size);
