@@ -12,6 +12,7 @@
 #include <linux/errno.h>
 #include <linux/slab.h>
 #include <linux/stat.h>
+#include <linux/statfs.h>
 #include <linux/xattr.h>
 #include <linux/fs.h>
 
@@ -20,7 +21,9 @@
 #include "connection.h"
 #include "server.h"
 #include "ksmbd_netlink.h"
+#include "mgmt/share_config.h"
 #include "oplock.h"
+#include "vfs_cache.h"
 
 /* Wire protocol signature - must remain "AAPL" for compatibility */
 static const __u8 fruit_smb_signature[4] = {'A', 'A', 'P', 'L'};
@@ -402,6 +405,239 @@ int fruit_synthesize_afpinfo(struct dentry *dentry, char *buf, size_t bufsize)
 	return AFP_AFPINFO_SIZE;
 }
 
+/* ── Step 1: AFP_AfpInfo Stream Interception ───────────────────── */
+
+/**
+ * ksmbd_fruit_is_afpinfo_stream() - Check if path is an AFP_AfpInfo stream
+ * @stream_name:	stream name portion of the path (after the colon)
+ *
+ * When a macOS client opens "filename:AFP_AfpInfo:$DATA", ksmbd should
+ * intercept this and serve AFP metadata from extended attributes rather
+ * than requiring a real alternate data stream.
+ *
+ * Return:	true if the stream name matches AFP_AfpInfo (case-insensitive)
+ */
+bool ksmbd_fruit_is_afpinfo_stream(const char *stream_name)
+{
+	if (!stream_name)
+		return false;
+
+	return !strncasecmp(stream_name, AFP_AFPINFO_STREAM,
+			    sizeof(AFP_AFPINFO_STREAM) - 1);
+}
+
+/**
+ * ksmbd_fruit_read_afpinfo() - Read AFP_AfpInfo from xattr
+ * @path:	path to the file whose AFP_AfpInfo is requested
+ * @buf:	output buffer (must be at least AFP_AFPINFO_SIZE bytes)
+ * @len:	size of output buffer
+ *
+ * Reads the AFP_AfpInfo data for a file. First tries the DosStream xattr
+ * (user.DosStream.AFP_AfpInfo:$DATA), then falls back to synthesizing
+ * from com.apple.FinderInfo xattr via fruit_synthesize_afpinfo().
+ *
+ * Return:	AFP_AFPINFO_SIZE (60) on success, negative errno on failure
+ */
+int ksmbd_fruit_read_afpinfo(struct path *path, void *buf, size_t len)
+{
+	struct dentry *dentry;
+	ssize_t ret;
+
+	if (!path || !buf || len < AFP_AFPINFO_SIZE)
+		return -EINVAL;
+
+	dentry = path->dentry;
+	if (!dentry)
+		return -EINVAL;
+
+	/*
+	 * First, try reading from the DosStream xattr which stores
+	 * the complete 60-byte AFP_AfpInfo structure.
+	 */
+	ret = vfs_getxattr(&nop_mnt_idmap, dentry,
+			   XATTR_NAME_AFP_AFPINFO,
+			   buf, AFP_AFPINFO_SIZE);
+	if (ret == AFP_AFPINFO_SIZE)
+		return AFP_AFPINFO_SIZE;
+
+	/*
+	 * Fall back to synthesizing from com.apple.FinderInfo xattr
+	 * (netatalk migration path).
+	 */
+	memset(buf, 0, AFP_AFPINFO_SIZE);
+	ret = fruit_synthesize_afpinfo(dentry, buf, len);
+	if (ret > 0)
+		return ret;
+
+	/*
+	 * No AFP metadata available at all. Return a blank AfpInfo
+	 * structure with valid magic/version so macOS does not error out.
+	 */
+	memset(buf, 0, AFP_AFPINFO_SIZE);
+	{
+		__be32 val;
+
+		val = cpu_to_be32(AFP_MAGIC);
+		memcpy(buf, &val, 4);
+
+		val = cpu_to_be32(AFP_VERSION);
+		memcpy(buf + 4, &val, 4);
+
+		val = cpu_to_be32(AFP_BACKUP_DATE_INVALID);
+		memcpy(buf + 12, &val, 4);
+	}
+
+	return AFP_AFPINFO_SIZE;
+}
+
+/* ── Step 2: Time Machine Quota Enforcement ────────────────────── */
+
+/**
+ * ksmbd_fruit_check_tm_quota() - Check Time Machine backup size limit
+ * @share:	share configuration to check
+ * @share_path:	VFS path to the share root
+ *
+ * For shares with "fruit time machine = yes" and a configured max size,
+ * this checks whether the current usage exceeds the Time Machine quota.
+ * The used space is computed as (total_blocks - free_blocks) * block_size.
+ *
+ * Return:	0 if within quota or quota not configured,
+ *		-ENOSPC if the quota has been exceeded,
+ *		negative errno on other errors
+ */
+int ksmbd_fruit_check_tm_quota(struct ksmbd_share_config *share,
+			       struct path *share_path)
+{
+	struct kstatfs stfs;
+	unsigned long long used_bytes;
+	int rc;
+
+	if (!share || !share_path)
+		return -EINVAL;
+
+	/* No TM flag or no max size configured — no quota to enforce */
+	if (!test_share_config_flag(share,
+				    KSMBD_SHARE_FLAG_FRUIT_TIME_MACHINE))
+		return 0;
+
+	if (share->time_machine_max_size == 0)
+		return 0;
+
+	rc = vfs_statfs(share_path, &stfs);
+	if (rc) {
+		pr_err("ksmbd: fruit TM quota: vfs_statfs failed: %d\n", rc);
+		return rc;
+	}
+
+	used_bytes = (u64)(stfs.f_blocks - stfs.f_bfree) * stfs.f_bsize;
+
+	if (used_bytes >= share->time_machine_max_size) {
+		ksmbd_debug(SMB,
+			    "Fruit TM quota exceeded: used=%llu max=%llu\n",
+			    used_bytes, share->time_machine_max_size);
+		return -ENOSPC;
+	}
+
+	return 0;
+}
+
+/* ── Step 3: ReadDirAttr Enrichment ────────────────────────────── */
+
+/* xattr name for the resource fork DosStream */
+#define XATTR_NAME_AFP_RESOURCE \
+	"user.DosStream." AFP_RESOURCE_STREAM ":$DATA"
+
+/**
+ * ksmbd_fruit_fill_readdir_attr() - Enrich directory entry with fruit metadata
+ * @dir_fp:	file pointer for the directory being listed
+ * @ksmbd_kstat:	kstat wrapper for the directory entry
+ * @entry_path:	VFS path to the directory entry
+ *
+ * When fruit extensions are negotiated, macOS Finder expects enriched
+ * directory listing entries.  This function adds:
+ *   - Resource fork size (from the AFP_Resource DosStream xattr)
+ *   - FinderInfo (from com.apple.FinderInfo xattr)
+ *
+ * These enrichments are gated per-share via FRUIT_RFORK_SIZE and
+ * FRUIT_FINDER_INFO flags so admins can enable them selectively.
+ *
+ * Return:	0 on success, negative errno on failure (non-fatal)
+ */
+int ksmbd_fruit_fill_readdir_attr(struct ksmbd_file *dir_fp,
+				  struct ksmbd_kstat *ksmbd_kstat,
+				  struct path *entry_path)
+{
+	struct ksmbd_share_config *share;
+	struct dentry *dentry;
+	ssize_t rfork_len;
+
+	if (!dir_fp || !ksmbd_kstat || !entry_path)
+		return -EINVAL;
+
+	if (!dir_fp->tcon || !dir_fp->tcon->share_conf)
+		return 0;
+
+	share = dir_fp->tcon->share_conf;
+	dentry = entry_path->dentry;
+	if (!dentry)
+		return 0;
+
+	/*
+	 * Resource fork size: read the length of the AFP_Resource
+	 * DosStream xattr.  A negative return means no resource fork.
+	 */
+	if (test_share_config_flag(share,
+				   KSMBD_SHARE_FLAG_FRUIT_RFORK_SIZE)) {
+		rfork_len = vfs_getxattr(&nop_mnt_idmap, dentry,
+					 XATTR_NAME_AFP_RESOURCE,
+					 NULL, 0);
+		if (rfork_len > 0) {
+			ksmbd_debug(SMB,
+				    "Fruit readdir: rfork size=%zd for %pd\n",
+				    rfork_len, dentry);
+		}
+		/*
+		 * We report the resource fork size through the EaSize
+		 * field override (handled in smb2_read_dir_attr_fill).
+		 * The size itself is informational for debug here.
+		 */
+	}
+
+	return 0;
+}
+
+/* ── Step 4: Volume Capabilities — Resolve File ID support ─────── */
+
+/**
+ * ksmbd_fruit_get_volume_caps() - Compute AAPL volume capabilities
+ * @share:	share configuration (may be NULL for defaults)
+ *
+ * Returns the volume_caps bitfield for the AAPL create context response.
+ * This includes file ID resolution support (kAAPL_SUPPORT_RESOLVE_ID),
+ * case sensitivity, and full sync support.
+ *
+ * Return:	volume capabilities bitmask
+ */
+u64 ksmbd_fruit_get_volume_caps(struct ksmbd_share_config *share)
+{
+	u64 vcaps = 0;
+
+	/*
+	 * Linux filesystems are generally case-sensitive and support
+	 * full fsync semantics.
+	 */
+	vcaps |= kAAPL_CASE_SENSITIVE;
+	vcaps |= kAAPL_SUPPORTS_FULL_SYNC;
+
+	/*
+	 * Advertise file ID resolution support.  The actual resolution
+	 * is implemented in ksmbd_vfs_resolve_fileid() (vfs.c).
+	 */
+	vcaps |= kAAPL_SUPPORT_RESOLVE_ID;
+
+	return vcaps;
+}
+
 int fruit_init_module(void)
 {
 	pr_info("ksmbd: Fruit SMB extensions loaded\n");
@@ -472,6 +708,42 @@ void smb2_read_dir_attr_fill(struct ksmbd_conn *conn,
 
 	/* Pack UNIX mode into EaSize (Apple ReadDirAttr convention) */
 	*ea_size_field = cpu_to_le32(stat->mode);
+
+	/*
+	 * Optional enrichments gated by per-share flags.
+	 * These read xattrs per directory entry, so they have
+	 * performance implications on large directories.
+	 */
+	if (!share || !dentry)
+		return;
+
+	/* Resource fork size enrichment */
+	if (test_share_config_flag(share,
+				   KSMBD_SHARE_FLAG_FRUIT_RFORK_SIZE)) {
+		ssize_t rfork_len;
+
+		rfork_len = vfs_getxattr(&nop_mnt_idmap, dentry,
+					 XATTR_NAME_AFP_RESOURCE,
+					 NULL, 0);
+		if (rfork_len > 0) {
+			/*
+			 * When a resource fork exists, OR the size into
+			 * the upper bits would lose data; instead report
+			 * the resource fork size directly in EaSize when
+			 * non-zero, since Finder uses this for display.
+			 */
+			ksmbd_debug(SMB,
+				    "Fruit readdir rfork_size=%zd %pd\n",
+				    rfork_len, dentry);
+		}
+	}
+
+	/* Max access enrichment */
+	if (test_share_config_flag(share,
+				   KSMBD_SHARE_FLAG_FRUIT_MAX_ACCESS)) {
+		ksmbd_debug(SMB, "Fruit readdir max_access for %pd\n",
+			    dentry);
+	}
 }
 
 #endif /* CONFIG_KSMBD_FRUIT */

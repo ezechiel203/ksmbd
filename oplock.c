@@ -2094,8 +2094,8 @@ int create_fruit_rsp_buf(char *cc, struct ksmbd_conn *conn, size_t *out_size)
 	caps |= kAAPL_SUPPORTS_TM_LOCK_STEAL;
 	buf->server_caps = cpu_to_le64(caps);
 
-	/* volume_caps */
-	vcaps = kAAPL_CASE_SENSITIVE | kAAPL_SUPPORTS_FULL_SYNC;
+	/* volume_caps: use ksmbd_fruit_get_volume_caps() for resolve_fileid */
+	vcaps = ksmbd_fruit_get_volume_caps(NULL);
 	buf->volume_caps = cpu_to_le64(vcaps);
 
 	/* model string: ASCII → UTF-16LE */

@@ -185,6 +185,8 @@ struct fruit_conn_state {
 };
 
 struct ksmbd_share_config;
+struct ksmbd_file;
+struct ksmbd_kstat;
 
 #ifdef CONFIG_KSMBD_FRUIT
 
@@ -233,6 +235,22 @@ void smb2_read_dir_attr_fill(struct ksmbd_conn *conn,
 			     __le32 *ea_size_field);
 
 int fruit_synthesize_afpinfo(struct dentry *dentry, char *buf, size_t bufsize);
+
+/* Step 1: AFP_AfpInfo stream interception */
+bool ksmbd_fruit_is_afpinfo_stream(const char *stream_name);
+int ksmbd_fruit_read_afpinfo(struct path *path, void *buf, size_t len);
+
+/* Step 2: Time Machine quota enforcement */
+int ksmbd_fruit_check_tm_quota(struct ksmbd_share_config *share,
+			       struct path *share_path);
+
+/* Step 3: ReadDirAttr enrichment */
+int ksmbd_fruit_fill_readdir_attr(struct ksmbd_file *dir_fp,
+				  struct ksmbd_kstat *ksmbd_kstat,
+				  struct path *entry_path);
+
+/* Step 4: Volume capabilities with resolve_fileid */
+u64 ksmbd_fruit_get_volume_caps(struct ksmbd_share_config *share);
 
 int fruit_init_module(void);
 void fruit_cleanup_module(void);
@@ -302,6 +320,24 @@ static inline void smb2_read_dir_attr_fill(struct ksmbd_conn *conn,
 static inline int fruit_synthesize_afpinfo(struct dentry *dentry,
 			char *buf, size_t bufsize)
 { return -EOPNOTSUPP; }
+
+static inline bool ksmbd_fruit_is_afpinfo_stream(const char *stream_name)
+{ return false; }
+static inline int ksmbd_fruit_read_afpinfo(struct path *path,
+			void *buf, size_t len)
+{ return -EOPNOTSUPP; }
+static inline int ksmbd_fruit_check_tm_quota(
+			struct ksmbd_share_config *share,
+			struct path *share_path)
+{ return 0; }
+static inline int ksmbd_fruit_fill_readdir_attr(struct ksmbd_file *dir_fp,
+			struct ksmbd_kstat *ksmbd_kstat,
+			struct path *entry_path)
+{ return 0; }
+static inline u64 ksmbd_fruit_get_volume_caps(
+			struct ksmbd_share_config *share)
+{ return 0; }
+
 static inline int fruit_init_module(void) { return 0; }
 static inline void fruit_cleanup_module(void) {}
 

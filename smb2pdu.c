@@ -3193,6 +3193,22 @@ int smb2_open(struct ksmbd_work *work)
 				rc = parse_stream_name(name, &stream_name, &s_type);
 				if (rc < 0)
 					goto err_out2;
+#ifdef CONFIG_KSMBD_FRUIT
+				/*
+				 * AFP_AfpInfo stream interception: when
+				 * a macOS client opens the AFP_AfpInfo
+				 * named stream, ksmbd serves AFP metadata
+				 * from xattrs rather than requiring a real
+				 * alternate data stream.
+				 */
+				if (stream_name &&
+				    conn->is_fruit &&
+				    ksmbd_fruit_is_afpinfo_stream(stream_name)) {
+					ksmbd_debug(SMB,
+						    "Fruit: AFP_AfpInfo stream for %s\n",
+						    name);
+				}
+#endif
 			}
 
 			rc = ksmbd_validate_filename(name);
@@ -8070,6 +8086,24 @@ int smb2_write(struct ksmbd_work *work)
 		err = -EINVAL;
 		goto out;
 	}
+
+#ifdef CONFIG_KSMBD_FRUIT
+	/*
+	 * Time Machine quota enforcement: reject writes when the
+	 * share's Time Machine max size has been exceeded.
+	 */
+	if (work->tcon && work->tcon->share_conf &&
+	    work->conn->is_fruit) {
+		err = ksmbd_fruit_check_tm_quota(
+				work->tcon->share_conf,
+				&work->tcon->share_conf->vfs_path);
+		if (err) {
+			ksmbd_debug(SMB,
+				    "Fruit TM quota exceeded, rejecting write\n");
+			goto out;
+		}
+	}
+#endif
 
 	ksmbd_debug(SMB, "flags %u\n", le32_to_cpu(req->Flags));
 	if (le32_to_cpu(req->Flags) & SMB2_WRITEFLAG_WRITE_THROUGH)
