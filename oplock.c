@@ -132,8 +132,9 @@ static void free_opinfo(struct oplock_info *opinfo)
 {
 	if (opinfo->is_lease)
 		free_lease(opinfo);
-	if (opinfo->conn && atomic_dec_and_test(&opinfo->conn->refcnt))
-		kfree(opinfo->conn);
+	if (opinfo->conn)
+		atomic_dec(&opinfo->conn->refcnt);
+	opinfo->conn = NULL;
 	kfree(opinfo);
 }
 
@@ -2083,14 +2084,12 @@ int create_fruit_rsp_buf(char *cc, struct ksmbd_conn *conn, size_t *out_size)
 	caps = kAAPL_UNIX_BASED; /* always: Linux is UNIX-based */
 	if (server_conf.flags & KSMBD_GLOBAL_FLAG_FRUIT_COPYFILE)
 		caps |= kAAPL_SUPPORTS_OSX_COPYFILE;
-	if (server_conf.flags & KSMBD_GLOBAL_FLAG_FRUIT_NFS_ACES)
-		caps |= kAAPL_SUPPORTS_NFS_ACE;
 	caps |= kAAPL_SUPPORTS_READ_DIR_ATTR;
+	caps |= kAAPL_SUPPORTS_TM_LOCK_STEAL;
 	buf->server_caps = cpu_to_le64(caps);
 
 	/* volume_caps */
-	vcaps = kAAPL_CASE_SENSITIVE | kAAPL_SUPPORTS_FULL_SYNC |
-		kAAPL_SUPPORT_RESOLVE_ID;
+	vcaps = kAAPL_CASE_SENSITIVE | kAAPL_SUPPORTS_FULL_SYNC;
 	buf->volume_caps = cpu_to_le64(vcaps);
 
 	/* model string: ASCII → UTF-16LE */

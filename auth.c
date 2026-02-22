@@ -13,6 +13,7 @@
 #include <linux/xattr.h>
 #include <crypto/hash.h>
 #include <crypto/aead.h>
+#include <crypto/algapi.h>
 #include <linux/random.h>
 #include <linux/scatterlist.h>
 
@@ -343,7 +344,7 @@ int ksmbd_auth_ntlm(struct ksmbd_session *sess, char *pw_buf, char *cryptkey)
 	       CIFS_AUTH_RESP_SIZE);
 	sess->sequence_number = 1;
 
-	if (strncmp(pw_buf, key, CIFS_AUTH_RESP_SIZE) != 0) {
+	if (crypto_memneq(pw_buf, key, CIFS_AUTH_RESP_SIZE)) {
 		ksmbd_debug(AUTH, "ntlmv1 authentication failed\n");
 		return -EINVAL;
 	}
@@ -430,7 +431,7 @@ int ksmbd_auth_ntlmv2(struct ksmbd_conn *conn, struct ksmbd_session *sess,
 		goto out;
 	}
 
-	if (memcmp(ntlmv2->ntlmv2_hash, ntlmv2_rsp, CIFS_HMAC_MD5_HASH_SIZE) != 0)
+	if (crypto_memneq(ntlmv2->ntlmv2_hash, ntlmv2_rsp, CIFS_HMAC_MD5_HASH_SIZE))
 		rc = -EINVAL;
 out:
 	if (ctx)

@@ -40,20 +40,20 @@ void ksmbd_conn_free(struct ksmbd_conn *conn)
 	hash_del(&conn->hlist);
 	up_write(&conn_list_lock);
 
-	xa_destroy(&conn->sessions);
-	kvfree(conn->request_buf);
-	kfree(conn->preauth_info);
+	if (atomic_dec_and_test(&conn->refcnt)) {
+		xa_destroy(&conn->sessions);
+		kvfree(conn->request_buf);
+		kfree(conn->preauth_info);
 
 #ifdef CONFIG_KSMBD_FRUIT
-	/* Clean up Fruit SMB extension resources */
-	if (conn->fruit_state) {
-		fruit_cleanup_connection_state(conn->fruit_state);
-		kfree(conn->fruit_state);
-		conn->fruit_state = NULL;
-	}
+		/* Clean up Fruit SMB extension resources */
+		if (conn->fruit_state) {
+			fruit_cleanup_connection_state(conn->fruit_state);
+			kfree(conn->fruit_state);
+			conn->fruit_state = NULL;
+		}
 #endif
 
-	if (atomic_dec_and_test(&conn->refcnt)) {
 		conn->transport->ops->free_transport(conn->transport);
 		kfree(conn);
 	}
@@ -549,8 +549,10 @@ again:
 		t = conn->transport;
 		ksmbd_conn_set_exiting(conn);
 		if (t->ops->shutdown) {
+			atomic_inc(&conn->refcnt);
 			up_read(&conn_list_lock);
 			t->ops->shutdown(t);
+			atomic_dec(&conn->refcnt);
 			down_read(&conn_list_lock);
 		}
 	}

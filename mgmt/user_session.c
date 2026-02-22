@@ -7,6 +7,7 @@
 #include <linux/slab.h>
 #include <linux/rwsem.h>
 #include <linux/xarray.h>
+#include <linux/string.h>
 
 #include "ksmbd_ida.h"
 #include "user_session.h"
@@ -34,6 +35,7 @@ static void free_channel_list(struct ksmbd_session *sess)
 
 	xa_for_each(&sess->ksmbd_chann_list, index, chann) {
 		xa_erase(&sess->ksmbd_chann_list, index);
+		memzero_explicit(chann->smb3signingkey, sizeof(chann->smb3signingkey));
 		kfree(chann);
 	}
 
@@ -167,9 +169,13 @@ void ksmbd_session_destroy(struct ksmbd_session *sess)
 	ksmbd_launch_ksmbd_durable_scavenger();
 	ksmbd_session_rpc_clear_list(sess);
 	free_channel_list(sess);
-	kfree(sess->Preauth_HashValue);
+	memzero_explicit(sess->sess_key, sizeof(sess->sess_key));
+	memzero_explicit(sess->smb3encryptionkey, sizeof(sess->smb3encryptionkey));
+	memzero_explicit(sess->smb3decryptionkey, sizeof(sess->smb3decryptionkey));
+	memzero_explicit(sess->smb3signingkey, sizeof(sess->smb3signingkey));
+	kfree_sensitive(sess->Preauth_HashValue);
 	ksmbd_release_id(&session_ida, sess->id);
-	kfree(sess);
+	kfree_sensitive(sess);
 }
 
 struct ksmbd_session *__session_lookup(unsigned long long id)
@@ -340,8 +346,10 @@ struct ksmbd_session *ksmbd_session_lookup_all(struct ksmbd_conn *conn,
 	sess = ksmbd_session_lookup(conn, id);
 	if (!sess && conn->binding)
 		sess = ksmbd_session_lookup_slowpath(id);
-	if (sess && sess->state != SMB2_SESSION_VALID)
+	if (sess && sess->state != SMB2_SESSION_VALID) {
+		ksmbd_user_session_put(sess);
 		sess = NULL;
+	}
 	return sess;
 }
 

@@ -974,8 +974,8 @@ static bool session_fd_check(struct ksmbd_tree_connect *tcon,
 	list_for_each_entry_rcu(op, &ci->m_op_list, op_entry) {
 		if (op->conn != conn)
 			continue;
-		if (op->conn && atomic_dec_and_test(&op->conn->refcnt))
-			kfree(op->conn);
+		if (op->conn)
+			atomic_dec(&op->conn->refcnt);
 		op->conn = NULL;
 	}
 	up_write(&ci->m_lock);
@@ -1020,7 +1020,8 @@ void ksmbd_free_global_file_table(void)
 	unsigned int		id;
 
 	idr_for_each_entry(global_ft.idr, fp, id) {
-		ksmbd_remove_durable_fd(fp);
+		__ksmbd_remove_durable_fd(fp);
+		fp->persistent_id = KSMBD_NO_FID;
 		__ksmbd_close_fd(NULL, fp);
 	}
 

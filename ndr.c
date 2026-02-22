@@ -185,44 +185,52 @@ int ndr_encode_dos_attr(struct ndr *n, struct xattr_dos_attrib *da)
 		ret = ndr_write_string(n, "");
 	}
 	if (ret)
-		return ret;
+		goto err_free;
 
 	ret = ndr_write_int16(n, da->version);
 	if (ret)
-		return ret;
+		goto err_free;
 
 	ret = ndr_write_int32(n, da->version);
 	if (ret)
-		return ret;
+		goto err_free;
 
 	ret = ndr_write_int32(n, da->flags);
 	if (ret)
-		return ret;
+		goto err_free;
 
 	ret = ndr_write_int32(n, da->attr);
 	if (ret)
-		return ret;
+		goto err_free;
 
 	if (da->version == 3) {
 		ret = ndr_write_int32(n, da->ea_size);
 		if (ret)
-			return ret;
+			goto err_free;
 		ret = ndr_write_int64(n, da->size);
 		if (ret)
-			return ret;
+			goto err_free;
 		ret = ndr_write_int64(n, da->alloc_size);
 	} else {
 		ret = ndr_write_int64(n, da->itime);
 	}
 	if (ret)
-		return ret;
+		goto err_free;
 
 	ret = ndr_write_int64(n, da->create_time);
 	if (ret)
-		return ret;
+		goto err_free;
 
 	if (da->version == 3)
 		ret = ndr_write_int64(n, da->change_time);
+	if (ret)
+		goto err_free;
+
+	return 0;
+
+err_free:
+	kfree(n->data);
+	n->data = NULL;
 	return ret;
 }
 
@@ -520,7 +528,9 @@ int ndr_decode_v4_ntacl(struct ndr *n, struct xattr_ntacl *acl)
 	if (ret)
 		return ret;
 
-	ndr_read_bytes(n, acl->desc, 10);
+	ret = ndr_read_bytes(n, acl->desc, 10);
+	if (ret)
+		return ret;
 	if (strncmp(acl->desc, "posix_acl", 9)) {
 		pr_err("Invalid acl description : %s\n", acl->desc);
 		return -EINVAL;

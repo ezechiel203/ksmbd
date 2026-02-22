@@ -48,6 +48,7 @@ struct path;
 #define kAAPL_SUPPORTS_OSX_COPYFILE		0x02
 #define kAAPL_UNIX_BASED			0x04
 #define kAAPL_SUPPORTS_NFS_ACE			0x08
+#define kAAPL_SUPPORTS_TM_LOCK_STEAL		0x40
 
 /*
  * Apple kAAPL volume capabilities — sent in volume_caps field

@@ -172,6 +172,11 @@ static int smb2_get_data_area_len(unsigned int *off, unsigned int *len,
 		unsigned short lock_count;
 
 		lock_count = le16_to_cpu(((struct smb2_lock_req *)hdr)->LockCount);
+		if (lock_count > 64) {
+			ksmbd_debug(SMB, "Too many lock elements: %d\n",
+				    lock_count);
+			return -EINVAL;
+		}
 		if (lock_count > 0) {
 			*off = offsetof(struct smb2_lock_req, locks);
 			*len = sizeof(struct smb2_lock_element) * lock_count;
@@ -378,6 +383,11 @@ int ksmbd_smb2_check_message(struct ksmbd_work *work)
 	if ((u64)work->next_smb2_rcv_hdr_off + next_cmd > len) {
 		pr_err("next command(%u) offset exceeds smb msg size\n",
 				next_cmd);
+		return 1;
+	}
+
+	if (next_cmd > 0 && (next_cmd & 7)) {
+		pr_err("next command(%u) is not 8-byte aligned\n", next_cmd);
 		return 1;
 	}
 

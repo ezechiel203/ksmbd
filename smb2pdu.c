@@ -18,6 +18,8 @@
 #include <linux/filelock.h>
 #endif
 
+#include <crypto/algapi.h>
+
 #include "compat.h"
 #include "glob.h"
 #include "smb2pdu.h"
@@ -1026,6 +1028,11 @@ static __le32 deassemble_neg_contexts(struct ksmbd_conn *conn,
 
 	len_of_ctxts = len_of_smb - offset;
 
+	if (neg_ctxt_cnt > 16) {
+		pr_err("Too many negotiate contexts: %d\n", neg_ctxt_cnt);
+		return -EINVAL;
+	}
+
 	while (i++ < neg_ctxt_cnt) {
 		int clen, ctxt_len;
 
@@ -1273,7 +1280,7 @@ int smb2_handle_negotiate(struct ksmbd_work *work)
 
 err_out:
 	ksmbd_conn_unlock(conn);
-	if (rc)
+	if (rc && rsp->hdr.Status == 0)
 		rsp->hdr.Status = STATUS_INSUFFICIENT_RESOURCES;
 
 	if (!rc)
@@ -1992,6 +1999,12 @@ int smb2_tree_connect(struct ksmbd_work *work)
 	ksmbd_debug(SMB, "Received smb2 tree connect request\n");
 
 	WORK_BUFFERS(work, req, rsp);
+
+	if (le16_to_cpu(req->PathOffset) + le16_to_cpu(req->PathLength) >
+	    get_rfc1002_len(work->request_buf) + 4) {
+		rc = -EINVAL;
+		goto out_err1;
+	}
 
 	treename = smb_strndup_from_utf16((char *)req + le16_to_cpu(req->PathOffset),
 					  le16_to_cpu(req->PathLength), true,
@@ -4249,7 +4262,8 @@ static int smb2_populate_readdir_entry(struct ksmbd_conn *conn, int info_level,
 						&dinfo->EaSize);
 		dinfo->Reserved = 0;
 		if (conn->is_fruit &&
-		    (server_conf.flags & KSMBD_GLOBAL_FLAG_FRUIT_ZERO_FILEID))
+		    (server_conf.flags & KSMBD_GLOBAL_FLAG_FRUIT_ZERO_FILEID) &&
+		    d_info->name[0] == '.')
 			dinfo->UniqueId = 0;
 		else
 			dinfo->UniqueId = cpu_to_le64(ksmbd_kstat->kstat->ino);
@@ -4276,7 +4290,8 @@ static int smb2_populate_readdir_entry(struct ksmbd_conn *conn, int info_level,
 						NULL,
 						&fibdinfo->EaSize);
 		if (conn->is_fruit &&
-		    (server_conf.flags & KSMBD_GLOBAL_FLAG_FRUIT_ZERO_FILEID))
+		    (server_conf.flags & KSMBD_GLOBAL_FLAG_FRUIT_ZERO_FILEID) &&
+		    d_info->name[0] == '.')
 			fibdinfo->UniqueId = 0;
 		else
 			fibdinfo->UniqueId = cpu_to_le64(ksmbd_kstat->kstat->ino);
@@ -8565,6 +8580,19 @@ static int fsctl_copychunk(struct ksmbd_work *work,
 			rsp->hdr.Status = STATUS_UNEXPECTED_IO_ERROR;
 	}
 
+	/*
+	 * If chunks were successfully written, compute the last chunk's
+	 * written size from total_size_written minus the preceding chunks.
+	 * ksmbd_vfs_copy_file_ranges does not update chunk_size_written.
+	 */
+	if (chunk_count_written > 0) {
+		loff_t preceding = 0;
+
+		for (i = 0; i + 1 < chunk_count_written; i++)
+			preceding += le32_to_cpu(chunks[i].Length);
+		chunk_size_written = (unsigned int)(total_size_written - preceding);
+	}
+
 	ci_rsp->ChunksWritten = cpu_to_le32(chunk_count_written);
 	ci_rsp->ChunkBytesWritten = cpu_to_le32(chunk_size_written);
 	ci_rsp->TotalBytesWritten = cpu_to_le32(total_size_written);
@@ -9594,10 +9622,13 @@ bool smb2_is_sign_req(struct ksmbd_work *work, unsigned int command)
 {
 	struct smb2_hdr *rcv_hdr2 = smb2_get_msg(work->request_buf);
 
-	if ((rcv_hdr2->Flags & SMB2_FLAGS_SIGNED) &&
-	    command != SMB2_NEGOTIATE_HE &&
-	    command != SMB2_SESSION_SETUP_HE &&
-	    command != SMB2_OPLOCK_BREAK_HE)
+	if (command == SMB2_NEGOTIATE_HE ||
+	    command == SMB2_SESSION_SETUP_HE ||
+	    command == SMB2_OPLOCK_BREAK_HE)
+		return false;
+
+	if ((rcv_hdr2->Flags & SMB2_FLAGS_SIGNED) ||
+	    (work->sess && work->sess->sign))
 		return true;
 
 	return false;
@@ -9639,7 +9670,7 @@ int smb2_check_sign_req(struct ksmbd_work *work)
 				signature))
 		return 0;
 
-	if (memcmp(signature, signature_req, SMB2_SIGNATURE_SIZE)) {
+	if (crypto_memneq(signature, signature_req, SMB2_SIGNATURE_SIZE)) {
 		pr_err("bad smb2 signature\n");
 		return 0;
 	}
@@ -9727,7 +9758,7 @@ int smb3_check_sign_req(struct ksmbd_work *work)
 	if (ksmbd_sign_smb3_pdu(conn, signing_key, iov, 1, signature))
 		return 0;
 
-	if (memcmp(signature, signature_req, SMB2_SIGNATURE_SIZE)) {
+	if (crypto_memneq(signature, signature_req, SMB2_SIGNATURE_SIZE)) {
 		pr_err("bad smb2 signature\n");
 		return 0;
 	}
@@ -9763,8 +9794,10 @@ void smb3_set_sign_rsp(struct ksmbd_work *work)
 		signing_key = chann->smb3signingkey;
 	}
 
-	if (!signing_key)
+	if (!signing_key) {
+		pr_warn_once("SMB3 signing key not available for response\n");
 		return;
+	}
 
 	hdr->Flags |= SMB2_FLAGS_SIGNED;
 	memset(hdr->Signature, 0, SMB2_SIGNATURE_SIZE);

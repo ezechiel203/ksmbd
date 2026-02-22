@@ -105,7 +105,8 @@ bool ksmbd_queue_work(struct ksmbd_work *work)
 static inline void __ksmbd_iov_pin(struct ksmbd_work *work, void *ib,
 				   unsigned int ib_len)
 {
-	work->iov[++work->iov_idx].iov_base = ib;
+	work->iov_idx++;
+	work->iov[work->iov_idx].iov_base = ib;
 	work->iov[work->iov_idx].iov_len = ib_len;
 	work->iov_cnt++;
 }
@@ -123,7 +124,7 @@ static int __ksmbd_iov_pin_rsp(struct ksmbd_work *work, void *ib, int len,
 			return -ENOMEM;
 	}
 
-	if (work->iov_alloc_cnt < work->iov_cnt + need_iov_cnt) {
+	if (work->iov_alloc_cnt < work->iov_idx + 1 + need_iov_cnt) {
 		struct kvec *new;
 
 		work->iov_alloc_cnt += 4;

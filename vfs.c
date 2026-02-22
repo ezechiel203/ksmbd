@@ -855,8 +855,30 @@ static int ksmbd_vfs_stream_write(struct ksmbd_file *fp, char *buf, loff_t *pos,
 				 true);
 	if (err < 0)
 		goto out;
-	else
-		fp->stream.pos = size;
+
+#ifdef CONFIG_KSMBD_FRUIT
+	if (fp->stream.name &&
+	    strstr(fp->stream.name, "AFP_AfpInfo") &&
+	    size >= 48) {
+		int wb_err;
+
+		/* Write-back FinderInfo (bytes 16-47) to native xattr */
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+		wb_err = ksmbd_vfs_setxattr(idmap,
+#else
+		wb_err = ksmbd_vfs_setxattr(user_ns,
+#endif
+					    &fp->filp->f_path,
+					    APPLE_FINDER_INFO_XATTR_USER,
+					    (void *)(stream_buf + 16), 32,
+					    0, true);
+		if (wb_err < 0)
+			ksmbd_debug(VFS,
+				    "Failed to write-back FinderInfo: %d\n",
+				    wb_err);
+	}
+#endif
+	fp->stream.pos = size;
 	err = 0;
 out:
 	kvfree(stream_buf);
@@ -2023,6 +2045,11 @@ int ksmbd_vfs_copy_xattrs(struct dentry *src_dentry,
 
 		/* Only copy user.* namespace xattrs */
 		if (strncmp(name, XATTR_USER_PREFIX, XATTR_USER_PREFIX_LEN))
+			continue;
+
+		/* Skip CIFS-internal xattrs that should not be copied */
+		if (!strcmp(name, XATTR_NAME_DOS_ATTRIBUTE) ||
+		    !strncmp(name, XATTR_NAME_STREAM, XATTR_NAME_STREAM_LEN))
 			continue;
 
 		/* Read source xattr value */
