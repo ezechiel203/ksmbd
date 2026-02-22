@@ -5,6 +5,12 @@
  */
 
 #include <linux/fs.h>
+#include <linux/version.h>
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 12, 0)
+#include <linux/unaligned.h>
+#else
+#include <asm/unaligned.h>
+#endif
 
 #include "glob.h"
 #include "ndr.h"
@@ -43,7 +49,7 @@ static int ndr_write_int16(struct ndr *n, __u16 value)
 			return ret;
 	}
 
-	*(__le16 *)ndr_get_field(n) = cpu_to_le16(value);
+	put_unaligned_le16(value, ndr_get_field(n));
 	n->offset += sizeof(value);
 	return 0;
 }
@@ -58,7 +64,7 @@ static int ndr_write_int32(struct ndr *n, __u32 value)
 			return ret;
 	}
 
-	*(__le32 *)ndr_get_field(n) = cpu_to_le32(value);
+	put_unaligned_le32(value, ndr_get_field(n));
 	n->offset += sizeof(value);
 	return 0;
 }
@@ -73,7 +79,7 @@ static int ndr_write_int64(struct ndr *n, __u64 value)
 			return ret;
 	}
 
-	*(__le64 *)ndr_get_field(n) = cpu_to_le64(value);
+	put_unaligned_le64(value, ndr_get_field(n));
 	n->offset += sizeof(value);
 	return 0;
 }
@@ -114,12 +120,26 @@ static int ndr_write_string(struct ndr *n, char *value)
 
 static int ndr_read_string(struct ndr *n, void *value, size_t sz)
 {
+	unsigned int remaining;
 	int len;
 
-	if (n->offset + sz > n->length)
+	if (n->offset > n->length)
 		return -EINVAL;
 
+	remaining = n->length - n->offset;
+	if (sz > remaining) {
+		pr_err_ratelimited("NDR: string length %zu exceeds buffer %u\n",
+				   sz, remaining);
+		return -EINVAL;
+	}
+
 	len = strnlen(ndr_get_field(n), sz);
+	if (len + 1 > remaining) {
+		pr_err_ratelimited("NDR: string length %d exceeds remaining %u\n",
+				   len + 1, remaining);
+		return -EINVAL;
+	}
+
 	if (value)
 		memcpy(value, ndr_get_field(n), len);
 	len++;
@@ -132,8 +152,17 @@ static int ndr_read_string(struct ndr *n, void *value, size_t sz)
 
 static int ndr_read_bytes(struct ndr *n, void *value, size_t sz)
 {
-	if (n->offset + sz > n->length)
+	unsigned int remaining;
+
+	if (n->offset > n->length)
 		return -EINVAL;
+
+	remaining = n->length - n->offset;
+	if (sz > remaining) {
+		pr_err_ratelimited("NDR: read bytes %zu exceeds buffer %u\n",
+				   sz, remaining);
+		return -EINVAL;
+	}
 
 	if (value)
 		memcpy(value, ndr_get_field(n), sz);
@@ -143,33 +172,42 @@ static int ndr_read_bytes(struct ndr *n, void *value, size_t sz)
 
 static int ndr_read_int16(struct ndr *n, __u16 *value)
 {
-	if (n->offset + sizeof(__u16) > n->length)
+	if (n->offset + sizeof(__u16) > n->length) {
+		pr_err_ratelimited("NDR: read int16 at offset %u exceeds buffer %u\n",
+				   n->offset, n->length);
 		return -EINVAL;
+	}
 
 	if (value)
-		*value = le16_to_cpu(*(__le16 *)ndr_get_field(n));
+		*value = get_unaligned_le16(ndr_get_field(n));
 	n->offset += sizeof(__u16);
 	return 0;
 }
 
 static int ndr_read_int32(struct ndr *n, __u32 *value)
 {
-	if (n->offset + sizeof(__u32) > n->length)
+	if (n->offset + sizeof(__u32) > n->length) {
+		pr_err_ratelimited("NDR: read int32 at offset %u exceeds buffer %u\n",
+				   n->offset, n->length);
 		return -EINVAL;
+	}
 
 	if (value)
-		*value = le32_to_cpu(*(__le32 *)ndr_get_field(n));
+		*value = get_unaligned_le32(ndr_get_field(n));
 	n->offset += sizeof(__u32);
 	return 0;
 }
 
 static int ndr_read_int64(struct ndr *n, __u64 *value)
 {
-	if (n->offset + sizeof(__u64) > n->length)
+	if (n->offset + sizeof(__u64) > n->length) {
+		pr_err_ratelimited("NDR: read int64 at offset %u exceeds buffer %u\n",
+				   n->offset, n->length);
 		return -EINVAL;
+	}
 
 	if (value)
-		*value = le64_to_cpu(*(__le64 *)ndr_get_field(n));
+		*value = get_unaligned_le64(ndr_get_field(n));
 	n->offset += sizeof(__u64);
 	return 0;
 }
@@ -569,7 +607,18 @@ int ndr_decode_v4_ntacl(struct ndr *n, struct xattr_ntacl *acl)
 	if (ret)
 		return ret;
 
+	if (n->offset > n->length) {
+		pr_err_ratelimited("NDR: offset %u exceeds buffer length %u\n",
+				   n->offset, n->length);
+		return -EINVAL;
+	}
+
 	acl->sd_size = n->length - n->offset;
+	if (acl->sd_size == 0) {
+		pr_err_ratelimited("NDR: no data for security descriptor\n");
+		return -EINVAL;
+	}
+
 	acl->sd_buf = kzalloc(acl->sd_size, KSMBD_DEFAULT_GFP);
 	if (!acl->sd_buf)
 		return -ENOMEM;
