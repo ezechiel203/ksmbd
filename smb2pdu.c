@@ -7324,6 +7324,25 @@ int smb2_set_info(struct ksmbd_work *work)
 		rsp = smb2_get_msg(work->response_buf);
 	}
 
+	/*
+	 * Validate that BufferOffset + BufferLength from the client
+	 * does not exceed the actual request buffer, preventing
+	 * out-of-bounds reads from crafted packets.
+	 */
+	{
+		unsigned int buf_off = le16_to_cpu(req->BufferOffset);
+		unsigned int buf_len = le32_to_cpu(req->BufferLength);
+		unsigned int req_len = get_rfc1002_len(work->request_buf)
+				       - work->next_smb2_rcv_hdr_off;
+
+		if (buf_off < offsetof(struct smb2_set_info_req, Buffer) ||
+		    buf_off > req_len ||
+		    buf_len > req_len - buf_off) {
+			rc = -EINVAL;
+			goto err_out;
+		}
+	}
+
 	if (!test_tree_conn_flag(work->tcon, KSMBD_TREE_CONN_FLAG_WRITABLE)) {
 		ksmbd_debug(SMB, "User does not have write permission\n");
 		pr_err("User does not have write permission\n");
