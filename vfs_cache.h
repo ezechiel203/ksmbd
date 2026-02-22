@@ -127,6 +127,7 @@ struct ksmbd_file {
 	bool				is_durable;
 	bool				is_persistent;
 	bool				is_resilient;
+	unsigned int			resilient_timeout;
 
 	bool                            is_posix_ctxt;
 };

@@ -29,6 +29,7 @@
 #include "ksmbd_vss.h"
 #include "ksmbd_notify.h"
 #include "ksmbd_reparse.h"
+#include "ksmbd_resilient.h"
 
 extern int ksmbd_debugfs_init(void);
 extern void ksmbd_debugfs_exit(void);
@@ -608,9 +609,13 @@ static int __init ksmbd_server_init(void)
 	if (ret)
 		goto err_destroy_work_pools;
 
-	ret = ksmbd_ipc_init();
+	ret = ksmbd_oplock_init();
 	if (ret)
 		goto err_exit_file_cache;
+
+	ret = ksmbd_ipc_init();
+	if (ret)
+		goto err_exit_oplock;
 
 	ret = ksmbd_init_global_file_table();
 	if (ret)
@@ -665,8 +670,14 @@ static int __init ksmbd_server_init(void)
 	if (ret)
 		goto err_reparse;
 
+	ret = ksmbd_resilient_init();
+	if (ret)
+		goto err_resilient;
+
 	return 0;
 
+err_resilient:
+	ksmbd_reparse_exit();
 err_reparse:
 	ksmbd_notify_exit();
 err_notify:
@@ -690,6 +701,8 @@ err_destroy_file_table:
 	ksmbd_free_global_file_table();
 err_ipc_release:
 	ksmbd_ipc_release();
+err_exit_oplock:
+	ksmbd_oplock_exit();
 err_exit_file_cache:
 	ksmbd_exit_file_cache();
 err_destroy_work_pools:
@@ -707,6 +720,7 @@ err_config_exit:
  */
 static void __exit ksmbd_server_exit(void)
 {
+	ksmbd_resilient_exit();
 	ksmbd_reparse_exit();
 	ksmbd_notify_exit();
 	ksmbd_info_exit();
