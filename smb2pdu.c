@@ -48,6 +48,7 @@
 #include "ndr.h"
 #include "transport_tcp.h"
 #include "smb2fruit.h"
+#include "ksmbd_fsctl.h"
 
 static void __wbuf(struct ksmbd_work *work, void **req, void **rsp)
 {
@@ -8868,48 +8869,6 @@ ipv6_retry:
 	return nbytes;
 }
 
-static int fsctl_validate_negotiate_info(struct ksmbd_conn *conn,
-					 struct validate_negotiate_info_req *neg_req,
-					 struct validate_negotiate_info_rsp *neg_rsp,
-					 unsigned int in_buf_len)
-{
-	int ret = 0;
-	int dialect;
-
-	if (in_buf_len < offsetof(struct validate_negotiate_info_req, Dialects) +
-			le16_to_cpu(neg_req->DialectCount) * sizeof(__le16))
-		return -EINVAL;
-
-	dialect = ksmbd_lookup_dialect_by_id(neg_req->Dialects,
-					     neg_req->DialectCount);
-	if (dialect == BAD_PROT_ID || dialect != conn->dialect) {
-		ret = -EINVAL;
-		goto err_out;
-	}
-
-	if (strncmp(neg_req->Guid, conn->ClientGUID, SMB2_CLIENT_GUID_SIZE)) {
-		ret = -EINVAL;
-		goto err_out;
-	}
-
-	if (le16_to_cpu(neg_req->SecurityMode) != conn->cli_sec_mode) {
-		ret = -EINVAL;
-		goto err_out;
-	}
-
-	if (le32_to_cpu(neg_req->Capabilities) != conn->cli_cap) {
-		ret = -EINVAL;
-		goto err_out;
-	}
-
-	neg_rsp->Capabilities = cpu_to_le32(conn->vals->capabilities);
-	memset(neg_rsp->Guid, 0, SMB2_CLIENT_GUID_SIZE);
-	neg_rsp->SecurityMode = cpu_to_le16(conn->srv_sec_mode);
-	neg_rsp->Dialect = cpu_to_le16(conn->dialect);
-err_out:
-	return ret;
-}
-
 static int fsctl_query_allocated_ranges(struct ksmbd_work *work, u64 id,
 					struct file_allocated_range_buffer *qar_req,
 					struct file_allocated_range_buffer *qar_rsp,
@@ -8940,51 +8899,6 @@ static int fsctl_query_allocated_ranges(struct ksmbd_work *work, u64 id,
 
 	ksmbd_fd_put(work, fp);
 	return ret;
-}
-
-static int fsctl_pipe_transceive(struct ksmbd_work *work, u64 id,
-				 unsigned int out_buf_len,
-				 struct smb2_ioctl_req *req,
-				 struct smb2_ioctl_rsp *rsp)
-{
-	struct ksmbd_rpc_command *rpc_resp;
-	char *data_buf = (char *)req + le32_to_cpu(req->InputOffset);
-	int nbytes = 0;
-
-	rpc_resp = ksmbd_rpc_ioctl(work->sess, id, data_buf,
-				   le32_to_cpu(req->InputCount));
-	if (rpc_resp) {
-		if (rpc_resp->flags == KSMBD_RPC_SOME_NOT_MAPPED) {
-			/*
-			 * set STATUS_SOME_NOT_MAPPED response
-			 * for unknown domain sid.
-			 */
-			rsp->hdr.Status = STATUS_SOME_NOT_MAPPED;
-		} else if (rpc_resp->flags == KSMBD_RPC_ENOTIMPLEMENTED) {
-			rsp->hdr.Status = STATUS_NOT_SUPPORTED;
-			goto out;
-		} else if (rpc_resp->flags != KSMBD_RPC_OK) {
-			rsp->hdr.Status = STATUS_INVALID_PARAMETER;
-			goto out;
-		}
-
-		nbytes = rpc_resp->payload_sz;
-		if (rpc_resp->payload_sz > out_buf_len) {
-			rsp->hdr.Status = STATUS_BUFFER_OVERFLOW;
-			nbytes = out_buf_len;
-		}
-
-		if (!rpc_resp->payload_sz) {
-			rsp->hdr.Status =
-				STATUS_UNEXPECTED_IO_ERROR;
-			goto out;
-		}
-
-		memcpy((char *)rsp->Buffer, rpc_resp->payload, nbytes);
-	}
-out:
-	kvfree(rpc_resp);
-	return nbytes;
 }
 
 static inline int fsctl_set_sparse(struct ksmbd_work *work, u64 id,
@@ -9116,6 +9030,14 @@ int smb2_ioctl(struct ksmbd_work *work)
 
 	buffer = (char *)req + le32_to_cpu(req->InputOffset);
 
+	/* Try registered FSCTL handlers first */
+	ret = ksmbd_dispatch_fsctl(work, cnt_code, id, buffer,
+				   in_buf_len, out_buf_len, rsp, &nbytes);
+	if (ret != -EOPNOTSUPP)
+		goto done;
+
+	/* Fallback to legacy switch for unmigrated handlers */
+	ret = 0;
 	switch (cnt_code) {
 	case FSCTL_DFS_GET_REFERRALS:
 	case FSCTL_DFS_GET_REFERRALS_EX:
@@ -9123,63 +9045,14 @@ int smb2_ioctl(struct ksmbd_work *work)
 		ret = -EOPNOTSUPP;
 		rsp->hdr.Status = STATUS_FS_DRIVER_REQUIRED;
 		goto out2;
-	case FSCTL_CREATE_OR_GET_OBJECT_ID:
-	{
-		struct file_object_buf_type1_ioctl_rsp *obj_buf;
-
-		nbytes = sizeof(struct file_object_buf_type1_ioctl_rsp);
-		obj_buf = (struct file_object_buf_type1_ioctl_rsp *)
-			&rsp->Buffer[0];
-
-		/*
-		 * TODO: This is dummy implementation to pass smbtorture
-		 * Need to check correct response later
-		 */
-		memset(obj_buf->ObjectId, 0x0, 16);
-		memset(obj_buf->BirthVolumeId, 0x0, 16);
-		memset(obj_buf->BirthObjectId, 0x0, 16);
-		memset(obj_buf->DomainId, 0x0, 16);
-
-		break;
-	}
-	case FSCTL_PIPE_TRANSCEIVE:
-		out_buf_len = min_t(u32, KSMBD_IPC_MAX_PAYLOAD, out_buf_len);
-		nbytes = fsctl_pipe_transceive(work, id, out_buf_len, req, rsp);
-		break;
-	case FSCTL_VALIDATE_NEGOTIATE_INFO:
-		if (conn->dialect < SMB30_PROT_ID) {
-			ret = -EOPNOTSUPP;
-			goto out;
-		}
-
-		if (in_buf_len < offsetof(struct validate_negotiate_info_req,
-					  Dialects)) {
-			ret = -EINVAL;
-			goto out;
-		}
-
-		if (out_buf_len < sizeof(struct validate_negotiate_info_rsp)) {
-			ret = -EINVAL;
-			goto out;
-		}
-
-		ret = fsctl_validate_negotiate_info(conn,
-			(struct validate_negotiate_info_req *)buffer,
-			(struct validate_negotiate_info_rsp *)&rsp->Buffer[0],
-			in_buf_len);
-		if (ret < 0)
-			goto out;
-
-		nbytes = sizeof(struct validate_negotiate_info_rsp);
-		rsp->PersistentFileId = SMB2_NO_FID;
-		rsp->VolatileFileId = SMB2_NO_FID;
-		break;
+	/* TODO: migrate to registered handler */
 	case FSCTL_QUERY_NETWORK_INTERFACE_INFO:
 		ret = fsctl_query_iface_info_ioctl(conn, rsp, out_buf_len);
 		if (ret < 0)
 			goto out;
 		nbytes = ret;
 		break;
+	/* TODO: migrate to registered handler */
 	case FSCTL_REQUEST_RESUME_KEY:
 		if (out_buf_len < sizeof(struct resume_key_ioctl_rsp)) {
 			ret = -EINVAL;
@@ -9194,6 +9067,7 @@ int smb2_ioctl(struct ksmbd_work *work)
 		rsp->VolatileFileId = req->VolatileFileId;
 		nbytes = sizeof(struct resume_key_ioctl_rsp);
 		break;
+	/* TODO: migrate to registered handler */
 	case FSCTL_COPYCHUNK:
 	case FSCTL_COPYCHUNK_WRITE:
 		if (!test_tree_conn_flag(work->tcon, KSMBD_TREE_CONN_FLAG_WRITABLE)) {
@@ -9224,6 +9098,7 @@ int smb2_ioctl(struct ksmbd_work *work)
 				req->PersistentFileId,
 				rsp);
 		break;
+	/* TODO: migrate to registered handler */
 	case FSCTL_SET_SPARSE:
 		if (in_buf_len < sizeof(struct file_sparse)) {
 			ret = -EINVAL;
@@ -9234,6 +9109,7 @@ int smb2_ioctl(struct ksmbd_work *work)
 		if (ret < 0)
 			goto out;
 		break;
+	/* TODO: migrate to registered handler */
 	case FSCTL_SET_ZERO_DATA:
 	{
 		struct file_zero_data_information *zero_data;
@@ -9277,6 +9153,7 @@ int smb2_ioctl(struct ksmbd_work *work)
 		}
 		break;
 	}
+	/* TODO: migrate to registered handler */
 	case FSCTL_QUERY_ALLOCATED_RANGES:
 		if (in_buf_len < sizeof(struct file_allocated_range_buffer)) {
 			ret = -EINVAL;
@@ -9297,6 +9174,7 @@ int smb2_ioctl(struct ksmbd_work *work)
 
 		nbytes *= sizeof(struct file_allocated_range_buffer);
 		break;
+	/* TODO: migrate to registered handler */
 	case FSCTL_GET_REPARSE_POINT:
 	{
 		struct reparse_data_buffer *reparse_ptr;
@@ -9317,6 +9195,7 @@ int smb2_ioctl(struct ksmbd_work *work)
 		nbytes = sizeof(struct reparse_data_buffer);
 		break;
 	}
+	/* TODO: migrate to registered handler */
 	case FSCTL_DUPLICATE_EXTENTS_TO_FILE:
 	{
 		struct ksmbd_file *fp_in, *fp_out = NULL;
@@ -9388,6 +9267,7 @@ dup_ext_out:
 		goto out;
 	}
 
+done:
 	rsp->CntCode = cpu_to_le32(cnt_code);
 	rsp->InputCount = cpu_to_le32(0);
 	rsp->InputOffset = cpu_to_le32(112);

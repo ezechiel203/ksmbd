@@ -22,6 +22,7 @@
 #include "crypto_ctx.h"
 #include "auth.h"
 #include "smb2fruit.h"
+#include "ksmbd_fsctl.h"
 
 extern int ksmbd_debugfs_init(void);
 extern void ksmbd_debugfs_exit(void);
@@ -630,8 +631,14 @@ static int __init ksmbd_server_init(void)
 	if (ret)
 		goto err_debugfs;
 
+	ret = ksmbd_fsctl_init();
+	if (ret)
+		goto err_fsctl;
+
 	return 0;
 
+err_fsctl:
+	ksmbd_debugfs_exit();
 err_debugfs:
 err_crypto_destroy:
 	ksmbd_crypto_destroy();
@@ -658,6 +665,7 @@ err_config_exit:
  */
 static void __exit ksmbd_server_exit(void)
 {
+	ksmbd_fsctl_exit();
 	ksmbd_server_shutdown();
 	rcu_barrier();
 	ksmbd_release_inode_hash();
