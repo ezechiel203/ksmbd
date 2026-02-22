@@ -1,0 +1,119 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+/*
+ *   Copyright (C) 2016 Namjae Jeon <linkinjeon@kernel.org>
+ *   Copyright (C) 2018 Samsung Electronics Co., Ltd.
+ *
+ *   Debugfs interface for ksmbd server runtime inspection
+ */
+
+#include <linux/debugfs.h>
+#include <linux/seq_file.h>
+
+#include "glob.h"
+#include "server.h"
+#include "connection.h"
+
+static struct dentry *ksmbd_debugfs_dir;
+
+int ksmbd_debugfs_init(void);
+void ksmbd_debugfs_exit(void);
+
+/**
+ * ksmbd_conn_status_str() - convert connection status to string
+ * @conn:	connection instance
+ *
+ * Return:	string representation of the connection status
+ */
+static const char *ksmbd_conn_status_str(struct ksmbd_conn *conn)
+{
+	switch (READ_ONCE(conn->status)) {
+	case KSMBD_SESS_NEW:		return "new";
+	case KSMBD_SESS_GOOD:		return "good";
+	case KSMBD_SESS_EXITING:	return "exiting";
+	case KSMBD_SESS_NEED_RECONNECT:	return "reconnect";
+	case KSMBD_SESS_NEED_NEGOTIATE:	return "negotiate";
+	case KSMBD_SESS_NEED_SETUP:	return "setup";
+	case KSMBD_SESS_RELEASING:	return "releasing";
+	default:			return "unknown";
+	}
+}
+
+static int ksmbd_debugfs_connections_show(struct seq_file *s, void *v)
+{
+	struct ksmbd_conn *conn;
+	int bkt;
+
+	seq_printf(s, "%-20s %-6s %-10s %-8s %-8s\n",
+		   "peer", "dialect", "status", "credits", "requests");
+	seq_puts(s,
+		 "-----------------------------------------------------------\n");
+
+	down_read(&conn_list_lock);
+	hash_for_each(conn_list, bkt, conn, hlist) {
+		char addr_buf[64];
+
+		snprintf(addr_buf, sizeof(addr_buf), "%pIS",
+			 KSMBD_TCP_PEER_SOCKADDR(conn));
+		seq_printf(s, "%-20s 0x%04x %-10s %-8u %-8d\n",
+			   addr_buf,
+			   conn->dialect,
+			   ksmbd_conn_status_str(conn),
+			   conn->total_credits,
+			   atomic_read(&conn->req_running));
+	}
+	up_read(&conn_list_lock);
+	return 0;
+}
+
+DEFINE_SHOW_ATTRIBUTE(ksmbd_debugfs_connections);
+
+static int ksmbd_debugfs_stats_show(struct seq_file *s, void *v)
+{
+	struct ksmbd_conn *conn;
+	int bkt, num_conns = 0;
+	u64 total_requests = 0;
+
+	down_read(&conn_list_lock);
+	hash_for_each(conn_list, bkt, conn, hlist) {
+		num_conns++;
+		total_requests += atomic64_read(&conn->stats.request_served);
+	}
+	up_read(&conn_list_lock);
+
+	seq_printf(s, "active connections: %d\n", num_conns);
+	seq_printf(s, "total requests served: %llu\n", total_requests);
+	return 0;
+}
+
+DEFINE_SHOW_ATTRIBUTE(ksmbd_debugfs_stats);
+
+/**
+ * ksmbd_debugfs_init() - initialize debugfs entries for ksmbd
+ *
+ * Creates /sys/kernel/debug/ksmbd/ directory with entries for
+ * connections and server statistics.
+ *
+ * Return:	0 on success, negative error code on failure
+ */
+int ksmbd_debugfs_init(void)
+{
+	ksmbd_debugfs_dir = debugfs_create_dir("ksmbd", NULL);
+	if (IS_ERR(ksmbd_debugfs_dir)) {
+		pr_err("Failed to create debugfs directory\n");
+		return PTR_ERR(ksmbd_debugfs_dir);
+	}
+
+	debugfs_create_file("connections", 0444, ksmbd_debugfs_dir,
+			    NULL, &ksmbd_debugfs_connections_fops);
+	debugfs_create_file("stats", 0444, ksmbd_debugfs_dir,
+			    NULL, &ksmbd_debugfs_stats_fops);
+	return 0;
+}
+
+/**
+ * ksmbd_debugfs_exit() - remove all debugfs entries for ksmbd
+ */
+void ksmbd_debugfs_exit(void)
+{
+	debugfs_remove_recursive(ksmbd_debugfs_dir);
+}
