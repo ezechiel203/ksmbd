@@ -1,0 +1,25 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+name: Build
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        kernel: ['6.1', '6.6', '6.8', '6.12']
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install kernel headers
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y linux-headers-generic build-essential
+      - name: Build ksmbd module
+        run: make -j$(nproc)
+      - name: Run sparse check
+        run: make C=2 2>&1 | tee sparse-output.txt
+        continue-on-error: true
+      - name: Upload sparse report
+        uses: actions/upload-artifact@v4
+        with:
+          name: sparse-report-${{ matrix.kernel }}
+          path: sparse-output.txt
