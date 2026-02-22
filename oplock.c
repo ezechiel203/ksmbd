@@ -93,7 +93,7 @@ static void lease_del_list(struct oplock_info *opinfo)
 static void lb_add(struct lease_table *lb)
 {
 	write_lock(&lease_list_lock);
-	list_add(&lb->l_entry, &lease_table_list);
+	list_add_rcu(&lb->l_entry, &lease_table_list);
 	write_unlock(&lease_list_lock);
 }
 
@@ -198,11 +198,9 @@ static void opinfo_del(struct oplock_info *opinfo)
 {
 	struct ksmbd_inode *ci = opinfo->o_fp->f_ci;
 
-	if (opinfo->is_lease) {
-		write_lock(&lease_list_lock);
+	if (opinfo->is_lease)
 		lease_del_list(opinfo);
-		write_unlock(&lease_list_lock);
-	}
+
 	down_write(&ci->m_lock);
 	list_del(&opinfo->op_entry);
 	up_write(&ci->m_lock);
@@ -1177,8 +1175,8 @@ again:
 			goto again;
 		}
 		rcu_read_unlock();
-		list_del(&lb->l_entry);
-		kfree(lb);
+		list_del_rcu(&lb->l_entry);
+		kfree_rcu(lb, rcu_head);
 	}
 	write_unlock(&lease_list_lock);
 }
@@ -1193,23 +1191,22 @@ int find_same_lease_key(struct ksmbd_session *sess, struct ksmbd_inode *ci,
 	if (!lctx)
 		return err;
 
-	read_lock(&lease_list_lock);
+	rcu_read_lock();
 	if (list_empty(&lease_table_list)) {
-		read_unlock(&lease_list_lock);
+		rcu_read_unlock();
 		return 0;
 	}
 
-	list_for_each_entry(lb, &lease_table_list, l_entry) {
+	list_for_each_entry_rcu(lb, &lease_table_list, l_entry) {
 		if (!memcmp(lb->client_guid, sess->ClientGUID,
 			    SMB2_CLIENT_GUID_SIZE))
 			goto found;
 	}
-	read_unlock(&lease_list_lock);
+	rcu_read_unlock();
 
 	return 0;
 
 found:
-	rcu_read_lock();
 	list_for_each_entry_rcu(opinfo, &lb->lease_list, lease_entry) {
 		if (!refcount_inc_not_zero(&opinfo->refcount))
 			continue;
@@ -1223,7 +1220,7 @@ found:
 			ksmbd_debug(OPLOCK,
 				    "found same lease key is already used in other files\n");
 			opinfo_put(opinfo);
-			goto out;
+			return err;
 		}
 op_next:
 		opinfo_put(opinfo);
@@ -1231,8 +1228,6 @@ op_next:
 	}
 	rcu_read_unlock();
 
-out:
-	read_unlock(&lease_list_lock);
 	return err;
 }
 
@@ -1255,17 +1250,17 @@ static int add_lease_global_list(struct oplock_info *opinfo)
 {
 	struct lease_table *lb;
 
-	read_lock(&lease_list_lock);
-	list_for_each_entry(lb, &lease_table_list, l_entry) {
+	rcu_read_lock();
+	list_for_each_entry_rcu(lb, &lease_table_list, l_entry) {
 		if (!memcmp(lb->client_guid, opinfo->conn->ClientGUID,
 			    SMB2_CLIENT_GUID_SIZE)) {
 			opinfo->o_lease->l_lb = lb;
 			lease_add_list(opinfo);
-			read_unlock(&lease_list_lock);
+			rcu_read_unlock();
 			return 0;
 		}
 	}
-	read_unlock(&lease_list_lock);
+	rcu_read_unlock();
 
 	lb = kmalloc(sizeof(struct lease_table), KSMBD_DEFAULT_GFP);
 	if (!lb)
@@ -2130,18 +2125,17 @@ struct oplock_info *lookup_lease_in_table(struct ksmbd_conn *conn,
 	struct lease_table *lt;
 	int ret;
 
-	read_lock(&lease_list_lock);
-	list_for_each_entry(lt, &lease_table_list, l_entry) {
+	rcu_read_lock();
+	list_for_each_entry_rcu(lt, &lease_table_list, l_entry) {
 		if (!memcmp(lt->client_guid, conn->ClientGUID,
 			    SMB2_CLIENT_GUID_SIZE))
 			goto found;
 	}
 
-	read_unlock(&lease_list_lock);
+	rcu_read_unlock();
 	return NULL;
 
 found:
-	rcu_read_lock();
 	list_for_each_entry_rcu(opinfo, &lt->lease_list, lease_entry) {
 		if (!refcount_inc_not_zero(&opinfo->refcount))
 			continue;
@@ -2157,7 +2151,7 @@ found:
 		if (ret) {
 			ksmbd_debug(OPLOCK, "found opinfo\n");
 			ret_op = opinfo;
-			goto out;
+			return ret_op;
 		}
 op_next:
 		opinfo_put(opinfo);
@@ -2165,8 +2159,6 @@ op_next:
 	}
 	rcu_read_unlock();
 
-out:
-	read_unlock(&lease_list_lock);
 	return ret_op;
 }
 

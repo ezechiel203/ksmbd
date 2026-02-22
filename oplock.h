@@ -46,6 +46,7 @@ struct lease_table {
 	struct list_head	lease_list;
 	struct list_head	l_entry;
 	spinlock_t		lb_lock;
+	struct rcu_head		rcu_head;
 };
 
 struct lease {

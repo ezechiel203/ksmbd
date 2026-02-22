@@ -3301,9 +3301,63 @@ int smb2_open(struct ksmbd_work *work)
 			rc = PTR_ERR(context);
 			goto err_out2;
 		} else if (context) {
+			__le64 *twrp_ts;
+			u64 nts, unix_ts;
+			struct tm tm;
+			char gmt_token[KSMBD_VSS_GMT_TOKEN_LEN];
+			char *snap_path;
+
 			ksmbd_debug(SMB, "get timewarp context\n");
-			rc = -EBADF;
-			goto err_out2;
+
+			if (le16_to_cpu(context->DataOffset) +
+			    le32_to_cpu(context->DataLength) <
+			    sizeof(__le64)) {
+				rc = -EINVAL;
+				goto err_out2;
+			}
+
+			twrp_ts = (__le64 *)((char *)context +
+				  le16_to_cpu(context->DataOffset) +
+				  4);
+
+			/*
+			 * Convert Windows FILETIME (100ns intervals
+			 * since 1601-01-01) to Unix timestamp.
+			 */
+			nts = le64_to_cpu(*twrp_ts);
+			unix_ts = (nts / 10000000ULL) - 11644473600ULL;
+
+			time64_to_tm(unix_ts, 0, &tm);
+			snprintf(gmt_token, sizeof(gmt_token),
+				 "@GMT-%04ld.%02d.%02d-%02d.%02d.%02d",
+				 tm.tm_year + 1900,
+				 tm.tm_mon + 1, tm.tm_mday,
+				 tm.tm_hour, tm.tm_min, tm.tm_sec);
+
+			snap_path = kzalloc(PATH_MAX,
+					    KSMBD_DEFAULT_GFP);
+			if (!snap_path) {
+				rc = -ENOMEM;
+				goto err_out2;
+			}
+
+			rc = ksmbd_vss_resolve_path(share->path,
+						    gmt_token,
+						    snap_path,
+						    PATH_MAX);
+			if (rc) {
+				ksmbd_debug(SMB,
+					    "timewarp: no snapshot %s\n",
+					    gmt_token);
+				kfree(snap_path);
+				rc = -EBADF;
+				goto err_out2;
+			}
+
+			ksmbd_debug(SMB,
+				    "timewarp: resolved %s\n",
+				    gmt_token);
+			kfree(snap_path);
 		}
 	}
 
