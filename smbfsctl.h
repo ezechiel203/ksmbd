@@ -82,6 +82,7 @@
 #define IO_REPARSE_TAG_MOUNT_POINT   0xA0000003
 #define IO_REPARSE_TAG_HSM           0xC0000004
 #define IO_REPARSE_TAG_SIS           0x80000007
+#define IO_REPARSE_TAG_SYMLINK       0xA000000C
 
 /* WSL reparse tags */
 #define IO_REPARSE_TAG_LX_SYMLINK_LE	cpu_to_le32(0xA000001D)

@@ -28,6 +28,7 @@
 #include "ksmbd_dfs.h"
 #include "ksmbd_vss.h"
 #include "ksmbd_notify.h"
+#include "ksmbd_reparse.h"
 
 extern int ksmbd_debugfs_init(void);
 extern void ksmbd_debugfs_exit(void);
@@ -660,8 +661,14 @@ static int __init ksmbd_server_init(void)
 	if (ret)
 		goto err_notify;
 
+	ret = ksmbd_reparse_init();
+	if (ret)
+		goto err_reparse;
+
 	return 0;
 
+err_reparse:
+	ksmbd_notify_exit();
 err_notify:
 	ksmbd_info_exit();
 err_info:
@@ -700,6 +707,7 @@ err_config_exit:
  */
 static void __exit ksmbd_server_exit(void)
 {
+	ksmbd_reparse_exit();
 	ksmbd_notify_exit();
 	ksmbd_info_exit();
 	ksmbd_create_ctx_exit();
