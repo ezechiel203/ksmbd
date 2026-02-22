@@ -30,8 +30,18 @@
 
 static unsigned int inode_hash_mask __read_mostly;
 static unsigned int inode_hash_shift __read_mostly;
-static struct hlist_head *inode_hashtable __read_mostly;
-static DEFINE_RWLOCK(inode_hash_lock);
+
+/**
+ * struct ksmbd_inode_hash_bucket - per-bucket inode hash entry
+ * @head:	hash chain list head
+ * @lock:	per-bucket rwlock for reduced contention
+ */
+struct ksmbd_inode_hash_bucket {
+	struct hlist_head	head;
+	rwlock_t		lock;
+};
+
+static struct ksmbd_inode_hash_bucket *inode_hashtable __read_mostly;
 
 static struct ksmbd_file_table global_ft;
 static atomic_long_t fd_limit;
@@ -78,11 +88,11 @@ static unsigned long inode_hash(struct super_block *sb, unsigned long hashval)
 
 static struct ksmbd_inode *__ksmbd_inode_lookup(struct dentry *de)
 {
-	struct hlist_head *head = inode_hashtable +
+	unsigned long bucket =
 		inode_hash(d_inode(de)->i_sb, (unsigned long)de);
 	struct ksmbd_inode *ci = NULL, *ret_ci = NULL;
 
-	hlist_for_each_entry(ci, head, m_hash) {
+	hlist_for_each_entry(ci, &inode_hashtable[bucket].head, m_hash) {
 		if (ci->m_de == de) {
 			if (atomic_inc_not_zero(&ci->m_count))
 				ret_ci = ci;
@@ -100,10 +110,12 @@ static struct ksmbd_inode *ksmbd_inode_lookup(struct ksmbd_file *fp)
 struct ksmbd_inode *ksmbd_inode_lookup_lock(struct dentry *d)
 {
 	struct ksmbd_inode *ci;
+	unsigned long bucket =
+		inode_hash(d_inode(d)->i_sb, (unsigned long)d);
 
-	read_lock(&inode_hash_lock);
+	read_lock(&inode_hashtable[bucket].lock);
 	ci = __ksmbd_inode_lookup(d);
-	read_unlock(&inode_hash_lock);
+	read_unlock(&inode_hashtable[bucket].lock);
 
 	return ci;
 }
@@ -112,10 +124,12 @@ int ksmbd_query_inode_status(struct dentry *dentry)
 {
 	struct ksmbd_inode *ci;
 	int ret = KSMBD_INODE_STATUS_UNKNOWN;
+	unsigned long bucket =
+		inode_hash(d_inode(dentry)->i_sb, (unsigned long)dentry);
 
-	read_lock(&inode_hash_lock);
+	read_lock(&inode_hashtable[bucket].lock);
 	ci = __ksmbd_inode_lookup(dentry);
-	read_unlock(&inode_hash_lock);
+	read_unlock(&inode_hashtable[bucket].lock);
 	if (!ci)
 		return ret;
 
@@ -175,17 +189,22 @@ void ksmbd_fd_set_delete_on_close(struct ksmbd_file *fp,
 
 static void ksmbd_inode_hash(struct ksmbd_inode *ci)
 {
-	struct hlist_head *b = inode_hashtable +
-		inode_hash(d_inode(ci->m_de)->i_sb, (unsigned long)ci->m_de);
+	unsigned long bucket =
+		inode_hash(d_inode(ci->m_de)->i_sb,
+			   (unsigned long)ci->m_de);
 
-	hlist_add_head(&ci->m_hash, b);
+	hlist_add_head(&ci->m_hash, &inode_hashtable[bucket].head);
 }
 
 static void ksmbd_inode_unhash(struct ksmbd_inode *ci)
 {
-	write_lock(&inode_hash_lock);
+	unsigned long bucket =
+		inode_hash(d_inode(ci->m_de)->i_sb,
+			   (unsigned long)ci->m_de);
+
+	write_lock(&inode_hashtable[bucket].lock);
 	hlist_del_init(&ci->m_hash);
-	write_unlock(&inode_hash_lock);
+	write_unlock(&inode_hashtable[bucket].lock);
 }
 
 static int ksmbd_inode_init(struct ksmbd_inode *ci, struct ksmbd_file *fp)
@@ -205,11 +224,14 @@ static int ksmbd_inode_init(struct ksmbd_inode *ci, struct ksmbd_file *fp)
 static struct ksmbd_inode *ksmbd_inode_get(struct ksmbd_file *fp)
 {
 	struct ksmbd_inode *ci, *tmpci;
+	struct dentry *de = fp->filp->f_path.dentry;
+	unsigned long bucket =
+		inode_hash(d_inode(de)->i_sb, (unsigned long)de);
 	int rc;
 
-	read_lock(&inode_hash_lock);
+	read_lock(&inode_hashtable[bucket].lock);
 	ci = ksmbd_inode_lookup(fp);
-	read_unlock(&inode_hash_lock);
+	read_unlock(&inode_hashtable[bucket].lock);
 	if (ci)
 		return ci;
 
@@ -224,7 +246,7 @@ static struct ksmbd_inode *ksmbd_inode_get(struct ksmbd_file *fp)
 		return NULL;
 	}
 
-	write_lock(&inode_hash_lock);
+	write_lock(&inode_hashtable[bucket].lock);
 	tmpci = ksmbd_inode_lookup(fp);
 	if (!tmpci) {
 		ksmbd_inode_hash(ci);
@@ -232,7 +254,7 @@ static struct ksmbd_inode *ksmbd_inode_get(struct ksmbd_file *fp)
 		kfree(ci);
 		ci = tmpci;
 	}
-	write_unlock(&inode_hash_lock);
+	write_unlock(&inode_hashtable[bucket].lock);
 	return ci;
 }
 
@@ -252,7 +274,7 @@ int __init ksmbd_inode_hash_init(void)
 {
 	unsigned int loop;
 	unsigned long numentries = 16384;
-	unsigned long bucketsize = sizeof(struct hlist_head);
+	unsigned long bucketsize = sizeof(struct ksmbd_inode_hash_bucket);
 	unsigned long size;
 
 	inode_hash_shift = ilog2(numentries);
@@ -260,13 +282,15 @@ int __init ksmbd_inode_hash_init(void)
 
 	size = bucketsize << inode_hash_shift;
 
-	/* init master fp hash table */
+	/* init master fp hash table with per-bucket locks */
 	inode_hashtable = vmalloc(size);
 	if (!inode_hashtable)
 		return -ENOMEM;
 
-	for (loop = 0; loop < (1U << inode_hash_shift); loop++)
-		INIT_HLIST_HEAD(&inode_hashtable[loop]);
+	for (loop = 0; loop < (1U << inode_hash_shift); loop++) {
+		INIT_HLIST_HEAD(&inode_hashtable[loop].head);
+		rwlock_init(&inode_hashtable[loop].lock);
+	}
 	return 0;
 }
 
@@ -626,10 +650,12 @@ struct ksmbd_file *ksmbd_lookup_fd_inode(struct dentry *dentry)
 	struct ksmbd_file	*lfp;
 	struct ksmbd_inode	*ci;
 	struct inode		*inode = d_inode(dentry);
+	unsigned long		bucket =
+		inode_hash(inode->i_sb, (unsigned long)dentry);
 
-	read_lock(&inode_hash_lock);
+	read_lock(&inode_hashtable[bucket].lock);
 	ci = __ksmbd_inode_lookup(dentry);
-	read_unlock(&inode_hash_lock);
+	read_unlock(&inode_hashtable[bucket].lock);
 	if (!ci)
 		return NULL;
 
