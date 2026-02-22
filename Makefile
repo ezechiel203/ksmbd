@@ -23,10 +23,6 @@ ksmbd-y :=	unicode.o auth.o vfs.o vfs_cache.o connection.o crypto_ctx.o \
 		mgmt/tree_connect.o mgmt/user_session.o smb_common.o \
 		transport_tcp.o transport_ipc.o
 
-# Apple Fruit SMB extensions (macOS compatibility).
-# Set CONFIG_KSMBD_FRUIT=y to enable, =n or unset to disable.
-CONFIG_KSMBD_FRUIT ?= n
-
 ksmbd-y +=	smb2pdu.o smb2ops.o smb2misc.o ksmbd_spnego_negtokeninit.asn1.o \
 		ksmbd_spnego_negtokentarg.asn1.o asn1.o compat.o
 
