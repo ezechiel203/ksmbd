@@ -884,7 +884,7 @@ static void ksmbd_scavenger_dispose_dh(struct list_head *head)
 		 * handle if no one else has acquired a reference
 		 * (e.g. a concurrent reconnecting client).
 		 */
-		if (!atomic_dec_and_test(&fp->refcount)) {
+		if (!refcount_dec_and_test(&fp->refcount)) {
 			/*
 			 * Someone else holds a reference. Clear
 			 * the scavenger claim so they can proceed.

@@ -734,8 +734,6 @@ err_ipc_release:
 	ksmbd_ipc_release();
 err_exit_oplock:
 	ksmbd_oplock_exit();
-err_exit_file_cache:
-	ksmbd_exit_file_cache();
 err_destroy_buffer_pool:
 	ksmbd_buffer_pool_exit();
 err_destroy_work_pools:
