@@ -19,6 +19,7 @@ obj-$(CONFIG_SMB_SERVER) += ksmbd.o
 
 ksmbd-y :=	unicode.o auth.o vfs.o vfs_cache.o connection.o crypto_ctx.o \
 		server.o misc.o oplock.o ksmbd_work.o smbacl.o ndr.o\
+		ksmbd_buffer.o \
 		mgmt/ksmbd_ida.o mgmt/user_config.o mgmt/share_config.o \
 		mgmt/tree_connect.o mgmt/user_session.o smb_common.o \
 		transport_tcp.o transport_ipc.o ksmbd_debugfs.o \

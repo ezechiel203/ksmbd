@@ -53,6 +53,7 @@
 #include "ksmbd_vss.h"
 #include "ksmbd_notify.h"
 #include "ksmbd_info.h"
+#include "ksmbd_buffer.h"
 
 static void __wbuf(struct ksmbd_work *work, void **req, void **rsp)
 {
@@ -7816,7 +7817,7 @@ int smb2_read(struct ksmbd_work *work)
 	ksmbd_debug(SMB, "filename %pD, offset %lld, len %zu\n",
 		    fp->filp, offset, length);
 
-	aux_payload_buf = kvzalloc(ALIGN(length, 8), KSMBD_DEFAULT_GFP);
+	aux_payload_buf = ksmbd_buffer_pool_get(ALIGN(length, 8));
 	if (!aux_payload_buf) {
 		err = -ENOMEM;
 		goto out;
@@ -7824,13 +7825,13 @@ int smb2_read(struct ksmbd_work *work)
 
 	nbytes = ksmbd_vfs_read(work, fp, length, &offset, aux_payload_buf);
 	if (nbytes < 0) {
-		kvfree(aux_payload_buf);
+		ksmbd_buffer_pool_put(aux_payload_buf);
 		err = nbytes;
 		goto out;
 	}
 
 	if ((nbytes == 0 && length != 0) || nbytes < mincount) {
-		kvfree(aux_payload_buf);
+		ksmbd_buffer_pool_put(aux_payload_buf);
 		rsp->hdr.Status = STATUS_END_OF_FILE;
 		smb2_set_err_rsp(work);
 		ksmbd_fd_put(work, fp);
@@ -7845,7 +7846,7 @@ int smb2_read(struct ksmbd_work *work)
 		remain_bytes = smb2_read_rdma_channel(work, req,
 						      aux_payload_buf,
 						      nbytes);
-		kvfree(aux_payload_buf);
+		ksmbd_buffer_pool_put(aux_payload_buf);
 		aux_payload_buf = NULL;
 		nbytes = 0;
 		if (remain_bytes < 0) {
@@ -7967,7 +7968,7 @@ static ssize_t smb2_write_rdma_channel(struct ksmbd_work *work,
 	int ret;
 	ssize_t nbytes;
 
-	data_buf = kvzalloc(length, KSMBD_DEFAULT_GFP);
+	data_buf = ksmbd_buffer_pool_get(length);
 	if (!data_buf)
 		return -ENOMEM;
 
@@ -7976,12 +7977,12 @@ static ssize_t smb2_write_rdma_channel(struct ksmbd_work *work,
 				   ((char *)req + le16_to_cpu(req->WriteChannelInfoOffset)),
 				   le16_to_cpu(req->WriteChannelInfoLength));
 	if (ret < 0) {
-		kvfree(data_buf);
+		ksmbd_buffer_pool_put(data_buf);
 		return ret;
 	}
 
 	ret = ksmbd_vfs_write(work, fp, data_buf, length, &offset, sync, &nbytes);
-	kvfree(data_buf);
+	ksmbd_buffer_pool_put(data_buf);
 	if (ret < 0)
 		return ret;
 

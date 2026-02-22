@@ -11,6 +11,7 @@
 #include "server.h"
 #include "connection.h"
 #include "ksmbd_work.h"
+#include "ksmbd_buffer.h"
 #include "mgmt/ksmbd_ida.h"
 
 static struct kmem_cache *work_cache;
@@ -50,7 +51,7 @@ void ksmbd_free_work_struct(struct ksmbd_work *work)
 #endif
 
 	list_for_each_entry_safe(ar, tmp, &work->aux_read_list, entry) {
-		kvfree(ar->buf);
+		ksmbd_buffer_pool_put(ar->buf);
 		list_del(&ar->entry);
 		kfree(ar);
 	}
