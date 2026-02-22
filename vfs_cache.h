@@ -130,6 +130,7 @@ struct ksmbd_file {
 	bool				is_persistent;
 	bool				is_resilient;
 	unsigned int			resilient_timeout;
+	bool				is_scavenger_claimed;
 
 	bool                            is_posix_ctxt;
 

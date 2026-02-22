@@ -577,7 +577,8 @@ struct ksmbd_file *ksmbd_lookup_durable_fd(unsigned long long id)
 	struct ksmbd_file *fp;
 
 	fp = __ksmbd_lookup_fd(&global_ft, id);
-	if (fp && (fp->conn ||
+	if (fp && (fp->is_scavenger_claimed ||
+		   fp->conn ||
 		   (fp->durable_scavenger_timeout &&
 		    (fp->durable_scavenger_timeout <
 		     jiffies_to_msecs(jiffies))))) {
@@ -877,6 +878,24 @@ static void ksmbd_scavenger_dispose_dh(struct list_head *head)
 
 		fp = list_first_entry(head, struct ksmbd_file, node);
 		list_del_init(&fp->node);
+
+		/*
+		 * Drop the scavenger's reference. Only free the
+		 * handle if no one else has acquired a reference
+		 * (e.g. a concurrent reconnecting client).
+		 */
+		if (!atomic_dec_and_test(&fp->refcount)) {
+			/*
+			 * Someone else holds a reference. Clear
+			 * the scavenger claim so they can proceed.
+			 * The handle is already removed from the
+			 * global table, so the reconnect path
+			 * holding the ref will put it via
+			 * ksmbd_put_durable_fd().
+			 */
+			fp->is_scavenger_claimed = false;
+			continue;
+		}
 		__ksmbd_close_fd(NULL, fp);
 	}
 }
@@ -912,13 +931,31 @@ static int ksmbd_durable_scavenger(void *dummy)
 			if (!fp->durable_timeout)
 				continue;
 
-			if (refcount_read(&fp->refcount) > 1 ||
-			    fp->conn)
+			if (fp->conn)
 				continue;
 
 			found_fp_timeout = true;
 			if (fp->durable_scavenger_timeout <=
 			    jiffies_to_msecs(jiffies)) {
+				/*
+				 * Take a reference before claiming. If
+				 * someone else already holds a reference
+				 * (e.g. a reconnecting client), skip.
+				 */
+				if (!refcount_inc_not_zero(&fp->refcount))
+					continue;
+
+				if (refcount_read(&fp->refcount) != 2) {
+					/*
+					 * Another thread acquired a ref
+					 * between our check and inc.
+					 * Drop our ref and skip.
+					 */
+					refcount_dec(&fp->refcount);
+					continue;
+				}
+
+				fp->is_scavenger_claimed = true;
 				__ksmbd_remove_durable_fd(fp);
 				list_add(&fp->node, &scavenger_list);
 			} else {
@@ -1113,6 +1150,12 @@ int ksmbd_reopen_durable_fd(struct ksmbd_work *work, struct ksmbd_file *fp)
 		pr_err("Still in use durable fd: %llu\n", fp->volatile_id);
 		return -EBADF;
 	}
+
+	/*
+	 * Clear scavenger timeout so the scavenger thread will not
+	 * attempt to expire this handle while it is being reclaimed.
+	 */
+	fp->durable_scavenger_timeout = 0;
 
 	fp->conn = work->conn;
 	fp->tcon = work->tcon;
