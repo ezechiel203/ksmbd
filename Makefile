@@ -25,7 +25,11 @@ ksmbd-y :=	unicode.o auth.o vfs.o vfs_cache.o connection.o crypto_ctx.o \
 		transport_tcp.o transport_ipc.o ksmbd_debugfs.o \
 		ksmbd_config.o ksmbd_feature.o
 
-ksmbd-y +=	smb2pdu.o smb2ops.o smb2misc.o ksmbd_spnego_negtokeninit.asn1.o \
+ksmbd-y +=	smb2_pdu_common.o smb2_negotiate.o smb2_session.o \
+		smb2_tree.o smb2_create.o smb2_dir.o smb2_query_set.o \
+		smb2_read_write.o smb2_lock.o smb2_ioctl.o \
+		smb2_notify.o smb2_misc_cmds.o \
+		smb2ops.o smb2misc.o ksmbd_spnego_negtokeninit.asn1.o \
 		ksmbd_spnego_negtokentarg.asn1.o asn1.o compat.o \
 		ksmbd_fsctl.o ksmbd_create_ctx.o ksmbd_info.o \
 		ksmbd_dfs.o ksmbd_vss.o ksmbd_notify.o ksmbd_reparse.o \
