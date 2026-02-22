@@ -161,9 +161,25 @@ struct ksmbd_transport {
 #define KSMBD_TCP_SEND_TIMEOUT	(5 * HZ)
 #define KSMBD_TCP_PEER_SOCKADDR(c)	((struct sockaddr *)&((c)->peer_addr))
 
-#define CONN_HASH_BITS	12
-extern DECLARE_HASHTABLE(conn_list, CONN_HASH_BITS);
-extern struct rw_semaphore conn_list_lock;
+#define CONN_HASH_BITS	8
+#define CONN_HASH_SIZE	(1 << CONN_HASH_BITS)
+
+/**
+ * struct ksmbd_conn_hash_bucket - per-bucket hash entry for connections
+ * @head:	hash list head for this bucket
+ * @lock:	spinlock protecting this bucket
+ */
+struct ksmbd_conn_hash_bucket {
+	struct hlist_head	head;
+	spinlock_t		lock;
+};
+
+extern struct ksmbd_conn_hash_bucket conn_hash[CONN_HASH_SIZE];
+
+void ksmbd_conn_hash_init(void);
+void ksmbd_conn_hash_add(struct ksmbd_conn *conn, unsigned int key);
+void ksmbd_conn_hash_del(struct ksmbd_conn *conn);
+bool ksmbd_conn_hash_empty(void);
 
 bool ksmbd_conn_alive(struct ksmbd_conn *conn);
 void ksmbd_conn_wait_idle(struct ksmbd_conn *conn);

@@ -376,9 +376,7 @@ static struct smb_direct_transport *alloc_transport(struct rdma_cm_id *cm_id)
 	if (!conn)
 		goto err;
 
-	down_write(&conn_list_lock);
-	hash_add(conn_list, &conn->hlist, 0);
-	up_write(&conn_list_lock);
+	ksmbd_conn_hash_add(conn, 0);
 
 	conn->transport = KSMBD_TRANS(t);
 	KSMBD_TRANS(t)->conn = conn;

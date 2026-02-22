@@ -1781,8 +1781,10 @@ int smb_locking_andx(struct ksmbd_work *work)
 
 		list_del(&smb_lock->llist);
 		/* check locks in connections */
-		down_read(&conn_list_lock);
-		hash_for_each(conn_list, bkt, conn, hlist) {
+		for (bkt = 0; bkt < CONN_HASH_SIZE; bkt++) {
+		spin_lock(&conn_hash[bkt].lock);
+		hlist_for_each_entry(conn, &conn_hash[bkt].head,
+				     hlist) {
 			spin_lock(&conn->llist_lock);
 			list_for_each_entry_safe(cmp_lock, tmp2, &conn->lock_list, clist) {
 				if (file_inode(cmp_lock->fl->fl_file) !=
@@ -1794,7 +1796,7 @@ int smb_locking_andx(struct ksmbd_work *work)
 					cmp_lock->end == smb_lock->end) {
 					same_zero_lock = 1;
 					spin_unlock(&conn->llist_lock);
-					up_read(&conn_list_lock);
+					spin_unlock(&conn_hash[bkt].lock);
 					goto out_check_cl;
 				}
 
@@ -1835,7 +1837,7 @@ int smb_locking_andx(struct ksmbd_work *work)
 						smb_lock->start >= 0xEF000000)) {
 						if (timeout) {
 							spin_unlock(&conn->llist_lock);
-							up_read(&conn_list_lock);
+							spin_unlock(&conn_hash[bkt].lock);
 							ksmbd_debug(SMB, "waiting error response for timeout : %d\n",
 								timeout);
 							msleep(timeout);
@@ -1850,14 +1852,15 @@ int smb_locking_andx(struct ksmbd_work *work)
 
 					if (timeout <= 0) {
 						spin_unlock(&conn->llist_lock);
-						up_read(&conn_list_lock);
+						spin_unlock(&conn_hash[bkt].lock);
 					}
 					goto out;
 				}
 			}
 			spin_unlock(&conn->llist_lock);
 		}
-		up_read(&conn_list_lock);
+		spin_unlock(&conn_hash[bkt].lock);
+		}
 
 out_check_cl:
 		if (same_zero_lock)
@@ -1947,8 +1950,10 @@ skip:
 			flock->fl_end = offset + length;
 
 		locked = 0;
-		down_read(&conn_list_lock);
-		hash_for_each(conn_list, bkt, conn, hlist) {
+		for (bkt = 0; bkt < CONN_HASH_SIZE; bkt++) {
+		spin_lock(&conn_hash[bkt].lock);
+		hlist_for_each_entry(conn, &conn_hash[bkt].head,
+				     hlist) {
 			spin_lock(&conn->llist_lock);
 			list_for_each_entry(cmp_lock, &conn->lock_list, clist) {
 				if (file_inode(cmp_lock->fl->fl_file) !=
@@ -1959,13 +1964,14 @@ skip:
 					 cmp_lock->end == offset + length)) {
 					locked = 1;
 					spin_unlock(&conn->llist_lock);
-					up_read(&conn_list_lock);
+					spin_unlock(&conn_hash[bkt].lock);
 					goto out_check_cl_unlck;
 				}
 			}
 			spin_unlock(&conn->llist_lock);
 		}
-		up_read(&conn_list_lock);
+		spin_unlock(&conn_hash[bkt].lock);
+		}
 
 out_check_cl_unlck:
 		if (!locked) {

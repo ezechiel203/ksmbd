@@ -41,27 +41,33 @@ static const char *ksmbd_conn_status_str(struct ksmbd_conn *conn)
 static int ksmbd_debugfs_connections_show(struct seq_file *s, void *v)
 {
 	struct ksmbd_conn *conn;
-	int bkt;
+	int i;
 
 	seq_printf(s, "%-20s %-6s %-10s %-8s %-8s\n",
-		   "peer", "dialect", "status", "credits", "requests");
+		   "peer", "dialect", "status", "credits",
+		   "requests");
 	seq_puts(s,
 		 "-----------------------------------------------------------\n");
 
-	down_read(&conn_list_lock);
-	hash_for_each(conn_list, bkt, conn, hlist) {
-		char addr_buf[64];
+	for (i = 0; i < CONN_HASH_SIZE; i++) {
+		spin_lock(&conn_hash[i].lock);
+		hlist_for_each_entry(conn, &conn_hash[i].head,
+				     hlist) {
+			char addr_buf[64];
 
-		snprintf(addr_buf, sizeof(addr_buf), "%pIS",
-			 KSMBD_TCP_PEER_SOCKADDR(conn));
-		seq_printf(s, "%-20s 0x%04x %-10s %-8u %-8d\n",
-			   addr_buf,
-			   conn->dialect,
-			   ksmbd_conn_status_str(conn),
-			   conn->total_credits,
-			   atomic_read(&conn->req_running));
+			snprintf(addr_buf, sizeof(addr_buf),
+				 "%pIS",
+				 KSMBD_TCP_PEER_SOCKADDR(conn));
+			seq_printf(s,
+				   "%-20s 0x%04x %-10s %-8u %-8d\n",
+				   addr_buf,
+				   conn->dialect,
+				   ksmbd_conn_status_str(conn),
+				   conn->total_credits,
+				   atomic_read(&conn->req_running));
+		}
+		spin_unlock(&conn_hash[i].lock);
 	}
-	up_read(&conn_list_lock);
 	return 0;
 }
 
@@ -70,18 +76,24 @@ DEFINE_SHOW_ATTRIBUTE(ksmbd_debugfs_connections);
 static int ksmbd_debugfs_stats_show(struct seq_file *s, void *v)
 {
 	struct ksmbd_conn *conn;
-	int bkt, num_conns = 0;
+	int i, num_conns = 0;
 	u64 total_requests = 0;
 
-	down_read(&conn_list_lock);
-	hash_for_each(conn_list, bkt, conn, hlist) {
-		num_conns++;
-		total_requests += atomic64_read(&conn->stats.request_served);
+	for (i = 0; i < CONN_HASH_SIZE; i++) {
+		spin_lock(&conn_hash[i].lock);
+		hlist_for_each_entry(conn, &conn_hash[i].head,
+				     hlist) {
+			num_conns++;
+			total_requests +=
+				atomic64_read(
+					&conn->stats.request_served);
+		}
+		spin_unlock(&conn_hash[i].lock);
 	}
-	up_read(&conn_list_lock);
 
 	seq_printf(s, "active connections: %d\n", num_conns);
-	seq_printf(s, "total requests served: %llu\n", total_requests);
+	seq_printf(s, "total requests served: %llu\n",
+		   total_requests);
 	return 0;
 }
 

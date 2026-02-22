@@ -24,8 +24,67 @@ static DEFINE_MUTEX(init_lock);
 
 static struct ksmbd_conn_ops default_conn_ops;
 
-DEFINE_HASHTABLE(conn_list, CONN_HASH_BITS);
-DECLARE_RWSEM(conn_list_lock);
+struct ksmbd_conn_hash_bucket conn_hash[CONN_HASH_SIZE];
+
+/**
+ * ksmbd_conn_hash_init() - initialize per-bucket locks for conn hash
+ */
+void ksmbd_conn_hash_init(void)
+{
+	int i;
+
+	for (i = 0; i < CONN_HASH_SIZE; i++) {
+		INIT_HLIST_HEAD(&conn_hash[i].head);
+		spin_lock_init(&conn_hash[i].lock);
+	}
+}
+
+/**
+ * ksmbd_conn_hash_add() - add connection to the hash table
+ * @conn:	connection to add
+ * @key:	hash key (typically conn->inet_hash)
+ */
+void ksmbd_conn_hash_add(struct ksmbd_conn *conn, unsigned int key)
+{
+	unsigned int bkt = hash_min(key, CONN_HASH_BITS);
+
+	spin_lock(&conn_hash[bkt].lock);
+	hlist_add_head(&conn->hlist, &conn_hash[bkt].head);
+	spin_unlock(&conn_hash[bkt].lock);
+}
+
+/**
+ * ksmbd_conn_hash_del() - remove connection from the hash table
+ * @conn:	connection to remove
+ */
+void ksmbd_conn_hash_del(struct ksmbd_conn *conn)
+{
+	unsigned int bkt = hash_min(conn->inet_hash, CONN_HASH_BITS);
+
+	spin_lock(&conn_hash[bkt].lock);
+	hlist_del_init(&conn->hlist);
+	spin_unlock(&conn_hash[bkt].lock);
+}
+
+/**
+ * ksmbd_conn_hash_empty() - check if the connection hash is empty
+ *
+ * Return:	true if no connections remain
+ */
+bool ksmbd_conn_hash_empty(void)
+{
+	int i;
+
+	for (i = 0; i < CONN_HASH_SIZE; i++) {
+		spin_lock(&conn_hash[i].lock);
+		if (!hlist_empty(&conn_hash[i].head)) {
+			spin_unlock(&conn_hash[i].lock);
+			return false;
+		}
+		spin_unlock(&conn_hash[i].lock);
+	}
+	return true;
+}
 
 /**
  * ksmbd_conn_free() - free resources of the connection instance
@@ -37,9 +96,7 @@ DECLARE_RWSEM(conn_list_lock);
  */
 static void ksmbd_conn_cleanup(struct ksmbd_conn *conn)
 {
-	down_write(&conn_list_lock);
-	hash_del(&conn->hlist);
-	up_write(&conn_list_lock);
+	ksmbd_conn_hash_del(conn);
 
 	xa_destroy(&conn->sessions);
 	kvfree(conn->request_buf);
@@ -121,19 +178,20 @@ struct ksmbd_conn *ksmbd_conn_alloc(void)
 bool ksmbd_conn_lookup_dialect(struct ksmbd_conn *c)
 {
 	struct ksmbd_conn *t;
-	int bkt;
-	bool ret = false;
+	int i;
 
-	down_read(&conn_list_lock);
-	hash_for_each(conn_list, bkt, t, hlist) {
-		if (memcmp(t->ClientGUID, c->ClientGUID, SMB2_CLIENT_GUID_SIZE))
-			continue;
-
-		ret = true;
-		break;
+	for (i = 0; i < CONN_HASH_SIZE; i++) {
+		spin_lock(&conn_hash[i].lock);
+		hlist_for_each_entry(t, &conn_hash[i].head, hlist) {
+			if (!memcmp(t->ClientGUID, c->ClientGUID,
+				    SMB2_CLIENT_GUID_SIZE)) {
+				spin_unlock(&conn_hash[i].lock);
+				return true;
+			}
+		}
+		spin_unlock(&conn_hash[i].lock);
 	}
-	up_read(&conn_list_lock);
-	return ret;
+	return false;
 }
 
 void ksmbd_conn_enqueue_request(struct ksmbd_work *work)
@@ -197,14 +255,17 @@ void ksmbd_conn_unlock(struct ksmbd_conn *conn)
 void ksmbd_all_conn_set_status(u64 sess_id, u32 status)
 {
 	struct ksmbd_conn *conn;
-	int bkt;
+	int i;
 
-	down_read(&conn_list_lock);
-	hash_for_each(conn_list, bkt, conn, hlist) {
-		if (conn->binding || xa_load(&conn->sessions, sess_id))
-			WRITE_ONCE(conn->status, status);
+	for (i = 0; i < CONN_HASH_SIZE; i++) {
+		spin_lock(&conn_hash[i].lock);
+		hlist_for_each_entry(conn, &conn_hash[i].head, hlist) {
+			if (conn->binding ||
+			    xa_load(&conn->sessions, sess_id))
+				WRITE_ONCE(conn->status, status);
+		}
+		spin_unlock(&conn_hash[i].lock);
 	}
-	up_read(&conn_list_lock);
 }
 
 void ksmbd_conn_wait_idle(struct ksmbd_conn *conn)
@@ -212,34 +273,49 @@ void ksmbd_conn_wait_idle(struct ksmbd_conn *conn)
 	wait_event(conn->req_running_q, atomic_read(&conn->req_running) < 2);
 }
 
-int ksmbd_conn_wait_idle_sess_id(struct ksmbd_conn *curr_conn, u64 sess_id)
+int ksmbd_conn_wait_idle_sess_id(struct ksmbd_conn *curr_conn,
+				 u64 sess_id)
 {
 	struct ksmbd_conn *conn;
 	int rc, retry_count = 0, max_timeout = 120;
-	int rcount = 1, bkt;
+	int rcount, i;
 
 retry_idle:
 	if (retry_count >= max_timeout)
 		return -EIO;
 
-	down_read(&conn_list_lock);
-	hash_for_each(conn_list, bkt, conn, hlist) {
-		if (conn->binding || xa_load(&conn->sessions, sess_id)) {
-			if (conn == curr_conn)
-				rcount = 2;
-			if (atomic_read(&conn->req_running) >= rcount) {
-				rc = wait_event_timeout(conn->req_running_q,
-					atomic_read(&conn->req_running) < rcount,
+	for (i = 0; i < CONN_HASH_SIZE; i++) {
+		spin_lock(&conn_hash[i].lock);
+		hlist_for_each_entry(conn, &conn_hash[i].head,
+				     hlist) {
+			if (!conn->binding &&
+			    !xa_load(&conn->sessions, sess_id))
+				continue;
+
+			rcount = (conn == curr_conn) ? 2 : 1;
+			if (atomic_read(&conn->req_running) >=
+			    rcount) {
+				spin_unlock(&conn_hash[i].lock);
+				rc = wait_event_timeout(
+					conn->req_running_q,
+					atomic_read(
+					    &conn->req_running)
+					    < rcount,
 					HZ);
 				if (!rc) {
-					up_read(&conn_list_lock);
 					retry_count++;
 					goto retry_idle;
 				}
+				/*
+				 * Restart from beginning after
+				 * sleeping: bucket contents may
+				 * have changed.
+				 */
+				goto retry_idle;
 			}
 		}
+		spin_unlock(&conn_hash[i].lock);
 	}
-	up_read(&conn_list_lock);
 
 	return 0;
 }
@@ -529,6 +605,7 @@ int ksmbd_conn_transport_init(void)
 {
 	int ret;
 
+	ksmbd_conn_hash_init();
 	mutex_lock(&init_lock);
 	ret = ksmbd_tcp_init();
 	if (ret) {
@@ -550,24 +627,27 @@ static void stop_sessions(void)
 {
 	struct ksmbd_conn *conn;
 	struct ksmbd_transport *t;
-	int bkt;
+	int i;
 
 again:
-	down_read(&conn_list_lock);
-	hash_for_each(conn_list, bkt, conn, hlist) {
-		t = conn->transport;
-		ksmbd_conn_set_exiting(conn);
-		if (t->ops->shutdown) {
-			refcount_inc(&conn->refcnt);
-			up_read(&conn_list_lock);
-			t->ops->shutdown(t);
-			refcount_dec(&conn->refcnt);
-			goto again;
+	for (i = 0; i < CONN_HASH_SIZE; i++) {
+		spin_lock(&conn_hash[i].lock);
+		hlist_for_each_entry(conn, &conn_hash[i].head,
+				     hlist) {
+			t = conn->transport;
+			ksmbd_conn_set_exiting(conn);
+			if (t->ops->shutdown) {
+				refcount_inc(&conn->refcnt);
+				spin_unlock(&conn_hash[i].lock);
+				t->ops->shutdown(t);
+				refcount_dec(&conn->refcnt);
+				goto again;
+			}
 		}
+		spin_unlock(&conn_hash[i].lock);
 	}
-	up_read(&conn_list_lock);
 
-	if (!hash_empty(conn_list)) {
+	if (!ksmbd_conn_hash_empty()) {
 		msleep(100);
 		goto again;
 	}

@@ -96,9 +96,7 @@ static struct tcp_transport *alloc_transport(struct socket *client_sk)
 #else
 	conn->inet_addr = inet_sk(client_sk->sk)->inet_daddr;
 #endif
-	down_write(&conn_list_lock);
-	hash_add(conn_list, &conn->hlist, conn->inet_hash);
-	up_write(&conn_list_lock);
+	ksmbd_conn_hash_add(conn, conn->inet_hash);
 
 	conn->transport = KSMBD_TRANS(t);
 	KSMBD_TRANS(t)->conn = conn;
@@ -225,7 +223,7 @@ static int ksmbd_kthread_fn(void *p)
 	struct socket *client_sk = NULL;
 	struct interface *iface = (struct interface *)p;
 	struct ksmbd_conn *conn;
-	int ret, inet_hash;
+	int ret, inet_hash, bkt;
 	unsigned int max_ip_conns;
 
 	while (!kthread_should_stop()) {
@@ -254,29 +252,37 @@ static int ksmbd_kthread_fn(void *p)
 #endif
 
 		max_ip_conns = 0;
-		down_read(&conn_list_lock);
-		hash_for_each_possible(conn_list, conn, hlist, inet_hash) {
+		bkt = hash_min(inet_hash, CONN_HASH_BITS);
+		spin_lock(&conn_hash[bkt].lock);
+		hlist_for_each_entry(conn, &conn_hash[bkt].head,
+				     hlist) {
+			if (conn->inet_hash != inet_hash)
+				continue;
 #if IS_ENABLED(CONFIG_IPV6)
 			if (client_sk->sk->sk_family == AF_INET6) {
 				if (memcmp(&client_sk->sk->sk_v6_daddr,
-					   &conn->inet6_addr, 16) == 0)
+					   &conn->inet6_addr,
+					   16) == 0)
 					max_ip_conns++;
-			} else if (inet_sk(client_sk->sk)->inet_daddr ==
-				 conn->inet_addr)
+			} else if (inet_sk(client_sk->sk)->inet_daddr
+				   == conn->inet_addr) {
 				max_ip_conns++;
+			}
 #else
 			if (inet_sk(client_sk->sk)->inet_daddr ==
 			    conn->inet_addr)
 				max_ip_conns++;
 #endif
-			if (server_conf.max_ip_connections <= max_ip_conns) {
+			if (server_conf.max_ip_connections <=
+			    max_ip_conns) {
 				pr_info_ratelimited("Maximum IP connections exceeded (%u/%u)\n",
-						    max_ip_conns, server_conf.max_ip_connections);
+						    max_ip_conns,
+						    server_conf.max_ip_connections);
 				ret = -EAGAIN;
 				break;
 			}
 		}
-		up_read(&conn_list_lock);
+		spin_unlock(&conn_hash[bkt].lock);
 		if (ret == -EAGAIN) {
 			/* Per-IP limit hit: release the just-accepted socket. */
 			sock_release(client_sk);
