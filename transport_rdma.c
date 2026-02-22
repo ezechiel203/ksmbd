@@ -730,6 +730,12 @@ again:
 			if (recvmsg->first_segment && size == 4) {
 				unsigned int rfc1002_len =
 					data_length + remaining_data_length;
+				if (rfc1002_len < data_length ||
+				    rfc1002_len > MAX_STREAM_PROT_LEN) {
+					pr_err("Invalid rfc1002 length %u\n",
+					       rfc1002_len);
+					return -EINVAL;
+				}
 				*((__be32 *)buf) = cpu_to_be32(rfc1002_len);
 				data_read = 4;
 				recvmsg->first_segment = false;

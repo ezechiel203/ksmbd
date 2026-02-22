@@ -8,6 +8,7 @@
 #include <linux/rwsem.h>
 #include <linux/xarray.h>
 #include <linux/string.h>
+#include <crypto/algapi.h>
 
 #include "ksmbd_ida.h"
 #include "user_session.h"
@@ -403,7 +404,7 @@ void destroy_previous_session(struct ksmbd_conn *conn,
 	if (!prev_user ||
 	    strcmp(user->name, prev_user->name) ||
 	    user->passkey_sz != prev_user->passkey_sz ||
-	    memcmp(user->passkey, prev_user->passkey, user->passkey_sz))
+	    crypto_memneq(user->passkey, prev_user->passkey, user->passkey_sz))
 		goto out;
 
 	ksmbd_all_conn_set_status(id, KSMBD_SESS_NEED_RECONNECT);
@@ -454,6 +455,12 @@ static int __init_smb1_session(struct ksmbd_session *sess)
 
 static int __init_smb2_session(struct ksmbd_session *sess)
 {
+	/*
+	 * Note: Session IDs are allocated sequentially via IDA, which
+	 * could allow enumeration. This is a minor info-leak but
+	 * cannot easily use get_random_u64() since the ID is used as
+	 * an xarray index throughout the session management code.
+	 */
 	int id = ksmbd_acquire_smb2_uid(&session_ida);
 
 	if (id < 0)

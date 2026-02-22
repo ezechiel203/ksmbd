@@ -1037,7 +1037,12 @@ int ksmbd_vfs_setattr(struct ksmbd_work *work, const char *name, u64 fid,
 		return -ENOMEM;
 
 	if (name) {
-		err = kern_path(name, 0, &path);
+		unsigned int lookup_flags = 0;
+
+#ifdef LOOKUP_BENEATH
+		lookup_flags |= LOOKUP_BENEATH;
+#endif
+		err = kern_path(name, lookup_flags, &path);
 		if (err) {
 			ksmbd_revert_fsids(work);
 			ksmbd_debug(VFS, "lookup failed for %s, err = %d\n",
@@ -1142,6 +1147,12 @@ int ksmbd_vfs_symlink(struct ksmbd_work *work, const char *name,
 	struct path path;
 	struct dentry *dentry;
 	int err;
+
+	/* Prevent symlink targets that escape the share boundary */
+	if (name[0] == '/' || strstr(name, "..")) {
+		pr_err("Symlink target '%s' escapes share boundary\n", name);
+		return -EACCES;
+	}
 
 	if (ksmbd_override_fsids(work))
 		return -ENOMEM;
@@ -1478,7 +1489,13 @@ int ksmbd_vfs_link(struct ksmbd_work *work, const char *oldname,
 	if (ksmbd_override_fsids(work))
 		return -ENOMEM;
 
-	err = kern_path(oldname, LOOKUP_NO_SYMLINKS, &oldpath);
+	{
+		unsigned int lookup_flags = LOOKUP_NO_SYMLINKS;
+#ifdef LOOKUP_BENEATH
+		lookup_flags |= LOOKUP_BENEATH;
+#endif
+		err = kern_path(oldname, lookup_flags, &oldpath);
+	}
 	if (err) {
 		pr_err("cannot get linux path for %s, err = %d\n",
 		       oldname, err);
@@ -1983,6 +2000,14 @@ int ksmbd_vfs_resolve_fileid(const struct path *share_path,
 	if (!dentry)
 		return -ENOENT;
 
+	/* Verify resolved file is within the share boundary */
+	if (!is_subdir(dentry, share_path->dentry)) {
+		pr_err("resolve_fileid: inode %llu is outside share boundary\n",
+		       ino);
+		dput(dentry);
+		return -EACCES;
+	}
+
 	path_buf = kmalloc(PATH_MAX, KSMBD_DEFAULT_GFP);
 	if (!path_buf) {
 		dput(dentry);
@@ -2255,7 +2280,13 @@ int ksmbd_vfs_fsetxattr(struct ksmbd_work *work, const char *filename,
 	if (ksmbd_override_fsids(work))
 		return -ENOMEM;
 
-	err = kern_path(filename, 0, &path);
+	{
+		unsigned int lookup_flags = 0;
+#ifdef LOOKUP_BENEATH
+		lookup_flags |= LOOKUP_BENEATH;
+#endif
+		err = kern_path(filename, lookup_flags, &path);
+	}
 	if (err) {
 		ksmbd_revert_fsids(work);
 		ksmbd_debug(VFS, "cannot get linux path %s, err %d\n",

@@ -102,6 +102,8 @@ bool ksmbd_compare_user(struct ksmbd_user *u1, struct ksmbd_user *u2)
 {
 	if (strcmp(u1->name, u2->name))
 		return false;
+	if (u1->passkey_sz != u2->passkey_sz)
+		return false;
 	if (crypto_memneq(u1->passkey, u2->passkey, u1->passkey_sz))
 		return false;
 

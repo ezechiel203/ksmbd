@@ -81,7 +81,7 @@ static inline bool check_session_id(struct ksmbd_conn *conn, u64 id)
 		ksmbd_user_session_put(sess);
 		return true;
 	}
-	pr_err("Invalid user session id: %llu\n", id);
+	pr_err_ratelimited("Invalid user session id: %llu\n", id);
 	return false;
 }
 
@@ -348,7 +348,13 @@ int smb2_set_rsp_credits(struct ksmbd_work *work)
 	}
 
 	conn->total_credits -= credit_charge;
-	conn->outstanding_credits -= credit_charge;
+	if (credit_charge > conn->outstanding_credits) {
+		pr_err("Outstanding credits underflow: charge %u, outstanding %u\n",
+		       credit_charge, conn->outstanding_credits);
+		conn->outstanding_credits = 0;
+	} else {
+		conn->outstanding_credits -= credit_charge;
+	}
 	credits_requested = max_t(unsigned short,
 				  le16_to_cpu(req_hdr->CreditRequest), 1);
 
@@ -1030,7 +1036,7 @@ static __le32 deassemble_neg_contexts(struct ksmbd_conn *conn,
 
 	if (neg_ctxt_cnt > 16) {
 		pr_err("Too many negotiate contexts: %d\n", neg_ctxt_cnt);
-		return -EINVAL;
+		return STATUS_INVALID_PARAMETER;
 	}
 
 	while (i++ < neg_ctxt_cnt) {
@@ -1206,13 +1212,25 @@ int smb2_handle_negotiate(struct ksmbd_work *work)
 		neg_ctxt_len = assemble_neg_contexts(conn, rsp);
 		break;
 	case SMB302_PROT_ID:
-		init_smb3_02_server(conn);
+		rc = init_smb3_02_server(conn);
+		if (rc) {
+			rsp->hdr.Status = STATUS_NOT_SUPPORTED;
+			goto err_out;
+		}
 		break;
 	case SMB30_PROT_ID:
-		init_smb3_0_server(conn);
+		rc = init_smb3_0_server(conn);
+		if (rc) {
+			rsp->hdr.Status = STATUS_NOT_SUPPORTED;
+			goto err_out;
+		}
 		break;
 	case SMB21_PROT_ID:
-		init_smb2_1_server(conn);
+		rc = init_smb2_1_server(conn);
+		if (rc) {
+			rsp->hdr.Status = STATUS_NOT_SUPPORTED;
+			goto err_out;
+		}
 		break;
 	case SMB20_PROT_ID:
 		rc = init_smb2_0_server(conn);
@@ -1270,6 +1288,12 @@ int smb2_handle_negotiate(struct ksmbd_work *work)
 	    req->SecurityMode & SMB2_NEGOTIATE_SIGNING_REQUIRED_LE)
 		conn->sign = true;
 	else if (server_conf.signing == KSMBD_CONFIG_OPT_MANDATORY) {
+		/*
+		 * TODO: server_conf.enforced_signing is a global variable
+		 * written without locking. Concurrent negotiate requests
+		 * can race here. Ideally this should be a per-connection
+		 * flag, but that requires adding a field to ksmbd_conn.
+		 */
 		server_conf.enforced_signing = true;
 		rsp->SecurityMode |= SMB2_NEGOTIATE_SIGNING_REQUIRED_LE;
 		conn->sign = true;
@@ -1406,6 +1430,13 @@ static int ntlm_negotiate(struct ksmbd_work *work,
 		goto out;
 	}
 
+	if (spnego_blob_len > work->response_sz -
+	    ((char *)rsp->Buffer - (char *)work->response_buf)) {
+		rc = -ENOMEM;
+		kfree(spnego_blob);
+		goto out;
+	}
+
 	memcpy(rsp->Buffer, spnego_blob, spnego_blob_len);
 	rsp->SecurityBufferLength = cpu_to_le16(spnego_blob_len);
 
@@ -1487,6 +1518,12 @@ static int ntlm_authenticate(struct ksmbd_work *work,
 						    0);
 		if (rc)
 			return -ENOMEM;
+
+		if (spnego_blob_len > work->response_sz -
+		    ((char *)rsp->Buffer - (char *)work->response_buf)) {
+			kfree(spnego_blob);
+			return -ENOMEM;
+		}
 
 		memcpy(rsp->Buffer, spnego_blob, spnego_blob_len);
 		rsp->SecurityBufferLength = cpu_to_le16(spnego_blob_len);
@@ -1621,6 +1658,11 @@ static int krb5_authenticate(struct ksmbd_work *work,
 	u64 prev_sess_id;
 	int in_len, out_len;
 	int retval;
+
+	if ((u64)le16_to_cpu(req->SecurityBufferOffset) +
+	    le16_to_cpu(req->SecurityBufferLength) >
+	    get_rfc1002_len(work->request_buf) + 4)
+		return -EINVAL;
 
 	in_blob = (char *)&req->hdr.ProtocolId +
 		le16_to_cpu(req->SecurityBufferOffset);
@@ -1802,7 +1844,7 @@ int smb2_sess_setup(struct ksmbd_work *work)
 
 		conn->binding = true;
 	} else if ((conn->dialect < SMB30_PROT_ID ||
-		    server_conf.flags & KSMBD_GLOBAL_FLAG_SMB3_MULTICHANNEL) &&
+		    !(server_conf.flags & KSMBD_GLOBAL_FLAG_SMB3_MULTICHANNEL)) &&
 		   (req->Flags & SMB2_SESSION_REQ_FLAG_BINDING)) {
 		sess = NULL;
 		rc = -EACCES;
@@ -1834,6 +1876,11 @@ int smb2_sess_setup(struct ksmbd_work *work)
 	negblob_off = le16_to_cpu(req->SecurityBufferOffset);
 	negblob_len = le16_to_cpu(req->SecurityBufferLength);
 	if (negblob_off < offsetof(struct smb2_sess_setup_req, Buffer)) {
+		rc = -EINVAL;
+		goto out_err;
+	}
+
+	if ((u64)negblob_off + negblob_len > get_rfc1002_len(work->request_buf) + 4) {
 		rc = -EINVAL;
 		goto out_err;
 	}
@@ -2000,8 +2047,9 @@ int smb2_tree_connect(struct ksmbd_work *work)
 
 	WORK_BUFFERS(work, req, rsp);
 
-	if (le16_to_cpu(req->PathOffset) + le16_to_cpu(req->PathLength) >
-	    get_rfc1002_len(work->request_buf) + 4) {
+	if ((u64)le16_to_cpu(req->PathOffset) + le16_to_cpu(req->PathLength) >
+	    get_rfc1002_len(work->request_buf) + 4 -
+	    ((char *)req - (char *)work->request_buf)) {
 		rc = -EINVAL;
 		goto out_err1;
 	}
@@ -2074,8 +2122,11 @@ out_err1:
 	rsp->ShareFlags = SMB2_SHAREFLAG_MANUAL_CACHING;
 
 	rc = ksmbd_iov_pin_rsp(work, rsp, sizeof(struct smb2_tree_connect_rsp));
-	if (rc)
+	if (rc) {
+		if (status.ret == KSMBD_TREE_CONN_STATUS_OK)
+			ksmbd_tree_conn_disconnect(sess, status.tree_conn);
 		status.ret = KSMBD_TREE_CONN_STATUS_NOMEM;
+	}
 
 	if (!IS_ERR(treename))
 		kfree(treename);
@@ -2843,6 +2894,15 @@ static int parse_durable_handle_context(struct ksmbd_work *work,
 				goto out;
 			}
 
+			/* Validate client identity to prevent durable handle theft */
+			if (memcmp(dh_info->fp->client_guid, conn->ClientGUID,
+				   SMB2_CLIENT_GUID_SIZE)) {
+				pr_err("durable reconnect v2: client GUID mismatch\n");
+				err = -EBADF;
+				ksmbd_put_durable_fd(dh_info->fp);
+				goto out;
+			}
+
 			dh_info->type = dh_idx;
 			dh_info->reconnected = true;
 			ksmbd_debug(SMB,
@@ -2873,6 +2933,15 @@ static int parse_durable_handle_context(struct ksmbd_work *work,
 			if (!dh_info->fp) {
 				ksmbd_debug(SMB, "Failed to get durable handle state\n");
 				err = -EBADF;
+				goto out;
+			}
+
+			/* Validate client identity to prevent durable handle theft */
+			if (memcmp(dh_info->fp->client_guid, conn->ClientGUID,
+				   SMB2_CLIENT_GUID_SIZE)) {
+				pr_err("durable reconnect: client GUID mismatch\n");
+				err = -EBADF;
+				ksmbd_put_durable_fd(dh_info->fp);
 				goto out;
 			}
 
@@ -3036,6 +3105,12 @@ int smb2_open(struct ksmbd_work *work)
 	}
 
 	if (req->NameLength) {
+		if ((u64)le16_to_cpu(req->NameOffset) + le16_to_cpu(req->NameLength) >
+		    get_rfc1002_len(work->request_buf) + 4) {
+			rc = -EINVAL;
+			goto err_out2;
+		}
+
 		name = smb2_get_name((char *)req + le16_to_cpu(req->NameOffset),
 				     le16_to_cpu(req->NameLength),
 				     work->conn->local_nls);
@@ -3113,7 +3188,7 @@ int smb2_open(struct ksmbd_work *work)
 
 			rc = ksmbd_vfs_getattr(&fp->filp->f_path, &stat);
 			if (rc)
-				goto err_out2;
+				goto err_out1;
 
 			ksmbd_put_durable_fd(fp);
 			goto reconnected_fp;
@@ -3137,7 +3212,7 @@ int smb2_open(struct ksmbd_work *work)
 	} else {
 		if (req->CreateOptions & FILE_SEQUENTIAL_ONLY_LE &&
 		    req->CreateOptions & FILE_RANDOM_ACCESS_LE)
-			req->CreateOptions = ~(FILE_SEQUENTIAL_ONLY_LE);
+			req->CreateOptions &= ~(FILE_SEQUENTIAL_ONLY_LE);
 
 		if (req->CreateOptions &
 		    (FILE_OPEN_BY_FILE_ID_LE | CREATE_TREE_CONNECTION |
@@ -3151,7 +3226,7 @@ int smb2_open(struct ksmbd_work *work)
 				rc = -EINVAL;
 				goto err_out2;
 			} else if (req->CreateOptions & FILE_NO_COMPRESSION_LE) {
-				req->CreateOptions = ~(FILE_NO_COMPRESSION_LE);
+				req->CreateOptions &= ~(FILE_NO_COMPRESSION_LE);
 			}
 		}
 	}
@@ -3792,7 +3867,7 @@ continue_create: ;
 #endif /* CONFIG_KSMBD_FRUIT */
 	}
 
-	rc = ksmbd_vfs_getattr(&path, &stat);
+	rc = ksmbd_vfs_getattr(&fp->filp->f_path, &stat);
 	if (rc)
 		goto err_out1;
 
@@ -3887,7 +3962,7 @@ reconnected_fp:
 #else
 			ksmbd_vfs_query_maximal_access(user_ns,
 #endif
-						       path.dentry,
+						       fp->filp->f_path.dentry,
 						       &maximal_access);
 		mxac_ccontext = (struct create_context *)(rsp->Buffer +
 				le32_to_cpu(rsp->CreateContextsLength));
@@ -4254,18 +4329,22 @@ static int smb2_populate_readdir_entry(struct ksmbd_conn *conn, int info_level,
 			smb2_get_reparse_tag_special_file(ksmbd_kstat->kstat->mode);
 		if (dinfo->EaSize)
 			dinfo->ExtFileAttributes = ATTR_REPARSE_POINT_LE;
+#ifdef CONFIG_KSMBD_FRUIT
 		if (conn->is_fruit)
 			smb2_read_dir_attr_fill(conn,
 						ksmbd_kstat->kstat_dentry,
 						ksmbd_kstat->kstat,
 						NULL,
 						&dinfo->EaSize);
+#endif
 		dinfo->Reserved = 0;
+#ifdef CONFIG_KSMBD_FRUIT
 		if (conn->is_fruit &&
 		    (server_conf.flags & KSMBD_GLOBAL_FLAG_FRUIT_ZERO_FILEID) &&
 		    d_info->name[0] == '.')
 			dinfo->UniqueId = 0;
 		else
+#endif
 			dinfo->UniqueId = cpu_to_le64(ksmbd_kstat->kstat->ino);
 		if (d_info->hide_dot_file && d_info->name[0] == '.')
 			dinfo->ExtFileAttributes |= ATTR_HIDDEN_LE;
@@ -4283,6 +4362,7 @@ static int smb2_populate_readdir_entry(struct ksmbd_conn *conn, int info_level,
 			smb2_get_reparse_tag_special_file(ksmbd_kstat->kstat->mode);
 		if (fibdinfo->EaSize)
 			fibdinfo->ExtFileAttributes = ATTR_REPARSE_POINT_LE;
+#ifdef CONFIG_KSMBD_FRUIT
 		if (conn->is_fruit)
 			smb2_read_dir_attr_fill(conn,
 						ksmbd_kstat->kstat_dentry,
@@ -4294,6 +4374,7 @@ static int smb2_populate_readdir_entry(struct ksmbd_conn *conn, int info_level,
 		    d_info->name[0] == '.')
 			fibdinfo->UniqueId = 0;
 		else
+#endif
 			fibdinfo->UniqueId = cpu_to_le64(ksmbd_kstat->kstat->ino);
 		fibdinfo->ShortNameLength = 0;
 		fibdinfo->Reserved = 0;
@@ -4762,6 +4843,12 @@ int smb2_query_dir(struct ksmbd_work *work)
 	}
 
 	srch_flag = req->Flags;
+	if ((u64)le16_to_cpu(req->FileNameOffset) + le16_to_cpu(req->FileNameLength) >
+	    get_rfc1002_len(work->request_buf) + 4) {
+		rc = -EINVAL;
+		goto err_out2;
+	}
+
 	srch_ptr = smb_strndup_from_utf16((char *)req + le16_to_cpu(req->FileNameOffset),
 					  le16_to_cpu(req->FileNameLength), 1,
 					  conn->local_nls);
@@ -5042,6 +5129,11 @@ static int smb2_get_ea(struct ksmbd_work *work, struct ksmbd_file *fp,
 	if (req->InputBufferLength) {
 		if (le32_to_cpu(req->InputBufferLength) <=
 		    sizeof(struct smb2_ea_info_req))
+			return -EINVAL;
+
+		if ((u64)le16_to_cpu(req->InputBufferOffset) +
+		    le32_to_cpu(req->InputBufferLength) >
+		    get_rfc1002_len(work->request_buf) + 4)
 			return -EINVAL;
 
 		ea_req = (struct smb2_ea_info_req *)((char *)req +
@@ -5443,6 +5535,7 @@ static int get_file_stream_info(struct ksmbd_work *work,
 	}
 
 out:
+#ifdef CONFIG_KSMBD_FRUIT
 	/*
 	 * Time Machine: inject virtual streams on the share root
 	 * when FRUIT_TIME_MACHINE is configured. macOS checks for
@@ -5503,6 +5596,7 @@ out:
 			}
 		}
 	}
+#endif
 
 	if (!S_ISDIR(stat.mode) &&
 	    buf_free_len >= sizeof(struct smb2_file_stream_info) + 7 * 2) {
@@ -5890,7 +5984,6 @@ static int smb2_get_info_filesystem(struct ksmbd_work *work,
 				    struct smb2_query_info_req *req,
 				    struct smb2_query_info_rsp *rsp)
 {
-	struct ksmbd_session *sess = work->sess;
 	struct ksmbd_conn *conn = work->conn;
 	struct ksmbd_share_config *share = work->tcon->share_conf;
 	int fsinfoclass = 0;
@@ -6020,10 +6113,11 @@ static int smb2_get_info_filesystem(struct ksmbd_work *work,
 
 		info = (struct object_id_info *)(rsp->Buffer);
 
-		if (!user_guest(sess->user))
-			memcpy(info->objid, user_passkey(sess->user), 16);
-		else
-			memset(info->objid, 0, 16);
+		/*
+		 * Do not leak the user passkey as the object ID.
+		 * Use zeroed object ID for all users.
+		 */
+		memset(info->objid, 0, 16);
 
 		info->extended_info.magic = cpu_to_le32(EXTENDED_INFO_MAGIC);
 		info->extended_info.version = cpu_to_le32(1);
@@ -7847,7 +7941,6 @@ out:
  */
 int smb2_flush(struct ksmbd_work *work)
 {
-	struct ksmbd_conn *conn = work->conn;
 	struct smb2_flush_req *req;
 	struct smb2_flush_rsp *rsp;
 	bool fullsync = false;
@@ -7861,8 +7954,10 @@ int smb2_flush(struct ksmbd_work *work)
 	 * Apple F_FULLFSYNC: macOS Time Machine sends
 	 * Reserved1=0xFFFF to request a full device flush.
 	 */
-	if (conn->is_fruit && le16_to_cpu(req->Reserved1) == 0xFFFF)
+#ifdef CONFIG_KSMBD_FRUIT
+	if (work->conn->is_fruit && le16_to_cpu(req->Reserved1) == 0xFFFF)
 		fullsync = true;
+#endif
 
 	err = ksmbd_vfs_fsync(work, req->VolatileFileId,
 			      req->PersistentFileId, fullsync);
@@ -8597,6 +8692,7 @@ static int fsctl_copychunk(struct ksmbd_work *work,
 	ci_rsp->ChunkBytesWritten = cpu_to_le32(chunk_size_written);
 	ci_rsp->TotalBytesWritten = cpu_to_le32(total_size_written);
 
+#ifdef CONFIG_KSMBD_FRUIT
 	/*
 	 * Apple COPYFILE: after data copy succeeds, also copy
 	 * user.* xattrs (FinderInfo, resource forks, DosStream
@@ -8609,6 +8705,7 @@ static int fsctl_copychunk(struct ksmbd_work *work,
 			dst_fp->filp->f_path.dentry,
 			&dst_fp->filp->f_path);
 	}
+#endif
 
 out:
 	ksmbd_fd_put(work, src_fp);

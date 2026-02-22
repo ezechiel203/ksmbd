@@ -168,6 +168,16 @@ static struct ksmbd_share_config *share_config_request(struct ksmbd_work *work,
 		share->path = kstrndup(ksmbd_share_config_path(resp), path_len,
 				      KSMBD_DEFAULT_GFP);
 		if (share->path) {
+			/* Validate share path is absolute */
+			if (share->path[0] != '/' ||
+			    strstr(share->path, "/../") ||
+			    !strcmp(share->path, "/..")) {
+				pr_err("share path must be absolute without '..' components: %s\n",
+				       share->path);
+				kill_share(share);
+				share = NULL;
+				goto out;
+			}
 			share->path_sz = strlen(share->path);
 			while (share->path_sz > 1 &&
 			       share->path[share->path_sz - 1] == '/')

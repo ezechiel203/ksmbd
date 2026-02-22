@@ -442,8 +442,12 @@ static ssize_t stats_show(struct class *class, struct class_attribute *attr,
 		"reset",
 		"shutdown"
 	};
+	unsigned int cur_state = READ_ONCE(server_conf.state);
+
+	if (cur_state >= ARRAY_SIZE(state))
+		cur_state = SERVER_STATE_SHUTTING_DOWN;
 	return sysfs_emit(buf, "%d %s %d %lu\n", stats_version,
-			  state[server_conf.state], server_conf.tcp_port,
+			  state[cur_state], server_conf.tcp_port,
 			  server_conf.ipc_last_active / HZ);
 }
 

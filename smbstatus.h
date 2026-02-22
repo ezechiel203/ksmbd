@@ -25,9 +25,9 @@ struct ntstatus {
 	/* Facility is the high 12 bits of the following field */
 	__le32 Facility; /* low 2 bits Severity, next is Customer, then rsrvd */
 	__le32 Code;
-};
+} __packed;
 
-#define STATUS_SUCCESS 0x00000000
+#define STATUS_SUCCESS cpu_to_le32(0x00000000)
 #define STATUS_WAIT_0 cpu_to_le32(0x00000000)
 #define STATUS_WAIT_1 cpu_to_le32(0x00000001)
 #define STATUS_WAIT_2 cpu_to_le32(0x00000002)

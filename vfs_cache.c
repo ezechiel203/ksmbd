@@ -1033,7 +1033,7 @@ int ksmbd_file_table_flush(struct ksmbd_work *work)
 {
 	struct ksmbd_file	*fp = NULL;
 	unsigned int		id;
-	int			ret;
+	int			ret = 0;
 
 	read_lock(&work->sess->file_table.lock);
 	idr_for_each_entry(work->sess->file_table.idr, fp, id) {

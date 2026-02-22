@@ -270,6 +270,9 @@ static int smb_from_utf16(char *to, const __le16 *from, int tolen, int fromlen,
  * @len:	destination buffer size (in bytes)
  * @codepage:	codepage to which characters should be converted
  *
+ * NOTE: Callers must ensure @to is large enough to hold the converted
+ * output. The buffer should be at least (len * 2 + 2) bytes.
+ *
  * Return:	string length after conversion
  */
 int smb_strtoUTF16(__le16 *to, const char *from, int len,
@@ -378,6 +381,12 @@ char *smb_strndup_from_utf16(const char *src, const int maxlen,
  * page. Conversion may involve remapping up the six characters that are
  * only legal in POSIX-like OS (if they are present in the string). Path
  * names are little endian 16 bit Unicode on the wire
+ *
+ * NOTE: This function does not perform output bounds checking on @target.
+ * Callers MUST ensure that @target is allocated with at least
+ * (srclen * 2 + 2) bytes to accommodate the worst-case UTF-16 expansion
+ * plus a null terminator. Surrogate pairs and IVS sequences may produce
+ * up to 3 UTF-16 code units per input character.
  *
  * Return:	char length after conversion
  */

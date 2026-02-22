@@ -146,10 +146,10 @@ struct authenticate_message {
 struct ntlmv2_resp {
 	char ntlmv2_hash[CIFS_ENCPWD_SIZE];
 	__le32 blob_signature;
-	__u32  reserved;
+	__le32 reserved;
 	__le64  time;
-	__u64  client_chal; /* random */
-	__u32  reserved2;
+	__le64 client_chal; /* random */
+	__le32 reserved2;
 	/* array of name entries could follow ending in minimum 4 byte struct */
 } __packed;
 

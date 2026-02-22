@@ -1,5 +1,5 @@
-#ifndef COMPAT_H
-#define COMPAT_H
+#ifndef __KSMBD_COMPAT_H__
+#define __KSMBD_COMPAT_H__
 
 #include <linux/version.h>
 #include <linux/workqueue.h>

@@ -5,9 +5,9 @@
  */
 
 struct ndr {
-	char	*data;
-	int	offset;
-	int	length;
+	char		*data;
+	unsigned int	offset;
+	unsigned int	length;
 };
 
 #define NDR_NTSD_OFFSETOF	0xA0

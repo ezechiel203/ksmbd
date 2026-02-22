@@ -126,10 +126,9 @@ inline int ksmbd_max_protocol(void)
 int ksmbd_lookup_protocol_idx(char *str)
 {
 	int offt = ARRAY_SIZE(smb1_protos) - 1;
-	int len = strlen(str);
 
 	while (offt >= 0) {
-		if (!strncmp(str, smb1_protos[offt].prot, len)) {
+		if (!strcmp(str, smb1_protos[offt].prot)) {
 			ksmbd_debug(SMB, "selected %s dialect idx = %d\n",
 				    smb1_protos[offt].prot, offt);
 			return smb1_protos[offt].index;
@@ -139,7 +138,7 @@ int ksmbd_lookup_protocol_idx(char *str)
 
 	offt = ARRAY_SIZE(smb2_protos) - 1;
 	while (offt >= 0) {
-		if (!strncmp(str, smb2_protos[offt].prot, len)) {
+		if (!strcmp(str, smb2_protos[offt].prot)) {
 			ksmbd_debug(SMB, "selected %s dialect idx = %d\n",
 				    smb2_protos[offt].prot, offt);
 			return smb2_protos[offt].index;
@@ -210,14 +209,18 @@ bool ksmbd_smb_request(struct ksmbd_conn *conn)
 	    *proto != SMB2_TRANSFORM_PROTO_NUM)
 		return false;
 
+	if (*proto == SMB2_TRANSFORM_PROTO_NUM &&
+	    (!conn->ops || !conn->ops->is_transform_hdr))
+		return false;
+
 	return true;
 }
 
 static bool supported_protocol(int idx)
 {
 	if (idx == SMB2X_PROT &&
-	    (server_conf.min_protocol >= SMB21_PROT ||
-	     server_conf.max_protocol <= SMB311_PROT))
+	    server_conf.min_protocol >= SMB21_PROT &&
+	    server_conf.max_protocol <= SMB311_PROT)
 		return true;
 
 	return (server_conf.min_protocol <= idx &&
@@ -227,6 +230,9 @@ static bool supported_protocol(int idx)
 static char *next_dialect(char *dialect, int *next_off, int bcount)
 {
 	dialect = dialect + *next_off;
+	bcount -= *next_off;
+	if (bcount <= 0)
+		return NULL;
 	*next_off = strnlen(dialect, bcount);
 	if (dialect[*next_off] != '\0')
 		return NULL;
@@ -440,7 +446,11 @@ static struct smb_version_cmds smb1_server_cmds[1] = {
 
 static int init_smb1_server(struct ksmbd_conn *conn)
 {
-	conn->vals = &smb1_server_values;
+	conn->vals = kmemdup(&smb1_server_values,
+			     sizeof(smb1_server_values), GFP_KERNEL);
+	if (!conn->vals)
+		return -ENOMEM;
+
 	conn->ops = &smb1_server_ops;
 	conn->cmds = smb1_server_cmds;
 	conn->max_cmds = ARRAY_SIZE(smb1_server_cmds);
@@ -648,7 +658,9 @@ int ksmbd_smb_negotiate_common(struct ksmbd_work *work, unsigned int command)
 
 	if (command == SMB_COM_NEGOTIATE) {
 		if (__smb2_negotiate(conn)) {
-			init_smb3_11_server(conn);
+			ret = init_smb3_11_server(conn);
+			if (ret)
+				return ret;
 			init_smb2_neg_rsp(work);
 			ksmbd_debug(SMB, "Upgrade to SMB2 negotiation\n");
 			return 0;

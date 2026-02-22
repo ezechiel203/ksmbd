@@ -335,7 +335,7 @@ int ksmbd_auth_ntlm(struct ksmbd_session *sess, char *pw_buf, char *cryptkey)
 	rc = ksmbd_enc_p24(p21, cryptkey, key);
 	if (rc) {
 		pr_err("password processing failed\n");
-		return rc;
+		goto out;
 	}
 
 	ksmbd_enc_md4(sess->sess_key, user_passkey(sess->user),
@@ -346,11 +346,15 @@ int ksmbd_auth_ntlm(struct ksmbd_session *sess, char *pw_buf, char *cryptkey)
 
 	if (crypto_memneq(pw_buf, key, CIFS_AUTH_RESP_SIZE)) {
 		ksmbd_debug(AUTH, "ntlmv1 authentication failed\n");
-		return -EINVAL;
+		rc = -EINVAL;
+		goto out;
 	}
 
 	ksmbd_debug(AUTH, "ntlmv1 authentication pass\n");
-	return 0;
+out:
+	memzero_explicit(p21, sizeof(p21));
+	memzero_explicit(key, sizeof(key));
+	return rc;
 }
 #endif
 
@@ -437,6 +441,8 @@ out:
 	if (ctx)
 		ksmbd_release_crypto_ctx(ctx);
 	kfree(construct);
+	memzero_explicit(ntlmv2_hash, sizeof(ntlmv2_hash));
+	memzero_explicit(ntlmv2_rsp, sizeof(ntlmv2_rsp));
 	return rc;
 }
 
@@ -473,9 +479,12 @@ static int __ksmbd_auth_ntlmv2(struct ksmbd_session *sess,
 		goto out;
 	}
 
-	if (memcmp(ntlm_resp, key, CIFS_AUTH_RESP_SIZE) != 0)
+	if (crypto_memneq(ntlm_resp, key, CIFS_AUTH_RESP_SIZE))
 		rc = -EINVAL;
 out:
+	memzero_explicit(sess_key, sizeof(sess_key));
+	memzero_explicit(p21, sizeof(p21));
+	memzero_explicit(key, sizeof(key));
 	return rc;
 }
 #endif
@@ -1095,6 +1104,7 @@ static int generate_key(struct ksmbd_conn *conn, struct ksmbd_session *sess,
 
 smb3signkey_ret:
 	ksmbd_release_crypto_ctx(ctx);
+	memzero_explicit(prfhash, sizeof(prfhash));
 	return rc;
 }
 
@@ -1123,12 +1133,7 @@ static int generate_smb3signingkey(struct ksmbd_session *sess,
 	if (!(conn->dialect >= SMB30_PROT_ID && signing->binding))
 		memcpy(chann->smb3signingkey, key, SMB3_SIGN_KEY_SIZE);
 
-	ksmbd_debug(AUTH, "dumping generated AES signing keys\n");
-	ksmbd_debug(AUTH, "Session Id    %llu\n", sess->id);
-	ksmbd_debug(AUTH, "Session Key   %*ph\n",
-		    SMB2_NTLMV2_SESSKEY_SIZE, sess->sess_key);
-	ksmbd_debug(AUTH, "Signing Key   %*ph\n",
-		    SMB3_SIGN_KEY_SIZE, key);
+	ksmbd_debug(AUTH, "generated signing key for session %llu\n", sess->id);
 	return 0;
 }
 
@@ -1192,23 +1197,8 @@ static int generate_smb3encryptionkey(struct ksmbd_conn *conn,
 	if (rc)
 		return rc;
 
-	ksmbd_debug(AUTH, "dumping generated AES encryption keys\n");
-	ksmbd_debug(AUTH, "Cipher type   %d\n", conn->cipher_type);
-	ksmbd_debug(AUTH, "Session Id    %llu\n", sess->id);
-	ksmbd_debug(AUTH, "Session Key   %*ph\n",
-		    SMB2_NTLMV2_SESSKEY_SIZE, sess->sess_key);
-	if (conn->cipher_type == SMB2_ENCRYPTION_AES256_CCM ||
-	    conn->cipher_type == SMB2_ENCRYPTION_AES256_GCM) {
-		ksmbd_debug(AUTH, "ServerIn Key  %*ph\n",
-			    SMB3_GCM256_CRYPTKEY_SIZE, sess->smb3encryptionkey);
-		ksmbd_debug(AUTH, "ServerOut Key %*ph\n",
-			    SMB3_GCM256_CRYPTKEY_SIZE, sess->smb3decryptionkey);
-	} else {
-		ksmbd_debug(AUTH, "ServerIn Key  %*ph\n",
-			    SMB3_GCM128_CRYPTKEY_SIZE, sess->smb3encryptionkey);
-		ksmbd_debug(AUTH, "ServerOut Key %*ph\n",
-			    SMB3_GCM128_CRYPTKEY_SIZE, sess->smb3decryptionkey);
-	}
+	ksmbd_debug(AUTH, "generated encryption keys for session %llu, cipher type %d\n",
+		    sess->id, conn->cipher_type);
 	return 0;
 }
 
@@ -1555,5 +1545,6 @@ free_req:
 	aead_request_free(req);
 free_ctx:
 	ksmbd_release_crypto_ctx(ctx);
+	memzero_explicit(key, sizeof(key));
 	return rc;
 }

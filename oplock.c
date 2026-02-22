@@ -287,8 +287,12 @@ int opinfo_write_to_read(struct oplock_info *opinfo)
  */
 int opinfo_read_handle_to_read(struct oplock_info *opinfo)
 {
-	struct lease *lease = opinfo->o_lease;
+	struct lease *lease;
 
+	if (!opinfo->is_lease)
+		return -EINVAL;
+
+	lease = opinfo->o_lease;
 	lease->state = lease->new_state;
 	opinfo->level = SMB2_OPLOCK_LEVEL_II;
 	return 0;
@@ -464,8 +468,8 @@ void close_id_del_oplock(struct ksmbd_file *fp)
 	}
 
 	opinfo_count_dec(fp);
-	atomic_dec(&opinfo->refcount);
-	opinfo_put(opinfo);
+	opinfo_put(opinfo);  /* release the "created" reference */
+	opinfo_put(opinfo);  /* release the opinfo_get() reference */
 }
 
 /**
@@ -1342,16 +1346,22 @@ void smb_lazy_parent_lease_break_close(struct ksmbd_file *fp)
 	struct oplock_info *opinfo;
 	struct ksmbd_inode *p_ci = NULL;
 
-	rcu_read_lock();
-	opinfo = rcu_dereference(fp->f_opinfo);
-	rcu_read_unlock();
-
-	if (!opinfo || !opinfo->is_lease || opinfo->o_lease->version != 2)
+	opinfo = opinfo_get(fp);
+	if (!opinfo)
 		return;
+
+	if (!opinfo->is_lease || opinfo->o_lease->version != 2) {
+		opinfo_put(opinfo);
+		return;
+	}
 
 	p_ci = ksmbd_inode_lookup_lock(fp->filp->f_path.dentry->d_parent);
-	if (!p_ci)
+	if (!p_ci) {
+		opinfo_put(opinfo);
 		return;
+	}
+
+	opinfo_put(opinfo);
 
 	down_read(&p_ci->m_lock);
 	list_for_each_entry(opinfo, &p_ci->m_op_list, op_entry) {
@@ -1872,12 +1882,12 @@ void create_durable_v2_rsp_buf(char *cc, struct ksmbd_file *fp)
 	struct create_durable_v2_rsp *buf;
 
 	buf = (struct create_durable_v2_rsp *)cc;
-	memset(buf, 0, sizeof(struct create_durable_rsp));
+	memset(buf, 0, sizeof(struct create_durable_v2_rsp));
 	buf->ccontext.DataOffset = cpu_to_le16(offsetof
-			(struct create_durable_rsp, Data));
+			(struct create_durable_v2_rsp, Timeout));
 	buf->ccontext.DataLength = cpu_to_le32(8);
 	buf->ccontext.NameOffset = cpu_to_le16(offsetof
-			(struct create_durable_rsp, Name));
+			(struct create_durable_v2_rsp, Name));
 	buf->ccontext.NameLength = cpu_to_le16(4);
 	/* SMB2_CREATE_DURABLE_HANDLE_RESPONSE_V2 is "DH2Q" */
 	buf->Name[0] = 'D';

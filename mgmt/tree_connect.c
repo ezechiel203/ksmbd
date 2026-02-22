@@ -141,12 +141,19 @@ struct ksmbd_tree_connect *ksmbd_tree_conn_lookup(struct ksmbd_session *sess,
 int ksmbd_tree_conn_session_logoff(struct ksmbd_session *sess)
 {
 	int ret = 0;
-	struct ksmbd_tree_connect *tc;
+	struct ksmbd_tree_connect *tc, *tmp;
 	unsigned long id;
+	LIST_HEAD(free_list);
 
 	if (!sess)
 		return -EINVAL;
 
+	/*
+	 * Collect all tree connections under lock and erase them from
+	 * the xarray, then process disconnections after releasing the
+	 * lock. This avoids dropping/reacquiring the lock during
+	 * iteration which is racy.
+	 */
 	write_lock(&sess->tree_conns_lock);
 	xa_for_each(&sess->tree_conns, id, tc) {
 		if (tc->t_state == TREE_DISCONNECTED) {
@@ -154,11 +161,20 @@ int ksmbd_tree_conn_session_logoff(struct ksmbd_session *sess)
 			continue;
 		}
 		tc->t_state = TREE_DISCONNECTED;
-		write_unlock(&sess->tree_conns_lock);
-		ret |= ksmbd_tree_conn_disconnect(sess, tc);
-		write_lock(&sess->tree_conns_lock);
+		xa_erase(&sess->tree_conns, tc->id);
+		list_add(&tc->list, &free_list);
 	}
 	write_unlock(&sess->tree_conns_lock);
+
+	list_for_each_entry_safe(tc, tmp, &free_list, list) {
+		list_del(&tc->list);
+		ret |= ksmbd_ipc_tree_disconnect_request(sess->id, tc->id);
+		ksmbd_release_tree_conn_id(sess, tc->id);
+		ksmbd_share_config_put(tc->share_conf);
+		if (atomic_dec_and_test(&tc->refcount))
+			kfree(tc);
+	}
+
 	xa_destroy(&sess->tree_conns);
 	return ret;
 }

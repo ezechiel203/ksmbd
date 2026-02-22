@@ -17,8 +17,13 @@ static inline char *ndr_get_field(struct ndr *n)
 static int try_to_realloc_ndr_blob(struct ndr *n, size_t sz)
 {
 	char *data;
+	size_t new_sz;
 
-	data = krealloc(n->data, n->offset + sz + 1024, KSMBD_DEFAULT_GFP);
+	if (check_add_overflow((size_t)n->offset, sz, &new_sz) ||
+	    check_add_overflow(new_sz, (size_t)1024, &new_sz))
+		return -EOVERFLOW;
+
+	data = krealloc(n->data, new_sz, KSMBD_DEFAULT_GFP);
 	if (!data)
 		return -ENOMEM;
 
@@ -92,7 +97,7 @@ static int ndr_write_string(struct ndr *n, char *value)
 {
 	size_t sz;
 
-	sz = strlen(value) + 1;
+	sz = ALIGN(strlen(value) + 1, 2);
 	if (n->length <= n->offset + sz) {
 		int ret;
 
@@ -120,6 +125,8 @@ static int ndr_read_string(struct ndr *n, void *value, size_t sz)
 	len++;
 	n->offset += len;
 	n->offset = ALIGN(n->offset, 2);
+	if (n->offset > n->length)
+		return -EINVAL;
 	return 0;
 }
 
@@ -375,7 +382,7 @@ int ndr_encode_posix_acl(struct ndr *n,
 		ret = ndr_write_int32(n, 0);
 	}
 	if (ret)
-		return ret;
+		goto err_free;
 
 	if (def_acl) {
 		/* DEFAULT ACL ACCESS */
@@ -385,7 +392,7 @@ int ndr_encode_posix_acl(struct ndr *n,
 		ret = ndr_write_int32(n, 0);
 	}
 	if (ret)
-		return ret;
+		goto err_free;
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 12, 0)
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0)
@@ -399,7 +406,7 @@ int ndr_encode_posix_acl(struct ndr *n,
 	ret = ndr_write_int64(n, from_kuid(&init_user_ns, i_uid_into_mnt(user_ns, inode)));
 #endif
 	if (ret)
-		return ret;
+		goto err_free;
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0)
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
@@ -412,25 +419,33 @@ int ndr_encode_posix_acl(struct ndr *n,
 	ret = ndr_write_int64(n, from_kgid(&init_user_ns, i_gid_into_mnt(user_ns, inode)));
 #endif
 	if (ret)
-		return ret;
+		goto err_free;
 #else
 	ret = ndr_write_int64(n, from_kuid(&init_user_ns, inode->i_uid));
 	if (ret)
-		return ret;
+		goto err_free;
 
 	ret = ndr_write_int64(n, from_kgid(&init_user_ns, inode->i_gid));
 	if (ret)
-		return ret;
+		goto err_free;
 #endif
 	ret = ndr_write_int32(n, inode->i_mode);
 	if (ret)
-		return ret;
+		goto err_free;
 
 	if (acl) {
 		ret = ndr_encode_posix_acl_entry(n, acl);
 		if (def_acl && !ret)
 			ret = ndr_encode_posix_acl_entry(n, def_acl);
 	}
+	if (ret)
+		goto err_free;
+
+	return 0;
+
+err_free:
+	kfree(n->data);
+	n->data = NULL;
 	return ret;
 }
 
@@ -447,43 +462,51 @@ int ndr_encode_v4_ntacl(struct ndr *n, struct xattr_ntacl *acl)
 
 	ret = ndr_write_int16(n, acl->version);
 	if (ret)
-		return ret;
+		goto err_free;
 
 	ret = ndr_write_int32(n, acl->version);
 	if (ret)
-		return ret;
+		goto err_free;
 
 	ret = ndr_write_int16(n, 2);
 	if (ret)
-		return ret;
+		goto err_free;
 
 	ret = ndr_write_int32(n, ref_id);
 	if (ret)
-		return ret;
+		goto err_free;
 
 	/* push hash type and hash 64bytes */
 	ret = ndr_write_int16(n, acl->hash_type);
 	if (ret)
-		return ret;
+		goto err_free;
 
 	ret = ndr_write_bytes(n, acl->hash, XATTR_SD_HASH_SIZE);
 	if (ret)
-		return ret;
+		goto err_free;
 
 	ret = ndr_write_bytes(n, acl->desc, acl->desc_len);
 	if (ret)
-		return ret;
+		goto err_free;
 
 	ret = ndr_write_int64(n, acl->current_time);
 	if (ret)
-		return ret;
+		goto err_free;
 
 	ret = ndr_write_bytes(n, acl->posix_acl_hash, XATTR_SD_HASH_SIZE);
 	if (ret)
-		return ret;
+		goto err_free;
 
 	/* push ndr for security descriptor */
 	ret = ndr_write_bytes(n, acl->sd_buf, acl->sd_size);
+	if (ret)
+		goto err_free;
+
+	return 0;
+
+err_free:
+	kfree(n->data);
+	n->data = NULL;
 	return ret;
 }
 
@@ -532,7 +555,7 @@ int ndr_decode_v4_ntacl(struct ndr *n, struct xattr_ntacl *acl)
 	if (ret)
 		return ret;
 	if (strncmp(acl->desc, "posix_acl", 9)) {
-		pr_err("Invalid acl description : %s\n", acl->desc);
+		pr_err("Invalid acl description : %.10s\n", acl->desc);
 		return -EINVAL;
 	}
 

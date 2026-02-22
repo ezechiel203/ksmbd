@@ -7,6 +7,7 @@
 #include <linux/mutex.h>
 #include <linux/freezer.h>
 #include <linux/module.h>
+#include <linux/overflow.h>
 
 #include "server.h"
 #include "smb_common.h"
@@ -34,29 +35,36 @@ DECLARE_RWSEM(conn_list_lock);
  * During the thread termination, the corresponding conn instance
  * resources(sock/memory) are released and finally the conn object is freed.
  */
-void ksmbd_conn_free(struct ksmbd_conn *conn)
+static void ksmbd_conn_cleanup(struct ksmbd_conn *conn)
 {
 	down_write(&conn_list_lock);
 	hash_del(&conn->hlist);
 	up_write(&conn_list_lock);
 
-	if (atomic_dec_and_test(&conn->refcnt)) {
-		xa_destroy(&conn->sessions);
-		kvfree(conn->request_buf);
-		kfree(conn->preauth_info);
+	xa_destroy(&conn->sessions);
+	kvfree(conn->request_buf);
+	kfree(conn->preauth_info);
+	kfree(conn->vals);
 
 #ifdef CONFIG_KSMBD_FRUIT
-		/* Clean up Fruit SMB extension resources */
-		if (conn->fruit_state) {
-			fruit_cleanup_connection_state(conn->fruit_state);
-			kfree(conn->fruit_state);
-			conn->fruit_state = NULL;
-		}
+	/* Clean up Fruit SMB extension resources */
+	if (conn->fruit_state) {
+		fruit_cleanup_connection_state(conn->fruit_state);
+		kfree(conn->fruit_state);
+		conn->fruit_state = NULL;
+	}
 #endif
 
-		conn->transport->ops->free_transport(conn->transport);
-		kfree(conn);
-	}
+	conn->transport->ops->free_transport(conn->transport);
+	kfree(conn);
+}
+
+void ksmbd_conn_free(struct ksmbd_conn *conn)
+{
+	if (!atomic_dec_and_test(&conn->refcnt))
+		return;
+
+	ksmbd_conn_cleanup(conn);
 }
 
 /**
@@ -431,7 +439,8 @@ recheck:
 
 		/* 4 for rfc1002 length field */
 		/* 1 for implied bcc[0] */
-		size = pdu_size + 4 + 1;
+		if (check_add_overflow(pdu_size, 5u, (unsigned int *)&size))
+			break;
 		conn->request_buf = kvmalloc(size, KSMBD_DEFAULT_GFP);
 		if (!conn->request_buf)
 			break;
@@ -513,7 +522,7 @@ void ksmbd_conn_r_count_dec(struct ksmbd_conn *conn)
 		wake_up(&conn->r_count_q);
 
 	if (atomic_dec_and_test(&conn->refcnt))
-		kfree(conn);
+		ksmbd_conn_cleanup(conn);
 }
 
 int ksmbd_conn_transport_init(void)
@@ -553,7 +562,7 @@ again:
 			up_read(&conn_list_lock);
 			t->ops->shutdown(t);
 			atomic_dec(&conn->refcnt);
-			down_read(&conn_list_lock);
+			goto again;
 		}
 	}
 	up_read(&conn_list_lock);

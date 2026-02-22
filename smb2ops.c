@@ -227,7 +227,11 @@ static struct smb_version_cmds smb2_0_server_cmds[NUMBER_OF_SMB2_COMMANDS] = {
  */
 int init_smb2_0_server(struct ksmbd_conn *conn)
 {
-	conn->vals = &smb20_server_values;
+	conn->vals = kmemdup(&smb20_server_values,
+			     sizeof(smb20_server_values), GFP_KERNEL);
+	if (!conn->vals)
+		return -ENOMEM;
+
 	conn->ops = &smb2_0_server_ops;
 	conn->cmds = smb2_0_server_cmds;
 	conn->max_cmds = ARRAY_SIZE(smb2_0_server_cmds);
@@ -246,9 +250,13 @@ int init_smb2_0_server(struct ksmbd_conn *conn)
  *			command dispatcher
  * @conn:	connection instance
  */
-void init_smb2_1_server(struct ksmbd_conn *conn)
+int init_smb2_1_server(struct ksmbd_conn *conn)
 {
-	conn->vals = &smb21_server_values;
+	conn->vals = kmemdup(&smb21_server_values,
+			     sizeof(smb21_server_values), GFP_KERNEL);
+	if (!conn->vals)
+		return -ENOMEM;
+
 	conn->ops = &smb2_0_server_ops;
 	conn->cmds = smb2_0_server_cmds;
 	conn->max_cmds = ARRAY_SIZE(smb2_0_server_cmds);
@@ -256,6 +264,8 @@ void init_smb2_1_server(struct ksmbd_conn *conn)
 
 	if (server_conf.flags & KSMBD_GLOBAL_FLAG_SMB2_LEASES)
 		conn->vals->capabilities |= SMB2_GLOBAL_CAP_LEASING;
+
+	return 0;
 }
 
 /**
@@ -263,9 +273,13 @@ void init_smb2_1_server(struct ksmbd_conn *conn)
  *			command dispatcher
  * @conn:	connection instance
  */
-void init_smb3_0_server(struct ksmbd_conn *conn)
+int init_smb3_0_server(struct ksmbd_conn *conn)
 {
-	conn->vals = &smb30_server_values;
+	conn->vals = kmemdup(&smb30_server_values,
+			     sizeof(smb30_server_values), GFP_KERNEL);
+	if (!conn->vals)
+		return -ENOMEM;
+
 	conn->ops = &smb3_0_server_ops;
 	conn->cmds = smb2_0_server_cmds;
 	conn->max_cmds = ARRAY_SIZE(smb2_0_server_cmds);
@@ -282,6 +296,8 @@ void init_smb3_0_server(struct ksmbd_conn *conn)
 
 	if (server_conf.flags & KSMBD_GLOBAL_FLAG_SMB3_MULTICHANNEL)
 		conn->vals->capabilities |= SMB2_GLOBAL_CAP_MULTI_CHANNEL;
+
+	return 0;
 }
 
 /**
@@ -289,9 +305,13 @@ void init_smb3_0_server(struct ksmbd_conn *conn)
  *			command dispatcher
  * @conn:	connection instance
  */
-void init_smb3_02_server(struct ksmbd_conn *conn)
+int init_smb3_02_server(struct ksmbd_conn *conn)
 {
-	conn->vals = &smb302_server_values;
+	conn->vals = kmemdup(&smb302_server_values,
+			     sizeof(smb302_server_values), GFP_KERNEL);
+	if (!conn->vals)
+		return -ENOMEM;
+
 	conn->ops = &smb3_0_server_ops;
 	conn->cmds = smb2_0_server_cmds;
 	conn->max_cmds = ARRAY_SIZE(smb2_0_server_cmds);
@@ -311,6 +331,8 @@ void init_smb3_02_server(struct ksmbd_conn *conn)
 
 	if (server_conf.flags & KSMBD_GLOBAL_FLAG_DURABLE_HANDLE)
 		conn->vals->capabilities |= SMB2_GLOBAL_CAP_PERSISTENT_HANDLES;
+
+	return 0;
 }
 
 /**
@@ -320,7 +342,11 @@ void init_smb3_02_server(struct ksmbd_conn *conn)
  */
 int init_smb3_11_server(struct ksmbd_conn *conn)
 {
-	conn->vals = &smb311_server_values;
+	conn->vals = kmemdup(&smb311_server_values,
+			     sizeof(smb311_server_values), GFP_KERNEL);
+	if (!conn->vals)
+		return -ENOMEM;
+
 	conn->ops = &smb3_11_server_ops;
 	conn->cmds = smb2_0_server_cmds;
 	conn->max_cmds = ARRAY_SIZE(smb2_0_server_cmds);

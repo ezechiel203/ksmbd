@@ -64,7 +64,7 @@ int match_pattern(const char *str, size_t len, const char *pattern)
 		}
 	}
 
-	if (*p == '*')
+	while (*p == '*')
 		++p;
 	return !*p;
 }
@@ -125,6 +125,10 @@ int parse_stream_name(char *filename, char **stream_name, int *s_type)
 
 	s_name = filename;
 	filename = strsep(&s_name, ":");
+	if (!s_name) {
+		*stream_name = NULL;
+		return -ENOENT;
+	}
 	ksmbd_debug(SMB, "filename : %s, streams : %s\n", filename, s_name);
 	if (strchr(s_name, ':')) {
 		stream_type = s_name;
@@ -432,7 +436,7 @@ char *ksmbd_convert_dir_info_name(struct ksmbd_dir_info *d_info,
 	if (!sz)
 		return NULL;
 
-	conv = kmalloc(sz, KSMBD_DEFAULT_GFP);
+	conv = kmalloc(sz + 2, KSMBD_DEFAULT_GFP);
 	if (!conv)
 		return NULL;
 

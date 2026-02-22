@@ -166,7 +166,7 @@ struct smb2_transform_hdr {
 	__u8   Signature[16];
 	__u8   Nonce[16];
 	__le32 OriginalMessageSize;
-	__u16  Reserved1;
+	__le16 Reserved1;
 	__le16 Flags; /* EncryptionAlgorithm */
 	__le64  SessionId;
 } __packed;
@@ -224,7 +224,7 @@ struct smb2_negotiate_req {
 /* Capabilities flags */
 #define SMB2_GLOBAL_CAP_DFS		0x00000001
 #define SMB2_GLOBAL_CAP_LEASING		0x00000002 /* Resp only New to SMB2.1 */
-#define SMB2_GLOBAL_CAP_LARGE_MTU	0X00000004 /* Resp only New to SMB2.1 */
+#define SMB2_GLOBAL_CAP_LARGE_MTU	0x00000004 /* Resp only New to SMB2.1 */
 #define SMB2_GLOBAL_CAP_MULTI_CHANNEL	0x00000008 /* New to SMB3 */
 #define SMB2_GLOBAL_CAP_PERSISTENT_HANDLES 0x00000010 /* New to SMB3 */
 #define SMB2_GLOBAL_CAP_DIRECTORY_LEASING  0x00000020 /* New to SMB3 */
@@ -310,7 +310,7 @@ struct smb2_compression_ctx {
 	__le16  DataLength;
 	__le32	Reserved;
 	__le16	CompressionAlgorithmCount;
-	__u16	Padding;
+	__le16	Padding;
 	__le32	Reserved1;
 	__le16	CompressionAlgorithms[];
 } __packed;
@@ -371,10 +371,6 @@ struct smb2_negotiate_rsp {
 #define SMB2_SESSION_VALID		BIT(1)
 
 #define SMB2_SESSION_TIMEOUT		(10 * HZ)
-
-/* Flags */
-#define SMB2_SESSION_REQ_FLAG_BINDING		0x01
-#define SMB2_SESSION_REQ_FLAG_ENCRYPT_DATA	0x04
 
 struct smb2_sess_setup_req {
 	struct smb2_hdr hdr;
@@ -603,7 +599,7 @@ struct smb2_create_req {
 	__le16 NameLength;
 	__le32 CreateContextsOffset;
 	__le32 CreateContextsLength;
-	__u8   Buffer[0];
+	__u8   Buffer[];
 } __packed;
 
 struct smb2_create_rsp {
@@ -634,7 +630,7 @@ struct create_context {
 	__le16 Reserved;
 	__le16 DataOffset;
 	__le32 DataLength;
-	__u8 Buffer[0];
+	__u8 Buffer[];
 } __packed;
 
 struct create_durable_req_v2 {
@@ -703,7 +699,7 @@ struct create_posix {
 	struct create_context ccontext;
 	__u8    Name[16];
 	__le32  Mode;
-	__u32   Reserved;
+	__le32  Reserved;
 } __packed;
 
 struct create_durable_rsp {
@@ -763,7 +759,7 @@ struct create_fruit_server_query_rsp {
 	struct create_context ccontext;
 	__u8   Name[16];
 	__le32 response_size;
-	__u8   response_data[0];
+	__u8   response_data[];
 } __packed;
 
 struct create_fruit_volume_caps_req {
@@ -935,7 +931,7 @@ struct smb2_read_rsp {
 	__u8   Reserved;
 	__le32 DataLength;
 	__le32 DataRemaining;
-	__u32  Reserved2;
+	__le32 Reserved2;
 	__u8   Buffer[1];
 } __packed;
 
@@ -965,7 +961,7 @@ struct smb2_write_rsp {
 	__u8   Reserved;
 	__le32 DataLength;
 	__le32 DataRemaining;
-	__u32  Reserved2;
+	__le32 Reserved2;
 	__u8   Buffer[1];
 } __packed;
 
@@ -1143,8 +1139,8 @@ struct smb2_notify_req {
 	__le32 OutputBufferLength;
 	__u64 PersistentFileId;
 	__u64 VolatileFileId;
-	__u32 CompletionFileter;
-	__u32 Reserved;
+	__le32 CompletionFilter;
+	__le32 Reserved;
 } __packed;
 
 struct smb2_notify_rsp {
@@ -1199,13 +1195,13 @@ struct smb2_lock_rsp {
 struct smb2_echo_req {
 	struct smb2_hdr hdr;
 	__le16 StructureSize;	/* Must be 4 */
-	__u16  Reserved;
+	__le16 Reserved;
 } __packed;
 
 struct smb2_echo_rsp {
 	struct smb2_hdr hdr;
 	__le16 StructureSize;	/* Must be 4 */
-	__u16  Reserved;
+	__le16 Reserved;
 } __packed;
 
 /* search (query_directory) Flags field */
@@ -1534,13 +1530,13 @@ struct smb2_file_all_info { /* data block encoding of response to level 18 */
 	__le64 LastWriteTime;
 	__le64 ChangeTime;
 	__le32 Attributes;
-	__u32  Pad1;		/* End of FILE_BASIC_INFO_INFO equivalent */
+	__le32 Pad1;		/* End of FILE_BASIC_INFO_INFO equivalent */
 	__le64 AllocationSize;	/* Beginning of FILE_STANDARD_INFO equivalent */
 	__le64 EndOfFile;	/* size ie offset to first free byte in file */
 	__le32 NumberOfLinks;	/* hard links */
 	__u8   DeletePending;
 	__u8   Directory;
-	__u16  Pad2;		/* End of FILE_STANDARD_INFO equivalent */
+	__le16 Pad2;		/* End of FILE_STANDARD_INFO equivalent */
 	__le64 IndexNumber;
 	__le32 EASize;
 	__le32 AccessFlags;
@@ -1726,9 +1722,9 @@ struct smb2_posix_info {
 
 /* functions */
 int init_smb2_0_server(struct ksmbd_conn *conn);
-void init_smb2_1_server(struct ksmbd_conn *conn);
-void init_smb3_0_server(struct ksmbd_conn *conn);
-void init_smb3_02_server(struct ksmbd_conn *conn);
+int init_smb2_1_server(struct ksmbd_conn *conn);
+int init_smb3_0_server(struct ksmbd_conn *conn);
+int init_smb3_02_server(struct ksmbd_conn *conn);
 int init_smb3_11_server(struct ksmbd_conn *conn);
 
 void init_smb2_max_read_size(unsigned int sz);

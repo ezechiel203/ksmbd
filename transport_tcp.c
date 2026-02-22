@@ -212,9 +212,6 @@ static int ksmbd_tcp_new_connection(struct socket *client_sk)
 		free_transport(t);
 	}
 	return rc;
-
-	free_transport(t);
-	return rc;
 }
 
 /**
@@ -300,7 +297,10 @@ skip_max_ip_conns_limit:
 		client_sk->sk->sk_rcvtimeo = KSMBD_TCP_RECV_TIMEOUT;
 		client_sk->sk->sk_sndtimeo = KSMBD_TCP_SEND_TIMEOUT;
 
-		ksmbd_tcp_new_connection(client_sk);
+		if (ksmbd_tcp_new_connection(client_sk)) {
+			if (server_conf.max_connections)
+				atomic_dec(&active_num_conn);
+		}
 	}
 
 	ksmbd_debug(CONN, "releasing socket\n");

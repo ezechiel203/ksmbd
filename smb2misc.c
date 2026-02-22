@@ -98,7 +98,9 @@ static int smb2_get_data_area_len(unsigned int *off, unsigned int *len,
 	 */
 	switch (hdr->Command) {
 	case SMB2_SESSION_SETUP:
-		*off = le16_to_cpu(((struct smb2_sess_setup_req *)hdr)->SecurityBufferOffset);
+		*off = max_t(unsigned short int,
+			     le16_to_cpu(((struct smb2_sess_setup_req *)hdr)->SecurityBufferOffset),
+			     offsetof(struct smb2_sess_setup_req, Buffer));
 		*len = le16_to_cpu(((struct smb2_sess_setup_req *)hdr)->SecurityBufferLength);
 		break;
 	case SMB2_TREE_CONNECT:
@@ -145,7 +147,9 @@ static int smb2_get_data_area_len(unsigned int *off, unsigned int *len,
 		*len = le32_to_cpu(((struct smb2_set_info_req *)hdr)->BufferLength);
 		break;
 	case SMB2_READ:
-		*off = le16_to_cpu(((struct smb2_read_req *)hdr)->ReadChannelInfoOffset);
+		*off = max_t(unsigned short int,
+			     le16_to_cpu(((struct smb2_read_req *)hdr)->ReadChannelInfoOffset),
+			     offsetof(struct smb2_read_req, Buffer));
 		*len = le16_to_cpu(((struct smb2_read_req *)hdr)->ReadChannelInfoLength);
 		break;
 	case SMB2_WRITE:
@@ -266,48 +270,49 @@ calc_size_exit:
 	return 0;
 }
 
-static inline int smb2_query_info_req_len(struct smb2_query_info_req *h)
+static inline u64 smb2_query_info_req_len(struct smb2_query_info_req *h)
 {
-	return le32_to_cpu(h->InputBufferLength) +
+	return (u64)le32_to_cpu(h->InputBufferLength) +
 		le32_to_cpu(h->OutputBufferLength);
 }
 
-static inline int smb2_set_info_req_len(struct smb2_set_info_req *h)
+static inline u64 smb2_set_info_req_len(struct smb2_set_info_req *h)
 {
 	return le32_to_cpu(h->BufferLength);
 }
 
-static inline int smb2_read_req_len(struct smb2_read_req *h)
+static inline u64 smb2_read_req_len(struct smb2_read_req *h)
 {
 	return le32_to_cpu(h->Length);
 }
 
-static inline int smb2_write_req_len(struct smb2_write_req *h)
+static inline u64 smb2_write_req_len(struct smb2_write_req *h)
 {
 	return le32_to_cpu(h->Length);
 }
 
-static inline int smb2_query_dir_req_len(struct smb2_query_directory_req *h)
+static inline u64 smb2_query_dir_req_len(struct smb2_query_directory_req *h)
 {
 	return le32_to_cpu(h->OutputBufferLength);
 }
 
-static inline int smb2_ioctl_req_len(struct smb2_ioctl_req *h)
+static inline u64 smb2_ioctl_req_len(struct smb2_ioctl_req *h)
 {
-	return le32_to_cpu(h->InputCount) +
+	return (u64)le32_to_cpu(h->InputCount) +
 		le32_to_cpu(h->OutputCount);
 }
 
-static inline int smb2_ioctl_resp_len(struct smb2_ioctl_req *h)
+static inline u64 smb2_ioctl_resp_len(struct smb2_ioctl_req *h)
 {
-	return le32_to_cpu(h->MaxInputResponse) +
+	return (u64)le32_to_cpu(h->MaxInputResponse) +
 		le32_to_cpu(h->MaxOutputResponse);
 }
 
 static int smb2_validate_credit_charge(struct ksmbd_conn *conn,
 				       struct smb2_hdr *hdr)
 {
-	unsigned int req_len = 0, expect_resp_len = 0, calc_credit_num, max_len;
+	u64 req_len = 0, expect_resp_len = 0, max_len;
+	unsigned int calc_credit_num;
 	unsigned short credit_charge = le16_to_cpu(hdr->CreditCharge);
 	void *__hdr = hdr;
 	int ret = 0;
@@ -340,7 +345,7 @@ static int smb2_validate_credit_charge(struct ksmbd_conn *conn,
 	}
 
 	credit_charge = max_t(unsigned short, credit_charge, 1);
-	max_len = max_t(unsigned int, req_len, expect_resp_len);
+	max_len = max_t(u64, req_len, expect_resp_len);
 	calc_credit_num = DIV_ROUND_UP(max_len, SMB2_MAX_BUFFER_SIZE);
 
 	if (credit_charge < calc_credit_num) {
@@ -357,15 +362,13 @@ static int smb2_validate_credit_charge(struct ksmbd_conn *conn,
 		ksmbd_debug(SMB, "Insufficient credits granted, given: %u, granted: %u\n",
 			    credit_charge, conn->total_credits);
 		ret = 1;
-	}
-
-	if ((u64)conn->outstanding_credits + credit_charge > conn->total_credits) {
+	} else if ((u64)conn->outstanding_credits + credit_charge > conn->total_credits) {
 		ksmbd_debug(SMB, "Limits exceeding the maximum allowable outstanding requests, given : %u, pending : %u\n",
 			    credit_charge, conn->outstanding_credits);
 		ret = 1;
-	} else
+	} else {
 		conn->outstanding_credits += credit_charge;
-
+	}
 	spin_unlock(&conn->credits_lock);
 
 	return ret;
@@ -391,9 +394,13 @@ int ksmbd_smb2_check_message(struct ksmbd_work *work)
 		return 1;
 	}
 
-	if (next_cmd > 0)
+	if (next_cmd > 0) {
 		len = next_cmd;
-	else if (work->next_smb2_rcv_hdr_off)
+		if (len < sizeof(struct smb2_hdr) + 2) {
+			pr_err("compound sub-PDU too small: %u\n", len);
+			return 1;
+		}
+	} else if (work->next_smb2_rcv_hdr_off)
 		len -= work->next_smb2_rcv_hdr_off;
 
 	if (check_smb2_hdr(hdr))

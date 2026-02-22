@@ -132,74 +132,92 @@ static struct genl_ops ksmbd_genl_ops[] = {
 	{
 		.cmd	= KSMBD_EVENT_UNSPEC,
 		.doit	= handle_unsupported_event,
+		.flags	= GENL_ADMIN_PERM,
 	},
 	{
 		.cmd	= KSMBD_EVENT_HEARTBEAT_REQUEST,
 		.doit	= handle_unsupported_event,
+		.flags	= GENL_ADMIN_PERM,
 	},
 	{
 		.cmd	= KSMBD_EVENT_STARTING_UP,
 		.doit	= handle_startup_event,
+		.flags	= GENL_ADMIN_PERM,
 	},
 	{
 		.cmd	= KSMBD_EVENT_SHUTTING_DOWN,
 		.doit	= handle_unsupported_event,
+		.flags	= GENL_ADMIN_PERM,
 	},
 	{
 		.cmd	= KSMBD_EVENT_LOGIN_REQUEST,
 		.doit	= handle_unsupported_event,
+		.flags	= GENL_ADMIN_PERM,
 	},
 	{
 		.cmd	= KSMBD_EVENT_LOGIN_RESPONSE,
 		.doit	= handle_generic_event,
+		.flags	= GENL_ADMIN_PERM,
 	},
 	{
 		.cmd	= KSMBD_EVENT_SHARE_CONFIG_REQUEST,
 		.doit	= handle_unsupported_event,
+		.flags	= GENL_ADMIN_PERM,
 	},
 	{
 		.cmd	= KSMBD_EVENT_SHARE_CONFIG_RESPONSE,
 		.doit	= handle_generic_event,
+		.flags	= GENL_ADMIN_PERM,
 	},
 	{
 		.cmd	= KSMBD_EVENT_TREE_CONNECT_REQUEST,
 		.doit	= handle_unsupported_event,
+		.flags	= GENL_ADMIN_PERM,
 	},
 	{
 		.cmd	= KSMBD_EVENT_TREE_CONNECT_RESPONSE,
 		.doit	= handle_generic_event,
+		.flags	= GENL_ADMIN_PERM,
 	},
 	{
 		.cmd	= KSMBD_EVENT_TREE_DISCONNECT_REQUEST,
 		.doit	= handle_unsupported_event,
+		.flags	= GENL_ADMIN_PERM,
 	},
 	{
 		.cmd	= KSMBD_EVENT_LOGOUT_REQUEST,
 		.doit	= handle_unsupported_event,
+		.flags	= GENL_ADMIN_PERM,
 	},
 	{
 		.cmd	= KSMBD_EVENT_RPC_REQUEST,
 		.doit	= handle_unsupported_event,
+		.flags	= GENL_ADMIN_PERM,
 	},
 	{
 		.cmd	= KSMBD_EVENT_RPC_RESPONSE,
 		.doit	= handle_generic_event,
+		.flags	= GENL_ADMIN_PERM,
 	},
 	{
 		.cmd	= KSMBD_EVENT_SPNEGO_AUTHEN_REQUEST,
 		.doit	= handle_unsupported_event,
+		.flags	= GENL_ADMIN_PERM,
 	},
 	{
 		.cmd	= KSMBD_EVENT_SPNEGO_AUTHEN_RESPONSE,
 		.doit	= handle_generic_event,
+		.flags	= GENL_ADMIN_PERM,
 	},
 	{
 		.cmd	= KSMBD_EVENT_LOGIN_REQUEST_EXT,
 		.doit	= handle_unsupported_event,
+		.flags	= GENL_ADMIN_PERM,
 	},
 	{
 		.cmd	= KSMBD_EVENT_LOGIN_RESPONSE_EXT,
 		.doit	= handle_generic_event,
+		.flags	= GENL_ADMIN_PERM,
 	},
 };
 
@@ -496,20 +514,30 @@ static int ipc_validate_msg(struct ipc_msg_table_entry *entry)
 {
 	unsigned int msg_sz = entry->msg_sz;
 
+	if (entry->msg_sz > KSMBD_IPC_MAX_PAYLOAD)
+		return -EINVAL;
+
 	switch (entry->type) {
 	case KSMBD_EVENT_RPC_REQUEST:
 	{
 		struct ksmbd_rpc_command *resp = entry->response;
 
-		msg_sz = sizeof(struct ksmbd_rpc_command) + resp->payload_sz;
+		if (check_add_overflow(sizeof(struct ksmbd_rpc_command),
+				       resp->payload_sz, &msg_sz))
+			return -EINVAL;
 		break;
 	}
 	case KSMBD_EVENT_SPNEGO_AUTHEN_REQUEST:
 	{
 		struct ksmbd_spnego_authen_response *resp = entry->response;
+		unsigned int payload_sz;
 
-		msg_sz = sizeof(struct ksmbd_spnego_authen_response) +
-				resp->session_key_len + resp->spnego_blob_len;
+		if (check_add_overflow(resp->session_key_len,
+				       resp->spnego_blob_len, &payload_sz))
+			return -EINVAL;
+		if (check_add_overflow(sizeof(struct ksmbd_spnego_authen_response),
+				       payload_sz, &msg_sz))
+			return -EINVAL;
 		break;
 	}
 	case KSMBD_EVENT_SHARE_CONFIG_REQUEST:
@@ -520,8 +548,9 @@ static int ipc_validate_msg(struct ipc_msg_table_entry *entry)
 			if (resp->payload_sz < resp->veto_list_sz)
 				return -EINVAL;
 
-			msg_sz = sizeof(struct ksmbd_share_config_response) +
-					resp->payload_sz;
+			if (check_add_overflow(sizeof(struct ksmbd_share_config_response),
+					       resp->payload_sz, &msg_sz))
+				return -EINVAL;
 		}
 		break;
 	}
@@ -530,9 +559,17 @@ static int ipc_validate_msg(struct ipc_msg_table_entry *entry)
 		struct ksmbd_login_response_ext *resp = entry->response;
 
 		if (resp->ngroups) {
-			msg_sz = sizeof(struct ksmbd_login_response_ext) +
-					resp->ngroups * sizeof(gid_t);
+			unsigned int groups_sz;
+
+			if (check_mul_overflow(resp->ngroups,
+					       (unsigned int)sizeof(gid_t),
+					       &groups_sz))
+				return -EINVAL;
+			if (check_add_overflow(sizeof(struct ksmbd_login_response_ext),
+					       groups_sz, &msg_sz))
+				return -EINVAL;
 		}
+		break;
 	}
 	}
 

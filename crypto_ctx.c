@@ -31,8 +31,12 @@ static inline void free_aead(struct crypto_aead *aead)
 static void free_shash(struct shash_desc *shash)
 {
 	if (shash) {
-		crypto_free_shash(shash->tfm);
+		struct crypto_shash *tfm = shash->tfm;
+		size_t shash_size = sizeof(*shash) + crypto_shash_descsize(tfm);
+
+		memzero_explicit(shash, shash_size);
 		kfree(shash);
+		crypto_free_shash(tfm);
 	}
 }
 

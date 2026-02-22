@@ -116,9 +116,9 @@ struct ksmbd_conn {
 	__le16				signing_algorithm;
 	bool				binding;
 	atomic_t			refcnt;
-	bool				is_fruit;
 
 #ifdef CONFIG_KSMBD_FRUIT
+	bool				is_fruit;
 	/* Fruit SMB Extension Support */
 	struct fruit_conn_state	*fruit_state;
 #endif

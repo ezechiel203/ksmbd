@@ -25,7 +25,7 @@ ksmbd-y :=	unicode.o auth.o vfs.o vfs_cache.o connection.o crypto_ctx.o \
 
 # Apple Fruit SMB extensions (macOS compatibility).
 # Set CONFIG_KSMBD_FRUIT=y to enable, =n or unset to disable.
-CONFIG_KSMBD_FRUIT ?= y
+CONFIG_KSMBD_FRUIT ?= n
 
 ksmbd-y +=	smb2pdu.o smb2ops.o smb2misc.o ksmbd_spnego_negtokeninit.asn1.o \
 		ksmbd_spnego_negtokentarg.asn1.o asn1.o compat.o
@@ -47,7 +47,6 @@ else
 EXTRA_FLAGS += -I$(PWD)
 KDIR	?= /lib/modules/$(shell uname -r)/build
 MDIR	?= /lib/modules/$(shell uname -r)
-PWD	:= $(shell pwd)
 PWD	:= $(shell pwd)
 
 export CONFIG_SMB_SERVER := m

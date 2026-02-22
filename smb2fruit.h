@@ -101,7 +101,7 @@ struct fruit_server_query {
 	__le32			flags;
 	__le32			max_response_size;
 	__le32			reserved;
-	__u8			query_data[0];
+	__u8			query_data[];
 } __packed;
 
 struct fruit_volume_capabilities {

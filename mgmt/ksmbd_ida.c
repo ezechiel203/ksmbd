@@ -31,8 +31,11 @@ int ksmbd_acquire_smb2_uid(struct ida *ida)
 	int id;
 
 	id = ida_alloc_min(ida, 1, KSMBD_DEFAULT_GFP);
-	if (id == 0xFFFE)
-		id = ida_alloc_min(ida, 1, KSMBD_DEFAULT_GFP);
+	if (id == 0xFFFE) {
+		/* 0xFFFE is reserved; free it and allocate the next one */
+		ida_free(ida, id);
+		id = ida_alloc_min(ida, 0xFFFF, KSMBD_DEFAULT_GFP);
+	}
 
 	return id;
 }

@@ -84,7 +84,11 @@ static struct smb_version_cmds smb1_server_cmds[256] = {
  */
 int init_smb1_server(struct ksmbd_conn *conn)
 {
-	conn->vals = &smb1_server_values;
+	conn->vals = kmemdup(&smb1_server_values,
+			     sizeof(smb1_server_values), GFP_KERNEL);
+	if (!conn->vals)
+		return -ENOMEM;
+
 	conn->ops = &smb1_server_ops;
 	conn->cmds = smb1_server_cmds;
 	conn->max_cmds = ARRAY_SIZE(smb1_server_cmds);

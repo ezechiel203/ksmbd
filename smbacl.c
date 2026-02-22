@@ -74,43 +74,30 @@ static const struct smb_sid sid_unix_NFS_mode = { 1, 2, {0, 0, 0, 0, 0, 5},
 int compare_sids(const struct smb_sid *ctsid, const struct smb_sid *cwsid)
 {
 	int i;
-	int num_subauth, num_sat, num_saw;
+	int num_subauth, num_subauth_w;
 
 	if (!ctsid || !cwsid)
 		return 1;
 
 	/* compare the revision */
-	if (ctsid->revision != cwsid->revision) {
-		if (ctsid->revision > cwsid->revision)
-			return 1;
-		else
-			return -1;
-	}
+	if (ctsid->revision != cwsid->revision)
+		return 1;
 
-	/* compare all of the six auth values */
+	/* compare the num_subauth */
+	num_subauth = ctsid->num_subauth;
+	num_subauth_w = cwsid->num_subauth;
+	if (num_subauth != num_subauth_w)
+		return 1;
+
+	/* compare all of the six auth_id bytes */
 	for (i = 0; i < NUM_AUTHS; ++i) {
-		if (ctsid->authority[i] != cwsid->authority[i]) {
-			if (ctsid->authority[i] > cwsid->authority[i])
-				return 1;
-			else
-				return -1;
-		}
+		if (ctsid->authority[i] != cwsid->authority[i])
+			return 1;
 	}
 
-	/* compare all of the subauth values if any */
-	num_sat = ctsid->num_subauth;
-	num_saw = cwsid->num_subauth;
-	num_subauth = min(num_sat, num_saw);
-	if (num_subauth) {
-		for (i = 0; i < num_subauth; ++i) {
-			if (ctsid->sub_auth[i] != cwsid->sub_auth[i]) {
-				if (le32_to_cpu(ctsid->sub_auth[i]) >
-				    le32_to_cpu(cwsid->sub_auth[i]))
-					return 1;
-				else
-					return -1;
-			}
-		}
+	for (i = 0; i < num_subauth; ++i) {
+		if (ctsid->sub_auth[i] != cwsid->sub_auth[i])
+			return 1;
 	}
 
 	return 0; /* sids compare/match */
@@ -253,8 +240,10 @@ void id_to_sid(unsigned int cid, uint sidtype, struct smb_sid *ssid)
 	}
 
 	/* RID */
-	ssid->sub_auth[ssid->num_subauth] = cpu_to_le32(cid);
-	ssid->num_subauth++;
+	if (ssid->num_subauth < SID_MAX_SUB_AUTHORITIES) {
+		ssid->sub_auth[ssid->num_subauth] = cpu_to_le32(cid);
+		ssid->num_subauth++;
+	}
 }
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
@@ -394,7 +383,7 @@ void posix_state_to_acl(struct posix_acl_state *state,
 
 int init_acl_state(struct posix_acl_state *state, u16 cnt)
 {
-	int alloc;
+	size_t alloc;
 
 	memset(state, 0, sizeof(struct posix_acl_state));
 	/*
@@ -403,7 +392,7 @@ int init_acl_state(struct posix_acl_state *state, u16 cnt)
 	 * enough space for either:
 	 */
 	alloc = sizeof(struct posix_ace_state_array)
-		+ cnt * sizeof(struct posix_user_ace_state);
+		+ (size_t)cnt * sizeof(struct posix_user_ace_state);
 	state->users = kzalloc(alloc, KSMBD_DEFAULT_GFP);
 	if (!state->users)
 		return -ENOMEM;
@@ -863,7 +852,8 @@ static void set_mode_dacl(struct user_namespace *user_ns,
 		sid = &sid_unix_users;
 	ace_size = fill_ace_for_sid(pace, sid, ACCESS_ALLOWED, 0,
 				    fattr->cf_mode, 0700);
-	pace->sid.sub_auth[pace->sid.num_subauth++] = cpu_to_le32(uid);
+	if (pace->sid.num_subauth < SID_MAX_SUB_AUTHORITIES)
+		pace->sid.sub_auth[pace->sid.num_subauth++] = cpu_to_le32(uid);
 	pace->size = cpu_to_le16(ace_size + 4);
 	size += le16_to_cpu(pace->size);
 	pace = (struct smb_ace *)((char *)pndace + size);
@@ -871,8 +861,9 @@ static void set_mode_dacl(struct user_namespace *user_ns,
 	/* Group RID */
 	ace_size = fill_ace_for_sid(pace, &sid_unix_groups,
 				    ACCESS_ALLOWED, 0, fattr->cf_mode, 0070);
-	pace->sid.sub_auth[pace->sid.num_subauth++] =
-		cpu_to_le32(from_kgid(&init_user_ns, fattr->cf_gid));
+	if (pace->sid.num_subauth < SID_MAX_SUB_AUTHORITIES)
+		pace->sid.sub_auth[pace->sid.num_subauth++] =
+			cpu_to_le32(from_kgid(&init_user_ns, fattr->cf_gid));
 	pace->size = cpu_to_le16(ace_size + 4);
 	size += le16_to_cpu(pace->size);
 	pace = (struct smb_ace *)((char *)pndace + size);
@@ -1192,6 +1183,11 @@ int smb_inherit_dacl(struct ksmbd_conn *conn,
 	pdacl_size = le16_to_cpu(parent_pdacl->size);
 
 	if (pdacl_size > acl_len || pdacl_size < sizeof(struct smb_acl)) {
+		rc = -EINVAL;
+		goto free_parent_pntsd;
+	}
+
+	if (num_aces > (SIZE_MAX / (sizeof(struct smb_ace) * 2))) {
 		rc = -EINVAL;
 		goto free_parent_pntsd;
 	}
