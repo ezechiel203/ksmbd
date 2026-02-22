@@ -1990,10 +1990,9 @@ out_err:
 			bool try_delay = false;
 
 			/*
-			 * To avoid dictionary attacks (repeated session setups rapidly sent) to
-			 * connect to server, ksmbd make a delay of a 5 seconds on session setup
-			 * failure to make it harder to send enough random connection requests
-			 * to break into a server.
+			 * To mitigate dictionary attacks, force the client to
+			 * reconnect on auth failure. The TCP handshake provides
+			 * natural rate limiting (~100-300ms per attempt).
 			 */
 			if (sess->user && sess->user->flags & KSMBD_USER_FLAG_DELAY_SESSION)
 				try_delay = true;
@@ -2003,9 +2002,9 @@ out_err:
 			ksmbd_user_session_put(sess);
 			work->sess = NULL;
 			if (try_delay) {
+				pr_info_ratelimited("Auth failure from %pIS, forcing reconnect\n",
+						    KSMBD_TCP_PEER_SOCKADDR(conn));
 				ksmbd_conn_set_need_reconnect(conn);
-				ssleep(5);
-				ksmbd_conn_set_need_setup(conn);
 			}
 		}
 		smb2_set_err_rsp(work);
