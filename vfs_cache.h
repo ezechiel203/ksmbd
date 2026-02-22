@@ -132,6 +132,10 @@ struct ksmbd_file {
 	unsigned int			resilient_timeout;
 
 	bool                            is_posix_ctxt;
+
+	/* Lock sequence validation for resilient/durable handles */
+	__u8				lock_seq[16];
+	spinlock_t			lock_seq_lock;
 };
 
 static inline void set_ctx_actor(struct dir_context *ctx,

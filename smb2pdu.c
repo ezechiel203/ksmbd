@@ -8382,6 +8382,44 @@ static inline bool lock_defer_pending(struct file_lock *fl)
 }
 
 /**
+ * check_lock_sequence() - validate lock sequence for resilient/durable handles
+ * @fp:			ksmbd file pointer
+ * @lock_seq_val:	lock sequence value from SMB2 LOCK request
+ *
+ * Per MS-SMB2 3.3.5.14, the server validates that the lock sequence number
+ * hasn't been used before for the given index. This prevents stale lock
+ * requests from being processed after client reconnection.
+ *
+ * Return:	0 on success (proceed with lock), -EAGAIN if duplicate sequence
+ */
+static int check_lock_sequence(struct ksmbd_file *fp,
+			       __le32 lock_seq_val)
+{
+	u32 val = le32_to_cpu(lock_seq_val);
+	u8 seq_num = (val >> 28) & 0xF;  /* High 4 bits */
+	u8 seq_idx = (val >> 24) & 0xF;  /* Next 4 bits */
+	int ret = 0;
+
+	/* Index 0 means no lock sequence validation */
+	if (seq_idx == 0)
+		return 0;
+
+	/* Only validate for resilient/durable handles */
+	if (!fp->is_resilient && !fp->is_durable)
+		return 0;
+
+	spin_lock(&fp->lock_seq_lock);
+	if (fp->lock_seq[seq_idx] == seq_num) {
+		/* Duplicate - reject with STATUS_FILE_NOT_AVAILABLE */
+		ret = -EAGAIN;
+	} else {
+		fp->lock_seq[seq_idx] = seq_num;
+	}
+	spin_unlock(&fp->lock_seq_lock);
+	return ret;
+}
+
+/**
  * smb2_lock() - handler for smb2 file lock command
  * @work:	smb work containing lock command buffer
  *
@@ -8414,6 +8452,14 @@ int smb2_lock(struct ksmbd_work *work)
 	if (!fp) {
 		ksmbd_debug(SMB, "Invalid file id for lock : %llu\n", req->VolatileFileId);
 		err = -ENOENT;
+		goto out2;
+	}
+
+	/* Validate lock sequence for resilient/durable handles */
+	rc = check_lock_sequence(fp, req->LockSequenceNumber);
+	if (rc) {
+		rsp->hdr.Status = STATUS_FILE_NOT_AVAILABLE;
+		err = rc;
 		goto out2;
 	}
 

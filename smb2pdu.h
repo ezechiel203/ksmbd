@@ -1180,7 +1180,13 @@ struct smb2_lock_req {
 	struct smb2_hdr hdr;
 	__le16 StructureSize; /* Must be 48 */
 	__le16 LockCount;
-	__le32 Reserved;
+	/*
+	 * Per MS-SMB2 3.3.5.14:
+	 * Bits 28-31: LockSequenceNumber (4 bits)
+	 * Bits 24-27: LockSequenceIndex (4 bits)
+	 * Bits 0-23: Reserved
+	 */
+	__le32 LockSequenceNumber;
 	__u64  PersistentFileId;
 	__u64  VolatileFileId;
 	/* Followed by at least one */
