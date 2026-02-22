@@ -22,11 +22,11 @@ ksmbd-y :=	unicode.o auth.o vfs.o vfs_cache.o connection.o crypto_ctx.o \
 		mgmt/ksmbd_ida.o mgmt/user_config.o mgmt/share_config.o \
 		mgmt/tree_connect.o mgmt/user_session.o smb_common.o \
 		transport_tcp.o transport_ipc.o ksmbd_debugfs.o \
-		ksmbd_config.o
+		ksmbd_config.o ksmbd_feature.o
 
 ksmbd-y +=	smb2pdu.o smb2ops.o smb2misc.o ksmbd_spnego_negtokeninit.asn1.o \
 		ksmbd_spnego_negtokentarg.asn1.o asn1.o compat.o \
-		ksmbd_fsctl.o
+		ksmbd_fsctl.o ksmbd_create_ctx.o ksmbd_info.o
 
 ifeq ($(CONFIG_KSMBD_FRUIT),y)
 ccflags-y += -DCONFIG_KSMBD_FRUIT

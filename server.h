@@ -8,6 +8,7 @@
 
 #include "smbacl.h"
 #include "ksmbd_config.h"
+#include "ksmbd_feature.h"
 
 /*
  * Server state type
@@ -45,6 +46,8 @@ struct ksmbd_server_config {
 	unsigned int		max_connections;
 	unsigned int		max_inflight_req;
 	unsigned int		max_ip_connections;
+
+	unsigned long		features;  /* global feature enable bitmask */
 
 	char			*conf[SERVER_CONF_WORK_GROUP + 1];
 	char			fruit_model[64];

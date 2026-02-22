@@ -20,6 +20,7 @@
 #include "smb_common.h"
 #include "ksmbd_work.h"
 #include "smb2fruit.h"
+#include "ksmbd_feature.h"
 
 #define KSMBD_SOCKET_BACKLOG		16
 
@@ -117,6 +118,7 @@ struct ksmbd_conn {
 	__le16				signing_algorithm;
 	bool				binding;
 	refcount_t			refcnt;
+	unsigned long			features;  /* per-connection negotiated features */
 
 #ifdef CONFIG_KSMBD_FRUIT
 	bool				is_fruit;
