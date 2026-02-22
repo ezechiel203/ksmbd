@@ -1,6 +1,6 @@
 # KSMBD Master Implementation Plan: Road to Mainline
 
-> **For Claude:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development to implement this plan task-by-task.
+> **For Claude:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development to implement this plan task-by-task. Each subagent MUST read and follow the Coding Standards and Quality Requirements sections below before writing any code.
 
 **Goal:** Transform ksmbd from a functional but architecturally inconsistent out-of-tree module into a production-grade, modular, extensible, mainline-quality SMB3 server kernel module.
 
@@ -9,6 +9,220 @@
 **Tech Stack:** Linux kernel C (6.1-6.12), KUnit, syzkaller, sparse/smatch/coccinelle, GitHub Actions CI, smbtorture
 
 **Source:** `REVIEWFILES/TODO.md` (compiled from 7 review files totaling ~8,500 lines of analysis)
+
+---
+
+## Coding Standards (MANDATORY — Every Subagent Must Follow)
+
+These standards are non-negotiable. Code that violates them will be rejected at review.
+
+### File Header
+
+Every new file MUST start with:
+```c
+// SPDX-License-Identifier: GPL-2.0-or-later
+/*
+ *   Copyright (C) 2016 Namjae Jeon <linkinjeon@kernel.org>
+ *   Copyright (C) 2018 Samsung Electronics Co., Ltd.
+ */
+```
+
+### Include Ordering
+
+1. Linux kernel headers (`<linux/...>`) — alphabetical
+2. Crypto headers (`<crypto/...>`) if needed
+3. Blank line
+4. Local project headers (`"..."`) — alphabetical
+5. Conditional includes at end, guarded by `#if LINUX_VERSION_CODE` or `#ifdef CONFIG_*`
+
+### Naming Conventions
+
+- **All functions**: `ksmbd_` prefix, `snake_case` (e.g., `ksmbd_fsctl_init`, `ksmbd_conn_alloc`)
+- **Static/local functions**: no prefix required but still `snake_case`
+- **Struct members**: `snake_case` (e.g., `work->response_buf`)
+- **Constants/defines**: `UPPER_CASE` (e.g., `KSMBD_MAX_LOCK_COUNT`, `FSCTL_HASH_BITS`)
+- **Enum values**: `KSMBD_` prefix + `UPPER_CASE`
+- **Type names**: `struct ksmbd_*` for project types
+
+### Comment Style
+
+**Every exported/public function** gets kernel-doc:
+```c
+/**
+ * ksmbd_register_fsctl() - Register a FSCTL handler for dispatch
+ * @handler:	Handler structure with ctl_code and callback
+ *
+ * Registers a FSCTL handler in the RCU-protected hash table.
+ * The handler will be called when smb2_ioctl() receives a
+ * matching control code. Thread-safe; can be called from
+ * module_init context.
+ *
+ * Return:	0 on success, negative errno on failure
+ */
+int ksmbd_register_fsctl(struct ksmbd_fsctl_handler *handler)
+```
+
+**Static functions**: Brief one-line comment above if purpose isn't obvious:
+```c
+/* Look up FSCTL handler by control code under RCU read lock */
+static struct ksmbd_fsctl_handler *fsctl_lookup(__le32 ctl_code)
+```
+
+**Inline comments**: Explain _why_, not _what_:
+```c
+/* Cap at 64 to prevent memory exhaustion from a single request */
+if (le16_to_cpu(req->LockCount) > KSMBD_MAX_LOCK_COUNT)
+```
+
+**Section separators** for logical grouping within files:
+```c
+/*
+ * FSCTL registration and dispatch
+ */
+```
+
+### Error Handling
+
+- **Allocation failures**: Early return or goto cleanup, NEVER silent ignore
+- **goto cleanup pattern** for functions that acquire multiple resources:
+  ```c
+  int ksmbd_something_init(void)
+  {
+      a = kzalloc(...);
+      if (!a)
+          return -ENOMEM;
+
+      b = kzalloc(...);
+      if (!b)
+          goto err_free_a;
+
+      return 0;
+
+  err_free_a:
+      kfree(a);
+      return -ENOMEM;
+  }
+  ```
+- **Never return from inside a lock** — always goto an unlock path
+- **WARN_ON** for conditions that indicate a bug but shouldn't crash
+- **BUG_ON** is NEVER allowed — use WARN_ON_ONCE + graceful degradation
+
+### Memory Allocation
+
+- **KSMBD_DEFAULT_GFP** for all allocations (which is `GFP_KERNEL`)
+- **kzalloc** for small fixed-size allocations
+- **kvzalloc** for potentially large allocations (>PAGE_SIZE)
+- **kmem_cache** for frequently-allocated fixed-size objects (hot path)
+- **Always check for NULL** after every allocation
+- **kfree_sensitive / memzero_explicit** for key material
+
+### Synchronization
+
+- **spinlock_t** for short critical sections (hash bucket locks, list manipulation)
+- **struct rw_semaphore** for read-heavy shared state (session tables)
+- **struct mutex** for long-held locks (init, scavenger)
+- **RCU** for lockless read paths on registered handlers
+- **refcount_t** (not atomic_t) for all reference counting
+- **static_key** for zero-cost feature checks
+- Never nest locks without documented ordering
+- Never sleep while holding a spinlock
+
+### Kernel Version Compatibility
+
+Use the existing `compat.c`/`compat.h` pattern:
+```c
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+#include <linux/filelock.h>
+#endif
+```
+Never use `#if LINUX_VERSION_CODE` inside function bodies — isolate into compat wrappers.
+
+### Config Guards
+
+```c
+/* In Makefile: */
+ksmbd-$(CONFIG_KSMBD_FRUIT) += smb2fruit.o
+
+/* In headers — provide inline stubs when disabled: */
+#ifdef CONFIG_KSMBD_FRUIT
+int ksmbd_fruit_init(void);
+void ksmbd_fruit_exit(void);
+#else
+static inline int ksmbd_fruit_init(void) { return 0; }
+static inline void ksmbd_fruit_exit(void) {}
+#endif
+```
+
+### Line Length and Formatting
+
+- **80-column soft limit**, 100-column hard limit (kernel standard)
+- **Tabs for indentation** (8-space tabs, kernel standard)
+- **K&R brace style** for functions (opening brace on new line)
+- **Egyptian brace style** for control structures (opening brace on same line)
+- **No trailing whitespace**
+- **Single blank line** between functions
+- **Two blank lines** between logical sections
+
+---
+
+## Quality Requirements (MANDATORY — Every Task Must Meet)
+
+### Before Writing Code
+
+1. **Read the existing code** in the file you're modifying. Match its style exactly.
+2. **Understand the data flow** — trace how the affected data moves through the system.
+3. **Identify all callers** of any function you modify (use grep).
+
+### While Writing Code
+
+1. **Minimal changes**: Fix exactly what the task says. Don't refactor nearby code.
+2. **Human-readable**: A kernel developer should understand the code without referring to this plan.
+3. **Self-documenting names**: `ksmbd_fsctl_lookup` not `fsctl_lkup` or `find_handler`.
+4. **Defensive programming**: Validate all inputs from wire data. Trust nothing from the network.
+5. **No magic numbers**: Define constants with descriptive names.
+6. **Consistent patterns**: If the codebase uses `goto out` for cleanup, you use `goto out`.
+
+### After Writing Code
+
+1. **Build test**: `make clean && make` must succeed with zero warnings.
+2. **Load test**: Module must load (`insmod ksmbd.ko`) without errors.
+3. **No new warnings**: `make C=1` (sparse) should not add warnings.
+4. **Review your own diff**: `git diff` before committing. Every line must be intentional.
+
+### Documentation Requirements
+
+1. **Every new public function**: kernel-doc comment (see Comment Style above)
+2. **Every new struct**: kernel-doc comment explaining purpose and lifecycle
+3. **Every new config option**: Kconfig help text explaining what it does and when to enable
+4. **Every complex algorithm**: Inline comment explaining the approach and why alternatives were rejected
+5. **Every non-obvious constant**: Comment explaining derivation (e.g., `/* MS-SMB2 Section 3.3.5.14 */`)
+
+### Testing Requirements
+
+1. **Every security fix**: Describe the attack vector in the commit message
+2. **Every new feature**: If KUnit framework exists, add at least one test
+3. **Every registration API**: Test register, lookup, dispatch, unregister, re-register
+4. **Every race fix**: Describe the race window and how the fix closes it in commit message
+5. **Build verification**: `make` must pass after every single commit
+
+### Commit Message Format
+
+```
+category: concise description (imperative mood)
+
+Detailed explanation of what changed and why. Reference the
+specific attack vector, race window, or protocol section.
+Include file:line references for the root cause.
+
+- Bullet points for multiple changes in one commit
+- Reference finding IDs from REVIEWFILES/TODO.md
+
+Fixes: [finding IDs]
+Signed-off-by: ...
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
+```
+
+Categories: `security`, `safety`, `perf`, `feat`, `arch`, `test`, `build`, `docs`
 
 ---
 
@@ -1665,18 +1879,85 @@ Each **Task** (1.1, 1.2, ..., 8.11) is a discrete work unit for one subagent inv
 
 When complete, ksmbd will meet these criteria for mainline kernel inclusion:
 
-1. **Zero known security vulnerabilities** (all CRITICAL/HIGH/MEDIUM fixed)
-2. **No global lock contention** in READ/WRITE hot path
-3. **Full CHANGE_NOTIFY** support (Windows Explorer auto-refresh)
-4. **DFS and VSS** support for enterprise deployment
-5. **100+ KUnit tests** with CI/CD on every commit
-6. **Fuzzing infrastructure** with 24h clean run
-7. **Modular architecture** with stable extension API
-8. **smb2pdu.c decomposed** from 10K lines to 12 files of 500-2K lines each
-9. **All features runtime-toggleable** without recompilation
-10. **Documentation** in kernel style (kernel-doc comments on all public APIs)
+### Security
+1. **Zero known security vulnerabilities** — all CRITICAL/HIGH/MEDIUM findings fixed
+2. **All wire-format offsets validated** before pointer arithmetic
+3. **All loops over wire data** have explicit iteration count limits
+4. **Constant-time authentication** comparisons everywhere
+5. **Session key material** zeroed on all cleanup paths
+6. **Per-IP connection limits** enforced with atomic counting
+
+### Performance
+7. **No global lock contention** in READ/WRITE hot path
+8. **Zero-copy I/O** for large reads (splice/sendfile)
+9. **Dedicated slab caches** for hot-path objects (ksmbd_work, oplock_info, ksmbd_file)
+10. **Per-bucket locking** for inode hash, connection hash, lease table
+11. **RCU-protected** read paths for share config, session lookup, handler dispatch
+
+### Protocol Compliance
+12. **Full CHANGE_NOTIFY** — Windows Explorer auto-refresh works
+13. **DFS referrals** — enterprise namespace navigation works
+14. **VSS/Previous Versions** — snapshot enumeration and point-in-time access
+15. **Reparse points** — Windows symlinks and junctions
+16. **AES-GMAC signing** — Windows 11 preferred algorithm
+17. **smbtorture full suite** pass rate > 95%
+
+### Code Quality
+18. **smb2pdu.c decomposed** from 10K lines to 12 files of 500-2K lines each
+19. **kernel-doc comments** on every public function and struct
+20. **Zero sparse/smatch warnings** (`make C=2` clean)
+21. **No file exceeds 3,000 lines** (hard limit for maintainability)
+22. **All `#ifdef` blocks** in shared code eliminated via registration APIs
+
+### Testing
+23. **100+ KUnit tests** covering NDR, ACL, credit, oplock, config, locking
+24. **Fuzzing harnesses** for all parsing code with 24h clean run
+25. **CI/CD pipeline** building against 4+ kernel versions on every push
+26. **Integration tests** via smbtorture with automated pass/fail reporting
+
+### Architecture
+27. **Modular architecture** with stable, versioned extension API
+28. **All features runtime-toggleable** without recompilation
+29. **Hook system** with zero overhead when no hooks registered (static_key)
+30. **Transport, auth, and feature modules** independently loadable
+
+### Documentation
+31. **Every new file** has SPDX header and copyright block
+32. **Every public API** has kernel-doc with usage example
+33. **Architecture overview** in Documentation/ suitable for kernel docs
+34. **Commit history** tells a clear story — each commit is atomic and self-explanatory
+
+---
+
+## Execution Approach: Subagent-Driven with Opus
+
+This plan is executed using **subagent-driven development**:
+
+1. **One fresh subagent per task** — no context pollution between tasks
+2. **Each subagent receives**: full task text, coding standards, quality requirements, and relevant file context
+3. **Two-stage review after each task**: spec compliance first, then code quality
+4. **Every commit builds** — `make` verified before committing
+5. **Phase gates** — smbtorture regression test between phases
+
+### Parallelization Strategy
+
+Within each phase, tasks are grouped into **parallel cohorts** that touch different files:
+
+| Phase | Cohort A | Cohort B | Cohort C |
+|-------|----------|----------|----------|
+| 1 | 1.1, 1.5, 1.9 | 1.2, 1.3, 1.6 | 1.4, 1.7, 1.8, 1.10 |
+| 2 | 2.1, 2.3, 2.5 | 2.2, 2.4, 2.6 | — |
+| 3 | 3.1, 3.4 | 3.2, 3.3 | 3.5, 3.6 |
+| 4 | 4.1, 4.2, 4.4 | 4.3, 4.5, 4.6, 4.7 | — |
+| 5 | 5.1, 5.3 | 5.2, 5.4, 5.5, 5.6 | — |
+
+Tasks within the same cohort can run in parallel (different files). Tasks in different cohorts within the same phase are also parallel-safe.
+
+**Between phases**, tasks are sequential (Phase 2 depends on Phase 1, etc.) unless the dependency graph explicitly allows parallel execution (Phases 4-5 can parallel with 2-3).
 
 ---
 
 *End of Master Implementation Plan*
 *145 items, 8 phases, ~55 tasks, ~25,000 new lines of code*
+*Coding standards: Linux kernel style, kernel-doc, refcount_t, RCU, sparse-clean*
+*Quality gates: build-test every commit, smbtorture every phase, KUnit for every API*
