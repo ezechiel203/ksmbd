@@ -23,6 +23,8 @@
 #include "auth.h"
 #include "smb2fruit.h"
 #include "ksmbd_fsctl.h"
+#include "ksmbd_create_ctx.h"
+#include "ksmbd_info.h"
 
 extern int ksmbd_debugfs_init(void);
 extern void ksmbd_debugfs_exit(void);
@@ -635,8 +637,20 @@ static int __init ksmbd_server_init(void)
 	if (ret)
 		goto err_fsctl;
 
+	ret = ksmbd_create_ctx_init();
+	if (ret)
+		goto err_create_ctx;
+
+	ret = ksmbd_info_init();
+	if (ret)
+		goto err_info;
+
 	return 0;
 
+err_info:
+	ksmbd_create_ctx_exit();
+err_create_ctx:
+	ksmbd_fsctl_exit();
 err_fsctl:
 	ksmbd_debugfs_exit();
 err_debugfs:
@@ -665,6 +679,8 @@ err_config_exit:
  */
 static void __exit ksmbd_server_exit(void)
 {
+	ksmbd_info_exit();
+	ksmbd_create_ctx_exit();
 	ksmbd_fsctl_exit();
 	ksmbd_server_shutdown();
 	rcu_barrier();
