@@ -396,7 +396,9 @@ void destroy_previous_session(struct ksmbd_conn *conn,
 
 	down_write(&sessions_table_lock);
 	down_write(&conn->session_lock);
+	rcu_read_lock();
 	prev_sess = __session_lookup(id);
+	rcu_read_unlock();
 	if (!prev_sess || prev_sess->state == SMB2_SESSION_EXPIRED)
 		goto out;
 
