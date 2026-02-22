@@ -1632,6 +1632,31 @@ struct smb2_file_attr_tag_info {
 	__le32 ReparseTag;
 } __packed;
 
+/* MS-FSCC 2.4.29 - FilePipeInformation */
+struct smb2_file_pipe_info {
+	__le32 ReadMode;
+	__le32 CompletionMode;
+} __packed;
+
+/* MS-FSCC 2.4.30 - FilePipeLocalInformation */
+struct smb2_file_pipe_local_info {
+	__le32 NamedPipeType;
+	__le32 NamedPipeConfiguration;
+	__le32 MaximumInstances;
+	__le32 CurrentInstances;
+	__le32 InboundQuota;
+	__le32 ReadDataAvailable;
+	__le32 OutboundQuota;
+	__le32 WriteQuotaAvailable;
+	__le32 NamedPipeState;
+	__le32 NamedPipeEnd;
+} __packed;
+
+/* MS-FSCC 2.4.45 - FileValidDataLengthInformation */
+struct smb2_file_valid_data_length_info {
+	__le64 ValidDataLength;
+} __packed;
+
 #define SL_RESTART_SCAN	0x00000001
 #define SL_RETURN_SINGLE_ENTRY	0x00000002
 #define SL_INDEX_SPECIFIED	0x00000004

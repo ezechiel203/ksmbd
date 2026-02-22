@@ -26,12 +26,14 @@
 #include <linux/path.h>
 #include <linux/fs.h>
 #include <linux/nls.h>
+#include <linux/falloc.h>
 
 #include "ksmbd_info.h"
 #include "glob.h"
 #include "smb2pdu.h"
 #include "connection.h"
 #include "misc.h"
+#include "oplock.h"
 #include "mgmt/share_config.h"
 
 /* 256 buckets (2^8) -- sufficient for all SMB2 info classes */
@@ -270,6 +272,225 @@ static int ksmbd_info_set_fs_control(struct ksmbd_work *work,
 	return 0;
 }
 
+/*
+ * FILE_PIPE_INFORMATION (class 23) GET handler
+ *
+ * Returns pipe read mode and completion mode.  Since ksmbd does not
+ * serve named pipes directly, return default values (byte-stream
+ * mode, blocking completion).
+ */
+
+/**
+ * ksmbd_info_get_pipe() - FILE_PIPE_INFORMATION query handler
+ * @work:    smb work for this request
+ * @fp:      ksmbd file pointer
+ * @buf:     response buffer to fill
+ * @buf_len: available space in @buf
+ * @out_len: [out] bytes written to @buf
+ *
+ * Return: 0 on success, negative errno on failure
+ */
+static int ksmbd_info_get_pipe(struct ksmbd_work *work,
+			       struct ksmbd_file *fp,
+			       void *buf,
+			       unsigned int buf_len,
+			       unsigned int *out_len)
+{
+	struct smb2_file_pipe_info *pipe_info;
+
+	if (buf_len < sizeof(struct smb2_file_pipe_info))
+		return -ENOSPC;
+
+	pipe_info = (struct smb2_file_pipe_info *)buf;
+	pipe_info->ReadMode = cpu_to_le32(0);
+	pipe_info->CompletionMode = cpu_to_le32(0);
+
+	*out_len = sizeof(struct smb2_file_pipe_info);
+
+	ksmbd_debug(SMB,
+		    "FILE_PIPE_INFORMATION: default response\n");
+	return 0;
+}
+
+/*
+ * FILE_PIPE_LOCAL_INFORMATION (class 24) GET handler
+ *
+ * Returns local pipe information.  Since ksmbd does not serve named
+ * pipes directly, return default values for all fields.
+ */
+
+/**
+ * ksmbd_info_get_pipe_local() - FILE_PIPE_LOCAL_INFORMATION query handler
+ * @work:    smb work for this request
+ * @fp:      ksmbd file pointer
+ * @buf:     response buffer to fill
+ * @buf_len: available space in @buf
+ * @out_len: [out] bytes written to @buf
+ *
+ * Return: 0 on success, negative errno on failure
+ */
+static int ksmbd_info_get_pipe_local(struct ksmbd_work *work,
+				     struct ksmbd_file *fp,
+				     void *buf,
+				     unsigned int buf_len,
+				     unsigned int *out_len)
+{
+	struct smb2_file_pipe_local_info *pipe_info;
+
+	if (buf_len < sizeof(struct smb2_file_pipe_local_info))
+		return -ENOSPC;
+
+	pipe_info = (struct smb2_file_pipe_local_info *)buf;
+	pipe_info->NamedPipeType = cpu_to_le32(0);
+	pipe_info->NamedPipeConfiguration = cpu_to_le32(0);
+	pipe_info->MaximumInstances = cpu_to_le32(0xFFFFFFFF);
+	pipe_info->CurrentInstances = cpu_to_le32(0);
+	pipe_info->InboundQuota = cpu_to_le32(0);
+	pipe_info->ReadDataAvailable = cpu_to_le32(0);
+	pipe_info->OutboundQuota = cpu_to_le32(0);
+	pipe_info->WriteQuotaAvailable = cpu_to_le32(0);
+	pipe_info->NamedPipeState = cpu_to_le32(0);
+	pipe_info->NamedPipeEnd = cpu_to_le32(0);
+
+	*out_len = sizeof(struct smb2_file_pipe_local_info);
+
+	ksmbd_debug(SMB,
+		    "FILE_PIPE_LOCAL_INFORMATION: default response\n");
+	return 0;
+}
+
+/*
+ * FILE_VALID_DATA_LENGTH_INFORMATION (class 39) SET handler
+ *
+ * Sets the valid data length for a file.  Uses vfs_fallocate()
+ * with FALLOC_FL_KEEP_SIZE to pre-allocate without changing
+ * the file size.
+ */
+
+/**
+ * ksmbd_info_set_valid_data_length() - FILE_VALID_DATA_LENGTH set handler
+ * @work:    smb work for this request
+ * @fp:      ksmbd file pointer
+ * @buf:     request data buffer
+ * @buf_len: length of request data
+ * @out_len: [out] bytes consumed from @buf
+ *
+ * Return: 0 on success, negative errno on failure
+ */
+static int ksmbd_info_set_valid_data_length(struct ksmbd_work *work,
+					    struct ksmbd_file *fp,
+					    void *buf,
+					    unsigned int buf_len,
+					    unsigned int *out_len)
+{
+	struct smb2_file_valid_data_length_info *vdl_info;
+	loff_t length;
+	int rc;
+
+	if (!fp)
+		return -EINVAL;
+
+	if (buf_len < sizeof(struct smb2_file_valid_data_length_info))
+		return -EMSGSIZE;
+
+	vdl_info = (struct smb2_file_valid_data_length_info *)buf;
+	length = le64_to_cpu(vdl_info->ValidDataLength);
+
+	if (length < 0)
+		return -EINVAL;
+
+	ksmbd_debug(SMB,
+		    "FILE_VALID_DATA_LENGTH_INFORMATION SET: length=%lld\n",
+		    length);
+
+	smb_break_all_levII_oplock(work, fp, 1);
+
+	rc = vfs_fallocate(fp->filp, FALLOC_FL_KEEP_SIZE, 0, length);
+	if (rc && rc != -EOPNOTSUPP) {
+		pr_err("vfs_fallocate for valid data length failed: %d\n",
+		       rc);
+		return rc;
+	}
+
+	*out_len = sizeof(struct smb2_file_valid_data_length_info);
+	return 0;
+}
+
+/*
+ * FILE_NORMALIZED_NAME_INFORMATION (class 48) GET handler
+ *
+ * Returns the normalized (canonical) name of the file using the
+ * dentry path.  The response layout matches FILE_NAME_INFORMATION:
+ *   4 bytes  FileNameLength (in bytes, of the UTF-16LE name)
+ *   variable FileName[]     (UTF-16LE, NOT null-terminated)
+ */
+
+/**
+ * ksmbd_info_get_normalized_name() - FILE_NORMALIZED_NAME query handler
+ * @work:    smb work for this request
+ * @fp:      ksmbd file pointer
+ * @buf:     response buffer to fill
+ * @buf_len: available space in @buf
+ * @out_len: [out] bytes written to @buf
+ *
+ * Return: 0 on success, negative errno on failure
+ */
+static int ksmbd_info_get_normalized_name(struct ksmbd_work *work,
+					  struct ksmbd_file *fp,
+					  void *buf,
+					  unsigned int buf_len,
+					  unsigned int *out_len)
+{
+	struct ksmbd_conn *conn = work->conn;
+	char *filename;
+	int conv_len;
+	__le32 *name_len_ptr;
+	unsigned int min_len;
+
+	if (!fp)
+		return -EINVAL;
+
+	/* Need at least 4 bytes for FileNameLength */
+	min_len = sizeof(__le32);
+	if (buf_len < min_len)
+		return -ENOSPC;
+
+	filename = convert_to_nt_pathname(work->tcon->share_conf,
+					  &fp->filp->f_path);
+	if (IS_ERR(filename))
+		return PTR_ERR(filename);
+
+	ksmbd_debug(SMB,
+		    "FILE_NORMALIZED_NAME_INFORMATION: filename = %s\n",
+		    filename);
+
+	name_len_ptr = (__le32 *)buf;
+
+	/*
+	 * Convert filename to UTF-16LE after the 4-byte length
+	 * field.  smbConvertToUTF16 returns the number of
+	 * UTF-16 code units written.
+	 */
+	conv_len = smbConvertToUTF16(
+			(__le16 *)((char *)buf + sizeof(__le32)),
+			filename,
+			PATH_MAX,
+			conn->local_nls,
+			0);
+	conv_len *= 2; /* code units -> bytes */
+
+	if (sizeof(__le32) + conv_len > buf_len) {
+		kfree(filename);
+		return -ENOSPC;
+	}
+
+	*name_len_ptr = cpu_to_le32(conv_len);
+	*out_len = sizeof(__le32) + conv_len;
+
+	kfree(filename);
+	return 0;
+}
+
 /* Static handler descriptors for built-in info-level handlers */
 static struct ksmbd_info_handler ksmbd_file_name_get_handler = {
 	.info_type	= SMB2_O_INFO_FILE,
@@ -284,6 +505,38 @@ static struct ksmbd_info_handler ksmbd_fs_control_set_handler = {
 	.info_class	= FS_CONTROL_INFORMATION,
 	.op		= KSMBD_INFO_SET,
 	.handler	= ksmbd_info_set_fs_control,
+	.owner		= THIS_MODULE,
+};
+
+static struct ksmbd_info_handler ksmbd_pipe_info_get_handler = {
+	.info_type	= SMB2_O_INFO_FILE,
+	.info_class	= FILE_PIPE_INFORMATION,
+	.op		= KSMBD_INFO_GET,
+	.handler	= ksmbd_info_get_pipe,
+	.owner		= THIS_MODULE,
+};
+
+static struct ksmbd_info_handler ksmbd_pipe_local_info_get_handler = {
+	.info_type	= SMB2_O_INFO_FILE,
+	.info_class	= FILE_PIPE_LOCAL_INFORMATION,
+	.op		= KSMBD_INFO_GET,
+	.handler	= ksmbd_info_get_pipe_local,
+	.owner		= THIS_MODULE,
+};
+
+static struct ksmbd_info_handler ksmbd_valid_data_length_set_handler = {
+	.info_type	= SMB2_O_INFO_FILE,
+	.info_class	= FILE_VALID_DATA_LENGTH_INFORMATION,
+	.op		= KSMBD_INFO_SET,
+	.handler	= ksmbd_info_set_valid_data_length,
+	.owner		= THIS_MODULE,
+};
+
+static struct ksmbd_info_handler ksmbd_normalized_name_get_handler = {
+	.info_type	= SMB2_O_INFO_FILE,
+	.info_class	= FILE_NORMALIZED_NAME_INFORMATION,
+	.op		= KSMBD_INFO_GET,
+	.handler	= ksmbd_info_get_normalized_name,
 	.owner		= THIS_MODULE,
 };
 
@@ -309,9 +562,33 @@ int ksmbd_info_init(void)
 	if (ret)
 		goto err_unreg_file_name;
 
+	ret = ksmbd_register_info_handler(&ksmbd_pipe_info_get_handler);
+	if (ret)
+		goto err_unreg_fs_control;
+
+	ret = ksmbd_register_info_handler(&ksmbd_pipe_local_info_get_handler);
+	if (ret)
+		goto err_unreg_pipe_info;
+
+	ret = ksmbd_register_info_handler(&ksmbd_valid_data_length_set_handler);
+	if (ret)
+		goto err_unreg_pipe_local;
+
+	ret = ksmbd_register_info_handler(&ksmbd_normalized_name_get_handler);
+	if (ret)
+		goto err_unreg_valid_data;
+
 	ksmbd_debug(SMB, "Info-level handler table initialized\n");
 	return 0;
 
+err_unreg_valid_data:
+	ksmbd_unregister_info_handler(&ksmbd_valid_data_length_set_handler);
+err_unreg_pipe_local:
+	ksmbd_unregister_info_handler(&ksmbd_pipe_local_info_get_handler);
+err_unreg_pipe_info:
+	ksmbd_unregister_info_handler(&ksmbd_pipe_info_get_handler);
+err_unreg_fs_control:
+	ksmbd_unregister_info_handler(&ksmbd_fs_control_set_handler);
 err_unreg_file_name:
 	ksmbd_unregister_info_handler(&ksmbd_file_name_get_handler);
 err_out:
@@ -326,6 +603,10 @@ err_out:
  */
 void ksmbd_info_exit(void)
 {
+	ksmbd_unregister_info_handler(&ksmbd_normalized_name_get_handler);
+	ksmbd_unregister_info_handler(&ksmbd_valid_data_length_set_handler);
+	ksmbd_unregister_info_handler(&ksmbd_pipe_local_info_get_handler);
+	ksmbd_unregister_info_handler(&ksmbd_pipe_info_get_handler);
 	ksmbd_unregister_info_handler(&ksmbd_fs_control_set_handler);
 	ksmbd_unregister_info_handler(&ksmbd_file_name_get_handler);
 }

@@ -10,6 +10,7 @@
 #include <linux/refcount.h>
 #include <linux/rcupdate.h>
 #include <linux/xarray.h>
+#include <linux/atomic.h>
 
 #include "../smb_common.h"
 #include "../ntlmssp.h"
@@ -66,6 +67,10 @@ struct ksmbd_session {
 	struct ksmbd_file_table		file_table;
 	unsigned long			last_active;
 	rwlock_t			tree_conns_lock;
+
+	/* Monotonic GCM nonce counter to prevent nonce reuse */
+	atomic64_t			gcm_nonce_counter;
+	__u8				gcm_nonce_prefix[4];
 
 	refcount_t			refcnt;
 	struct rw_semaphore		rpc_lock;

@@ -10,6 +10,7 @@
 #include <linux/mutex.h>
 #include <linux/xarray.h>
 #include <linux/string.h>
+#include <linux/random.h>
 #include <crypto/algapi.h>
 
 #include "ksmbd_ida.h"
@@ -553,6 +554,9 @@ static struct ksmbd_session *__session_create(int protocol)
 	rwlock_init(&sess->tree_conns_lock);
 	refcount_set(&sess->refcnt, 2);
 	init_rwsem(&sess->rpc_lock);
+	atomic64_set(&sess->gcm_nonce_counter, 0);
+	get_random_bytes(sess->gcm_nonce_prefix,
+			 sizeof(sess->gcm_nonce_prefix));
 
 	switch (protocol) {
 #ifdef CONFIG_SMB_INSECURE_SERVER

@@ -10103,7 +10103,23 @@ void smb3_preauth_hash_rsp(struct ksmbd_work *work)
 	}
 }
 
-static void fill_transform_hdr(void *tr_buf, char *old_buf, __le16 cipher_type)
+/**
+ * ksmbd_gcm_nonce_limit_reached() - check if GCM nonce counter is exhausted
+ * @sess:	session to check
+ *
+ * For deterministic (counter-based) GCM nonces the theoretical limit
+ * is 2^64, but we cap at 2^63 - 1 to stay well within safe bounds.
+ *
+ * Return: true if the nonce space is exhausted
+ */
+static bool ksmbd_gcm_nonce_limit_reached(struct ksmbd_session *sess)
+{
+	return atomic64_read(&sess->gcm_nonce_counter) >= S64_MAX;
+}
+
+static int fill_transform_hdr(void *tr_buf, char *old_buf,
+			       __le16 cipher_type,
+			       struct ksmbd_session *sess)
 {
 	struct smb2_transform_hdr *tr_hdr = tr_buf + 4;
 	struct smb2_hdr *hdr = smb2_get_msg(old_buf);
@@ -10114,13 +10130,46 @@ static void fill_transform_hdr(void *tr_buf, char *old_buf, __le16 cipher_type)
 	tr_hdr->OriginalMessageSize = cpu_to_le32(orig_len);
 	tr_hdr->Flags = cpu_to_le16(0x01);
 	if (cipher_type == SMB2_ENCRYPTION_AES128_GCM ||
-	    cipher_type == SMB2_ENCRYPTION_AES256_GCM)
-		get_random_bytes(&tr_hdr->Nonce, SMB3_AES_GCM_NONCE);
-	else
+	    cipher_type == SMB2_ENCRYPTION_AES256_GCM) {
+		__le64 counter_le;
+
+		if (sess && !ksmbd_gcm_nonce_limit_reached(sess)) {
+			u64 counter;
+
+			/*
+			 * Use deterministic nonce: 4-byte random
+			 * session prefix + 8-byte monotonic counter.
+			 * This guarantees uniqueness per session key
+			 * and avoids the birthday-bound risk of fully
+			 * random nonces.
+			 */
+			counter = atomic64_inc_return(
+					&sess->gcm_nonce_counter);
+			memcpy(&tr_hdr->Nonce,
+			       sess->gcm_nonce_prefix, 4);
+			counter_le = cpu_to_le64(counter);
+			memcpy(&tr_hdr->Nonce[4],
+			       &counter_le, 8);
+		} else {
+			/*
+			 * Fallback: no session or counter exhausted;
+			 * use random nonce.  Counter exhaustion means
+			 * the key must be rotated — log a warning.
+			 */
+			if (sess)
+				pr_warn_ratelimited(
+					"GCM nonce counter exhausted for session %llu, using random nonce\n",
+					sess->id);
+			get_random_bytes(&tr_hdr->Nonce,
+					 SMB3_AES_GCM_NONCE);
+		}
+	} else {
 		get_random_bytes(&tr_hdr->Nonce, SMB3_AES_CCM_NONCE);
+	}
 	memcpy(&tr_hdr->SessionId, &hdr->SessionId, 8);
 	inc_rfc1001_len(tr_buf, sizeof(struct smb2_transform_hdr));
 	inc_rfc1001_len(tr_buf, orig_len);
+	return 0;
 }
 
 int smb3_encrypt_resp(struct ksmbd_work *work)
@@ -10134,7 +10183,8 @@ int smb3_encrypt_resp(struct ksmbd_work *work)
 		return rc;
 
 	/* fill transform header */
-	fill_transform_hdr(tr_buf, work->response_buf, work->conn->cipher_type);
+	fill_transform_hdr(tr_buf, work->response_buf,
+			   work->conn->cipher_type, work->sess);
 
 	iov[0].iov_base = tr_buf;
 	iov[0].iov_len = sizeof(struct smb2_transform_hdr) + 4;
