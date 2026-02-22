@@ -33,6 +33,7 @@
 #include "ksmbd_quota.h"
 #include "ksmbd_app_instance.h"
 #include "ksmbd_fsctl_extra.h"
+#include "ksmbd_hooks.h"
 
 extern int ksmbd_debugfs_init(void);
 extern void ksmbd_debugfs_exit(void);
@@ -690,8 +691,14 @@ static int __init ksmbd_server_init(void)
 	if (ret)
 		goto err_fsctl_extra;
 
+	ret = ksmbd_hooks_init();
+	if (ret)
+		goto err_hooks;
+
 	return 0;
 
+err_hooks:
+	ksmbd_fsctl_extra_exit();
 err_fsctl_extra:
 	ksmbd_app_instance_exit();
 err_app_instance:
@@ -742,6 +749,7 @@ err_config_exit:
  */
 static void __exit ksmbd_server_exit(void)
 {
+	ksmbd_hooks_exit();
 	ksmbd_fsctl_extra_exit();
 	ksmbd_app_instance_exit();
 	ksmbd_quota_exit();

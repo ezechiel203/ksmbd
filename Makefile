@@ -29,7 +29,7 @@ ksmbd-y +=	smb2pdu.o smb2ops.o smb2misc.o ksmbd_spnego_negtokeninit.asn1.o \
 		ksmbd_fsctl.o ksmbd_create_ctx.o ksmbd_info.o \
 		ksmbd_dfs.o ksmbd_vss.o ksmbd_notify.o ksmbd_reparse.o \
 		ksmbd_resilient.o ksmbd_quota.o ksmbd_app_instance.o \
-		ksmbd_fsctl_extra.o
+		ksmbd_fsctl_extra.o ksmbd_hooks.o
 
 ifeq ($(CONFIG_KSMBD_FRUIT),y)
 ccflags-y += -DCONFIG_KSMBD_FRUIT
