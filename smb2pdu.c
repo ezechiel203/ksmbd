@@ -3701,6 +3701,7 @@ int smb2_open(struct ksmbd_work *work)
 					struct smb_fattr fattr;
 					struct smb_ntsd *pntsd;
 					int pntsd_size, ace_num = 0;
+					unsigned int sd_buf_size;
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
 					ksmbd_acls_fattr(&fattr, idmap, inode);
@@ -3712,10 +3713,13 @@ int smb2_open(struct ksmbd_work *work)
 					if (fattr.cf_dacls)
 						ace_num += fattr.cf_dacls->a_count;
 
-					pntsd = kmalloc(sizeof(struct smb_ntsd) +
-							sizeof(struct smb_sid) * 3 +
-							sizeof(struct smb_acl) +
-							sizeof(struct smb_ace) * ace_num * 2,
+					sd_buf_size =
+						sizeof(struct smb_ntsd) +
+						sizeof(struct smb_sid) * 3 +
+						sizeof(struct smb_acl) +
+						sizeof(struct smb_ace) *
+						ace_num * 2;
+					pntsd = kmalloc(sd_buf_size,
 							KSMBD_DEFAULT_GFP);
 					if (!pntsd) {
 						posix_acl_release(fattr.cf_acls);
@@ -3732,7 +3736,9 @@ int smb2_open(struct ksmbd_work *work)
 							    OWNER_SECINFO |
 							    GROUP_SECINFO |
 							    DACL_SECINFO,
-							    &pntsd_size, &fattr);
+							    &pntsd_size,
+							    &fattr,
+							    sd_buf_size);
 					posix_acl_release(fattr.cf_acls);
 					posix_acl_release(fattr.cf_dacls);
 					if (rc) {
@@ -6364,13 +6370,18 @@ static int smb2_get_info_sec(struct ksmbd_work *work,
 						     &ppntsd);
 
 	/* Check if sd buffer size exceeds response buffer size */
-	if (smb2_resp_buf_len(work, 8) > ppntsd_size)
+	if (smb2_resp_buf_len(work, 8) > ppntsd_size) {
+		unsigned int resp_buf_size =
+			(unsigned int)smb2_resp_buf_len(work, 8);
+
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
 		rc = build_sec_desc(idmap, pntsd, ppntsd, ppntsd_size,
 #else
 		rc = build_sec_desc(user_ns, pntsd, ppntsd, ppntsd_size,
 #endif
-				    addition_info, &secdesclen, &fattr);
+				    addition_info, &secdesclen,
+				    &fattr, resp_buf_size);
+	}
 	posix_acl_release(fattr.cf_acls);
 	posix_acl_release(fattr.cf_dacls);
 	kfree(ppntsd);
@@ -8309,7 +8320,7 @@ int smb2_lock(struct ksmbd_work *work)
 	int nolock = 0;
 	LIST_HEAD(lock_list);
 	LIST_HEAD(rollback_list);
-	int prior_lock = 0, bkt;
+	int prior_lock = 0, bkt = 0;
 
 	WORK_BUFFERS(work, req, rsp);
 
@@ -8424,8 +8435,10 @@ int smb2_lock(struct ksmbd_work *work)
 
 		nolock = 1;
 		/* check locks in connection list */
-		down_read(&conn_list_lock);
-		hash_for_each(conn_list, bkt, conn, hlist) {
+		for (bkt = 0; bkt < CONN_HASH_SIZE; bkt++) {
+		spin_lock(&conn_hash[bkt].lock);
+		hlist_for_each_entry(conn, &conn_hash[bkt].head,
+				     hlist) {
 			spin_lock(&conn->llist_lock);
 			list_for_each_entry_safe(cmp_lock, tmp2, &conn->lock_list, clist) {
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 9, 0)
@@ -8454,7 +8467,7 @@ int smb2_lock(struct ksmbd_work *work)
 						list_del(&cmp_lock->flist);
 						list_del(&cmp_lock->clist);
 						spin_unlock(&conn->llist_lock);
-						up_read(&conn_list_lock);
+						spin_unlock(&conn_hash[bkt].lock);
 
 						locks_free_lock(cmp_lock->fl);
 						kfree(cmp_lock);
@@ -8480,7 +8493,7 @@ int smb2_lock(struct ksmbd_work *work)
 				    cmp_lock->start > smb_lock->start &&
 				    cmp_lock->start < smb_lock->end) {
 					spin_unlock(&conn->llist_lock);
-					up_read(&conn_list_lock);
+					spin_unlock(&conn_hash[bkt].lock);
 					pr_err_ratelimited("previous lock conflict with zero byte lock range\n");
 					goto out;
 				}
@@ -8489,7 +8502,7 @@ int smb2_lock(struct ksmbd_work *work)
 				    smb_lock->start > cmp_lock->start &&
 				    smb_lock->start < cmp_lock->end) {
 					spin_unlock(&conn->llist_lock);
-					up_read(&conn_list_lock);
+					spin_unlock(&conn_hash[bkt].lock);
 					pr_err_ratelimited("current lock conflict with zero byte lock range\n");
 					goto out;
 				}
@@ -8500,14 +8513,15 @@ int smb2_lock(struct ksmbd_work *work)
 				      cmp_lock->end >= smb_lock->end)) &&
 				    !cmp_lock->zero_len && !smb_lock->zero_len) {
 					spin_unlock(&conn->llist_lock);
-					up_read(&conn_list_lock);
+					spin_unlock(&conn_hash[bkt].lock);
 					pr_err_ratelimited("Not allow lock operation on exclusive lock range\n");
 					goto out;
 				}
 			}
 			spin_unlock(&conn->llist_lock);
 		}
-		up_read(&conn_list_lock);
+		spin_unlock(&conn_hash[bkt].lock);
+		}
 out_check_cl:
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 9, 0)
 		if (lock_is_unlock(smb_lock->fl) && nolock) {
@@ -9681,8 +9695,21 @@ int smb2_oplock_break(struct ksmbd_work *work)
 }
 
 /**
+ * smb2_notify_cancel() - cancel callback for async notify
+ * @argv: cancel arguments (argv[0] = ksmbd_notify_watch *)
+ */
+static void smb2_notify_cancel(void **argv)
+{
+	ksmbd_notify_cancel(argv);
+}
+
+/**
  * smb2_notify() - handler for smb2 notify request
  * @work:   smb work containing notify command buffer
+ *
+ * Validates the CHANGE_NOTIFY request, installs an fsnotify watch
+ * on the target directory, and returns STATUS_PENDING.  The actual
+ * response is sent asynchronously when a matching event arrives.
  *
  * Return:      0 on success, otherwise error
  */
@@ -9690,6 +9717,12 @@ int smb2_notify(struct ksmbd_work *work)
 {
 	struct smb2_notify_req *req;
 	struct smb2_notify_rsp *rsp;
+	struct ksmbd_file *fp;
+	u32 completion_filter;
+	u32 output_buf_len;
+	bool watch_tree;
+	void **argv;
+	int rc;
 
 	ksmbd_debug(SMB, "Received smb2 notify\n");
 
@@ -9701,9 +9734,80 @@ int smb2_notify(struct ksmbd_work *work)
 		return -EIO;
 	}
 
-	smb2_set_err_rsp(work);
-	rsp->hdr.Status = STATUS_NOT_IMPLEMENTED;
-	return -EOPNOTSUPP;
+	fp = ksmbd_lookup_fd_slow(work,
+				  req->VolatileFileId,
+				  req->PersistentFileId);
+	if (!fp) {
+		pr_err_ratelimited("ksmbd: notify invalid FID\n");
+		rsp->hdr.Status = STATUS_FILE_CLOSED;
+		smb2_set_err_rsp(work);
+		return -EBADF;
+	}
+
+	/* CHANGE_NOTIFY is only valid on directories */
+	if (!S_ISDIR(file_inode(fp->filp)->i_mode)) {
+		pr_err_ratelimited(
+			"ksmbd: notify on non-directory\n");
+		rsp->hdr.Status = STATUS_INVALID_PARAMETER;
+		smb2_set_err_rsp(work);
+		ksmbd_fd_put(work, fp);
+		return -EINVAL;
+	}
+
+	completion_filter =
+		le32_to_cpu(req->CompletionFilter);
+	output_buf_len =
+		le32_to_cpu(req->OutputBufferLength);
+	watch_tree =
+		le16_to_cpu(req->Flags) & SMB2_WATCH_TREE;
+
+	/* Set up async work for STATUS_PENDING */
+	argv = kmalloc(sizeof(void *), KSMBD_DEFAULT_GFP);
+	if (!argv) {
+		rsp->hdr.Status = STATUS_INSUFFICIENT_RESOURCES;
+		smb2_set_err_rsp(work);
+		ksmbd_fd_put(work, fp);
+		return -ENOMEM;
+	}
+
+	rc = setup_async_work(work, smb2_notify_cancel,
+			      argv);
+	if (rc) {
+		kfree(argv);
+		rsp->hdr.Status = STATUS_INSUFFICIENT_RESOURCES;
+		smb2_set_err_rsp(work);
+		ksmbd_fd_put(work, fp);
+		return rc;
+	}
+
+	/*
+	 * Install the fsnotify watch.  On success argv[0]
+	 * is set to the watch pointer for cancel path.
+	 */
+	rc = ksmbd_notify_add_watch(fp, work,
+				    completion_filter,
+				    watch_tree,
+				    output_buf_len,
+				    argv);
+	if (rc) {
+		release_async_work(work);
+		rsp->hdr.Status = STATUS_INSUFFICIENT_RESOURCES;
+		smb2_set_err_rsp(work);
+		ksmbd_fd_put(work, fp);
+		return rc;
+	}
+
+	/* Send STATUS_PENDING interim response */
+	smb2_send_interim_resp(work, STATUS_PENDING);
+
+	ksmbd_fd_put(work, fp);
+
+	/*
+	 * Do NOT send a response from the main handler --
+	 * the async completion in fsnotify will send it.
+	 */
+	work->send_no_response = 1;
+	return 0;
 }
 
 /**

@@ -26,6 +26,7 @@
 #include "ksmbd_create_ctx.h"
 #include "ksmbd_info.h"
 #include "ksmbd_dfs.h"
+#include "ksmbd_vss.h"
 #include "ksmbd_notify.h"
 
 extern int ksmbd_debugfs_init(void);
@@ -643,6 +644,10 @@ static int __init ksmbd_server_init(void)
 	if (ret)
 		goto err_dfs;
 
+	ret = ksmbd_vss_init();
+	if (ret)
+		goto err_vss;
+
 	ret = ksmbd_create_ctx_init();
 	if (ret)
 		goto err_create_ctx;
@@ -662,6 +667,8 @@ err_notify:
 err_info:
 	ksmbd_create_ctx_exit();
 err_create_ctx:
+	ksmbd_vss_exit();
+err_vss:
 	ksmbd_dfs_exit();
 err_dfs:
 	ksmbd_fsctl_exit();
@@ -696,6 +703,7 @@ static void __exit ksmbd_server_exit(void)
 	ksmbd_notify_exit();
 	ksmbd_info_exit();
 	ksmbd_create_ctx_exit();
+	ksmbd_vss_exit();
 	ksmbd_dfs_exit();
 	ksmbd_fsctl_exit();
 	ksmbd_server_shutdown();
