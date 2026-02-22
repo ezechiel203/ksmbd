@@ -44,11 +44,29 @@
 #include "mgmt/tree_connect.h"
 #include "mgmt/user_session.h"
 #include "mgmt/user_config.h"
+#include "compat.h"
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 6, 0)
 extern int vfs_path_lookup(struct dentry *, struct vfsmount *,
 			   const char *, unsigned int, struct path *);
 #endif
+
+/**
+ * ksmbd_vfs_path_is_within_share() - Verify file is within share root
+ * @file:	opened file
+ * @share_root:	share root path
+ *
+ * Post-open defense-in-depth check to confirm the opened file has not
+ * escaped the share boundary via a symlink race (TOCTOU).
+ *
+ * Return: true if file is within share root, false otherwise
+ */
+static bool __maybe_unused
+ksmbd_vfs_path_is_within_share(struct file *file,
+			       const struct path *share_root)
+{
+	return path_is_under(&file->f_path, share_root);
+}
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(6, 4, 0)
 static char *extract_last_component(char *path)
@@ -1037,11 +1055,8 @@ int ksmbd_vfs_setattr(struct ksmbd_work *work, const char *name, u64 fid,
 		return -ENOMEM;
 
 	if (name) {
-		unsigned int lookup_flags = 0;
+		unsigned int lookup_flags = LOOKUP_BENEATH;
 
-#ifdef LOOKUP_BENEATH
-		lookup_flags |= LOOKUP_BENEATH;
-#endif
 		err = kern_path(name, lookup_flags, &path);
 		if (err) {
 			ksmbd_revert_fsids(work);
@@ -1490,10 +1505,8 @@ int ksmbd_vfs_link(struct ksmbd_work *work, const char *oldname,
 		return -ENOMEM;
 
 	{
-		unsigned int lookup_flags = LOOKUP_NO_SYMLINKS;
-#ifdef LOOKUP_BENEATH
-		lookup_flags |= LOOKUP_BENEATH;
-#endif
+		unsigned int lookup_flags =
+			LOOKUP_NO_SYMLINKS | LOOKUP_BENEATH;
 		err = kern_path(oldname, lookup_flags, &oldpath);
 	}
 	if (err) {
@@ -2281,10 +2294,8 @@ int ksmbd_vfs_fsetxattr(struct ksmbd_work *work, const char *filename,
 		return -ENOMEM;
 
 	{
-		unsigned int lookup_flags = 0;
-#ifdef LOOKUP_BENEATH
-		lookup_flags |= LOOKUP_BENEATH;
-#endif
+		unsigned int lookup_flags = LOOKUP_BENEATH;
+
 		err = kern_path(filename, lookup_flags, &path);
 	}
 	if (err) {
@@ -2994,6 +3005,14 @@ struct ksmbd_file *ksmbd_vfs_dentry_open(struct ksmbd_work *work,
 		return ERR_PTR(err);
 	}
 
+	/* Post-open TOCTOU check: verify file is within share root */
+	if (!ksmbd_vfs_path_is_within_share(filp,
+			&work->tcon->share_conf->vfs_path)) {
+		pr_err_ratelimited("path escapes share root\n");
+		fput(filp);
+		return ERR_PTR(-EACCES);
+	}
+
 	ksmbd_vfs_set_fadvise(filp, option);
 
 	fp = ksmbd_open_fd(work, filp);
@@ -3201,7 +3220,7 @@ retry:
 		err = vfs_path_lookup(share_conf->vfs_path.dentry,
 				      share_conf->vfs_path.mnt,
 				      filepath,
-				      flags,
+				      flags | LOOKUP_BENEATH,
 				      &parent_path);
 		next[0] = '/';
 		if (err)
@@ -3358,7 +3377,7 @@ int ksmbd_vfs_kern_path(struct ksmbd_work *work, char *name,
 	if (IS_ERR(abs_name))
 		return PTR_ERR(abs_name);
 
-	err = kern_path(abs_name, flags, path);
+	err = kern_path(abs_name, flags | LOOKUP_BENEATH, path);
 	if (!err) {
 		err = 0;
 		goto free_abs_name;
@@ -3402,7 +3421,9 @@ int ksmbd_vfs_kern_path(struct ksmbd_work *work, char *name,
 			path_put(&parent);
 			next[0] = '\0';
 
-			err = kern_path(filepath, flags, &parent);
+			err = kern_path(filepath,
+					flags | LOOKUP_BENEATH,
+					&parent);
 			if (err)
 				goto out;
 

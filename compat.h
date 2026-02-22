@@ -3,6 +3,15 @@
 
 #include <linux/version.h>
 #include <linux/workqueue.h>
+#include <linux/namei.h>
+
+/*
+ * LOOKUP_BENEATH was added in Linux 5.6.  Define as no-op on older
+ * kernels so callers can unconditionally OR the flag into lookup_flags.
+ */
+#ifndef LOOKUP_BENEATH
+#define LOOKUP_BENEATH 0
+#endif
 
 /*
  * disable_work_sync() was introduced in Linux 6.13.
