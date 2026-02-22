@@ -415,7 +415,7 @@ static struct ksmbd_file *ksmbd_fp_get(struct ksmbd_file *fp)
 	if (fp->f_state != FP_INITED)
 		return NULL;
 
-	if (!atomic_inc_not_zero(&fp->refcount))
+	if (!refcount_inc_not_zero(&fp->refcount))
 		return NULL;
 	return fp;
 }
@@ -473,7 +473,7 @@ int ksmbd_close_fd(struct ksmbd_work *work, u64 id)
 			fp = NULL;
 		else {
 			fp->f_state = FP_CLOSED;
-			if (!atomic_dec_and_test(&fp->refcount))
+			if (!refcount_dec_and_test(&fp->refcount))
 				fp = NULL;
 		}
 	}
@@ -491,7 +491,7 @@ void ksmbd_fd_put(struct ksmbd_work *work, struct ksmbd_file *fp)
 	if (!fp)
 		return;
 
-	if (!atomic_dec_and_test(&fp->refcount))
+	if (!refcount_dec_and_test(&fp->refcount))
 		return;
 	__put_fd_final(work, fp);
 }
@@ -566,7 +566,7 @@ struct ksmbd_file *ksmbd_lookup_durable_fd(unsigned long long id)
 
 void ksmbd_put_durable_fd(struct ksmbd_file *fp)
 {
-	if (!atomic_dec_and_test(&fp->refcount))
+	if (!refcount_dec_and_test(&fp->refcount))
 		return;
 
 	__ksmbd_close_fd(NULL, fp);
@@ -713,7 +713,7 @@ struct ksmbd_file *ksmbd_open_fd(struct ksmbd_work *work, struct file *filp)
 	INIT_LIST_HEAD(&fp->node);
 	INIT_LIST_HEAD(&fp->lock_list);
 	spin_lock_init(&fp->f_lock);
-	atomic_set(&fp->refcount, 1);
+	refcount_set(&fp->refcount, 1);
 
 	fp->filp		= filp;
 	fp->conn		= work->conn;
@@ -772,7 +772,7 @@ __close_file_table_ids(struct ksmbd_file_table *ft,
 		}
 
 		if (skip(tcon, fp) ||
-		    !atomic_dec_and_test(&fp->refcount)) {
+		    !refcount_dec_and_test(&fp->refcount)) {
 			id++;
 			write_unlock(&ft->lock);
 			continue;
@@ -884,7 +884,7 @@ static int ksmbd_durable_scavenger(void *dummy)
 			if (!fp->durable_timeout)
 				continue;
 
-			if (atomic_read(&fp->refcount) > 1 ||
+			if (refcount_read(&fp->refcount) > 1 ||
 			    fp->conn)
 				continue;
 
@@ -975,7 +975,7 @@ static bool session_fd_check(struct ksmbd_tree_connect *tcon,
 		if (op->conn != conn)
 			continue;
 		if (op->conn)
-			atomic_dec(&op->conn->refcnt);
+			refcount_dec(&op->conn->refcnt);
 		op->conn = NULL;
 	}
 	up_write(&ci->m_lock);
@@ -1095,7 +1095,7 @@ int ksmbd_reopen_durable_fd(struct ksmbd_work *work, struct ksmbd_file *fp)
 		if (op->conn)
 			continue;
 		op->conn = fp->conn;
-		atomic_inc(&op->conn->refcnt);
+		refcount_inc(&op->conn->refcnt);
 	}
 	up_write(&ci->m_lock);
 

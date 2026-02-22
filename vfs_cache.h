@@ -11,6 +11,7 @@
 #include <linux/rwsem.h>
 #include <linux/spinlock.h>
 #include <linux/idr.h>
+#include <linux/refcount.h>
 #include <linux/workqueue.h>
 
 #include "vfs.h"
@@ -81,7 +82,7 @@ struct ksmbd_file {
 	struct ksmbd_conn		*conn;
 	struct ksmbd_tree_connect	*tcon;
 
-	atomic_t			refcount;
+	refcount_t			refcount;
 	__le32				daccess;
 	__le32				saccess;
 	__le32				coption;

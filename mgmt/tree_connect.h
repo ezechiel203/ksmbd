@@ -7,6 +7,7 @@
 #define __TREE_CONNECT_MANAGEMENT_H__
 
 #include <linux/hashtable.h>
+#include <linux/refcount.h>
 
 #include "../ksmbd_netlink.h"
 
@@ -32,7 +33,7 @@ struct ksmbd_tree_connect {
 
 	int				maximal_access;
 	bool				posix_extensions;
-	atomic_t			refcount;
+	refcount_t			refcount;
 	unsigned int			t_state;
 };
 

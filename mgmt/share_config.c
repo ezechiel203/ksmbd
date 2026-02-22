@@ -69,7 +69,7 @@ void __ksmbd_share_config_put(struct ksmbd_share_config *share)
 static struct ksmbd_share_config *
 __get_share_config(struct ksmbd_share_config *share)
 {
-	if (!atomic_inc_not_zero(&share->refcount))
+	if (!refcount_inc_not_zero(&share->refcount))
 		return NULL;
 	return share;
 }
@@ -155,7 +155,7 @@ static struct ksmbd_share_config *share_config_request(struct ksmbd_work *work,
 		goto out;
 
 	share->flags = resp->flags;
-	atomic_set(&share->refcount, 1);
+	refcount_set(&share->refcount, 1);
 	INIT_LIST_HEAD(&share->veto_list);
 	share->name = kstrdup(name, KSMBD_DEFAULT_GFP);
 

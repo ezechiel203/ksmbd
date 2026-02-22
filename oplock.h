@@ -7,6 +7,7 @@
 #ifndef __KSMBD_OPLOCK_H
 #define __KSMBD_OPLOCK_H
 
+#include <linux/refcount.h>
 #include "smb_common.h"
 
 #define OPLOCK_WAIT_TIME	(35 * HZ)
@@ -70,7 +71,7 @@ struct oplock_info {
 	unsigned long		pending_break;
 	u64			fid;
 	atomic_t		breaking_cnt;
-	atomic_t		refcount;
+	refcount_t		refcount;
 	__u16                   Tid;
 	bool			is_lease;
 #ifdef CONFIG_SMB_INSECURE_SERVER

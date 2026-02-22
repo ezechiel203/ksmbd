@@ -9,6 +9,7 @@
 #include <linux/workqueue.h>
 #include <linux/hashtable.h>
 #include <linux/path.h>
+#include <linux/refcount.h>
 #include <linux/unicode.h>
 
 struct ksmbd_work;
@@ -23,7 +24,7 @@ struct ksmbd_share_config {
 
 	struct path		vfs_path;
 
-	atomic_t		refcount;
+	refcount_t		refcount;
 	struct hlist_node	hlist;
 	unsigned short		create_mask;
 	unsigned short		directory_mask;
@@ -66,7 +67,7 @@ void __ksmbd_share_config_put(struct ksmbd_share_config *share);
 
 static inline void ksmbd_share_config_put(struct ksmbd_share_config *share)
 {
-	if (!atomic_dec_and_test(&share->refcount))
+	if (!refcount_dec_and_test(&share->refcount))
 		return;
 	__ksmbd_share_config_put(share);
 }

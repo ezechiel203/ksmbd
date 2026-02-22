@@ -61,7 +61,7 @@ static void ksmbd_conn_cleanup(struct ksmbd_conn *conn)
 
 void ksmbd_conn_free(struct ksmbd_conn *conn)
 {
-	if (!atomic_dec_and_test(&conn->refcnt))
+	if (!refcount_dec_and_test(&conn->refcnt))
 		return;
 
 	ksmbd_conn_cleanup(conn);
@@ -97,7 +97,7 @@ struct ksmbd_conn *ksmbd_conn_alloc(void)
 		conn->um = NULL;
 	atomic_set(&conn->req_running, 0);
 	atomic_set(&conn->r_count, 0);
-	atomic_set(&conn->refcnt, 1);
+	refcount_set(&conn->refcnt, 1);
 	conn->total_credits = 1;
 	conn->outstanding_credits = 0;
 
@@ -517,11 +517,11 @@ void ksmbd_conn_r_count_dec(struct ksmbd_conn *conn)
 	 * disconnection. waitqueue_active is safe because it
 	 * uses atomic operation for condition.
 	 */
-	atomic_inc(&conn->refcnt);
+	refcount_inc(&conn->refcnt);
 	if (!atomic_dec_return(&conn->r_count) && waitqueue_active(&conn->r_count_q))
 		wake_up(&conn->r_count_q);
 
-	if (atomic_dec_and_test(&conn->refcnt))
+	if (refcount_dec_and_test(&conn->refcnt))
 		ksmbd_conn_cleanup(conn);
 }
 
@@ -558,10 +558,10 @@ again:
 		t = conn->transport;
 		ksmbd_conn_set_exiting(conn);
 		if (t->ops->shutdown) {
-			atomic_inc(&conn->refcnt);
+			refcount_inc(&conn->refcnt);
 			up_read(&conn_list_lock);
 			t->ops->shutdown(t);
-			atomic_dec(&conn->refcnt);
+			refcount_dec(&conn->refcnt);
 			goto again;
 		}
 	}

@@ -434,7 +434,7 @@ int smb_tree_disconnect(struct ksmbd_work *work)
 		return -ENOENT;
 	}
 
-	WARN_ON_ONCE(atomic_dec_and_test(&tcon->refcount));
+	WARN_ON_ONCE(refcount_dec_and_test(&tcon->refcount));
 	tcon->t_state = TREE_DISCONNECTED;
 	write_unlock(&sess->tree_conns_lock);
 

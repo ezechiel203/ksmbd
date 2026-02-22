@@ -14,6 +14,7 @@
 #include <net/request_sock.h>
 #include <linux/kthread.h>
 #include <linux/nls.h>
+#include <linux/refcount.h>
 #include <linux/unicode.h>
 
 #include "smb_common.h"
@@ -115,7 +116,7 @@ struct ksmbd_conn {
 	bool				signing_negotiated;
 	__le16				signing_algorithm;
 	bool				binding;
-	atomic_t			refcnt;
+	refcount_t			refcnt;
 
 #ifdef CONFIG_KSMBD_FRUIT
 	bool				is_fruit;

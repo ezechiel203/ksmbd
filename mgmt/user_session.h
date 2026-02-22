@@ -7,6 +7,7 @@
 #define __USER_SESSION_MANAGEMENT_H__
 
 #include <linux/hashtable.h>
+#include <linux/refcount.h>
 #include <linux/xarray.h>
 
 #include "../smb_common.h"
@@ -65,7 +66,7 @@ struct ksmbd_session {
 	unsigned long			last_active;
 	rwlock_t			tree_conns_lock;
 
-	atomic_t			refcnt;
+	refcount_t			refcnt;
 	struct rw_semaphore		rpc_lock;
 };
 

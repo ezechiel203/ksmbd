@@ -56,9 +56,9 @@ static struct oplock_info *alloc_opinfo(struct ksmbd_work *work,
 	INIT_LIST_HEAD(&opinfo->op_entry);
 	init_waitqueue_head(&opinfo->oplock_q);
 	init_waitqueue_head(&opinfo->oplock_brk);
-	atomic_set(&opinfo->refcount, 1);
+	refcount_set(&opinfo->refcount, 1);
 	atomic_set(&opinfo->breaking_cnt, 0);
-	atomic_inc(&opinfo->conn->refcnt);
+	refcount_inc(&opinfo->conn->refcnt);
 
 	return opinfo;
 }
@@ -133,7 +133,7 @@ static void free_opinfo(struct oplock_info *opinfo)
 	if (opinfo->is_lease)
 		free_lease(opinfo);
 	if (opinfo->conn)
-		atomic_dec(&opinfo->conn->refcnt);
+		refcount_dec(&opinfo->conn->refcnt);
 	opinfo->conn = NULL;
 	kfree(opinfo);
 }
@@ -144,7 +144,7 @@ struct oplock_info *opinfo_get(struct ksmbd_file *fp)
 
 	rcu_read_lock();
 	opinfo = rcu_dereference(fp->f_opinfo);
-	if (opinfo && !atomic_inc_not_zero(&opinfo->refcount))
+	if (opinfo && !refcount_inc_not_zero(&opinfo->refcount))
 		opinfo = NULL;
 	rcu_read_unlock();
 
@@ -160,11 +160,11 @@ static struct oplock_info *opinfo_get_list(struct ksmbd_inode *ci)
 					  op_entry);
 	if (opinfo) {
 		if (opinfo->conn == NULL ||
-		    !atomic_inc_not_zero(&opinfo->refcount))
+		    !refcount_inc_not_zero(&opinfo->refcount))
 			opinfo = NULL;
 		else {
 			if (ksmbd_conn_releasing(opinfo->conn)) {
-				atomic_dec(&opinfo->refcount);
+				refcount_dec(&opinfo->refcount);
 				opinfo = NULL;
 			}
 		}
@@ -179,7 +179,7 @@ void opinfo_put(struct oplock_info *opinfo)
 	if (!opinfo)
 		return;
 
-	if (!atomic_dec_and_test(&opinfo->refcount))
+	if (!refcount_dec_and_test(&opinfo->refcount))
 		return;
 
 	free_opinfo(opinfo);
@@ -1211,7 +1211,7 @@ int find_same_lease_key(struct ksmbd_session *sess, struct ksmbd_inode *ci,
 found:
 	rcu_read_lock();
 	list_for_each_entry_rcu(opinfo, &lb->lease_list, lease_entry) {
-		if (!atomic_inc_not_zero(&opinfo->refcount))
+		if (!refcount_inc_not_zero(&opinfo->refcount))
 			continue;
 		rcu_read_unlock();
 		if (opinfo->o_fp->f_ci == ci)
@@ -1324,7 +1324,7 @@ void smb_send_parent_lease_break_noti(struct ksmbd_file *fp,
 		    (!(lctx->flags & SMB2_LEASE_FLAG_PARENT_LEASE_KEY_SET_LE) ||
 		     !compare_guid_key(opinfo, fp->conn->ClientGUID,
 				      lctx->parent_lease_key))) {
-			if (!atomic_inc_not_zero(&opinfo->refcount))
+			if (!refcount_inc_not_zero(&opinfo->refcount))
 				continue;
 
 			if (ksmbd_conn_releasing(opinfo->conn)) {
@@ -1369,7 +1369,7 @@ void smb_lazy_parent_lease_break_close(struct ksmbd_file *fp)
 			continue;
 
 		if (opinfo->o_lease->state != SMB2_OPLOCK_LEVEL_NONE) {
-			if (!atomic_inc_not_zero(&opinfo->refcount))
+			if (!refcount_inc_not_zero(&opinfo->refcount))
 				continue;
 
 			if (ksmbd_conn_releasing(opinfo->conn)) {
@@ -1576,7 +1576,7 @@ void smb_break_all_levII_oplock(struct ksmbd_work *work, struct ksmbd_file *fp,
 		if (brk_op->conn == NULL)
 			continue;
 
-		if (!atomic_inc_not_zero(&brk_op->refcount))
+		if (!refcount_inc_not_zero(&brk_op->refcount))
 			continue;
 
 		if (ksmbd_conn_releasing(brk_op->conn)) {
@@ -2143,7 +2143,7 @@ struct oplock_info *lookup_lease_in_table(struct ksmbd_conn *conn,
 found:
 	rcu_read_lock();
 	list_for_each_entry_rcu(opinfo, &lt->lease_list, lease_entry) {
-		if (!atomic_inc_not_zero(&opinfo->refcount))
+		if (!refcount_inc_not_zero(&opinfo->refcount))
 			continue;
 		rcu_read_unlock();
 		if (!opinfo->op_state || opinfo->op_state == OPLOCK_CLOSING)
