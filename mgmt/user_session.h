@@ -8,6 +8,7 @@
 
 #include <linux/hashtable.h>
 #include <linux/refcount.h>
+#include <linux/rcupdate.h>
 #include <linux/xarray.h>
 
 #include "../smb_common.h"
@@ -68,6 +69,7 @@ struct ksmbd_session {
 
 	refcount_t			refcnt;
 	struct rw_semaphore		rpc_lock;
+	struct rcu_head			rcu_head;
 };
 
 static inline int test_session_flag(struct ksmbd_session *sess, int bit)

@@ -6,6 +6,8 @@
 #include <linux/list.h>
 #include <linux/slab.h>
 #include <linux/rwsem.h>
+#include <linux/rcupdate.h>
+#include <linux/mutex.h>
 #include <linux/xarray.h>
 #include <linux/string.h>
 #include <crypto/algapi.h>
@@ -22,7 +24,7 @@ static DEFINE_IDA(session_ida);
 
 #define SESSION_HASH_BITS		12
 static DEFINE_HASHTABLE(sessions_table, SESSION_HASH_BITS);
-static DECLARE_RWSEM(sessions_table_lock);
+static DEFINE_MUTEX(sessions_table_lock);
 
 struct ksmbd_session_rpc {
 	int			id;
@@ -183,7 +185,7 @@ struct ksmbd_session *__session_lookup(unsigned long long id)
 {
 	struct ksmbd_session *sess;
 
-	hash_for_each_possible(sessions_table, sess, hlist, id) {
+	hash_for_each_possible_rcu(sessions_table, sess, hlist, id) {
 		if (id == sess->id) {
 			sess->last_active = jiffies;
 			return sess;
@@ -194,12 +196,16 @@ struct ksmbd_session *__session_lookup(unsigned long long id)
 
 static void ksmbd_expire_session(struct ksmbd_conn *conn)
 {
+	struct ksmbd_session *expired[16];
+	int nr_expired = 0, i;
 	unsigned long id;
 	struct ksmbd_session *sess;
 
-	down_write(&sessions_table_lock);
+	mutex_lock(&sessions_table_lock);
 	down_write(&conn->session_lock);
 	xa_for_each(&conn->sessions, id, sess) {
+		if (nr_expired >= ARRAY_SIZE(expired))
+			break;
 		if (refcount_read(&sess->refcnt) <= 1 &&
 		    (sess->state != SMB2_SESSION_VALID ||
 		     time_after(jiffies,
@@ -207,16 +213,22 @@ static void ksmbd_expire_session(struct ksmbd_conn *conn)
 			xa_erase(&conn->sessions, sess->id);
 #ifdef CONFIG_SMB_INSECURE_SERVER
 			if (hash_hashed(&sess->hlist))
-				hash_del(&sess->hlist);
+				hash_del_rcu(&sess->hlist);
 #else
-			hash_del(&sess->hlist);
+			hash_del_rcu(&sess->hlist);
 #endif
-			ksmbd_session_destroy(sess);
+			expired[nr_expired++] = sess;
 			continue;
 		}
 	}
 	up_write(&conn->session_lock);
-	up_write(&sessions_table_lock);
+	mutex_unlock(&sessions_table_lock);
+
+	if (nr_expired) {
+		synchronize_rcu();
+		for (i = 0; i < nr_expired; i++)
+			ksmbd_session_destroy(expired[i]);
+	}
 }
 
 int ksmbd_session_register(struct ksmbd_conn *conn,
@@ -243,27 +255,42 @@ static int ksmbd_chann_del(struct ksmbd_conn *conn, struct ksmbd_session *sess)
 void ksmbd_sessions_deregister(struct ksmbd_conn *conn)
 {
 	struct ksmbd_session *sess;
+	struct ksmbd_session **to_destroy = NULL;
+	int nr_destroy = 0, capacity = 0;
 	unsigned long id;
 
-	down_write(&sessions_table_lock);
+	mutex_lock(&sessions_table_lock);
 	if (conn->binding) {
 		int bkt;
 		struct hlist_node *tmp;
 
-		hash_for_each_safe(sessions_table, bkt, tmp, sess, hlist) {
+		hash_for_each_safe(sessions_table, bkt, tmp,
+				   sess, hlist) {
 			if (!ksmbd_chann_del(conn, sess) &&
 			    xa_empty(&sess->ksmbd_chann_list)) {
 #ifdef CONFIG_SMB_INSECURE_SERVER
 				if (hash_hashed(&sess->hlist))
-					hash_del(&sess->hlist);
+					hash_del_rcu(&sess->hlist);
 #else
-				hash_del(&sess->hlist);
+				hash_del_rcu(&sess->hlist);
 #endif
 				down_write(&conn->session_lock);
 				xa_erase(&conn->sessions, sess->id);
 				up_write(&conn->session_lock);
-				if (refcount_dec_and_test(&sess->refcnt))
-					ksmbd_session_destroy(sess);
+				if (refcount_dec_and_test(&sess->refcnt)) {
+					if (nr_destroy >= capacity) {
+						capacity = max(8,
+							       capacity * 2);
+						to_destroy = krealloc(
+							to_destroy,
+							capacity *
+							sizeof(*to_destroy),
+							KSMBD_DEFAULT_GFP);
+					}
+					if (to_destroy)
+						to_destroy[nr_destroy++] =
+							sess;
+				}
 			}
 		}
 	}
@@ -283,16 +310,35 @@ void ksmbd_sessions_deregister(struct ksmbd_conn *conn)
 			xa_erase(&conn->sessions, sess->id);
 #ifdef CONFIG_SMB_INSECURE_SERVER
 			if (hash_hashed(&sess->hlist))
-				hash_del(&sess->hlist);
+				hash_del_rcu(&sess->hlist);
 #else
-			hash_del(&sess->hlist);
+			hash_del_rcu(&sess->hlist);
 #endif
-			if (refcount_dec_and_test(&sess->refcnt))
-				ksmbd_session_destroy(sess);
+			if (refcount_dec_and_test(&sess->refcnt)) {
+				if (nr_destroy >= capacity) {
+					capacity = max(8, capacity * 2);
+					to_destroy = krealloc(
+						to_destroy,
+						capacity *
+						sizeof(*to_destroy),
+						KSMBD_DEFAULT_GFP);
+				}
+				if (to_destroy)
+					to_destroy[nr_destroy++] = sess;
+			}
 		}
 	}
 	up_write(&conn->session_lock);
-	up_write(&sessions_table_lock);
+	mutex_unlock(&sessions_table_lock);
+
+	if (nr_destroy) {
+		int i;
+
+		synchronize_rcu();
+		for (i = 0; i < nr_destroy; i++)
+			ksmbd_session_destroy(to_destroy[i]);
+	}
+	kfree(to_destroy);
 }
 
 bool is_ksmbd_session_in_connection(struct ksmbd_conn *conn,
@@ -326,15 +372,28 @@ struct ksmbd_session *ksmbd_session_lookup(struct ksmbd_conn *conn,
 	return sess;
 }
 
+/**
+ * ksmbd_session_lookup_slowpath() - Look up session by ID from
+ *                                   global table
+ * @id: session ID to look up
+ *
+ * Uses RCU for lock-free read-side lookup of sessions in the
+ * global sessions hash table. Takes a reference on the session
+ * if found.
+ *
+ * Return: session with incremented refcount, or NULL
+ */
 struct ksmbd_session *ksmbd_session_lookup_slowpath(unsigned long long id)
 {
 	struct ksmbd_session *sess;
 
-	down_read(&sessions_table_lock);
+	rcu_read_lock();
 	sess = __session_lookup(id);
-	if (sess)
-		ksmbd_user_session_get(sess);
-	up_read(&sessions_table_lock);
+	if (sess) {
+		if (!refcount_inc_not_zero(&sess->refcnt))
+			sess = NULL;
+	}
+	rcu_read_unlock();
 
 	return sess;
 }
@@ -394,7 +453,7 @@ void destroy_previous_session(struct ksmbd_conn *conn,
 	struct ksmbd_user *prev_user;
 	int err;
 
-	down_write(&sessions_table_lock);
+	mutex_lock(&sessions_table_lock);
 	down_write(&conn->session_lock);
 	rcu_read_lock();
 	prev_sess = __session_lookup(id);
@@ -406,7 +465,8 @@ void destroy_previous_session(struct ksmbd_conn *conn,
 	if (!prev_user ||
 	    strcmp(user->name, prev_user->name) ||
 	    user->passkey_sz != prev_user->passkey_sz ||
-	    crypto_memneq(user->passkey, prev_user->passkey, user->passkey_sz))
+	    crypto_memneq(user->passkey, prev_user->passkey,
+			  user->passkey_sz))
 		goto out;
 
 	ksmbd_all_conn_set_status(id, KSMBD_SESS_NEED_RECONNECT);
@@ -422,7 +482,7 @@ void destroy_previous_session(struct ksmbd_conn *conn,
 	ksmbd_launch_ksmbd_durable_scavenger();
 out:
 	up_write(&conn->session_lock);
-        up_write(&sessions_table_lock);
+	mutex_unlock(&sessions_table_lock);
 }
 
 static bool ksmbd_preauth_session_id_match(struct preauth_session *sess,
@@ -513,9 +573,9 @@ static struct ksmbd_session *__session_create(int protocol)
 
 	ida_init(&sess->tree_conn_ida);
 
-	down_write(&sessions_table_lock);
-	hash_add(sessions_table, &sess->hlist, sess->id);
-	up_write(&sessions_table_lock);
+	mutex_lock(&sessions_table_lock);
+	hash_add_rcu(sessions_table, &sess->hlist, sess->id);
+	mutex_unlock(&sessions_table_lock);
 
 	return sess;
 

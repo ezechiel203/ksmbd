@@ -10,6 +10,7 @@
 #include <linux/hashtable.h>
 #include <linux/path.h>
 #include <linux/refcount.h>
+#include <linux/rcupdate.h>
 #include <linux/unicode.h>
 
 struct ksmbd_work;
@@ -26,6 +27,7 @@ struct ksmbd_share_config {
 
 	refcount_t		refcount;
 	struct hlist_node	hlist;
+	struct rcu_head		rcu_head;
 	unsigned short		create_mask;
 	unsigned short		directory_mask;
 	unsigned short		force_create_mode;
