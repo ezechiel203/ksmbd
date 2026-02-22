@@ -116,6 +116,8 @@ struct ksmbd_conn {
 	bool				posix_ext_supported;
 	bool				signing_negotiated;
 	__le16				signing_algorithm;
+	__le16				rdma_transform_ids[3];
+	unsigned int			rdma_transform_count;
 	bool				binding;
 	refcount_t			refcnt;
 	unsigned long			features;  /* per-connection negotiated features */

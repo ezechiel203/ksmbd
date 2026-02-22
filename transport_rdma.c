@@ -214,6 +214,25 @@ unsigned int get_smbd_max_read_write_size(void)
 	return smb_direct_max_read_write_size;
 }
 
+/**
+ * ksmbd_rdma_transform_supported() - check if an RDMA transform is negotiated
+ * @conn:	smb connection
+ * @transform_id: RDMA transform ID to check (le16)
+ *
+ * Return:	true if the transform was negotiated, else false
+ */
+bool ksmbd_rdma_transform_supported(struct ksmbd_conn *conn,
+				     __le16 transform_id)
+{
+	unsigned int i;
+
+	for (i = 0; i < conn->rdma_transform_count; i++) {
+		if (conn->rdma_transform_ids[i] == transform_id)
+			return true;
+	}
+	return false;
+}
+
 static inline int get_buf_page_count(void *buf, int size)
 {
 	return (int)(DIV_ROUND_UP((uintptr_t)buf + size, PAGE_SIZE) -

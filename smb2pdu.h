@@ -257,6 +257,7 @@ struct preauth_integrity_info {
 #define SMB2_ENCRYPTION_CAPABILITIES		cpu_to_le16(2)
 #define SMB2_COMPRESSION_CAPABILITIES		cpu_to_le16(3)
 #define SMB2_NETNAME_NEGOTIATE_CONTEXT_ID	cpu_to_le16(5)
+#define SMB2_RDMA_TRANSFORM_CAPABILITIES	cpu_to_le16(7)
 #define SMB2_SIGNING_CAPABILITIES		cpu_to_le16(8)
 #define SMB2_POSIX_EXTENSIONS_AVAILABLE		cpu_to_le16(0x100)
 
@@ -335,6 +336,21 @@ struct smb2_netname_neg_context {
 #define SIGNING_ALG_HMAC_SHA256		cpu_to_le16(0)
 #define SIGNING_ALG_AES_CMAC		cpu_to_le16(1)
 #define SIGNING_ALG_AES_GMAC		cpu_to_le16(2)
+
+/* RDMA Transform IDs */
+#define SMB2_RDMA_TRANSFORM_NONE	cpu_to_le16(0x0000)
+#define SMB2_RDMA_TRANSFORM_ENCRYPTION	cpu_to_le16(0x0001)
+#define SMB2_RDMA_TRANSFORM_SIGNING	cpu_to_le16(0x0002)
+
+struct smb2_rdma_transform_capabilities {
+	__le16	ContextType; /* 7 */
+	__le16	DataLength;
+	__le32	Reserved;
+	__le16	TransformCount;
+	__le16	Reserved1;
+	__le32	Reserved2;
+	__le16	RDMATransformIds[];
+} __packed;
 
 struct smb2_signing_capabilities {
 	__le16	ContextType; /* 8 */

@@ -829,6 +829,29 @@ static void build_sign_cap_ctxt(struct smb2_signing_capabilities *pneg_ctxt,
 	pneg_ctxt->SigningAlgorithms[0] = sign_algo;
 }
 
+static void build_rdma_transform_ctxt(
+			struct smb2_rdma_transform_capabilities *pneg_ctxt,
+			struct ksmbd_conn *conn)
+{
+	unsigned int count = conn->rdma_transform_count;
+	unsigned int data_len;
+	unsigned int i;
+
+	pneg_ctxt->ContextType = SMB2_RDMA_TRANSFORM_CAPABILITIES;
+	pneg_ctxt->Reserved = cpu_to_le32(0);
+	pneg_ctxt->TransformCount = cpu_to_le16(count);
+	pneg_ctxt->Reserved1 = cpu_to_le16(0);
+	pneg_ctxt->Reserved2 = cpu_to_le32(0);
+
+	for (i = 0; i < count; i++)
+		pneg_ctxt->RDMATransformIds[i] = conn->rdma_transform_ids[i];
+
+	data_len = sizeof(struct smb2_rdma_transform_capabilities)
+		   - sizeof(struct smb2_neg_context)
+		   + count * sizeof(__le16);
+	pneg_ctxt->DataLength = cpu_to_le16(data_len);
+}
+
 static void build_posix_ctxt(struct smb2_posix_neg_context *pneg_ctxt)
 {
 	pneg_ctxt->ContextType = SMB2_POSIX_EXTENSIONS_AVAILABLE;
@@ -900,6 +923,18 @@ static unsigned int assemble_neg_contexts(struct ksmbd_conn *conn,
 				    conn->signing_algorithm);
 		neg_ctxt_cnt++;
 		ctxt_size += sizeof(struct smb2_signing_capabilities) + 2;
+	}
+
+	if (conn->rdma_transform_count) {
+		ctxt_size = round_up(ctxt_size, 8);
+		ksmbd_debug(SMB,
+			    "assemble SMB2_RDMA_TRANSFORM_CAPABILITIES context\n");
+		build_rdma_transform_ctxt(
+			(struct smb2_rdma_transform_capabilities *)
+			(pneg_ctxt + ctxt_size), conn);
+		neg_ctxt_cnt++;
+		ctxt_size += sizeof(struct smb2_rdma_transform_capabilities)
+			     + conn->rdma_transform_count * sizeof(__le16);
 	}
 
 	rsp->NegotiateContextCount = cpu_to_le16(neg_ctxt_cnt);
@@ -1041,6 +1076,48 @@ static void decode_sign_cap_ctxt(struct ksmbd_conn *conn,
 	}
 }
 
+static void decode_rdma_transform_ctxt(struct ksmbd_conn *conn,
+					struct smb2_rdma_transform_capabilities *pneg_ctxt,
+					int ctxt_len)
+{
+	int xform_cnt;
+	int i, xforms_size;
+
+	if (sizeof(struct smb2_rdma_transform_capabilities) > ctxt_len) {
+		pr_err("Invalid SMB2_RDMA_TRANSFORM_CAPABILITIES context size\n");
+		return;
+	}
+
+	conn->rdma_transform_count = 0;
+
+	xform_cnt = le16_to_cpu(pneg_ctxt->TransformCount);
+	if (xform_cnt == 0) {
+		pr_err("RDMA transform count is zero\n");
+		return;
+	}
+
+	xforms_size = xform_cnt * sizeof(__le16);
+
+	if (sizeof(struct smb2_rdma_transform_capabilities) + xforms_size >
+	    ctxt_len) {
+		pr_err("Invalid RDMA transform count(%d)\n", xform_cnt);
+		return;
+	}
+
+	for (i = 0; i < xform_cnt; i++) {
+		if (pneg_ctxt->RDMATransformIds[i] == SMB2_RDMA_TRANSFORM_NONE ||
+		    pneg_ctxt->RDMATransformIds[i] == SMB2_RDMA_TRANSFORM_ENCRYPTION ||
+		    pneg_ctxt->RDMATransformIds[i] == SMB2_RDMA_TRANSFORM_SIGNING) {
+			if (conn->rdma_transform_count >= ARRAY_SIZE(conn->rdma_transform_ids))
+				break;
+			ksmbd_debug(SMB, "RDMA Transform ID = 0x%x\n",
+				    le16_to_cpu(pneg_ctxt->RDMATransformIds[i]));
+			conn->rdma_transform_ids[conn->rdma_transform_count++] =
+				pneg_ctxt->RDMATransformIds[i];
+		}
+	}
+}
+
 static __le32 deassemble_neg_contexts(struct ksmbd_conn *conn,
 				      struct smb2_negotiate_req *req,
 				      unsigned int len_of_smb)
@@ -1113,6 +1190,15 @@ static __le32 deassemble_neg_contexts(struct ksmbd_conn *conn,
 			ksmbd_debug(SMB,
 				    "deassemble SMB2_POSIX_EXTENSIONS_AVAILABLE context\n");
 			conn->posix_ext_supported = true;
+		} else if (pctx->ContextType == SMB2_RDMA_TRANSFORM_CAPABILITIES) {
+			ksmbd_debug(SMB,
+				    "deassemble SMB2_RDMA_TRANSFORM_CAPABILITIES context\n");
+			if (conn->rdma_transform_count)
+				break;
+
+			decode_rdma_transform_ctxt(conn,
+						   (struct smb2_rdma_transform_capabilities *)pctx,
+						   ctxt_len);
 		} else if (pctx->ContextType == SMB2_SIGNING_CAPABILITIES) {
 			ksmbd_debug(SMB,
 				    "deassemble SMB2_SIGNING_CAPABILITIES context\n");

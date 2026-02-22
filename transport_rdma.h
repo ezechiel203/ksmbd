@@ -59,6 +59,7 @@ void ksmbd_rdma_destroy(void);
 bool ksmbd_rdma_capable_netdev(struct net_device *netdev);
 void init_smbd_max_io_size(unsigned int sz);
 unsigned int get_smbd_max_read_write_size(void);
+bool ksmbd_rdma_transform_supported(struct ksmbd_conn *conn, __le16 transform_id);
 #else
 static inline int ksmbd_rdma_init(void) { return 0; }
 static inline void ksmbd_rdma_stop_listening(void) { }
@@ -66,6 +67,11 @@ static inline void ksmbd_rdma_destroy(void) { }
 static inline bool ksmbd_rdma_capable_netdev(struct net_device *netdev) { return false; }
 static inline void init_smbd_max_io_size(unsigned int sz) { }
 static inline unsigned int get_smbd_max_read_write_size(void) { return 0; }
+static inline bool ksmbd_rdma_transform_supported(struct ksmbd_conn *conn,
+						   __le16 transform_id)
+{
+	return false;
+}
 #endif
 
 #endif /* __KSMBD_TRANSPORT_RDMA_H__ */
