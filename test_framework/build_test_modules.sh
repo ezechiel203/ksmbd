@@ -98,7 +98,6 @@ prepare_kernel_config() {
         log_info "Enabling ksmbd module in kernel config..."
         echo "CONFIG_SMB_SERVER=m" >> "${ROOT_DIR}/.config"
         echo "CONFIG_SMB_SERVER_SMBDIRECT=y" >> "${ROOT_DIR}/.config"
-        echo "CONFIG_SMB_SERVER_CHECK_CAP_NET_ADMIN=y" >> "${ROOT_DIR}/.config"
         echo "CONFIG_SMB_SERVER_KERBEROS5=y" >> "${ROOT_DIR}/.config"
     fi
 

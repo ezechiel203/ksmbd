@@ -51,7 +51,6 @@ jobs:
         echo 'CONFIG_SMB_SERVER=m' >> .config
         echo 'CONFIG_SMB_INSECURE_SERVER=y' >> .config
         echo '# CONFIG_SMB_SERVER_SMBDIRECT is not set' >> .config
-        echo '# CONFIG_SMB_SERVER_CHECK_CAP_NET_ADMIN is not set' >> .config
         make -j$((`nproc`+1)) fs/ksmbd/ksmbd.ko
 
         yes "" | make oldconfig > /dev/null
@@ -60,7 +59,6 @@ jobs:
         echo 'CONFIG_SMB_SERVER=m' >> .config
         echo '# CONFIG_SMB_INSECURE_SERVER is not set' >> .config
         echo '# CONFIG_SMB_SERVER_SMBDIRECT is not set' >> .config
-        echo '# CONFIG_SMB_SERVER_CHECK_CAP_NET_ADMIN is not set' >> .config
         make -j$((`nproc`+1)) fs/ksmbd/ksmbd.ko
 
         yes "" | make oldconfig > /dev/null
@@ -69,7 +67,6 @@ jobs:
         echo 'CONFIG_SMB_SERVER=m' >> .config
         echo '# CONFIG_SMB_INSECURE_SERVER is not set' >> .config
         echo '# CONFIG_SMB_SERVER_SMBDIRECT is not set' >> .config
-        echo '# CONFIG_SMB_SERVER_CHECK_CAP_NET_ADMIN is not set' >> .config
         make -j$((`nproc`+1)) fs/ksmbd/ksmbd.ko
     - name: Compile and insmod ksmbd module
       run: |

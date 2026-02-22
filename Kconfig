@@ -65,10 +65,17 @@ config SMB_SERVER_SMBDIRECT
 	  SMB Direct allows transferring SMB packets over RDMA. If unsure,
 	  say N.
 
-config SMB_SERVER_CHECK_CAP_NET_ADMIN
-	bool "Enable check network administration capability"
+config KSMBD_FRUIT
+	bool "Support for Apple SMB extensions (macOS compatibility)"
 	depends on SMB_SERVER
-	default y
+	default n
 
 	help
-	  Prevent unprivileged processes to start the ksmbd kernel server.
+	  Enables Apple-specific SMB2 create context extensions for
+	  improved macOS client compatibility. This includes support for
+	  the AAPL create context, Time Machine backups, Finder metadata,
+	  and resource fork handling.
+
+	  Enable this if ksmbd will serve macOS or iOS clients. If unsure,
+	  say N.
+
