@@ -79,3 +79,11 @@ config KSMBD_FRUIT
 	  Enable this if ksmbd will serve macOS or iOS clients. If unsure,
 	  say N.
 
+config KSMBD_KUNIT_TEST
+	tristate "KUnit tests for ksmbd" if !KUNIT_ALL_TESTS
+	depends on SMB_SERVER && KUNIT
+	default KUNIT_ALL_TESTS
+	help
+	  KUnit tests for the ksmbd SMB server. Only useful for kernel
+	  developers running KUnit test suites.
+
