@@ -803,6 +803,65 @@ int ksmbd_vfs_read(struct ksmbd_work *work, struct ksmbd_file *fp, size_t count,
 	return nbytes;
 }
 
+/**
+ * ksmbd_vfs_sendfile() - validate and prepare zero-copy file read
+ * @work:	smb work context (contains connection/socket)
+ * @fp:		ksmbd file pointer
+ * @offset:	file offset to start reading from
+ * @count:	number of bytes requested
+ *
+ * Validates that the file can be read at the given offset and
+ * computes the actual number of bytes available for a zero-copy
+ * transfer. The actual data transfer is performed later by the
+ * transport layer's sendfile operation in ksmbd_conn_write().
+ *
+ * Return:	number of bytes available to send, or negative errno
+ */
+ssize_t ksmbd_vfs_sendfile(struct ksmbd_work *work, struct ksmbd_file *fp,
+			   loff_t offset, size_t count)
+{
+	struct ksmbd_conn *conn = work->conn;
+	struct file *filp = fp->filp;
+	struct inode *inode = file_inode(filp);
+	loff_t file_size;
+	ssize_t avail;
+
+	if (S_ISDIR(inode->i_mode))
+		return -EISDIR;
+
+	if (unlikely(count == 0))
+		return 0;
+
+	if (conn->connection_type) {
+		if (!(fp->daccess & (FILE_READ_DATA_LE | FILE_EXECUTE_LE))) {
+			pr_err("no right to read(%pD)\n", fp->filp);
+			return -EACCES;
+		}
+	}
+
+	/* Zero-copy is not supported for stream files */
+	if (ksmbd_stream_fd(fp))
+		return -EOPNOTSUPP;
+
+	if (!work->tcon->posix_extensions) {
+		int ret;
+
+		ret = check_lock_range(filp, offset, offset + count - 1, READ);
+		if (ret) {
+			pr_err("unable to read due to lock\n");
+			return -EAGAIN;
+		}
+	}
+
+	/* Compute available bytes from file size */
+	file_size = i_size_read(inode);
+	if (offset >= file_size)
+		return 0;
+
+	avail = min_t(loff_t, count, file_size - offset);
+	return avail;
+}
+
 static int ksmbd_vfs_stream_write(struct ksmbd_file *fp, char *buf, loff_t *pos,
 				  size_t count)
 {

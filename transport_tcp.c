@@ -5,6 +5,21 @@
  */
 
 #include <linux/freezer.h>
+#include <linux/uio.h>
+#include <linux/highmem.h>
+#include <linux/splice.h>
+#include <linux/version.h>
+
+/*
+ * ITER_DEST/ITER_SOURCE were introduced in kernel 6.0 replacing
+ * READ/WRITE for iov_iter direction. Provide compat definitions.
+ */
+#ifndef ITER_DEST
+#define ITER_DEST	READ
+#endif
+#ifndef ITER_SOURCE
+#define ITER_SOURCE	WRITE
+#endif
 
 #include "smb_common.h"
 #include "server.h"
@@ -440,6 +455,112 @@ static int ksmbd_tcp_writev(struct ksmbd_transport *t, struct kvec *iov,
 	return kernel_sendmsg(TCP_TRANS(t)->sock, &smb_msg, iov, nvecs, size);
 }
 
+/**
+ * ksmbd_tcp_sendfile() - zero-copy file-to-socket transfer
+ * @t:		TCP transport instance
+ * @filp:	file to read data from
+ * @pos:	file offset to start reading from (updated on return)
+ * @count:	number of bytes to send
+ *
+ * Reads file data into pages using vfs_iter_read() with a bvec
+ * iterator, then sends the pages directly to the network socket.
+ * This avoids the intermediate kvzalloc bounce buffer used in the
+ * normal read path.
+ *
+ * Return:	number of bytes sent on success, or negative errno
+ */
+#define KSMBD_SENDFILE_MAX_PAGES 16
+static int ksmbd_tcp_sendfile(struct ksmbd_transport *t, struct file *filp,
+			      loff_t *pos, size_t count)
+{
+	struct tcp_transport *tcp_t = TCP_TRANS(t);
+	struct socket *sock = tcp_t->sock;
+	ssize_t total_sent = 0;
+
+	while (count > 0) {
+		struct bio_vec bvec[KSMBD_SENDFILE_MAX_PAGES];
+		struct page *pages[KSMBD_SENDFILE_MAX_PAGES];
+		struct iov_iter iter;
+		struct msghdr msg = {.msg_flags = MSG_NOSIGNAL};
+		size_t chunk, read_bytes;
+		ssize_t ret;
+		int nr_pages, i;
+
+		chunk = min_t(size_t, count,
+			      KSMBD_SENDFILE_MAX_PAGES * PAGE_SIZE);
+		nr_pages = DIV_ROUND_UP(chunk, PAGE_SIZE);
+
+		/* Allocate pages for reading file data */
+		for (i = 0; i < nr_pages; i++) {
+			pages[i] = alloc_page(KSMBD_DEFAULT_GFP);
+			if (!pages[i]) {
+				while (--i >= 0)
+					put_page(pages[i]);
+				return total_sent ? total_sent : -ENOMEM;
+			}
+		}
+
+		/* Set up bvec entries for the pages */
+		for (i = 0; i < nr_pages; i++) {
+			size_t len = min_t(size_t, chunk - (i * PAGE_SIZE),
+					   PAGE_SIZE);
+			bvec[i].bv_page = pages[i];
+			bvec[i].bv_len = len;
+			bvec[i].bv_offset = 0;
+		}
+
+		/* Read file data directly into pages */
+		iov_iter_bvec(&iter, ITER_DEST, bvec, nr_pages, chunk);
+		ret = vfs_iter_read(filp, &iter, pos, 0);
+		if (ret <= 0) {
+			for (i = 0; i < nr_pages; i++)
+				put_page(pages[i]);
+			return total_sent ? total_sent : (ret ? ret : -EIO);
+		}
+		read_bytes = ret;
+
+		/* Adjust last bvec if we read less than requested */
+		if (read_bytes < chunk) {
+			size_t remaining = read_bytes;
+
+			for (i = 0; i < nr_pages; i++) {
+				size_t bv_len = min_t(size_t, remaining,
+						      PAGE_SIZE);
+				bvec[i].bv_len = bv_len;
+				remaining -= bv_len;
+				if (remaining == 0) {
+					/* Free unused pages */
+					int j;
+
+					for (j = i + 1; j < nr_pages; j++)
+						put_page(pages[j]);
+					nr_pages = i + 1;
+					break;
+				}
+			}
+		}
+
+		/* Send pages to socket */
+		iov_iter_bvec(&iter, ITER_SOURCE, bvec, nr_pages, read_bytes);
+		msg.msg_iter = iter;
+		ret = sock_sendmsg(sock, &msg);
+
+		for (i = 0; i < nr_pages; i++)
+			put_page(pages[i]);
+
+		if (ret < 0)
+			return total_sent ? total_sent : ret;
+
+		total_sent += ret;
+		count -= ret;
+
+		if ((size_t)ret < read_bytes)
+			break;
+	}
+
+	return total_sent;
+}
+
 static void ksmbd_tcp_disconnect(struct ksmbd_transport *t)
 {
 	free_transport(TCP_TRANS(t));
@@ -712,6 +833,7 @@ int ksmbd_tcp_set_interfaces(char *ifc_list, int ifc_list_sz)
 static const struct ksmbd_transport_ops ksmbd_tcp_transport_ops = {
 	.read		= ksmbd_tcp_read,
 	.writev		= ksmbd_tcp_writev,
+	.sendfile	= ksmbd_tcp_sendfile,
 	.disconnect	= ksmbd_tcp_disconnect,
 	.free_transport = ksmbd_tcp_free_transport,
 };

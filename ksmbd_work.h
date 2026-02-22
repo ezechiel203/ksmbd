@@ -76,8 +76,15 @@ struct ksmbd_work {
 	/* Is this SYNC or ASYNC ksmbd_work */
 	bool                            asynchronous:1;
 	bool                            need_invalidate_rkey:1;
+	/* Zero-copy sendfile for read response */
+	bool                            sendfile:1;
 
 	unsigned int                    remote_key;
+
+	/* Zero-copy sendfile state */
+	struct file			*sendfile_filp;
+	loff_t				sendfile_offset;
+	size_t				sendfile_count;
 	/* cancel works */
 	int                             async_id;
 	void                            **cancel_argv;

@@ -7919,6 +7919,72 @@ int smb2_read(struct ksmbd_work *work)
 	ksmbd_debug(SMB, "filename %pD, offset %lld, len %zu\n",
 		    fp->filp, offset, length);
 
+	/*
+	 * Try zero-copy path: send file data directly to the socket
+	 * without an intermediate buffer copy. This is eligible when:
+	 * - Not encrypted (encryption needs to process the data)
+	 * - Not signed (signing needs to hash the data payload)
+	 * - Not a compound request (need contiguous response)
+	 * - Not an RDMA channel (uses different transfer mechanism)
+	 * - Not a stream file (streams need special handling)
+	 * - Transport supports sendfile
+	 */
+	if (!work->encrypted &&
+	    !(work->sess && work->sess->sign) &&
+	    !(req->hdr.Flags & SMB2_FLAGS_SIGNED) &&
+	    !work->next_smb2_rcv_hdr_off &&
+	    !is_rdma_channel &&
+	    !ksmbd_stream_fd(fp) &&
+	    conn->transport->ops->sendfile) {
+		nbytes = ksmbd_vfs_sendfile(work, fp, offset, length);
+		if (nbytes == -EOPNOTSUPP)
+			goto buffered_read;
+
+		if (nbytes < 0) {
+			err = nbytes;
+			goto out;
+		}
+
+		if ((nbytes == 0 && length != 0) || nbytes < mincount) {
+			rsp->hdr.Status = STATUS_END_OF_FILE;
+			smb2_set_err_rsp(work);
+			ksmbd_fd_put(work, fp);
+			return -ENODATA;
+		}
+
+		ksmbd_debug(SMB, "zero-copy nbytes %zu, offset %lld\n",
+			    nbytes, offset);
+
+		rsp->StructureSize = cpu_to_le16(17);
+		rsp->DataOffset = 80;
+		rsp->Reserved = 0;
+		rsp->DataLength = cpu_to_le32(nbytes);
+		rsp->DataRemaining = cpu_to_le32(0);
+		rsp->Reserved2 = 0;
+
+		/*
+		 * Pin just the header; file data will be sent by the
+		 * transport sendfile op after the header is written.
+		 */
+		err = ksmbd_iov_pin_rsp(work, (void *)rsp,
+					offsetof(struct smb2_read_rsp, Buffer));
+		if (err)
+			goto out;
+
+		/* Include the file data length in the rfc1002 length */
+		inc_rfc1001_len(work->iov[0].iov_base, nbytes);
+
+		/* Set up sendfile state on the work struct */
+		work->sendfile = true;
+		work->sendfile_filp = get_file(fp->filp);
+		work->sendfile_offset = offset;
+		work->sendfile_count = nbytes;
+
+		ksmbd_fd_put(work, fp);
+		return 0;
+	}
+
+buffered_read:
 	aux_payload_buf = ksmbd_buffer_pool_get(ALIGN(length, 8));
 	if (!aux_payload_buf) {
 		err = -ENOMEM;

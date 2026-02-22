@@ -60,6 +60,9 @@ void ksmbd_free_work_struct(struct ksmbd_work *work)
 	kvfree(work->request_buf);
 	kfree(work->iov);
 
+	if (work->sendfile_filp)
+		fput(work->sendfile_filp);
+
 	if (work->async_id)
 		ksmbd_release_id(&work->conn->async_ida, work->async_id);
 	kmem_cache_free(work_cache, work);

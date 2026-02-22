@@ -357,30 +357,64 @@ int ksmbd_conn_write(struct ksmbd_work *work)
 		ksmbd_conn_unlock(conn);
 
 	} else {
+		size_t len = get_rfc1002_len(work->iov[0].iov_base) + 4;
+
+		if (work->sendfile)
+			len -= work->sendfile_count;
+
 		ksmbd_conn_lock(conn);
-		sent = conn->transport->ops->writev(conn->transport, work->iov,
-				work->iov_cnt,
-				get_rfc1002_len(work->iov[0].iov_base) + 4,
-				work->need_invalidate_rkey,
-				work->remote_key);
+		sent = conn->transport->ops->writev(conn->transport,
+						    work->iov,
+						    work->iov_cnt, len,
+						    work->need_invalidate_rkey,
+						    work->remote_key);
 		ksmbd_conn_unlock(conn);
 	}
 #else
 	if (!work->iov_idx)
 		return -EINVAL;
 
-	ksmbd_conn_lock(conn);
-	sent = conn->transport->ops->writev(conn->transport, work->iov,
-			work->iov_cnt,
-			get_rfc1002_len(work->iov[0].iov_base) + 4,
-			work->need_invalidate_rkey,
-			work->remote_key);
-	ksmbd_conn_unlock(conn);
+	{
+		size_t len = get_rfc1002_len(work->iov[0].iov_base) + 4;
+
+		/*
+		 * For zero-copy sendfile, the rfc1002 length includes the
+		 * file data size, but the iov only contains the header.
+		 * Subtract the sendfile count so writev sends only the
+		 * header bytes. The file data is sent separately below.
+		 */
+		if (work->sendfile)
+			len -= work->sendfile_count;
+
+		ksmbd_conn_lock(conn);
+		sent = conn->transport->ops->writev(conn->transport,
+						    work->iov,
+						    work->iov_cnt, len,
+						    work->need_invalidate_rkey,
+						    work->remote_key);
+		ksmbd_conn_unlock(conn);
+	}
 #endif
 
 	if (sent < 0) {
 		pr_err("Failed to send message: %d\n", sent);
 		return sent;
+	}
+
+	/* Send file data via zero-copy after the header */
+	if (work->sendfile && conn->transport->ops->sendfile) {
+		loff_t offset = work->sendfile_offset;
+
+		ksmbd_conn_lock(conn);
+		sent = conn->transport->ops->sendfile(conn->transport,
+						      work->sendfile_filp,
+						      &offset,
+						      work->sendfile_count);
+		ksmbd_conn_unlock(conn);
+		if (sent < 0) {
+			pr_err("Failed to sendfile: %d\n", sent);
+			return sent;
+		}
 	}
 
 	return 0;

@@ -151,6 +151,8 @@ struct ksmbd_transport_ops {
 			  void *buf, unsigned int len,
 			  struct smb2_buffer_desc_v1 *desc,
 			  unsigned int desc_len);
+	int (*sendfile)(struct ksmbd_transport *t, struct file *filp,
+			loff_t *pos, size_t count);
 	void (*free_transport)(struct ksmbd_transport *kt);
 };
 

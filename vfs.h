@@ -148,6 +148,8 @@ int ksmbd_vfs_create(struct ksmbd_work *work, const char *name, umode_t mode);
 int ksmbd_vfs_mkdir(struct ksmbd_work *work, const char *name, umode_t mode);
 int ksmbd_vfs_read(struct ksmbd_work *work, struct ksmbd_file *fp, size_t count,
 		   loff_t *pos, char *rbuf);
+ssize_t ksmbd_vfs_sendfile(struct ksmbd_work *work, struct ksmbd_file *fp,
+			   loff_t offset, size_t count);
 int ksmbd_vfs_write(struct ksmbd_work *work, struct ksmbd_file *fp,
 		    char *buf, size_t count, loff_t *pos, bool sync,
 		    ssize_t *written);
