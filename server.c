@@ -23,6 +23,9 @@
 #include "auth.h"
 #include "smb2fruit.h"
 
+extern int ksmbd_debugfs_init(void);
+extern void ksmbd_debugfs_exit(void);
+
 int ksmbd_debug_types;
 
 struct ksmbd_server_config server_conf;
@@ -553,6 +556,7 @@ static int ksmbd_server_shutdown(void)
 {
 	WRITE_ONCE(server_conf.state, SERVER_STATE_SHUTTING_DOWN);
 
+	ksmbd_debugfs_exit();
 	class_unregister(&ksmbd_control_class);
 	ksmbd_workqueue_destroy();
 	ksmbd_ipc_release();
@@ -563,6 +567,7 @@ static int ksmbd_server_shutdown(void)
 	ksmbd_work_pool_destroy();
 	ksmbd_exit_file_cache();
 	server_conf_free();
+	ksmbd_config_exit();
 	return 0;
 }
 
@@ -570,10 +575,16 @@ static int __init ksmbd_server_init(void)
 {
 	int ret;
 
+	ret = ksmbd_config_init();
+	if (ret) {
+		pr_err("Failed to initialize configuration subsystem\n");
+		return ret;
+	}
+
 	ret = class_register(&ksmbd_control_class);
 	if (ret) {
 		pr_err("Unable to register ksmbd-control class\n");
-		return ret;
+		goto err_config_exit;
 	}
 
 	ksmbd_server_tcp_callbacks_init();
@@ -615,8 +626,13 @@ static int __init ksmbd_server_init(void)
 	if (ret)
 		goto err_crypto_destroy;
 
+	ret = ksmbd_debugfs_init();
+	if (ret)
+		goto err_debugfs;
+
 	return 0;
 
+err_debugfs:
 err_crypto_destroy:
 	ksmbd_crypto_destroy();
 err_release_inode_hash:
@@ -631,6 +647,8 @@ err_destroy_work_pools:
 	ksmbd_work_pool_destroy();
 err_unregister:
 	class_unregister(&ksmbd_control_class);
+err_config_exit:
+	ksmbd_config_exit();
 
 	return ret;
 }

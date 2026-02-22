@@ -96,17 +96,17 @@ static struct smb_protocol smb2_protos[] = {
 
 unsigned int ksmbd_server_side_copy_max_chunk_count(void)
 {
-	return 256;
+	return ksmbd_config_get_u32(KSMBD_CFG_COPY_CHUNK_MAX_COUNT);
 }
 
 unsigned int ksmbd_server_side_copy_max_chunk_size(void)
 {
-	return (2U << 30) - 1;
+	return ksmbd_config_get_u32(KSMBD_CFG_COPY_CHUNK_MAX_SIZE);
 }
 
 unsigned int ksmbd_server_side_copy_max_total_size(void)
 {
-	return (2U << 30) - 1;
+	return ksmbd_config_get_u32(KSMBD_CFG_COPY_CHUNK_TOTAL_SIZE);
 }
 
 inline int ksmbd_min_protocol(void)

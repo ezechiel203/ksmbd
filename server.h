@@ -7,6 +7,7 @@
 #define __SERVER_H__
 
 #include "smbacl.h"
+#include "ksmbd_config.h"
 
 /*
  * Server state type
