@@ -68,7 +68,21 @@ struct path;
 #define AFP_AFPINFO_STREAM			"AFP_AfpInfo"
 #define AFP_RESOURCE_STREAM			"AFP_Resource"
 #define APPLE_FINDER_INFO_XATTR			"com.apple.FinderInfo"
+#define APPLE_FINDER_INFO_XATTR_USER		"user." APPLE_FINDER_INFO_XATTR
 #define AFP_AFPINFO_SIZE			60
+#define AFP_FINDER_INFO_SIZE			32
+
+/*
+ * AFP_AfpInfo on-disk structure (60 bytes, big-endian fields).
+ * This is what macOS expects when reading the AFP_AfpInfo named stream.
+ */
+#define AFP_MAGIC				0x41465000 /* "AFP\0" */
+#define AFP_VERSION				0x00010000 /* 1.0 */
+#define AFP_BACKUP_DATE_INVALID			0x80000000
+
+/* The xattr name that ksmbd uses for the AFP_AfpInfo DosStream */
+#define XATTR_NAME_AFP_AFPINFO \
+	"user.DosStream." AFP_AFPINFO_STREAM ":$DATA"
 
 #define FRUIT_SERVER_QUERY_SIZE			256
 #define FRUIT_VOLUME_CAPS_SIZE			128
@@ -203,10 +217,16 @@ int fruit_handle_savebox_bundle(struct ksmbd_conn *conn,
 int fruit_process_server_query(struct ksmbd_conn *conn,
 			       const struct fruit_server_query *query);
 void fruit_debug_capabilities(u64 capabilities);
+struct ksmbd_share_config;
+
 int smb2_read_dir_attr(struct ksmbd_work *work);
 void smb2_read_dir_attr_fill(struct ksmbd_conn *conn,
+			     struct dentry *dentry,
 			     struct kstat *stat,
+			     struct ksmbd_share_config *share,
 			     __le32 *ea_size_field);
+
+int fruit_synthesize_afpinfo(struct dentry *dentry, char *buf, size_t bufsize);
 
 int fruit_init_module(void);
 void fruit_cleanup_module(void);

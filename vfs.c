@@ -39,6 +39,7 @@
 #include "misc.h"
 
 #include "smb_common.h"
+#include "smb2fruit.h"
 #include "mgmt/share_config.h"
 #include "mgmt/tree_connect.h"
 #include "mgmt/user_session.h"
@@ -617,9 +618,33 @@ static int ksmbd_vfs_stream_read(struct ksmbd_file *fp, char *buf, loff_t *pos,
 				       fp->stream.name,
 				       fp->stream.size,
 				       &stream_buf);
-	if ((int)v_len <= 0)
-		return (int)v_len;
+	if ((int)v_len <= 0) {
+		/*
+		 * AFP_AfpInfo synthesis: when the DosStream xattr
+		 * doesn't exist, try to build a 60-byte AfpInfo
+		 * from the native com.apple.FinderInfo xattr.
+		 * This handles files migrated from netatalk/AFP.
+		 */
+		if (fp->stream.name &&
+		    strstr(fp->stream.name, AFP_AFPINFO_STREAM)) {
+			stream_buf = kvzalloc(AFP_AFPINFO_SIZE,
+					      KSMBD_DEFAULT_GFP);
+			if (!stream_buf)
+				return -ENOMEM;
 
+			v_len = fruit_synthesize_afpinfo(
+					fp->filp->f_path.dentry,
+					stream_buf, AFP_AFPINFO_SIZE);
+			if ((int)v_len <= 0) {
+				kvfree(stream_buf);
+				return (int)v_len;
+			}
+			goto have_data;
+		}
+		return (int)v_len;
+	}
+
+have_data:
 	if (v_len <= *pos) {
 		count = -EINVAL;
 		goto free_buf;
@@ -1900,6 +1925,128 @@ int ksmbd_vfs_truncate(struct ksmbd_work *work,
 	if (err)
 		pr_err("truncate failed, err %d\n", err);
 	return err;
+}
+
+/**
+ * ksmbd_vfs_resolve_fileid() - resolve inode number to path relative to share
+ * @share_path:	the share root path
+ * @ino:	inode number to resolve
+ * @buf:	output buffer for the resolved path (UTF-8)
+ * @buflen:	size of output buffer
+ *
+ * Used by Apple kAAPL_RESOLVE_ID to convert a file ID (inode number)
+ * back to its full path for alias/symlink resolution.
+ *
+ * Return:	length of path on success, negative errno on failure
+ */
+int ksmbd_vfs_resolve_fileid(const struct path *share_path,
+			     u64 ino, char *buf, int buflen)
+{
+	struct inode *inode;
+	struct dentry *dentry;
+	char *path_buf, *resolved;
+	int len;
+
+	inode = ilookup(share_path->dentry->d_sb, ino);
+	if (!inode)
+		return -ENOENT;
+
+	dentry = d_find_alias(inode);
+	iput(inode);
+	if (!dentry)
+		return -ENOENT;
+
+	path_buf = kmalloc(PATH_MAX, KSMBD_DEFAULT_GFP);
+	if (!path_buf) {
+		dput(dentry);
+		return -ENOMEM;
+	}
+
+	/*
+	 * Use dentry_path_raw to get path relative to the filesystem root,
+	 * then strip the share path prefix to get share-relative path.
+	 */
+	resolved = dentry_path_raw(dentry, path_buf, PATH_MAX);
+	dput(dentry);
+
+	if (IS_ERR(resolved)) {
+		kfree(path_buf);
+		return PTR_ERR(resolved);
+	}
+
+	len = strlen(resolved);
+	if (len >= buflen) {
+		kfree(path_buf);
+		return -ENAMETOOLONG;
+	}
+
+	memcpy(buf, resolved, len + 1);
+	kfree(path_buf);
+	return len;
+}
+
+/**
+ * ksmbd_vfs_copy_xattrs() - copy all user.* xattrs from src to dst
+ * @src_dentry:	source dentry
+ * @dst_dentry:	destination dentry
+ * @dst_path:	destination path (needed for ksmbd_vfs_setxattr)
+ *
+ * Used by Apple COPYFILE support to preserve metadata (FinderInfo,
+ * resource forks, DosStream attributes) during server-side copy.
+ *
+ * Return:	0 on success (partial failures are logged but not fatal),
+ *		negative errno if xattr enumeration fails
+ */
+int ksmbd_vfs_copy_xattrs(struct dentry *src_dentry,
+			   struct dentry *dst_dentry,
+			   const struct path *dst_path)
+{
+	char *xattr_list = NULL, *name;
+	ssize_t list_len;
+	int idx = 0;
+
+	list_len = ksmbd_vfs_listxattr(src_dentry, &xattr_list);
+	if (list_len <= 0)
+		return list_len;
+
+	while (idx < list_len) {
+		ssize_t val_len;
+		char *val_buf = NULL;
+
+		name = xattr_list + idx;
+		idx += strlen(name) + 1;
+
+		/* Only copy user.* namespace xattrs */
+		if (strncmp(name, XATTR_USER_PREFIX, XATTR_USER_PREFIX_LEN))
+			continue;
+
+		/* Read source xattr value */
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+		val_len = ksmbd_vfs_getxattr(&nop_mnt_idmap,
+#else
+		val_len = ksmbd_vfs_getxattr(&init_user_ns,
+#endif
+					     src_dentry, name, &val_buf);
+		if (val_len < 0) {
+			ksmbd_debug(VFS, "copy xattr: skip %s (read err %zd)\n",
+				    name, val_len);
+			continue;
+		}
+
+		/* Write to destination */
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+		ksmbd_vfs_setxattr(&nop_mnt_idmap,
+#else
+		ksmbd_vfs_setxattr(&init_user_ns,
+#endif
+				   dst_path, name,
+				   val_buf, val_len, 0, true);
+
+		kvfree(val_buf);
+	}
+
+	kvfree(xattr_list);
+	return 0;
 }
 
 /**

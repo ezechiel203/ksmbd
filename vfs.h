@@ -110,6 +110,7 @@ struct ksmbd_readdir_data {
 /* ksmbd kstat wrapper to get valid create time when reading dir entry */
 struct ksmbd_kstat {
 	struct kstat		*kstat;
+	struct dentry		*kstat_dentry;
 	unsigned long long	create_time;
 	__le32			file_attributes;
 };
@@ -151,6 +152,11 @@ int ksmbd_vfs_write(struct ksmbd_work *work, struct ksmbd_file *fp,
 		    char *buf, size_t count, loff_t *pos, bool sync,
 		    ssize_t *written);
 int ksmbd_vfs_fsync(struct ksmbd_work *work, u64 fid, u64 p_id, bool fullsync);
+int ksmbd_vfs_copy_xattrs(struct dentry *src_dentry,
+			   struct dentry *dst_dentry,
+			   const struct path *dst_path);
+int ksmbd_vfs_resolve_fileid(const struct path *share_path,
+			     u64 ino, char *buf, int buflen);
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 4, 0)
 int ksmbd_vfs_remove_file(struct ksmbd_work *work, const struct path *path);
 #else

@@ -40,6 +40,8 @@ typedef uint64_t u64;
 #define le32_to_cpu(x) ((__u32)(x))
 #define le64_to_cpu(x) ((__u64)(x))
 #define min_t(type, a, b) ((type)(a) < (type)(b) ? (type)(a) : (type)(b))
+#include <endian.h>
+#define cpu_to_be32(x) htobe32(x)
 
 /* ── Block system linux/kernel.h (we provide our own stubs) ──── */
 #define _LINUX_KERNEL_H
@@ -224,6 +226,11 @@ struct ksmbd_server_config server_conf = {
 /* ── Stub for struct kstat (kernel-only, needed by smb2_read_dir_attr_fill) */
 struct kstat {
 	unsigned short mode;
+};
+
+/* ── Stub for struct ksmbd_share_config (needed by smb2_read_dir_attr_fill) */
+struct ksmbd_share_config {
+	unsigned int flags;
 };
 
 /* Include the actual source under test.
@@ -1314,7 +1321,7 @@ static void test_Z2(void) {
 	__le32 ea_size = cpu_to_le32(0xDEAD);
 	conn.is_fruit = true;
 	st.mode = 0100644; /* regular file, rw-r--r-- */
-	smb2_read_dir_attr_fill(&conn, &st, &ea_size);
+	smb2_read_dir_attr_fill(&conn, NULL, &st, NULL, &ea_size);
 	T_ASSERT_EQ(0100644, (int)le32_to_cpu(ea_size), "Z2", "mode packed into EaSize");
 	test_pass("Z2");
 }
@@ -1327,7 +1334,7 @@ static void test_Z3(void) {
 	__le32 ea_size = cpu_to_le32(0xDEAD);
 	conn.is_fruit = false;
 	st.mode = 0100755;
-	smb2_read_dir_attr_fill(&conn, &st, &ea_size);
+	smb2_read_dir_attr_fill(&conn, NULL, &st, NULL, &ea_size);
 	T_ASSERT_EQ((int)0xDEAD, (int)le32_to_cpu(ea_size), "Z3", "unchanged for non-fruit");
 	test_pass("Z3");
 }
@@ -1338,7 +1345,7 @@ static void test_Z4(void) {
 	struct ksmbd_conn conn = {0};
 	__le32 ea_size = cpu_to_le32(0xBEEF);
 	conn.is_fruit = true;
-	smb2_read_dir_attr_fill(&conn, NULL, &ea_size);
+	smb2_read_dir_attr_fill(&conn, NULL, NULL, NULL, &ea_size);
 	T_ASSERT_EQ((int)0xBEEF, (int)le32_to_cpu(ea_size), "Z4", "unchanged for NULL stat");
 	test_pass("Z4");
 }

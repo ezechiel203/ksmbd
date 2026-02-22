@@ -4236,7 +4236,10 @@ static int smb2_populate_readdir_entry(struct ksmbd_conn *conn, int info_level,
 		if (dinfo->EaSize)
 			dinfo->ExtFileAttributes = ATTR_REPARSE_POINT_LE;
 		if (conn->is_fruit)
-			smb2_read_dir_attr_fill(conn, ksmbd_kstat->kstat,
+			smb2_read_dir_attr_fill(conn,
+						ksmbd_kstat->kstat_dentry,
+						ksmbd_kstat->kstat,
+						NULL,
 						&dinfo->EaSize);
 		dinfo->Reserved = 0;
 		if (conn->is_fruit &&
@@ -4261,7 +4264,10 @@ static int smb2_populate_readdir_entry(struct ksmbd_conn *conn, int info_level,
 		if (fibdinfo->EaSize)
 			fibdinfo->ExtFileAttributes = ATTR_REPARSE_POINT_LE;
 		if (conn->is_fruit)
-			smb2_read_dir_attr_fill(conn, ksmbd_kstat->kstat,
+			smb2_read_dir_attr_fill(conn,
+						ksmbd_kstat->kstat_dentry,
+						ksmbd_kstat->kstat,
+						NULL,
 						&fibdinfo->EaSize);
 		if (conn->is_fruit &&
 		    (server_conf.flags & KSMBD_GLOBAL_FLAG_FRUIT_ZERO_FILEID))
@@ -4435,6 +4441,7 @@ static int process_query_dir_entries(struct smb2_query_dir_private *priv)
 		}
 
 		ksmbd_kstat.kstat = &kstat;
+		ksmbd_kstat.kstat_dentry = dent;
 		if (priv->info_level != FILE_NAMES_INFORMATION) {
 			rc = ksmbd_vfs_fill_dentry_attrs(priv->work,
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
@@ -5415,6 +5422,67 @@ static int get_file_stream_info(struct ksmbd_work *work,
 	}
 
 out:
+	/*
+	 * Time Machine: inject virtual streams on the share root
+	 * when FRUIT_TIME_MACHINE is configured. macOS checks for
+	 * these streams to determine if a volume supports Time Machine.
+	 */
+	if (conn->is_fruit && S_ISDIR(stat.mode) &&
+	    work->tcon && work->tcon->share_conf &&
+	    test_share_config_flag(work->tcon->share_conf,
+				   KSMBD_SHARE_FLAG_FRUIT_TIME_MACHINE) &&
+	    path->dentry == work->tcon->share_conf->vfs_path.dentry) {
+		const char *tm_supported =
+			":com.apple.timemachine.supported:$DATA";
+		int tm_len = strlen(tm_supported);
+
+		next = sizeof(struct smb2_file_stream_info) + tm_len * 2;
+		if (buf_free_len >= next) {
+			file_info = (struct smb2_file_stream_info *)
+				&rsp->Buffer[nbytes];
+			streamlen = smbConvertToUTF16(
+				(__le16 *)file_info->StreamName,
+				tm_supported, tm_len,
+				conn->local_nls, 0);
+			streamlen *= 2;
+			file_info->StreamNameLength = cpu_to_le32(streamlen);
+			/* Stream value is "1" (supported) */
+			file_info->StreamSize = cpu_to_le64(1);
+			file_info->StreamAllocationSize = cpu_to_le64(1);
+			file_info->NextEntryOffset = cpu_to_le32(next);
+			nbytes += next;
+			buf_free_len -= next;
+		}
+
+		/* Inject MaxSize if configured */
+		if (work->tcon->share_conf->time_machine_max_size > 0) {
+			const char *tm_maxsize =
+				":com.apple.timemachine.MaxSize:$DATA";
+			int ms_len = strlen(tm_maxsize);
+
+			next = sizeof(struct smb2_file_stream_info) +
+			       ms_len * 2;
+			if (buf_free_len >= next) {
+				file_info = (struct smb2_file_stream_info *)
+					&rsp->Buffer[nbytes];
+				streamlen = smbConvertToUTF16(
+					(__le16 *)file_info->StreamName,
+					tm_maxsize, ms_len,
+					conn->local_nls, 0);
+				streamlen *= 2;
+				file_info->StreamNameLength =
+					cpu_to_le32(streamlen);
+				file_info->StreamSize = cpu_to_le64(8);
+				file_info->StreamAllocationSize =
+					cpu_to_le64(8);
+				file_info->NextEntryOffset =
+					cpu_to_le32(next);
+				nbytes += next;
+				buf_free_len -= next;
+			}
+		}
+	}
+
 	if (!S_ISDIR(stat.mode) &&
 	    buf_free_len >= sizeof(struct smb2_file_stream_info) + 7 * 2) {
 		file_info = (struct smb2_file_stream_info *)
@@ -8494,6 +8562,20 @@ static int fsctl_copychunk(struct ksmbd_work *work,
 	ci_rsp->ChunksWritten = cpu_to_le32(chunk_count_written);
 	ci_rsp->ChunkBytesWritten = cpu_to_le32(chunk_size_written);
 	ci_rsp->TotalBytesWritten = cpu_to_le32(total_size_written);
+
+	/*
+	 * Apple COPYFILE: after data copy succeeds, also copy
+	 * user.* xattrs (FinderInfo, resource forks, DosStream
+	 * attributes) from source to destination.
+	 */
+	if (!ret && work->conn->is_fruit && src_fp && dst_fp &&
+	    (server_conf.flags & KSMBD_GLOBAL_FLAG_FRUIT_COPYFILE)) {
+		ksmbd_vfs_copy_xattrs(
+			src_fp->filp->f_path.dentry,
+			dst_fp->filp->f_path.dentry,
+			&dst_fp->filp->f_path);
+	}
+
 out:
 	ksmbd_fd_put(work, src_fp);
 	ksmbd_fd_put(work, dst_fp);

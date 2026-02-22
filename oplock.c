@@ -2088,7 +2088,8 @@ int create_fruit_rsp_buf(char *cc, struct ksmbd_conn *conn, size_t *out_size)
 	buf->server_caps = cpu_to_le64(caps);
 
 	/* volume_caps */
-	vcaps = kAAPL_CASE_SENSITIVE | kAAPL_SUPPORTS_FULL_SYNC;
+	vcaps = kAAPL_CASE_SENSITIVE | kAAPL_SUPPORTS_FULL_SYNC |
+		kAAPL_SUPPORT_RESOLVE_ID;
 	buf->volume_caps = cpu_to_le64(vcaps);
 
 	/* model string: ASCII → UTF-16LE */

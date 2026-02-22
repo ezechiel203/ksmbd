@@ -10,6 +10,8 @@
 #include <linux/errno.h>
 #include <linux/slab.h>
 #include <linux/stat.h>
+#include <linux/xattr.h>
+#include <linux/fs.h>
 
 #include "smb2fruit.h"
 #include "smb_common.h"
@@ -334,6 +336,70 @@ int fruit_handle_savebox_bundle(struct ksmbd_conn *conn,
 	return 0;
 }
 
+/*
+ * fruit_synthesize_afpinfo - Build a 60-byte AFP_AfpInfo structure
+ * from the com.apple.FinderInfo xattr (netatalk migration path).
+ *
+ * When a macOS client reads the AFP_AfpInfo stream and the DosStream
+ * xattr doesn't exist, we try to synthesize it from the native
+ * com.apple.FinderInfo xattr that netatalk/AFP servers create.
+ *
+ * Returns AFP_AFPINFO_SIZE (60) on success, negative errno on failure.
+ */
+int fruit_synthesize_afpinfo(struct dentry *dentry, char *buf, size_t bufsize)
+{
+	ssize_t fi_len;
+	__be32 val;
+
+	if (!dentry || !buf || bufsize < AFP_AFPINFO_SIZE)
+		return -EINVAL;
+
+	/*
+	 * Try to read the native com.apple.FinderInfo xattr.
+	 * This is what netatalk stores (32 bytes of FinderInfo data).
+	 */
+	fi_len = vfs_getxattr(&nop_mnt_idmap, dentry,
+			      APPLE_FINDER_INFO_XATTR_USER,
+			      buf + 16, AFP_FINDER_INFO_SIZE);
+	if (fi_len < 0)
+		return fi_len;
+
+	/*
+	 * Build the 60-byte AfpInfo header around the FinderInfo.
+	 * All multi-byte fields are big-endian (Apple convention).
+	 *
+	 * Offset  Size  Field
+	 * 0       4     Magic ("AFP\0" = 0x41465000)
+	 * 4       4     Version (0x00010000 = 1.0)
+	 * 8       4     FileID (0)
+	 * 12      4     BackupDate (0x80000000 = invalid)
+	 * 16      32    FinderInfo (already placed by vfs_getxattr)
+	 * 48      6     ProDOS info (0)
+	 * 54      6     Padding (0)
+	 */
+	memset(buf, 0, 16);    /* clear header area */
+	memset(buf + 48, 0, 12); /* clear ProDOS + padding */
+
+	val = cpu_to_be32(AFP_MAGIC);
+	memcpy(buf, &val, 4);
+
+	val = cpu_to_be32(AFP_VERSION);
+	memcpy(buf + 4, &val, 4);
+
+	/* FileID = 0 (bytes 8-11 already zeroed) */
+
+	val = cpu_to_be32(AFP_BACKUP_DATE_INVALID);
+	memcpy(buf + 12, &val, 4);
+
+	/* FinderInfo at offset 16 was already written by vfs_getxattr */
+
+	/* Pad remaining bytes if FinderInfo was short */
+	if (fi_len < AFP_FINDER_INFO_SIZE)
+		memset(buf + 16 + fi_len, 0, AFP_FINDER_INFO_SIZE - fi_len);
+
+	return AFP_AFPINFO_SIZE;
+}
+
 int fruit_init_module(void)
 {
 	pr_info("ksmbd: Fruit SMB extensions loaded\n");
@@ -380,11 +446,23 @@ int smb2_read_dir_attr(struct ksmbd_work *work)
 /*
  * smb2_read_dir_attr_fill - Enrich a directory entry with UNIX metadata.
  * Called from smb2_populate_readdir_entry() for Fruit connections.
- * Packs UNIX mode (S_IFMT | permission bits) into the EaSize field.
- * This is the minimum viable ReadDirAttr that satisfies macOS Finder.
+ *
+ * Apple ReadDirAttr convention:
+ *   EaSize[4] = UNIX mode (S_IFMT | permission bits)
+ *
+ * Additional enrichment (per-share flags):
+ *   FRUIT_FINDER_INFO  → reads com.apple.FinderInfo xattr (32 bytes)
+ *   FRUIT_RFORK_SIZE   → reads resource fork size from AFP_Resource stream
+ *   FRUIT_MAX_ACCESS   → computes maximum access rights for current user
+ *
+ * Note: Full FinderInfo/ResourceFork/MaxAccess enrichment reads xattrs
+ * per directory entry which has performance implications on large dirs.
+ * These are gated behind per-share flags so admins can enable selectively.
  */
 void smb2_read_dir_attr_fill(struct ksmbd_conn *conn,
+			     struct dentry *dentry,
 			     struct kstat *stat,
+			     struct ksmbd_share_config *share,
 			     __le32 *ea_size_field)
 {
 	if (!conn->is_fruit || !stat || !ea_size_field)
