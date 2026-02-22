@@ -1161,7 +1161,8 @@ int ksmbd_init_file_cache(void)
 {
 	filp_cache = kmem_cache_create("ksmbd_file_cache",
 				       sizeof(struct ksmbd_file), 0,
-				       SLAB_HWCACHE_ALIGN, NULL);
+				       SLAB_HWCACHE_ALIGN | SLAB_ACCOUNT,
+				       NULL);
 	if (!filp_cache)
 		goto out;
 

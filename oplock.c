@@ -23,6 +23,7 @@
 
 static LIST_HEAD(lease_table_list);
 static DEFINE_RWLOCK(lease_list_lock);
+static struct kmem_cache *opinfo_cache;
 
 /**
  * alloc_opinfo() - allocate a new opinfo object for oplock info
@@ -39,7 +40,7 @@ static struct oplock_info *alloc_opinfo(struct ksmbd_work *work,
 	struct ksmbd_session *sess = work->sess;
 	struct oplock_info *opinfo;
 
-	opinfo = kzalloc(sizeof(struct oplock_info), KSMBD_DEFAULT_GFP);
+	opinfo = kmem_cache_zalloc(opinfo_cache, KSMBD_DEFAULT_GFP);
 	if (!opinfo)
 		return NULL;
 
@@ -135,7 +136,7 @@ static void free_opinfo(struct oplock_info *opinfo)
 	if (opinfo->conn)
 		refcount_dec(&opinfo->conn->refcnt);
 	opinfo->conn = NULL;
-	kfree(opinfo);
+	kmem_cache_free(opinfo_cache, opinfo);
 }
 
 struct oplock_info *opinfo_get(struct ksmbd_file *fp)
@@ -2228,4 +2229,28 @@ int smb2_check_durable_oplock(struct ksmbd_conn *conn,
 out:
 	opinfo_put(opinfo);
 	return ret;
+}
+
+/**
+ * ksmbd_oplock_init() - initialize opinfo slab cache
+ *
+ * Return:	0 on success, negative errno on failure
+ */
+int ksmbd_oplock_init(void)
+{
+	opinfo_cache = kmem_cache_create("ksmbd_opinfo_cache",
+					 sizeof(struct oplock_info), 0,
+					 SLAB_HWCACHE_ALIGN | SLAB_ACCOUNT,
+					 NULL);
+	if (!opinfo_cache)
+		return -ENOMEM;
+	return 0;
+}
+
+/**
+ * ksmbd_oplock_exit() - destroy opinfo slab cache
+ */
+void ksmbd_oplock_exit(void)
+{
+	kmem_cache_destroy(opinfo_cache);
 }

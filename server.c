@@ -572,6 +572,7 @@ static int ksmbd_server_shutdown(void)
 	ksmbd_crypto_destroy();
 	ksmbd_free_global_file_table();
 	destroy_lease_table(NULL);
+	ksmbd_oplock_exit();
 	ksmbd_work_pool_destroy();
 	ksmbd_exit_file_cache();
 	server_conf_free();

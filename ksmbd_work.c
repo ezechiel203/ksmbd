@@ -73,7 +73,8 @@ int ksmbd_work_pool_init(void)
 {
 	work_cache = kmem_cache_create("ksmbd_work_cache",
 				       sizeof(struct ksmbd_work), 0,
-				       SLAB_HWCACHE_ALIGN, NULL);
+				       SLAB_HWCACHE_ALIGN | SLAB_ACCOUNT,
+				       NULL);
 	if (!work_cache)
 		return -ENOMEM;
 	return 0;
