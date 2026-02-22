@@ -8650,28 +8650,33 @@ out:
 	list_for_each_entry_safe(smb_lock, tmp, &rollback_list, llist) {
 		struct file_lock *rlock = NULL;
 
-		rlock = smb_flock_init(filp);
+		rlock = smb_lock->fl;
+		/* Convert to unlock */
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 9, 0)
 		rlock->c.flc_type = F_UNLCK;
 #else
 		rlock->fl_type = F_UNLCK;
 #endif
-		rlock->fl_start = smb_lock->start;
-		rlock->fl_end = smb_lock->end;
-
-		rc = vfs_lock_file(filp, F_SETLK, rlock, NULL);
+		/* Apply the unlock to VFS */
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 9, 0)
+		rc = vfs_lock_file(rlock->c.flc_file,
+				   F_SETLK, rlock, NULL);
+#else
+		rc = vfs_lock_file(rlock->fl_file,
+				   F_SETLK, rlock, NULL);
+#endif
 		if (rc)
 			pr_err("rollback unlock fail : %d\n", rc);
 
-		list_del(&smb_lock->llist);
+		/* Remove from all lists under proper locking */
 		spin_lock(&work->conn->llist_lock);
-		if (!list_empty(&smb_lock->flist))
-			list_del(&smb_lock->flist);
 		list_del(&smb_lock->clist);
 		spin_unlock(&work->conn->llist_lock);
 
+		list_del(&smb_lock->flist);
+		list_del(&smb_lock->llist);
+
 		locks_free_lock(smb_lock->fl);
-		locks_free_lock(rlock);
 		kfree(smb_lock);
 	}
 out2:
