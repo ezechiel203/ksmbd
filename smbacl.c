@@ -1080,7 +1080,7 @@ int parse_sec_desc(struct user_namespace *user_ns, struct smb_ntsd *pntsd,
 {
 	int rc = 0;
 	struct smb_sid *owner_sid_ptr, *group_sid_ptr;
-	struct smb_acl *dacl_ptr; /* no need for SACL ptr */
+	struct smb_acl *dacl_ptr;
 	char *end_of_acl = ((char *)pntsd) + acl_len;
 	__u32 dacloffset;
 	int pntsd_type;
@@ -1110,6 +1110,16 @@ int parse_sec_desc(struct user_namespace *user_ns, struct smb_ntsd *pntsd,
 	}
 
 	pntsd->type = cpu_to_le16(DACL_PRESENT);
+
+	/* Preserve SACL flags if present in the incoming descriptor */
+	if (pntsd_type & SACL_PRESENT)
+		pntsd->type |= cpu_to_le16(SACL_PRESENT);
+	if (pntsd_type & SACL_DEFAULTED)
+		pntsd->type |= cpu_to_le16(SACL_DEFAULTED);
+	if (pntsd_type & SACL_AUTO_INHERITED)
+		pntsd->type |= cpu_to_le16(SACL_AUTO_INHERITED);
+	if (pntsd_type & SACL_PROTECTED)
+		pntsd->type |= cpu_to_le16(SACL_PROTECTED);
 
 	if (pntsd->osidoffset) {
 		if (le32_to_cpu(pntsd->osidoffset) < sizeof(struct smb_ntsd))
@@ -1204,7 +1214,8 @@ int build_sec_desc(struct user_namespace *user_ns,
 	unsigned int sid_size, new_off;
 	struct smb_sid *owner_sid_ptr, *group_sid_ptr;
 	struct smb_sid *nowner_sid_ptr, *ngroup_sid_ptr;
-	struct smb_acl *dacl_ptr = NULL; /* no need for SACL ptr */
+	struct smb_acl *dacl_ptr = NULL;
+	struct smb_acl *sacl_ptr = NULL;
 	uid_t uid;
 	gid_t gid;
 	unsigned int sid_type = SIDOWNER;
@@ -1268,6 +1279,26 @@ int build_sec_desc(struct user_namespace *user_ns,
 		group_sid_ptr = (struct smb_sid *)((char *)pntsd +
 				offset);
 		smb_copy_sid(group_sid_ptr, ngroup_sid_ptr);
+		offset = new_off;
+	}
+
+	if (addition_info & SACL_SECINFO) {
+		if (check_add_overflow(offset,
+				       (unsigned int)sizeof(struct smb_acl),
+				       &new_off) ||
+		    new_off > buf_size) {
+			pr_err_ratelimited("SD buffer overflow: SACL hdr\n");
+			rc = -ENOSPC;
+			goto out;
+		}
+
+		pntsd->type |= cpu_to_le16(SACL_PRESENT);
+		pntsd->sacloffset = cpu_to_le32(offset);
+		sacl_ptr = (struct smb_acl *)((char *)pntsd + offset);
+		sacl_ptr->revision = cpu_to_le16(2);
+		sacl_ptr->size = cpu_to_le16(sizeof(struct smb_acl));
+		sacl_ptr->num_aces = 0;
+		sacl_ptr->reserved = 0;
 		offset = new_off;
 	}
 

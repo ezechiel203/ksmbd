@@ -6311,8 +6311,10 @@ static int smb2_get_info_sec(struct ksmbd_work *work,
 	int rc = 0, ppntsd_size = 0;
 
 	if (addition_info & ~(OWNER_SECINFO | GROUP_SECINFO | DACL_SECINFO |
-			      PROTECTED_DACL_SECINFO |
-			      UNPROTECTED_DACL_SECINFO)) {
+			      SACL_SECINFO | PROTECTED_DACL_SECINFO |
+			      UNPROTECTED_DACL_SECINFO |
+			      PROTECTED_SACL_SECINFO |
+			      UNPROTECTED_SACL_SECINFO)) {
 		ksmbd_debug(SMB, "Unsupported addition info: 0x%x)\n",
 		       addition_info);
 
