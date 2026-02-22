@@ -8925,7 +8925,7 @@ static int fsctl_pipe_transceive(struct ksmbd_work *work, u64 id,
 				 struct smb2_ioctl_rsp *rsp)
 {
 	struct ksmbd_rpc_command *rpc_resp;
-	char *data_buf = (char *)req + le16_to_cpu(req->InputOffset);
+	char *data_buf = (char *)req + le32_to_cpu(req->InputOffset);
 	int nbytes = 0;
 
 	rpc_resp = ksmbd_rpc_ioctl(work->sess, id, data_buf,
@@ -9062,8 +9062,6 @@ int smb2_ioctl(struct ksmbd_work *work)
 		goto out;
 	}
 
-	buffer = (char *)req + le16_to_cpu(req->InputOffset);
-
 	cnt_code = le32_to_cpu(req->CntCode);
 	ret = smb2_calc_max_out_buf_len(work, 48,
 					le32_to_cpu(req->MaxOutputResponse));
@@ -9073,6 +9071,27 @@ int smb2_ioctl(struct ksmbd_work *work)
 	}
 	out_buf_len = (unsigned int)ret;
 	in_buf_len = le32_to_cpu(req->InputCount);
+
+	/* Validate InputOffset before using it as pointer arithmetic */
+	if (in_buf_len > 0) {
+		unsigned int input_off = le32_to_cpu(req->InputOffset);
+		unsigned int req_len = get_rfc1002_len(work->request_buf) + 4;
+
+		if (work->next_smb2_rcv_hdr_off)
+			req_len -= work->next_smb2_rcv_hdr_off;
+
+		if (input_off < sizeof(struct smb2_ioctl_req) ||
+		    input_off > req_len ||
+		    in_buf_len > req_len - input_off) {
+			pr_err_ratelimited("Invalid IOCTL InputOffset %u or InputCount %u (req_len=%u)\n",
+					   input_off, in_buf_len, req_len);
+			ret = -EINVAL;
+			rsp->hdr.Status = STATUS_INVALID_PARAMETER;
+			goto out;
+		}
+	}
+
+	buffer = (char *)req + le32_to_cpu(req->InputOffset);
 
 	switch (cnt_code) {
 	case FSCTL_DFS_GET_REFERRALS:
