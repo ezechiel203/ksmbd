@@ -62,6 +62,9 @@ static void __wbuf(struct ksmbd_work *work, void **req, void **rsp)
 
 #define WORK_BUFFERS(w, rq, rs)	__wbuf((w), (void **)&(rq), (void **)&(rs))
 
+/* Cap lock count to prevent memory exhaustion from single request */
+#define KSMBD_MAX_LOCK_COUNT	64
+
 /**
  * check_session_id() - check for valid session id in smb header
  * @conn:	connection instance
@@ -123,12 +126,12 @@ int smb2_get_ksmbd_tcon(struct ksmbd_work *work)
 	 */
 	if (work->next_smb2_rcv_hdr_off) {
 		if (!work->tcon) {
-			pr_err("The first operation in the compound does not have tcon\n");
+			pr_err_ratelimited("The first operation in the compound does not have tcon\n");
 			return -EINVAL;
 		}
 		if (tree_id != UINT_MAX && work->tcon->id != tree_id) {
-			pr_err("tree id(%u) is different with id(%u) in first operation\n",
-					tree_id, work->tcon->id);
+			pr_err_ratelimited("tree id(%u) is different with id(%u) in first operation\n",
+					   tree_id, work->tcon->id);
 			return -EINVAL;
 		}
 		return 1;
@@ -136,7 +139,7 @@ int smb2_get_ksmbd_tcon(struct ksmbd_work *work)
 
 	work->tcon = ksmbd_tree_conn_lookup(work->sess, tree_id);
 	if (!work->tcon) {
-		pr_err("Invalid tid %d\n", tree_id);
+		pr_err_ratelimited("Invalid tid %d\n", tree_id);
 		return -ENOENT;
 	}
 
@@ -335,7 +338,7 @@ int smb2_set_rsp_credits(struct ksmbd_work *work)
 
 	if (conn->total_credits > conn->vals->max_credits) {
 		hdr->CreditRequest = 0;
-		pr_err("Total credits overflow: %d\n", conn->total_credits);
+		pr_err_ratelimited("Total credits overflow: %d\n", conn->total_credits);
 		return -EINVAL;
 	}
 
@@ -349,7 +352,7 @@ int smb2_set_rsp_credits(struct ksmbd_work *work)
 
 	conn->total_credits -= credit_charge;
 	if (credit_charge > conn->outstanding_credits) {
-		pr_err("Outstanding credits underflow: charge %u, outstanding %u\n",
+		pr_err_ratelimited("Outstanding credits underflow: charge %u, outstanding %u\n",
 		       credit_charge, conn->outstanding_credits);
 		conn->outstanding_credits = 0;
 	} else {
@@ -472,14 +475,14 @@ bool is_chained_smb2_message(struct ksmbd_work *work)
 		if ((u64)work->next_smb2_rcv_hdr_off + next_cmd +
 			__SMB2_HEADER_STRUCTURE_SIZE >
 		    get_rfc1002_len(work->request_buf)) {
-			pr_err("next command(%u) offset exceeds smb msg size\n",
-			       next_cmd);
+			pr_err_ratelimited("next command(%u) offset exceeds smb msg size\n",
+					   next_cmd);
 			return false;
 		}
 
 		if ((u64)get_rfc1002_len(work->response_buf) + MAX_CIFS_SMALL_BUFFER_SIZE >
 		    work->response_sz) {
-			pr_err("next response offset exceeds response buffer size\n");
+			pr_err_ratelimited("next response offset exceeds response buffer size\n");
 			return false;
 		}
 
@@ -610,12 +613,12 @@ int smb2_check_user_session(struct ksmbd_work *work)
 	 */
 	if (work->next_smb2_rcv_hdr_off) {
 		if (!work->sess) {
-			pr_err("The first operation in the compound does not have sess\n");
+			pr_err_ratelimited("The first operation in the compound does not have sess\n");
 			return -EINVAL;
 		}
 		if (sess_id != ULLONG_MAX && work->sess->id != sess_id) {
-			pr_err("session id(%llu) is different with the first operation(%lld)\n",
-					sess_id, work->sess->id);
+			pr_err_ratelimited("session id(%llu) is different with the first operation(%lld)\n",
+					   sess_id, work->sess->id);
 			return -EINVAL;
 		}
 		return 1;
@@ -924,7 +927,7 @@ static void decode_encrypt_ctxt(struct ksmbd_conn *conn,
 	int i, cphs_size;
 
 	if (sizeof(struct smb2_encryption_neg_context) > ctxt_len) {
-		pr_err("Invalid SMB2_ENCRYPTION_CAPABILITIES context size\n");
+		pr_err_ratelimited("Invalid SMB2_ENCRYPTION_CAPABILITIES context size\n");
 		return;
 	}
 
@@ -935,7 +938,7 @@ static void decode_encrypt_ctxt(struct ksmbd_conn *conn,
 
 	if (sizeof(struct smb2_encryption_neg_context) + cphs_size >
 	    ctxt_len) {
-		pr_err("Invalid cipher count(%d)\n", cph_cnt);
+		pr_err_ratelimited("Invalid cipher count(%d)\n", cph_cnt);
 		return;
 	}
 
@@ -988,7 +991,7 @@ static void decode_sign_cap_ctxt(struct ksmbd_conn *conn,
 	int i, sign_alos_size;
 
 	if (sizeof(struct smb2_signing_capabilities) > ctxt_len) {
-		pr_err("Invalid SMB2_SIGNING_CAPABILITIES context length\n");
+		pr_err_ratelimited("Invalid SMB2_SIGNING_CAPABILITIES context length\n");
 		return;
 	}
 
@@ -998,7 +1001,7 @@ static void decode_sign_cap_ctxt(struct ksmbd_conn *conn,
 
 	if (sizeof(struct smb2_signing_capabilities) + sign_alos_size >
 	    ctxt_len) {
-		pr_err("Invalid signing algorithm count(%d)\n", sign_algo_cnt);
+		pr_err_ratelimited("Invalid signing algorithm count(%d)\n", sign_algo_cnt);
 		return;
 	}
 
@@ -1035,7 +1038,7 @@ static __le32 deassemble_neg_contexts(struct ksmbd_conn *conn,
 	len_of_ctxts = len_of_smb - offset;
 
 	if (neg_ctxt_cnt > 16) {
-		pr_err("Too many negotiate contexts: %d\n", neg_ctxt_cnt);
+		pr_err_ratelimited("Too many negotiate contexts: %d\n", neg_ctxt_cnt);
 		return STATUS_INVALID_PARAMETER;
 	}
 
@@ -1121,7 +1124,7 @@ int smb2_handle_negotiate(struct ksmbd_work *work)
 	ksmbd_debug(SMB, "Received negotiate request\n");
 	conn->need_neg = false;
 	if (ksmbd_conn_good(conn)) {
-		pr_err("conn->tcp_status is already in CifsGood State\n");
+		pr_err_ratelimited("conn->tcp_status is already in CifsGood State\n");
 		work->send_no_response = 1;
 		return rc;
 	}
@@ -1136,7 +1139,7 @@ int smb2_handle_negotiate(struct ksmbd_work *work)
 	}
 
 	if (req->DialectCount == 0) {
-		pr_err("malformed packet\n");
+		pr_err_ratelimited("malformed packet\n");
 		rsp->hdr.Status = STATUS_INVALID_PARAMETER;
 		rc = -EINVAL;
 		goto err_out;
@@ -1640,7 +1643,7 @@ binding_session:
 
 	if (conn->dialect > SMB20_PROT_ID) {
 		if (!ksmbd_conn_lookup_dialect(conn)) {
-			pr_err("fail to verify the dialect\n");
+			pr_err_ratelimited("fail to verify the dialect\n");
 			return -ENOENT;
 		}
 	}
@@ -1744,7 +1747,7 @@ binding_session:
 
 	if (conn->dialect > SMB20_PROT_ID) {
 		if (!ksmbd_conn_lookup_dialect(conn)) {
-			pr_err("fail to verify the dialect\n");
+			pr_err_ratelimited("fail to verify the dialect\n");
 			return -ENOENT;
 		}
 	}
@@ -1950,11 +1953,11 @@ int smb2_sess_setup(struct ksmbd_work *work)
 			}
 		} else {
 			/* TODO: need one more negotiation */
-			pr_err("Not support the preferred authentication\n");
+			pr_err_ratelimited("Not support the preferred authentication\n");
 			rc = -EINVAL;
 		}
 	} else {
-		pr_err("Not support authentication\n");
+		pr_err_ratelimited("Not support authentication\n");
 		rc = -EINVAL;
 	}
 
@@ -2057,7 +2060,7 @@ int smb2_tree_connect(struct ksmbd_work *work)
 					  le16_to_cpu(req->PathLength), true,
 					  conn->local_nls);
 	if (IS_ERR(treename)) {
-		pr_err("treename is NULL\n");
+		pr_err_ratelimited("treename is NULL\n");
 		status.ret = KSMBD_TREE_CONN_STATUS_ERROR;
 		goto out_err1;
 	}
@@ -2896,7 +2899,7 @@ static int parse_durable_handle_context(struct ksmbd_work *work,
 			/* Validate client identity to prevent durable handle theft */
 			if (memcmp(dh_info->fp->client_guid, conn->ClientGUID,
 				   SMB2_CLIENT_GUID_SIZE)) {
-				pr_err("durable reconnect v2: client GUID mismatch\n");
+				pr_err_ratelimited("durable reconnect v2: client GUID mismatch\n");
 				err = -EBADF;
 				ksmbd_put_durable_fd(dh_info->fp);
 				goto out;
@@ -2938,7 +2941,7 @@ static int parse_durable_handle_context(struct ksmbd_work *work,
 			/* Validate client identity to prevent durable handle theft */
 			if (memcmp(dh_info->fp->client_guid, conn->ClientGUID,
 				   SMB2_CLIENT_GUID_SIZE)) {
-				pr_err("durable reconnect: client GUID mismatch\n");
+				pr_err_ratelimited("durable reconnect: client GUID mismatch\n");
 				err = -EBADF;
 				ksmbd_put_durable_fd(dh_info->fp);
 				goto out;
@@ -3196,16 +3199,16 @@ int smb2_open(struct ksmbd_work *work)
 		lc = parse_lease_state(req);
 
 	if (le32_to_cpu(req->ImpersonationLevel) > le32_to_cpu(IL_DELEGATE_LE)) {
-		pr_err("Invalid impersonationlevel : 0x%x\n",
-		       le32_to_cpu(req->ImpersonationLevel));
+		pr_err_ratelimited("Invalid impersonationlevel : 0x%x\n",
+				   le32_to_cpu(req->ImpersonationLevel));
 		rc = -EIO;
 		rsp->hdr.Status = STATUS_BAD_IMPERSONATION_LEVEL;
 		goto err_out2;
 	}
 
 	if (req->CreateOptions && !(req->CreateOptions & CREATE_OPTIONS_MASK)) {
-		pr_err("Invalid create options : 0x%x\n",
-		       le32_to_cpu(req->CreateOptions));
+		pr_err_ratelimited("Invalid create options : 0x%x\n",
+				   le32_to_cpu(req->CreateOptions));
 		rc = -EINVAL;
 		goto err_out2;
 	} else {
@@ -3232,22 +3235,22 @@ int smb2_open(struct ksmbd_work *work)
 
 	if (le32_to_cpu(req->CreateDisposition) >
 	    le32_to_cpu(FILE_OVERWRITE_IF_LE)) {
-		pr_err("Invalid create disposition : 0x%x\n",
-		       le32_to_cpu(req->CreateDisposition));
+		pr_err_ratelimited("Invalid create disposition : 0x%x\n",
+				   le32_to_cpu(req->CreateDisposition));
 		rc = -EINVAL;
 		goto err_out2;
 	}
 
 	if (!(req->DesiredAccess & DESIRED_ACCESS_MASK)) {
-		pr_err("Invalid desired access : 0x%x\n",
-		       le32_to_cpu(req->DesiredAccess));
+		pr_err_ratelimited("Invalid desired access : 0x%x\n",
+				   le32_to_cpu(req->DesiredAccess));
 		rc = -EACCES;
 		goto err_out2;
 	}
 
 	if (req->FileAttributes && !(req->FileAttributes & ATTR_MASK_LE)) {
-		pr_err("Invalid file attribute : 0x%x\n",
-		       le32_to_cpu(req->FileAttributes));
+		pr_err_ratelimited("Invalid file attribute : 0x%x\n",
+				   le32_to_cpu(req->FileAttributes));
 		rc = -EINVAL;
 		goto err_out2;
 	}
@@ -5009,7 +5012,7 @@ static int buffer_check_err(int reqOutputBufferLength,
 			    void *rsp_org)
 {
 	if (reqOutputBufferLength < le32_to_cpu(rsp->OutputBufferLength)) {
-		pr_err("Invalid Buffer Size Requested\n");
+		pr_err_ratelimited("Invalid Buffer Size Requested\n");
 		rsp->hdr.Status = STATUS_INFO_LENGTH_MISMATCH;
 		*(__be32 *)rsp_org = cpu_to_be32(sizeof(struct smb2_hdr));
 		return -EINVAL;
@@ -7279,7 +7282,7 @@ static int smb2_set_info_file(struct ksmbd_work *work, struct ksmbd_file *fp,
 	}
 	}
 
-	pr_err("Unimplemented Fileinfoclass :%d\n", req->FileInfoClass);
+	pr_err_ratelimited("Unimplemented Fileinfoclass :%d\n", req->FileInfoClass);
 	return -EOPNOTSUPP;
 }
 
@@ -7730,9 +7733,9 @@ static noinline int smb2_write_pipe(struct ksmbd_work *work)
 
 	if ((u64)le16_to_cpu(req->DataOffset) + length >
 	    get_rfc1002_len(work->request_buf)) {
-		pr_err("invalid write data offset %u, smb_len %u\n",
-		       le16_to_cpu(req->DataOffset),
-		       get_rfc1002_len(work->request_buf));
+		pr_err_ratelimited("invalid write data offset %u, smb_len %u\n",
+				   le16_to_cpu(req->DataOffset),
+				   get_rfc1002_len(work->request_buf));
 		err = -EINVAL;
 		goto out;
 	}
@@ -8238,7 +8241,8 @@ int smb2_lock(struct ksmbd_work *work)
 	lock_ele = req->locks;
 
 	ksmbd_debug(SMB, "lock count is %d\n", lock_count);
-	if (!lock_count) {
+	if (!lock_count || lock_count > KSMBD_MAX_LOCK_COUNT) {
+		pr_err_ratelimited("Invalid lock count: %d\n", lock_count);
 		err = -EINVAL;
 		goto out2;
 	}
@@ -8255,7 +8259,7 @@ int smb2_lock(struct ksmbd_work *work)
 		lock_start = le64_to_cpu(lock_ele[i].Offset);
 		lock_length = le64_to_cpu(lock_ele[i].Length);
 		if (lock_start > U64_MAX - lock_length) {
-			pr_err("Invalid lock range requested\n");
+			pr_err_ratelimited("Invalid lock range requested\n");
 			rsp->hdr.Status = STATUS_INVALID_LOCK_RANGE;
 			locks_free_lock(flock);
 			goto out;
@@ -8292,7 +8296,7 @@ int smb2_lock(struct ksmbd_work *work)
 				if (cmp_lock->fl->fl_type != F_UNLCK &&
 				    flock->fl_type != F_UNLCK) {
 #endif
-					pr_err("conflict two locks in one request\n");
+					pr_err_ratelimited("conflict two locks in one request\n");
 					err = -EINVAL;
 					locks_free_lock(flock);
 					goto out;
@@ -8392,7 +8396,7 @@ int smb2_lock(struct ksmbd_work *work)
 				    cmp_lock->start < smb_lock->end) {
 					spin_unlock(&conn->llist_lock);
 					up_read(&conn_list_lock);
-					pr_err("previous lock conflict with zero byte lock range\n");
+					pr_err_ratelimited("previous lock conflict with zero byte lock range\n");
 					goto out;
 				}
 
@@ -8401,7 +8405,7 @@ int smb2_lock(struct ksmbd_work *work)
 				    smb_lock->start < cmp_lock->end) {
 					spin_unlock(&conn->llist_lock);
 					up_read(&conn_list_lock);
-					pr_err("current lock conflict with zero byte lock range\n");
+					pr_err_ratelimited("current lock conflict with zero byte lock range\n");
 					goto out;
 				}
 
@@ -8412,7 +8416,7 @@ int smb2_lock(struct ksmbd_work *work)
 				    !cmp_lock->zero_len && !smb_lock->zero_len) {
 					spin_unlock(&conn->llist_lock);
 					up_read(&conn_list_lock);
-					pr_err("Not allow lock operation on exclusive lock range\n");
+					pr_err_ratelimited("Not allow lock operation on exclusive lock range\n");
 					goto out;
 				}
 			}
@@ -8425,7 +8429,7 @@ out_check_cl:
 #else
 		if (smb_lock->fl->fl_type == F_UNLCK && nolock) {
 #endif
-			pr_err("Try to unlock nolocked range\n");
+			pr_err_ratelimited("Try to unlock nolocked range\n");
 			rsp->hdr.Status = STATUS_RANGE_NOT_LOCKED;
 			goto out;
 		}
@@ -9512,8 +9516,8 @@ static void smb20_oplock_break_ack(struct ksmbd_work *work)
 		rsp_oplevel = SMB2_OPLOCK_LEVEL_NONE;
 		break;
 	default:
-		pr_err("unknown oplock change 0x%x -> 0x%x\n",
-		       opinfo->level, rsp_oplevel);
+		pr_err_ratelimited("unknown oplock change 0x%x -> 0x%x\n",
+				   opinfo->level, rsp_oplevel);
 	}
 
 	if (ret < 0) {
@@ -9586,8 +9590,8 @@ static void smb21_lease_break_ack(struct ksmbd_work *work)
 	lease = opinfo->o_lease;
 
 	if (opinfo->op_state == OPLOCK_STATE_NONE) {
-		pr_err("unexpected lease break state 0x%x\n",
-		       opinfo->op_state);
+		pr_err_ratelimited("unexpected lease break state 0x%x\n",
+				   opinfo->op_state);
 		rsp->hdr.Status = STATUS_UNSUCCESSFUL;
 		goto err_out;
 	}
@@ -9805,7 +9809,7 @@ int smb2_check_sign_req(struct ksmbd_work *work)
 		return 0;
 
 	if (crypto_memneq(signature, signature_req, SMB2_SIGNATURE_SIZE)) {
-		pr_err("bad smb2 signature\n");
+		pr_err_ratelimited("bad smb2 signature\n");
 		return 0;
 	}
 
@@ -9893,7 +9897,7 @@ int smb3_check_sign_req(struct ksmbd_work *work)
 		return 0;
 
 	if (crypto_memneq(signature, signature_req, SMB2_SIGNATURE_SIZE)) {
-		pr_err("bad smb2 signature\n");
+		pr_err_ratelimited("bad smb2 signature\n");
 		return 0;
 	}
 
@@ -10048,20 +10052,20 @@ int smb3_decrypt_req(struct ksmbd_work *work)
 
 	if (pdu_length < sizeof(struct smb2_transform_hdr) ||
 	    buf_data_size < sizeof(struct smb2_hdr)) {
-		pr_err("Transform message is too small (%u)\n",
-		       pdu_length);
+		pr_err_ratelimited("Transform message is too small (%u)\n",
+				   pdu_length);
 		return -ECONNABORTED;
 	}
 
 	if (buf_data_size < le32_to_cpu(tr_hdr->OriginalMessageSize)) {
-		pr_err("Transform message is broken\n");
+		pr_err_ratelimited("Transform message is broken\n");
 		return -ECONNABORTED;
 	}
 
 	sess = ksmbd_session_lookup_all(work->conn, le64_to_cpu(tr_hdr->SessionId));
 	if (!sess) {
-		pr_err("invalid session id(%llx) in transform header\n",
-		       le64_to_cpu(tr_hdr->SessionId));
+		pr_err_ratelimited("invalid session id(%llx) in transform header\n",
+				   le64_to_cpu(tr_hdr->SessionId));
 		return -ECONNABORTED;
 	}
 	ksmbd_user_session_put(sess);

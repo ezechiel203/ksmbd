@@ -212,8 +212,9 @@ int get_nlink(struct kstat *st)
 	int nlink;
 
 	nlink = st->nlink;
+	/* Avoid underflow on mount points or pseudo-filesystems */
 	if (S_ISDIR(st->mode))
-		nlink--;
+		nlink = (nlink > 1) ? nlink - 1 : 0;
 
 	return nlink;
 }
