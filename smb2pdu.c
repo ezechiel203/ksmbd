@@ -49,6 +49,7 @@
 #include "transport_tcp.h"
 #include "smb2fruit.h"
 #include "ksmbd_fsctl.h"
+#include "ksmbd_create_ctx.h"
 
 static void __wbuf(struct ksmbd_work *work, void **req, void **rsp)
 {
@@ -3257,6 +3258,12 @@ int smb2_open(struct ksmbd_work *work)
 	}
 
 	if (req->CreateContextsOffset) {
+		/*
+		 * TODO: dispatch to registered create context handlers
+		 * via ksmbd_find_create_context() instead of inline
+		 * processing.  See ksmbd_create_ctx.h for the API.
+		 */
+
 		/* Parse non-durable handle create contexts */
 		context = smb2_find_context_vals(req, SMB2_CREATE_EA_BUFFER, 4);
 		if (IS_ERR(context)) {
