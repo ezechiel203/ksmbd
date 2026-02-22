@@ -30,6 +30,7 @@
 #include "ksmbd_notify.h"
 #include "ksmbd_reparse.h"
 #include "ksmbd_resilient.h"
+#include "ksmbd_quota.h"
 
 extern int ksmbd_debugfs_init(void);
 extern void ksmbd_debugfs_exit(void);
@@ -675,8 +676,14 @@ static int __init ksmbd_server_init(void)
 	if (ret)
 		goto err_resilient;
 
+	ret = ksmbd_quota_init();
+	if (ret)
+		goto err_quota;
+
 	return 0;
 
+err_quota:
+	ksmbd_resilient_exit();
 err_resilient:
 	ksmbd_reparse_exit();
 err_reparse:
@@ -721,6 +728,7 @@ err_config_exit:
  */
 static void __exit ksmbd_server_exit(void)
 {
+	ksmbd_quota_exit();
 	ksmbd_resilient_exit();
 	ksmbd_reparse_exit();
 	ksmbd_notify_exit();

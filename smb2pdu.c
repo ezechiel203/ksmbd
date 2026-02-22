@@ -52,6 +52,7 @@
 #include "ksmbd_create_ctx.h"
 #include "ksmbd_vss.h"
 #include "ksmbd_notify.h"
+#include "ksmbd_info.h"
 
 static void __wbuf(struct ksmbd_work *work, void **req, void **rsp)
 {
@@ -6429,6 +6430,47 @@ int smb2_query_info(struct ksmbd_work *work)
 		ksmbd_debug(SMB, "GOT SMB2_O_INFO_SECURITY\n");
 		rc = smb2_get_info_sec(work, req, rsp);
 		break;
+	case SMB2_O_INFO_QUOTA:
+	{
+		struct ksmbd_file *fp;
+		unsigned int id = KSMBD_NO_FID, pid = KSMBD_NO_FID;
+		unsigned int qout_len = 0;
+
+		ksmbd_debug(SMB, "GOT SMB2_O_INFO_QUOTA\n");
+
+		if (work->next_smb2_rcv_hdr_off) {
+			if (!has_file_id(req->VolatileFileId)) {
+				id = work->compound_fid;
+				pid = work->compound_pfid;
+			}
+		}
+		if (!has_file_id(id)) {
+			id = req->VolatileFileId;
+			pid = req->PersistentFileId;
+		}
+
+		fp = ksmbd_lookup_fd_slow(work, id, pid);
+		if (!fp) {
+			rc = -ENOENT;
+			break;
+		}
+
+		rc = ksmbd_dispatch_info(work, fp,
+					 SMB2_O_INFO_QUOTA, 0,
+					 KSMBD_INFO_GET,
+					 rsp->Buffer,
+					 le32_to_cpu(req->OutputBufferLength),
+					 &qout_len);
+		ksmbd_fd_put(work, fp);
+
+		if (rc == -EOPNOTSUPP) {
+			/* No handler registered — not supported */
+			break;
+		}
+		if (!rc)
+			rsp->OutputBufferLength = cpu_to_le32(qout_len);
+		break;
+	}
 	default:
 		ksmbd_debug(SMB, "InfoType %d not supported yet\n",
 			    req->InfoType);
