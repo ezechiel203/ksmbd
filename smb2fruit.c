@@ -649,16 +649,22 @@ void fruit_cleanup_module(void)
 	pr_info("ksmbd: Fruit SMB extensions unloaded\n");
 }
 
+/*
+ * fruit_process_server_query - [STUB] Process Fruit server query
+ *
+ * Not yet implemented.  Logs the query type and returns -ENOSYS
+ * so callers know the query was not handled.
+ */
 int fruit_process_server_query(struct ksmbd_conn *conn,
 			       const struct fruit_server_query *query)
 {
 	if (!conn || !query)
 		return -EINVAL;
 
-	ksmbd_debug(SMB, "Fruit server query: type=%d flags=%d\n",
+	ksmbd_debug(SMB, "Fruit server query: type=%d flags=%d [STUB]\n",
 		    le32_to_cpu(query->type), le32_to_cpu(query->flags));
 
-	return 0;
+	return -ENOSYS;
 }
 
 void fruit_debug_capabilities(u64 capabilities)
@@ -671,14 +677,20 @@ void fruit_debug_capabilities(u64 capabilities)
 		    !!(capabilities & kAAPL_SUPPORTS_NFS_ACE));
 }
 
+/*
+ * smb2_read_dir_attr - [STUB] Read directory attributes for Fruit
+ *
+ * Not yet implemented.  Per-entry attribute enrichment is handled
+ * by smb2_read_dir_attr_fill() for basic UNIX mode packing.
+ */
 int smb2_read_dir_attr(struct ksmbd_work *work)
 {
 	if (!work)
 		return -EINVAL;
 
-	ksmbd_debug(SMB, "Fruit read directory attrs\n");
+	ksmbd_debug(SMB, "Fruit read directory attrs [STUB]\n");
 
-	return 0;
+	return -ENOSYS;
 }
 
 /*
@@ -727,21 +739,20 @@ void smb2_read_dir_attr_fill(struct ksmbd_conn *conn,
 					 NULL, 0);
 		if (rfork_len > 0) {
 			/*
-			 * When a resource fork exists, OR the size into
-			 * the upper bits would lose data; instead report
-			 * the resource fork size directly in EaSize when
-			 * non-zero, since Finder uses this for display.
+			 * TODO: materialize rfork_len into response.
+			 * Currently only logs; macOS Finder won't see
+			 * resource fork sizes until this is wired up.
 			 */
 			ksmbd_debug(SMB,
-				    "Fruit readdir rfork_size=%zd %pd\n",
+				    "Fruit readdir rfork_size=%zd %pd [STUB]\n",
 				    rfork_len, dentry);
 		}
 	}
 
-	/* Max access enrichment */
+	/* Max access enrichment — TODO: compute and return max access mask */
 	if (test_share_config_flag(share,
 				   KSMBD_SHARE_FLAG_FRUIT_MAX_ACCESS)) {
-		ksmbd_debug(SMB, "Fruit readdir max_access for %pd\n",
+		ksmbd_debug(SMB, "Fruit readdir max_access for %pd [STUB]\n",
 			    dentry);
 	}
 }

@@ -11,13 +11,13 @@ KSMBD is an open-source in-kernel CIFS/SMB3 server for Linux Kernel. It provides
 
 ## 🌟 Key Features
 
-### 🍎 Apple SMB Extensions (NEW!)
-- **Complete Apple® Integration**: Native support for Apple® SMB protocol extensions
-- **Time Machine® Backup**: Full support for Apple® Time Machine® network backups
-- **Finder® Metadata**: Classic file type/creator codes and Finder® flags
-- **Performance Optimizations**: 14x faster directory listings for Apple® clients
-- **Enterprise Security**: Cryptographic client validation and capability gating
-- **Multi-Platform Support**: macOS®, iOS®, iPadOS®, watchOS®, and tvOS®
+### 🍎 Apple SMB Extensions
+- **AAPL Context Support**: Apple create-context negotiation (complete)
+- **ReadDirAttr**: UNIX mode packing into EaSize for Finder (complete)
+- **Finder Metadata Paths**: Finder/AFP metadata helpers and stream handling
+- **Time Machine Hooks**: Time Machine related configuration and quota plumbing
+- **Server Query / Resource Fork / Max Access**: WIP (stubs present, not yet wired)
+- **Compatibility Goal**: Best-effort interoperability with Apple clients
 
 ### Core SMB Features
 - **Multi-Protocol Support**: SMB1, SMB2.0, SMB2.1, SMB3.0, SMB3.1.1
@@ -204,7 +204,7 @@ make
 ### General Security
 - **SMB3 Encryption**: AES-CCM and AES-GCM encryption support
 - **Pre-authentication Integrity**: SMB 3.1.1 security features
-- **Kerberos Authentication**: Full Kerberos support (in development)
+- **Kerberos Authentication**: Kerberos support path present (feature maturity varies by deployment)
 - **Secure Negotiation**: Prevents downgrade attacks
 
 ## 📊 Performance
