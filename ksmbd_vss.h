@@ -18,8 +18,12 @@
 
 struct ksmbd_work;
 
-/* @GMT-YYYY.MM.DD-HH.MM.SS format: 24 chars + NUL */
-#define KSMBD_VSS_GMT_TOKEN_LEN		25
+/*
+ * @GMT-YYYY.MM.DD-HH.MM.SS format: 24 chars + NUL = 25.
+ * Use 32 to silence gcc -Wformat-truncation (cannot prove
+ * year fits in 4 digits) and provide headroom.
+ */
+#define KSMBD_VSS_GMT_TOKEN_LEN		32
 
 /**
  * struct ksmbd_snapshot_entry - Single snapshot timestamp
