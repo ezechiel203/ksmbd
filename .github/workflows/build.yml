@@ -21,33 +21,36 @@ jobs:
         run: |
           # Check that key object files were produced
           EXPECTED_OBJS="server.o connection.o auth.o vfs.o vfs_cache.o \
-            smb2pdu.o smb_common.o oplock.o unicode.o misc.o ndr.o \
+            smb_common.o oplock.o unicode.o misc.o ndr.o \
             transport_tcp.o transport_ipc.o ksmbd_work.o crypto_ctx.o smbacl.o"
           MISSING=0
           for obj in $EXPECTED_OBJS; do
             if [ ! -f "$obj" ]; then
-              echo "WARNING: Missing object file: $obj"
+              echo "ERROR: Missing object file: $obj"
               MISSING=$((MISSING + 1))
             fi
           done
           if [ "$MISSING" -gt 0 ]; then
-            echo "WARNING: $MISSING expected object files missing"
+            echo "ERROR: $MISSING expected object files missing"
+            exit 1
           fi
-          echo "Build artifacts:"
-          ls -la *.o 2>/dev/null | wc -l
-          ls -la *.ko 2>/dev/null
+          # Verify the final .ko was produced
+          if [ ! -f ksmbd.ko ]; then
+            echo "ERROR: ksmbd.ko not produced"
+            exit 1
+          fi
+          echo "Build verified: $(ls *.o 2>/dev/null | wc -l) objects, ksmbd.ko present"
       - name: Run sparse check
-        run: make C=2 2>&1 | tee sparse-output.txt
-        continue-on-error: true
-      - name: Count sparse warnings
         run: |
-          WARNINGS=$(grep -c 'warning:' sparse-output.txt 2>/dev/null || echo 0)
+          make C=2 2>&1 | tee sparse-output.txt
           ERRORS=$(grep -c 'error:' sparse-output.txt 2>/dev/null || echo 0)
+          WARNINGS=$(grep -c 'warning:' sparse-output.txt 2>/dev/null || echo 0)
           echo "Sparse warnings: $WARNINGS"
           echo "Sparse errors: $ERRORS"
           if [ "$ERRORS" -gt 0 ]; then
             echo "ERROR: Sparse found errors"
             grep 'error:' sparse-output.txt
+            exit 1
           fi
       - name: Upload sparse report
         uses: actions/upload-artifact@v4

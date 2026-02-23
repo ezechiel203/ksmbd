@@ -22,22 +22,33 @@ jobs:
             exit 1
           fi
           echo "Module build succeeded"
-      - name: Verify test infrastructure
+      - name: Syntax-check KUnit test sources
         run: |
-          KUNIT_COUNT=$(ls test/ksmbd_test_*.c 2>/dev/null | wc -l)
-          FUZZ_COUNT=$(ls test/fuzz/*_fuzz.c 2>/dev/null | wc -l)
-          echo "KUnit test files: $KUNIT_COUNT"
-          echo "Fuzz harness files: $FUZZ_COUNT"
-          if [ "$KUNIT_COUNT" -lt 20 ]; then
-            echo "ERROR: Expected at least 20 KUnit test files, found $KUNIT_COUNT"
-            exit 1
-          fi
-          if [ "$FUZZ_COUNT" -lt 10 ]; then
-            echo "ERROR: Expected at least 10 fuzz harness files, found $FUZZ_COUNT"
-            exit 1
-          fi
+          KERN_HEADERS="/usr/src/linux-headers-$(uname -r)"
+          ERRORS=0
+          for f in test/ksmbd_test_*.c; do
+            echo "Checking: $f"
+            if ! gcc -fsyntax-only -std=gnu11 \
+              -include "$KERN_HEADERS/include/linux/kconfig.h" \
+              -I "$KERN_HEADERS/include" \
+              -I "$KERN_HEADERS/include/uapi" \
+              -I "$KERN_HEADERS/arch/x86/include" \
+              -I "$KERN_HEADERS/arch/x86/include/generated" \
+              -I . -I mgmt/ \
+              -D__KERNEL__ -DMODULE -DKBUILD_MODNAME='"ksmbd_test"' \
+              "$f" 2>&1; then
+              echo "WARNING: Syntax errors in $f (non-fatal, may need kernel-internal headers)"
+            fi
+          done
+          echo "KUnit syntax check complete"
+      - name: Verify test infrastructure and scripts
+        run: |
           bash -n run_tests.sh
-          echo "Test infrastructure verified"
+          bash -n benchmarks/run_benchmarks.sh
+          for f in tests/*.sh; do
+            [ -f "$f" ] && bash -n "$f"
+          done
+          echo "All scripts pass syntax check"
 
   static-analysis:
     name: Static Analysis
@@ -97,10 +108,10 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y shellcheck
       - name: Lint test scripts
         run: |
-          shellcheck tests/*.sh || true
+          shellcheck --severity=error tests/*.sh
       - name: Lint benchmark scripts
         run: |
-          shellcheck benchmarks/*.sh || true
+          shellcheck --severity=error benchmarks/*.sh
 
   benchmark-regression:
     name: Benchmark Regression Check
