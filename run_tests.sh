@@ -557,7 +557,10 @@ main() {
 
     # Setup environment (creates RESULTS_DIR and sets TEST_LOG)
     # Must happen before any logging calls that write to TEST_LOG.
-    setup_environment
+    # In dry-run mode, skip all side effects (no directory/file creation).
+    if [[ "$DRY_RUN" != "true" ]]; then
+        setup_environment
+    fi
 
     log_header "Apple SMB Extensions Test Framework"
     log_info "Started at $(date)"
