@@ -215,12 +215,21 @@ send:
 		spin_unlock(&watch->fp->f_lock);
 	}
 
-	release_async_work(work);
+	/*
+	 * ksmbd_conn_try_dequeue_request() decrements conn->req_running
+	 * (which was incremented in ksmbd_conn_enqueue_request but never
+	 * decremented because handle_ksmbd_work skipped it for
+	 * pending_async works) and calls release_async_work() internally.
+	 */
+	ksmbd_conn_try_dequeue_request(work);
 	ksmbd_free_work_struct(work);
 
 	spin_lock(&watch->lock);
 	watch->pending_work = NULL;
 	spin_unlock(&watch->lock);
+
+	/* Destroy the fsnotify mark so it does not accumulate */
+	fsnotify_destroy_mark(&watch->mark, ksmbd_notify_group);
 }
 
 /* ------------------------------------------------------------------ */
@@ -464,7 +473,7 @@ void ksmbd_notify_cancel(void **argv)
 		spin_unlock(&watch->fp->f_lock);
 	}
 
-	release_async_work(work);
+	ksmbd_conn_try_dequeue_request(work);
 	ksmbd_free_work_struct(work);
 
 	/* Remove the fsnotify mark (exported API for modules) */
@@ -538,7 +547,7 @@ void ksmbd_notify_cleanup_file(struct ksmbd_file *fp)
 				    - 1))
 					ksmbd_conn_write(work);
 
-				release_async_work(work);
+				ksmbd_conn_try_dequeue_request(work);
 				ksmbd_free_work_struct(work);
 			} else {
 				spin_unlock(&watch->lock);
