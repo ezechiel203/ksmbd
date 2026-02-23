@@ -13,17 +13,16 @@ jobs:
           sudo apt-get install -y build-essential linux-headers-$(uname -r)
       - name: Build ksmbd module
         run: make -j$(nproc)
-      - name: Build KUnit test modules
+      - name: Build with warnings
         run: |
-          # KUnit tests compile as separate modules
-          # In a full kernel build they'd use CONFIG_KSMBD_KUNIT_TEST=m
-          # For out-of-tree, we verify they compile
-          echo "KUnit test sources verified during module build"
-          echo "Test files:"
-          ls -la test/ksmbd_test_*.c | wc -l
-          echo "Fuzz harnesses:"
-          ls -la test/fuzz/*_fuzz.c | wc -l
-      - name: Verify test file count
+          make -j$(nproc) W=1 2>&1 | tee build-output.txt
+          # Fail CI on compile errors (warnings are informational)
+          if grep -q 'error:' build-output.txt; then
+            echo "ERROR: Build produced compile errors"
+            exit 1
+          fi
+          echo "Module build succeeded"
+      - name: Verify test infrastructure
         run: |
           KUNIT_COUNT=$(ls test/ksmbd_test_*.c 2>/dev/null | wc -l)
           FUZZ_COUNT=$(ls test/fuzz/*_fuzz.c 2>/dev/null | wc -l)
@@ -37,6 +36,8 @@ jobs:
             echo "ERROR: Expected at least 10 fuzz harness files, found $FUZZ_COUNT"
             exit 1
           fi
+          bash -n run_tests.sh
+          echo "Test infrastructure verified"
 
   static-analysis:
     name: Static Analysis
