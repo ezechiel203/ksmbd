@@ -34,6 +34,7 @@ MOUNT_POINT=""
 OUTPUT_FILE=""
 QUICK_MODE=0
 SIZE_OVERRIDE=""
+ITERATIONS=1
 FIO_DIR=""
 CLEANUP_FILES=()
 
@@ -67,6 +68,7 @@ ${BOLD}Required:${NC}
 ${BOLD}Options:${NC}
   --size SIZE         Override default file sizes (e.g., 256M for quick runs)
   --output FILE       JSON output file (default: results_YYYYMMDD_HHMMSS.json)
+  --iterations N      Run each workload N times and report mean/min/max (default: 1)
   --quick             Use reduced sizes (256MB) for fast CI runs
   --help              Show this help message
 
@@ -190,6 +192,14 @@ parse_args() {
                 OUTPUT_FILE="${1:-}"
                 if [ -z "$OUTPUT_FILE" ]; then
                     err "--output requires a FILE argument"
+                    exit 1
+                fi
+                ;;
+            --iterations)
+                shift
+                ITERATIONS="${1:-}"
+                if [ -z "$ITERATIONS" ] || ! [[ "$ITERATIONS" =~ ^[1-9][0-9]*$ ]]; then
+                    err "--iterations requires a positive integer argument"
                     exit 1
                 fi
                 ;;
@@ -361,6 +371,43 @@ run_fio_workload() {
 }
 
 # ---------------------------------------------------------------------------
+# Multi-iteration statistics
+# ---------------------------------------------------------------------------
+
+# Compute mean, min, max across iterations for each metric field.
+# Usage: compute_iteration_stats <metrics_line1> <metrics_line2> ...
+# Each metrics line is "bw:iops:lat_avg:lat_p50:lat_p95:lat_p99".
+# Returns "mean_bw:mean_iops:...:min_bw:min_iops:...:max_bw:max_iops:..."
+# formatted as three colon-separated metric tuples joined by "|".
+compute_iteration_stats() {
+    local lines=("$@")
+    local n=${#lines[@]}
+
+    awk -F: -v n="$n" '
+    BEGIN {
+        for (f = 1; f <= 6; f++) { sum[f] = 0; mn[f] = ""; mx[f] = "" }
+    }
+    {
+        for (f = 1; f <= 6; f++) {
+            v = $f + 0
+            sum[f] += v
+            if (mn[f] == "" || v < mn[f]) mn[f] = v
+            if (mx[f] == "" || v > mx[f]) mx[f] = v
+        }
+    }
+    END {
+        for (f = 1; f <= 6; f++) mean[f] = sum[f] / n
+        # mean tuple
+        printf "%.2f:%.0f:%.2f:%.2f:%.2f:%.2f|", mean[1], mean[2], mean[3], mean[4], mean[5], mean[6]
+        # min tuple
+        printf "%.2f:%.0f:%.2f:%.2f:%.2f:%.2f|", mn[1], mn[2], mn[3], mn[4], mn[5], mn[6]
+        # max tuple
+        printf "%.2f:%.0f:%.2f:%.2f:%.2f:%.2f\n", mx[1], mx[2], mx[3], mx[4], mx[5], mx[6]
+    }
+    ' <<< "$(printf '%s\n' "${lines[@]}")"
+}
+
+# ---------------------------------------------------------------------------
 # Workload definitions
 # ---------------------------------------------------------------------------
 
@@ -373,6 +420,7 @@ run_all_workloads() {
     info " Mount point : $MOUNT_POINT"
     info " Test dir    : $FIO_DIR"
     info " Output file : $OUTPUT_FILE"
+    info " Iterations  : $ITERATIONS"
     info " Quick mode  : $([ "$QUICK_MODE" -eq 1 ] && echo "yes" || echo "no")"
     info "============================================================"
     echo ""
@@ -381,103 +429,166 @@ run_all_workloads() {
     local metrics
     workload_names+=("Sequential Read")
     info "--- Workload 1/7: Sequential Read ---"
-    # Pre-create file for read test
-    fio --name=precreate --directory="$FIO_DIR" --rw=write --bs=1M \
-        --size="$SEQ_SIZE" --numjobs=1 --ioengine=posixaio --direct=1 \
-        >/dev/null 2>&1 || true
-    metrics=$(run_fio_workload "seq_read" "read" "1M" "$SEQ_SIZE" 1)
-    workload_metrics+=("$metrics")
+    local -a iter_results=()
+    for (( iter=1; iter<=ITERATIONS; iter++ )); do
+        [ "$ITERATIONS" -gt 1 ] && info "  iteration $iter/$ITERATIONS"
+        # Pre-create file for read test
+        fio --name=precreate --directory="$FIO_DIR" --rw=write --bs=1M \
+            --size="$SEQ_SIZE" --numjobs=1 --ioengine=posixaio --direct=1 \
+            >/dev/null 2>&1 || true
+        metrics=$(run_fio_workload "seq_read_i${iter}" "read" "1M" "$SEQ_SIZE" 1)
+        iter_results+=("$metrics")
+    done
+    if [ "$ITERATIONS" -gt 1 ]; then
+        workload_metrics+=("$(compute_iteration_stats "${iter_results[@]}")")
+    else
+        workload_metrics+=("${iter_results[0]}")
+    fi
     echo ""
 
     # Workload 2: Sequential write
     workload_names+=("Sequential Write")
     info "--- Workload 2/7: Sequential Write ---"
-    metrics=$(run_fio_workload "seq_write" "write" "1M" "$SEQ_SIZE" 1)
-    workload_metrics+=("$metrics")
+    iter_results=()
+    for (( iter=1; iter<=ITERATIONS; iter++ )); do
+        [ "$ITERATIONS" -gt 1 ] && info "  iteration $iter/$ITERATIONS"
+        metrics=$(run_fio_workload "seq_write_i${iter}" "write" "1M" "$SEQ_SIZE" 1)
+        iter_results+=("$metrics")
+    done
+    if [ "$ITERATIONS" -gt 1 ]; then
+        workload_metrics+=("$(compute_iteration_stats "${iter_results[@]}")")
+    else
+        workload_metrics+=("${iter_results[0]}")
+    fi
     echo ""
 
     # Workload 3: Random read 4K
     workload_names+=("Random Read 4K")
     info "--- Workload 3/7: Random Read 4K ---"
-    # Pre-create file for random read
-    fio --name=precreate_rand --directory="$FIO_DIR" --rw=write --bs=1M \
-        --size="$RAND_SIZE" --numjobs=1 --ioengine=posixaio --direct=1 \
-        >/dev/null 2>&1 || true
-    metrics=$(run_fio_workload "rand_read_4k" "randread" "4k" "$RAND_SIZE" 4)
-    workload_metrics+=("$metrics")
+    iter_results=()
+    for (( iter=1; iter<=ITERATIONS; iter++ )); do
+        [ "$ITERATIONS" -gt 1 ] && info "  iteration $iter/$ITERATIONS"
+        # Pre-create file for random read
+        fio --name=precreate_rand --directory="$FIO_DIR" --rw=write --bs=1M \
+            --size="$RAND_SIZE" --numjobs=1 --ioengine=posixaio --direct=1 \
+            >/dev/null 2>&1 || true
+        metrics=$(run_fio_workload "rand_read_4k_i${iter}" "randread" "4k" "$RAND_SIZE" 4)
+        iter_results+=("$metrics")
+    done
+    if [ "$ITERATIONS" -gt 1 ]; then
+        workload_metrics+=("$(compute_iteration_stats "${iter_results[@]}")")
+    else
+        workload_metrics+=("${iter_results[0]}")
+    fi
     echo ""
 
     # Workload 4: Random write 4K
     workload_names+=("Random Write 4K")
     info "--- Workload 4/7: Random Write 4K ---"
-    metrics=$(run_fio_workload "rand_write_4k" "randwrite" "4k" "$RAND_SIZE" 4)
-    workload_metrics+=("$metrics")
+    iter_results=()
+    for (( iter=1; iter<=ITERATIONS; iter++ )); do
+        [ "$ITERATIONS" -gt 1 ] && info "  iteration $iter/$ITERATIONS"
+        metrics=$(run_fio_workload "rand_write_4k_i${iter}" "randwrite" "4k" "$RAND_SIZE" 4)
+        iter_results+=("$metrics")
+    done
+    if [ "$ITERATIONS" -gt 1 ]; then
+        workload_metrics+=("$(compute_iteration_stats "${iter_results[@]}")")
+    else
+        workload_metrics+=("${iter_results[0]}")
+    fi
     echo ""
 
     # Workload 5: Mixed random 70/30 read/write
     workload_names+=("Mixed Random 70/30")
     info "--- Workload 5/7: Mixed Random 70/30 ---"
-    metrics=$(run_fio_workload "mixed_rand_70_30" "randrw" "4k" "$RAND_SIZE" 4 \
-        --rwmixread=70)
-    workload_metrics+=("$metrics")
+    iter_results=()
+    for (( iter=1; iter<=ITERATIONS; iter++ )); do
+        [ "$ITERATIONS" -gt 1 ] && info "  iteration $iter/$ITERATIONS"
+        metrics=$(run_fio_workload "mixed_rand_70_30_i${iter}" "randrw" "4k" "$RAND_SIZE" 4 \
+            --rwmixread=70)
+        iter_results+=("$metrics")
+    done
+    if [ "$ITERATIONS" -gt 1 ]; then
+        workload_metrics+=("$(compute_iteration_stats "${iter_results[@]}")")
+    else
+        workload_metrics+=("${iter_results[0]}")
+    fi
     echo ""
 
     # Workload 6: Metadata operations
     workload_names+=("Metadata Ops")
     info "--- Workload 6/7: Metadata Operations ---"
-    local meta_dir="$FIO_DIR/metadata_test"
-    mkdir -p "$meta_dir"
-    CLEANUP_FILES+=("$meta_dir")
-    local meta_json="$FIO_DIR/fio_metadata.json"
-    CLEANUP_FILES+=("$meta_json")
+    iter_results=()
+    for (( iter=1; iter<=ITERATIONS; iter++ )); do
+        [ "$ITERATIONS" -gt 1 ] && info "  iteration $iter/$ITERATIONS"
+        local meta_dir="$FIO_DIR/metadata_test_i${iter}"
+        mkdir -p "$meta_dir"
+        CLEANUP_FILES+=("$meta_dir")
+        local meta_json="$FIO_DIR/fio_metadata_i${iter}.json"
+        CLEANUP_FILES+=("$meta_json")
 
-    fio --name=metadata_ops \
-        --directory="$meta_dir" \
-        --rw=randwrite \
-        --bs=4k \
-        --filesize="$META_FILESIZE" \
-        --nrfiles="$META_NRFILES" \
-        --numjobs=1 \
-        --group_reporting \
-        --output-format=json \
-        --output="$meta_json" \
-        --ioengine=posixaio \
-        --openfiles=10 \
-        --file_service_type=sequential \
-        --create_on_open=1 \
-        --fallocate=none \
-        --percentile_list=50:95:99 \
-        2>/dev/null || true
+        fio --name=metadata_ops \
+            --directory="$meta_dir" \
+            --rw=randwrite \
+            --bs=4k \
+            --filesize="$META_FILESIZE" \
+            --nrfiles="$META_NRFILES" \
+            --numjobs=1 \
+            --group_reporting \
+            --output-format=json \
+            --output="$meta_json" \
+            --ioengine=posixaio \
+            --openfiles=10 \
+            --file_service_type=sequential \
+            --create_on_open=1 \
+            --fallocate=none \
+            --percentile_list=50:95:99 \
+            2>/dev/null || true
 
-    local meta_metrics="0:0:0:0:0:0"
-    if [ -f "$meta_json" ] && command -v jq >/dev/null 2>&1; then
-        local meta_iops
-        meta_iops=$(jq -r '.jobs[0].write.iops // 0' "$meta_json" | awk '{printf "%.0f", $1}')
-        local meta_bw
-        meta_bw=$(jq -r '.jobs[0].write.bw_bytes // 0' "$meta_json" | awk '{printf "%.2f", $1/1048576}')
-        local meta_lat_avg
-        meta_lat_avg=$(jq -r '.jobs[0].write.lat_ns.mean // 0' "$meta_json" | awk '{printf "%.2f", $1/1000}')
-        local meta_lat_p50
-        meta_lat_p50=$(jq -r '.jobs[0].write.clat_ns.percentile."50.000000" // 0' "$meta_json" | awk '{printf "%.2f", $1/1000}')
-        local meta_lat_p95
-        meta_lat_p95=$(jq -r '.jobs[0].write.clat_ns.percentile."95.000000" // 0' "$meta_json" | awk '{printf "%.2f", $1/1000}')
-        local meta_lat_p99
-        meta_lat_p99=$(jq -r '.jobs[0].write.clat_ns.percentile."99.000000" // 0' "$meta_json" | awk '{printf "%.2f", $1/1000}')
-        meta_metrics="${meta_bw}:${meta_iops}:${meta_lat_avg}:${meta_lat_p50}:${meta_lat_p95}:${meta_lat_p99}"
+        local meta_metrics="0:0:0:0:0:0"
+        if [ -f "$meta_json" ] && command -v jq >/dev/null 2>&1; then
+            local meta_iops
+            meta_iops=$(jq -r '.jobs[0].write.iops // 0' "$meta_json" | awk '{printf "%.0f", $1}')
+            local meta_bw
+            meta_bw=$(jq -r '.jobs[0].write.bw_bytes // 0' "$meta_json" | awk '{printf "%.2f", $1/1048576}')
+            local meta_lat_avg
+            meta_lat_avg=$(jq -r '.jobs[0].write.lat_ns.mean // 0' "$meta_json" | awk '{printf "%.2f", $1/1000}')
+            local meta_lat_p50
+            meta_lat_p50=$(jq -r '.jobs[0].write.clat_ns.percentile."50.000000" // 0' "$meta_json" | awk '{printf "%.2f", $1/1000}')
+            local meta_lat_p95
+            meta_lat_p95=$(jq -r '.jobs[0].write.clat_ns.percentile."95.000000" // 0' "$meta_json" | awk '{printf "%.2f", $1/1000}')
+            local meta_lat_p99
+            meta_lat_p99=$(jq -r '.jobs[0].write.clat_ns.percentile."99.000000" // 0' "$meta_json" | awk '{printf "%.2f", $1/1000}')
+            meta_metrics="${meta_bw}:${meta_iops}:${meta_lat_avg}:${meta_lat_p50}:${meta_lat_p95}:${meta_lat_p99}"
+        fi
+        iter_results+=("$meta_metrics")
+    done
+    if [ "$ITERATIONS" -gt 1 ]; then
+        workload_metrics+=("$(compute_iteration_stats "${iter_results[@]}")")
+    else
+        workload_metrics+=("${iter_results[0]}")
     fi
-    workload_metrics+=("$meta_metrics")
     ok "Completed: Metadata Ops"
     echo ""
 
     # Workload 7: Large sequential read
     workload_names+=("Large Sequential Read")
     info "--- Workload 7/7: Large Sequential Read ---"
-    # Pre-create large file
-    fio --name=precreate_large --directory="$FIO_DIR" --rw=write --bs=1M \
-        --size="$LARGE_SIZE" --numjobs=1 --ioengine=posixaio --direct=1 \
-        >/dev/null 2>&1 || true
-    metrics=$(run_fio_workload "large_seq_read" "read" "1M" "$LARGE_SIZE" 1)
-    workload_metrics+=("$metrics")
+    iter_results=()
+    for (( iter=1; iter<=ITERATIONS; iter++ )); do
+        [ "$ITERATIONS" -gt 1 ] && info "  iteration $iter/$ITERATIONS"
+        # Pre-create large file
+        fio --name=precreate_large --directory="$FIO_DIR" --rw=write --bs=1M \
+            --size="$LARGE_SIZE" --numjobs=1 --ioengine=posixaio --direct=1 \
+            >/dev/null 2>&1 || true
+        metrics=$(run_fio_workload "large_seq_read_i${iter}" "read" "1M" "$LARGE_SIZE" 1)
+        iter_results+=("$metrics")
+    done
+    if [ "$ITERATIONS" -gt 1 ]; then
+        workload_metrics+=("$(compute_iteration_stats "${iter_results[@]}")")
+    else
+        workload_metrics+=("${iter_results[0]}")
+    fi
     echo ""
 
     # Print results
@@ -495,6 +606,9 @@ print_results_table() {
     echo ""
     echo -e "${BOLD}============================================================${NC}"
     echo -e "${BOLD}                   BENCHMARK RESULTS                        ${NC}"
+    if [ "$ITERATIONS" -gt 1 ]; then
+        echo -e "${BOLD}              ($ITERATIONS iterations per workload)                ${NC}"
+    fi
     echo -e "${BOLD}============================================================${NC}"
     echo ""
 
@@ -507,10 +621,28 @@ print_results_table() {
     for i in "${!names_ref[@]}"; do
         local name="${names_ref[$i]}"
         local m="${metrics_ref[$i]}"
-        IFS=':' read -r bw iops lat_avg lat_p50 lat_p95 lat_p99 <<< "$m"
 
-        printf "%-22s %12s %12s %12s %12s %12s %12s\n" \
-            "$name" "$bw" "$iops" "$lat_avg" "$lat_p50" "$lat_p95" "$lat_p99"
+        if [ "$ITERATIONS" -gt 1 ]; then
+            # Multi-iteration: format is "mean|min|max"
+            local mean_part min_part max_part
+            IFS='|' read -r mean_part min_part max_part <<< "$m"
+
+            IFS=':' read -r bw iops lat_avg lat_p50 lat_p95 lat_p99 <<< "$mean_part"
+            printf "%-22s %12s %12s %12s %12s %12s %12s\n" \
+                "$name (mean)" "$bw" "$iops" "$lat_avg" "$lat_p50" "$lat_p95" "$lat_p99"
+
+            IFS=':' read -r bw iops lat_avg lat_p50 lat_p95 lat_p99 <<< "$min_part"
+            printf "%-22s %12s %12s %12s %12s %12s %12s\n" \
+                "  (min)" "$bw" "$iops" "$lat_avg" "$lat_p50" "$lat_p95" "$lat_p99"
+
+            IFS=':' read -r bw iops lat_avg lat_p50 lat_p95 lat_p99 <<< "$max_part"
+            printf "%-22s %12s %12s %12s %12s %12s %12s\n" \
+                "  (max)" "$bw" "$iops" "$lat_avg" "$lat_p50" "$lat_p95" "$lat_p99"
+        else
+            IFS=':' read -r bw iops lat_avg lat_p50 lat_p95 lat_p99 <<< "$m"
+            printf "%-22s %12s %12s %12s %12s %12s %12s\n" \
+                "$name" "$bw" "$iops" "$lat_avg" "$lat_p50" "$lat_p95" "$lat_p99"
+        fi
     done
 
     echo ""
@@ -542,28 +674,70 @@ write_json_results() {
         echo "  \"hostname\": \"$hostname_val\","
         echo "  \"kernel\": \"$kernel_ver\","
         echo "  \"mount_point\": \"$MOUNT_POINT\","
+        echo "  \"iterations\": $ITERATIONS,"
         echo "  \"quick_mode\": $([ "$QUICK_MODE" -eq 1 ] && echo "true" || echo "false"),"
         echo "  \"workloads\": ["
 
         for i in "${!names_ref[@]}"; do
             local name="${names_ref[$i]}"
             local m="${metrics_ref[$i]}"
-            IFS=':' read -r bw iops lat_avg lat_p50 lat_p95 lat_p99 <<< "$m"
 
             local comma=","
             if [ "$i" -eq $(( ${#names_ref[@]} - 1 )) ]; then
                 comma=""
             fi
 
-            echo "    {"
-            echo "      \"name\": \"$name\","
-            echo "      \"bandwidth_mbps\": $bw,"
-            echo "      \"iops\": $iops,"
-            echo "      \"latency_avg_us\": $lat_avg,"
-            echo "      \"latency_p50_us\": $lat_p50,"
-            echo "      \"latency_p95_us\": $lat_p95,"
-            echo "      \"latency_p99_us\": $lat_p99"
-            echo "    }$comma"
+            if [ "$ITERATIONS" -gt 1 ]; then
+                local mean_part min_part max_part
+                IFS='|' read -r mean_part min_part max_part <<< "$m"
+
+                local mean_bw mean_iops mean_lat_avg mean_lat_p50 mean_lat_p95 mean_lat_p99
+                IFS=':' read -r mean_bw mean_iops mean_lat_avg mean_lat_p50 mean_lat_p95 mean_lat_p99 <<< "$mean_part"
+                local min_bw min_iops min_lat_avg min_lat_p50 min_lat_p95 min_lat_p99
+                IFS=':' read -r min_bw min_iops min_lat_avg min_lat_p50 min_lat_p95 min_lat_p99 <<< "$min_part"
+                local max_bw max_iops max_lat_avg max_lat_p50 max_lat_p95 max_lat_p99
+                IFS=':' read -r max_bw max_iops max_lat_avg max_lat_p50 max_lat_p95 max_lat_p99 <<< "$max_part"
+
+                echo "    {"
+                echo "      \"name\": \"$name\","
+                echo "      \"mean\": {"
+                echo "        \"bandwidth_mbps\": $mean_bw,"
+                echo "        \"iops\": $mean_iops,"
+                echo "        \"latency_avg_us\": $mean_lat_avg,"
+                echo "        \"latency_p50_us\": $mean_lat_p50,"
+                echo "        \"latency_p95_us\": $mean_lat_p95,"
+                echo "        \"latency_p99_us\": $mean_lat_p99"
+                echo "      },"
+                echo "      \"min\": {"
+                echo "        \"bandwidth_mbps\": $min_bw,"
+                echo "        \"iops\": $min_iops,"
+                echo "        \"latency_avg_us\": $min_lat_avg,"
+                echo "        \"latency_p50_us\": $min_lat_p50,"
+                echo "        \"latency_p95_us\": $min_lat_p95,"
+                echo "        \"latency_p99_us\": $min_lat_p99"
+                echo "      },"
+                echo "      \"max\": {"
+                echo "        \"bandwidth_mbps\": $max_bw,"
+                echo "        \"iops\": $max_iops,"
+                echo "        \"latency_avg_us\": $max_lat_avg,"
+                echo "        \"latency_p50_us\": $max_lat_p50,"
+                echo "        \"latency_p95_us\": $max_lat_p95,"
+                echo "        \"latency_p99_us\": $max_lat_p99"
+                echo "      }"
+                echo "    }$comma"
+            else
+                IFS=':' read -r bw iops lat_avg lat_p50 lat_p95 lat_p99 <<< "$m"
+
+                echo "    {"
+                echo "      \"name\": \"$name\","
+                echo "      \"bandwidth_mbps\": $bw,"
+                echo "      \"iops\": $iops,"
+                echo "      \"latency_avg_us\": $lat_avg,"
+                echo "      \"latency_p50_us\": $lat_p50,"
+                echo "      \"latency_p95_us\": $lat_p95,"
+                echo "      \"latency_p99_us\": $lat_p99"
+                echo "    }$comma"
+            fi
         done
 
         echo "  ]"
