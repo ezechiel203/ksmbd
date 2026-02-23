@@ -11,7 +11,7 @@ set -eo pipefail
 SCRIPT_NAME="$(basename "$0")"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "${SCRIPT_DIR}" && pwd)"
-TEST_DIR="${ROOT_DIR}/test_framework"
+TEST_DIR="${ROOT_DIR}/test"
 
 # Configuration
 BUILD_SCRIPT="${TEST_DIR}/build_test_modules.sh"
@@ -38,8 +38,9 @@ CI_MODE=false
 SKIP_BUILD=false
 KEEP_RESULTS=false
 DRY_RUN=false
-TEST_LOG=""
+TEST_LOG="/dev/null"
 EXIT_CODE=0
+USE_NATIVE_SUITES=false
 
 # Test exit codes
 EXIT_SUCCESS=0
@@ -50,31 +51,68 @@ EXIT_RUNTIME_ERROR=4
 
 # Logging functions
 log_info() {
-    echo -e "${BLUE}[INFO]${NC} $1" | tee -a "$TEST_LOG"
+    if [[ -n "$TEST_LOG" ]]; then
+        echo -e "${BLUE}[INFO]${NC} $1" | tee -a "$TEST_LOG"
+    else
+        echo -e "${BLUE}[INFO]${NC} $1"
+    fi
 }
 
 log_success() {
-    echo -e "${GREEN}[SUCCESS]${NC} $1" | tee -a "$TEST_LOG"
+    if [[ -n "$TEST_LOG" ]]; then
+        echo -e "${GREEN}[SUCCESS]${NC} $1" | tee -a "$TEST_LOG"
+    else
+        echo -e "${GREEN}[SUCCESS]${NC} $1"
+    fi
 }
 
 log_warning() {
-    echo -e "${YELLOW}[WARNING]${NC} $1" | tee -a "$TEST_LOG"
+    if [[ -n "$TEST_LOG" ]]; then
+        echo -e "${YELLOW}[WARNING]${NC} $1" | tee -a "$TEST_LOG"
+    else
+        echo -e "${YELLOW}[WARNING]${NC} $1"
+    fi
 }
 
 log_error() {
-    echo -e "${RED}[ERROR]${NC} $1" | tee -a "$TEST_LOG"
+    if [[ -n "$TEST_LOG" ]]; then
+        echo -e "${RED}[ERROR]${NC} $1" | tee -a "$TEST_LOG"
+    else
+        echo -e "${RED}[ERROR]${NC} $1"
+    fi
     EXIT_CODE=${EXIT_CODE:-$EXIT_TEST_FAILED}
 }
 
 log_debug() {
     if [[ "$VERBOSE" == "true" ]]; then
-        echo -e "${PURPLE}[DEBUG]${NC} $1" | tee -a "$TEST_LOG"
+        if [[ -n "$TEST_LOG" ]]; then
+            echo -e "${PURPLE}[DEBUG]${NC} $1" | tee -a "$TEST_LOG"
+        else
+            echo -e "${PURPLE}[DEBUG]${NC} $1"
+        fi
     fi
 }
 
 log_header() {
-    echo -e "${CYAN}${BOLD}$1${NC}" | tee -a "$TEST_LOG"
-    echo -e "${CYAN}$(printf '%*s' "${#1}" '' | tr ' ' '=')${NC}" | tee -a "$TEST_LOG"
+    if [[ -n "$TEST_LOG" ]]; then
+        echo -e "${CYAN}${BOLD}$1${NC}" | tee -a "$TEST_LOG"
+        echo -e "${CYAN}$(printf '%*s' "${#1}" '' | tr ' ' '=')${NC}" | tee -a "$TEST_LOG"
+    else
+        echo -e "${CYAN}${BOLD}$1${NC}"
+        echo -e "${CYAN}$(printf '%*s' "${#1}" '' | tr ' ' '=')${NC}"
+    fi
+}
+
+configure_test_backend() {
+    if [[ -f "$BUILD_SCRIPT" && -f "$AUTOMATION_SCRIPT" ]]; then
+        USE_NATIVE_SUITES=false
+        return
+    fi
+
+    USE_NATIVE_SUITES=true
+    TEST_DIR="${ROOT_DIR}"
+    BUILD_SCRIPT="${ROOT_DIR}/test_compilation.sh"
+    AUTOMATION_SCRIPT=""
 }
 
 # Print help information
@@ -189,27 +227,38 @@ validate_environment() {
         return $EXIT_CONFIG_ERROR
     fi
 
-    # Check required scripts
-    if [[ ! -f "$BUILD_SCRIPT" ]]; then
-        log_error "Build script not found: $BUILD_SCRIPT"
-        return $EXIT_CONFIG_ERROR
-    fi
+    if [[ "$USE_NATIVE_SUITES" == "true" ]]; then
+        if [[ ! -f "$BUILD_SCRIPT" ]]; then
+            log_error "Build script not found: $BUILD_SCRIPT"
+            return $EXIT_CONFIG_ERROR
+        fi
+        if [[ ! -f "${ROOT_DIR}/tests/run_integration.sh" ]]; then
+            log_error "Integration suite not found: ${ROOT_DIR}/tests/run_integration.sh"
+            return $EXIT_CONFIG_ERROR
+        fi
+    else
+        # Check required scripts
+        if [[ ! -f "$BUILD_SCRIPT" ]]; then
+            log_error "Build script not found: $BUILD_SCRIPT"
+            return $EXIT_CONFIG_ERROR
+        fi
 
-    if [[ ! -f "$AUTOMATION_SCRIPT" ]]; then
-        log_error "Automation script not found: $AUTOMATION_SCRIPT"
-        return $EXIT_CONFIG_ERROR
-    fi
+        if [[ ! -f "$AUTOMATION_SCRIPT" ]]; then
+            log_error "Automation script not found: $AUTOMATION_SCRIPT"
+            return $EXIT_CONFIG_ERROR
+        fi
 
-    # Check Python availability
-    if ! command -v python3 >/dev/null 2>&1; then
-        log_error "Python3 is required but not found"
-        return $EXIT_CONFIG_ERROR
-    fi
+        # Check Python availability
+        if ! command -v python3 >/dev/null 2>&1; then
+            log_error "Python3 is required but not found"
+            return $EXIT_CONFIG_ERROR
+        fi
 
-    # Check for required modules
-    if ! python3 -c "import json, subprocess, sys, time, threading, signal, tempfile, shutil, pathlib, argparse, logging, datetime" >/dev/null 2>&1; then
-        log_error "Required Python modules not available"
-        return $EXIT_CONFIG_ERROR
+        # Check for required modules
+        if ! python3 -c "import json, subprocess, sys, time, threading, signal, tempfile, shutil, pathlib, argparse, logging, datetime" >/dev/null 2>&1; then
+            log_error "Required Python modules not available"
+            return $EXIT_CONFIG_ERROR
+        fi
     fi
 
     log_success "Environment validation passed"
@@ -283,42 +332,66 @@ run_test_suite() {
 
     log_header "Running $suite Tests"
 
+    local cmd=()
+    local cmd_desc=""
+
+    if [[ "$USE_NATIVE_SUITES" == "true" ]]; then
+        case "$suite" in
+            "unit")
+                cmd=("${ROOT_DIR}/test_compilation.sh")
+                ;;
+            "integration")
+                cmd=("${ROOT_DIR}/tests/run_integration.sh" "--skip-smbtorture")
+                ;;
+            "performance")
+                cmd=("${ROOT_DIR}/benchmarks/run_benchmarks.sh" "--help")
+                ;;
+            "security")
+                cmd=("${ROOT_DIR}/tests/run_smbtorture.sh" "--list")
+                ;;
+            "all")
+                cmd=("bash" "-lc" "${ROOT_DIR}/test_compilation.sh && ${ROOT_DIR}/tests/run_integration.sh --help && ${ROOT_DIR}/tests/run_smbtorture.sh --list && ${ROOT_DIR}/benchmarks/run_benchmarks.sh --help")
+                ;;
+            *)
+                log_error "Unknown test suite: $suite"
+                return $EXIT_CONFIG_ERROR
+                ;;
+        esac
+    else
+        cmd=("python3" "$AUTOMATION_SCRIPT" "--config" "$CONFIG_FILE" "--results-dir" "$RESULTS_DIR")
+        case "$suite" in
+            "unit")
+                cmd+=("--unit-only")
+                ;;
+            "integration")
+                cmd+=("--integration-only")
+                ;;
+            "performance")
+                cmd+=("--performance-only")
+                ;;
+            "security")
+                cmd+=("--security-only")
+                ;;
+            "all")
+                ;;
+            *)
+                log_error "Unknown test suite: $suite"
+                return $EXIT_CONFIG_ERROR
+                ;;
+        esac
+
+        if [[ "$VERBOSE" == "true" ]]; then
+            cmd+=("--verbose")
+        fi
+
+        if [[ "$CI_MODE" == "true" ]]; then
+            cmd+=("--ci-mode")
+        fi
+    fi
+
     if [[ "$DRY_RUN" == "true" ]]; then
-        log_info "[DRY RUN] Would run $suite tests using: python3 $AUTOMATION_SCRIPT"
+        log_info "[DRY RUN] Would run $suite tests using: ${cmd[*]}"
         return $EXIT_SUCCESS
-    fi
-
-    # Build automation command
-    local cmd=("python3" "$AUTOMATION_SCRIPT" "--config" "$CONFIG_FILE" "--results-dir" "$RESULTS_DIR")
-
-    case "$suite" in
-        "unit")
-            cmd+=("--unit-only")
-            ;;
-        "integration")
-            cmd+=("--integration-only")
-            ;;
-        "performance")
-            cmd+=("--performance-only")
-            ;;
-        "security")
-            cmd+=("--security-only")
-            ;;
-        "all")
-            # No additional arguments needed
-            ;;
-        *)
-            log_error "Unknown test suite: $suite"
-            return $EXIT_CONFIG_ERROR
-            ;;
-    esac
-
-    if [[ "$VERBOSE" == "true" ]]; then
-        cmd+=("--verbose")
-    fi
-
-    if [[ "$CI_MODE" == "true" ]]; then
-        cmd+=("--ci-mode")
     fi
 
     log_info "Running: ${cmd[*]}"
@@ -478,18 +551,20 @@ main() {
     local start_time=$(date +%s)
     EXIT_CODE=$EXIT_SUCCESS
 
+    # Parse command line arguments first so backend selection can honor flags.
+    parse_args "$@"
+    configure_test_backend
+
+    # Setup environment (creates RESULTS_DIR and sets TEST_LOG)
+    # Must happen before any logging calls that write to TEST_LOG.
+    setup_environment
+
     log_header "Apple SMB Extensions Test Framework"
     log_info "Started at $(date)"
     log_info "Test type: $TEST_TYPE"
 
-    # Parse command line arguments
-    parse_args "$@"
-
     # Validate environment
     validate_environment || exit $?
-
-    # Setup environment
-    setup_environment
 
     # Execute requested command
     case "$TEST_TYPE" in
