@@ -344,7 +344,7 @@ static int ntlm_authenticate(struct ksmbd_work *work,
 	up_read(&sess->state_lock);
 
 	if ((rsp->SessionFlags != SMB2_SESSION_FLAG_IS_GUEST_LE &&
-	     (conn->sign || server_conf.enforced_signing)) ||
+	     (conn->sign || server_conf.signing == KSMBD_CONFIG_OPT_MANDATORY)) ||
 	    (req->SecurityMode & SMB2_NEGOTIATE_SIGNING_REQUIRED))
 		sess->sign = true;
 
@@ -455,7 +455,7 @@ static int krb5_authenticate(struct ksmbd_work *work,
 	up_read(&sess->state_lock);
 
 	if ((rsp->SessionFlags != SMB2_SESSION_FLAG_IS_GUEST_LE &&
-	    (conn->sign || server_conf.enforced_signing)) ||
+	    (conn->sign || server_conf.signing == KSMBD_CONFIG_OPT_MANDATORY)) ||
 	    (req->SecurityMode & SMB2_NEGOTIATE_SIGNING_REQUIRED))
 		sess->sign = true;
 

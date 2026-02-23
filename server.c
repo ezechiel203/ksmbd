@@ -360,7 +360,6 @@ static void server_conf_free(void)
 static int server_conf_init(void)
 {
 	WRITE_ONCE(server_conf.state, SERVER_STATE_STARTING_UP);
-	server_conf.enforced_signing = 0;
 	server_conf.min_protocol = ksmbd_min_protocol();
 	server_conf.max_protocol = ksmbd_max_protocol();
 	server_conf.auth_mechs = KSMBD_AUTH_NTLMSSP;

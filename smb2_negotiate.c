@@ -669,13 +669,6 @@ int smb2_handle_negotiate(struct ksmbd_work *work)
 	    req->SecurityMode & SMB2_NEGOTIATE_SIGNING_REQUIRED_LE)
 		conn->sign = true;
 	else if (server_conf.signing == KSMBD_CONFIG_OPT_MANDATORY) {
-		/*
-		 * TODO: server_conf.enforced_signing is a global variable
-		 * written without locking. Concurrent negotiate requests
-		 * can race here. Ideally this should be a per-connection
-		 * flag, but that requires adding a field to ksmbd_conn.
-		 */
-		server_conf.enforced_signing = true;
 		rsp->SecurityMode |= SMB2_NEGOTIATE_SIGNING_REQUIRED_LE;
 		conn->sign = true;
 	}

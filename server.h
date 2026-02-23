@@ -33,7 +33,6 @@ struct ksmbd_server_config {
 	unsigned int		flags;
 	unsigned int		state;
 	short			signing;
-	short			enforced_signing;
 	short			min_protocol;
 	short			max_protocol;
 	unsigned short		tcp_port;

@@ -438,9 +438,8 @@ void ksmbd_notify_cancel(void **argv)
 	smb2_send_interim_resp(work, STATUS_CANCELLED);
 	work->send_no_response = 1;
 
-	/* Detach the fsnotify mark */
-	fsnotify_detach_mark(&watch->mark);
-	fsnotify_put_mark(&watch->mark);
+	/* Remove the fsnotify mark (exported API for modules) */
+	fsnotify_destroy_mark(&watch->mark, ksmbd_notify_group);
 }
 
 /**
@@ -503,8 +502,8 @@ void ksmbd_notify_cleanup_file(struct ksmbd_file *fp)
 				spin_unlock(&watch->lock);
 			}
 
-			fsnotify_detach_mark(&watch->mark);
-			fsnotify_put_mark(&watch->mark);
+			fsnotify_destroy_mark(&watch->mark,
+					      ksmbd_notify_group);
 		}
 
 		spin_lock(&fp->f_lock);
@@ -544,7 +543,7 @@ int ksmbd_notify_init(void)
 void ksmbd_notify_exit(void)
 {
 	if (ksmbd_notify_group) {
-		fsnotify_destroy_group(ksmbd_notify_group);
+		fsnotify_put_group(ksmbd_notify_group);
 		ksmbd_notify_group = NULL;
 	}
 }
