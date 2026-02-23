@@ -21,8 +21,10 @@
 #include "connection.h"
 #include "mgmt/tree_connect.h"
 #include "mgmt/user_session.h"
+#include "smb2pdu.h"
 #include "smb_common.h"
 #include "server.h"
+#include "ksmbd_notify.h"
 
 #define S_DEL_PENDING			1
 #define S_DEL_ON_CLS			2
@@ -49,7 +51,7 @@ static struct kmem_cache *filp_cache;
 
 static bool durable_scavenger_running;
 static DEFINE_MUTEX(durable_scavenger_lock);
-wait_queue_head_t dh_wq;
+static wait_queue_head_t dh_wq;
 
 void ksmbd_set_fd_limit(unsigned long limit)
 {
@@ -473,8 +475,20 @@ static void set_close_state_blocked_works(struct ksmbd_file *fp)
 	spin_lock(&fp->f_lock);
 	list_for_each_entry(cancel_work, &fp->blocked_works,
 				 fp_entry) {
+		struct smb2_hdr *hdr;
+
+		/*
+		 * Skip CHANGE_NOTIFY entries — they are handled
+		 * by ksmbd_notify_cleanup_file() which safely
+		 * drops the lock before doing I/O and freeing.
+		 */
+		hdr = smb2_get_msg(cancel_work->request_buf);
+		if (hdr->Command == SMB2_CHANGE_NOTIFY)
+			continue;
+
 		cancel_work->state = KSMBD_WORK_CLOSED;
-		cancel_work->cancel_fn(cancel_work->cancel_argv);
+		if (cancel_work->cancel_fn)
+			cancel_work->cancel_fn(cancel_work->cancel_argv);
 	}
 	spin_unlock(&fp->f_lock);
 }
@@ -492,6 +506,7 @@ int ksmbd_close_fd(struct ksmbd_work *work, u64 id)
 	fp = idr_find(ft->idr, id);
 	if (fp) {
 		set_close_state_blocked_works(fp);
+		ksmbd_notify_cleanup_file(fp);
 
 		if (fp->f_state != FP_INITED)
 			fp = NULL;
@@ -808,6 +823,7 @@ __close_file_table_ids(struct ksmbd_file_table *ft,
 		}
 
 		set_close_state_blocked_works(fp);
+		ksmbd_notify_cleanup_file(fp);
 		idr_remove(ft->idr, fp->volatile_id);
 		fp->volatile_id = KSMBD_NO_FID;
 		write_unlock(&ft->lock);

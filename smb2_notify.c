@@ -6,62 +6,17 @@
  *   smb2_notify.c - SMB2_CHANGE_NOTIFY handler
  */
 
-// SPDX-License-Identifier: GPL-2.0-or-later
-/*
- *   Copyright (C) 2016 Namjae Jeon <linkinjeon@kernel.org>
- *   Copyright (C) 2018 Samsung Electronics Co., Ltd.
- */
-
-#include <linux/inetdevice.h>
-#include <net/addrconf.h>
-#include <linux/syscalls.h>
+#include <linux/fs.h>
 #include <linux/namei.h>
-#include <linux/statfs.h>
-#include <linux/ethtool.h>
-#include <linux/falloc.h>
-#include <linux/crc32.h>
-#include <linux/mount.h>
-#include <linux/version.h>
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
-#include <linux/filelock.h>
-#endif
 
-#include <crypto/algapi.h>
-
-#include "compat.h"
 #include "glob.h"
 #include "smb2pdu.h"
-#include "smbfsctl.h"
-#include "oplock.h"
-#include "smbacl.h"
-
-#include "auth.h"
-#include "asn1.h"
-#include "connection.h"
-#include "transport_ipc.h"
-#include "transport_rdma.h"
-#include "vfs.h"
-#include "vfs_cache.h"
-#include "misc.h"
-
-#include "server.h"
-#include "smb_common.h"
 #include "smbstatus.h"
 #include "ksmbd_work.h"
-#include "mgmt/user_config.h"
-#include "mgmt/share_config.h"
-#include "mgmt/tree_connect.h"
+#include "vfs_cache.h"
+#include "connection.h"
 #include "mgmt/user_session.h"
-#include "mgmt/ksmbd_ida.h"
-#include "ndr.h"
-#include "transport_tcp.h"
-#include "smb2fruit.h"
-#include "ksmbd_fsctl.h"
-#include "ksmbd_create_ctx.h"
-#include "ksmbd_vss.h"
 #include "ksmbd_notify.h"
-#include "ksmbd_info.h"
-#include "ksmbd_buffer.h"
 #include "smb2pdu_internal.h"
 
 static void smb2_notify_cancel(void **argv)
@@ -163,6 +118,13 @@ int smb2_notify(struct ksmbd_work *work)
 		return rc;
 	}
 
+	/*
+	 * Transfer work ownership to the notify subsystem.
+	 * The worker thread must NOT free this work; the fsnotify
+	 * event callback, cancel path, or file close will do it.
+	 */
+	work->pending_async = 1;
+
 	/* Send STATUS_PENDING interim response */
 	smb2_send_interim_resp(work, STATUS_PENDING);
 
@@ -175,11 +137,3 @@ int smb2_notify(struct ksmbd_work *work)
 	work->send_no_response = 1;
 	return 0;
 }
-
-/**
- * smb2_is_sign_req() - handler for checking packet signing status
- * @work:	smb work containing notify command buffer
- * @command:	SMB2 command id
- *
- * Return:	true if packed is signed, false otherwise
- */

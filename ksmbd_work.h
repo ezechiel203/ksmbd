@@ -78,6 +78,8 @@ struct ksmbd_work {
 	bool                            need_invalidate_rkey:1;
 	/* Zero-copy sendfile for read response */
 	bool                            sendfile:1;
+	/* Async work owned by subsystem (notify), worker must not free */
+	bool                            pending_async:1;
 
 	unsigned int                    remote_key;
 

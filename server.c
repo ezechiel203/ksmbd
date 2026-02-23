@@ -285,8 +285,20 @@ static void handle_ksmbd_work(struct work_struct *wk)
 
 	__handle_ksmbd_work(work, conn);
 
-	ksmbd_conn_try_dequeue_request(work);
-	ksmbd_free_work_struct(work);
+	if (work->pending_async) {
+		/*
+		 * Work lifetime transferred to async subsystem
+		 * (e.g. CHANGE_NOTIFY).  Only dequeue from the
+		 * synchronous request list; the async entry and
+		 * work struct are freed by the completion path.
+		 */
+		spin_lock(&conn->request_lock);
+		list_del_init(&work->request_entry);
+		spin_unlock(&conn->request_lock);
+	} else {
+		ksmbd_conn_try_dequeue_request(work);
+		ksmbd_free_work_struct(work);
+	}
 	ksmbd_conn_r_count_dec(conn);
 }
 

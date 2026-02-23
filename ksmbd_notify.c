@@ -18,6 +18,16 @@
 #include "connection.h"
 #include "ksmbd_notify.h"
 
+/*
+ * fsnotify group flags differ across kernel versions.
+ * Use the strongest supported flag set available at build time.
+ */
+#ifdef FSNOTIFY_GROUP_NOFS
+#define KSMBD_FSNOTIFY_GROUP_FLAGS FSNOTIFY_GROUP_NOFS
+#else
+#define KSMBD_FSNOTIFY_GROUP_FLAGS FSNOTIFY_GROUP_USER
+#endif
+
 /* Global fsnotify group for all ksmbd watches */
 static struct fsnotify_group *ksmbd_notify_group;
 
@@ -197,7 +207,16 @@ send:
 		rsp->hdr.Status = STATUS_INSUFFICIENT_RESOURCES;
 
 	ksmbd_conn_write(work);
+
+	/* Detach from fp->blocked_works before freeing */
+	if (watch->fp) {
+		spin_lock(&watch->fp->f_lock);
+		list_del_init(&work->fp_entry);
+		spin_unlock(&watch->fp->f_lock);
+	}
+
 	release_async_work(work);
+	ksmbd_free_work_struct(work);
 
 	spin_lock(&watch->lock);
 	watch->pending_work = NULL;
@@ -438,6 +457,16 @@ void ksmbd_notify_cancel(void **argv)
 	smb2_send_interim_resp(work, STATUS_CANCELLED);
 	work->send_no_response = 1;
 
+	/* Detach from fp->blocked_works before freeing */
+	if (watch->fp) {
+		spin_lock(&watch->fp->f_lock);
+		list_del_init(&work->fp_entry);
+		spin_unlock(&watch->fp->f_lock);
+	}
+
+	release_async_work(work);
+	ksmbd_free_work_struct(work);
+
 	/* Remove the fsnotify mark (exported API for modules) */
 	fsnotify_destroy_mark(&watch->mark, ksmbd_notify_group);
 }
@@ -453,23 +482,35 @@ void ksmbd_notify_cleanup_file(struct ksmbd_file *fp)
 {
 	struct ksmbd_work *work, *tmp;
 	struct smb2_hdr *hdr;
+	LIST_HEAD(cleanup_list);
 
 	if (!fp || !ksmbd_notify_group)
 		return;
 
+	/*
+	 * Collect CHANGE_NOTIFY works into a local list so we
+	 * can drop fp->f_lock before doing I/O and freeing.
+	 */
 	spin_lock(&fp->f_lock);
 	list_for_each_entry_safe(work, tmp,
 				 &fp->blocked_works, fp_entry) {
 		hdr = smb2_get_msg(work->request_buf);
-
-		/* Only clean up CHANGE_NOTIFY entries */
 		if (hdr->Command != SMB2_CHANGE_NOTIFY)
 			continue;
 
 		list_del_init(&work->fp_entry);
-		spin_unlock(&fp->f_lock);
+		list_add(&work->fp_entry, &cleanup_list);
+	}
+	spin_unlock(&fp->f_lock);
 
-		if (work->cancel_argv) {
+	/* Process collected entries without holding any spinlock */
+	list_for_each_entry_safe(work, tmp, &cleanup_list, fp_entry) {
+		list_del_init(&work->fp_entry);
+
+		if (!work->cancel_argv)
+			continue;
+
+		{
 			struct ksmbd_notify_watch *watch;
 			struct smb2_notify_rsp *rsp;
 
@@ -498,6 +539,7 @@ void ksmbd_notify_cleanup_file(struct ksmbd_file *fp)
 					ksmbd_conn_write(work);
 
 				release_async_work(work);
+				ksmbd_free_work_struct(work);
 			} else {
 				spin_unlock(&watch->lock);
 			}
@@ -505,10 +547,7 @@ void ksmbd_notify_cleanup_file(struct ksmbd_file *fp)
 			fsnotify_destroy_mark(&watch->mark,
 					      ksmbd_notify_group);
 		}
-
-		spin_lock(&fp->f_lock);
 	}
-	spin_unlock(&fp->f_lock);
 }
 
 /* ------------------------------------------------------------------ */
@@ -523,12 +562,11 @@ void ksmbd_notify_cleanup_file(struct ksmbd_file *fp)
 int ksmbd_notify_init(void)
 {
 	ksmbd_notify_group = fsnotify_alloc_group(
-		&ksmbd_notify_ops, FSNOTIFY_GROUP_NOFS);
+		&ksmbd_notify_ops, KSMBD_FSNOTIFY_GROUP_FLAGS);
 	if (IS_ERR(ksmbd_notify_group)) {
 		int ret = PTR_ERR(ksmbd_notify_group);
 
-		pr_err("ksmbd: failed to allocate "
-		       "fsnotify group: %d\n", ret);
+		pr_err("ksmbd: failed to allocate fsnotify group: %d\n", ret);
 		ksmbd_notify_group = NULL;
 		return ret;
 	}
