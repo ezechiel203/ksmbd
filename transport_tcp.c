@@ -148,8 +148,8 @@ static unsigned int kvec_array_init(struct kvec *new, struct kvec *iov,
 {
 	size_t base = 0;
 
-	while (bytes || !iov->iov_len) {
-		int copy = min(bytes, iov->iov_len);
+	while (nr_segs && (bytes || !iov->iov_len)) {
+		size_t copy = min(bytes, iov->iov_len);
 
 		bytes -= copy;
 		base += copy;
@@ -159,6 +159,9 @@ static unsigned int kvec_array_init(struct kvec *new, struct kvec *iov,
 			base = 0;
 		}
 	}
+
+	if (!nr_segs)
+		return 0;
 
 	memcpy(new, iov, sizeof(*iov) * nr_segs);
 	new->iov_base += base;
@@ -389,11 +392,15 @@ static int ksmbd_tcp_readv(struct tcp_transport *t, struct kvec *iov_orig,
 		if (!ksmbd_conn_alive(conn)) {
 			total_read = -ESHUTDOWN;
 			break;
-		}
-		segs = kvec_array_init(iov, iov_orig, nr_segs, total_read);
+			}
+			segs = kvec_array_init(iov, iov_orig, nr_segs, total_read);
+			if (!segs) {
+				total_read = -EIO;
+				break;
+			}
 
-		length = kernel_recvmsg(t->sock, &ksmbd_msg,
-					iov, segs, to_read, 0);
+			length = kernel_recvmsg(t->sock, &ksmbd_msg,
+						iov, segs, to_read, 0);
 
 		if (length == -EINTR) {
 			total_read = -ESHUTDOWN;

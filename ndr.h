@@ -4,6 +4,8 @@
  *   Author(s): Namjae Jeon <linkinjeon@kernel.org>
  */
 
+#include <linux/version.h>
+
 struct ndr {
 	char		*data;
 	unsigned int	offset;

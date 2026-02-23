@@ -2,14 +2,6 @@
 /*
  *   Copyright (C) 2016 Namjae Jeon <linkinjeon@kernel.org>
  *   Copyright (C) 2018 Samsung Electronics Co., Ltd.
- *
- *   smb2_tree.c - Tree connect/disconnect + session logoff
- */
-
-// SPDX-License-Identifier: GPL-2.0-or-later
-/*
- *   Copyright (C) 2016 Namjae Jeon <linkinjeon@kernel.org>
- *   Copyright (C) 2018 Samsung Electronics Co., Ltd.
  */
 
 #include <linux/inetdevice.h>
@@ -77,7 +69,10 @@ int smb2_tree_connect(struct ksmbd_work *work)
 	struct smb2_tree_connect_rsp *rsp;
 	struct ksmbd_session *sess = work->sess;
 	char *treename = NULL, *name = NULL;
-	struct ksmbd_tree_conn_status status;
+	struct ksmbd_tree_conn_status status = {
+		.ret = KSMBD_TREE_CONN_STATUS_ERROR,
+		.tree_conn = NULL,
+	};
 	struct ksmbd_share_config *share = NULL;
 	int rc = -EINVAL;
 

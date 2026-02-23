@@ -326,6 +326,12 @@ static int ksmbd_fsctl_set_reparse_point(struct ksmbd_work *work,
 	}
 
 	/* Prevent symlink targets that escape share boundary */
+	if (!target) {
+		ret = -EINVAL;
+		rsp->hdr.Status = STATUS_IO_REPARSE_DATA_INVALID;
+		goto out;
+	}
+
 	if (target[0] == '/' || strstr(target, "..")) {
 		pr_err_ratelimited(
 			"set reparse: target '%s' escapes share\n",

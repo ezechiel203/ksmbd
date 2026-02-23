@@ -872,8 +872,8 @@ static void __smb2_oplock_break_noti(struct work_struct *wk)
 		rsp->OplockLevel = SMB2_OPLOCK_LEVEL_NONE;
 	rsp->Reserved = 0;
 	rsp->Reserved2 = 0;
-	rsp->PersistentFid = fp->persistent_id;
-	rsp->VolatileFid = fp->volatile_id;
+	rsp->PersistentFid = cpu_to_le64(fp->persistent_id);
+	rsp->VolatileFid = cpu_to_le64(fp->volatile_id);
 
 	ksmbd_fd_put(work, fp);
 	if (ksmbd_iov_pin_rsp(work, (void *)rsp,
@@ -1893,7 +1893,7 @@ void create_durable_v2_rsp_buf(char *cc, struct ksmbd_file *fp)
 
 	buf->Timeout = cpu_to_le32(fp->durable_timeout);
 	if (fp->is_persistent)
-		buf->Flags = SMB2_DHANDLE_FLAG_PERSISTENT;
+		buf->Flags = cpu_to_le32(SMB2_DHANDLE_FLAG_PERSISTENT);
 }
 
 /**

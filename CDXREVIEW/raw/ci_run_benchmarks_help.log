@@ -1,0 +1,36 @@
+\033[1mUsage:\033[0m run_benchmarks.sh --mount PATH [OPTIONS]
+
+\033[1mfio-based performance benchmark suite for ksmbd\033[0m
+
+Runs standardized I/O workloads against a mounted SMB share and produces
+structured results for regression detection.
+
+\033[1mRequired:\033[0m
+  --mount PATH        Mount point of the SMB share to benchmark
+
+\033[1mOptions:\033[0m
+  --size SIZE         Override default file sizes (e.g., 256M for quick runs)
+  --output FILE       JSON output file (default: results_YYYYMMDD_HHMMSS.json)
+  --iterations N      Run each workload N times and report mean/min/max (default: 1)
+  --quick             Use reduced sizes (256MB) for fast CI runs
+  --help              Show this help message
+
+\033[1mWorkloads:\033[0m
+  1. Sequential read     (1MB blocks, 4G file, 1 job)
+  2. Sequential write    (1MB blocks, 4G file, 1 job)
+  3. Random read 4K      (4K blocks, 1G file, 4 jobs)
+  4. Random write 4K     (4K blocks, 1G file, 4 jobs)
+  5. Mixed random 70/30  (4K blocks, 1G file, 4 jobs)
+  6. Metadata ops        (4K random write, 10000 files of 4K each)
+  7. Large sequential    (1MB blocks, 16G file, sustained throughput)
+
+\033[1mPrerequisites:\033[0m
+  - fio (>= 3.0)
+  - A mounted SMB share (ksmbd, Samba, or NFS)
+  - Sufficient disk space for test files
+
+\033[1mExamples:\033[0m
+  run_benchmarks.sh --mount /mnt/ksmbd_test
+  run_benchmarks.sh --mount /mnt/ksmbd_test --quick --output ci_results.json
+  run_benchmarks.sh --mount /mnt/ksmbd_test --size 512M
+[0;34m[INFO][0m  Cleaning up test files...

@@ -2,14 +2,6 @@
 /*
  *   Copyright (C) 2016 Namjae Jeon <linkinjeon@kernel.org>
  *   Copyright (C) 2018 Samsung Electronics Co., Ltd.
- *
- *   smb2_misc_cmds.c - Oplock break, close, echo
- */
-
-// SPDX-License-Identifier: GPL-2.0-or-later
-/*
- *   Copyright (C) 2016 Namjae Jeon <linkinjeon@kernel.org>
- *   Copyright (C) 2018 Samsung Electronics Co., Ltd.
  */
 
 #include <linux/inetdevice.h>
@@ -261,8 +253,8 @@ static void smb20_oplock_break_ack(struct ksmbd_work *work)
 
 	WORK_BUFFERS(work, req, rsp);
 
-	volatile_id = req->VolatileFid;
-	persistent_id = req->PersistentFid;
+	volatile_id = le64_to_cpu(req->VolatileFid);
+	persistent_id = le64_to_cpu(req->PersistentFid);
 	req_oplevel = req->OplockLevel;
 	ksmbd_debug(OPLOCK, "v_id %llu, p_id %llu request oplock level %d\n",
 		    volatile_id, persistent_id, req_oplevel);
@@ -352,8 +344,8 @@ static void smb20_oplock_break_ack(struct ksmbd_work *work)
 	rsp->OplockLevel = rsp_oplevel;
 	rsp->Reserved = 0;
 	rsp->Reserved2 = 0;
-	rsp->VolatileFid = volatile_id;
-	rsp->PersistentFid = persistent_id;
+	rsp->VolatileFid = cpu_to_le64(volatile_id);
+	rsp->PersistentFid = cpu_to_le64(persistent_id);
 	ret = ksmbd_iov_pin_rsp(work, rsp, sizeof(struct smb2_oplock_break));
 	if (ret) {
 err_out:

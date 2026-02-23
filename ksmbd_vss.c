@@ -242,7 +242,7 @@ static int ksmbd_vss_dirname_to_gmt(const char *dirname, int namlen,
 
 format:
 	/* Basic sanity checks */
-	if (year < 1970 || month < 1 || month > 12 ||
+	if (year < 1970 || year > 9999 || month < 1 || month > 12 ||
 	    day < 1 || day > 31 || hour > 23 ||
 	    min > 59 || sec > 59)
 		return -EINVAL;

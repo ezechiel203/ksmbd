@@ -1,0 +1,2 @@
+0x0705f42c	ksmbd_register_hook	ksmbd	EXPORT_SYMBOL_GPL	
+0xb79cee8e	ksmbd_unregister_hook	ksmbd	EXPORT_SYMBOL_GPL	

@@ -1,0 +1,26 @@
+
+[1m[0;36m=== smbtorture Test Categories ===[0m
+
+  [1mCATEGORY             TESTS[0m
+  --------             -----
+  connect              1
+  read                 4
+  scan                 4
+  dir                  7
+  rename               8
+  maxfid               1
+  sharemode            2
+  compound             10
+  streams              11
+  create               10
+  delete_on_close      7
+  oplock               39
+  session              6
+  lock                 16
+  lease                26
+  acls                 6
+  credits              3
+  durable              27
+
+  [1mTOTAL                188[0m
+

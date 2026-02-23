@@ -1,0 +1,5 @@
+Usage: ./tests/run_integration.sh [--skip-smbtorture]
+
+Options:
+  --skip-smbtorture  Skip smbtorture tests even if available
+  --help, -h         Show this help message

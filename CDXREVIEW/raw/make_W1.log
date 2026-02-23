@@ -1,0 +1,8 @@
+make -C /lib/modules/6.17.0-14-generic/build M=/home/ezechiel203/ksmbd modules
+make[1]: Entering directory '/usr/src/linux-headers-6.17.0-14-generic'
+make[2]: Entering directory '/home/ezechiel203/ksmbd'
+warning: the compiler differs from the one used to build the kernel
+  The kernel was built by: x86_64-linux-gnu-gcc (Ubuntu 15.2.0-4ubuntu4) 15.2.0
+  You are using:           gcc (Ubuntu 15.2.0-4ubuntu4) 15.2.0
+make[2]: Leaving directory '/home/ezechiel203/ksmbd'
+make[1]: Leaving directory '/usr/src/linux-headers-6.17.0-14-generic'

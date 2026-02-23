@@ -2,14 +2,6 @@
 /*
  *   Copyright (C) 2016 Namjae Jeon <linkinjeon@kernel.org>
  *   Copyright (C) 2018 Samsung Electronics Co., Ltd.
- *
- *   smb2_query_set.c - SMB2_QUERY_INFO + SMB2_SET_INFO handlers
- */
-
-// SPDX-License-Identifier: GPL-2.0-or-later
-/*
- *   Copyright (C) 2016 Namjae Jeon <linkinjeon@kernel.org>
- *   Copyright (C) 2018 Samsung Electronics Co., Ltd.
  */
 
 #include <linux/inetdevice.h>
@@ -245,7 +237,7 @@ static int smb2_get_ea(struct ksmbd_work *work, struct ksmbd_file *fp,
 			     STREAM_PREFIX_LEN))
 			continue;
 
-		if (req->InputBufferLength &&
+		if (req->InputBufferLength && ea_req &&
 		    strncmp(&name[XATTR_USER_PREFIX_LEN], ea_req->name,
 			    ea_req->EaNameLength))
 			continue;

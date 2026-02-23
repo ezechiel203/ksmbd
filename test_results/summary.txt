@@ -1,0 +1,26 @@
+Apple SMB Extensions Test Summary
+=================================
+
+Test Run Timestamp: 2026-02-23 23:03:30
+Git Commit: 4c289e805bc1be3fea1e1ba855cf09d0376927b2
+Git Branch: phase1-security-hardening
+Test Type: all
+CI Mode: false
+Verbose Mode: false
+
+Configuration:
+- Config File: /home/ezechiel203/ksmbd/test_config.json
+- Results Directory: /home/ezechiel203/ksmbd/test_results
+- Log File: /dev/null
+
+Quality Gates:
+- Min Coverage: 95%
+- Min Performance Improvement: 14x
+- Max Security Vulnerabilities: 0
+
+Results:
+  No test reports found
+
+Performance Metrics:
+
+Files Generated:

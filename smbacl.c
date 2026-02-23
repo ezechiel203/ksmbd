@@ -906,7 +906,7 @@ static int set_ntacl_dacl(struct user_namespace *user_ns,
 	if (rc)
 		return rc;
 
-	pndacl->num_aces = cpu_to_le32(num_aces);
+	pndacl->num_aces = cpu_to_le16(num_aces);
 	pndacl->size = cpu_to_le16(le16_to_cpu(pndacl->size) + size);
 	return 0;
 }

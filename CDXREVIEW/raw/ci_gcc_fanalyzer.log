@@ -1,0 +1,130 @@
+make -C /lib/modules/6.17.0-14-generic/build M=/home/ezechiel203/ksmbd modules
+make[1]: Entering directory '/usr/src/linux-headers-6.17.0-14-generic'
+make[2]: Entering directory '/home/ezechiel203/ksmbd'
+warning: the compiler differs from the one used to build the kernel
+  The kernel was built by: x86_64-linux-gnu-gcc (Ubuntu 15.2.0-4ubuntu4) 15.2.0
+  You are using:           gcc (Ubuntu 15.2.0-4ubuntu4) 15.2.0
+  CC [M]  unicode.o
+  CC [M]  auth.o
+  CC [M]  vfs.o
+  CC [M]  vfs_cache.o
+  CC [M]  connection.o
+  CC [M]  crypto_ctx.o
+  CC [M]  server.o
+  CC [M]  misc.o
+  CC [M]  oplock.o
+  CC [M]  ksmbd_work.o
+Warning: misc.c:280 function parameter 'um' not described in 'ksmbd_extract_sharename'
+  CC [M]  smbacl.o
+  CC [M]  ndr.o
+  CC [M]  ksmbd_buffer.o
+  CC [M]  mgmt/ksmbd_ida.o
+  CC [M]  mgmt/user_config.o
+  CC [M]  mgmt/share_config.o
+  CC [M]  mgmt/tree_connect.o
+  CC [M]  mgmt/user_session.o
+  CC [M]  smb_common.o
+Warning: auth.c:327 function parameter 'cryptkey' not described in 'ksmbd_auth_ntlm'
+Warning: auth.c:464 function parameter 'cryptkey' not described in '__ksmbd_auth_ntlmv2'
+  CC [M]  transport_tcp.o
+Warning: vfs.c:250 function parameter 'idmap' not described in 'ksmbd_vfs_lock_parent'
+Warning: vfs.c:250 function parameter 'parent' not described in 'ksmbd_vfs_lock_parent'
+Warning: vfs.c:250 function parameter 'child' not described in 'ksmbd_vfs_lock_parent'
+Warning: vfs.c:1219 function parameter 'work' not described in 'ksmbd_vfs_symlink'
+Warning: vfs.c:1383 function parameter 'fullsync' not described in 'ksmbd_vfs_fsync'
+Warning: vfs.c:1467 function parameter 'work' not described in 'ksmbd_vfs_remove_file'
+Warning: vfs.c:2232 bad line: #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+Warning: vfs.c:2233 bad line: +  @idmap:      idmap
+Warning: vfs.c:2234 bad line: #else
+Warning: vfs.c:2235 bad line: +  @user_ns:    user namespace
+Warning: vfs.c:2236 bad line: #endif
+Warning: vfs.c:2250 function parameter 'idmap' not described in 'ksmbd_vfs_getxattr'
+Warning: vfs.c:2286 bad line: #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+Warning: vfs.c:2288 bad line: #else
+Warning: vfs.c:2290 bad line: #endif
+Warning: vfs.c:3358 function parameter 'work' not described in 'ksmbd_vfs_kern_path'
+  CC [M]  transport_ipc.o
+  CC [M]  ksmbd_debugfs.o
+  CC [M]  ksmbd_config.o
+  CC [M]  ksmbd_feature.o
+  CC [M]  smb2_pdu_common.o
+  CC [M]  smb2_negotiate.o
+  CC [M]  smb2_session.o
+  CC [M]  smb2_tree.o
+  CC [M]  smb2_create.o
+  CC [M]  smb2_dir.o
+  CC [M]  smb2_query_set.o
+  CC [M]  smb2_read_write.o
+  CC [M]  smb2_lock.o
+  CC [M]  smb2_ioctl.o
+  CC [M]  smb2_notify.o
+  CC [M]  smb2_misc_cmds.o
+  CC [M]  smb2ops.o
+  CC [M]  smb2misc.o
+  CC [M]  ksmbd_spnego_negtokeninit.asn1.o
+  CC [M]  ksmbd_spnego_negtokentarg.asn1.o
+  CC [M]  asn1.o
+  CC [M]  compat.o
+  CC [M]  ksmbd_fsctl.o
+  CC [M]  ksmbd_create_ctx.o
+  CC [M]  ksmbd_info.o
+Warning: ksmbd_create_ctx.c:119 function parameter 'work' not described in 'mxac_on_request'
+Warning: ksmbd_create_ctx.c:119 function parameter 'fp' not described in 'mxac_on_request'
+Warning: ksmbd_create_ctx.c:119 function parameter 'ctx_data' not described in 'mxac_on_request'
+Warning: ksmbd_create_ctx.c:119 function parameter 'ctx_len' not described in 'mxac_on_request'
+Warning: ksmbd_create_ctx.c:135 function parameter 'work' not described in 'mxac_on_response'
+Warning: ksmbd_create_ctx.c:135 function parameter 'fp' not described in 'mxac_on_response'
+Warning: ksmbd_create_ctx.c:135 function parameter 'rsp_buf' not described in 'mxac_on_response'
+Warning: ksmbd_create_ctx.c:135 function parameter 'max_len' not described in 'mxac_on_response'
+Warning: ksmbd_create_ctx.c:135 function parameter 'rsp_len' not described in 'mxac_on_response'
+Warning: ksmbd_create_ctx.c:151 function parameter 'work' not described in 'qfid_on_request'
+Warning: ksmbd_create_ctx.c:151 function parameter 'fp' not described in 'qfid_on_request'
+Warning: ksmbd_create_ctx.c:151 function parameter 'ctx_data' not described in 'qfid_on_request'
+Warning: ksmbd_create_ctx.c:151 function parameter 'ctx_len' not described in 'qfid_on_request'
+Warning: ksmbd_create_ctx.c:167 function parameter 'work' not described in 'qfid_on_response'
+Warning: ksmbd_create_ctx.c:167 function parameter 'fp' not described in 'qfid_on_response'
+Warning: ksmbd_create_ctx.c:167 function parameter 'rsp_buf' not described in 'qfid_on_response'
+Warning: ksmbd_create_ctx.c:167 function parameter 'max_len' not described in 'qfid_on_response'
+Warning: ksmbd_create_ctx.c:167 function parameter 'rsp_len' not described in 'qfid_on_response'
+  CC [M]  ksmbd_dfs.o
+  CC [M]  ksmbd_vss.o
+  CC [M]  ksmbd_notify.o
+  CC [M]  ksmbd_reparse.o
+Warning: ksmbd_fsctl.c:148 function parameter 'work' not described in 'fsctl_create_or_get_object_id_handler'
+Warning: ksmbd_fsctl.c:148 function parameter 'id' not described in 'fsctl_create_or_get_object_id_handler'
+Warning: ksmbd_fsctl.c:148 function parameter 'in_buf' not described in 'fsctl_create_or_get_object_id_handler'
+Warning: ksmbd_fsctl.c:148 function parameter 'in_buf_len' not described in 'fsctl_create_or_get_object_id_handler'
+Warning: ksmbd_fsctl.c:148 function parameter 'max_out_len' not described in 'fsctl_create_or_get_object_id_handler'
+Warning: ksmbd_fsctl.c:148 function parameter 'rsp' not described in 'fsctl_create_or_get_object_id_handler'
+Warning: ksmbd_fsctl.c:148 function parameter 'out_len' not described in 'fsctl_create_or_get_object_id_handler'
+Warning: ksmbd_fsctl.c:181 function parameter 'work' not described in 'fsctl_validate_negotiate_info_handler'
+Warning: ksmbd_fsctl.c:181 function parameter 'id' not described in 'fsctl_validate_negotiate_info_handler'
+Warning: ksmbd_fsctl.c:181 function parameter 'in_buf' not described in 'fsctl_validate_negotiate_info_handler'
+Warning: ksmbd_fsctl.c:181 function parameter 'in_buf_len' not described in 'fsctl_validate_negotiate_info_handler'
+Warning: ksmbd_fsctl.c:181 function parameter 'max_out_len' not described in 'fsctl_validate_negotiate_info_handler'
+Warning: ksmbd_fsctl.c:181 function parameter 'rsp' not described in 'fsctl_validate_negotiate_info_handler'
+Warning: ksmbd_fsctl.c:181 function parameter 'out_len' not described in 'fsctl_validate_negotiate_info_handler'
+Warning: ksmbd_fsctl.c:244 function parameter 'work' not described in 'fsctl_pipe_transceive_handler'
+Warning: ksmbd_fsctl.c:244 function parameter 'id' not described in 'fsctl_pipe_transceive_handler'
+Warning: ksmbd_fsctl.c:244 function parameter 'in_buf' not described in 'fsctl_pipe_transceive_handler'
+Warning: ksmbd_fsctl.c:244 function parameter 'in_buf_len' not described in 'fsctl_pipe_transceive_handler'
+Warning: ksmbd_fsctl.c:244 function parameter 'max_out_len' not described in 'fsctl_pipe_transceive_handler'
+Warning: ksmbd_fsctl.c:244 function parameter 'rsp' not described in 'fsctl_pipe_transceive_handler'
+Warning: ksmbd_fsctl.c:244 function parameter 'out_len' not described in 'fsctl_pipe_transceive_handler'
+  CC [M]  ksmbd_resilient.o
+  CC [M]  ksmbd_quota.o
+  CC [M]  ksmbd_app_instance.o
+Warning: smb2_create.c:81 function parameter 'coptions' not described in 'smb2_create_open_flags'
+Warning: smb2_create.c:81 function parameter 'mode' not described in 'smb2_create_open_flags'
+  CC [M]  ksmbd_fsctl_extra.o
+  CC [M]  ksmbd_hooks.o
+  CC [M]  transport_rdma.o
+  LD [M]  ksmbd.o
+  MODPOST Module.symvers
+  CC [M]  ksmbd.mod.o
+  CC [M]  .module-common.o
+  LD [M]  ksmbd.ko
+  BTF [M] ksmbd.ko
+Skipping BTF generation for ksmbd.ko due to unavailability of vmlinux
+make[2]: Leaving directory '/home/ezechiel203/ksmbd'
+make[1]: Leaving directory '/usr/src/linux-headers-6.17.0-14-generic'
