@@ -450,9 +450,6 @@ print_results_table() {
     for entry in "${results_ref[@]}"; do
         IFS=':' read -r clients agg_bw agg_iops pcbw avg_lat p50 p95 p99 cpu lock_info <<< "$entry"
 
-        # Color the per-client BW based on scaling efficiency
-        local pcbw_colored="$pcbw"
-
         printf "%-10s %12s %12s %14s %14s %12s %12s %12s %10s\n" \
             "$clients" "$agg_bw" "$agg_iops" "$pcbw" "$avg_lat" "$p50" "$p95" "$p99" "$cpu"
     done

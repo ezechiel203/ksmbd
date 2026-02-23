@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2034  # TORTURE_SUITES_* arrays are accessed via nameref
 # SPDX-License-Identifier: GPL-2.0-or-later
 #
 # Comprehensive smbtorture test runner for ksmbd
@@ -34,7 +35,6 @@ SHARE_DIR="/mnt/test3"
 KSMBD_CONF_DIR="/etc/ksmbd"
 KSMBD_CONF="${KSMBD_CONF_DIR}/ksmbd.conf"
 KSMBD_CONF_BACKUP=""
-PWD_DB="${KSMBD_CONF_DIR}/ksmbdpwd.db"
 SERVER="127.0.0.1"
 SHARE_NAME="cifsd-test3"
 TEST_USER="testuser"
@@ -57,7 +57,6 @@ JSON_RESULTS=()
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
-BLUE='\033[0;34m'
 CYAN='\033[0;36m'
 BOLD='\033[1m'
 NC='\033[0m'
@@ -100,6 +99,7 @@ test_skip() {
 # ---------------------------------------------------------------------------
 # SMB2 torture test suites organized by category
 # Complete list extracted from the ksmbd CI pipeline
+# Accessed via nameref in get_category_tests() / get_category_count()
 # ---------------------------------------------------------------------------
 TORTURE_SUITES_CONNECT=(
 	"smb2.connect"
@@ -516,7 +516,8 @@ setup_environment() {
 	log_info "Setting up test environment..."
 
 	# Create share directory
-	mkdir -m 777 -p "${SHARE_DIR}"
+	mkdir -p "${SHARE_DIR}"
+	chmod 777 "${SHARE_DIR}"
 
 	# Backup existing ksmbd configuration if present
 	if [ -f "${KSMBD_CONF}" ]; then

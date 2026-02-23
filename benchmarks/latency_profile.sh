@@ -276,7 +276,7 @@ enable_ftrace() {
 
     # Enable tracing
     echo 1 > "$FTRACE_DIR/tracing_on" 2>/dev/null || true
-    info "ftrace enabled for ksmbd functions"
+    info "ftrace enabled for ${operation_name} (ksmbd functions)"
 }
 
 disable_ftrace() {

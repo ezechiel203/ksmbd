@@ -34,8 +34,6 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 KSMBD_CONF_DIR="/etc/ksmbd"
 KSMBD_CONF="${KSMBD_CONF_DIR}/ksmbd.conf"
 KSMBD_CONF_BACKUP=""
-PWD_DB=""
-SERVER="127.0.0.1"
 TEST_USER="testuser"
 TEST_PASS="1234"
 XFSTESTS_DIR=""
@@ -58,7 +56,6 @@ SINGLE_TEST=""
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
-BLUE='\033[0;34m'
 CYAN='\033[0;36m'
 BOLD='\033[1m'
 NC='\033[0m'
@@ -397,9 +394,9 @@ setup_environment() {
 	log_info "Setting up test environment..."
 
 	# Create mount and share directories
-	mkdir -m 777 -p "${MNT_TEST1}"
-	mkdir -m 777 -p "${MNT_TEST2}"
-	mkdir -m 777 -p "${MNT_TEST3}"
+	mkdir -p "${MNT_TEST1}" && chmod 777 "${MNT_TEST1}"
+	mkdir -p "${MNT_TEST2}" && chmod 777 "${MNT_TEST2}"
+	mkdir -p "${MNT_TEST3}" && chmod 777 "${MNT_TEST3}"
 	mkdir -p "${MNT_1}"
 	mkdir -p "${MNT_2}"
 
@@ -443,7 +440,6 @@ setup_environment() {
 	log_info "Installed xfstests SMB configuration"
 
 	# Set up password database
-	PWD_DB="${KSMBD_CONF_DIR}/ksmbdpwd.db"
 	echo "${TEST_PASS}" | ksmbd.adduser -a "${TEST_USER}" 2>/dev/null || true
 	log_info "Added test user: ${TEST_USER}"
 

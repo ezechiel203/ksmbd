@@ -284,8 +284,10 @@ setup_environment() {
         TEST_LOG="${RESULTS_DIR}/test_run_$(date +%Y%m%d_%H%M%S).log"
     fi
 
-    mkdir -p "$(dirname "$TEST_LOG")"
-    touch "$TEST_LOG"
+    if [[ "$TEST_LOG" != "/dev/null" ]]; then
+        mkdir -p "$(dirname "$TEST_LOG")"
+        touch "$TEST_LOG"
+    fi
 
     log_info "Test environment ready"
     log_info "Results directory: $RESULTS_DIR"

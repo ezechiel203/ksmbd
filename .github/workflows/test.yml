@@ -44,11 +44,18 @@ jobs:
       - name: Verify test infrastructure and scripts
         run: |
           bash -n run_tests.sh
+          bash -n test_compilation.sh
           bash -n benchmarks/run_benchmarks.sh
           for f in tests/*.sh; do
             [ -f "$f" ] && bash -n "$f"
           done
           echo "All scripts pass syntax check"
+      - name: Run test compilation validation
+        run: |
+          bash test_compilation.sh
+      - name: Run test framework dry-run
+        run: |
+          bash run_tests.sh --dry-run
 
   static-analysis:
     name: Static Analysis
