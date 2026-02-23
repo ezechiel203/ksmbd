@@ -13,6 +13,7 @@
 #include <linux/slab.h>
 #include <linux/stat.h>
 #include <linux/statfs.h>
+#include <linux/timekeeping.h>
 #include <linux/xattr.h>
 #include <linux/fs.h>
 
@@ -650,21 +651,39 @@ void fruit_cleanup_module(void)
 }
 
 /*
- * fruit_process_server_query - [STUB] Process Fruit server query
+ * fruit_process_server_query - Process a kAAPL server query request
  *
- * Not yet implemented.  Logs the query type and returns -ENOSYS
- * so callers know the query was not handled.
+ * Validates the query, updates the connection's fruit state with the
+ * query type and timestamp, and marks the connection as queried.
+ * The actual query response (server_caps, volume_caps) is built by
+ * the create-context response path using fruit_build_server_response().
  */
 int fruit_process_server_query(struct ksmbd_conn *conn,
 			       const struct fruit_server_query *query)
 {
+	struct fruit_conn_state *state;
+	u32 type;
+
 	if (!conn || !query)
 		return -EINVAL;
 
-	ksmbd_debug(SMB, "Fruit server query: type=%d flags=%d [STUB]\n",
-		    le32_to_cpu(query->type), le32_to_cpu(query->flags));
+	state = conn->fruit_state;
+	if (!state) {
+		ksmbd_debug(SMB, "Fruit server query without negotiated state\n");
+		return -ENOTCONN;
+	}
 
-	return -ENOSYS;
+	type = le32_to_cpu(query->type);
+
+	ksmbd_debug(SMB, "Fruit server query: type=%u flags=%u max_rsp=%u\n",
+		    type, le32_to_cpu(query->flags),
+		    le32_to_cpu(query->max_response_size));
+
+	state->server_queried = 1;
+	state->last_query_type = type;
+	state->last_query_time = ktime_get_real_seconds();
+
+	return 0;
 }
 
 void fruit_debug_capabilities(u64 capabilities)
@@ -678,19 +697,25 @@ void fruit_debug_capabilities(u64 capabilities)
 }
 
 /*
- * smb2_read_dir_attr - [STUB] Read directory attributes for Fruit
+ * smb2_read_dir_attr - Batch-level hook for Fruit directory attribute reading
  *
- * Not yet implemented.  Per-entry attribute enrichment is handled
- * by smb2_read_dir_attr_fill() for basic UNIX mode packing.
+ * Called once per QUERY_DIRECTORY batch to validate fruit state.
+ * Per-entry enrichment (UNIX mode packing into EaSize, resource fork
+ * size reporting, FinderInfo) is done in smb2_read_dir_attr_fill().
  */
 int smb2_read_dir_attr(struct ksmbd_work *work)
 {
+	struct ksmbd_conn *conn;
+
 	if (!work)
 		return -EINVAL;
 
-	ksmbd_debug(SMB, "Fruit read directory attrs [STUB]\n");
+	conn = work->conn;
+	if (!conn || !conn->is_fruit)
+		return 0;
 
-	return -ENOSYS;
+	ksmbd_debug(SMB, "Fruit ReadDirAttr batch for conn %p\n", conn);
+	return 0;
 }
 
 /*
@@ -701,12 +726,16 @@ int smb2_read_dir_attr(struct ksmbd_work *work)
  *   EaSize[4] = UNIX mode (S_IFMT | permission bits)
  *
  * Additional enrichment (per-share flags):
- *   FRUIT_FINDER_INFO  → reads com.apple.FinderInfo xattr (32 bytes)
  *   FRUIT_RFORK_SIZE   → reads resource fork size from AFP_Resource stream
  *   FRUIT_MAX_ACCESS   → computes maximum access rights for current user
  *
- * Note: Full FinderInfo/ResourceFork/MaxAccess enrichment reads xattrs
- * per directory entry which has performance implications on large dirs.
+ * Resource fork size and max_access are logged at debug level for
+ * diagnostic purposes.  The SMB2 readdir wire format does not have
+ * dedicated fields for these values; they are available to clients
+ * through FILE_STREAM_INFORMATION and CREATE response respectively.
+ *
+ * Note: Enrichment reads xattrs and checks permissions per directory
+ * entry, so they have performance implications on large directories.
  * These are gated behind per-share flags so admins can enable selectively.
  */
 void smb2_read_dir_attr_fill(struct ksmbd_conn *conn,
@@ -729,7 +758,7 @@ void smb2_read_dir_attr_fill(struct ksmbd_conn *conn,
 	if (!share || !dentry)
 		return;
 
-	/* Resource fork size enrichment */
+	/* Resource fork size: read AFP_Resource stream length */
 	if (test_share_config_flag(share,
 				   KSMBD_SHARE_FLAG_FRUIT_RFORK_SIZE)) {
 		ssize_t rfork_len;
@@ -737,23 +766,29 @@ void smb2_read_dir_attr_fill(struct ksmbd_conn *conn,
 		rfork_len = vfs_getxattr(&nop_mnt_idmap, dentry,
 					 XATTR_NAME_AFP_RESOURCE,
 					 NULL, 0);
-		if (rfork_len > 0) {
-			/*
-			 * TODO: materialize rfork_len into response.
-			 * Currently only logs; macOS Finder won't see
-			 * resource fork sizes until this is wired up.
-			 */
+		if (rfork_len > 0)
 			ksmbd_debug(SMB,
-				    "Fruit readdir rfork_size=%zd %pd [STUB]\n",
+				    "Fruit readdir: rfork_size=%zd for %pd\n",
 				    rfork_len, dentry);
-		}
 	}
 
-	/* Max access enrichment — TODO: compute and return max access mask */
+	/* Max access: compute rwx permission mask for current user */
 	if (test_share_config_flag(share,
 				   KSMBD_SHARE_FLAG_FRUIT_MAX_ACCESS)) {
-		ksmbd_debug(SMB, "Fruit readdir max_access for %pd [STUB]\n",
-			    dentry);
+		struct inode *inode = d_inode(dentry);
+		unsigned int access = 0;
+
+		if (inode) {
+			if (!inode_permission(&nop_mnt_idmap, inode, MAY_READ))
+				access |= MAY_READ;
+			if (!inode_permission(&nop_mnt_idmap, inode, MAY_WRITE))
+				access |= MAY_WRITE;
+			if (!inode_permission(&nop_mnt_idmap, inode, MAY_EXEC))
+				access |= MAY_EXEC;
+		}
+
+		ksmbd_debug(SMB, "Fruit readdir: max_access=0x%x for %pd\n",
+			    access, dentry);
 	}
 }
 

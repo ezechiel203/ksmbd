@@ -285,7 +285,7 @@ static int smb2_populate_readdir_entry(struct ksmbd_conn *conn, int info_level,
 			smb2_read_dir_attr_fill(conn,
 						ksmbd_kstat->kstat_dentry,
 						ksmbd_kstat->kstat,
-						NULL,
+						ksmbd_kstat->share,
 						&dinfo->EaSize);
 #endif
 		dinfo->Reserved = 0;
@@ -318,7 +318,7 @@ static int smb2_populate_readdir_entry(struct ksmbd_conn *conn, int info_level,
 			smb2_read_dir_attr_fill(conn,
 						ksmbd_kstat->kstat_dentry,
 						ksmbd_kstat->kstat,
-						NULL,
+						ksmbd_kstat->share,
 						&fibdinfo->EaSize);
 		if (conn->is_fruit &&
 		    (server_conf.flags & KSMBD_GLOBAL_FLAG_FRUIT_ZERO_FILEID) &&
@@ -495,6 +495,10 @@ static int process_query_dir_entries(struct smb2_query_dir_private *priv)
 
 		ksmbd_kstat.kstat = &kstat;
 		ksmbd_kstat.kstat_dentry = dent;
+#ifdef CONFIG_KSMBD_FRUIT
+		ksmbd_kstat.share = priv->dir_fp->tcon ?
+			priv->dir_fp->tcon->share_conf : NULL;
+#endif
 		if (priv->info_level != FILE_NAMES_INFORMATION) {
 			rc = ksmbd_vfs_fill_dentry_attrs(priv->work,
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)

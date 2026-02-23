@@ -113,6 +113,9 @@ struct ksmbd_kstat {
 	struct dentry		*kstat_dentry;
 	unsigned long long	create_time;
 	__le32			file_attributes;
+#ifdef CONFIG_KSMBD_FRUIT
+	struct ksmbd_share_config *share;
+#endif
 };
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(5, 12, 0)

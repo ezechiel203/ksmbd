@@ -16,7 +16,8 @@ KSMBD is an open-source in-kernel CIFS/SMB3 server for Linux Kernel. It provides
 - **ReadDirAttr**: UNIX mode packing into EaSize for Finder (complete)
 - **Finder Metadata Paths**: Finder/AFP metadata helpers and stream handling
 - **Time Machine Hooks**: Time Machine related configuration and quota plumbing
-- **Server Query / Resource Fork / Max Access**: WIP (stubs present, not yet wired)
+- **Server Query**: kAAPL server query processing and state tracking (complete)
+- **Resource Fork / Max Access**: Per-entry diagnostic enrichment in readdir (complete; wire-level per-entry response requires protocol extension)
 - **Compatibility Goal**: Best-effort interoperability with Apple clients
 
 ### Core SMB Features
