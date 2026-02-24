@@ -10,7 +10,7 @@
 #include <linux/slab.h>
 #include <linux/string.h>
 
-#include "../smbacl.h"
+#include "smbacl.h"
 
 /*
  * test_compare_sids_equal - identical SIDs should compare as equal (return 0)

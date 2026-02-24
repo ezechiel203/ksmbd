@@ -9,7 +9,7 @@
 #include <linux/hashtable.h>
 #include <linux/refcount.h>
 
-#include "../ksmbd_netlink.h"
+#include "ksmbd_netlink.h"
 
 struct ksmbd_share_config;
 struct ksmbd_user;

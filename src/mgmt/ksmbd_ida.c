@@ -3,7 +3,7 @@
  *   Copyright (C) 2018 Samsung Electronics Co., Ltd.
  */
 
-#include "../glob.h"
+#include "glob.h"
 #include "ksmbd_ida.h"
 
 #ifdef CONFIG_SMB_INSECURE_SERVER

@@ -7,8 +7,8 @@
 #include <linux/slab.h>
 #include <linux/xarray.h>
 
-#include "../transport_ipc.h"
-#include "../connection.h"
+#include "transport_ipc.h"
+#include "connection.h"
 
 #include "tree_connect.h"
 #include "user_config.h"

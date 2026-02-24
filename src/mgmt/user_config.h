@@ -6,7 +6,7 @@
 #ifndef __USER_CONFIG_MANAGEMENT_H__
 #define __USER_CONFIG_MANAGEMENT_H__
 
-#include "../glob.h"
+#include "glob.h"
 
 struct ksmbd_user {
 	unsigned short		flags;

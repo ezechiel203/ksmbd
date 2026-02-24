@@ -35,7 +35,12 @@ export CONFIG_SMB_INSECURE_SERVER := y
 export CONFIG_SMB_SERVER_SMBDIRECT := n
 
 # Compiler flags for cross-compilation
-EXTRA_CFLAGS += -I$(PWD)
+EXTRA_CFLAGS += -I$(PWD)/src
+EXTRA_CFLAGS += -I$(PWD)/src/include/core
+EXTRA_CFLAGS += -I$(PWD)/src/include/fs
+EXTRA_CFLAGS += -I$(PWD)/src/include/protocol
+EXTRA_CFLAGS += -I$(PWD)/src/include/transport
+EXTRA_CFLAGS += -I$(PWD)/src/include/encoding
 EXTRA_CFLAGS += -D__KERNEL__
 EXTRA_CFLAGS += -Wall
 EXTRA_CFLAGS += -Wno-attribute-alias
@@ -54,26 +59,8 @@ ifdef DEBUG
 EXTRA_CFLAGS += -g -DDEBUG
 endif
 
-# Source files (from original Makefile)
-obj-m := ksmbd.o
-
-ksmbd-y := unicode.o auth.o vfs.o vfs_cache.o connection.o crypto_ctx.o \
-		server.o misc.o oplock.o ksmbd_work.o smbacl.o ndr.o\
-		mgmt/ksmbd_ida.o mgmt/user_config.o mgmt/share_config.o \
-		mgmt/tree_connect.o mgmt/user_session.o smb_common.o \
-		transport_tcp.o transport_ipc.o
-
-ksmbd-y += smb2pdu.o smb2ops.o smb2misc.o ksmbd_spnego_negtokeninit.asn1.o \
-		ksmbd_spnego_negtokentarg.asn1.o asn1.o compat.o smb2aapl.o
-
-ksmbd-$(CONFIG_SMB_INSECURE_SERVER) += smb1pdu.o smb1ops.o smb1misc.o netmisc.o
-ksmbd-$(CONFIG_SMB_SERVER_SMBDIRECT) += transport_rdma.o
-
-# ASN.1 generated files
-$(obj)/asn1.o: $(obj)/ksmbd_spnego_negtokeninit.asn1.h $(obj)/ksmbd_spnego_negtokentarg.asn1.h
-
-$(obj)/ksmbd_spnego_negtokeninit.asn1.o: $(obj)/ksmbd_spnego_negtokeninit.asn1.c $(obj)/ksmbd_spnego_negtokeninit.asn1.h
-$(obj)/ksmbd_spnego_negtokentarg.asn1.o: $(obj)/ksmbd_spnego_negtokentarg.asn1.c $(obj)/ksmbd_spnego_negtokentarg.asn1.h
+# Module object graph is defined by the main kbuild file: ./Makefile
+# This wrapper only configures ARM64 cross-build environment and invokes kbuild.
 
 # Default target
 all: setup-headers kernel-config build-module
@@ -149,6 +136,7 @@ clean:
 		$(MAKE) -C $(KDIR) M=$(PWD) ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE) clean; \
 	fi
 	@rm -f *.o *.ko *.mod.* .*.cmd *.order *.symvers
+	@find src -type f \( -name '*.o' -o -name '*.cmd' -o -name '*.mod' -o -name '*.mod.c' -o -name '*.mod.o' \) -delete 2>/dev/null || true
 	@rm -rf .tmp_versions
 	@rm -rf $(BUILD_DIR)/build
 

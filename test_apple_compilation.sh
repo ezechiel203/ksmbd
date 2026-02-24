@@ -3,54 +3,67 @@
 # Apple SMB Compilation Test Script
 # This script checks for common compilation errors in the Apple SMB code
 
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+FRUIT_SRC="$ROOT_DIR/src/protocol/smb2/smb2fruit.c"
+FRUIT_HDR="$ROOT_DIR/src/include/protocol/smb2fruit.h"
+
 echo "=== Apple SMB Compilation Test ==="
 echo
 
 # Check if we can at least parse the C syntax without kernel headers
 echo "1. Checking C syntax parsing..."
 
-# Try to compile just the preprocessing stage
-gcc -E -I. -I./mgmt -I./vfs_cache -I./unicode -I./auth -I./misc -I./smbacl \
-    -I./smbfsctl -I./smberr -I./ntlmssp -I./ndr -I./asn1 -I./crypto_ctx \
-    -I./compat -I./server -I./smb_common -I./connection -I./ksmbd_work \
-    -I./oplock -I./transport_tcp -I./transport_rdma -I./transport_ipc \
-    -I./glob -I./xattr -I./unicode -I./netmisc -I./nterr -I./oplock \
-    -I./unicode -I./uniupr -I./vfs_cache -I./vfs -I./smb2aapl.h \
-    smb2pdu.c -o smb2pdu.i 2>&1 | head -20
+if [[ ! -f "$FRUIT_SRC" || ! -f "$FRUIT_HDR" ]]; then
+    echo "✗ Required Fruit source files are missing"
+    echo "  Expected:"
+    echo "    $FRUIT_SRC"
+    echo "    $FRUIT_HDR"
+    exit 1
+fi
 
-if [ $? -eq 0 ]; then
+echo "✓ Found Fruit source and header files"
+
+# Try to run preprocessing against the relocated source tree
+if gcc -E \
+    -I"$ROOT_DIR/src" \
+    -I"$ROOT_DIR/src/include/core" \
+    -I"$ROOT_DIR/src/include/fs" \
+    -I"$ROOT_DIR/src/include/protocol" \
+    -I"$ROOT_DIR/src/include/transport" \
+    -I"$ROOT_DIR/src/include/encoding" \
+    "$FRUIT_SRC" -o /tmp/ksmbd_fruit.i 2>/tmp/ksmbd_fruit_preprocess.log; then
     echo "✓ Preprocessing successful"
 else
     echo "✗ Preprocessing failed"
+    head -20 /tmp/ksmbd_fruit_preprocess.log
 fi
 
 echo
 echo "2. Checking for common compilation errors..."
 
-# Check for undefined constants
-echo "Checking for undefined constants..."
-grep -n "SMB2_REOPEN_ORIGINAL\|SMB2_REOPEN_POSITION\|KSMBD_DIR_INFO_REQ_XATTR_BATCH" smb2pdu.c | head -10
+# Check for expected symbol usage
+echo "Checking for expected Apple SMB symbols..."
+grep -n "fruit_process_server_query\\|fruit_debug_capabilities\\|smb2_read_dir_attr" "$FRUIT_SRC" | head -10
 
-# Check for structure field access issues
+# Check for structure field usage sanity
 echo
 echo "Checking for structure field access issues..."
-grep -n "\.flags\|\.entry_count\|\.BufferLength" smb2pdu.c | grep -v "d_info\.flags" | head -10
+grep -n "\.flags\\|\.entry_count\\|\.BufferLength" "$FRUIT_SRC" | grep -v "d_info\\.flags" | head -10
 
 # Check for function prototype issues
 echo
 echo "Checking for missing function prototypes..."
-grep -n "aapl_supports_capability\|process_query_dir_entries" smb2pdu.c | head -5
+grep -n "fruit_process_server_query\\|fruit_debug_capabilities\\|smb2_read_dir_attr" "$FRUIT_HDR" | head -10
 
 echo
 echo "3. Checking include dependencies..."
 
-# Check if all required includes are present
-echo "Checking smb2aapl.h include..."
-grep -n "#include.*smb2aapl" smb2pdu.c
+echo "Checking key include usage..."
+grep -n "#include.*smb2fruit.h" "$FRUIT_SRC" || true
 
 echo
 echo "Checking other required includes..."
-grep -n "#include.*ksmbd" smb2pdu.c | head -5
+grep -n "#include.*connection.h\\|#include.*oplock.h" "$FRUIT_SRC" | head -10
 
 echo
 echo "=== Test Complete ==="

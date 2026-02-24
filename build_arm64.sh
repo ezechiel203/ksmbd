@@ -97,7 +97,7 @@ verify_prerequisites() {
     done
 
     # Check source files
-    if [ ! -f "$PROJECT_ROOT/smb2pdu.c" ] || [ ! -f "$PROJECT_ROOT/Makefile" ]; then
+    if [ ! -f "$PROJECT_ROOT/src/protocol/smb2/smb2_pdu_common.c" ] || [ ! -f "$PROJECT_ROOT/Makefile" ]; then
         print_error "KSMBD source files not found!"
         return 1
     fi
@@ -136,6 +136,7 @@ prepare_build() {
     if [ "$CLEAN" = "1" ]; then
         print_info "Cleaning previous builds..."
         rm -f "$PROJECT_ROOT"/*.ko "$PROJECT_ROOT"/*.o "$PROJECT_ROOT"/*.mod.*
+        find "$PROJECT_ROOT/src" -type f \( -name '*.o' -o -name '*.cmd' -o -name '*.mod' -o -name '*.mod.c' -o -name '*.mod.o' \) -delete 2>/dev/null || true
         rm -rf "$PROJECT_ROOT/.tmp_versions"
     fi
 

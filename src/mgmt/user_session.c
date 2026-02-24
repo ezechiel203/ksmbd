@@ -17,9 +17,9 @@
 #include "user_session.h"
 #include "user_config.h"
 #include "tree_connect.h"
-#include "../transport_ipc.h"
-#include "../connection.h"
-#include "../vfs_cache.h"
+#include "transport_ipc.h"
+#include "connection.h"
+#include "vfs_cache.h"
 
 static DEFINE_IDA(session_ida);
 

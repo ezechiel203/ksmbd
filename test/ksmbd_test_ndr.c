@@ -10,8 +10,8 @@
 #include <linux/slab.h>
 #include <linux/string.h>
 
-#include "../xattr.h"
-#include "../ndr.h"
+#include "xattr.h"
+#include "ndr.h"
 
 /*
  * test_ndr_encode_decode_dos_attr_v4 - roundtrip test for version 4

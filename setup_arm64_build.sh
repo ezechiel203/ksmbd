@@ -219,7 +219,7 @@ export CROSS_COMPILE="$CROSS_COMPILE"
 export KERNEL_VERSION="$KERNEL_VERSION"
 export BUILD_DIR="$BUILD_DIR"
 export KERNEL_HEADERS_DIR="$BUILD_DIR/linux-headers-$KERNEL_VERSION-arm64"
-export EXTRA_CFLAGS="-I$PROJECT_ROOT -D__KERNEL__ -Wall -mgeneral-regs-only -mstrict-align"
+export EXTRA_CFLAGS="-I$PROJECT_ROOT/src -I$PROJECT_ROOT/src/include/core -I$PROJECT_ROOT/src/include/fs -I$PROJECT_ROOT/src/include/protocol -I$PROJECT_ROOT/src/include/transport -I$PROJECT_ROOT/src/include/encoding -D__KERNEL__ -Wall -mgeneral-regs-only -mstrict-align"
 EOF
 
     print_success "Build configuration created"

@@ -1,4 +1,11 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
+ccflags-y += -I$(src)/../src \
+	-I$(src)/../src/include/core \
+	-I$(src)/../src/include/fs \
+	-I$(src)/../src/include/protocol \
+	-I$(src)/../src/include/transport \
+	-I$(src)/../src/include/encoding
+
 obj-$(CONFIG_KSMBD_KUNIT_TEST) += ksmbd_test_ndr.o \
 	ksmbd_test_acl.o \
 	ksmbd_test_misc.o \

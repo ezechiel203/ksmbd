@@ -8,7 +8,7 @@
 
 #include <kunit/test.h>
 
-#include "../ksmbd_config.h"
+#include "ksmbd_config.h"
 
 /*
  * test_config_init_and_defaults - verify init sets default values

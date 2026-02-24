@@ -17,9 +17,9 @@
 #include "share_config.h"
 #include "user_config.h"
 #include "user_session.h"
-#include "../connection.h"
-#include "../transport_ipc.h"
-#include "../misc.h"
+#include "connection.h"
+#include "transport_ipc.h"
+#include "misc.h"
 
 #define SHARE_HASH_BITS		12
 static DEFINE_HASHTABLE(shares_table, SHARE_HASH_BITS);

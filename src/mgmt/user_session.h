@@ -12,8 +12,8 @@
 #include <linux/xarray.h>
 #include <linux/atomic.h>
 
-#include "../smb_common.h"
-#include "../ntlmssp.h"
+#include "smb_common.h"
+#include "ntlmssp.h"
 
 #ifdef CONFIG_SMB_INSECURE_SERVER
 #define CIFDS_SESSION_FLAG_SMB1		BIT(0)

@@ -86,7 +86,7 @@ run_test "setup_arm64_build.sh executable" "[[ -x \"setup_arm64_build.sh\" ]]"
 run_test "build_arm64.sh exists" "[[ -f \"build_arm64.sh\" ]]"
 run_test "build_arm64.sh executable" "[[ -x \"build_arm64.sh\" ]]"
 run_test "Makefile.arm64 exists" "[[ -f \"Makefile.arm64\" ]]"
-run_test "smb2pdu.c source file exists" "[[ -f \"smb2pdu.c\" ]]"
+run_test "smb2_pdu_common.c source file exists" "[[ -f \"src/protocol/smb2/smb2_pdu_common.c\" ]]"
 
 # Test 6: Check script syntax
 run_test "setup_arm64_build.sh syntax valid" "bash -n setup_arm64_build.sh"

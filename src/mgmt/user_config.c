@@ -8,7 +8,7 @@
 #include <crypto/algapi.h>
 
 #include "user_config.h"
-#include "../transport_ipc.h"
+#include "transport_ipc.h"
 
 struct ksmbd_user *ksmbd_login_user(const char *account)
 {

@@ -11,7 +11,7 @@
 #include <linux/string.h>
 #include <linux/time64.h>
 
-#include "../misc.h"
+#include "misc.h"
 
 /* --- match_pattern() tests --- */
 

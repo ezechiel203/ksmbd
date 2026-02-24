@@ -17,8 +17,8 @@
 
 #include <kunit/test.h>
 
-#include "../oplock.h"
-#include "../smb2pdu.h"
+#include "oplock.h"
+#include "smb2pdu.h"
 
 /* --- smb2_map_lease_to_oplock() tests --- */
 
