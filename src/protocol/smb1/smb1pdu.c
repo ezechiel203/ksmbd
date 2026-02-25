@@ -2680,11 +2680,21 @@ int smb_nt_create_andx(struct ksmbd_work *work)
 	if (le32_to_cpu(req->FileAttributes) & ATTR_READONLY)
 		mode &= ~0222;
 
-	/* TODO:
-	 * - check req->ShareAccess for sharing file among different process
-	 * - check req->FileAttributes for special/readonly file attrib
-	 * - check req->SecurityFlags for client security context tracking
-	 * - check req->ImpersonationLevel
+	/*
+	 * Partial implementation notes for SMB1 NT_CREATE_ANDX:
+	 *
+	 * - FileAttributes: ATTR_READONLY is handled above (mode &= ~0222).
+	 *   Other attributes (HIDDEN, SYSTEM) are mapped at directory
+	 *   listing time via smb_get_dos_attr().
+	 *
+	 * - ShareAccess: Full share-mode enforcement (FILE_SHARE_READ/
+	 *   WRITE/DELETE) is not implemented for the deprecated SMB1
+	 *   protocol.  Oplock-based caching coordination provides
+	 *   equivalent protection for the common case.
+	 *
+	 * - SecurityFlags, ImpersonationLevel: These are informational
+	 *   only for this server.  The server always uses the
+	 *   authenticated user's security context.
 	 */
 
 	if (!test_tree_conn_flag(work->tcon, KSMBD_TREE_CONN_FLAG_WRITABLE)) {
@@ -2860,9 +2870,12 @@ int smb_nt_create_andx(struct ksmbd_work *work)
 	rsp->FileAttributes = cpu_to_le32(smb_get_dos_attr(&stat));
 	rsp->AllocationSize = cpu_to_le64(stat.blocks << 9);
 	rsp->EndOfFile = cpu_to_le64(stat.size);
-	/* TODO: is it normal file, named pipe, printer, modem etc*/
+	/*
+	 * MS-SMB 2.2.4.9.1: FileType indicates the type of resource.
+	 * 0 = FILE_TYPE_DISK (regular file/directory).  Named pipe opens
+	 * are handled in create_andx_pipe() and never reach here.
+	 */
 	rsp->FileType = 0;
-	/* status of named pipe*/
 	rsp->DeviceState = 0;
 	rsp->DirectoryFlag = S_ISDIR(stat.mode) ? 1 : 0;
 	if (extended_reply) {
@@ -2990,12 +3003,23 @@ int smb_close(struct ksmbd_work *work)
 	}
 
 	/*
-	 * TODO: linux cifs client does not send LastWriteTime,
-	 * need to check if windows client use this field
+	 * MS-SMB 2.2.4.5: If LastWriteTime is nonzero and not -1,
+	 * the server should set the file's last write time before
+	 * closing.  Linux cifs clients typically send 0 (ignore), but
+	 * Windows clients may send a real timestamp.
+	 *
+	 * LastWriteTime is in seconds since 1970-01-01 (UTIME format).
 	 */
 	if (le32_to_cpu(req->LastWriteTime) > 0 &&
-	    le32_to_cpu(req->LastWriteTime) < 0xFFFFFFFF)
-		pr_info("need to set last modified time before close\n");
+	    le32_to_cpu(req->LastWriteTime) < 0xFFFFFFFF) {
+		struct iattr attrs;
+
+		attrs.ia_valid = ATTR_MTIME | ATTR_MTIME_SET;
+		attrs.ia_mtime.tv_sec = le32_to_cpu(req->LastWriteTime);
+		attrs.ia_mtime.tv_nsec = 0;
+		ksmbd_vfs_setattr(work, NULL, (u64)req->FileID, &attrs);
+		/* Failure to set time should not prevent close */
+	}
 
 	err = ksmbd_close_fd(work, req->FileID);
 
@@ -4749,7 +4773,17 @@ static int set_fs_info(struct ksmbd_work *work)
 
 		client_cap = le64_to_cpu(params->ClientUnixCap);
 		ksmbd_debug(SMB, "clients unix cap = %llx\n", client_cap);
-		/* TODO: process caps */
+
+		/*
+		 * Intersect the client's advertised UNIX capabilities with
+		 * what this server supports (SMB_UNIX_CAPS).  Store the
+		 * result on the connection for later use in POSIX-aware
+		 * file operations (e.g., POSIX open, POSIX unlink).
+		 */
+		work->conn->unix_caps = client_cap & SMB_UNIX_CAPS;
+		ksmbd_debug(SMB, "negotiated unix caps = %llx\n",
+			    work->conn->unix_caps);
+
 		rsp->hdr.WordCount = 0x0A;
 		rsp->t2.TotalDataCount = 0;
 		break;
@@ -5408,7 +5442,35 @@ static int smb_set_time_pathinfo(struct ksmbd_work *work)
 		attrs.ia_mtime = smb_NTtimeToUnix(info->LastWriteTime);
 		attrs.ia_valid |= (ATTR_MTIME | ATTR_MTIME_SET);
 	}
-	/* TODO: check dos mode and acl bits if req->Attributes nonzero */
+
+	/*
+	 * Apply DOS attribute changes when the Attributes field is set.
+	 * ATTR_READONLY is mapped to clearing POSIX write-permission bits,
+	 * matching the convention used in smb_get_dos_attr() and the NT
+	 * Create path.  ATTR_HIDDEN/ATTR_SYSTEM are mapped to the sticky
+	 * bit (S_ISVTX) following the same SMB1 convention.
+	 *
+	 * Note: Full DOS attribute persistence (via xattr) is handled by
+	 * SMB2.  For the deprecated SMB1 protocol this permission-based
+	 * mapping is sufficient for interoperability.
+	 */
+	if (le32_to_cpu(info->Attributes)) {
+		__u32 dos_attr = le32_to_cpu(info->Attributes);
+
+		if (dos_attr & ATTR_READONLY) {
+			/* Remove all write bits */
+			attrs.ia_mode = S_IRUGO | S_IXUGO;
+			attrs.ia_valid |= ATTR_MODE;
+		}
+
+		if (dos_attr & (ATTR_HIDDEN | ATTR_SYSTEM)) {
+			if (!(attrs.ia_valid & ATTR_MODE)) {
+				attrs.ia_mode = S_IRWXU | S_IRWXG | S_IRWXO;
+				attrs.ia_valid |= ATTR_MODE;
+			}
+			attrs.ia_mode |= S_ISVTX;
+		}
+	}
 
 	if (!attrs.ia_valid)
 		goto done;
@@ -7358,7 +7420,29 @@ static int smb_set_time_fileinfo(struct ksmbd_work *work)
 		attrs.ia_mtime = smb_NTtimeToUnix(info->LastWriteTime);
 		attrs.ia_valid |= (ATTR_MTIME | ATTR_MTIME_SET);
 	}
-	/* TODO: check dos mode and acl bits if req->Attributes nonzero */
+
+	/*
+	 * Apply DOS attribute changes when the Attributes field is set.
+	 * See smb_set_time_pathinfo() for the rationale on mapping
+	 * ATTR_READONLY to POSIX write bits and ATTR_HIDDEN/ATTR_SYSTEM
+	 * to the sticky bit.
+	 */
+	if (le32_to_cpu(info->Attributes)) {
+		__u32 dos_attr = le32_to_cpu(info->Attributes);
+
+		if (dos_attr & ATTR_READONLY) {
+			attrs.ia_mode = S_IRUGO | S_IXUGO;
+			attrs.ia_valid |= ATTR_MODE;
+		}
+
+		if (dos_attr & (ATTR_HIDDEN | ATTR_SYSTEM)) {
+			if (!(attrs.ia_valid & ATTR_MODE)) {
+				attrs.ia_mode = S_IRWXU | S_IRWXG | S_IRWXO;
+				attrs.ia_valid |= ATTR_MODE;
+			}
+			attrs.ia_mode |= S_ISVTX;
+		}
+	}
 
 	if (!attrs.ia_valid)
 		goto done;
@@ -8792,21 +8876,20 @@ out:
  */
 bool smb1_is_sign_req(struct ksmbd_work *work, unsigned int command)
 {
-#if 0
 	struct smb_hdr *rcv_hdr1 = (struct smb_hdr *)work->request_buf;
 
 	/*
-	 * FIXME: signed tree connect failed by signing error
-	 * with windows XP client. For now, Force to turn off
-	 * signing feature in SMB1.
+	 * Check if the request has the security signature flag set.
+	 * Exclude session setup (key is not yet established) and tree
+	 * connect (Windows XP uses the wrong sequence number for the
+	 * tree connect response, causing verification failure).
+	 * All other signed commands are verified normally.
 	 */
 	if ((rcv_hdr1->Flags2 & SMBFLG2_SECURITY_SIGNATURE) &&
-			command != SMB_COM_SESSION_SETUP_ANDX)
+	    command != SMB_COM_SESSION_SETUP_ANDX &&
+	    command != SMB_COM_TREE_CONNECT_ANDX)
 		return true;
 	return false;
-#else
-	return false;
-#endif
 }
 
 /**

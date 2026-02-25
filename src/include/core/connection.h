@@ -122,6 +122,11 @@ struct ksmbd_conn {
 	refcount_t			refcnt;
 	unsigned long			features;  /* per-connection negotiated features */
 
+#ifdef CONFIG_SMB_INSECURE_SERVER
+	/* Negotiated CIFS UNIX extension capabilities (SMB1 only) */
+	__u64				unix_caps;
+#endif
+
 #ifdef CONFIG_KSMBD_FRUIT
 	bool				is_fruit;
 	/* Fruit SMB Extension Support */
