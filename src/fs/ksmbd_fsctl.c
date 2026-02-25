@@ -1316,6 +1316,32 @@ out:
 	return ret;
 }
 
+/**
+ * fsctl_mark_handle_handler() - FSCTL_MARK_HANDLE
+ *
+ * Marks a file handle for special behavior (USN journal, backup
+ * semantics). Accept as hint with file handle validation.
+ */
+static int fsctl_mark_handle_handler(struct ksmbd_work *work,
+				     u64 id, void *in_buf,
+				     unsigned int in_buf_len,
+				     unsigned int max_out_len,
+				     struct smb2_ioctl_rsp *rsp,
+				     unsigned int *out_len)
+{
+	struct ksmbd_file *fp;
+
+	fp = ksmbd_lookup_fd_fast(work, id);
+	if (!fp) {
+		rsp->hdr.Status = STATUS_INVALID_HANDLE;
+		return -ENOENT;
+	}
+
+	ksmbd_fd_put(work, fp);
+	*out_len = 0;
+	return 0;
+}
+
 static int fsctl_set_sparse_handler(struct ksmbd_work *work,
 				    u64 id, void *in_buf,
 				    unsigned int in_buf_len,
@@ -2090,6 +2116,11 @@ static struct ksmbd_fsctl_handler builtin_fsctl_handlers[] = {
 	{
 		.ctl_code = FSCTL_DUPLICATE_EXTENTS_TO_FILE_EX,
 		.handler  = fsctl_duplicate_extents_ex_handler,
+		.owner    = THIS_MODULE,
+	},
+	{
+		.ctl_code = FSCTL_MARK_HANDLE,
+		.handler  = fsctl_mark_handle_handler,
 		.owner    = THIS_MODULE,
 	},
 };
