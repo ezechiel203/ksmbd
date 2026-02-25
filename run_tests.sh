@@ -331,11 +331,20 @@ build_test_modules() {
 run_test_suite() {
     local suite="$1"
     local extra_args=()
+    local benchmark_mount="${KSMBD_BENCHMARK_MOUNT:-}"
 
     log_header "Running $suite Tests"
 
     local cmd=()
     local cmd_desc=""
+
+    if [[ "$USE_NATIVE_SUITES" == "true" && "$suite" == "all" ]]; then
+        run_test_suite "unit" || return $?
+        run_test_suite "integration" || return $?
+        run_test_suite "security" || return $?
+        run_test_suite "performance" || return $?
+        return $EXIT_SUCCESS
+    fi
 
     if [[ "$USE_NATIVE_SUITES" == "true" ]]; then
         case "$suite" in
@@ -343,16 +352,37 @@ run_test_suite() {
                 cmd=("${ROOT_DIR}/test_compilation.sh")
                 ;;
             "integration")
+                if [[ "$(id -u)" -ne 0 ]]; then
+                    log_warning "Skipping integration tests: root privileges required"
+                    return $EXIT_SUCCESS
+                fi
                 cmd=("${ROOT_DIR}/tests/run_integration.sh" "--skip-smbtorture")
                 ;;
             "performance")
-                cmd=("${ROOT_DIR}/benchmarks/run_benchmarks.sh" "--help")
+                if [[ -z "$benchmark_mount" ]]; then
+                    log_warning "Skipping performance tests: set KSMBD_BENCHMARK_MOUNT"
+                    return $EXIT_SUCCESS
+                fi
+                if [[ ! -d "$benchmark_mount" ]]; then
+                    log_warning "Skipping performance tests: mount path does not exist: $benchmark_mount"
+                    return $EXIT_SUCCESS
+                fi
+                if ! command -v fio >/dev/null 2>&1; then
+                    log_warning "Skipping performance tests: fio is not installed"
+                    return $EXIT_SUCCESS
+                fi
+                cmd=("${ROOT_DIR}/benchmarks/run_benchmarks.sh" "--mount" "$benchmark_mount" "--quick")
                 ;;
             "security")
-                cmd=("${ROOT_DIR}/tests/run_smbtorture.sh" "--list")
-                ;;
-            "all")
-                cmd=("bash" "-lc" "${ROOT_DIR}/test_compilation.sh && ${ROOT_DIR}/tests/run_integration.sh --help && ${ROOT_DIR}/tests/run_smbtorture.sh --list && ${ROOT_DIR}/benchmarks/run_benchmarks.sh --help")
+                if [[ "$(id -u)" -ne 0 ]]; then
+                    log_warning "Skipping security tests: root privileges required"
+                    return $EXIT_SUCCESS
+                fi
+                if ! command -v smbtorture >/dev/null 2>&1; then
+                    log_warning "Skipping security tests: smbtorture is not installed"
+                    return $EXIT_SUCCESS
+                fi
+                cmd=("${ROOT_DIR}/tests/run_smbtorture.sh" "--quick")
                 ;;
             *)
                 log_error "Unknown test suite: $suite"
@@ -403,7 +433,9 @@ run_test_suite() {
     local test_output=""
 
     # Run tests with timeout
-    if ! test_output=$("${cmd[@]}" 2>&1); then
+    if test_output=$("${cmd[@]}" 2>&1); then
+        :
+    else
         local test_exit_code=$?
         log_error "Test suite '$suite' failed with exit code: $test_exit_code"
         echo "$test_output" >> "$TEST_LOG"

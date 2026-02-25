@@ -54,7 +54,43 @@
 #include "ksmbd_notify.h"
 #include "ksmbd_info.h"
 #include "ksmbd_buffer.h"
+#include "ksmbd_dfs.h"
 #include "smb2pdu_internal.h"
+
+static char *ksmbd_extract_dfs_root_sharename(struct unicode_map *um,
+					      const char *treename)
+{
+	const char *p = treename;
+	const char *share_start;
+	const char *share_end;
+	char *share, *cf_share;
+
+	while (*p == '\\' || *p == '/')
+		p++;
+
+	/* server component */
+	while (*p && *p != '\\' && *p != '/')
+		p++;
+	if (!*p)
+		return ERR_PTR(-EINVAL);
+
+	while (*p == '\\' || *p == '/')
+		p++;
+	share_start = p;
+	while (*p && *p != '\\' && *p != '/')
+		p++;
+	share_end = p;
+	if (share_end == share_start)
+		return ERR_PTR(-EINVAL);
+
+	share = kstrndup(share_start, share_end - share_start, KSMBD_DEFAULT_GFP);
+	if (!share)
+		return ERR_PTR(-ENOMEM);
+
+	cf_share = ksmbd_casefold_sharename(um, share);
+	kfree(share);
+	return cf_share;
+}
 
 /**
  * smb2_tree_connect() - handler for smb2 tree connect command
@@ -68,12 +104,13 @@ int smb2_tree_connect(struct ksmbd_work *work)
 	struct smb2_tree_connect_req *req;
 	struct smb2_tree_connect_rsp *rsp;
 	struct ksmbd_session *sess = work->sess;
-	char *treename = NULL, *name = NULL;
+	char *treename = NULL, *name = NULL, *dfs_name = ERR_PTR(-EINVAL);
 	struct ksmbd_tree_conn_status status = {
 		.ret = KSMBD_TREE_CONN_STATUS_ERROR,
 		.tree_conn = NULL,
 	};
 	struct ksmbd_share_config *share = NULL;
+	bool dfs_op;
 	int rc = -EINVAL;
 
 	ksmbd_debug(SMB, "Received smb2 tree connect request\n");
@@ -96,14 +133,8 @@ int smb2_tree_connect(struct ksmbd_work *work)
 		goto out_err1;
 	}
 
-	/*
-	 * When SMB2_FLAGS_DFS_OPERATIONS is set, the tree path may
-	 * contain a DFS prefix.  Log the DFS operation for debugging.
-	 * Full DFS path resolution (stripping the DFS prefix and
-	 * redirecting to the correct share) will be implemented when
-	 * IPC integration with ksmbd.mountd is available.
-	 */
-	if (req->hdr.Flags & SMB2_FLAGS_DFS_OPERATIONS)
+	dfs_op = !!(req->hdr.Flags & SMB2_FLAGS_DFS_OPERATIONS);
+	if (dfs_op)
 		ksmbd_debug(SMB,
 			    "DFS flag set for tree connect: %s\n",
 			    treename);
@@ -118,6 +149,20 @@ int smb2_tree_connect(struct ksmbd_work *work)
 		    name, treename);
 
 	status = ksmbd_tree_conn_connect(work, name);
+	if (status.ret != KSMBD_TREE_CONN_STATUS_OK && dfs_op) {
+		dfs_name = ksmbd_extract_dfs_root_sharename(conn->um, treename);
+		if (!IS_ERR(dfs_name) && strcmp(name, dfs_name)) {
+			ksmbd_debug(SMB,
+				    "retry tree connect using DFS root share %s\n",
+				    dfs_name);
+			status = ksmbd_tree_conn_connect(work, dfs_name);
+			if (status.ret == KSMBD_TREE_CONN_STATUS_OK) {
+				kfree(name);
+				name = dfs_name;
+				dfs_name = ERR_PTR(-EINVAL);
+			}
+		}
+	}
 	if (status.ret == KSMBD_TREE_CONN_STATUS_OK)
 		rsp->hdr.Id.SyncId.TreeId = cpu_to_le32(status.tree_conn->id);
 	else
@@ -156,15 +201,18 @@ int smb2_tree_connect(struct ksmbd_work *work)
 	write_unlock(&sess->tree_conns_lock);
 	rsp->StructureSize = cpu_to_le16(16);
 out_err1:
+	rsp->Capabilities = 0;
 	if (server_conf.flags & KSMBD_GLOBAL_FLAG_DURABLE_HANDLE && share &&
 	    test_share_config_flag(share,
 				   KSMBD_SHARE_FLAG_CONTINUOUS_AVAILABILITY))
-		rsp->Capabilities = SMB2_SHARE_CAP_CONTINUOUS_AVAILABILITY;
-	else
-		rsp->Capabilities = 0;
+		rsp->Capabilities |= SMB2_SHARE_CAP_CONTINUOUS_AVAILABILITY;
+	if (ksmbd_dfs_enabled())
+		rsp->Capabilities |= SMB2_SHARE_CAP_DFS;
 	rsp->Reserved = 0;
 	/* default manual caching */
-	rsp->ShareFlags = SMB2_SHAREFLAG_MANUAL_CACHING;
+	rsp->ShareFlags = cpu_to_le32(SMB2_SHAREFLAG_MANUAL_CACHING);
+	if (ksmbd_dfs_enabled())
+		rsp->ShareFlags |= cpu_to_le32(SHI1005_FLAGS_DFS);
 
 	rc = ksmbd_iov_pin_rsp(work, rsp, sizeof(struct smb2_tree_connect_rsp));
 	if (rc) {
@@ -177,6 +225,8 @@ out_err1:
 		kfree(treename);
 	if (!IS_ERR(name))
 		kfree(name);
+	if (!IS_ERR(dfs_name))
+		kfree(dfs_name);
 
 	switch (status.ret) {
 	case KSMBD_TREE_CONN_STATUS_OK:

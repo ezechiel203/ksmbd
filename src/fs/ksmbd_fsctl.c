@@ -715,6 +715,7 @@ struct fsctl_starting_vcn_input {
 
 struct fsctl_retrieval_pointers_hdr {
 	__le32 ExtentCount;
+	__le32 Reserved;	/* alignment padding per MS-FSCC 2.3.33 */
 	__le64 StartingVcn;
 } __packed;
 
@@ -770,6 +771,7 @@ static int fsctl_get_retrieval_pointers_handler(struct ksmbd_work *work,
 
 		out_hdr = (struct fsctl_retrieval_pointers_hdr *)&rsp->Buffer[0];
 		out_hdr->ExtentCount = 0;
+		out_hdr->Reserved = 0;
 		out_hdr->StartingVcn = cpu_to_le64(starting_vcn);
 		*out_len = sizeof(*out_hdr);
 		ksmbd_fd_put(work, fp);
@@ -784,6 +786,7 @@ static int fsctl_get_retrieval_pointers_handler(struct ksmbd_work *work,
 
 	out_rsp = (struct fsctl_retrieval_pointers_rsp *)&rsp->Buffer[0];
 	out_rsp->hdr.ExtentCount = cpu_to_le32(1);
+	out_rsp->hdr.Reserved = 0;
 	out_rsp->hdr.StartingVcn = cpu_to_le64(starting_vcn);
 	out_rsp->extents[0].NextVcn = cpu_to_le64(total_clusters);
 	out_rsp->extents[0].Lcn = cpu_to_le64(starting_vcn);
@@ -1216,7 +1219,10 @@ out:
 #define DUPLICATE_EXTENTS_DATA_EX_SOURCE_ATOMIC 0x00000001
 
 struct duplicate_extents_data_ex {
-	__le64 SourceFileId;
+	__le32 StructureSize;
+	__le32 Reserved;
+	__u64  PersistentFileHandle;  /* opaque endianness */
+	__u64  VolatileFileHandle;
 	__le64 SourceFileOffset;
 	__le64 TargetFileOffset;
 	__le64 ByteCount;
@@ -1247,7 +1253,8 @@ static int fsctl_duplicate_extents_ex_handler(struct ksmbd_work *work,
 
 	dup_ext = (struct duplicate_extents_data_ex *)in_buf;
 
-	fp_in = ksmbd_lookup_fd_fast(work, le64_to_cpu(dup_ext->SourceFileId));
+	fp_in = ksmbd_lookup_fd_slow(work, dup_ext->VolatileFileHandle,
+				     dup_ext->PersistentFileHandle);
 	if (!fp_in) {
 		rsp->hdr.Status = STATUS_INVALID_HANDLE;
 		return -ENOENT;
@@ -2225,6 +2232,11 @@ static struct ksmbd_fsctl_handler builtin_fsctl_handlers[] = {
 	},
 	{
 		.ctl_code = FSCTL_SET_INTEGRITY_INFORMATION,
+		.handler  = fsctl_set_integrity_info_handler,
+		.owner    = THIS_MODULE,
+	},
+	{
+		.ctl_code = FSCTL_SET_INTEGRITY_INFORMATION_EX,
 		.handler  = fsctl_set_integrity_info_handler,
 		.owner    = THIS_MODULE,
 	},

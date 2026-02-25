@@ -801,6 +801,144 @@ out:
 	return err;
 }
 
+static int smb2_dispatch_create_context_handlers_pass(struct ksmbd_work *work,
+						      struct smb2_create_req *req,
+						      struct ksmbd_file *fp,
+						      bool app_instance_id_only)
+{
+	struct create_context *cc;
+	unsigned int next = 0;
+	unsigned int remain_len;
+
+	if (!req->CreateContextsOffset || !req->CreateContextsLength)
+		return 0;
+
+	cc = (struct create_context *)((char *)req +
+				       le32_to_cpu(req->CreateContextsOffset));
+	remain_len = le32_to_cpu(req->CreateContextsLength);
+
+	do {
+		struct ksmbd_create_ctx_handler *h;
+		char *name;
+		void *ctx_data;
+		unsigned int name_off, name_len, value_off, value_len, cc_len;
+		bool is_app_instance_id;
+		int rc;
+
+		cc = (struct create_context *)((char *)cc + next);
+		if (remain_len < offsetof(struct create_context, Buffer))
+			return -EINVAL;
+
+		next = le32_to_cpu(cc->Next);
+		name_off = le16_to_cpu(cc->NameOffset);
+		name_len = le16_to_cpu(cc->NameLength);
+		value_off = le16_to_cpu(cc->DataOffset);
+		value_len = le32_to_cpu(cc->DataLength);
+		cc_len = next ? next : remain_len;
+
+		if ((next & 0x7) != 0 ||
+		    next > remain_len ||
+		    name_off != offsetof(struct create_context, Buffer) ||
+		    name_len < 4 ||
+		    name_off + name_len > cc_len ||
+		    (value_off & 0x7) != 0 ||
+		    (value_len &&
+		     value_off < name_off + (name_len < 8 ? 8 : name_len)) ||
+		    (u64)value_off + value_len > cc_len)
+			return -EINVAL;
+
+		name = (char *)cc + name_off;
+		ctx_data = (char *)cc + value_off;
+		is_app_instance_id =
+			(name_len == 16 &&
+			 !memcmp(name, SMB2_CREATE_APP_INSTANCE_ID, 16));
+		if (is_app_instance_id != app_instance_id_only)
+			goto next_ctx;
+
+		h = ksmbd_find_create_context(name, name_len);
+		if (!h)
+			goto next_ctx;
+
+		if (!h->on_request) {
+			ksmbd_put_create_context(h);
+			goto next_ctx;
+		}
+
+		rc = h->on_request(work, fp, ctx_data, value_len);
+		ksmbd_put_create_context(h);
+		if (rc)
+			return rc;
+
+next_ctx:
+		remain_len -= next;
+	} while (next != 0);
+
+	return 0;
+}
+
+static int smb2_dispatch_registered_create_contexts(struct ksmbd_work *work,
+						    struct smb2_create_req *req,
+						    struct ksmbd_file *fp)
+{
+	int rc;
+
+	/*
+	 * Process APP_INSTANCE_VERSION before APP_INSTANCE_ID to preserve
+	 * version-aware close semantics regardless of request context order.
+	 */
+	rc = smb2_dispatch_create_context_handlers_pass(work, req, fp, false);
+	if (rc)
+		return rc;
+
+	return smb2_dispatch_create_context_handlers_pass(work, req, fp, true);
+}
+
+static int smb2_resolve_open_by_file_id(struct ksmbd_work *work,
+					struct smb2_create_req *req,
+					char **name)
+{
+	__le64 file_id_le[2];
+	u64 volatile_id;
+	u64 persistent_id = KSMBD_NO_FID;
+	unsigned int name_len = le16_to_cpu(req->NameLength);
+	unsigned int name_off = le16_to_cpu(req->NameOffset);
+	struct ksmbd_file *id_fp;
+	char *path_name;
+
+	if (name_len != sizeof(__le64) &&
+	    name_len != 2 * sizeof(__le64))
+		return -EINVAL;
+
+	if ((u64)name_off + name_len >
+	    get_rfc1002_len(work->request_buf) + 4)
+		return -EINVAL;
+
+	memcpy(file_id_le, (char *)req + name_off, name_len);
+	volatile_id = le64_to_cpu(file_id_le[0]);
+	if (name_len == 2 * sizeof(__le64))
+		persistent_id = le64_to_cpu(file_id_le[1]);
+
+	if (persistent_id != KSMBD_NO_FID)
+		id_fp = ksmbd_lookup_fd_slow(work, volatile_id, persistent_id);
+	else
+		id_fp = ksmbd_lookup_fd_fast(work, volatile_id);
+	if (!id_fp)
+		return -ENOENT;
+
+	path_name = convert_to_nt_pathname(work->tcon->share_conf,
+					   &id_fp->filp->f_path);
+	ksmbd_fd_put(work, id_fp);
+	if (IS_ERR(path_name))
+		return PTR_ERR(path_name);
+
+	ksmbd_conv_path_to_unix(path_name);
+	if (path_name[0] == '/')
+		memmove(path_name, path_name + 1, strlen(path_name));
+
+	*name = path_name;
+	return 0;
+}
+
 /**
  * smb2_open() - handler for smb file open request
  * @work:	smb work containing request buffer
@@ -893,13 +1031,19 @@ int smb2_open(struct ksmbd_work *work)
 			goto err_out2;
 		}
 
-		name = smb2_get_name((char *)req + le16_to_cpu(req->NameOffset),
-				     le16_to_cpu(req->NameLength),
-				     work->conn->local_nls);
-		if (IS_ERR(name)) {
-			rc = PTR_ERR(name);
-			name = NULL;
-			goto err_out2;
+		if (req->CreateOptions & FILE_OPEN_BY_FILE_ID_LE) {
+			rc = smb2_resolve_open_by_file_id(work, req, &name);
+			if (rc < 0)
+				goto err_out2;
+		} else {
+			name = smb2_get_name((char *)req + le16_to_cpu(req->NameOffset),
+					     le16_to_cpu(req->NameLength),
+					     work->conn->local_nls);
+			if (IS_ERR(name)) {
+				rc = PTR_ERR(name);
+				name = NULL;
+				goto err_out2;
+			}
 		}
 
 		ksmbd_debug(SMB, "converted name = %s\n", name);
@@ -1007,17 +1151,26 @@ int smb2_open(struct ksmbd_work *work)
 				   le32_to_cpu(req->CreateOptions));
 		rc = -EINVAL;
 		goto err_out2;
-	} else {
-		if (req->CreateOptions & FILE_SEQUENTIAL_ONLY_LE &&
-		    req->CreateOptions & FILE_RANDOM_ACCESS_LE)
-			req->CreateOptions &= ~(FILE_SEQUENTIAL_ONLY_LE);
+		} else {
+			if (req->CreateOptions & FILE_SEQUENTIAL_ONLY_LE &&
+			    req->CreateOptions & FILE_RANDOM_ACCESS_LE)
+				req->CreateOptions &= ~(FILE_SEQUENTIAL_ONLY_LE);
 
-		if (req->CreateOptions &
-		    (FILE_OPEN_BY_FILE_ID_LE | CREATE_TREE_CONNECTION |
-		     FILE_RESERVE_OPFILTER_LE)) {
-			rc = -EOPNOTSUPP;
-			goto err_out2;
-		}
+			if (req->CreateOptions & CREATE_TREE_CONNECTION) {
+				req->CreateOptions &= ~CREATE_TREE_CONNECTION;
+			}
+
+			if (req->CreateOptions & FILE_RESERVE_OPFILTER_LE) {
+				req->CreateOptions &= ~FILE_RESERVE_OPFILTER_LE;
+			}
+
+			if (req->CreateOptions & FILE_OPEN_BY_FILE_ID_LE) {
+				if (!name) {
+					rc = -EINVAL;
+					goto err_out2;
+				}
+				req->CreateOptions &= ~FILE_OPEN_BY_FILE_ID_LE;
+			}
 
 		if (req->CreateOptions & FILE_DIRECTORY_FILE_LE) {
 			if (req->CreateOptions & FILE_NON_DIRECTORY_FILE_LE) {
@@ -1053,9 +1206,9 @@ int smb2_open(struct ksmbd_work *work)
 
 	if (req->CreateContextsOffset) {
 		/*
-		 * TODO: dispatch to registered create context handlers
-		 * via ksmbd_find_create_context() instead of inline
-		 * processing.  See ksmbd_create_ctx.h for the API.
+		 * Built-in contexts are parsed inline below. Registered
+		 * create context handlers are dispatched post-open once
+		 * a ksmbd_file exists.
 		 */
 
 		/* Parse non-durable handle create contexts */
@@ -1569,6 +1722,12 @@ int smb2_open(struct ksmbd_work *work)
 	list_add(&fp->node, &fp->f_ci->m_fp_list);
 	up_write(&fp->f_ci->m_lock);
 
+	if (req->CreateContextsOffset) {
+		rc = smb2_dispatch_registered_create_contexts(work, req, fp);
+		if (rc)
+			goto err_out1;
+	}
+
 	/* Check delete pending among previous fp before oplock break */
 	if (ksmbd_inode_pending_delete(fp)) {
 		rc = -EBUSY;
@@ -1948,13 +2107,11 @@ err_out2:
 		ksmbd_update_fstate(&work->sess->file_table, fp, FP_INITED);
 		rc = ksmbd_iov_pin_rsp(work, (void *)rsp, iov_len);
 	}
-	if (rc) {
-		if (rc == -EINVAL)
-			rsp->hdr.Status = STATUS_INVALID_PARAMETER;
-		else if (rc == -EOPNOTSUPP)
-			rsp->hdr.Status = STATUS_NOT_SUPPORTED;
-		else if (rc == -EACCES || rc == -ESTALE || rc == -EXDEV)
-			rsp->hdr.Status = STATUS_ACCESS_DENIED;
+		if (rc) {
+			if (rc == -EINVAL || rc == -EOPNOTSUPP)
+				rsp->hdr.Status = STATUS_INVALID_PARAMETER;
+			else if (rc == -EACCES || rc == -ESTALE || rc == -EXDEV)
+				rsp->hdr.Status = STATUS_ACCESS_DENIED;
 		else if (rc == -ENOENT)
 			rsp->hdr.Status = STATUS_OBJECT_NAME_INVALID;
 		else if (rc == -EPERM)

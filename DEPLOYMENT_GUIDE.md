@@ -1,521 +1,510 @@
-# Apple SMB Extensions Deployment Guide
+# KSMBD Deployment Guide
 
-## Overview
+This guide is written for multiple audiences:
 
-This guide provides step-by-step instructions for deploying KSMBD with Apple SMB extensions to enable Time Machine compatibility and performance improvements for Apple clients.
+- `Sysadmins` running production Linux SMB services.
+- `NAS users` deploying on home lab or appliance-style Linux NAS.
+- `End users` who only need to connect clients.
+- `Platform engineers` automating CI/CD style deployments.
 
-## System Requirements
+It reflects the current repository Makefiles and deployment workflow.
 
-### Kernel Requirements
-- **Linux Kernel**: 5.4 or later (KSMBD minimum requirement)
-- **Architecture**: x86_64, ARM64 (Apple Silicon compatible)
-- **Memory**: Minimum 2GB RAM (4GB recommended for Time Machine)
+## 1. What You Deploy
 
-### Development Tools
-```bash
-# Required packages for Ubuntu/Debian
-sudo apt-get update
-sudo apt-get install build-essential linux-headers-$(uname -r)
-sudo apt-get install git make gcc
+KSMBD deployment has two parts:
 
-# Required packages for RHEL/CentOS
-sudo yum update
-sudo yum groupinstall "Development Tools"
-sudo yum install kernel-devel-$(uname -r)
-```
+- `ksmbd` kernel module (this repository).
+- `ksmbd-tools` userspace daemons and admin tools (`ksmbd.mountd`, `ksmbd.adduser`, `ksmbd.control`).
 
-## Pre-Deployment Checklist
+Typical flow:
 
-### ✅ **System Preparation**
-1. **Backup existing KSMBD installation** (if any)
-2. **Verify kernel compatibility**: `uname -r` should be 5.4+
-3. **Install development tools**: Verify build environment
-4. **Check disk space**: Minimum 1GB available for build
-5. **Network configuration**: Ensure port 445 is available
+1. Build module.
+2. Install module into `/lib/modules/$(uname -r)`.
+3. Load module (`modprobe ksmbd`).
+4. Install/configure `ksmbd-tools`.
+5. Configure shares and users.
 
-### ✅ **Apple Client Preparation**
-1. **macOS version**: 10.15 (Catalina) or later recommended
-2. **iOS version**: 13.0 or later for mobile clients
-3. **Network connectivity**: Test basic SMB connectivity
-4. **Time Machine**: Verify Time Machine is disabled initially
+## 2. Quick Start by Audience
 
-## Deployment Steps
-
-### Step 1: Build KSMBD with Apple Extensions
+### Sysadmin Quick Start (single host)
 
 ```bash
-# Navigate to KSMBD source directory
 cd /path/to/ksmbd
-
-# Clean any previous builds
-make clean
-
-# Build the kernel module with Apple extensions
-make
-
-# Verify successful build
-ls -la ksmbd.ko
+make -j"$(nproc)"
+sudo make deploy
+lsmod | grep '^ksmbd'
+modinfo -n ksmbd
 ```
 
-**Expected Output**:
-```
--rw-r--r-- 1 user user 1234567 Oct 19 17:30 ksmbd.ko
-```
-
-### Step 2: Install the Kernel Module
+### NAS User Quick Start (home server)
 
 ```bash
-# Install the module
-sudo make install
-
-# Verify module installation
-modinfo ksmbd | grep -E "(version|filename)"
+cd /path/to/ksmbd
+make -j"$(nproc)"
+sudo make deploy
+sudo ufw allow 445/tcp    # if ufw is used
 ```
 
-**Expected Output**:
-```
-filename:       /lib/modules/5.15.0/kernel/fs/ksmbd/ksmbd.ko
-version:        3.5.3
-license:        GPL
-```
+Then continue with `ksmbd-tools` and share config sections.
 
-### Step 3: Load the KSMBD Module
+### End User Quick Start (client only)
+
+End users do not build or deploy.
+
+1. Ask admin for server hostname/IP, share name, username/password.
+2. Connect from client:
+
+- Windows: `\\server-ip\share`
+- macOS Finder: `smb://server-ip/share`
+- Linux: `mount -t cifs //server-ip/share /mnt/share -o username=<user>`
+
+### Remote Cross-Deploy Quick Start (All Supported Architectures)
 
 ```bash
-# Load the kernel module
-sudo modprobe ksmbd
-
-# Verify module is loaded
-lsmod | grep ksmbd
-
-# Check kernel log for Apple extension initialization
-dmesg | grep -i ksmbd | tail -10
+cd /path/to/ksmbd
+make remote-deploy-x86_64 X86_64_HOST=user@x86-host
+make remote-deploy-arm64 ARM64_HOST=user@arm64-host
+make remote-deploy-ppc64 PPC64_HOST=user@ppc64-host
 ```
 
-**Expected Output**:
-```
-ksmbd              1234567  0
-ksmbd: server initialized
-ksmbd: Apple SMB extensions loaded
-ksmbd: Apple capability negotiation enabled
-```
-
-### Step 4: Install and Configure ksmbd-tools
+Optional:
 
 ```bash
-# Download and install ksmbd-tools (if not already installed)
-wget https://github.com/cifsd-team/ksmbd-tools/releases/latest/download/ksmbd-tools.tar.gz
-tar -xzf ksmbd-tools.tar.gz
+make remote-deploy-arm64 \
+  ARM64_HOST=user@arm64-host \
+  ARM64_REMOTE_TMP=/tmp/ksmbd.ko
+```
+
+## 3. Prerequisites
+
+### Build Host Requirements
+
+- Linux kernel headers installed for running kernel.
+- Toolchain: `gcc`, `make`, `binutils`.
+- Root access for install/load operations.
+
+Debian/Ubuntu:
+
+```bash
+sudo apt-get update
+sudo apt-get install -y build-essential linux-headers-$(uname -r) git
+```
+
+RHEL/CentOS/Fedora:
+
+```bash
+sudo dnf install -y gcc make kernel-devel-$(uname -r) git
+```
+
+### Runtime Requirements
+
+- Port `445/tcp` reachable from clients.
+- Proper filesystem permissions for shared paths.
+- `ksmbd-tools` installed and configured.
+
+## 4. Module Build and Deployment (Primary Makefile)
+
+Run from repo root.
+
+### Core Targets
+
+- `make all` builds `ksmbd.ko`.
+- `sudo make install` builds then installs module under `/lib/modules/.../kernel/fs/ksmbd/`.
+- `sudo make deploy` installs and reloads module (`modprobe -r ksmbd` then `modprobe ksmbd`).
+- `sudo make undeploy` unloads module.
+- `sudo make uninstall` removes installed module tree and refreshes depmod.
+
+### Recommended Deployment Command
+
+```bash
+sudo make deploy
+```
+
+### Verification
+
+```bash
+uname -r
+lsmod | grep '^ksmbd'
+modinfo -n ksmbd
+sudo dmesg | grep -i ksmbd | tail -n 20
+```
+
+## 5. DKMS Deployment Path (Kernel Update Friendly)
+
+Use DKMS if hosts receive regular kernel upgrades.
+
+### Install with DKMS
+
+```bash
+sudo make dkms-install
+```
+
+Optional explicit version:
+
+```bash
+sudo make dkms-install PKGVER=20260225
+```
+
+### Remove DKMS Version
+
+```bash
+sudo make dkms-uninstall
+```
+
+Optional explicit version:
+
+```bash
+sudo make dkms-uninstall PKGVER=20260225
+```
+
+## 6. Cross-Compilation and Remote Deploy (x86_64, ARM64, PowerPC64)
+
+Architecture wrappers:
+
+- `Makefile.x86_64` (`x86_64`, default `x86_64-linux-gnu-`)
+- `Makefile.arm64` (`arm64`, default `aarch64-linux-gnu-`)
+- `Makefile.ppc64` (`powerpc`, default `powerpc64le-linux-gnu-`)
+
+Each wrapper handles:
+
+- cross-compiling for its target architecture
+- downloading matching Linux source tree for target kernel version
+- remote deployment via `scp` + `ssh`
+
+### Build Only (per architecture)
+
+```bash
+make -f Makefile.x86_64 all
+make -f Makefile.arm64 all
+make -f Makefile.ppc64 all
+```
+
+### Deploy to Remote Hosts
+
+```bash
+make -f Makefile.x86_64 deploy X86_64_HOST=user@x86-host
+make -f Makefile.arm64 deploy ARM64_HOST=user@arm64-host
+make -f Makefile.ppc64 deploy PPC64_HOST=user@ppc64-host
+```
+
+### Root Shortcut Targets
+
+```bash
+make remote-deploy-x86_64 X86_64_HOST=user@x86-host
+make remote-deploy-arm64 ARM64_HOST=user@arm64-host
+make remote-deploy-ppc64 PPC64_HOST=user@ppc64-host
+```
+
+### Security Model for Remote Deploy
+
+Remote deploy uses:
+
+1. `scp ksmbd.ko user@host:/tmp/ksmbd.ko`
+2. `ssh user@host 'sudo install ...; sudo depmod ...; sudo modprobe ...'`
+
+Recommendations:
+
+- Use SSH keys, not passwords, for automation.
+- Keep SSH host key checking enabled.
+- Use least-privilege `sudoers` rules for deploy account.
+
+Example remote sudoers drop-in (`/etc/sudoers.d/ksmbd-deploy`):
+
+```sudoers
+user ALL=(root) NOPASSWD:/usr/bin/install,/usr/sbin/depmod,/usr/sbin/modprobe
+```
+
+## 7. Install ksmbd-tools
+
+If your distro does not provide `ksmbd-tools`, build from included source:
+
+```bash
 cd ksmbd-tools
-
-# Compile and install
 ./autogen.sh
 ./configure --with-rundir=/run
-make
+make -j"$(nproc)"
 sudo make install
-
-# Verify installation
-which ksmbd.mountd
-which ksmbd.adduser
 ```
 
-### Step 5: Configure KSMBD for Apple Clients
+Verify:
 
-#### Create Configuration Directory
 ```bash
-sudo mkdir -p /usr/local/etc/ksmbd
+command -v ksmbd.mountd
+command -v ksmbd.adduser
+command -v ksmbd.control
+```
+
+## 8. Base Server Configuration
+
+Create config directory and data directories:
+
+```bash
+sudo mkdir -p /etc/ksmbd
+sudo mkdir -p /srv/ksmbd/public
 sudo mkdir -p /var/lib/ksmbd
 ```
 
-#### Create Main Configuration File
-```bash
-sudo tee /usr/local/etc/ksmbd/ksmbd.conf > /dev/null <<EOF
-# KSMBD Configuration with Apple Extensions
+Create `/etc/ksmbd/ksmbd.conf`:
 
+```ini
 [global]
-# Server identification
-server string = KSMBD Server with Apple Support
-work group = WORKGROUP
-netbios name = KSMBSERVER
-
-# Apple SMB extensions
-apple extensions = yes
-time machine support = yes
-readdirattr support = yes
-
-# Protocol settings
+workgroup = WORKGROUP
+server string = KSMBD Server
+netbios name = KSMBD
 min protocol = SMB2_10
 max protocol = SMB3_11
-signing = required
 
-# Performance settings
-max connections = 100
-deadtime = 15
-
-# Logging
-log level = 2
-log file = /var/log/ksmbd.log
-EOF
-```
-
-#### Configure Time Machine Share
-```bash
-sudo tee /usr/local/etc/ksmbd/ksmbd.conf.tm > /dev/null <<EOF
-# Time Machine Share Configuration
-
-[TimeMachine]
-# Share path (create this directory)
-path = /srv/timemachine
-comment = Time Machine Backup Share
-
-# Apple-specific settings
-apple time machine = yes
-vfs objects = fruit
-fruit:time machine = yes
-
-# Permissions
+[public]
+path = /srv/ksmbd/public
 read only = no
 guest ok = no
-valid users = tmuser
-
-# File settings
-create mask = 0666
-directory mask = 0777
-force user = tmuser
-force group = tmuser
-
-# Performance for large files
-large readwrite = yes
-EOF
+browseable = yes
 ```
 
-### Step 6: Create Time Machine User and Directory
+Set permissions:
 
 ```bash
-# Create Time Machine user
-sudo ksmbd.adduser -a tmuser
-# Enter and confirm password when prompted
-
-# Create Time Machine directory
-sudo mkdir -p /srv/timemachine
-sudo chown tmuser:tmuser /srv/timemachine
-sudo chmod 0755 /srv/timemachine
-
-# Verify directory permissions
-ls -la /srv/
+sudo chown -R root:root /srv/ksmbd
+sudo chmod -R 0755 /srv/ksmbd
 ```
 
-### Step 7: Start KSMBD Services
+Create SMB user:
 
 ```bash
-# Start the ksmbd.mountd daemon
-sudo ksmbd.mountd
-
-# Verify daemon is running
-ps aux | grep ksmbd.mountd
-
-# Check for Apple extension initialization
-sudo ksmbd.control -d "all"
-cat /sys/class/ksmbd-control/debug
+sudo ksmbd.adduser -a smbuser
 ```
 
-**Expected Output**:
-```
-[apple] auth vfs oplock ipc conn [rdma]
-```
-
-### Step 8: Configure Firewall
+Start daemon:
 
 ```bash
-# Open SMB port (445) in firewall
-sudo ufw allow 445/tcp
-# or for firewalld:
-sudo firewall-cmd --permanent --add-service=samba
-sudo firewall-cmd --reload
-```
-
-## Apple Client Configuration
-
-### macOS Client Setup
-
-#### Step 1: Connect to SMB Share
-```bash
-# In Finder, press Cmd+K or Go → Connect to Server
-# Enter server address: smb://server-ip-address
-# Connect with tmuser credentials
-```
-
-#### Step 2: Verify Apple Extensions
-```bash
-# Check if share appears as "SMB (OSX)" in Finder
-# Look for extended attributes support
-# Test directory listing performance
-```
-
-#### Step 3: Configure Time Machine
-```bash
-# Open System Preferences → Time Machine
-# Select "Add Backup Disk"
-# Choose the TimeMachine share
-# Enter credentials when prompted
-```
-
-### iOS/iPadOS Client Setup
-```bash
-# Open Files app
-# Tap Browse → Connect to Server
-# Enter server address and credentials
-# Access files and verify performance
-```
-
-## Verification and Testing
-
-### Test Apple Client Detection
-```bash
-# Connect from macOS client and check server logs
-sudo tail -f /var/log/ksmbd.log
-
-# Look for Apple detection messages:
-# "Apple client detected via AAPL context"
-# "Apple capability negotiation complete"
-```
-
-### Test Capability Negotiation
-```bash
-# Check negotiated capabilities
-sudo ksmbd.control -d "all"
-
-# Look for Apple debug messages
-dmesg | grep -i apple
-```
-
-### Test Directory Performance
-```bash
-# On macOS client, time directory listing
-time ls -la /Volumes/TimeMachine/large_directory
-
-# Expected: Significant improvement vs standard SMB
-```
-
-### Test Time Machine Backup
-```bash
-# Start initial Time Machine backup
-# Monitor progress and performance
-# Verify backup completion and integrity
-```
-
-## Monitoring and Maintenance
-
-### Check Apple Extension Status
-```bash
-# Check if Apple extensions are active
-cat /sys/class/ksmbd-control/debug
-
-# Monitor Apple-specific operations
-sudo tail -f /var/log/ksmbd.log | grep -i apple
-```
-
-### Performance Monitoring
-```bash
-# Monitor connection performance
-sudo ksmbd.control -s
-
-# Check active Apple connections
-sudo ss -tlnp | grep :445
-```
-
-### Log Analysis
-```bash
-# Monitor Apple client connections
-grep -i "Apple client detected" /var/log/ksmbd.log
-
-# Monitor capability negotiations
-grep -i "capability negotiation" /var/log/ksmbd.log
-
-# Monitor Time Machine operations
-grep -i "time machine" /var/log/ksmbd.log
-```
-
-## Troubleshooting
-
-### Common Issues and Solutions
-
-#### Issue 1: Apple Client Not Detected
-**Symptoms**: Share appears as standard SMB, not "SMB (OSX)"
-**Solutions**:
-```bash
-# Check debug logs
-sudo ksmbd.control -d "all"
-dmesg | grep -i ksmbd
-
-# Restart ksmbd services
-sudo pkill ksmbd.mountd
-sudo modprobe -r ksmbd
-sudo modprobe ksmbd
 sudo ksmbd.mountd
 ```
 
-#### Issue 2: Time Machine Connection Fails
-**Symptoms**: Time Machine cannot connect to backup share
-**Solutions**:
-```bash
-# Verify share configuration
-sudo ksmbd.control -s
+Run daemon with systemd (recommended for servers):
 
-# Check user authentication
-sudo ksmbd.adduser -l tmuser
+```ini
+# /etc/systemd/system/ksmbd-mountd.service
+[Unit]
+Description=KSMBD Mount Daemon
+After=network-online.target
+Wants=network-online.target
 
-# Verify directory permissions
-ls -la /srv/timemachine
+[Service]
+Type=simple
+ExecStart=/usr/sbin/ksmbd.mountd
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target
 ```
 
-#### Issue 3: Performance Not Improved
-**Symptoms**: Directory operations still slow
-**Solutions**:
 ```bash
-# Check if readdirattr is enabled
-cat /sys/class/ksmbd-control/debug | grep readdirattr
-
-# Verify Apple capability negotiation
-grep -i "capability" /var/log/ksmbd.log
-
-# Test with different macOS versions
+sudo systemctl daemon-reload
+sudo systemctl enable --now ksmbd-mountd.service
+sudo systemctl status ksmbd-mountd.service
 ```
 
-#### Issue 4: Module Load Failure
-**Symptoms**: modprobe ksmbd fails
-**Solutions**:
+## 9. Audience-Specific Guidance
+
+### Sysadmins (Production)
+
+Checklist:
+
+1. Pin deployment to maintenance windows.
+2. Deploy with DKMS on fleets.
+3. Use config management for `ksmbd.conf` and firewall rules.
+4. Monitor `dmesg`, service health, and connection metrics.
+5. Keep rollback command ready (`sudo make undeploy` + reinstall prior module).
+
+Recommended validation after each deployment:
+
 ```bash
-# Check kernel version compatibility
-uname -r
-# Should be 5.4 or later
+sudo make deploy
+lsmod | grep '^ksmbd'
+modinfo -n ksmbd
+sudo dmesg | grep -i -E 'ksmbd|smb' | tail -n 50
+```
 
-# Check for existing module
-lsmod | grep ksmbd
+### NAS Users (Home/SMB Appliance Style)
 
-# Remove and reload
-sudo modprobe -r ksmbd 2>/dev/null
+1. Confirm your NAS OS allows out-of-tree kernel modules.
+2. Keep a console path available in case module load fails.
+3. Prefer a dedicated test share before moving live data.
+4. Enable only required shares and users.
+5. Open only required port `445/tcp` on trusted LAN segments.
+
+Small-home example firewall:
+
+```bash
+sudo ufw allow from 192.168.1.0/24 to any port 445 proto tcp
+```
+
+### End Users (Clients)
+
+Windows:
+
+```powershell
+net use Z: \\server-ip\public /user:smbuser
+```
+
+macOS:
+
+1. Finder -> Go -> Connect to Server.
+2. Enter `smb://server-ip/public`.
+3. Authenticate with provided user credentials.
+
+Linux Desktop:
+
+```bash
+sudo mount -t cifs //server-ip/public /mnt/public -o username=smbuser
+```
+
+## 10. Security Hardening
+
+Minimum hardening baseline:
+
+1. Use SMB2/SMB3 only.
+2. Disable guest access unless explicitly needed.
+3. Restrict `445/tcp` by subnet.
+4. Use unique per-user credentials.
+5. Rotate credentials periodically.
+6. Keep kernel and userspace updated.
+
+Operational notes:
+
+- Out-of-tree modules taint the kernel.
+- Unsigned modules can be rejected in Secure Boot environments.
+- If Secure Boot is enabled, sign module or use approved key enrollment workflow.
+
+## 11. Upgrade and Rollback
+
+### Upgrade
+
+```bash
+git pull
+make -j"$(nproc)"
+sudo make deploy
+```
+
+### Rollback
+
+If new module causes regressions:
+
+```bash
+sudo make undeploy
+# reinstall previously known-good module package/artifact
 sudo modprobe ksmbd
 ```
 
-### Debug Mode Enablement
+If using DKMS:
+
 ```bash
-# Enable comprehensive debugging
-sudo ksmbd.control -d "all"
-
-# Check specific Apple debugging
-sudo ksmbd.control -d "apple"
-
-# Monitor debug output
-sudo tail -f /var/log/ksmbd.log
+sudo make dkms-uninstall PKGVER=<bad-version>
+# install prior good version
 ```
 
-## Performance Tuning
+## 12. Troubleshooting
 
-### Server-Side Optimizations
+### `ERROR: kernel build directory not found`
+
+Install matching kernel headers:
+
 ```bash
-# Increase connection limits for multiple Apple clients
-echo "max connections = 200" | sudo tee -a /usr/local/etc/ksmbd/ksmbd.conf
-
-# Optimize for large file transfers (Time Machine)
-echo "large readwrite = yes" | sudo tee -a /usr/local/etc/ksmbd/ksmbd.conf
-
-# Enable read-ahead for better performance
-echo "read size = 65536" | sudo tee -a /usr/local/etc/ksmbd/ksmbd.conf
+sudo apt-get install -y linux-headers-$(uname -r)
 ```
 
-### Network Optimizations
-```bash
-# Optimize TCP settings for SMB
-echo 'net.core.rmem_max = 16777216' | sudo tee -a /etc/sysctl.conf
-echo 'net.core.wmem_max = 16777216' | sudo tee -a /etc/sysctl.conf
-sudo sysctl -p
+### Module builds but fails to load
 
-# Enable jumbo frames if network supports it
-# Configure network interfaces for MTU 9000
+Check:
+
+```bash
+sudo dmesg | tail -n 100
+modinfo ksmbd
 ```
 
-## Security Considerations
+Common causes:
 
-### Enable SMB Signing
+- ABI mismatch with running kernel.
+- Missing signatures under Secure Boot.
+- Missing runtime dependencies.
+
+### Remote cross-architecture deploy fails
+
+Validate:
+
 ```bash
-# Ensure SMB signing is required for Apple clients
-echo "signing = required" | sudo tee -a /usr/local/etc/ksmbd/ksmbd.conf
+make -f Makefile.x86_64 check-toolchain
+make -f Makefile.arm64 check-toolchain
+make -f Makefile.ppc64 check-toolchain
+
+ssh user@target-host uname -m
 ```
 
-### Network Isolation
+Expected target architecture:
+
+- x86_64 workflow: `x86_64` (or `amd64`)
+- ARM64 workflow: `aarch64` (or `arm64`)
+- PowerPC64 workflow: `ppc64`/`ppc64le`
+
+### `sudo` prompts break automation
+
+For CI/CD deploy accounts, configure limited `NOPASSWD` rules only for required commands.
+
+## 13. Automation Notes
+
+For non-interactive pipelines:
+
+- Ensure deploy host has passwordless `sudo` for required commands.
+- Use SSH keys and locked-down deploy user.
+- Capture deployment logs and `dmesg` snippet as artifacts.
+
+Example pipeline step:
+
 ```bash
-# Restrict SMB access to specific networks
-echo "hosts allow = 192.168.1.0/24 10.0.0.0/8" | sudo tee -a /usr/local/etc/ksmbd/ksmbd.conf
-echo "hosts deny = all" | sudo tee -a /usr/local/etc/ksmbd/ksmbd.conf
+make -j"$(nproc)"
+sudo make deploy
+lsmod | grep '^ksmbd'
+modinfo -n ksmbd
 ```
 
-### User Authentication
-```bash
-# Use strong passwords for Time Machine users
-sudo ksmbd.adduser -p tmuser
+## 14. Operational Command Reference
 
-# Consider two-factor authentication for additional security
+From repo root:
+
+```bash
+make help
+make all
+make clean
+sudo make install
+sudo make deploy
+make remote-deploy-x86_64 X86_64_HOST=user@x86-host
+make remote-deploy-arm64 ARM64_HOST=user@arm64-host
+make remote-deploy-ppc64 PPC64_HOST=user@ppc64-host
+sudo make undeploy
+sudo make uninstall
+sudo make dkms-install
+sudo make dkms-uninstall
 ```
 
-## Backup and Recovery
+Cross wrappers:
 
-### Configuration Backup
 ```bash
-# Backup KSMBD configuration
-sudo cp -r /usr/local/etc/ksmbd /backup/ksmbd-config-$(date +%Y%m%d)
+make -f Makefile.x86_64 help
+make -f Makefile.x86_64 all
+make -f Makefile.x86_64 deploy X86_64_HOST=user@x86-host
+make -f Makefile.x86_64 clean
+make -f Makefile.x86_64 distclean
 
-# Backup user database
-sudo cp /var/lib/ksmbd/ksmbdpwd.db /backup/ksmbdpwd-$(date +%Y%m%d).db
+make -f Makefile.arm64 help
+make -f Makefile.arm64 all
+make -f Makefile.arm64 deploy ARM64_HOST=user@arm64-host
+make -f Makefile.arm64 clean
+make -f Makefile.arm64 distclean
+
+make -f Makefile.ppc64 help
+make -f Makefile.ppc64 all
+make -f Makefile.ppc64 deploy PPC64_HOST=user@ppc64-host
+make -f Makefile.ppc64 clean
+make -f Makefile.ppc64 distclean
 ```
-
-### Time Machine Backup Verification
-```bash
-# Verify Time Machine backup integrity
-tmutil verifybackup /Volumes/TimeMachine/backup_name
-
-# Check backup history
-tmutil listbackups
-```
-
-## Upgrade Path
-
-### Upgrading KSMBD with Apple Extensions
-```bash
-# Stop services
-sudo pkill ksmbd.mountd
-sudo modprobe -r ksmbd
-
-# Backup current installation
-sudo cp /lib/modules/$(uname -r)/kernel/fs/ksmbd/ksmbd.ko /backup/ksmbd-old.ko
-
-# Build and install new version
-make clean && make && sudo make install
-
-# Load new module
-sudo modprobe ksmbd
-sudo ksmbd.mountd
-```
-
-## Support and Documentation
-
-### Getting Help
-- **GitHub Issues**: https://github.com/cifsd-team/ksmbd/issues
-- **Documentation**: See ksmbd.rst in source tree
-- **Community Forums**: KSMBD mailing list
-
-### Log Locations
-- **System Logs**: `/var/log/syslog` or `journalctl -u ksmbd`
-- **KSMBD Logs**: `/var/log/ksmbd.log`
-- **Kernel Messages**: `dmesg | grep ksmbd`
-
-### Configuration Files
-- **Main Config**: `/usr/local/etc/ksmbd/ksmbd.conf`
-- **User Database**: `/var/lib/ksmbd/ksmbdpwd.db`
-- **Runtime State**: `/run/ksmbd/`
-
----
-
-**Deployment Status**: ✅ **Ready for Production**
-
-This deployment guide provides comprehensive instructions for successfully deploying KSMBD with Apple SMB extensions. Follow these steps carefully to enable Time Machine compatibility and achieve significant performance improvements for Apple clients.

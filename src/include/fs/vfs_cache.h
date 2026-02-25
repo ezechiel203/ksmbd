@@ -97,7 +97,9 @@ struct ksmbd_file {
 	char				create_guid[16];
 	char				app_instance_id[16];
 	bool				has_app_instance_id;
+	bool				has_app_instance_version;
 	u64				app_instance_version;
+	u64				app_instance_version_low;
 
 	struct stream			stream;
 	struct list_head		node;

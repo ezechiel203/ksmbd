@@ -464,7 +464,8 @@ int smb2_ioctl(struct ksmbd_work *work)
 	if (!has_file_id(id))
 		id = req->VolatileFileId;
 
-	if (req->Flags != cpu_to_le32(SMB2_0_IOCTL_IS_FSCTL)) {
+	if (req->Flags != cpu_to_le32(SMB2_0_IOCTL_IS_FSCTL) &&
+	    req->Flags != 0) {
 		ret = -EOPNOTSUPP;
 		goto out;
 	}
@@ -506,17 +507,17 @@ int smb2_ioctl(struct ksmbd_work *work)
 	if (ret != -EOPNOTSUPP)
 		goto done;
 
-	/* Fallback to legacy switch for unmigrated handlers */
+	/* Legacy compatibility fallback for non-registered handlers */
 	ret = 0;
 	switch (cnt_code) {
-	/* TODO: migrate to registered handler */
+	/* Legacy compatibility fallback */
 	case FSCTL_QUERY_NETWORK_INTERFACE_INFO:
 		ret = fsctl_query_iface_info_ioctl(conn, rsp, out_buf_len);
 		if (ret < 0)
 			goto out;
 		nbytes = ret;
 		break;
-	/* TODO: migrate to registered handler */
+	/* Legacy compatibility fallback */
 	case FSCTL_REQUEST_RESUME_KEY:
 		if (out_buf_len < sizeof(struct resume_key_ioctl_rsp)) {
 			ret = -EINVAL;
@@ -531,7 +532,7 @@ int smb2_ioctl(struct ksmbd_work *work)
 		rsp->VolatileFileId = req->VolatileFileId;
 		nbytes = sizeof(struct resume_key_ioctl_rsp);
 		break;
-	/* TODO: migrate to registered handler */
+	/* Legacy compatibility fallback */
 	case FSCTL_COPYCHUNK:
 	case FSCTL_COPYCHUNK_WRITE:
 		if (!test_tree_conn_flag(work->tcon, KSMBD_TREE_CONN_FLAG_WRITABLE)) {
@@ -562,7 +563,7 @@ int smb2_ioctl(struct ksmbd_work *work)
 				req->PersistentFileId,
 				rsp);
 		break;
-	/* TODO: migrate to registered handler */
+	/* Legacy compatibility fallback */
 	case FSCTL_SET_SPARSE:
 		if (in_buf_len < sizeof(struct file_sparse)) {
 			ret = -EINVAL;
@@ -573,7 +574,7 @@ int smb2_ioctl(struct ksmbd_work *work)
 		if (ret < 0)
 			goto out;
 		break;
-	/* TODO: migrate to registered handler */
+	/* Legacy compatibility fallback */
 	case FSCTL_SET_ZERO_DATA:
 	{
 		struct file_zero_data_information *zero_data;
@@ -617,7 +618,7 @@ int smb2_ioctl(struct ksmbd_work *work)
 		}
 		break;
 	}
-	/* TODO: migrate to registered handler */
+	/* Legacy compatibility fallback */
 	case FSCTL_QUERY_ALLOCATED_RANGES:
 		if (in_buf_len < sizeof(struct file_allocated_range_buffer)) {
 			ret = -EINVAL;
@@ -638,7 +639,7 @@ int smb2_ioctl(struct ksmbd_work *work)
 
 		nbytes *= sizeof(struct file_allocated_range_buffer);
 		break;
-	/* TODO: migrate to registered handler */
+	/* Legacy compatibility fallback */
 	case FSCTL_GET_REPARSE_POINT:
 	{
 		struct reparse_data_buffer *reparse_ptr;
@@ -659,7 +660,7 @@ int smb2_ioctl(struct ksmbd_work *work)
 		nbytes = sizeof(struct reparse_data_buffer);
 		break;
 	}
-	/* TODO: migrate to registered handler */
+	/* Legacy compatibility fallback */
 	case FSCTL_DUPLICATE_EXTENTS_TO_FILE:
 	{
 		struct ksmbd_file *fp_in, *fp_out = NULL;
@@ -725,7 +726,7 @@ dup_ext_out:
 		break;
 	}
 	default:
-		ksmbd_debug(SMB, "not implemented yet ioctl command 0x%x\n",
+		ksmbd_debug(SMB, "unknown ioctl command 0x%x\n",
 			    cnt_code);
 		ret = -EOPNOTSUPP;
 		goto out;
@@ -751,7 +752,7 @@ out:
 	else if (ret == -ENOENT)
 		rsp->hdr.Status = STATUS_OBJECT_NAME_NOT_FOUND;
 	else if (ret == -EOPNOTSUPP)
-		rsp->hdr.Status = STATUS_NOT_SUPPORTED;
+		rsp->hdr.Status = STATUS_INVALID_DEVICE_REQUEST;
 	else if (ret == -ENOSPC)
 		rsp->hdr.Status = STATUS_BUFFER_TOO_SMALL;
 	else if (ret < 0 || rsp->hdr.Status == 0)

@@ -26,4 +26,5 @@ obj-$(CONFIG_KSMBD_KUNIT_TEST) += ksmbd_test_ndr.o \
 	ksmbd_test_unicode.o \
 	ksmbd_test_vss.o \
 	ksmbd_test_reparse.o \
+	ksmbd_test_smb1_parser.o \
 	ksmbd_test_fruit.o

@@ -249,10 +249,13 @@ static int ksmbd_kthread_fn(void *p)
 			break;
 		}
 		ret = kernel_accept(iface->ksmbd_socket, &client_sk, 0);
-		if (ret == -EINVAL)
+		if (ret == -EINVAL || ret == -ESHUTDOWN ||
+		    ret == -EBADF || ret == -ENOTSOCK)
 			break;
-		if (ret)
+		if (ret) {
+			cond_resched();
 			continue;
+		}
 
 		if (!server_conf.max_ip_connections)
 			goto skip_max_ip_conns_limit;
@@ -457,9 +460,34 @@ static int ksmbd_tcp_writev(struct ksmbd_transport *t, struct kvec *iov,
 			    unsigned int remote_key)
 
 {
+	struct tcp_transport *tcp_t = TCP_TRANS(t);
 	struct msghdr smb_msg = {.msg_flags = MSG_NOSIGNAL};
+	struct kvec *cur_iov;
+	unsigned int segs;
+	int total_sent = 0;
+	int ret;
 
-	return kernel_sendmsg(TCP_TRANS(t)->sock, &smb_msg, iov, nvecs, size);
+	cur_iov = get_conn_iovec(tcp_t, nvecs);
+	if (!cur_iov)
+		return -ENOMEM;
+
+	while (total_sent < size) {
+		if (!ksmbd_conn_alive(KSMBD_TRANS(tcp_t)->conn))
+			return -ESHUTDOWN;
+
+		segs = kvec_array_init(cur_iov, iov, nvecs, total_sent);
+		if (!segs)
+			return -EIO;
+
+		ret = kernel_sendmsg(tcp_t->sock, &smb_msg, cur_iov, segs,
+				     size - total_sent);
+		if (ret <= 0)
+			return ret ? ret : -EPIPE;
+
+		total_sent += ret;
+	}
+
+	return total_sent;
 }
 
 /**
@@ -489,9 +517,12 @@ static int ksmbd_tcp_sendfile(struct ksmbd_transport *t, struct file *filp,
 		struct page *pages[KSMBD_SENDFILE_MAX_PAGES];
 		struct iov_iter iter;
 		struct msghdr msg = {.msg_flags = MSG_NOSIGNAL};
-		size_t chunk, read_bytes;
+		size_t chunk, read_bytes, remaining;
 		ssize_t ret;
 		int nr_pages, i;
+
+		if (!ksmbd_conn_alive(KSMBD_TRANS(tcp_t)->conn))
+			return -ESHUTDOWN;
 
 		chunk = min_t(size_t, count,
 			      KSMBD_SENDFILE_MAX_PAGES * PAGE_SIZE);
@@ -550,19 +581,22 @@ static int ksmbd_tcp_sendfile(struct ksmbd_transport *t, struct file *filp,
 		/* Send pages to socket */
 		iov_iter_bvec(&iter, ITER_SOURCE, bvec, nr_pages, read_bytes);
 		msg.msg_iter = iter;
-		ret = sock_sendmsg(sock, &msg);
+		remaining = read_bytes;
+		while (remaining > 0) {
+			ret = sock_sendmsg(sock, &msg);
+			if (ret <= 0) {
+				for (i = 0; i < nr_pages; i++)
+					put_page(pages[i]);
+				return ret ? ret : -EPIPE;
+			}
+
+			remaining -= ret;
+			total_sent += ret;
+			count -= ret;
+		}
 
 		for (i = 0; i < nr_pages; i++)
 			put_page(pages[i]);
-
-		if (ret < 0)
-			return total_sent ? total_sent : ret;
-
-		total_sent += ret;
-		count -= ret;
-
-		if ((size_t)ret < read_bytes)
-			break;
 	}
 
 	return total_sent;
@@ -573,6 +607,16 @@ static void ksmbd_tcp_disconnect(struct ksmbd_transport *t)
 	free_transport(TCP_TRANS(t));
 	if (server_conf.max_connections)
 		atomic_dec(&active_num_conn);
+}
+
+static void ksmbd_tcp_shutdown(struct ksmbd_transport *t)
+{
+	struct socket *sock = TCP_TRANS(t)->sock;
+
+	if (!sock)
+		return;
+
+	kernel_sock_shutdown(sock, SHUT_RDWR);
 }
 
 static void tcp_destroy_socket(struct socket *ksmbd_socket)
@@ -786,6 +830,15 @@ void ksmbd_tcp_destroy(void)
 	unregister_netdevice_notifier(&ksmbd_netdev_notifier);
 
 	list_for_each_entry_safe(iface, tmp, &iface_list, entry) {
+		if (iface->ksmbd_socket)
+			kernel_sock_shutdown(iface->ksmbd_socket, SHUT_RDWR);
+		tcp_stop_kthread(iface->ksmbd_kthread);
+		iface->ksmbd_kthread = NULL;
+		if (iface->ksmbd_socket) {
+			sock_release(iface->ksmbd_socket);
+			iface->ksmbd_socket = NULL;
+		}
+		iface->state = IFACE_STATE_DOWN;
 		list_del(&iface->entry);
 		kfree(iface->name);
 		kfree(iface);
@@ -842,5 +895,6 @@ static const struct ksmbd_transport_ops ksmbd_tcp_transport_ops = {
 	.writev		= ksmbd_tcp_writev,
 	.sendfile	= ksmbd_tcp_sendfile,
 	.disconnect	= ksmbd_tcp_disconnect,
+	.shutdown	= ksmbd_tcp_shutdown,
 	.free_transport = ksmbd_tcp_free_transport,
 };

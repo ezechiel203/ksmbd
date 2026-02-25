@@ -25,8 +25,11 @@
 #include "smbstatus.h"
 #include "glob.h"
 #include "ksmbd_work.h"
+#include "vfs.h"
 #include "vfs_cache.h"
+#include "xattr.h"
 #include "connection.h"
+#include "mgmt/tree_connect.h"
 
 /*
  * Reparse data buffer structures per MS-FSCC 2.1.2.1
@@ -70,6 +73,50 @@ struct reparse_mount_point_data_buf {
 /* Maximum symlink target path length we support */
 #define REPARSE_MAX_PATH_LEN	4096
 
+static int ksmbd_reparse_store_opaque(struct ksmbd_file *fp,
+				      const void *buf, size_t len)
+{
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+	return ksmbd_vfs_setxattr(file_mnt_idmap(fp->filp),
+#else
+	return ksmbd_vfs_setxattr(file_mnt_user_ns(fp->filp),
+#endif
+				  &fp->filp->f_path,
+				  XATTR_NAME_REPARSE_DATA,
+				  (void *)buf, len, 0, true);
+}
+
+static int ksmbd_reparse_load_opaque(struct ksmbd_file *fp,
+				     char **buf, size_t *len)
+{
+	ssize_t xattr_len;
+
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+	xattr_len = ksmbd_vfs_getxattr(file_mnt_idmap(fp->filp),
+#else
+	xattr_len = ksmbd_vfs_getxattr(file_mnt_user_ns(fp->filp),
+#endif
+				       fp->filp->f_path.dentry,
+				       XATTR_NAME_REPARSE_DATA, buf);
+	if (xattr_len < 0)
+		return xattr_len;
+
+	*len = xattr_len;
+	return 0;
+}
+
+static int ksmbd_reparse_remove_opaque(struct ksmbd_file *fp)
+{
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+	return ksmbd_vfs_remove_xattr(file_mnt_idmap(fp->filp),
+#else
+	return ksmbd_vfs_remove_xattr(file_mnt_user_ns(fp->filp),
+#endif
+				      &fp->filp->f_path,
+				      (char *)XATTR_NAME_REPARSE_DATA,
+				      true);
+}
+
 /**
  * ksmbd_convert_slashes() - Convert backslashes to forward slashes
  * @path:	path string to convert in-place
@@ -99,6 +146,208 @@ static void ksmbd_strip_nt_prefix(char *path)
 	     strncmp(path, "//?/", 4) == 0)) {
 		memmove(path, path + 4, len - 4 + 1);
 	}
+}
+
+static bool ksmbd_is_safe_reparse_target(const char *target)
+{
+	const char *p;
+
+	if (!target || !*target)
+		return false;
+
+	/* Reparse targets must remain share-relative. */
+	if (target[0] == '/')
+		return false;
+
+	p = target;
+	while (*p) {
+		const char *seg = p;
+		size_t seglen;
+
+		while (*p && *p != '/')
+			p++;
+		seglen = p - seg;
+
+		if (seglen == 1 && seg[0] == '.')
+			return false;
+		if (seglen == 2 && seg[0] == '.' && seg[1] == '.')
+			return false;
+
+		if (*p == '/')
+			p++;
+	}
+
+	return true;
+}
+
+static int ksmbd_reparse_get_fullpath(struct ksmbd_file *fp, char **fullpath)
+{
+	char *pathname, *path;
+
+	pathname = kmalloc(PATH_MAX, KSMBD_DEFAULT_GFP);
+	if (!pathname)
+		return -ENOMEM;
+
+	path = d_path(&fp->filp->f_path, pathname, PATH_MAX);
+	if (IS_ERR(path)) {
+		kfree(pathname);
+		return PTR_ERR(path);
+	}
+
+	*fullpath = kstrdup(path, KSMBD_DEFAULT_GFP);
+	kfree(pathname);
+	if (!*fullpath)
+		return -ENOMEM;
+
+	return 0;
+}
+
+static int ksmbd_reparse_replace_with_symlink(struct ksmbd_file *fp,
+					      const char *target)
+{
+	struct path create_path;
+	struct dentry *create_dentry;
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 4, 0)
+	struct dentry *parent;
+#endif
+	char *fullpath = NULL;
+	int ret;
+
+	ret = ksmbd_reparse_get_fullpath(fp, &fullpath);
+	if (ret)
+		return ret;
+
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 4, 0)
+	ret = ksmbd_vfs_unlink(fp->filp);
+#else
+	parent = dget_parent(fp->filp->f_path.dentry);
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+	ret = ksmbd_vfs_unlink(file_mnt_idmap(fp->filp), parent,
+			       fp->filp->f_path.dentry);
+#else
+	ret = ksmbd_vfs_unlink(file_mnt_user_ns(fp->filp), parent,
+			       fp->filp->f_path.dentry);
+#endif
+	dput(parent);
+#endif
+	if (ret)
+		goto out;
+
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 18, 0)
+	create_dentry = start_creating_path(AT_FDCWD, fullpath,
+					    &create_path, 0);
+#else
+	create_dentry = kern_path_create(AT_FDCWD, fullpath,
+					 &create_path, 0);
+#endif
+	if (IS_ERR(create_dentry)) {
+		ret = PTR_ERR(create_dentry);
+		goto out;
+	}
+
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 19, 0)
+	ret = vfs_symlink(mnt_idmap(create_path.mnt),
+			  d_inode(create_dentry->d_parent),
+			  create_dentry, target, NULL);
+#else
+	ret = vfs_symlink(mnt_idmap(create_path.mnt),
+			  d_inode(create_dentry->d_parent),
+			  create_dentry, target);
+#endif
+#else
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 12, 0)
+	ret = vfs_symlink(mnt_user_ns(create_path.mnt),
+			  d_inode(create_dentry->d_parent),
+			  create_dentry, target);
+#else
+	ret = vfs_symlink(d_inode(create_dentry->d_parent),
+			  create_dentry, target);
+#endif
+#endif
+
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 18, 0)
+	end_creating_path(&create_path, create_dentry);
+#else
+	done_path_create(&create_path, create_dentry);
+#endif
+
+out:
+	kfree(fullpath);
+	return ret;
+}
+
+static int ksmbd_reparse_replace_with_regular_file(struct ksmbd_file *fp)
+{
+	struct path create_path;
+	struct dentry *create_dentry;
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 4, 0)
+	struct dentry *parent;
+#endif
+	char *fullpath = NULL;
+	int ret;
+
+	ret = ksmbd_reparse_get_fullpath(fp, &fullpath);
+	if (ret)
+		return ret;
+
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 4, 0)
+	ret = ksmbd_vfs_unlink(fp->filp);
+#else
+	parent = dget_parent(fp->filp->f_path.dentry);
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+	ret = ksmbd_vfs_unlink(file_mnt_idmap(fp->filp), parent,
+			       fp->filp->f_path.dentry);
+#else
+	ret = ksmbd_vfs_unlink(file_mnt_user_ns(fp->filp), parent,
+			       fp->filp->f_path.dentry);
+#endif
+	dput(parent);
+#endif
+	if (ret)
+		goto out;
+
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 18, 0)
+	create_dentry = start_creating_path(AT_FDCWD, fullpath,
+					    &create_path, 0);
+#else
+	create_dentry = kern_path_create(AT_FDCWD, fullpath,
+					 &create_path, 0);
+#endif
+	if (IS_ERR(create_dentry)) {
+		ret = PTR_ERR(create_dentry);
+		goto out;
+	}
+
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 12, 0)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 19, 0)
+	ret = vfs_create(mnt_idmap(create_path.mnt), create_dentry,
+			 S_IFREG | 0644, NULL);
+#else
+	ret = vfs_create(mnt_idmap(create_path.mnt),
+			 d_inode(create_dentry->d_parent),
+			 create_dentry, S_IFREG | 0644, true);
+#endif
+#else
+	ret = vfs_create(mnt_user_ns(create_path.mnt),
+			 d_inode(create_dentry->d_parent),
+			 create_dentry, S_IFREG | 0644, true);
+#endif
+#else
+	ret = vfs_create(d_inode(create_dentry->d_parent),
+			 create_dentry, S_IFREG | 0644, true);
+#endif
+
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 18, 0)
+	end_creating_path(&create_path, create_dentry);
+#else
+	done_path_create(&create_path, create_dentry);
+#endif
+
+out:
+	kfree(fullpath);
+	return ret;
 }
 
 /**
@@ -247,6 +496,11 @@ static int ksmbd_fsctl_set_reparse_point(struct ksmbd_work *work,
 	__le32 tag;
 	int ret;
 
+	if (!test_tree_conn_flag(work->tcon, KSMBD_TREE_CONN_FLAG_WRITABLE)) {
+		rsp->hdr.Status = STATUS_ACCESS_DENIED;
+		return -EACCES;
+	}
+
 	if (in_buf_len < sizeof(struct reparse_data_buf_hdr)) {
 		pr_err_ratelimited(
 			"set reparse: input buffer too short: %u\n",
@@ -257,6 +511,10 @@ static int ksmbd_fsctl_set_reparse_point(struct ksmbd_work *work,
 
 	hdr = (struct reparse_data_buf_hdr *)in_buf;
 	tag = hdr->reparse_tag;
+	if (in_buf_len < sizeof(*hdr) + le16_to_cpu(hdr->reparse_data_length)) {
+		rsp->hdr.Status = STATUS_IO_REPARSE_DATA_INVALID;
+		return -EINVAL;
+	}
 
 	fp = ksmbd_lookup_fd_fast(work, id);
 	if (!fp) {
@@ -317,11 +575,24 @@ static int ksmbd_fsctl_set_reparse_point(struct ksmbd_work *work,
 		break;
 	}
 	default:
-		ksmbd_debug(SMB,
-			    "set reparse: unsupported tag 0x%x\n",
-			    le32_to_cpu(tag));
-		ret = -EOPNOTSUPP;
-		rsp->hdr.Status = STATUS_IO_REPARSE_TAG_NOT_HANDLED;
+		/*
+		 * Keep unsupported-name-surrogate tags as opaque reparse
+		 * data so clients using custom tags can round-trip
+		 * FSCTL_SET/GET/DELETE_REPARSE_POINT.
+		 */
+		ret = ksmbd_reparse_store_opaque(fp, in_buf, in_buf_len);
+		if (ret) {
+			if (ret == -EACCES || ret == -EPERM)
+				rsp->hdr.Status = STATUS_ACCESS_DENIED;
+			else if (ret == -ENOSPC)
+				rsp->hdr.Status = STATUS_DISK_FULL;
+			else
+				rsp->hdr.Status = STATUS_UNEXPECTED_IO_ERROR;
+			goto out;
+		}
+
+		*out_len = 0;
+		ret = 0;
 		goto out;
 	}
 
@@ -332,7 +603,7 @@ static int ksmbd_fsctl_set_reparse_point(struct ksmbd_work *work,
 		goto out;
 	}
 
-	if (target[0] == '/' || strstr(target, "..")) {
+	if (!ksmbd_is_safe_reparse_target(target)) {
 		pr_err_ratelimited(
 			"set reparse: target '%s' escapes share\n",
 			target);
@@ -344,17 +615,25 @@ static int ksmbd_fsctl_set_reparse_point(struct ksmbd_work *work,
 	ksmbd_debug(SMB, "set reparse: tag 0x%x -> %s\n",
 		    le32_to_cpu(tag), target);
 
-	/*
-	 * Creating a symlink on Linux requires removing the existing
-	 * file and creating a symlink in its place.  This is a
-	 * destructive operation that needs careful VFS manipulation.
-	 *
-	 * For now, we validate the input and report success.  A full
-	 * implementation would atomically replace the file with a
-	 * symlink.
-	 *
-	 * TODO: implement atomic file-to-symlink replacement
-	 */
+	ret = ksmbd_reparse_replace_with_symlink(fp, target);
+	if (ret) {
+		if (ret == -EACCES || ret == -EPERM)
+			rsp->hdr.Status = STATUS_ACCESS_DENIED;
+		else if (ret == -ENOSPC)
+			rsp->hdr.Status = STATUS_DISK_FULL;
+		else if (ret == -ENOTEMPTY)
+			rsp->hdr.Status = STATUS_DIRECTORY_NOT_EMPTY;
+			else if (ret == -EEXIST)
+				rsp->hdr.Status = STATUS_OBJECT_NAME_COLLISION;
+			else if (ret == -ENOENT)
+				rsp->hdr.Status = STATUS_OBJECT_NAME_NOT_FOUND;
+			else if (ret == -EOPNOTSUPP)
+				rsp->hdr.Status = STATUS_INVALID_DEVICE_REQUEST;
+			else
+				rsp->hdr.Status = STATUS_UNEXPECTED_IO_ERROR;
+		goto out;
+	}
+
 	*out_len = 0;
 	ret = 0;
 
@@ -390,11 +669,15 @@ static int ksmbd_fsctl_get_reparse_point(struct ksmbd_work *work,
 {
 	struct ksmbd_file *fp;
 	struct inode *inode;
+	struct reparse_data_buf_hdr *opaque_hdr;
 	struct reparse_data_buffer *reparse_ptr;
 	struct reparse_symlink_data_buf *symdata;
 	const struct nls_table *codepage;
+	char *opaque_buf = NULL;
+	size_t opaque_len = 0;
 	int conv_len;
 	unsigned int ucs2_bytes, total_len;
+	int ret;
 
 	fp = ksmbd_lookup_fd_fast(work, id);
 	if (!fp) {
@@ -405,6 +688,43 @@ static int ksmbd_fsctl_get_reparse_point(struct ksmbd_work *work,
 
 	inode = file_inode(fp->filp);
 	codepage = work->conn->local_nls;
+
+	ret = ksmbd_reparse_load_opaque(fp, &opaque_buf, &opaque_len);
+	if (!ret) {
+		if (opaque_len < sizeof(*opaque_hdr)) {
+			kfree(opaque_buf);
+			ksmbd_fd_put(work, fp);
+			rsp->hdr.Status = STATUS_IO_REPARSE_DATA_INVALID;
+			return -EINVAL;
+		}
+
+		opaque_hdr = (struct reparse_data_buf_hdr *)opaque_buf;
+		if (opaque_len < sizeof(*opaque_hdr) +
+				 le16_to_cpu(opaque_hdr->reparse_data_length)) {
+			kfree(opaque_buf);
+			ksmbd_fd_put(work, fp);
+			rsp->hdr.Status = STATUS_IO_REPARSE_DATA_INVALID;
+			return -EINVAL;
+		}
+
+		if (opaque_len > max_out_len) {
+			kfree(opaque_buf);
+			ksmbd_fd_put(work, fp);
+			rsp->hdr.Status = STATUS_BUFFER_TOO_SMALL;
+			return -ENOSPC;
+		}
+
+		memcpy(&rsp->Buffer[0], opaque_buf, opaque_len);
+		kfree(opaque_buf);
+		*out_len = opaque_len;
+		ksmbd_fd_put(work, fp);
+		return 0;
+	}
+	if (ret != -ENODATA && ret != -ENOENT && ret != -EOPNOTSUPP) {
+		ksmbd_fd_put(work, fp);
+		rsp->hdr.Status = STATUS_UNEXPECTED_IO_ERROR;
+		return ret;
+	}
 
 	if (S_ISLNK(inode->i_mode)) {
 		const char *link;
@@ -573,8 +893,12 @@ static int ksmbd_fsctl_delete_reparse_point(struct ksmbd_work *work,
 					    unsigned int *out_len)
 {
 	struct reparse_data_buf_hdr *hdr;
+	struct reparse_data_buf_hdr *opaque_hdr;
 	struct ksmbd_file *fp;
 	struct inode *inode;
+	char *opaque_buf = NULL;
+	size_t opaque_len = 0;
+	int ret;
 
 	if (in_buf_len < sizeof(struct reparse_data_buf_hdr)) {
 		pr_err_ratelimited(
@@ -591,6 +915,36 @@ static int ksmbd_fsctl_delete_reparse_point(struct ksmbd_work *work,
 		pr_err_ratelimited("delete reparse: not found\n");
 		rsp->hdr.Status = STATUS_INVALID_HANDLE;
 		return -ENOENT;
+	}
+
+	ret = ksmbd_reparse_load_opaque(fp, &opaque_buf, &opaque_len);
+	if (!ret) {
+		if (opaque_len < sizeof(*opaque_hdr)) {
+			rsp->hdr.Status = STATUS_IO_REPARSE_DATA_INVALID;
+			ret = -EINVAL;
+			goto out;
+		}
+
+		opaque_hdr = (struct reparse_data_buf_hdr *)opaque_buf;
+		if (hdr->reparse_tag != opaque_hdr->reparse_tag) {
+			rsp->hdr.Status = STATUS_IO_REPARSE_TAG_MISMATCH;
+			ret = -EINVAL;
+			goto out;
+		}
+
+		ret = ksmbd_reparse_remove_opaque(fp);
+		if (ret && ret != -ENOENT && ret != -ENODATA) {
+			rsp->hdr.Status = STATUS_UNEXPECTED_IO_ERROR;
+			goto out;
+		}
+
+		*out_len = 0;
+		ret = 0;
+		goto out;
+	}
+	if (ret != -ENODATA && ret != -ENOENT && ret != -EOPNOTSUPP) {
+		rsp->hdr.Status = STATUS_UNEXPECTED_IO_ERROR;
+		goto out;
 	}
 
 	inode = file_inode(fp->filp);
@@ -619,22 +973,26 @@ static int ksmbd_fsctl_delete_reparse_point(struct ksmbd_work *work,
 	}
 
 	/*
-	 * Deleting a reparse point on a symlink would require
-	 * unlinking the symlink.  This is a destructive operation
-	 * that needs careful handling to avoid data loss.
-	 *
-	 * For now, we accept the request and report success.
-	 * A full implementation would unlink the symlink and
-	 * recreate it as a regular file.
-	 *
-	 * TODO: implement symlink-to-file conversion
+	 * Convert reparse symlink to a regular file by replacing
+	 * the symlink dentry atomically from the same pathname.
 	 */
 	ksmbd_debug(SMB, "delete reparse: tag 0x%x on ino %lu\n",
 		    le32_to_cpu(hdr->reparse_tag), inode->i_ino);
 
+	if (S_ISLNK(inode->i_mode)) {
+		ret = ksmbd_reparse_replace_with_regular_file(fp);
+		if (ret) {
+			rsp->hdr.Status = STATUS_UNEXPECTED_IO_ERROR;
+			goto out;
+		}
+	}
+
 	*out_len = 0;
+	ret = 0;
+out:
+	kfree(opaque_buf);
 	ksmbd_fd_put(work, fp);
-	return 0;
+	return ret;
 }
 
 /* FSCTL handler descriptors */

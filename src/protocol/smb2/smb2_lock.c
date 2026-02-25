@@ -77,6 +77,8 @@ int smb2_cancel(struct ksmbd_work *work)
 	struct smb2_hdr *chdr;
 	struct ksmbd_work *iter;
 	struct list_head *command_list;
+	void (*cancel_fn)(void **argv) = NULL;
+	void **cancel_argv = NULL;
 
 	if (work->next_smb2_rcv_hdr_off)
 		hdr = ksmbd_resp_buf_next(work);
@@ -101,11 +103,16 @@ int smb2_cancel(struct ksmbd_work *work)
 				    le64_to_cpu(hdr->Id.AsyncId),
 				    le16_to_cpu(chdr->Command));
 			iter->state = KSMBD_WORK_CANCELLED;
-			if (iter->cancel_fn)
-				iter->cancel_fn(iter->cancel_argv);
+			cancel_fn = iter->cancel_fn;
+			cancel_argv = iter->cancel_argv;
+			iter->cancel_fn = NULL;
+			iter->cancel_argv = NULL;
 			break;
 		}
 		spin_unlock(&conn->request_lock);
+		if (cancel_fn)
+			cancel_fn(cancel_argv);
+		kfree(cancel_argv);
 	} else {
 		command_list = &conn->requests;
 
@@ -158,6 +165,33 @@ struct file_lock *smb_flock_init(struct file *f)
 
 out:
 	return fl;
+}
+
+/*
+ * Wait for a deferred POSIX lock with periodic wakeups so disconnect/cancel
+ * can abort the wait and prevent stuck worker threads.
+ */
+static void smb2_wait_for_posix_lock(struct ksmbd_work *work,
+				     struct file_lock *flock)
+{
+	int rc;
+
+	for (;;) {
+		rc = ksmbd_vfs_posix_lock_wait_timeout(flock, HZ);
+		if (rc > 0)
+			return;
+
+		if (work->state != KSMBD_WORK_ACTIVE ||
+		    !ksmbd_conn_alive(work->conn)) {
+			if (work->state == KSMBD_WORK_ACTIVE)
+				work->state = KSMBD_WORK_CANCELLED;
+			ksmbd_vfs_posix_lock_unblock(flock);
+			return;
+		}
+
+		if (rc < 0 && rc != -ERESTARTSYS)
+			return;
+	}
 }
 
 static int smb2_set_flock_flags(struct file_lock *flock, int flags)
@@ -601,7 +635,7 @@ skip:
 
 				smb2_send_interim_resp(work, STATUS_PENDING);
 
-				ksmbd_vfs_posix_lock_wait(flock);
+				smb2_wait_for_posix_lock(work, flock);
 
 				spin_lock(&fp->f_lock);
 				list_del(&work->fp_entry);

@@ -10,9 +10,8 @@
  *   registered at module init; additional handlers can be registered
  *   by extension modules.
  *
- *   Note: The actual dispatch from smb2_open() is not yet wired up.
- *   This file establishes the infrastructure and registers proof-of-
- *   pattern handlers for future incremental migration.
+ *   Dispatch is wired from smb2_create.c. Built-in handlers can perform
+ *   per-context validation and request-side processing.
  */
 
 #include <linux/slab.h>
@@ -100,10 +99,8 @@ void ksmbd_put_create_context(struct ksmbd_create_ctx_handler *h)
  * ============================================================
  *
  *  MxAc (Query Maximal Access) and QFid (Query on Disk ID) are
- *  registered here as proof of the registration pattern.  Their
- *  actual processing logic remains in smb2_open() for now due to
- *  deep local variable dependencies.  These stubs will be expanded
- *  when the dispatch is wired up incrementally.
+ *  registered here for request-side validation and future response-side
+ *  modularization.
  */
 
 /**
@@ -118,7 +115,13 @@ static int mxac_on_request(struct ksmbd_work *work,
 			   const void *ctx_data,
 			   unsigned int ctx_len)
 {
-	ksmbd_debug(SMB, "MxAc create context handler (request stub)\n");
+	/*
+	 * MxAc request data is either empty or an 8-byte timestamp
+	 * (SMB2_CREATE_QUERY_MAXIMAL_ACCESS_REQUEST).
+	 */
+	if (ctx_len != 0 && ctx_len != sizeof(__le64))
+		return -EINVAL;
+
 	return 0;
 }
 
@@ -150,7 +153,10 @@ static int qfid_on_request(struct ksmbd_work *work,
 			   const void *ctx_data,
 			   unsigned int ctx_len)
 {
-	ksmbd_debug(SMB, "QFid create context handler (request stub)\n");
+	/* QFid request has no payload data. */
+	if (ctx_len != 0)
+		return -EINVAL;
+
 	return 0;
 }
 

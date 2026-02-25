@@ -39,7 +39,7 @@
 /*
  * Maximum valid FileInformationClass values (MS-FSCC)
  */
-#define FILE_INFO_CLASS_MAX		77  /* FileIdGlobalTxDirectoryInformation */
+#define FILE_INFO_CLASS_MAX		81  /* FileIdAllExtdBothDirectoryInformation */
 #define FS_INFO_CLASS_MAX		11  /* FileFsSectorSizeInformation */
 
 /*

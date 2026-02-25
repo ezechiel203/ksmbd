@@ -5,9 +5,12 @@
  *
  *   Extra FSCTL handlers for ksmbd
  *
- *   Registers FSCTL handlers for FSCTL_FILE_LEVEL_TRIM,
- *   FSCTL_QUERY_ALLOCATED_RANGES, FSCTL_SET_ZERO_DATA, and
- *   FSCTL_PIPE_WAIT via the ksmbd FSCTL registration API.
+ *   Registers supplemental FSCTL handlers that are intentionally
+ *   kept outside the built-in core table (currently
+ *   FSCTL_FILE_LEVEL_TRIM and FSCTL_PIPE_WAIT).
+ *
+ *   Handlers that are now covered by the built-in table remain in
+ *   this file for reference but are not registered here.
  */
 
 #include <linux/slab.h>
@@ -19,6 +22,7 @@
 #include "ksmbd_fsctl.h"
 #include "smb2pdu.h"
 #include "smbfsctl.h"
+#include "smb_common.h"
 #include "smbstatus.h"
 #include "glob.h"
 #include "ksmbd_work.h"
@@ -303,6 +307,239 @@ static int ksmbd_fsctl_set_zero_data(struct ksmbd_work *work,
 	return 0;
 }
 
+static int ksmbd_fsctl_copychunk_common(struct ksmbd_work *work,
+					u64 id, void *in_buf,
+					unsigned int in_buf_len,
+					unsigned int max_out_len,
+					struct smb2_ioctl_rsp *rsp,
+					unsigned int *out_len,
+					bool check_dst_read_access)
+{
+	struct copychunk_ioctl_req *ci_req;
+	struct copychunk_ioctl_rsp *ci_rsp;
+	struct ksmbd_file *src_fp = NULL, *dst_fp = NULL;
+	struct srv_copychunk *chunks;
+	unsigned int i, chunk_count, chunk_count_written = 0;
+	unsigned int chunk_size_written = 0;
+	loff_t total_size_written = 0;
+	int ret = 0;
+
+	if (!test_tree_conn_flag(work->tcon, KSMBD_TREE_CONN_FLAG_WRITABLE)) {
+		rsp->hdr.Status = STATUS_ACCESS_DENIED;
+		return -EACCES;
+	}
+
+	if (in_buf_len <= sizeof(struct copychunk_ioctl_req)) {
+		rsp->hdr.Status = STATUS_INVALID_PARAMETER;
+		return -EINVAL;
+	}
+
+	if (max_out_len < sizeof(struct copychunk_ioctl_rsp)) {
+		rsp->hdr.Status = STATUS_BUFFER_TOO_SMALL;
+		return -ENOSPC;
+	}
+
+	ci_req = (struct copychunk_ioctl_req *)in_buf;
+	ci_rsp = (struct copychunk_ioctl_rsp *)&rsp->Buffer[0];
+	rsp->VolatileFileId = id;
+	rsp->PersistentFileId = SMB2_NO_FID;
+
+	ci_rsp->ChunksWritten =
+		cpu_to_le32(ksmbd_server_side_copy_max_chunk_count());
+	ci_rsp->ChunkBytesWritten =
+		cpu_to_le32(ksmbd_server_side_copy_max_chunk_size());
+	ci_rsp->TotalBytesWritten =
+		cpu_to_le32(ksmbd_server_side_copy_max_total_size());
+
+	chunks = (struct srv_copychunk *)&ci_req->Chunks[0];
+	chunk_count = le32_to_cpu(ci_req->ChunkCount);
+	if (!chunk_count) {
+		*out_len = sizeof(struct copychunk_ioctl_rsp);
+		return 0;
+	}
+
+	if (chunk_count > ksmbd_server_side_copy_max_chunk_count() ||
+	    in_buf_len < offsetof(struct copychunk_ioctl_req, Chunks) +
+			  chunk_count * sizeof(struct srv_copychunk)) {
+		rsp->hdr.Status = STATUS_INVALID_PARAMETER;
+		return -EINVAL;
+	}
+
+	for (i = 0; i < chunk_count; i++) {
+		if (!le32_to_cpu(chunks[i].Length) ||
+		    le32_to_cpu(chunks[i].Length) >
+		    ksmbd_server_side_copy_max_chunk_size())
+			break;
+		total_size_written += le32_to_cpu(chunks[i].Length);
+	}
+	if (i < chunk_count ||
+	    total_size_written > ksmbd_server_side_copy_max_total_size()) {
+		rsp->hdr.Status = STATUS_INVALID_PARAMETER;
+		return -EINVAL;
+	}
+
+	src_fp = ksmbd_lookup_foreign_fd(work, le64_to_cpu(ci_req->ResumeKey[0]));
+	dst_fp = ksmbd_lookup_fd_fast(work, id);
+	if (!src_fp ||
+	    src_fp->persistent_id != le64_to_cpu(ci_req->ResumeKey[1])) {
+		rsp->hdr.Status = STATUS_OBJECT_NAME_NOT_FOUND;
+		ret = -ENOENT;
+		goto out;
+	}
+	if (!dst_fp) {
+		rsp->hdr.Status = STATUS_INVALID_HANDLE;
+		ret = -ENOENT;
+		goto out;
+	}
+
+	rsp->VolatileFileId = dst_fp->volatile_id;
+	rsp->PersistentFileId = dst_fp->persistent_id;
+
+	if (check_dst_read_access &&
+	    !(dst_fp->daccess & (FILE_READ_DATA_LE | FILE_GENERIC_READ_LE))) {
+		rsp->hdr.Status = STATUS_ACCESS_DENIED;
+		ret = -EACCES;
+		goto out;
+	}
+
+	ret = ksmbd_vfs_copy_file_ranges(work, src_fp, dst_fp,
+					 chunks, chunk_count,
+					 &chunk_count_written,
+					 &chunk_size_written,
+					 &total_size_written);
+	if (ret < 0) {
+		if (ret == -EACCES)
+			rsp->hdr.Status = STATUS_ACCESS_DENIED;
+		else if (ret == -EAGAIN)
+			rsp->hdr.Status = STATUS_FILE_LOCK_CONFLICT;
+		else if (ret == -EBADF)
+			rsp->hdr.Status = STATUS_INVALID_HANDLE;
+		else if (ret == -EFBIG || ret == -ENOSPC)
+			rsp->hdr.Status = STATUS_DISK_FULL;
+		else if (ret == -EINVAL)
+			rsp->hdr.Status = STATUS_INVALID_PARAMETER;
+		else if (ret == -EISDIR)
+			rsp->hdr.Status = STATUS_FILE_IS_A_DIRECTORY;
+		else if (ret == -E2BIG)
+			rsp->hdr.Status = STATUS_INVALID_VIEW_SIZE;
+		else
+			rsp->hdr.Status = STATUS_UNEXPECTED_IO_ERROR;
+	}
+
+	if (chunk_count_written > 0) {
+		loff_t preceding = 0;
+
+		for (i = 0; i + 1 < chunk_count_written; i++)
+			preceding += le32_to_cpu(chunks[i].Length);
+		chunk_size_written = (unsigned int)(total_size_written - preceding);
+	}
+
+	ci_rsp->ChunksWritten = cpu_to_le32(chunk_count_written);
+	ci_rsp->ChunkBytesWritten = cpu_to_le32(chunk_size_written);
+	ci_rsp->TotalBytesWritten = cpu_to_le32(total_size_written);
+	*out_len = sizeof(struct copychunk_ioctl_rsp);
+
+out:
+	ksmbd_fd_put(work, src_fp);
+	ksmbd_fd_put(work, dst_fp);
+	return ret;
+}
+
+static int ksmbd_fsctl_copychunk(struct ksmbd_work *work, u64 id, void *in_buf,
+				 unsigned int in_buf_len,
+				 unsigned int max_out_len,
+				 struct smb2_ioctl_rsp *rsp,
+				 unsigned int *out_len)
+{
+	return ksmbd_fsctl_copychunk_common(work, id, in_buf, in_buf_len,
+					    max_out_len, rsp, out_len, true);
+}
+
+static int ksmbd_fsctl_copychunk_write(struct ksmbd_work *work, u64 id,
+				       void *in_buf, unsigned int in_buf_len,
+				       unsigned int max_out_len,
+				       struct smb2_ioctl_rsp *rsp,
+				       unsigned int *out_len)
+{
+	return ksmbd_fsctl_copychunk_common(work, id, in_buf, in_buf_len,
+					    max_out_len, rsp, out_len, false);
+}
+
+static int ksmbd_fsctl_duplicate_extents_to_file(struct ksmbd_work *work,
+						 u64 id, void *in_buf,
+						 unsigned int in_buf_len,
+						 unsigned int max_out_len,
+						 struct smb2_ioctl_rsp *rsp,
+						 unsigned int *out_len)
+{
+	struct duplicate_extents_to_file *dup_ext;
+	struct ksmbd_file *fp_in = NULL, *fp_out = NULL;
+	loff_t src_off, dst_off, length;
+	loff_t copied;
+	int ret = 0;
+
+	if (!test_tree_conn_flag(work->tcon, KSMBD_TREE_CONN_FLAG_WRITABLE)) {
+		rsp->hdr.Status = STATUS_ACCESS_DENIED;
+		return -EACCES;
+	}
+
+	if (in_buf_len < sizeof(struct duplicate_extents_to_file)) {
+		rsp->hdr.Status = STATUS_INVALID_PARAMETER;
+		return -EINVAL;
+	}
+
+	dup_ext = (struct duplicate_extents_to_file *)in_buf;
+	fp_in = ksmbd_lookup_fd_slow(work, dup_ext->VolatileFileHandle,
+				     dup_ext->PersistentFileHandle);
+	if (!fp_in) {
+		rsp->hdr.Status = STATUS_INVALID_HANDLE;
+		return -ENOENT;
+	}
+
+	fp_out = ksmbd_lookup_fd_fast(work, id);
+	if (!fp_out) {
+		rsp->hdr.Status = STATUS_INVALID_HANDLE;
+		ret = -ENOENT;
+		goto out;
+	}
+
+	rsp->VolatileFileId = fp_out->volatile_id;
+	rsp->PersistentFileId = fp_out->persistent_id;
+
+	src_off = le64_to_cpu(dup_ext->SourceFileOffset);
+	dst_off = le64_to_cpu(dup_ext->TargetFileOffset);
+	length = le64_to_cpu(dup_ext->ByteCount);
+
+	copied = vfs_clone_file_range(fp_in->filp, src_off,
+				      fp_out->filp, dst_off, length, 0);
+	if (copied != length) {
+		copied = vfs_copy_file_range(fp_in->filp, src_off,
+					     fp_out->filp, dst_off,
+					     length, 0);
+		if (copied != length)
+			ret = copied < 0 ? copied : -EINVAL;
+	}
+
+	if (ret < 0) {
+		if (ret == -EACCES || ret == -EPERM)
+			rsp->hdr.Status = STATUS_ACCESS_DENIED;
+		else if (ret == -EBADF)
+			rsp->hdr.Status = STATUS_INVALID_HANDLE;
+		else if (ret == -EFBIG || ret == -ENOSPC)
+			rsp->hdr.Status = STATUS_DISK_FULL;
+		else if (ret == -EISDIR)
+			rsp->hdr.Status = STATUS_FILE_IS_A_DIRECTORY;
+		else
+			rsp->hdr.Status = STATUS_INVALID_PARAMETER;
+	}
+
+	*out_len = 0;
+out:
+	ksmbd_fd_put(work, fp_in);
+	ksmbd_fd_put(work, fp_out);
+	return ret;
+}
+
 /**
  * ksmbd_fsctl_pipe_wait() - Handle FSCTL_PIPE_WAIT
  * @work:	    smb work for this request
@@ -339,15 +576,33 @@ static struct ksmbd_fsctl_handler file_level_trim_handler = {
 	.owner    = THIS_MODULE,
 };
 
-static struct ksmbd_fsctl_handler query_allocated_ranges_handler = {
+static struct ksmbd_fsctl_handler __maybe_unused query_allocated_ranges_handler = {
 	.ctl_code = FSCTL_QUERY_ALLOCATED_RANGES,
 	.handler  = ksmbd_fsctl_query_allocated_ranges,
 	.owner    = THIS_MODULE,
 };
 
-static struct ksmbd_fsctl_handler set_zero_data_handler = {
+static struct ksmbd_fsctl_handler __maybe_unused set_zero_data_handler = {
 	.ctl_code = FSCTL_SET_ZERO_DATA,
 	.handler  = ksmbd_fsctl_set_zero_data,
+	.owner    = THIS_MODULE,
+};
+
+static struct ksmbd_fsctl_handler __maybe_unused copychunk_handler = {
+	.ctl_code = FSCTL_COPYCHUNK,
+	.handler  = ksmbd_fsctl_copychunk,
+	.owner    = THIS_MODULE,
+};
+
+static struct ksmbd_fsctl_handler __maybe_unused copychunk_write_handler = {
+	.ctl_code = FSCTL_COPYCHUNK_WRITE,
+	.handler  = ksmbd_fsctl_copychunk_write,
+	.owner    = THIS_MODULE,
+};
+
+static struct ksmbd_fsctl_handler __maybe_unused duplicate_extents_handler = {
+	.ctl_code = FSCTL_DUPLICATE_EXTENTS_TO_FILE,
+	.handler  = ksmbd_fsctl_duplicate_extents_to_file,
 	.owner    = THIS_MODULE,
 };
 
@@ -357,57 +612,39 @@ static struct ksmbd_fsctl_handler pipe_wait_handler = {
 	.owner    = THIS_MODULE,
 };
 
+static struct ksmbd_fsctl_handler *extra_handlers[] = {
+	&file_level_trim_handler,
+	&pipe_wait_handler,
+};
+
 /**
  * ksmbd_fsctl_extra_init() - Initialize extra FSCTL handlers
  *
- * Registers FSCTL handlers for FSCTL_FILE_LEVEL_TRIM (0x00098208),
- * FSCTL_QUERY_ALLOCATED_RANGES (0x000940CF),
- * FSCTL_SET_ZERO_DATA (0x000980C8), and
- * FSCTL_PIPE_WAIT (0x00110018).
+ * Registers extra FSCTL handlers, including:
+ * - FSCTL_FILE_LEVEL_TRIM (0x00098208)
+ * - FSCTL_PIPE_WAIT (0x00110018)
  *
  * Return: 0 on success, negative errno on failure
  */
 int ksmbd_fsctl_extra_init(void)
 {
-	int ret;
+	int i, ret;
 
-	ret = ksmbd_register_fsctl(&file_level_trim_handler);
-	if (ret) {
-		pr_err("Failed to register FSCTL_FILE_LEVEL_TRIM: %d\n",
-		       ret);
-		return ret;
-	}
-
-	ret = ksmbd_register_fsctl(&query_allocated_ranges_handler);
-	if (ret) {
-		pr_err("Failed to register FSCTL_QUERY_ALLOCATED_RANGES: %d\n",
-		       ret);
-		goto err_unregister_trim;
-	}
-
-	ret = ksmbd_register_fsctl(&set_zero_data_handler);
-	if (ret) {
-		pr_err("Failed to register FSCTL_SET_ZERO_DATA: %d\n",
-		       ret);
-		goto err_unregister_qar;
-	}
-
-	ret = ksmbd_register_fsctl(&pipe_wait_handler);
-	if (ret) {
-		pr_err("Failed to register FSCTL_PIPE_WAIT: %d\n",
-		       ret);
-		goto err_unregister_zero;
+	for (i = 0; i < ARRAY_SIZE(extra_handlers); i++) {
+		ret = ksmbd_register_fsctl(extra_handlers[i]);
+		if (ret) {
+			pr_err("Failed to register FSCTL 0x%08x: %d\n",
+			       extra_handlers[i]->ctl_code, ret);
+			goto err_unregister;
+		}
 	}
 
 	ksmbd_debug(SMB, "Extra FSCTL handlers initialized\n");
 	return 0;
 
-err_unregister_zero:
-	ksmbd_unregister_fsctl(&set_zero_data_handler);
-err_unregister_qar:
-	ksmbd_unregister_fsctl(&query_allocated_ranges_handler);
-err_unregister_trim:
-	ksmbd_unregister_fsctl(&file_level_trim_handler);
+err_unregister:
+	while (--i >= 0)
+		ksmbd_unregister_fsctl(extra_handlers[i]);
 	return ret;
 }
 
@@ -418,8 +655,8 @@ err_unregister_trim:
  */
 void ksmbd_fsctl_extra_exit(void)
 {
-	ksmbd_unregister_fsctl(&pipe_wait_handler);
-	ksmbd_unregister_fsctl(&set_zero_data_handler);
-	ksmbd_unregister_fsctl(&query_allocated_ranges_handler);
-	ksmbd_unregister_fsctl(&file_level_trim_handler);
+	int i;
+
+	for (i = ARRAY_SIZE(extra_handlers) - 1; i >= 0; i--)
+		ksmbd_unregister_fsctl(extra_handlers[i]);
 }

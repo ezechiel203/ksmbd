@@ -54,6 +54,7 @@
 #include "ksmbd_notify.h"
 #include "ksmbd_info.h"
 #include "ksmbd_buffer.h"
+#include "xattr.h"
 #include "smb2pdu_internal.h"
 
 static int buffer_check_err(int reqOutputBufferLength,
@@ -98,13 +99,15 @@ static void get_internal_info_pipe(struct smb2_query_info_rsp *rsp, u64 num,
 		cpu_to_le32(sizeof(struct smb2_file_internal_info));
 }
 
-static int smb2_get_info_file_pipe(struct ksmbd_session *sess,
+static int smb2_get_info_file_pipe(struct ksmbd_work *work,
+				   struct ksmbd_session *sess,
 				   struct smb2_query_info_req *req,
 				   struct smb2_query_info_rsp *rsp,
 				   void *rsp_org)
 {
 	u64 id;
 	int rc;
+	unsigned int qout_len = 0;
 
 	/*
 	 * Windows can sometime send query file info request on
@@ -136,9 +139,21 @@ static int smb2_get_info_file_pipe(struct ksmbd_session *sess,
 				      rsp, rsp_org);
 		break;
 	default:
-		ksmbd_debug(SMB, "smb2_info_file_pipe for %u not supported\n",
-			    req->FileInfoClass);
-		rc = -EOPNOTSUPP;
+		rc = ksmbd_dispatch_info(work, NULL,
+					 SMB2_O_INFO_FILE,
+					 req->FileInfoClass,
+					 KSMBD_INFO_GET,
+					 rsp->Buffer,
+					 le32_to_cpu(req->OutputBufferLength),
+					 &qout_len);
+		if (!rc) {
+			rsp->OutputBufferLength = cpu_to_le32(qout_len);
+			rc = buffer_check_err(le32_to_cpu(req->OutputBufferLength),
+					      rsp, rsp_org);
+		} else {
+			ksmbd_debug(SMB, "smb2_info_file_pipe for %u not supported\n",
+				    req->FileInfoClass);
+		}
 	}
 	return rc;
 }
@@ -783,7 +798,10 @@ static int get_file_compression_info(struct smb2_query_info_rsp *rsp,
 
 	file_info = (struct smb2_file_comp_info *)rsp->Buffer;
 	file_info->CompressedFileSize = cpu_to_le64(stat.blocks << 9);
-	file_info->CompressionFormat = COMPRESSION_FORMAT_NONE;
+	if (fp->f_ci->m_fattr & ATTR_COMPRESSED_LE)
+		file_info->CompressionFormat = COMPRESSION_FORMAT_LZNT1;
+	else
+		file_info->CompressionFormat = COMPRESSION_FORMAT_NONE;
 	file_info->CompressionUnitShift = 0;
 	file_info->ChunkShift = 0;
 	file_info->ClusterShift = 0;
@@ -799,6 +817,9 @@ static int get_file_attribute_tag_info(struct smb2_query_info_rsp *rsp,
 				       struct ksmbd_file *fp, void *rsp_org)
 {
 	struct smb2_file_attr_tag_info *file_info;
+	char *reparse_buf = NULL;
+	__le32 reparse_tag;
+	ssize_t reparse_len;
 
 	if (!(fp->daccess & FILE_READ_ATTRIBUTES_LE)) {
 		pr_err("no right to read the attributes : 0x%x\n",
@@ -808,9 +829,185 @@ static int get_file_attribute_tag_info(struct smb2_query_info_rsp *rsp,
 
 	file_info = (struct smb2_file_attr_tag_info *)rsp->Buffer;
 	file_info->FileAttributes = fp->f_ci->m_fattr;
-	file_info->ReparseTag = 0;
+	file_info->ReparseTag =
+		smb2_get_reparse_tag_special_file(file_inode(fp->filp)->i_mode);
+	if (file_info->ReparseTag) {
+		file_info->FileAttributes |= ATTR_REPARSE_POINT_LE;
+		goto out;
+	}
+
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+	reparse_len = ksmbd_vfs_getxattr(file_mnt_idmap(fp->filp),
+#else
+	reparse_len = ksmbd_vfs_getxattr(file_mnt_user_ns(fp->filp),
+#endif
+					 fp->filp->f_path.dentry,
+					 XATTR_NAME_REPARSE_DATA,
+					 &reparse_buf);
+	if (reparse_len >= sizeof(reparse_tag)) {
+		memcpy(&reparse_tag, reparse_buf, sizeof(reparse_tag));
+		file_info->ReparseTag = reparse_tag;
+		file_info->FileAttributes |= ATTR_REPARSE_POINT_LE;
+	}
+	kfree(reparse_buf);
+
+out:
 	rsp->OutputBufferLength =
 		cpu_to_le32(sizeof(struct smb2_file_attr_tag_info));
+	return 0;
+}
+
+struct smb2_file_reparse_point_info {
+	__le64 FileReferenceNumber;
+	__le32 Tag;
+} __packed;
+
+static int get_file_reparse_point_info(struct smb2_query_info_rsp *rsp,
+				       struct ksmbd_file *fp, void *rsp_org)
+{
+	struct smb2_file_reparse_point_info *info;
+	char *reparse_buf = NULL;
+	__le32 reparse_tag;
+	ssize_t reparse_len;
+
+	if (!(fp->daccess & FILE_READ_ATTRIBUTES_LE))
+		return -EACCES;
+
+	info = (struct smb2_file_reparse_point_info *)rsp->Buffer;
+	info->FileReferenceNumber = cpu_to_le64(file_inode(fp->filp)->i_ino);
+	info->Tag = smb2_get_reparse_tag_special_file(file_inode(fp->filp)->i_mode);
+	if (info->Tag)
+		goto out;
+
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+	reparse_len = ksmbd_vfs_getxattr(file_mnt_idmap(fp->filp),
+#else
+	reparse_len = ksmbd_vfs_getxattr(file_mnt_user_ns(fp->filp),
+#endif
+					 fp->filp->f_path.dentry,
+					 XATTR_NAME_REPARSE_DATA,
+					 &reparse_buf);
+	if (reparse_len >= sizeof(reparse_tag)) {
+		memcpy(&reparse_tag, reparse_buf, sizeof(reparse_tag));
+		info->Tag = reparse_tag;
+	}
+	kfree(reparse_buf);
+
+out:
+	rsp->OutputBufferLength = cpu_to_le32(sizeof(*info));
+	return 0;
+}
+
+struct smb2_file_standard_link_info {
+	__le32 NumberOfAccessibleLinks;
+	__le32 TotalNumberOfLinks;
+	__u8 DeletePending;
+	__u8 Directory;
+	__le16 Reserved;
+} __packed;
+
+static int get_file_standard_link_info(struct smb2_query_info_rsp *rsp,
+				       struct ksmbd_file *fp, void *rsp_org)
+{
+	struct smb2_file_standard_link_info *info;
+	unsigned int delete_pending;
+	struct kstat stat;
+	int ret;
+
+	if (!(fp->daccess & FILE_READ_ATTRIBUTES_LE))
+		return -EACCES;
+
+	ret = vfs_getattr(&fp->filp->f_path, &stat, STATX_BASIC_STATS,
+			  AT_STATX_SYNC_AS_STAT);
+	if (ret)
+		return ret;
+
+	delete_pending = ksmbd_inode_pending_delete(fp);
+	info = (struct smb2_file_standard_link_info *)rsp->Buffer;
+	info->TotalNumberOfLinks = cpu_to_le32(get_nlink(&stat));
+	info->NumberOfAccessibleLinks =
+		cpu_to_le32(get_nlink(&stat) - delete_pending);
+	info->DeletePending = delete_pending;
+	info->Directory = S_ISDIR(stat.mode) ? 1 : 0;
+	info->Reserved = 0;
+	rsp->OutputBufferLength = cpu_to_le32(sizeof(*info));
+	return 0;
+}
+
+struct smb2_file_id_info {
+	__le64 FileId;
+} __packed;
+
+static int get_file_id_info(struct smb2_query_info_rsp *rsp,
+			    struct ksmbd_file *fp, void *rsp_org)
+{
+	struct smb2_file_id_info *info;
+
+	if (!(fp->daccess & FILE_READ_ATTRIBUTES_LE))
+		return -EACCES;
+
+	info = (struct smb2_file_id_info *)rsp->Buffer;
+	info->FileId = cpu_to_le64(file_inode(fp->filp)->i_ino);
+	rsp->OutputBufferLength = cpu_to_le32(sizeof(*info));
+	return 0;
+}
+
+static void fill_fallback_object_id(struct ksmbd_file *fp, u8 *object_id)
+{
+	struct inode *inode = file_inode(fp->filp);
+	__le64 ino = cpu_to_le64(inode->i_ino);
+	__le32 gen = cpu_to_le32(inode->i_generation);
+	__le32 dev = cpu_to_le32((u32)new_encode_dev(inode->i_sb->s_dev));
+
+	memset(object_id, 0, 16);
+	memcpy(object_id, &ino, sizeof(ino));
+	memcpy(object_id + sizeof(ino), &gen, sizeof(gen));
+	memcpy(object_id + sizeof(ino) + sizeof(gen), &dev, sizeof(dev));
+}
+
+static int get_file_object_id_info(struct smb2_query_info_rsp *rsp,
+				   struct ksmbd_file *fp, void *rsp_org)
+{
+	char *xattr_buf = NULL;
+	u8 object_id[16];
+	u8 *out;
+	int i;
+	ssize_t xattr_len;
+
+	if (!(fp->daccess & FILE_READ_ATTRIBUTES_LE))
+		return -EACCES;
+
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+	xattr_len = ksmbd_vfs_getxattr(file_mnt_idmap(fp->filp),
+#else
+	xattr_len = ksmbd_vfs_getxattr(file_mnt_user_ns(fp->filp),
+#endif
+				       fp->filp->f_path.dentry,
+				       XATTR_NAME_OBJECT_ID,
+				       &xattr_buf);
+	if (xattr_len == 16) {
+		memcpy(object_id, xattr_buf, 16);
+		kfree(xattr_buf);
+	} else {
+		kfree(xattr_buf);
+		if (xattr_len < 0 &&
+		    xattr_len != -ENOENT &&
+		    xattr_len != -ENODATA &&
+		    xattr_len != -EOPNOTSUPP)
+			return xattr_len;
+		fill_fallback_object_id(fp, object_id);
+	}
+
+	out = (u8 *)rsp->Buffer;
+	for (i = 0; i < sizeof(struct file_object_buf_type1_ioctl_rsp); i++)
+		out[i] = 0;
+	for (i = 0; i < 16; i++) {
+		out[i] = object_id[i];
+		out[32 + i] = object_id[i];
+	}
+
+	rsp->OutputBufferLength =
+		cpu_to_le32(sizeof(struct file_object_buf_type1_ioctl_rsp));
 	return 0;
 }
 
@@ -922,12 +1119,13 @@ static int smb2_get_info_file(struct ksmbd_work *work,
 	struct ksmbd_file *fp;
 	int fileinfoclass = 0;
 	int rc = 0;
+	unsigned int qout_len = 0;
 	unsigned int id = KSMBD_NO_FID, pid = KSMBD_NO_FID;
 
 	if (test_share_config_flag(work->tcon->share_conf,
 				   KSMBD_SHARE_FLAG_PIPE)) {
 		/* smb2 info file called for pipe */
-		return smb2_get_info_file_pipe(work->sess, req, rsp,
+		return smb2_get_info_file_pipe(work, work->sess, req, rsp,
 					       work->response_buf);
 	}
 
@@ -1008,21 +1206,39 @@ static int smb2_get_info_file(struct ksmbd_work *work,
 		rc = get_file_compression_info(rsp, fp, work->response_buf);
 		break;
 
+	case FILE_OBJECT_ID_INFORMATION:
+		rc = get_file_object_id_info(rsp, fp, work->response_buf);
+		break;
+
+	case FILE_REPARSE_POINT_INFORMATION:
+		rc = get_file_reparse_point_info(rsp, fp, work->response_buf);
+		break;
+
 	case FILE_ATTRIBUTE_TAG_INFORMATION:
 		rc = get_file_attribute_tag_info(rsp, fp, work->response_buf);
 		break;
+	case FILE_STANDARD_LINK_INFORMATION:
+		rc = get_file_standard_link_info(rsp, fp, work->response_buf);
+		break;
+	case FILE_ID_INFORMATION:
+		rc = get_file_id_info(rsp, fp, work->response_buf);
+		break;
 	case SMB_FIND_FILE_POSIX_INFO:
-		if (!work->tcon->posix_extensions) {
-			pr_err("client doesn't negotiate with SMB3.1.1 POSIX Extensions\n");
-			rc = -EOPNOTSUPP;
-		} else {
-			rc = find_file_posix_info(rsp, fp, work->response_buf);
-		}
+		rc = find_file_posix_info(rsp, fp, work->response_buf);
 		break;
 	default:
-		ksmbd_debug(SMB, "fileinfoclass %d not supported yet\n",
-			    fileinfoclass);
-		rc = -EOPNOTSUPP;
+		rc = ksmbd_dispatch_info(work, fp,
+					 SMB2_O_INFO_FILE,
+					 fileinfoclass,
+					 KSMBD_INFO_GET,
+					 rsp->Buffer,
+					 le32_to_cpu(req->OutputBufferLength),
+					 &qout_len);
+			if (!rc)
+				rsp->OutputBufferLength = cpu_to_le32(qout_len);
+			else
+				ksmbd_debug(SMB, "fileinfoclass %d unsupported\n",
+					    fileinfoclass);
 	}
 	if (!rc)
 		rc = buffer_check_err(le32_to_cpu(req->OutputBufferLength),
@@ -1040,6 +1256,7 @@ static int smb2_get_info_filesystem(struct ksmbd_work *work,
 	int fsinfoclass = 0;
 	struct kstatfs stfs;
 	struct path path;
+	unsigned int qout_len = 0;
 	int rc = 0, len;
 
 	if (!share->path)
@@ -1223,26 +1440,32 @@ static int smb2_get_info_filesystem(struct ksmbd_work *work,
 	{
 		struct filesystem_posix_info *info;
 
-		if (!work->tcon->posix_extensions) {
-			pr_err("client doesn't negotiate with SMB3.1.1 POSIX Extensions\n");
-			path_put(&path);
-			return -EOPNOTSUPP;
-		} else {
-			info = (struct filesystem_posix_info *)(rsp->Buffer);
-			info->OptimalTransferSize = cpu_to_le32(stfs.f_bsize);
-			info->BlockSize = cpu_to_le32(stfs.f_bsize);
-			info->TotalBlocks = cpu_to_le64(stfs.f_blocks);
-			info->BlocksAvail = cpu_to_le64(stfs.f_bfree);
-			info->UserBlocksAvail = cpu_to_le64(stfs.f_bavail);
-			info->TotalFileNodes = cpu_to_le64(stfs.f_files);
-			info->FreeFileNodes = cpu_to_le64(stfs.f_ffree);
-			rsp->OutputBufferLength = cpu_to_le32(56);
-		}
+		info = (struct filesystem_posix_info *)(rsp->Buffer);
+		info->OptimalTransferSize = cpu_to_le32(stfs.f_bsize);
+		info->BlockSize = cpu_to_le32(stfs.f_bsize);
+		info->TotalBlocks = cpu_to_le64(stfs.f_blocks);
+		info->BlocksAvail = cpu_to_le64(stfs.f_bfree);
+		info->UserBlocksAvail = cpu_to_le64(stfs.f_bavail);
+		info->TotalFileNodes = cpu_to_le64(stfs.f_files);
+		info->FreeFileNodes = cpu_to_le64(stfs.f_ffree);
+		rsp->OutputBufferLength = cpu_to_le32(56);
 		break;
 	}
 	default:
-		path_put(&path);
-		return -EOPNOTSUPP;
+		rc = ksmbd_dispatch_info(work, NULL,
+					 SMB2_O_INFO_FILESYSTEM,
+					 fsinfoclass,
+					 KSMBD_INFO_GET,
+					 rsp->Buffer,
+					 le32_to_cpu(req->OutputBufferLength),
+					 &qout_len);
+		if (rc) {
+			path_put(&path);
+			return rc;
+		}
+
+		rsp->OutputBufferLength = cpu_to_le32(qout_len);
+		break;
 	}
 	rc = buffer_check_err(le32_to_cpu(req->OutputBufferLength),
 			      rsp, work->response_buf);
@@ -1364,6 +1587,7 @@ int smb2_query_info(struct ksmbd_work *work)
 	struct smb2_query_info_req *req;
 	struct smb2_query_info_rsp *rsp;
 	int rc = 0;
+	unsigned int qout_len = 0;
 
 	ksmbd_debug(SMB, "Received request smb2 query info request\n");
 
@@ -1412,27 +1636,42 @@ int smb2_query_info(struct ksmbd_work *work)
 			break;
 		}
 
-		rc = ksmbd_dispatch_info(work, fp,
-					 SMB2_O_INFO_QUOTA, 0,
-					 KSMBD_INFO_GET,
-					 rsp->Buffer,
-					 le32_to_cpu(req->OutputBufferLength),
-					 &qout_len);
+			rc = ksmbd_dispatch_info(work, fp,
+						 SMB2_O_INFO_QUOTA,
+						 req->FileInfoClass,
+						 KSMBD_INFO_GET,
+						 rsp->Buffer,
+						 le32_to_cpu(req->OutputBufferLength),
+						 &qout_len);
 		ksmbd_fd_put(work, fp);
 
-		if (rc == -EOPNOTSUPP) {
-			/* No handler registered — not supported */
+			if (rc == -EOPNOTSUPP) {
+				/*
+				 * If quota handlers are not registered, keep
+				 * behavior probe-friendly by returning an empty
+				 * response rather than failing the request.
+				 */
+				rc = 0;
+				qout_len = 0;
+			}
+			if (!rc)
+				rsp->OutputBufferLength = cpu_to_le32(qout_len);
 			break;
 		}
-		if (!rc)
-			rsp->OutputBufferLength = cpu_to_le32(qout_len);
-		break;
-	}
-	default:
-		ksmbd_debug(SMB, "InfoType %d not supported yet\n",
-			    req->InfoType);
-		rc = -EOPNOTSUPP;
-	}
+		default:
+			rc = ksmbd_dispatch_info(work, NULL,
+						 req->InfoType,
+						 req->FileInfoClass,
+						 KSMBD_INFO_GET,
+						 rsp->Buffer,
+						 le32_to_cpu(req->OutputBufferLength),
+						 &qout_len);
+				if (!rc)
+					rsp->OutputBufferLength = cpu_to_le32(qout_len);
+				else
+					ksmbd_debug(SMB, "InfoType %d unsupported\n",
+						    req->InfoType);
+		}
 	ksmbd_revert_fsids(work);
 
 	if (!rc) {
@@ -2053,6 +2292,100 @@ static int set_file_disposition_info(struct ksmbd_file *fp,
 	return 0;
 }
 
+#define FILE_DISPOSITION_DELETE			0x00000001
+#define FILE_DISPOSITION_POSIX_SEMANTICS	0x00000002
+#define FILE_DISPOSITION_FORCE_IMAGE_SECTION_CHECK 0x00000004
+#define FILE_DISPOSITION_ON_CLOSE		0x00000008
+#define FILE_DISPOSITION_IGNORE_READONLY_ATTRIBUTE 0x00000010
+
+struct smb2_file_disposition_info_ex {
+	__le32 Flags;
+} __packed;
+
+static int set_file_disposition_info_ex(struct ksmbd_file *fp,
+					struct smb2_file_disposition_info_ex *file_info)
+{
+	struct smb2_file_disposition_info legacy = {};
+	u32 flags = le32_to_cpu(file_info->Flags);
+	u32 valid_flags = FILE_DISPOSITION_DELETE |
+			  FILE_DISPOSITION_POSIX_SEMANTICS |
+			  FILE_DISPOSITION_FORCE_IMAGE_SECTION_CHECK |
+			  FILE_DISPOSITION_ON_CLOSE |
+			  FILE_DISPOSITION_IGNORE_READONLY_ATTRIBUTE;
+
+	if (flags & ~valid_flags)
+		return -EINVAL;
+
+	if (flags & FILE_DISPOSITION_IGNORE_READONLY_ATTRIBUTE)
+		fp->f_ci->m_fattr &= ~ATTR_READONLY_LE;
+
+	legacy.DeletePending = !!(flags & FILE_DISPOSITION_DELETE);
+	return set_file_disposition_info(fp, &legacy);
+}
+
+#define FILE_RENAME_REPLACE_IF_EXISTS			0x00000001
+#define FILE_RENAME_POSIX_SEMANTICS			0x00000002
+#define FILE_RENAME_SUPPRESS_PIN_STATE_INHERITANCE	0x00000004
+#define FILE_RENAME_SUPPRESS_STORAGE_RESERVE_INHERITANCE 0x00000008
+#define FILE_RENAME_NO_INCREASE_AVAILABLE_SPACE		0x00000010
+#define FILE_RENAME_NO_DECREASE_AVAILABLE_SPACE		0x00000020
+#define FILE_RENAME_IGNORE_READONLY_ATTRIBUTE		0x00000040
+#define FILE_RENAME_FORCE_RESIZE_TARGET_SR		0x00000080
+#define FILE_RENAME_FORCE_RESIZE_SOURCE_SR		0x00000100
+
+struct smb2_file_rename_info_ex {
+	__le32 Flags;
+	__u32 Reserved;
+	__u64 RootDirectory;
+	__le32 FileNameLength;
+	char FileName[];
+} __packed;
+
+static int set_rename_info_ex(struct ksmbd_work *work, struct ksmbd_file *fp,
+			      struct smb2_file_rename_info_ex *file_info,
+			      unsigned int buf_len)
+{
+	struct smb2_file_rename_info *legacy;
+	unsigned int name_len;
+	unsigned int valid_off = offsetof(struct smb2_file_rename_info_ex, FileName);
+	u32 flags = le32_to_cpu(file_info->Flags);
+	u32 valid_flags = FILE_RENAME_REPLACE_IF_EXISTS |
+			  FILE_RENAME_POSIX_SEMANTICS |
+			  FILE_RENAME_SUPPRESS_PIN_STATE_INHERITANCE |
+			  FILE_RENAME_SUPPRESS_STORAGE_RESERVE_INHERITANCE |
+			  FILE_RENAME_NO_INCREASE_AVAILABLE_SPACE |
+			  FILE_RENAME_NO_DECREASE_AVAILABLE_SPACE |
+			  FILE_RENAME_IGNORE_READONLY_ATTRIBUTE |
+			  FILE_RENAME_FORCE_RESIZE_TARGET_SR |
+			  FILE_RENAME_FORCE_RESIZE_SOURCE_SR;
+	size_t legacy_len;
+	int rc;
+
+	if (flags & ~valid_flags)
+		return -EINVAL;
+
+	if (buf_len < valid_off)
+		return -EMSGSIZE;
+
+	name_len = le32_to_cpu(file_info->FileNameLength);
+	if (name_len > buf_len - valid_off)
+		return -EINVAL;
+
+	legacy_len = sizeof(*legacy) + name_len;
+	legacy = kzalloc(legacy_len, KSMBD_DEFAULT_GFP);
+	if (!legacy)
+		return -ENOMEM;
+
+	legacy->ReplaceIfExists = !!(flags & FILE_RENAME_REPLACE_IF_EXISTS);
+	legacy->RootDirectory = file_info->RootDirectory;
+	legacy->FileNameLength = cpu_to_le32(name_len);
+	memcpy(legacy->FileName, file_info->FileName, name_len);
+
+	rc = set_rename_info(work, fp, legacy, legacy_len);
+	kfree(legacy);
+	return rc;
+}
+
 static int set_file_position_info(struct ksmbd_file *fp,
 				  struct smb2_file_pos_info *file_info)
 {
@@ -2105,6 +2438,31 @@ static int set_file_mode_info(struct ksmbd_file *fp,
 	return 0;
 }
 
+static int set_file_object_id_info(struct ksmbd_file *fp,
+				   const char *buffer, unsigned int buf_len)
+{
+	int rc;
+
+	if (!(fp->daccess & FILE_WRITE_ATTRIBUTES_LE))
+		return -EACCES;
+
+	if (buf_len < 16)
+		return -EMSGSIZE;
+
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+	rc = ksmbd_vfs_setxattr(file_mnt_idmap(fp->filp),
+#else
+	rc = ksmbd_vfs_setxattr(file_mnt_user_ns(fp->filp),
+#endif
+				&fp->filp->f_path,
+				XATTR_NAME_OBJECT_ID,
+				(void *)buffer,
+				16, 0, true);
+	if (rc == -EOPNOTSUPP)
+		return 0;
+	return rc;
+}
+
 /**
  * smb2_set_info_file() - handler for smb2 set info command
  * @work:	smb work containing set info command buffer
@@ -2120,6 +2478,8 @@ static int smb2_set_info_file(struct ksmbd_work *work, struct ksmbd_file *fp,
 {
 	unsigned int buf_len = le32_to_cpu(req->BufferLength);
 	char *buffer = (char *)req + le16_to_cpu(req->BufferOffset);
+	unsigned int consumed_len = 0;
+	int rc;
 
 	switch (req->FileInfoClass) {
 	case FILE_BASIC_INFORMATION:
@@ -2146,6 +2506,7 @@ static int smb2_set_info_file(struct ksmbd_work *work, struct ksmbd_file *fp,
 					    (struct smb2_file_eof_info *)buffer);
 	}
 	case FILE_RENAME_INFORMATION:
+	case FILE_RENAME_INFORMATION_BYPASS_ACCESS_CHECK:
 	{
 		if (buf_len < sizeof(struct smb2_file_rename_info))
 			return -EMSGSIZE;
@@ -2154,7 +2515,18 @@ static int smb2_set_info_file(struct ksmbd_work *work, struct ksmbd_file *fp,
 				       (struct smb2_file_rename_info *)buffer,
 				       buf_len);
 	}
+	case FILE_RENAME_INFORMATION_EX:
+	case FILE_RENAME_INFORMATION_EX_BYPASS_ACCESS_CHECK:
+	{
+		if (buf_len < offsetof(struct smb2_file_rename_info_ex, FileName))
+			return -EMSGSIZE;
+
+		return set_rename_info_ex(work, fp,
+					(struct smb2_file_rename_info_ex *)buffer,
+					buf_len);
+	}
 	case FILE_LINK_INFORMATION:
+	case FILE_LINK_INFORMATION_BYPASS_ACCESS_CHECK:
 	{
 		if (buf_len < sizeof(struct smb2_file_link_info))
 			return -EMSGSIZE;
@@ -2171,6 +2543,14 @@ static int smb2_set_info_file(struct ksmbd_work *work, struct ksmbd_file *fp,
 
 		return set_file_disposition_info(fp,
 						 (struct smb2_file_disposition_info *)buffer);
+	}
+	case FILE_DISPOSITION_INFORMATION_EX:
+	{
+		if (buf_len < sizeof(struct smb2_file_disposition_info_ex))
+			return -EMSGSIZE;
+
+		return set_file_disposition_info_ex(fp,
+					(struct smb2_file_disposition_info_ex *)buffer);
 	}
 	case FILE_FULL_EA_INFORMATION:
 	{
@@ -2200,10 +2580,20 @@ static int smb2_set_info_file(struct ksmbd_work *work, struct ksmbd_file *fp,
 
 		return set_file_mode_info(fp, (struct smb2_file_mode_info *)buffer);
 	}
+	case FILE_OBJECT_ID_INFORMATION:
+		return set_file_object_id_info(fp, buffer, buf_len);
 	}
 
-	pr_err_ratelimited("Unimplemented Fileinfoclass :%d\n", req->FileInfoClass);
-	return -EOPNOTSUPP;
+	rc = ksmbd_dispatch_info(work, fp,
+				 SMB2_O_INFO_FILE,
+				 req->FileInfoClass,
+				 KSMBD_INFO_SET,
+				 buffer, buf_len, &consumed_len);
+	if (!rc)
+		return 0;
+
+	ksmbd_debug(SMB, "FileInfoClass %d unsupported\n", req->FileInfoClass);
+	return rc;
 }
 
 static int smb2_set_info_sec(struct ksmbd_file *fp, int addition_info,
@@ -2230,6 +2620,9 @@ int smb2_set_info(struct ksmbd_work *work)
 	struct ksmbd_file *fp = NULL;
 	int rc = 0;
 	unsigned int id = KSMBD_NO_FID, pid = KSMBD_NO_FID;
+	char *set_buf;
+	unsigned int set_buf_len;
+	unsigned int consumed_len = 0;
 
 	ksmbd_debug(SMB, "Received smb2 set info request\n");
 
@@ -2285,10 +2678,24 @@ int smb2_set_info(struct ksmbd_work *work)
 		goto err_out;
 	}
 
+	set_buf = (char *)req + le16_to_cpu(req->BufferOffset);
+	set_buf_len = le32_to_cpu(req->BufferLength);
+
 	switch (req->InfoType) {
 	case SMB2_O_INFO_FILE:
 		ksmbd_debug(SMB, "GOT SMB2_O_INFO_FILE\n");
 		rc = smb2_set_info_file(work, fp, req, work->tcon->share_conf);
+		break;
+	case SMB2_O_INFO_FILESYSTEM:
+		ksmbd_debug(SMB, "GOT SMB2_O_INFO_FILESYSTEM\n");
+		rc = ksmbd_dispatch_info(work, fp,
+					 SMB2_O_INFO_FILESYSTEM,
+					 req->FileInfoClass,
+					 KSMBD_INFO_SET,
+					 set_buf, set_buf_len,
+					 &consumed_len);
+		if (!rc && consumed_len > set_buf_len)
+			rc = -EINVAL;
 		break;
 	case SMB2_O_INFO_SECURITY:
 		ksmbd_debug(SMB, "GOT SMB2_O_INFO_SECURITY\n");
@@ -2298,12 +2705,29 @@ int smb2_set_info(struct ksmbd_work *work)
 		}
 		rc = smb2_set_info_sec(fp,
 				       le32_to_cpu(req->AdditionalInformation),
-				       (char *)req + le16_to_cpu(req->BufferOffset),
-				       le32_to_cpu(req->BufferLength));
+				       set_buf, set_buf_len);
 		ksmbd_revert_fsids(work);
 		break;
+	case SMB2_O_INFO_QUOTA:
+		ksmbd_debug(SMB, "GOT SMB2_O_INFO_QUOTA\n");
+		rc = ksmbd_dispatch_info(work, fp,
+					 SMB2_O_INFO_QUOTA,
+					 req->FileInfoClass,
+					 KSMBD_INFO_SET,
+					 set_buf, set_buf_len,
+					 &consumed_len);
+		if (!rc && consumed_len > set_buf_len)
+			rc = -EINVAL;
+		break;
 	default:
-		rc = -EOPNOTSUPP;
+		rc = ksmbd_dispatch_info(work, fp,
+					 req->InfoType,
+					 req->FileInfoClass,
+					 KSMBD_INFO_SET,
+					 set_buf, set_buf_len,
+					 &consumed_len);
+		if (!rc && consumed_len > set_buf_len)
+			rc = -EINVAL;
 	}
 
 	if (rc < 0)

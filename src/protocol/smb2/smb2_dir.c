@@ -79,6 +79,20 @@ static int readdir_info_level_struct_sz(int info_level)
 		return sizeof(struct file_id_full_dir_info);
 	case FILEID_BOTH_DIRECTORY_INFORMATION:
 		return sizeof(struct file_id_both_directory_info);
+	case FILEID_GLOBAL_TX_DIRECTORY_INFORMATION:
+		return sizeof(struct file_id_both_directory_info);
+	case FILEID_EXTD_DIRECTORY_INFORMATION:
+		return sizeof(struct file_id_extd_dir_info);
+	case FILEID_EXTD_BOTH_DIRECTORY_INFORMATION:
+		return sizeof(struct file_id_extd_both_dir_info);
+	case FILEID_64_EXTD_DIRECTORY_INFORMATION:
+		return sizeof(struct file_id_64_extd_dir_info);
+	case FILEID_64_EXTD_BOTH_DIRECTORY_INFORMATION:
+		return sizeof(struct file_id_64_extd_both_dir_info);
+	case FILEID_ALL_EXTD_DIRECTORY_INFORMATION:
+		return sizeof(struct file_id_all_extd_dir_info);
+	case FILEID_ALL_EXTD_BOTH_DIRECTORY_INFORMATION:
+		return sizeof(struct file_id_all_extd_both_dir_info);
 	case SMB_FIND_FILE_POSIX_INFO:
 		return sizeof(struct smb2_posix_info);
 	default:
@@ -147,6 +161,76 @@ static int dentry_name(struct ksmbd_dir_info *d_info, int info_level)
 		d_info->rptr += le32_to_cpu(fibdinfo->NextEntryOffset);
 		d_info->name = fibdinfo->FileName;
 		d_info->name_len = le32_to_cpu(fibdinfo->FileNameLength);
+		return 0;
+	}
+	case FILEID_GLOBAL_TX_DIRECTORY_INFORMATION:
+	{
+		struct file_id_both_directory_info *fibdinfo;
+
+		fibdinfo = (struct file_id_both_directory_info *)d_info->rptr;
+		d_info->rptr += le32_to_cpu(fibdinfo->NextEntryOffset);
+		d_info->name = fibdinfo->FileName;
+		d_info->name_len = le32_to_cpu(fibdinfo->FileNameLength);
+		return 0;
+	}
+	case FILEID_EXTD_DIRECTORY_INFORMATION:
+	{
+		struct file_id_extd_dir_info *extdinfo;
+
+		extdinfo = (struct file_id_extd_dir_info *)d_info->rptr;
+		d_info->rptr += le32_to_cpu(extdinfo->NextEntryOffset);
+		d_info->name = extdinfo->FileName;
+		d_info->name_len = le32_to_cpu(extdinfo->FileNameLength);
+		return 0;
+	}
+	case FILEID_EXTD_BOTH_DIRECTORY_INFORMATION:
+	{
+		struct file_id_extd_both_dir_info *extdbinfo;
+
+		extdbinfo = (struct file_id_extd_both_dir_info *)d_info->rptr;
+		d_info->rptr += le32_to_cpu(extdbinfo->NextEntryOffset);
+		d_info->name = extdbinfo->FileName;
+		d_info->name_len = le32_to_cpu(extdbinfo->FileNameLength);
+		return 0;
+	}
+	case FILEID_64_EXTD_DIRECTORY_INFORMATION:
+	{
+		struct file_id_64_extd_dir_info *extd64info;
+
+		extd64info = (struct file_id_64_extd_dir_info *)d_info->rptr;
+		d_info->rptr += le32_to_cpu(extd64info->NextEntryOffset);
+		d_info->name = extd64info->FileName;
+		d_info->name_len = le32_to_cpu(extd64info->FileNameLength);
+		return 0;
+	}
+	case FILEID_64_EXTD_BOTH_DIRECTORY_INFORMATION:
+	{
+		struct file_id_64_extd_both_dir_info *extd64binfo;
+
+		extd64binfo = (struct file_id_64_extd_both_dir_info *)d_info->rptr;
+		d_info->rptr += le32_to_cpu(extd64binfo->NextEntryOffset);
+		d_info->name = extd64binfo->FileName;
+		d_info->name_len = le32_to_cpu(extd64binfo->FileNameLength);
+		return 0;
+	}
+	case FILEID_ALL_EXTD_DIRECTORY_INFORMATION:
+	{
+		struct file_id_all_extd_dir_info *allexdinfo;
+
+		allexdinfo = (struct file_id_all_extd_dir_info *)d_info->rptr;
+		d_info->rptr += le32_to_cpu(allexdinfo->NextEntryOffset);
+		d_info->name = allexdinfo->FileName;
+		d_info->name_len = le32_to_cpu(allexdinfo->FileNameLength);
+		return 0;
+	}
+	case FILEID_ALL_EXTD_BOTH_DIRECTORY_INFORMATION:
+	{
+		struct file_id_all_extd_both_dir_info *allexdbinfo;
+
+		allexdbinfo = (struct file_id_all_extd_both_dir_info *)d_info->rptr;
+		d_info->rptr += le32_to_cpu(allexdbinfo->NextEntryOffset);
+		d_info->name = allexdbinfo->FileName;
+		d_info->name_len = le32_to_cpu(allexdbinfo->FileNameLength);
 		return 0;
 	}
 	case SMB_FIND_FILE_POSIX_INFO:
@@ -304,6 +388,7 @@ static int smb2_populate_readdir_entry(struct ksmbd_conn *conn, int info_level,
 		break;
 	}
 	case FILEID_BOTH_DIRECTORY_INFORMATION:
+	case FILEID_GLOBAL_TX_DIRECTORY_INFORMATION:
 	{
 		struct file_id_both_directory_info *fibdinfo;
 
@@ -334,6 +419,142 @@ static int smb2_populate_readdir_entry(struct ksmbd_conn *conn, int info_level,
 			fibdinfo->ExtFileAttributes |= ATTR_HIDDEN_LE;
 		memcpy(fibdinfo->FileName, conv_name, conv_len);
 		fibdinfo->NextEntryOffset = cpu_to_le32(next_entry_offset);
+		break;
+	}
+	case FILEID_EXTD_DIRECTORY_INFORMATION:
+	{
+		struct file_id_extd_dir_info *extdinfo;
+		__le32 reparse_tag;
+		__le64 ino = cpu_to_le64(ksmbd_kstat->kstat->ino);
+
+		extdinfo = (struct file_id_extd_dir_info *)kstat;
+		extdinfo->FileNameLength = cpu_to_le32(conv_len);
+		reparse_tag =
+			smb2_get_reparse_tag_special_file(ksmbd_kstat->kstat->mode);
+		extdinfo->EaSize = reparse_tag;
+		extdinfo->ReparsePointTag = reparse_tag;
+		if (reparse_tag)
+			extdinfo->ExtFileAttributes = ATTR_REPARSE_POINT_LE;
+		memcpy(&extdinfo->FileId[0], &ino, sizeof(ino));
+		memset(&extdinfo->FileId[8], 0, 8);
+		if (d_info->hide_dot_file && d_info->name[0] == '.')
+			extdinfo->ExtFileAttributes |= ATTR_HIDDEN_LE;
+		memcpy(extdinfo->FileName, conv_name, conv_len);
+		extdinfo->NextEntryOffset = cpu_to_le32(next_entry_offset);
+		break;
+	}
+	case FILEID_EXTD_BOTH_DIRECTORY_INFORMATION:
+	{
+		struct file_id_extd_both_dir_info *extdbinfo;
+		__le32 reparse_tag;
+		__le64 ino = cpu_to_le64(ksmbd_kstat->kstat->ino);
+
+		extdbinfo = (struct file_id_extd_both_dir_info *)kstat;
+		extdbinfo->FileNameLength = cpu_to_le32(conv_len);
+		reparse_tag =
+			smb2_get_reparse_tag_special_file(ksmbd_kstat->kstat->mode);
+		extdbinfo->EaSize = reparse_tag;
+		extdbinfo->ReparsePointTag = reparse_tag;
+		if (reparse_tag)
+			extdbinfo->ExtFileAttributes = ATTR_REPARSE_POINT_LE;
+		memcpy(&extdbinfo->FileId[0], &ino, sizeof(ino));
+		memset(&extdbinfo->FileId[8], 0, 8);
+		extdbinfo->ShortNameLength = 0;
+		extdbinfo->Reserved = 0;
+		if (d_info->hide_dot_file && d_info->name[0] == '.')
+			extdbinfo->ExtFileAttributes |= ATTR_HIDDEN_LE;
+		memcpy(extdbinfo->FileName, conv_name, conv_len);
+		extdbinfo->NextEntryOffset = cpu_to_le32(next_entry_offset);
+		break;
+	}
+	case FILEID_64_EXTD_DIRECTORY_INFORMATION:
+	{
+		struct file_id_64_extd_dir_info *extd64info;
+		__le32 reparse_tag;
+
+		extd64info = (struct file_id_64_extd_dir_info *)kstat;
+		extd64info->FileNameLength = cpu_to_le32(conv_len);
+		reparse_tag =
+			smb2_get_reparse_tag_special_file(ksmbd_kstat->kstat->mode);
+		extd64info->EaSize = reparse_tag;
+		extd64info->ReparsePointTag = reparse_tag;
+		if (reparse_tag)
+			extd64info->ExtFileAttributes = ATTR_REPARSE_POINT_LE;
+		extd64info->FileId = cpu_to_le64(ksmbd_kstat->kstat->ino);
+		if (d_info->hide_dot_file && d_info->name[0] == '.')
+			extd64info->ExtFileAttributes |= ATTR_HIDDEN_LE;
+		memcpy(extd64info->FileName, conv_name, conv_len);
+		extd64info->NextEntryOffset = cpu_to_le32(next_entry_offset);
+		break;
+	}
+	case FILEID_64_EXTD_BOTH_DIRECTORY_INFORMATION:
+	{
+		struct file_id_64_extd_both_dir_info *extd64binfo;
+		__le32 reparse_tag;
+
+		extd64binfo = (struct file_id_64_extd_both_dir_info *)kstat;
+		extd64binfo->FileNameLength = cpu_to_le32(conv_len);
+		reparse_tag =
+			smb2_get_reparse_tag_special_file(ksmbd_kstat->kstat->mode);
+		extd64binfo->EaSize = reparse_tag;
+		extd64binfo->ReparsePointTag = reparse_tag;
+		if (reparse_tag)
+			extd64binfo->ExtFileAttributes = ATTR_REPARSE_POINT_LE;
+		extd64binfo->FileId = cpu_to_le64(ksmbd_kstat->kstat->ino);
+		extd64binfo->ShortNameLength = 0;
+		extd64binfo->Reserved = 0;
+		if (d_info->hide_dot_file && d_info->name[0] == '.')
+			extd64binfo->ExtFileAttributes |= ATTR_HIDDEN_LE;
+		memcpy(extd64binfo->FileName, conv_name, conv_len);
+		extd64binfo->NextEntryOffset = cpu_to_le32(next_entry_offset);
+		break;
+	}
+	case FILEID_ALL_EXTD_DIRECTORY_INFORMATION:
+	{
+		struct file_id_all_extd_dir_info *allexdinfo;
+		__le32 reparse_tag;
+		__le64 ino = cpu_to_le64(ksmbd_kstat->kstat->ino);
+
+		allexdinfo = (struct file_id_all_extd_dir_info *)kstat;
+		allexdinfo->FileNameLength = cpu_to_le32(conv_len);
+		reparse_tag =
+			smb2_get_reparse_tag_special_file(ksmbd_kstat->kstat->mode);
+		allexdinfo->EaSize = reparse_tag;
+		allexdinfo->ReparsePointTag = reparse_tag;
+		if (reparse_tag)
+			allexdinfo->ExtFileAttributes = ATTR_REPARSE_POINT_LE;
+		allexdinfo->FileId = ino;
+		memcpy(&allexdinfo->FileId128[0], &ino, sizeof(ino));
+		memset(&allexdinfo->FileId128[8], 0, 8);
+		if (d_info->hide_dot_file && d_info->name[0] == '.')
+			allexdinfo->ExtFileAttributes |= ATTR_HIDDEN_LE;
+		memcpy(allexdinfo->FileName, conv_name, conv_len);
+		allexdinfo->NextEntryOffset = cpu_to_le32(next_entry_offset);
+		break;
+	}
+	case FILEID_ALL_EXTD_BOTH_DIRECTORY_INFORMATION:
+	{
+		struct file_id_all_extd_both_dir_info *allexdbinfo;
+		__le32 reparse_tag;
+		__le64 ino = cpu_to_le64(ksmbd_kstat->kstat->ino);
+
+		allexdbinfo = (struct file_id_all_extd_both_dir_info *)kstat;
+		allexdbinfo->FileNameLength = cpu_to_le32(conv_len);
+		reparse_tag =
+			smb2_get_reparse_tag_special_file(ksmbd_kstat->kstat->mode);
+		allexdbinfo->EaSize = reparse_tag;
+		allexdbinfo->ReparsePointTag = reparse_tag;
+		if (reparse_tag)
+			allexdbinfo->ExtFileAttributes = ATTR_REPARSE_POINT_LE;
+		allexdbinfo->FileId = ino;
+		memcpy(&allexdbinfo->FileId128[0], &ino, sizeof(ino));
+		memset(&allexdbinfo->FileId128[8], 0, 8);
+		allexdbinfo->ShortNameLength = 0;
+		allexdbinfo->Reserved = 0;
+		if (d_info->hide_dot_file && d_info->name[0] == '.')
+			allexdbinfo->ExtFileAttributes |= ATTR_HIDDEN_LE;
+		memcpy(allexdbinfo->FileName, conv_name, conv_len);
+		allexdbinfo->NextEntryOffset = cpu_to_le32(next_entry_offset);
 		break;
 	}
 	case SMB_FIND_FILE_POSIX_INFO:
@@ -603,6 +824,7 @@ static int reserve_populate_dentry(struct ksmbd_dir_info *d_info,
 		break;
 	}
 	case FILEID_BOTH_DIRECTORY_INFORMATION:
+	case FILEID_GLOBAL_TX_DIRECTORY_INFORMATION:
 	{
 		struct file_id_both_directory_info *fibdinfo;
 
@@ -611,6 +833,73 @@ static int reserve_populate_dentry(struct ksmbd_dir_info *d_info,
 		fibdinfo->FileName[d_info->name_len] = 0x00;
 		fibdinfo->FileNameLength = cpu_to_le32(d_info->name_len);
 		fibdinfo->NextEntryOffset = cpu_to_le32(next_entry_offset);
+		break;
+	}
+	case FILEID_EXTD_DIRECTORY_INFORMATION:
+	{
+		struct file_id_extd_dir_info *extdinfo;
+
+		extdinfo = (struct file_id_extd_dir_info *)d_info->wptr;
+		memcpy(extdinfo->FileName, d_info->name, d_info->name_len);
+		extdinfo->FileName[d_info->name_len] = 0x00;
+		extdinfo->FileNameLength = cpu_to_le32(d_info->name_len);
+		extdinfo->NextEntryOffset = cpu_to_le32(next_entry_offset);
+		break;
+	}
+	case FILEID_EXTD_BOTH_DIRECTORY_INFORMATION:
+	{
+		struct file_id_extd_both_dir_info *extdbinfo;
+
+		extdbinfo = (struct file_id_extd_both_dir_info *)d_info->wptr;
+		memcpy(extdbinfo->FileName, d_info->name, d_info->name_len);
+		extdbinfo->FileName[d_info->name_len] = 0x00;
+		extdbinfo->FileNameLength = cpu_to_le32(d_info->name_len);
+		extdbinfo->NextEntryOffset = cpu_to_le32(next_entry_offset);
+		break;
+	}
+	case FILEID_64_EXTD_DIRECTORY_INFORMATION:
+	{
+		struct file_id_64_extd_dir_info *extd64info;
+
+		extd64info = (struct file_id_64_extd_dir_info *)d_info->wptr;
+		memcpy(extd64info->FileName, d_info->name, d_info->name_len);
+		extd64info->FileName[d_info->name_len] = 0x00;
+		extd64info->FileNameLength = cpu_to_le32(d_info->name_len);
+		extd64info->NextEntryOffset = cpu_to_le32(next_entry_offset);
+		break;
+	}
+	case FILEID_64_EXTD_BOTH_DIRECTORY_INFORMATION:
+	{
+		struct file_id_64_extd_both_dir_info *extd64binfo;
+
+		extd64binfo = (struct file_id_64_extd_both_dir_info *)d_info->wptr;
+		memcpy(extd64binfo->FileName, d_info->name, d_info->name_len);
+		extd64binfo->FileName[d_info->name_len] = 0x00;
+		extd64binfo->FileNameLength = cpu_to_le32(d_info->name_len);
+		extd64binfo->NextEntryOffset = cpu_to_le32(next_entry_offset);
+		break;
+	}
+	case FILEID_ALL_EXTD_DIRECTORY_INFORMATION:
+	{
+		struct file_id_all_extd_dir_info *allexdinfo;
+
+		allexdinfo = (struct file_id_all_extd_dir_info *)d_info->wptr;
+		memcpy(allexdinfo->FileName, d_info->name, d_info->name_len);
+		allexdinfo->FileName[d_info->name_len] = 0x00;
+		allexdinfo->FileNameLength = cpu_to_le32(d_info->name_len);
+		allexdinfo->NextEntryOffset = cpu_to_le32(next_entry_offset);
+		break;
+	}
+	case FILEID_ALL_EXTD_BOTH_DIRECTORY_INFORMATION:
+	{
+		struct file_id_all_extd_both_dir_info *allexdbinfo;
+
+		allexdbinfo =
+			(struct file_id_all_extd_both_dir_info *)d_info->wptr;
+		memcpy(allexdbinfo->FileName, d_info->name, d_info->name_len);
+		allexdbinfo->FileName[d_info->name_len] = 0x00;
+		allexdbinfo->FileNameLength = cpu_to_le32(d_info->name_len);
+		allexdbinfo->NextEntryOffset = cpu_to_le32(next_entry_offset);
 		break;
 	}
 	case SMB_FIND_FILE_POSIX_INFO:
@@ -703,6 +992,13 @@ static int verify_info_level(int info_level)
 	case FILE_NAMES_INFORMATION:
 	case FILEID_FULL_DIRECTORY_INFORMATION:
 	case FILEID_BOTH_DIRECTORY_INFORMATION:
+	case FILEID_GLOBAL_TX_DIRECTORY_INFORMATION:
+	case FILEID_EXTD_DIRECTORY_INFORMATION:
+	case FILEID_EXTD_BOTH_DIRECTORY_INFORMATION:
+	case FILEID_64_EXTD_DIRECTORY_INFORMATION:
+	case FILEID_64_EXTD_BOTH_DIRECTORY_INFORMATION:
+	case FILEID_ALL_EXTD_DIRECTORY_INFORMATION:
+	case FILEID_ALL_EXTD_BOTH_DIRECTORY_INFORMATION:
 	case SMB_FIND_FILE_POSIX_INFO:
 		break;
 	default:

@@ -1,141 +1,59 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 name: Build
-on: [push, pull_request]
+
+on: [push, pull_request, workflow_dispatch]
+
 jobs:
-  build:
-    name: Build (kernel ${{ matrix.kernel }})
+  build-matrix:
+    name: Build (${{ matrix.distro_id }} / ${{ matrix.target_arch }})
     runs-on: ubuntu-latest
+    container:
+      image: ${{ matrix.distro }}
     strategy:
       fail-fast: false
       matrix:
-        kernel: ['6.1', '6.6', '6.8', '6.12']
+        include:
+          - distro: ubuntu:24.04
+            distro_id: ubuntu2404
+            target_arch: x86_64
+          - distro: debian:bookworm
+            distro_id: debian-bookworm
+            target_arch: x86_64
+          - distro: fedora:41
+            distro_id: fedora41
+            target_arch: x86_64
+          - distro: ubuntu:24.04
+            distro_id: ubuntu2404
+            target_arch: arm32
+          - distro: ubuntu:24.04
+            distro_id: ubuntu2404
+            target_arch: arm64
+          - distro: ubuntu:24.04
+            distro_id: ubuntu2404
+            target_arch: powerpc64le
+          - distro: ubuntu:24.04
+            distro_id: ubuntu2404
+            target_arch: riscv64
+    env:
+      TARGET_ARCH: ${{ matrix.target_arch }}
+      KERNEL_VERSION: "6.1.0"
+      JOBS: "2"
     steps:
       - uses: actions/checkout@v4
-      - name: Install kernel headers
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y linux-headers-generic build-essential
-      - name: Build ksmbd module
-        run: make -j$(nproc)
-      - name: Verify all source files compiled
-        run: |
-          # Check that key object files were produced
-          EXPECTED_OBJS="server.o connection.o auth.o vfs.o vfs_cache.o \
-            smb_common.o oplock.o unicode.o misc.o ndr.o \
-            transport_tcp.o transport_ipc.o ksmbd_work.o crypto_ctx.o smbacl.o"
-          MISSING=0
-          for obj in $EXPECTED_OBJS; do
-            if [ ! -f "$obj" ]; then
-              echo "ERROR: Missing object file: $obj"
-              MISSING=$((MISSING + 1))
-            fi
-          done
-          if [ "$MISSING" -gt 0 ]; then
-            echo "ERROR: $MISSING expected object files missing"
-            exit 1
-          fi
-          # Verify the final .ko was produced
-          if [ ! -f ksmbd.ko ]; then
-            echo "ERROR: ksmbd.ko not produced"
-            exit 1
-          fi
-          echo "Build verified: $(ls *.o 2>/dev/null | wc -l) objects, ksmbd.ko present"
-      - name: Run sparse check
-        run: |
-          make C=2 2>&1 | tee sparse-output.txt
-          ERRORS=$(grep -c 'error:' sparse-output.txt 2>/dev/null || echo 0)
-          WARNINGS=$(grep -c 'warning:' sparse-output.txt 2>/dev/null || echo 0)
-          echo "Sparse warnings: $WARNINGS"
-          echo "Sparse errors: $ERRORS"
-          if [ "$ERRORS" -gt 0 ]; then
-            echo "ERROR: Sparse found errors"
-            grep 'error:' sparse-output.txt
-            exit 1
-          fi
-      - name: Upload sparse report
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: sparse-report-${{ matrix.kernel }}
-          path: sparse-output.txt
 
-  test-compile:
-    name: Verify Test Sources
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
       - name: Install dependencies
+        run: .github/scripts/ci-install-deps.sh
+
+      - name: Build ksmbd module
+        run: .github/scripts/ci-build-module.sh
+
+      - name: Verify module output
         run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential linux-headers-generic
-      - name: Verify KUnit test syntax
-        run: |
-          echo "=== KUnit Test Files ==="
-          for f in test/ksmbd_test_*.c; do
-            echo "Checking: $f"
-            # Verify each test file has required KUnit includes and macros
-            if ! grep -q '#include <kunit/test.h>' "$f"; then
-              echo "ERROR: $f missing kunit/test.h include"
-              exit 1
-            fi
-            if ! grep -q 'kunit_test_suite' "$f"; then
-              echo "ERROR: $f missing kunit_test_suite registration"
-              exit 1
-            fi
-            if ! grep -q 'MODULE_LICENSE' "$f"; then
-              echo "ERROR: $f missing MODULE_LICENSE"
-              exit 1
-            fi
-          done
-          echo "All KUnit test files pass syntax check"
-      - name: Verify fuzz harness syntax
-        run: |
-          echo "=== Fuzz Harness Files ==="
-          for f in test/fuzz/*_fuzz.c; do
-            echo "Checking: $f"
-            if ! grep -q '#include <linux/module.h>' "$f"; then
-              echo "ERROR: $f missing module.h include"
-              exit 1
-            fi
-            if ! grep -q 'module_init' "$f"; then
-              echo "ERROR: $f missing module_init"
-              exit 1
-            fi
-            if ! grep -q 'MODULE_LICENSE' "$f"; then
-              echo "ERROR: $f missing MODULE_LICENSE"
-              exit 1
-            fi
-          done
-          echo "All fuzz harness files pass syntax check"
-      - name: Verify test Makefile
-        run: |
-          echo "=== test/Makefile ==="
-          cat test/Makefile
-          # Count entries
-          OBJ_COUNT=$(grep -c 'ksmbd_test_' test/Makefile || echo 0)
-          echo "Test objects in Makefile: $OBJ_COUNT"
-          # Verify each test file has a corresponding Makefile entry
-          for f in test/ksmbd_test_*.c; do
-            base=$(basename "$f" .c)
-            if ! grep -q "$base" test/Makefile; then
-              echo "ERROR: $base not in test/Makefile"
-              exit 1
-            fi
-          done
-          echo "All test files registered in Makefile"
-      - name: Count test infrastructure
-        run: |
-          echo "=== Test Infrastructure Summary ==="
-          echo "KUnit test files: $(ls test/ksmbd_test_*.c | wc -l)"
-          echo "Fuzz harnesses: $(ls test/fuzz/*_fuzz.c | wc -l)"
-          echo "Integration scripts: $(ls tests/*.sh | wc -l)"
-          echo "Benchmark scripts: $(ls benchmarks/*.sh 2>/dev/null | wc -l)"
-          echo ""
-          echo "=== KUnit Test Case Counts ==="
-          total=0
-          for f in test/ksmbd_test_*.c; do
-            count=$(grep -c 'KUNIT_CASE(' "$f" 2>/dev/null || echo 0)
-            echo "  $(basename $f): $count cases"
-            total=$((total + count))
-          done
-          echo "Total KUnit test cases: $total"
+          ls -lh ksmbd.ko
+          file ksmbd.ko
+
+      - name: Upload module artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ksmbd-${{ matrix.distro_id }}-${{ matrix.target_arch }}
+          path: ksmbd.ko

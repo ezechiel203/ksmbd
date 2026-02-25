@@ -70,7 +70,9 @@ static const char app_instance_version_tag[] = {
  * close_previous_app_instance() - Close prior opens with same app instance
  * @work:	smb work for this request
  * @fp:		the newly opened file (already in the inode fp list)
- * @version:	the app instance version from the new open (0 if none)
+ * @version_high: app instance version high from the new open
+ * @version_low: app instance version low from the new open
+ * @has_version: true if APP_INSTANCE_VERSION context was supplied
  *
  * Walk the inode's file list looking for an existing open that has the
  * same app_instance_id on the same inode.  If found, close it only
@@ -79,11 +81,13 @@ static const char app_instance_version_tag[] = {
  */
 static void close_previous_app_instance(struct ksmbd_work *work,
 					struct ksmbd_file *fp,
-					u64 version)
+					u64 version_high,
+					u64 version_low,
+					bool has_version)
 {
 	struct ksmbd_inode *ci = fp->f_ci;
 	struct ksmbd_file *prev_fp;
-	struct ksmbd_file *found = NULL;
+	u64 found_id = KSMBD_NO_FID;
 
 	down_read(&ci->m_lock);
 	list_for_each_entry(prev_fp, &ci->m_fp_list, node) {
@@ -99,23 +103,32 @@ static void close_previous_app_instance(struct ksmbd_work *work,
 			continue;
 
 		/*
-		 * Same app instance ID on same inode.  If the new
-		 * open carries a version, only close if the version
-		 * is strictly higher.
+		 * Same app instance ID on same inode.  If the new open
+		 * carries a version, only close if (high, low) is strictly
+		 * higher than the previous open's version tuple.
 		 */
-		if (version && prev_fp->app_instance_version >= version)
-			continue;
+		if (has_version) {
+			if (prev_fp->app_instance_version > version_high)
+				continue;
+			if (prev_fp->app_instance_version == version_high &&
+			    prev_fp->app_instance_version_low >= version_low)
+				continue;
+		}
 
-		found = prev_fp;
+		/*
+		 * Capture the volatile ID while protected by ci->m_lock.
+		 * Do not retain a raw pointer after unlocking.
+		 */
+		found_id = prev_fp->volatile_id;
 		break;
 	}
 	up_read(&ci->m_lock);
 
-	if (found) {
+	if (has_file_id(found_id)) {
 		ksmbd_debug(SMB,
 			    "Closing previous app instance open fid=%llu\n",
-			    found->volatile_id);
-		ksmbd_close_fd(work, found->volatile_id);
+			    found_id);
+		ksmbd_close_fd(work, found_id);
 	}
 }
 
@@ -163,7 +176,10 @@ static int app_instance_id_on_request(struct ksmbd_work *work,
 	ksmbd_debug(SMB, "APP_INSTANCE_ID: set on fid=%llu\n",
 		    fp->volatile_id);
 
-	close_previous_app_instance(work, fp, 0);
+	close_previous_app_instance(work, fp,
+				    fp->app_instance_version,
+				    fp->app_instance_version_low,
+				    fp->has_app_instance_version);
 	return 0;
 }
 
@@ -187,7 +203,7 @@ static int app_instance_version_on_request(struct ksmbd_work *work,
 					   unsigned int ctx_len)
 {
 	const u8 *data = ctx_data;
-	u64 ver_high, ver_low, version;
+	u64 ver_high, ver_low;
 
 	if (ctx_len < APP_INSTANCE_VERSION_STRUCT_SIZE) {
 		ksmbd_debug(SMB,
@@ -208,8 +224,9 @@ static int app_instance_version_on_request(struct ksmbd_work *work,
 	ver_low = le64_to_cpu(*(__le64 *)(data +
 			      APP_INSTANCE_VERSION_LOW_OFFSET));
 
-	version = ver_high;
-	fp->app_instance_version = version;
+	fp->has_app_instance_version = true;
+	fp->app_instance_version = ver_high;
+	fp->app_instance_version_low = ver_low;
 
 	ksmbd_debug(SMB,
 		    "APP_INSTANCE_VERSION: high=%llu low=%llu on fid=%llu\n",
@@ -221,7 +238,7 @@ static int app_instance_version_on_request(struct ksmbd_work *work,
 	 * try to close previous opens with version comparison.
 	 */
 	if (fp->has_app_instance_id)
-		close_previous_app_instance(work, fp, version);
+		close_previous_app_instance(work, fp, ver_high, ver_low, true);
 
 	return 0;
 }

@@ -209,20 +209,24 @@ build_module() {
     export CONFIG_SMB_SERVER_SMBDIRECT=n
 
     # Build flags
-    local make_flags="-C $KERNEL_HEADERS_DIR M=$PROJECT_ROOT ARCH=$ARCH CROSS_COMPILE=$CROSS_COMPILE CC=$CC"
+    local -a make_args=(
+        -C "$KERNEL_HEADERS_DIR"
+        "M=$PROJECT_ROOT"
+        "ARCH=$ARCH"
+        "CROSS_COMPILE=$CROSS_COMPILE"
+        "CC=$CC"
+        "-j$JOBS"
+    )
 
     if [ "$DEBUG" = "1" ]; then
-        make_flags="$make_flags EXTRA_CFLAGS='-g -DDEBUG'"
+        make_args+=("EXTRA_CFLAGS=-g -DDEBUG")
         print_info "Building with debug symbols"
     fi
 
-    # Add parallel build
-    make_flags="$make_flags -j$JOBS"
-
-    print_info "Build command: make $make_flags modules"
+    print_info "Build command: make ${make_args[*]} modules"
 
     # Execute build
-    if make $make_flags modules; then
+    if make "${make_args[@]}" modules; then
         print_success "Module build completed successfully"
     else
         print_error "Module build failed"

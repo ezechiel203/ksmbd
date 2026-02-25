@@ -443,12 +443,16 @@ void destroy_previous_session(struct ksmbd_conn *conn,
 {
 	struct ksmbd_session *prev_sess;
 	struct ksmbd_user *prev_user;
+	bool needs_setup_status = false;
 	int err;
 
+	prev_sess = NULL;
 	mutex_lock(&sessions_table_lock);
 	down_write(&conn->session_lock);
 	rcu_read_lock();
 	prev_sess = __session_lookup(id);
+	if (prev_sess)
+		ksmbd_user_session_get(prev_sess);
 	rcu_read_unlock();
 	if (!prev_sess)
 		goto out;
@@ -456,7 +460,7 @@ void destroy_previous_session(struct ksmbd_conn *conn,
 	down_write(&prev_sess->state_lock);
 	if (prev_sess->state == SMB2_SESSION_EXPIRED) {
 		up_write(&prev_sess->state_lock);
-		goto out;
+		goto out_put;
 	}
 
 	prev_user = prev_sess->user;
@@ -466,22 +470,47 @@ void destroy_previous_session(struct ksmbd_conn *conn,
 	    crypto_memneq(user->passkey, prev_user->passkey,
 			  user->passkey_sz)) {
 		up_write(&prev_sess->state_lock);
-		goto out;
+		goto out_put;
 	}
 
 	ksmbd_all_conn_set_status(id, KSMBD_SESS_NEED_RECONNECT);
+	needs_setup_status = true;
+	up_write(&prev_sess->state_lock);
+	up_write(&conn->session_lock);
+	mutex_unlock(&sessions_table_lock);
+
+	/*
+	 * Avoid holding session table/state locks while waiting for
+	 * in-flight requests. Keeping these locks held can block request
+	 * completion paths and cause reconnect stalls.
+	 */
 	err = ksmbd_conn_wait_idle_sess_id(conn, id);
 	if (err) {
 		ksmbd_all_conn_set_status(id, KSMBD_SESS_NEED_SETUP);
-		up_write(&prev_sess->state_lock);
-		goto out;
+		goto out_session_put;
 	}
 
-	ksmbd_destroy_file_table(&prev_sess->file_table);
-	prev_sess->state = SMB2_SESSION_EXPIRED;
+	mutex_lock(&sessions_table_lock);
+	down_write(&conn->session_lock);
+	down_write(&prev_sess->state_lock);
+	if (prev_sess->state != SMB2_SESSION_EXPIRED) {
+		ksmbd_destroy_file_table(&prev_sess->file_table);
+		prev_sess->state = SMB2_SESSION_EXPIRED;
+		ksmbd_launch_ksmbd_durable_scavenger();
+	}
+
+	if (needs_setup_status)
+		ksmbd_all_conn_set_status(id, KSMBD_SESS_NEED_SETUP);
 	up_write(&prev_sess->state_lock);
-	ksmbd_all_conn_set_status(id, KSMBD_SESS_NEED_SETUP);
-	ksmbd_launch_ksmbd_durable_scavenger();
+	up_write(&conn->session_lock);
+	mutex_unlock(&sessions_table_lock);
+
+out_session_put:
+	ksmbd_user_session_put(prev_sess);
+	return;
+
+out_put:
+	ksmbd_user_session_put(prev_sess);
 out:
 	up_write(&conn->session_lock);
 	mutex_unlock(&sessions_table_lock);

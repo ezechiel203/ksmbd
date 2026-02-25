@@ -270,7 +270,12 @@ void ksmbd_all_conn_set_status(u64 sess_id, u32 status)
 
 void ksmbd_conn_wait_idle(struct ksmbd_conn *conn)
 {
-	wait_event(conn->req_running_q, atomic_read(&conn->req_running) < 2);
+	if (!wait_event_timeout(conn->req_running_q,
+				atomic_read(&conn->req_running) < 2,
+				120 * HZ))
+		pr_err_ratelimited("Timeout waiting for idle conn (req_running=%d, status=%d)\n",
+				   atomic_read(&conn->req_running),
+				   READ_ONCE(conn->status));
 }
 
 int ksmbd_conn_wait_idle_sess_id(struct ksmbd_conn *curr_conn,
@@ -493,7 +498,7 @@ int ksmbd_conn_handler_loop(void *p)
 	struct ksmbd_transport *t = conn->transport;
 	unsigned int pdu_size, max_allowed_pdu_size, max_req;
 	char hdr_buf[4] = {0,};
-	int size;
+	int size, rc;
 
 	mutex_init(&conn->srv_mutex);
 	__module_get(THIS_MODULE);
@@ -513,8 +518,14 @@ int ksmbd_conn_handler_loop(void *p)
 
 recheck:
 		if (atomic_read(&conn->req_running) + 1 > max_req) {
-			wait_event_interruptible(conn->req_running_q,
-				atomic_read(&conn->req_running) < max_req);
+			rc = wait_event_interruptible_timeout(conn->req_running_q,
+							      atomic_read(&conn->req_running) < max_req ||
+							      !ksmbd_conn_alive(conn),
+							      HZ);
+			if (rc < 0)
+				break;
+			if (!ksmbd_conn_alive(conn))
+				break;
 			goto recheck;
 		}
 

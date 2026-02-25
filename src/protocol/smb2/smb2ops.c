@@ -14,7 +14,6 @@
 #include "server.h"
 #include "ksmbd_dfs.h"
 
-#ifdef CONFIG_SMB_INSECURE_SERVER
 static struct smb_version_values smb20_server_values = {
 	.version_string = SMB20_VERSION_STRING,
 	.protocol_id = SMB20_PROT_ID,
@@ -40,7 +39,6 @@ static struct smb_version_values smb20_server_values = {
 	.create_disk_id_size = sizeof(struct create_disk_id_rsp),
 	.create_posix_size = sizeof(struct create_posix_rsp),
 };
-#endif
 
 static struct smb_version_values smb21_server_values = {
 	.version_string = SMB21_VERSION_STRING,
@@ -220,7 +218,6 @@ static struct smb_version_cmds smb2_0_server_cmds[NUMBER_OF_SMB2_COMMANDS] = {
 	[SMB2_CHANGE_NOTIFY_HE]	=	{ .proc = smb2_notify},
 };
 
-#ifdef CONFIG_SMB_INSECURE_SERVER
 /**
  * init_smb2_0_server() - initialize a smb server connection with smb2.0
  *			command dispatcher
@@ -239,12 +236,6 @@ int init_smb2_0_server(struct ksmbd_conn *conn)
 	conn->signing_algorithm = SIGNING_ALG_HMAC_SHA256;
 	return 0;
 }
-#else
-int init_smb2_0_server(struct ksmbd_conn *conn)
-{
-	return -EOPNOTSUPP;
-}
-#endif
 
 /**
  * init_smb2_1_server() - initialize a smb server connection with smb2.1

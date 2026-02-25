@@ -49,6 +49,17 @@ log_info()  { echo -e "${GREEN}[INFO]${NC}  $*"; }
 log_warn()  { echo -e "${YELLOW}[WARN]${NC}  $*"; }
 log_error() { echo -e "${RED}[ERROR]${NC} $*"; }
 
+stop_ksmbd_daemon() {
+	# Avoid hanging forever if control path gets wedged.
+	if command -v timeout >/dev/null 2>&1; then
+		timeout 10 ksmbd.control -s >/dev/null 2>&1 || true
+	else
+		ksmbd.control -s >/dev/null 2>&1 || true
+	fi
+	sleep 1
+	pkill -x ksmbd.mountd >/dev/null 2>&1 || true
+}
+
 # ---------------------------------------------------------------------------
 # Test result tracking
 # ---------------------------------------------------------------------------
@@ -161,8 +172,9 @@ setup_environment() {
 	cp "${TEST_CONF}" "${KSMBD_CONF}"
 	log_info "Installed test configuration"
 
-	# Add test user
-	echo "${TEST_PASS}" | ksmbd.adduser -a "${TEST_USER}" 2>/dev/null || true
+	# Add/update test user with non-interactive password input
+	ksmbd.adduser -a -p "${TEST_PASS}" "${TEST_USER}" 2>/dev/null || \
+		ksmbd.adduser -u -p "${TEST_PASS}" "${TEST_USER}" 2>/dev/null || true
 	log_info "Added test user: ${TEST_USER}"
 
 	# Load ksmbd module if not already loaded
@@ -181,11 +193,7 @@ start_daemon() {
 	log_info "Starting ksmbd.mountd daemon..."
 
 	# Stop any existing instance
-	ksmbd.control -s 2>/dev/null || true
-	sleep 1
-
-	# Kill any lingering mountd processes
-	pkill -f ksmbd.mountd 2>/dev/null || true
+	stop_ksmbd_daemon
 	sleep 1
 
 	# Start the daemon
@@ -193,9 +201,11 @@ start_daemon() {
 	local daemon_pid=$!
 	sleep 2
 
-	# Verify it's running
-	if kill -0 "${daemon_pid}" 2>/dev/null; then
-		log_info "ksmbd.mountd started (PID: ${daemon_pid})"
+	# Verify it's running. ksmbd.mountd can daemonize and exit parent.
+	local running_pid
+	running_pid="$(pgrep -x ksmbd.mountd | head -n1 || true)"
+	if [ -n "${running_pid}" ]; then
+		log_info "ksmbd.mountd started (PID: ${running_pid})"
 	else
 		log_error "Failed to start ksmbd.mountd"
 		return 1
@@ -558,11 +568,7 @@ cleanup() {
 	log_info "Cleaning up..."
 
 	# Stop ksmbd daemon
-	ksmbd.control -s 2>/dev/null || true
-	sleep 1
-
-	# Kill any lingering mountd processes
-	pkill -f ksmbd.mountd 2>/dev/null || true
+	stop_ksmbd_daemon
 
 	# Remove test user
 	ksmbd.adduser -d "${TEST_USER}" 2>/dev/null || true

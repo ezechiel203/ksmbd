@@ -86,6 +86,12 @@ static noinline int smb2_read_pipe(struct ksmbd_work *work)
 	if (rpc_resp) {
 		void *aux_payload_buf;
 
+		if (rpc_resp->flags == KSMBD_RPC_ENOTIMPLEMENTED) {
+			kvfree(rpc_resp);
+			rpc_resp = NULL;
+			goto empty_read;
+		}
+
 		if (rpc_resp->flags != KSMBD_RPC_OK) {
 			err = -EINVAL;
 			goto out;
@@ -108,6 +114,7 @@ static noinline int smb2_read_pipe(struct ksmbd_work *work)
 			goto out;
 		kvfree(rpc_resp);
 	} else {
+empty_read:
 		err = ksmbd_iov_pin_rsp(work, (void *)rsp,
 					offsetof(struct smb2_read_rsp, Buffer));
 		if (err)
@@ -452,10 +459,9 @@ static noinline int smb2_write_pipe(struct ksmbd_work *work)
 	rpc_resp = ksmbd_rpc_write(work->sess, id, data_buf, length);
 	if (rpc_resp) {
 		if (rpc_resp->flags == KSMBD_RPC_ENOTIMPLEMENTED) {
-			rsp->hdr.Status = STATUS_NOT_SUPPORTED;
 			kvfree(rpc_resp);
-			smb2_set_err_rsp(work);
-			return -EOPNOTSUPP;
+			rpc_resp = NULL;
+			goto write_rsp;
 		}
 		if (rpc_resp->flags != KSMBD_RPC_OK) {
 			rsp->hdr.Status = STATUS_INVALID_HANDLE;
@@ -466,6 +472,7 @@ static noinline int smb2_write_pipe(struct ksmbd_work *work)
 		kvfree(rpc_resp);
 	}
 
+write_rsp:
 	rsp->StructureSize = cpu_to_le16(17);
 	rsp->DataOffset = 0;
 	rsp->Reserved = 0;

@@ -1,177 +1,162 @@
+#!/bin/bash
 # SPDX-License-Identifier: GPL-2.0-or-later
 #
 # Copyright (C) 2019 Samsung Electronics Co., Ltd.
 #
 
-#!/bin/sh
+set -euo pipefail
 
-KERNEL_SRC=''
-COMP_FLAGS=''
+KERNEL_SRC=""
+COMP_FLAGS="${FLAGS:-}"
+MODULE_DIR=""
+MODULE_NAME=""
 
-function is_module
-{
-	local ok=$(cat "$KERNEL_SRC"/.config | grep "CONFIG_SMB_SERVER=m")
-
-	if [ "z$ok" == "z" ]; then
-		echo "1"
-		return 1
-	fi
-
-	echo "0"
-	return 0
+err() {
+	echo "ERROR: $*" >&2
+	exit 1
 }
 
-function patch_fs_config
-{
-	local ok=$(pwd |  grep -c "fs/smbd")
-	if [ "z$ok" != "z1" ]; then
-		echo "ERROR: please ``cd`` to fs/smbd"
-		exit 1
-	fi
-
-	KERNEL_SRC=$(pwd | sed -e 's/fs\/smbd//')
-	if [ ! -f "$KERNEL_SRC"/fs/Kconfig ]; then
-		echo "ERROR: please ``cd`` to fs/smbd"
-		exit 1
-	fi
-
-	ok=$(cat "$KERNEL_SRC"/fs/Makefile | grep smbd)
-	if [ "z$ok" == "z" ]; then
-		echo 'obj-$(CONFIG_SMB_SERVER)	+= smbd/' \
-			>> "$KERNEL_SRC"/fs/Makefile
-	fi
-
-	ok=$(cat "$KERNEL_SRC"/fs/Kconfig | grep smbd)
-	if [ "z$ok" == "z" ]; then
-		ok=$(cat "$KERNEL_SRC"/fs/Kconfig \
-			| sed -e 's/fs\/cifs\/Kconfig/fs\/cifs\/Kconfig\"\nsource \"fs\/smbd\/Kconfig/' \
-			> "$KERNEL_SRC"/fs/Kconfig.new)
-		if [ $? != 0 ]; then
-			exit 1
-		fi
-		mv "$KERNEL_SRC"/fs/Kconfig.new "$KERNEL_SRC"/fs/Kconfig
-	fi
-
-	ok=$(cat "$KERNEL_SRC"/.config | grep "CONFIG_NETWORK_FILESYSTEMS=y")
-	if [ "z$ok" == "z" ]; then
-		ok=$(echo "CONFIG_NETWORK_FILESYSTEMS=y" \
-			>> "$KERNEL_SRC"/.config)
-		if [ $? != 0 ]; then
-			exit 1
-		fi
-	fi
-
-	ok=$(is_module)
-	if [ "z$ok" == "z1" ]; then
-		ok=$(echo "CONFIG_SMB_SERVER=m" >> "$KERNEL_SRC"/.config)
-		if [ $? != 0 ]; then
-			exit 1
-		fi
-		ok=$(echo "CONFIG_SMB_INSECURE_SERVER=y" \
-			>> "$KERNEL_SRC"/.config)
-		if [ $? != 0 ]; then
-			exit 1
-		fi
+ensure_context() {
+	if [[ -z "$KERNEL_SRC" || -z "$MODULE_DIR" || -z "$MODULE_NAME" ]]; then
+		err "build context is not initialized"
 	fi
 }
 
-function ksmbd_module_make
-{
-	echo "Running smbd make"
+is_module() {
+	ensure_context
+	grep -q '^CONFIG_SMB_SERVER=m$' "$KERNEL_SRC/.config"
+}
 
-	local c="make "$COMP_FLAGS" -C "$KERNEL_SRC" M="$KERNEL_SRC"/fs/smbd"
+patch_fs_config() {
+	local cwd
+	local kconfig_new
 
-	rm smbd.ko
+	cwd=$(pwd)
+	case "$cwd" in
+		*/fs/smbd)
+			MODULE_DIR="smbd"
+			MODULE_NAME="smbd"
+			;;
+		*/fs/ksmbd)
+			MODULE_DIR="ksmbd"
+			MODULE_NAME="ksmbd"
+			;;
+		*)
+			err "please cd to fs/smbd or fs/ksmbd"
+			;;
+	esac
 
-	cd "$KERNEL_SRC"
-	echo $c
-	$c
-	cd "$KERNEL_SRC"/fs/smbd
+	KERNEL_SRC="${cwd%/fs/$MODULE_DIR}"
+	if [[ ! -f "$KERNEL_SRC/fs/Kconfig" ]]; then
+		err "invalid kernel tree: missing $KERNEL_SRC/fs/Kconfig"
+	fi
 
-	if [ $? != 0 ]; then
-		exit 1
+	if ! grep -q "$MODULE_DIR" "$KERNEL_SRC/fs/Makefile"; then
+		echo "obj-\$(CONFIG_SMB_SERVER)\t+= $MODULE_DIR/" >> "$KERNEL_SRC/fs/Makefile"
+	fi
+
+	if ! grep -q "fs/$MODULE_DIR/Kconfig" "$KERNEL_SRC/fs/Kconfig"; then
+		kconfig_new="$KERNEL_SRC/fs/Kconfig.new"
+		sed "s#source \"fs/cifs/Kconfig\"#source \"fs/cifs/Kconfig\"\\nsource \"fs/$MODULE_DIR/Kconfig\"#" \
+			"$KERNEL_SRC/fs/Kconfig" > "$kconfig_new"
+		mv "$kconfig_new" "$KERNEL_SRC/fs/Kconfig"
+	fi
+
+	if ! grep -q '^CONFIG_NETWORK_FILESYSTEMS=y$' "$KERNEL_SRC/.config"; then
+		echo "CONFIG_NETWORK_FILESYSTEMS=y" >> "$KERNEL_SRC/.config"
+	fi
+
+	if ! is_module; then
+		echo "CONFIG_SMB_SERVER=m" >> "$KERNEL_SRC/.config"
+		echo "CONFIG_SMB_INSECURE_SERVER=y" >> "$KERNEL_SRC/.config"
 	fi
 }
 
-function ksmbd_module_install
-{
-	echo "Running smbd install"
+ksmbd_module_make() {
+	local -a cmd
 
-	local ok=$(lsmod | grep -c smbd)
-	if [ "z$ok" == "z1" ]; then
-		sudo rmmod smbd
-		if [ $? -ne 0 ]; then
-			echo "ERROR: unable to rmmod smbd"
-			exit 1
-		fi
+	ensure_context
+	echo "Running $MODULE_NAME make"
+
+	cmd=(make)
+	if [[ -n "$COMP_FLAGS" ]]; then
+		local -a flag_args
+		read -r -a flag_args <<< "$COMP_FLAGS"
+		cmd+=("${flag_args[@]}")
+	fi
+	cmd+=(-C "$KERNEL_SRC" "M=$KERNEL_SRC/fs/$MODULE_DIR")
+
+	rm -f "$MODULE_NAME.ko"
+	(
+		cd "$KERNEL_SRC"
+		"${cmd[@]}"
+	)
+}
+
+ksmbd_module_install() {
+	local ver
+	local module_path
+	local module_dest
+
+	ensure_context
+	echo "Running $MODULE_NAME install"
+
+	if lsmod | awk '{print $1}' | grep -qx "$MODULE_NAME"; then
+		sudo rmmod "$MODULE_NAME" || err "unable to rmmod $MODULE_NAME"
 	fi
 
-	ok=$(is_module)
-	if [ "z$ok" == "z1" ]; then
-		echo "It doesn't look like SMB_SERVER is as a kernel module"
-		exit 1
+	if ! is_module; then
+		err "CONFIG_SMB_SERVER is not configured as module"
 	fi
 
-	if [ ! -f "$KERNEL_SRC"/fs/smbd/smbd.ko ]; then
-		echo "ERROR: smbd.ko was not found"
-		exit 1
+	module_path="$KERNEL_SRC/fs/$MODULE_DIR/$MODULE_NAME.ko"
+	if [[ ! -f "$module_path" ]]; then
+		err "$module_path was not found"
 	fi
 
-	cd "$KERNEL_SRC"
-	if [ -f "/lib/modules/$(uname -r)/kernel/fs/smbd/smbd.ko*" ]; then
-		sudo rm /lib/modules/$(uname -r)/kernel/fs/smbd/smbd.ko*
-		sudo cp "$KERNEL_SRC"/fs/smbd/smbd.ko \
-			/lib/modules/$(uname -r)/kernel/fs/smbd/smbd.ko
-
-		local VER=$(make kernelrelease)
-		sudo depmod -A $VER
+	module_dest="/lib/modules/$(uname -r)/kernel/fs/$MODULE_DIR/$MODULE_NAME.ko"
+	if ls "${module_dest}"* >/dev/null 2>&1; then
+		sudo rm -f "${module_dest}"*
+		sudo install -m644 "$module_path" "$module_dest"
+		ver=$(make -s -C "$KERNEL_SRC" kernelrelease)
+		sudo depmod -A "$ver"
 	else
-		sudo make -C "$KERNEL_SRC" M="$KERNEL_SRC"/fs/smbd/ \
-			modules_install
-		local VER=$(make kernelrelease)
-		sudo depmod -A $VER
+		sudo make -C "$KERNEL_SRC" "M=$KERNEL_SRC/fs/$MODULE_DIR/" modules_install
+		ver=$(make -s -C "$KERNEL_SRC" kernelrelease)
+		sudo depmod -A "$ver"
 	fi
-	cd "$KERNEL_SRC"/fs/smbd
 }
 
-function ksmbd_module_clean
-{
-	echo "Running smbd clean"
-
-	cd "$KERNEL_SRC"
-	make -C "$KERNEL_SRC" M="$KERNEL_SRC"/fs/smbd/ clean
-	cd "$KERNEL_SRC"/fs/smbd
+ksmbd_module_clean() {
+	ensure_context
+	echo "Running $MODULE_NAME clean"
+	(
+		cd "$KERNEL_SRC"
+		make -C "$KERNEL_SRC" "M=$KERNEL_SRC/fs/$MODULE_DIR/" clean
+	)
 }
 
-function main
-{
+main() {
 	patch_fs_config
 
-	COMP_FLAGS="$FLAGS"
-
-	case $1 in
+	case "${1:-make}" in
 		clean)
 			ksmbd_module_clean
-			exit 0
 			;;
 		install)
 			ksmbd_module_make
 			ksmbd_module_install
-			exit 0
 			;;
 		make)
 			ksmbd_module_make
-			exit 0
 			;;
 		help)
 			echo "Usage: build_ksmbd.sh [clean | make | install]"
-			exit 0
 			;;
 		*)
 			ksmbd_module_make
-			exit 0
 			;;
 	esac
 }
 
-main $1
+main "$@"

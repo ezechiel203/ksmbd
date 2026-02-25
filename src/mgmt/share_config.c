@@ -109,17 +109,16 @@ static int parse_veto_list(struct ksmbd_share_config *share,
 			   char *veto_list,
 			   int veto_list_sz)
 {
-	int sz = 0;
-
 	if (!veto_list_sz)
 		return 0;
 
 	while (veto_list_sz > 0) {
 		struct ksmbd_veto_pattern *p;
+		size_t sz;
 
-		sz = strlen(veto_list);
+		sz = strnlen(veto_list, veto_list_sz);
 		if (!sz)
-			break;
+			goto skip_empty;
 
 		p = kzalloc(sizeof(struct ksmbd_veto_pattern), KSMBD_DEFAULT_GFP);
 		if (!p)
@@ -133,11 +132,41 @@ static int parse_veto_list(struct ksmbd_share_config *share,
 
 		list_add(&p->list, &share->veto_list);
 
+skip_empty:
+		/*
+		 * Veto entries are NUL-separated. If no terminator is found
+		 * in the remaining bytes, this is the final chunk.
+		 */
+		if (sz == veto_list_sz)
+			break;
+
 		veto_list += sz + 1;
 		veto_list_sz -= (sz + 1);
 	}
 
 	return 0;
+}
+
+static bool ksmbd_path_has_dotdot_component(const char *path)
+{
+	const char *p = path;
+
+	while (*p) {
+		const char *seg;
+
+		while (*p == '/')
+			p++;
+		if (!*p)
+			break;
+
+		seg = p;
+		while (*p && *p != '/')
+			p++;
+		if (p - seg == 2 && seg[0] == '.' && seg[1] == '.')
+			return true;
+	}
+
+	return false;
 }
 
 static struct ksmbd_share_config *share_config_request(struct ksmbd_work *work,
@@ -159,6 +188,12 @@ static struct ksmbd_share_config *share_config_request(struct ksmbd_work *work,
 	if (*resp->share_name) {
 		char *cf_resp_name;
 		bool equal;
+		size_t share_name_len;
+
+		share_name_len = strnlen(resp->share_name,
+					 KSMBD_REQ_MAX_SHARE_NAME);
+		if (share_name_len >= KSMBD_REQ_MAX_SHARE_NAME)
+			goto out;
 
 		cf_resp_name = ksmbd_casefold_sharename(um, resp->share_name);
 		if (IS_ERR(cf_resp_name))
@@ -177,25 +212,42 @@ static struct ksmbd_share_config *share_config_request(struct ksmbd_work *work,
 	refcount_set(&share->refcount, 1);
 	INIT_LIST_HEAD(&share->veto_list);
 	share->name = kstrdup(name, KSMBD_DEFAULT_GFP);
+	if (!share->name) {
+		kill_share(share);
+		share = NULL;
+		goto out;
+	}
+
+	/*
+	 * ksmbd-tools should set KSMBD_SHARE_FLAG_PIPE for IPC$.
+	 * If it is missing, force pipe mode for IPC$ so tree-connect
+	 * to IPC can proceed and we don't incorrectly require a path.
+	 */
+	if (!test_share_config_flag(share, KSMBD_SHARE_FLAG_PIPE) &&
+	    !strncasecmp(share->name, "ipc$", 4) &&
+	    share->name[4] == '\0')
+		share->flags |= KSMBD_SHARE_FLAG_PIPE;
 
 	if (!test_share_config_flag(share, KSMBD_SHARE_FLAG_PIPE)) {
-		int path_len = PATH_MAX;
+		size_t path_len = 0;
 
-		if (resp->payload_sz)
-			path_len = resp->payload_sz - resp->veto_list_sz;
+		if (resp->payload_sz < resp->veto_list_sz)
+			goto out_bad_share;
+		path_len = resp->payload_sz - resp->veto_list_sz;
+		if (!path_len)
+			goto out_bad_share;
 
 		share->path = kstrndup(ksmbd_share_config_path(resp), path_len,
 				      KSMBD_DEFAULT_GFP);
+		if (!share->path || !share->path[0])
+			goto out_bad_share;
 		if (share->path) {
 			/* Validate share path is absolute */
 			if (share->path[0] != '/' ||
-			    strstr(share->path, "/../") ||
-			    !strcmp(share->path, "/..")) {
-				pr_err("share path must be absolute without '..' components: %s\n",
-				       share->path);
-				kill_share(share);
-				share = NULL;
-				goto out;
+			    ksmbd_path_has_dotdot_component(share->path)) {
+				pr_err("share %s path must be absolute without '..' components: %s\n",
+				       share->name, share->path);
+				goto out_bad_share;
 			}
 			share->path_sz = strlen(share->path);
 			while (share->path_sz > 1 &&
@@ -214,9 +266,7 @@ static struct ksmbd_share_config *share_config_request(struct ksmbd_work *work,
 				      resp->veto_list_sz);
 		if (!ret && share->path) {
 			if (__ksmbd_override_fsids(work, share)) {
-				kill_share(share);
-				share = NULL;
-				goto out;
+				goto out_bad_share;
 			}
 
 			ret = kern_path(share->path, 0, &share->vfs_path);
@@ -229,10 +279,8 @@ static struct ksmbd_share_config *share_config_request(struct ksmbd_work *work,
 				share->path = NULL;
 			}
 		}
-		if (ret || !share->name) {
-			kill_share(share);
-			share = NULL;
-			goto out;
+		if (ret) {
+			goto out_bad_share;
 		}
 	}
 
@@ -248,7 +296,13 @@ static struct ksmbd_share_config *share_config_request(struct ksmbd_work *work,
 		share = lookup;
 	}
 	spin_unlock(&shares_table_lock);
+	goto out;
 
+out_bad_share:
+	if (share) {
+		kill_share(share);
+		share = NULL;
+	}
 out:
 	kvfree(resp);
 	return share;

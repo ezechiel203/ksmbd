@@ -49,6 +49,37 @@ static void test_strip_nt_prefix(char *path)
 	}
 }
 
+static bool test_is_safe_reparse_target(const char *target)
+{
+	const char *p;
+
+	if (!target || !*target)
+		return false;
+
+	if (target[0] == '/')
+		return false;
+
+	p = target;
+	while (*p) {
+		const char *seg = p;
+		size_t seglen;
+
+		while (*p && *p != '/')
+			p++;
+		seglen = p - seg;
+
+		if (seglen == 1 && seg[0] == '.')
+			return false;
+		if (seglen == 2 && seg[0] == '.' && seg[1] == '.')
+			return false;
+
+		if (*p == '/')
+			p++;
+	}
+
+	return true;
+}
+
 /* ── ksmbd_convert_slashes() tests ─── */
 
 static void test_convert_slashes_basic(struct kunit *test)
@@ -178,6 +209,30 @@ static void test_full_workflow(struct kunit *test)
 	KUNIT_EXPECT_STREQ(test, path, "C:/Users/test/file.txt");
 }
 
+/* ── reparse target safety checks ─── */
+
+static void test_reparse_target_relative_ok(struct kunit *test)
+{
+	KUNIT_EXPECT_TRUE(test, test_is_safe_reparse_target("dir/file.txt"));
+}
+
+static void test_reparse_target_reject_absolute(struct kunit *test)
+{
+	KUNIT_EXPECT_FALSE(test, test_is_safe_reparse_target("/etc/passwd"));
+}
+
+static void test_reparse_target_reject_dotdot(struct kunit *test)
+{
+	KUNIT_EXPECT_FALSE(test, test_is_safe_reparse_target("../escape"));
+	KUNIT_EXPECT_FALSE(test, test_is_safe_reparse_target("a/../escape"));
+}
+
+static void test_reparse_target_reject_dot_component(struct kunit *test)
+{
+	KUNIT_EXPECT_FALSE(test, test_is_safe_reparse_target("./file"));
+	KUNIT_EXPECT_FALSE(test, test_is_safe_reparse_target("a/./file"));
+}
+
 static struct kunit_case ksmbd_reparse_test_cases[] = {
 	KUNIT_CASE(test_convert_slashes_basic),
 	KUNIT_CASE(test_convert_slashes_no_backslashes),
@@ -192,6 +247,10 @@ static struct kunit_case ksmbd_reparse_test_cases[] = {
 	KUNIT_CASE(test_strip_nt_prefix_too_short),
 	KUNIT_CASE(test_strip_nt_prefix_just_prefix_plus_one),
 	KUNIT_CASE(test_full_workflow),
+	KUNIT_CASE(test_reparse_target_relative_ok),
+	KUNIT_CASE(test_reparse_target_reject_absolute),
+	KUNIT_CASE(test_reparse_target_reject_dotdot),
+	KUNIT_CASE(test_reparse_target_reject_dot_component),
 	{}
 };
 

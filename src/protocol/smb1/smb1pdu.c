@@ -280,16 +280,43 @@ int smb_allocate_rsp_buf(struct ksmbd_work *work)
  */
 static char *andx_request_buffer(char *buf, int command)
 {
-	struct andx_block *andx_ptr =
-		(struct andx_block *)(buf + sizeof(struct smb_hdr) - 1);
-	struct andx_block *next;
+	struct andx_block *andx_ptr;
+	char *andx_start;
+	char *buf_end;
+	unsigned int depth = 0;
 
-	while (andx_ptr->AndXCommand != SMB_NO_MORE_ANDX_COMMAND) {
-		next = (struct andx_block *)(buf + 4 +
-					     le16_to_cpu(andx_ptr->AndXOffset));
+	andx_start = buf + sizeof(struct smb_hdr) - 1;
+	buf_end = buf + 4 + get_rfc1002_len(buf);
+	andx_ptr = (struct andx_block *)andx_start;
+
+	while (1) {
+		unsigned int andx_off;
+		char *next_ptr;
+
+		if ((char *)andx_ptr < andx_start ||
+		    (char *)andx_ptr + sizeof(*andx_ptr) > buf_end)
+			return NULL;
+
+		if (andx_ptr->AndXCommand == SMB_NO_MORE_ANDX_COMMAND)
+			break;
+
+		andx_off = le16_to_cpu(andx_ptr->AndXOffset);
+		next_ptr = buf + 4 + andx_off;
+		if (next_ptr < andx_start ||
+		    next_ptr + sizeof(struct andx_block) > buf_end)
+			return NULL;
+
 		if (andx_ptr->AndXCommand == command)
-			return (char *)next;
-		andx_ptr = next;
+			return next_ptr;
+
+		/*
+		 * Reject non-forward progress and unreasonable chain depth
+		 * to avoid loops on malformed AndX chains.
+		 */
+		if (next_ptr <= (char *)andx_ptr || ++depth > 32)
+			return NULL;
+
+		andx_ptr = (struct andx_block *)next_ptr;
 	}
 	return NULL;
 }
@@ -2068,20 +2095,49 @@ int smb_trans(struct ksmbd_work *work)
 	__u16 subcommand;
 	char *name, *pipe;
 	char *pipedata;
-	int setup_bytes_count = 0;
+	unsigned int setup_bytes_count = 0;
+	unsigned int req_buf_len;
+	unsigned int trans_data_off;
+	unsigned int name_maxlen;
+	unsigned int param_off, param_cnt;
+	unsigned int data_off, data_cnt;
+	unsigned int min_param_data_off;
 	int pipe_name_offset = 0;
-	int str_len_uni;
+	unsigned int str_len_uni;
 	int ret = 0, nbytes = 0;
 	int param_len = 0;
 	int id;
-	int padding;
+	size_t max_payload;
+
+	req_buf_len = get_rfc1002_len(req);
+	trans_data_off = offsetof(struct smb_com_trans_req, Data) - 4;
+	if (trans_data_off > req_buf_len) {
+		rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;
+		return -EINVAL;
+	}
+	if (work->response_sz < sizeof(struct smb_com_trans_rsp)) {
+		rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;
+		return -EINVAL;
+	}
 
 	if (req->SetupCount)
-		setup_bytes_count = 2 * req->SetupCount;
+		setup_bytes_count = req->SetupCount * sizeof(__le16);
+	if (setup_bytes_count > req_buf_len - trans_data_off) {
+		rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;
+		return -EINVAL;
+	}
+
+	name_maxlen = req_buf_len - trans_data_off - setup_bytes_count;
+	if (!name_maxlen) {
+		rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;
+		return -EINVAL;
+	}
+	if (name_maxlen > 256)
+		name_maxlen = 256;
 
 	subcommand = le16_to_cpu(req->SubCommand);
-	name = smb_strndup_from_utf16(req->Data + setup_bytes_count, 256, 1,
-				      conn->local_nls);
+	name = smb_strndup_from_utf16(req->Data + setup_bytes_count,
+				      name_maxlen, 1, conn->local_nls);
 
 	if (IS_ERR(name)) {
 		pr_err("failed to allocate memory\n");
@@ -2089,8 +2145,23 @@ int smb_trans(struct ksmbd_work *work)
 		return PTR_ERR(name);
 	}
 
-	ksmbd_debug(SMB, "Obtained string name = %s setupcount = %d\n",
+	ksmbd_debug(SMB, "Obtained string name = %s setupcount = %u\n",
 			name, setup_bytes_count);
+
+	param_off = le16_to_cpu(req->ParameterOffset);
+	param_cnt = le16_to_cpu(req->ParameterCount);
+	data_off = le16_to_cpu(req->DataOffset);
+	data_cnt = le16_to_cpu(req->DataCount);
+	if (param_off > req_buf_len || param_cnt > req_buf_len - param_off ||
+	    data_off > req_buf_len || data_cnt > req_buf_len - data_off) {
+		ksmbd_debug(SMB,
+			    "Invalid SMB_TRANS offsets: P@%u/%u D@%u/%u len=%u\n",
+			    param_off, param_cnt, data_off, data_cnt,
+			    req_buf_len);
+		rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;
+		kfree(name);
+		return -EINVAL;
+	}
 
 	pipe_name_offset = strlen("\\PIPE");
 	if (strncmp("\\PIPE", name, pipe_name_offset) != 0) {
@@ -2114,18 +2185,29 @@ int smb_trans(struct ksmbd_work *work)
 
 	/* Incoming pipe name unicode len */
 	str_len_uni = 2 * (strlen(name) + 1);
+	if (str_len_uni > req_buf_len - trans_data_off - setup_bytes_count) {
+		rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;
+		ret = -EINVAL;
+		goto out;
+	}
 
-	ksmbd_debug(SMB, "Pipe name unicode len = %d\n", str_len_uni);
+	ksmbd_debug(SMB, "Pipe name unicode len = %u\n", str_len_uni);
 
-	/* Some clients like Windows may have additional padding. */
-	padding = le16_to_cpu(req->ParameterOffset) -
-		offsetof(struct smb_com_trans_req, Data)
-		- str_len_uni;
-	pipedata = req->Data + str_len_uni + setup_bytes_count + padding;
+	/*
+	 * ParameterOffset is relative to SMB header start (&hdr.Protocol).
+	 * Require the pipe parameter area to start after setup and pipe name.
+	 */
+	min_param_data_off = trans_data_off + setup_bytes_count + str_len_uni;
+	if (param_off < min_param_data_off) {
+		rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;
+		ret = -EINVAL;
+		goto out;
+	}
+	pipedata = (char *)&req->hdr.Protocol + param_off;
 
 	if (!strncmp(pipe, "LANMAN", sizeof("LANMAN"))) {
 		rpc_resp = ksmbd_rpc_rap(work->sess, pipedata,
-					 le16_to_cpu(req->TotalParameterCount));
+					 param_cnt);
 
 		if (rpc_resp) {
 			if (rpc_resp->flags == KSMBD_RPC_ENOTIMPLEMENTED) {
@@ -2140,9 +2222,19 @@ int smb_trans(struct ksmbd_work *work)
 				goto out;
 			}
 
-			nbytes = rpc_resp->payload_sz;
-			memcpy((char *)rsp + sizeof(struct smb_com_trans_rsp),
-			       rpc_resp->payload, nbytes);
+				max_payload = work->response_sz -
+					sizeof(struct smb_com_trans_rsp);
+				if (rpc_resp->payload_sz > max_payload) {
+					rsp->hdr.Status.CifsError =
+						STATUS_INVALID_PARAMETER;
+					kvfree(rpc_resp);
+					ret = -EINVAL;
+					goto out;
+				}
+				nbytes = rpc_resp->payload_sz;
+				memcpy((char *)rsp +
+				       sizeof(struct smb_com_trans_rsp),
+				       rpc_resp->payload, nbytes);
 
 			kvfree(rpc_resp);
 			ret = 0;
@@ -2160,7 +2252,7 @@ int smb_trans(struct ksmbd_work *work)
 		ksmbd_debug(SMB, "GOT TRANSACT_DCERPCCMD\n");
 		ret = -EINVAL;
 		rpc_resp = ksmbd_rpc_ioctl(work->sess, id, pipedata,
-					   le16_to_cpu(req->DataCount));
+					   data_cnt);
 		if (rpc_resp) {
 			if (rpc_resp->flags == KSMBD_RPC_ENOTIMPLEMENTED) {
 				rsp->hdr.Status.CifsError =
@@ -2174,9 +2266,19 @@ int smb_trans(struct ksmbd_work *work)
 				goto out;
 			}
 
-			nbytes = rpc_resp->payload_sz;
-			memcpy((char *)rsp + sizeof(struct smb_com_trans_rsp),
-			       rpc_resp->payload, nbytes);
+				max_payload = work->response_sz -
+					sizeof(struct smb_com_trans_rsp);
+				if (rpc_resp->payload_sz > max_payload) {
+					rsp->hdr.Status.CifsError =
+						STATUS_INVALID_PARAMETER;
+					kvfree(rpc_resp);
+					ret = -EINVAL;
+					goto out;
+				}
+				nbytes = rpc_resp->payload_sz;
+				memcpy((char *)rsp +
+				       sizeof(struct smb_com_trans_rsp),
+				       rpc_resp->payload, nbytes);
 			kvfree(rpc_resp);
 			ret = 0;
 		}

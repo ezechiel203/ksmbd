@@ -119,6 +119,7 @@ sudo smbpasswd -a macuser
   - Protocol flow and integration
 
 ### 🚀 Deployment Guide
+- [KSMBD Deployment Guide (Sysadmins, NAS users, End users)](DEPLOYMENT_GUIDE.md)
 - [Production Deployment Guide](DOCUMENTATION/Production_Deployment_Guide.md)
   - Step-by-step deployment instructions
   - Configuration examples for different scenarios
@@ -176,6 +177,25 @@ sudo make install
 
 # Load the module
 sudo modprobe ksmbd
+```
+
+### Remote Deploy Workflows (All Supported Architectures)
+```bash
+# x86_64 target
+make remote-deploy-x86_64 X86_64_HOST=user@x86-host
+
+# ARM64 target
+make remote-deploy-arm64 ARM64_HOST=user@arm64-host
+
+# PowerPC64 target
+make remote-deploy-ppc64 PPC64_HOST=user@ppc64-host
+```
+
+Direct wrapper usage:
+```bash
+make -f Makefile.x86_64 deploy X86_64_HOST=user@x86-host
+make -f Makefile.arm64 deploy ARM64_HOST=user@arm64-host
+make -f Makefile.ppc64 deploy PPC64_HOST=user@ppc64-host
 ```
 
 ### As Part of Kernel
@@ -321,14 +341,33 @@ The project includes comprehensive testing:
 
 ### Running Tests
 ```bash
-# Run unit tests
-make test
+# Run scripted unit/integration/perf/security suites
+./run_tests.sh unit
+./run_tests.sh integration
+./run_tests.sh all
+```
 
-# Run Apple-specific tests
-make test-apple
+### Running KUnit SMB1 parser hardening tests
 
-# Performance benchmarks
-make benchmark
+The new SMB1 parser hardening suite is `ksmbd_smb1_parser`
+(`test/ksmbd_test_smb1_parser.c`).
+
+`kunit.py` is part of a full Linux kernel source tree (not the distro
+header package alone).
+
+```bash
+# From a Linux kernel source tree with this repository under fs/ksmbd
+./tools/testing/kunit/kunit.py run \
+  --kconfig_add CONFIG_SMB_SERVER=y \
+  --kconfig_add CONFIG_SMB_INSECURE_SERVER=y \
+  --kconfig_add CONFIG_KSMBD_KUNIT_TEST=y \
+  "ksmbd_smb1_parser*"
+
+# Optional: compile-only sanity check from this repository
+make -C /lib/modules/$(uname -r)/build \
+  M=$PWD/test \
+  CONFIG_KSMBD_KUNIT_TEST=y \
+  ksmbd_test_smb1_parser.o
 ```
 
 ## 📄 License
@@ -359,6 +398,6 @@ KSMBD includes implementation of protocols and concepts developed by:
 
 ---
 
-**For production deployments, please refer to the [Production Deployment Guide](DOCUMENTATION/Production_Deployment_Guide.md) and [Integration Examples](DOCUMENTATION/Integration_Examples_and_Troubleshooting.md).**
+**For deployments, start with the [KSMBD Deployment Guide](DEPLOYMENT_GUIDE.md). For deeper production details, refer to the [Production Deployment Guide](DOCUMENTATION/Production_Deployment_Guide.md) and [Integration Examples](DOCUMENTATION/Integration_Examples_and_Troubleshooting.md).**
 
 **For developers implementing Apple SMB support, see the [API Reference Manual](DOCUMENTATION/API_Reference_Manual.md) and [Implementation Guide](DOCUMENTATION/Apple_SMB_Protocol_Implementation_Guide.md).**

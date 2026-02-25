@@ -246,6 +246,27 @@ static int smb_direct_post_send_data(struct smb_direct_transport *t,
 				     struct kvec *iov, int niov,
 				     int remaining_data_length);
 
+static int smb_direct_wait_send_pending(struct smb_direct_transport *t,
+					const char *caller)
+{
+	long ret;
+
+	ret = wait_event_timeout(t->wait_send_pending,
+				 atomic_read(&t->send_pending) == 0 ||
+				 t->status != SMB_DIRECT_CS_CONNECTED,
+				 SMB_DIRECT_NEGOTIATE_TIMEOUT * HZ);
+	if (ret <= 0) {
+		pr_err_ratelimited("%s: timeout waiting for pending sends (pending=%d status=%d)\n",
+				   caller, atomic_read(&t->send_pending), t->status);
+		return -ETIMEDOUT;
+	}
+
+	if (atomic_read(&t->send_pending) == 0)
+		return 0;
+
+	return -ENOTCONN;
+}
+
 static inline struct smb_direct_transport *
 smb_trans_direct_transfort(struct ksmbd_transport *t)
 {
@@ -332,6 +353,11 @@ static void smb_direct_disconnect_rdma_work(struct work_struct *work)
 
 	if (t->status == SMB_DIRECT_CS_CONNECTED) {
 		t->status = SMB_DIRECT_CS_DISCONNECTING;
+		wake_up_interruptible(&t->wait_status);
+		wake_up_interruptible(&t->wait_reassembly_queue);
+		wake_up(&t->wait_send_credits);
+		wake_up(&t->wait_rw_credits);
+		wake_up(&t->wait_send_pending);
 		rdma_disconnect(t->cm_id);
 	}
 }
@@ -416,17 +442,20 @@ static void free_transport(struct smb_direct_transport *t)
 	struct smb_direct_recvmsg *recvmsg;
 
 	wake_up_interruptible(&t->wait_send_credits);
-
-	ksmbd_debug(RDMA, "wait for all send posted to IB to finish\n");
-	wait_event(t->wait_send_pending,
-		   atomic_read(&t->send_pending) == 0);
+	wake_up(&t->wait_rw_credits);
 
 	disable_work_sync(&t->disconnect_work);
 	disable_work_sync(&t->post_recv_credits_work);
 	disable_work_sync(&t->send_immediate_work);
 
-	if (t->qp) {
+	if (t->qp)
 		ib_drain_qp(t->qp);
+
+	ksmbd_debug(RDMA, "wait for all send posted to IB to finish\n");
+	if (atomic_read(&t->send_pending))
+		smb_direct_wait_send_pending(t, __func__);
+
+	if (t->qp) {
 		ib_mr_pool_destroy(t->qp, &t->qp->rdma_mrs);
 		t->qp = NULL;
 		rdma_destroy_qp(t->cm_id);
@@ -692,7 +721,7 @@ static int smb_direct_post_recv(struct smb_direct_transport *t,
 }
 
 static int smb_direct_read(struct ksmbd_transport *t, char *buf,
-			   unsigned int size, int unused)
+			   unsigned int size, int max_retries)
 {
 	struct smb_direct_recvmsg *recvmsg;
 	struct smb_direct_data_transfer *data_transfer;
@@ -702,6 +731,9 @@ static int smb_direct_read(struct ksmbd_transport *t, char *buf,
 	struct smb_direct_transport *st = smb_trans_direct_transfort(t);
 
 again:
+	if (!ksmbd_conn_alive(st->transport.conn))
+		return -ESHUTDOWN;
+
 	if (st->status != SMB_DIRECT_CS_CONNECTED) {
 		pr_err("disconnected\n");
 		return -ENOTCONN;
@@ -815,11 +847,22 @@ read_rfc1002_done:
 	}
 
 	ksmbd_debug(RDMA, "wait_event on more data\n");
-	rc = wait_event_interruptible(st->wait_reassembly_queue,
-				      st->reassembly_data_length >= size ||
-				       st->status != SMB_DIRECT_CS_CONNECTED);
-	if (rc)
+	rc = wait_event_interruptible_timeout(st->wait_reassembly_queue,
+					      st->reassembly_data_length >= size ||
+					      st->status != SMB_DIRECT_CS_CONNECTED,
+					      KSMBD_TCP_RECV_TIMEOUT);
+	if (rc < 0)
 		return -EINTR;
+	if (rc == 0) {
+		/*
+		 * Match TCP transport semantics: bounded retries for request
+		 * body reads, unlimited retries for header reads.
+		 */
+		if (max_retries == 0)
+			return -EAGAIN;
+		else if (max_retries > 0)
+			max_retries--;
+	}
 
 	goto again;
 }
@@ -994,13 +1037,19 @@ static int wait_for_credits(struct smb_direct_transport *t,
 			return 0;
 
 		atomic_add(needed, total_credits);
-		ret = wait_event_interruptible(*waitq,
-					       atomic_read(total_credits) >= needed ||
-					       t->status != SMB_DIRECT_CS_CONNECTED);
+		ret = wait_event_interruptible_timeout(*waitq,
+						       atomic_read(total_credits) >= needed ||
+						       t->status != SMB_DIRECT_CS_CONNECTED,
+						       SMB_DIRECT_NEGOTIATE_TIMEOUT * HZ);
 
 		if (t->status != SMB_DIRECT_CS_CONNECTED)
 			return -ENOTCONN;
-		else if (ret < 0)
+		else if (ret == 0) {
+			pr_err_ratelimited("timeout waiting for RDMA credits (needed=%d avail=%d)\n",
+					   needed, atomic_read(total_credits));
+			smb_direct_disconnect_rdma_connection(t);
+			return -ETIMEDOUT;
+		} else if (ret < 0)
 			return ret;
 	} while (true);
 }
@@ -1377,8 +1426,9 @@ done:
 	 * that means all the I/Os have been out and we are good to return
 	 */
 
-	wait_event(st->wait_send_pending,
-		   atomic_read(&st->send_pending) == 0);
+	error = smb_direct_wait_send_pending(st, __func__);
+	if (!ret && error)
+		ret = error;
 	return ret;
 }
 
@@ -1537,7 +1587,14 @@ static int smb_direct_rdma_xmit(struct smb_direct_transport *t,
 	}
 
 	msg = list_last_entry(&msg_list, struct smb_direct_rdma_rw_msg, list);
-	wait_for_completion(&completion);
+	if (!wait_for_completion_timeout(&completion,
+					 SMB_DIRECT_NEGOTIATE_TIMEOUT * HZ)) {
+		pr_err_ratelimited("timeout waiting for RDMA %s completion\n",
+				   is_read ? "read" : "write");
+		smb_direct_disconnect_rdma_connection(t);
+		ret = -ETIMEDOUT;
+		goto out;
+	}
 	ret = msg->status;
 out:
 	list_for_each_entry_safe(msg, next_msg, &msg_list, list) {
@@ -1571,12 +1628,17 @@ static int smb_direct_rdma_read(struct ksmbd_transport *t,
 static void smb_direct_disconnect(struct ksmbd_transport *t)
 {
 	struct smb_direct_transport *st = smb_trans_direct_transfort(t);
+	int ret;
 
 	ksmbd_debug(RDMA, "Disconnecting cm_id=%p\n", st->cm_id);
 
 	smb_direct_disconnect_rdma_work(&st->disconnect_work);
-	wait_event_interruptible(st->wait_status,
-				 st->status == SMB_DIRECT_CS_DISCONNECTED);
+	ret = wait_event_interruptible_timeout(st->wait_status,
+					       st->status == SMB_DIRECT_CS_DISCONNECTED,
+					       SMB_DIRECT_NEGOTIATE_TIMEOUT * HZ);
+	if (!ret)
+		pr_err_ratelimited("timeout waiting for RDMA disconnect (status=%d)\n",
+				   st->status);
 	free_transport(st);
 }
 
@@ -1611,11 +1673,17 @@ static int smb_direct_cm_handler(struct rdma_cm_id *cm_id,
 		wake_up_interruptible(&t->wait_status);
 		wake_up_interruptible(&t->wait_reassembly_queue);
 		wake_up(&t->wait_send_credits);
+		wake_up(&t->wait_rw_credits);
+		wake_up(&t->wait_send_pending);
 		break;
 	}
 	case RDMA_CM_EVENT_CONNECT_ERROR: {
 		t->status = SMB_DIRECT_CS_DISCONNECTED;
 		wake_up_interruptible(&t->wait_status);
+		wake_up_interruptible(&t->wait_reassembly_queue);
+		wake_up(&t->wait_send_credits);
+		wake_up(&t->wait_rw_credits);
+		wake_up(&t->wait_send_pending);
 		break;
 	}
 	default:
@@ -1696,9 +1764,7 @@ static int smb_direct_send_negotiate_response(struct smb_direct_transport *t,
 		return ret;
 	}
 
-	wait_event(t->wait_send_pending,
-		   atomic_read(&t->send_pending) == 0);
-	return 0;
+	return smb_direct_wait_send_pending(t, __func__);
 }
 
 static int smb_direct_accept_client(struct smb_direct_transport *t)

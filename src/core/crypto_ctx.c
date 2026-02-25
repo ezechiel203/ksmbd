@@ -195,7 +195,7 @@ static struct ksmbd_crypto_ctx *____crypto_shash_ctx_find(int id)
 {
 	struct ksmbd_crypto_ctx *ctx;
 
-	if (id >= CRYPTO_SHASH_MAX)
+	if (id < 0 || id >= CRYPTO_SHASH_MAX)
 		return NULL;
 
 	ctx = ksmbd_find_crypto_ctx();
