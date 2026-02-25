@@ -35,6 +35,7 @@
 #include "ksmbd_fsctl_extra.h"
 #include "ksmbd_hooks.h"
 #include "ksmbd_buffer.h"
+#include "mgmt/ksmbd_witness.h"
 
 extern int ksmbd_debugfs_init(void);
 extern void ksmbd_debugfs_exit(void);
@@ -627,9 +628,13 @@ static int __init ksmbd_server_init(void)
 	if (ret)
 		goto err_destroy_work_pools;
 
-	ret = ksmbd_oplock_init();
+	ret = ksmbd_init_file_cache();
 	if (ret)
 		goto err_destroy_buffer_pool;
+
+	ret = ksmbd_oplock_init();
+	if (ret)
+		goto err_exit_file_cache;
 
 	ret = ksmbd_ipc_init();
 	if (ret)
@@ -708,8 +713,14 @@ static int __init ksmbd_server_init(void)
 	if (ret)
 		goto err_hooks;
 
+	ret = ksmbd_witness_init();
+	if (ret)
+		goto err_witness;
+
 	return 0;
 
+err_witness:
+	ksmbd_hooks_exit();
 err_hooks:
 	ksmbd_fsctl_extra_exit();
 err_fsctl_extra:
@@ -745,6 +756,8 @@ err_ipc_release:
 	ksmbd_ipc_release();
 err_exit_oplock:
 	ksmbd_oplock_exit();
+err_exit_file_cache:
+	ksmbd_exit_file_cache();
 err_destroy_buffer_pool:
 	ksmbd_buffer_pool_exit();
 err_destroy_work_pools:
@@ -762,6 +775,7 @@ err_config_exit:
  */
 static void __exit ksmbd_server_exit(void)
 {
+	ksmbd_witness_exit();
 	ksmbd_hooks_exit();
 	ksmbd_fsctl_extra_exit();
 	ksmbd_app_instance_exit();
