@@ -582,26 +582,6 @@ static int fsctl_stub_noop_success_handler(struct ksmbd_work *work,
 	return 0;
 }
 
-static int fsctl_stub_query_u32_zero_handler(struct ksmbd_work *work,
-					     u64 id, void *in_buf,
-					     unsigned int in_buf_len,
-					     unsigned int max_out_len,
-					     struct smb2_ioctl_rsp *rsp,
-					     unsigned int *out_len)
-{
-	__le32 *out;
-
-	if (max_out_len < sizeof(__le32)) {
-		rsp->hdr.Status = STATUS_BUFFER_TOO_SMALL;
-		return -ENOSPC;
-	}
-
-	out = (__le32 *)&rsp->Buffer[0];
-	*out = 0;
-	*out_len = sizeof(__le32);
-	return 0;
-}
-
 /**
  * fsctl_not_supported_handler() - Return STATUS_NOT_SUPPORTED
  *
@@ -2100,7 +2080,7 @@ static struct ksmbd_fsctl_handler builtin_fsctl_handlers[] = {
 	},
 	{
 		.ctl_code = FSCTL_FIND_FILES_BY_SID,
-		.handler  = fsctl_stub_query_u32_zero_handler,
+		.handler  = fsctl_not_supported_handler,
 		.owner    = THIS_MODULE,
 	},
 		{
@@ -2115,7 +2095,7 @@ static struct ksmbd_fsctl_handler builtin_fsctl_handlers[] = {
 		},
 	{
 		.ctl_code = FSCTL_LMR_GET_LINK_TRACK_INF,
-		.handler  = fsctl_stub_query_u32_zero_handler,
+		.handler  = fsctl_not_supported_handler,
 		.owner    = THIS_MODULE,
 	},
 	{
