@@ -1226,6 +1226,96 @@ out:
 	return ret;
 }
 
+/*
+ * MS-FSCC 2.3.8 FSCTL_DUPLICATE_EXTENTS_TO_FILE_EX
+ *
+ * Extended version with Flags field. Key flag:
+ * DUPLICATE_EXTENTS_DATA_EX_SOURCE_ATOMIC.
+ */
+
+#define DUPLICATE_EXTENTS_DATA_EX_SOURCE_ATOMIC 0x00000001
+
+struct duplicate_extents_data_ex {
+	__le64 SourceFileId;
+	__le64 SourceFileOffset;
+	__le64 TargetFileOffset;
+	__le64 ByteCount;
+	__le32 Flags;
+} __packed;
+
+static int fsctl_duplicate_extents_ex_handler(struct ksmbd_work *work,
+					      u64 id, void *in_buf,
+					      unsigned int in_buf_len,
+					      unsigned int max_out_len,
+					      struct smb2_ioctl_rsp *rsp,
+					      unsigned int *out_len)
+{
+	struct duplicate_extents_data_ex *dup_ext;
+	struct ksmbd_file *fp_in = NULL, *fp_out = NULL;
+	loff_t src_off, dst_off, length, cloned;
+	int ret = 0;
+
+	if (!test_tree_conn_flag(work->tcon, KSMBD_TREE_CONN_FLAG_WRITABLE)) {
+		rsp->hdr.Status = STATUS_ACCESS_DENIED;
+		return -EACCES;
+	}
+
+	if (in_buf_len < sizeof(*dup_ext)) {
+		rsp->hdr.Status = STATUS_INVALID_PARAMETER;
+		return -EINVAL;
+	}
+
+	dup_ext = (struct duplicate_extents_data_ex *)in_buf;
+
+	fp_in = ksmbd_lookup_fd_fast(work, le64_to_cpu(dup_ext->SourceFileId));
+	if (!fp_in) {
+		rsp->hdr.Status = STATUS_INVALID_HANDLE;
+		return -ENOENT;
+	}
+
+	fp_out = ksmbd_lookup_fd_fast(work, id);
+	if (!fp_out) {
+		ksmbd_fd_put(work, fp_in);
+		rsp->hdr.Status = STATUS_INVALID_HANDLE;
+		return -ENOENT;
+	}
+
+	src_off = le64_to_cpu(dup_ext->SourceFileOffset);
+	dst_off = le64_to_cpu(dup_ext->TargetFileOffset);
+	length = le64_to_cpu(dup_ext->ByteCount);
+
+	/*
+	 * Use vfs_clone_file_range() which is atomic on filesystems
+	 * that support reflink (btrfs, xfs). The ATOMIC flag is
+	 * honored implicitly. Fall back to vfs_copy_file_range()
+	 * if clone is not supported.
+	 */
+	cloned = vfs_clone_file_range(fp_in->filp, src_off,
+				      fp_out->filp, dst_off, length, 0);
+	if (cloned == -EXDEV || cloned == -EOPNOTSUPP) {
+		ret = -EOPNOTSUPP;
+		goto out;
+	} else if (cloned != length) {
+		cloned = vfs_copy_file_range(fp_in->filp, src_off,
+					     fp_out->filp, dst_off,
+					     length, 0);
+		if (cloned != length) {
+			if (cloned < 0)
+				ret = cloned;
+			else
+				ret = -EINVAL;
+		}
+	}
+
+	rsp->VolatileFileId = id;
+	rsp->PersistentFileId = fp_out->persistent_id;
+	*out_len = 0;
+out:
+	ksmbd_fd_put(work, fp_in);
+	ksmbd_fd_put(work, fp_out);
+	return ret;
+}
+
 static int fsctl_set_sparse_handler(struct ksmbd_work *work,
 				    u64 id, void *in_buf,
 				    unsigned int in_buf_len,
@@ -1995,6 +2085,11 @@ static struct ksmbd_fsctl_handler builtin_fsctl_handlers[] = {
 	{
 		.ctl_code = FSCTL_SET_INTEGRITY_INFORMATION,
 		.handler  = fsctl_set_integrity_info_handler,
+		.owner    = THIS_MODULE,
+	},
+	{
+		.ctl_code = FSCTL_DUPLICATE_EXTENTS_TO_FILE_EX,
+		.handler  = fsctl_duplicate_extents_ex_handler,
 		.owner    = THIS_MODULE,
 	},
 };
