@@ -119,7 +119,7 @@ struct xattr_ntacl {
 #define XATTR_NAME_SD_LEN	\
 		(sizeof(XATTR_SECURITY_PREFIX SD_PREFIX) - 1)
 
-/* OBJECT ID XATTR PREFIX */
+/* OBJECT ID XATTR PREFIX - stores 16-byte object identifier per file */
 #define OBJECT_ID_PREFIX		"ObjectId"
 #define OBJECT_ID_PREFIX_LEN		(sizeof(OBJECT_ID_PREFIX) - 1)
 #define XATTR_NAME_OBJECT_ID		(XATTR_USER_PREFIX OBJECT_ID_PREFIX)

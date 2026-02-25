@@ -40,6 +40,7 @@
 #include "vfs.h"
 #include "ksmbd_work.h"
 #include "xattr.h"
+#include "oplock.h"
 #include "mgmt/tree_connect.h"
 #include "mgmt/user_session.h"
 
@@ -1846,9 +1847,11 @@ static int fsctl_set_integrity_info_handler(struct ksmbd_work *work,
 /*
  * MS-FSCC 2.3.53 / 2.3.55 FSCTL_OFFLOAD_READ / FSCTL_OFFLOAD_WRITE
  *
- * ODX (Offload Data Transfer) uses opaque tokens. OFFLOAD_READ generates
- * a server-local token. OFFLOAD_WRITE currently returns STATUS_NOT_SUPPORTED
- * to trigger COPYCHUNK fallback.
+ * ODX (Offload Data Transfer) uses opaque tokens.  OFFLOAD_READ generates
+ * a server-local token encoding the source inode identity and range.
+ * OFFLOAD_WRITE validates the token, locates the source file within the
+ * session's open handles, and uses vfs_copy_file_range() to perform the
+ * data transfer.
  */
 
 #define STORAGE_OFFLOAD_TOKEN_SIZE	512
@@ -1877,6 +1880,22 @@ struct offload_read_output {
 	__le32 Flags;
 	__le64 TransferLength;
 	u8     Token[STORAGE_OFFLOAD_TOKEN_SIZE];
+} __packed;
+
+/* MS-FSCC 2.3.55 FSCTL_OFFLOAD_WRITE input/output */
+struct offload_write_input {
+	__le32 Size;
+	__le32 Flags;
+	__le64 FileOffset;
+	__le64 CopyLength;
+	__le64 TransferOffset;
+	u8     Token[STORAGE_OFFLOAD_TOKEN_SIZE];
+} __packed;
+
+struct offload_write_output {
+	__le32 Size;
+	__le32 Flags;
+	__le64 LengthWritten;
 } __packed;
 
 static int fsctl_offload_read_handler(struct ksmbd_work *work,
@@ -1942,6 +1961,17 @@ static int fsctl_offload_read_handler(struct ksmbd_work *work,
 	return 0;
 }
 
+/**
+ * fsctl_offload_write_handler() - Handle FSCTL_OFFLOAD_WRITE (ODX write)
+ *
+ * Validates the server-local ODX token produced by a prior OFFLOAD_READ,
+ * locates the source file by inode number within the session's open handles,
+ * and uses vfs_copy_file_range() to perform the data transfer.
+ *
+ * MS-FSCC 2.3.55: The token encodes the source file identity and the range
+ * to copy.  TransferOffset selects the starting position within the
+ * token-described range.
+ */
 static int fsctl_offload_write_handler(struct ksmbd_work *work,
 				       u64 id, void *in_buf,
 				       unsigned int in_buf_len,
@@ -1949,13 +1979,162 @@ static int fsctl_offload_write_handler(struct ksmbd_work *work,
 				       struct smb2_ioctl_rsp *rsp,
 				       unsigned int *out_len)
 {
+	struct offload_write_input *input;
+	struct offload_write_output *output;
+	struct ksmbd_odx_token *token;
+	struct ksmbd_file *dst_fp = NULL, *src_fp = NULL;
+	struct inode *src_inode;
+	loff_t src_off, dst_off, copy_len, token_off, token_len, xfer_off;
+	loff_t remaining, copied_total = 0;
+	ssize_t copied;
+	unsigned int out_sz = sizeof(*output);
+	int ret = 0;
+
+	if (!test_tree_conn_flag(work->tcon, KSMBD_TREE_CONN_FLAG_WRITABLE)) {
+		rsp->hdr.Status = STATUS_ACCESS_DENIED;
+		return -EACCES;
+	}
+
+	if (in_buf_len < sizeof(*input)) {
+		rsp->hdr.Status = STATUS_INVALID_PARAMETER;
+		return -EINVAL;
+	}
+
+	if (max_out_len < out_sz) {
+		rsp->hdr.Status = STATUS_BUFFER_TOO_SMALL;
+		return -ENOSPC;
+	}
+
+	input = (struct offload_write_input *)in_buf;
+	token = (struct ksmbd_odx_token *)input->Token;
+
+	/* Validate the ODX token magic */
+	if (le32_to_cpu(token->magic) != KSMBD_ODX_TOKEN_MAGIC) {
+		ksmbd_debug(SMB,
+			    "OFFLOAD_WRITE: invalid token magic 0x%08x\n",
+			    le32_to_cpu(token->magic));
+		rsp->hdr.Status = STATUS_INVALID_PARAMETER;
+		return -EINVAL;
+	}
+
+	token_off = le64_to_cpu(token->offset);
+	token_len = le64_to_cpu(token->length);
+	dst_off = le64_to_cpu(input->FileOffset);
+	copy_len = le64_to_cpu(input->CopyLength);
+	xfer_off = le64_to_cpu(input->TransferOffset);
+
 	/*
-	 * Full ODX write requires source file lookup by token.
-	 * Return STATUS_NOT_SUPPORTED to trigger COPYCHUNK fallback.
+	 * TransferOffset is an offset into the token's range.
+	 * The actual source offset = token->offset + TransferOffset.
+	 * The available length from that point = token->length - TransferOffset.
 	 */
-	rsp->hdr.Status = STATUS_NOT_SUPPORTED;
-	*out_len = 0;
-	return -EOPNOTSUPP;
+	if (xfer_off < 0 || xfer_off > token_len) {
+		rsp->hdr.Status = STATUS_INVALID_PARAMETER;
+		return -EINVAL;
+	}
+
+	src_off = token_off + xfer_off;
+
+	/* Clamp copy length to the available token range */
+	if (copy_len == 0)
+		copy_len = token_len - xfer_off;
+	else if (copy_len > token_len - xfer_off)
+		copy_len = token_len - xfer_off;
+
+	if (copy_len <= 0) {
+		/* Nothing to copy -- return zero bytes written */
+		goto out_success;
+	}
+
+	/* Look up the destination file */
+	dst_fp = ksmbd_lookup_fd_fast(work, id);
+	if (!dst_fp) {
+		rsp->hdr.Status = STATUS_INVALID_HANDLE;
+		return -ENOENT;
+	}
+
+	/*
+	 * Find the source file by inode number from the token.
+	 * The token encodes the inode number and generation from
+	 * the OFFLOAD_READ that created it.
+	 */
+	src_fp = ksmbd_lookup_fd_inode_sess(work, le64_to_cpu(token->file_id));
+	if (!src_fp) {
+		ksmbd_debug(SMB,
+			    "OFFLOAD_WRITE: source inode %llu not found in session\n",
+			    le64_to_cpu(token->file_id));
+		rsp->hdr.Status = STATUS_FILE_CLOSED;
+		ret = -ENOENT;
+		goto out;
+	}
+
+	/*
+	 * Validate the inode generation to ensure the source file
+	 * is the same one that was originally read (i.e., the inode
+	 * number has not been recycled).
+	 */
+	src_inode = file_inode(src_fp->filp);
+	if (src_inode->i_generation != (u32)le64_to_cpu(token->generation)) {
+		ksmbd_debug(SMB,
+			    "OFFLOAD_WRITE: generation mismatch (%u vs %llu)\n",
+			    src_inode->i_generation,
+			    le64_to_cpu(token->generation));
+		rsp->hdr.Status = STATUS_FILE_CLOSED;
+		ret = -ESTALE;
+		goto out;
+	}
+
+	/* Break any level-II oplocks on the destination */
+	smb_break_all_levII_oplock(work, dst_fp, 1);
+
+	/*
+	 * Perform the copy using vfs_copy_file_range().  This handles
+	 * reflink, server-side copy, and splice fallback transparently.
+	 * Loop to handle partial copies.
+	 */
+	remaining = copy_len;
+	while (remaining > 0) {
+		copied = vfs_copy_file_range(src_fp->filp, src_off,
+					     dst_fp->filp, dst_off,
+					     remaining, 0);
+		if (copied <= 0) {
+			if (copied == 0)
+				break;
+			if (copied == -EOPNOTSUPP || copied == -EXDEV) {
+				/*
+				 * Filesystem does not support copy_file_range
+				 * between these files.  Report what we have
+				 * copied so far; the client can fall back to
+				 * COPYCHUNK for the remainder.
+				 */
+				break;
+			}
+			ret = copied;
+			if (ret == -ENOSPC || ret == -EFBIG)
+				rsp->hdr.Status = STATUS_DISK_FULL;
+			else if (ret == -EACCES)
+				rsp->hdr.Status = STATUS_ACCESS_DENIED;
+			else
+				rsp->hdr.Status = STATUS_UNEXPECTED_IO_ERROR;
+			goto out;
+		}
+		src_off += copied;
+		dst_off += copied;
+		remaining -= copied;
+		copied_total += copied;
+	}
+
+out_success:
+	output = (struct offload_write_output *)&rsp->Buffer[0];
+	memset(output, 0, out_sz);
+	output->Size = cpu_to_le32(out_sz);
+	output->LengthWritten = cpu_to_le64(copied_total);
+	*out_len = out_sz;
+
+out:
+	ksmbd_fd_put(work, src_fp);
+	ksmbd_fd_put(work, dst_fp);
+	return ret;
 }
 
 /**

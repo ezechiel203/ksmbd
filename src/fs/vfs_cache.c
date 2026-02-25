@@ -689,6 +689,48 @@ struct ksmbd_file *ksmbd_lookup_fd_inode(struct dentry *dentry)
 	return NULL;
 }
 
+/**
+ * ksmbd_lookup_fd_inode_sess() - Find an open file by inode number
+ *                                in the session's file table
+ * @work:  smb work containing the session reference
+ * @ino:   inode number to search for
+ *
+ * Iterates the session's file table under the read lock, looking for
+ * an open file handle whose backing inode number matches @ino.
+ * Returns a reference-counted ksmbd_file on success, NULL if not found.
+ *
+ * The caller must call ksmbd_fd_put() when done with the returned file.
+ */
+struct ksmbd_file *ksmbd_lookup_fd_inode_sess(struct ksmbd_work *work,
+					      u64 ino)
+{
+	struct ksmbd_file *fp = NULL;
+	unsigned int entry_id;
+
+	if (!work->sess)
+		return NULL;
+
+	read_lock(&work->sess->file_table.lock);
+	idr_for_each_entry(work->sess->file_table.idr, fp, entry_id) {
+		struct inode *inode;
+
+		if (!fp->filp)
+			continue;
+
+		if (fp->f_state != FP_INITED)
+			continue;
+
+		inode = file_inode(fp->filp);
+		if (inode->i_ino == ino) {
+			fp = ksmbd_fp_get(fp);
+			break;
+		}
+	}
+	read_unlock(&work->sess->file_table.lock);
+
+	return fp;
+}
+
 #define OPEN_ID_TYPE_VOLATILE_ID	(0)
 #define OPEN_ID_TYPE_PERSISTENT_ID	(1)
 
