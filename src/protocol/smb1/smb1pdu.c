@@ -548,21 +548,32 @@ int smb_tree_connect_andx(struct ksmbd_work *work)
 	if (!req->PasswordLength) {
 		treename = smb_strndup_from_utf16(req->Password + 1,
 						  256, true, conn->local_nls);
-		dev_type = smb_strndup_from_utf16(req->Password + 1 +
-			((strlen(treename) + 1) * 2), 256, false,
-			conn->local_nls);
 	} else {
 		treename = smb_strndup_from_utf16(req->Password +
 				le16_to_cpu(req->PasswordLength), 256, true,
 				conn->local_nls);
+	}
+
+	if (IS_ERR(treename)) {
+		pr_err("Unable to strdup() treename uid %d\n",
+		       rsp_hdr->Uid);
+		status.ret = KSMBD_TREE_CONN_STATUS_ERROR;
+		goto out_err;
+	}
+
+	if (!req->PasswordLength) {
+		dev_type = smb_strndup_from_utf16(req->Password + 1 +
+			((strlen(treename) + 1) * 2), 256, false,
+			conn->local_nls);
+	} else {
 		dev_type = smb_strndup_from_utf16(req->Password +
 			le16_to_cpu(req->PasswordLength) +
 				((strlen(treename) + 1) * 2),
 			256, false, conn->local_nls);
 	}
 
-	if (IS_ERR(treename) || IS_ERR(dev_type)) {
-		pr_err("Unable to strdup() treename or devtype uid %d\n",
+	if (IS_ERR(dev_type)) {
+		pr_err("Unable to strdup() devtype uid %d\n",
 		       rsp_hdr->Uid);
 		status.ret = KSMBD_TREE_CONN_STATUS_ERROR;
 		goto out_err;

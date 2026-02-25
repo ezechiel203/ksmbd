@@ -1863,8 +1863,97 @@ struct ksmbd_odx_token {
 	__le64 offset;
 	__le64 length;
 	__le64 generation;
-	u8     reserved[512 - 36];
+	u8     nonce[16];
+	u8     reserved[512 - 36 - 16];
 } __packed;
+
+/*
+ * Server-side ODX token registry.  Each token issued by OFFLOAD_READ is
+ * recorded here keyed by its random nonce.  OFFLOAD_WRITE validates
+ * tokens by looking them up in this table, which prevents forgery --
+ * an attacker cannot construct a valid token without the server having
+ * issued it.
+ */
+struct ksmbd_odx_token_entry {
+	struct hlist_node	node;
+	u8			nonce[16];
+	__le64			file_id;
+	__le64			offset;
+	__le64			length;
+	__le64			generation;
+};
+
+#define KSMBD_ODX_TOKEN_HASH_BITS	8
+static DEFINE_HASHTABLE(odx_token_table, KSMBD_ODX_TOKEN_HASH_BITS);
+static DEFINE_SPINLOCK(odx_token_lock);
+
+static u32 odx_nonce_hash(const u8 *nonce)
+{
+	u32 val;
+
+	/* Use first 4 bytes of nonce as hash key */
+	memcpy(&val, nonce, sizeof(val));
+	return val;
+}
+
+static void odx_token_store(const struct ksmbd_odx_token *token)
+{
+	struct ksmbd_odx_token_entry *entry;
+
+	entry = kmalloc(sizeof(*entry), GFP_KERNEL);
+	if (!entry)
+		return;
+
+	memcpy(entry->nonce, token->nonce, 16);
+	entry->file_id = token->file_id;
+	entry->offset = token->offset;
+	entry->length = token->length;
+	entry->generation = token->generation;
+
+	spin_lock(&odx_token_lock);
+	hash_add(odx_token_table, &entry->node,
+		 odx_nonce_hash(entry->nonce));
+	spin_unlock(&odx_token_lock);
+}
+
+static bool odx_token_validate(const struct ksmbd_odx_token *token)
+{
+	struct ksmbd_odx_token_entry *entry;
+	u32 key = odx_nonce_hash(token->nonce);
+	bool found = false;
+
+	spin_lock(&odx_token_lock);
+	hash_for_each_possible(odx_token_table, entry, node, key) {
+		if (memcmp(entry->nonce, token->nonce, 16) == 0 &&
+		    entry->file_id == token->file_id &&
+		    entry->offset == token->offset &&
+		    entry->length == token->length &&
+		    entry->generation == token->generation) {
+			/* Consume the token: one-time use */
+			hash_del(&entry->node);
+			kfree(entry);
+			found = true;
+			break;
+		}
+	}
+	spin_unlock(&odx_token_lock);
+
+	return found;
+}
+
+static void odx_token_cleanup(void)
+{
+	struct ksmbd_odx_token_entry *entry;
+	struct hlist_node *tmp;
+	int bkt;
+
+	spin_lock(&odx_token_lock);
+	hash_for_each_safe(odx_token_table, bkt, tmp, entry, node) {
+		hash_del(&entry->node);
+		kfree(entry);
+	}
+	spin_unlock(&odx_token_lock);
+}
 
 struct offload_read_input {
 	__le32 Size;
@@ -1955,6 +2044,10 @@ static int fsctl_offload_read_handler(struct ksmbd_work *work,
 	token->offset = cpu_to_le64(offset);
 	token->length = cpu_to_le64(length);
 	token->generation = cpu_to_le64(inode->i_generation);
+	get_random_bytes(token->nonce, sizeof(token->nonce));
+
+	/* Store the token server-side so OFFLOAD_WRITE can validate it */
+	odx_token_store(token);
 
 	*out_len = out_sz;
 	ksmbd_fd_put(work, fp);
@@ -2013,6 +2106,18 @@ static int fsctl_offload_write_handler(struct ksmbd_work *work,
 		ksmbd_debug(SMB,
 			    "OFFLOAD_WRITE: invalid token magic 0x%08x\n",
 			    le32_to_cpu(token->magic));
+		rsp->hdr.Status = STATUS_INVALID_PARAMETER;
+		return -EINVAL;
+	}
+
+	/*
+	 * Validate the token against the server-side registry.
+	 * This prevents forged tokens -- only tokens issued by a prior
+	 * OFFLOAD_READ are accepted.  The token is consumed (one-time use).
+	 */
+	if (!odx_token_validate(token)) {
+		ksmbd_debug(SMB,
+			    "OFFLOAD_WRITE: token validation failed (forged or reused)\n");
 		rsp->hdr.Status = STATUS_INVALID_PARAMETER;
 		return -EINVAL;
 	}
@@ -2456,6 +2561,7 @@ int ksmbd_fsctl_init(void)
 	int i, ret;
 
 	hash_init(fsctl_handlers);
+	hash_init(odx_token_table);
 
 	for (i = 0; i < ARRAY_SIZE(builtin_fsctl_handlers); i++) {
 		ret = ksmbd_register_fsctl(&builtin_fsctl_handlers[i]);
@@ -2485,4 +2591,7 @@ void ksmbd_fsctl_exit(void)
 
 	for (i = 0; i < ARRAY_SIZE(builtin_fsctl_handlers); i++)
 		ksmbd_unregister_fsctl(&builtin_fsctl_handlers[i]);
+
+	/* Free any outstanding ODX tokens */
+	odx_token_cleanup();
 }
