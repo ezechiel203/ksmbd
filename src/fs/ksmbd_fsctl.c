@@ -1566,6 +1566,24 @@ static int fsctl_set_zero_on_dealloc_handler(struct ksmbd_work *work,
 	return 0;
 }
 
+/**
+ * fsctl_set_encryption_handler() - FSCTL_SET_ENCRYPTION
+ *
+ * Per-file encryption (EFS). fscrypt key management model doesn't map
+ * to the SMB SET_ENCRYPTION request. Return STATUS_NOT_SUPPORTED.
+ */
+static int fsctl_set_encryption_handler(struct ksmbd_work *work,
+					u64 id, void *in_buf,
+					unsigned int in_buf_len,
+					unsigned int max_out_len,
+					struct smb2_ioctl_rsp *rsp,
+					unsigned int *out_len)
+{
+	rsp->hdr.Status = STATUS_NOT_SUPPORTED;
+	*out_len = 0;
+	return -EOPNOTSUPP;
+}
+
 /*
  * ============================================================
  *  Built-in handler table
@@ -1760,7 +1778,7 @@ static struct ksmbd_fsctl_handler builtin_fsctl_handlers[] = {
 	},
 	{
 		.ctl_code = FSCTL_SET_ENCRYPTION,
-		.handler  = fsctl_stub_noop_success_handler,
+		.handler  = fsctl_set_encryption_handler,
 		.owner    = THIS_MODULE,
 	},
 	{
