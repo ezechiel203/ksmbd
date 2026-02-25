@@ -1540,6 +1540,32 @@ static int fsctl_filesystem_get_stats_handler(struct ksmbd_work *work,
 	return 0;
 }
 
+/**
+ * fsctl_set_zero_on_dealloc_handler() - FSCTL_SET_ZERO_ON_DEALLOCATION
+ *
+ * Hint that deallocated space should be zeroed. Linux filesystems
+ * already zero deallocated blocks (ext4/xfs/btrfs), so accept as hint.
+ */
+static int fsctl_set_zero_on_dealloc_handler(struct ksmbd_work *work,
+					     u64 id, void *in_buf,
+					     unsigned int in_buf_len,
+					     unsigned int max_out_len,
+					     struct smb2_ioctl_rsp *rsp,
+					     unsigned int *out_len)
+{
+	struct ksmbd_file *fp;
+
+	fp = ksmbd_lookup_fd_fast(work, id);
+	if (!fp) {
+		rsp->hdr.Status = STATUS_INVALID_HANDLE;
+		return -ENOENT;
+	}
+
+	ksmbd_fd_put(work, fp);
+	*out_len = 0;
+	return 0;
+}
+
 /*
  * ============================================================
  *  Built-in handler table
@@ -1744,7 +1770,7 @@ static struct ksmbd_fsctl_handler builtin_fsctl_handlers[] = {
 	},
 	{
 		.ctl_code = FSCTL_SET_ZERO_ON_DEALLOC,
-		.handler  = fsctl_stub_noop_success_handler,
+		.handler  = fsctl_set_zero_on_dealloc_handler,
 		.owner    = THIS_MODULE,
 	},
 	{
