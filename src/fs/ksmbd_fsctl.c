@@ -1585,6 +1585,99 @@ static int fsctl_set_encryption_handler(struct ksmbd_work *work,
 }
 
 /*
+ * MS-FSCC 2.3.39 FSCTL_QUERY_FILE_REGIONS
+ *
+ * Returns information about file regions. Returns the requested range
+ * as a single valid-data region.
+ */
+
+struct file_region_input {
+	__le64 FileOffset;
+	__le64 Length;
+	__le32 DesiredUsage;
+	__le32 Reserved;
+} __packed;
+
+#define FILE_REGION_USAGE_VALID_CACHED_DATA	0x00000001
+
+struct file_region_output {
+	__le32 Flags;
+	__le32 TotalRegionEntryCount;
+	__le32 RegionEntryCount;
+	__le32 Reserved;
+} __packed;
+
+struct file_region_info {
+	__le64 FileOffset;
+	__le64 Length;
+	__le32 Usage;
+	__le32 Reserved;
+} __packed;
+
+static int fsctl_query_file_regions_handler(struct ksmbd_work *work,
+					    u64 id, void *in_buf,
+					    unsigned int in_buf_len,
+					    unsigned int max_out_len,
+					    struct smb2_ioctl_rsp *rsp,
+					    unsigned int *out_len)
+{
+	struct ksmbd_file *fp;
+	struct file_region_input *input;
+	struct file_region_output *output;
+	struct file_region_info *region;
+	struct inode *inode;
+	u64 offset, length, file_size;
+	unsigned int hdr_sz = sizeof(*output);
+	unsigned int entry_sz = sizeof(*region);
+
+	if (max_out_len < hdr_sz + entry_sz) {
+		rsp->hdr.Status = STATUS_BUFFER_TOO_SMALL;
+		return -ENOSPC;
+	}
+
+	fp = ksmbd_lookup_fd_fast(work, id);
+	if (!fp) {
+		rsp->hdr.Status = STATUS_INVALID_HANDLE;
+		return -ENOENT;
+	}
+
+	inode = file_inode(fp->filp);
+	file_size = i_size_read(inode);
+
+	if (in_buf_len >= sizeof(*input)) {
+		input = (struct file_region_input *)in_buf;
+		offset = le64_to_cpu(input->FileOffset);
+		length = le64_to_cpu(input->Length);
+	} else {
+		offset = 0;
+		length = file_size;
+	}
+
+	/* Clamp to file size */
+	if (offset >= file_size) {
+		offset = file_size;
+		length = 0;
+	} else if (offset + length > file_size) {
+		length = file_size - offset;
+	}
+
+	output = (struct file_region_output *)&rsp->Buffer[0];
+	memset(output, 0, hdr_sz);
+	output->TotalRegionEntryCount = cpu_to_le32(1);
+	output->RegionEntryCount = cpu_to_le32(1);
+
+	region = (struct file_region_info *)((char *)output + hdr_sz);
+	memset(region, 0, entry_sz);
+	region->FileOffset = cpu_to_le64(offset);
+	region->Length = cpu_to_le64(length);
+	region->Usage = cpu_to_le32(FILE_REGION_USAGE_VALID_CACHED_DATA);
+
+	*out_len = hdr_sz + entry_sz;
+	ksmbd_fd_put(work, fp);
+	return 0;
+}
+
+/*
  * ============================================================
  *  Built-in handler table
  * ============================================================
@@ -1824,6 +1917,11 @@ static struct ksmbd_fsctl_handler builtin_fsctl_handlers[] = {
 	{
 		.ctl_code = FSCTL_PIPE_TRANSCEIVE,
 		.handler  = fsctl_pipe_transceive_handler,
+		.owner    = THIS_MODULE,
+	},
+	{
+		.ctl_code = FSCTL_QUERY_FILE_REGIONS,
+		.handler  = fsctl_query_file_regions_handler,
 		.owner    = THIS_MODULE,
 	},
 };
