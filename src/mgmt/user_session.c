@@ -17,6 +17,7 @@
 #include "user_session.h"
 #include "user_config.h"
 #include "tree_connect.h"
+#include "ksmbd_witness.h"
 #include "transport_ipc.h"
 #include "connection.h"
 #include "vfs_cache.h"
@@ -165,6 +166,9 @@ void ksmbd_session_destroy(struct ksmbd_session *sess)
 	if (!sess)
 		return;
 
+	/* Clean up any witness registrations owned by this session */
+	ksmbd_witness_unregister_session(sess->id);
+
 	if (sess->user)
 		ksmbd_free_user(sess->user);
 
@@ -261,14 +265,13 @@ static int ksmbd_chann_del(struct ksmbd_conn *conn, struct ksmbd_session *sess)
 void ksmbd_sessions_deregister(struct ksmbd_conn *conn)
 {
 	struct ksmbd_session *sess;
-	struct ksmbd_session **to_destroy = NULL;
-	int nr_destroy = 0, capacity = 0;
+	struct hlist_node *tmp, *n;
+	HLIST_HEAD(to_destroy);
 	unsigned long id;
 
 	mutex_lock(&sessions_table_lock);
 	if (conn->binding) {
 		int bkt;
-		struct hlist_node *tmp;
 
 		hash_for_each_safe(sessions_table, bkt, tmp,
 				   sess, hlist) {
@@ -283,20 +286,10 @@ void ksmbd_sessions_deregister(struct ksmbd_conn *conn)
 				down_write(&conn->session_lock);
 				xa_erase(&conn->sessions, sess->id);
 				up_write(&conn->session_lock);
-				if (refcount_dec_and_test(&sess->refcnt)) {
-					if (nr_destroy >= capacity) {
-						capacity = max(8,
-							       capacity * 2);
-						to_destroy = krealloc(
-							to_destroy,
-							capacity *
-							sizeof(*to_destroy),
-							KSMBD_DEFAULT_GFP);
-					}
-					if (to_destroy)
-						to_destroy[nr_destroy++] =
-							sess;
-				}
+				if (refcount_dec_and_test(&sess->refcnt))
+					hlist_add_head(&sess->hlist,
+						       &to_destroy);
+				continue;
 			}
 		}
 	}
@@ -320,31 +313,18 @@ void ksmbd_sessions_deregister(struct ksmbd_conn *conn)
 #else
 			hash_del_rcu(&sess->hlist);
 #endif
-			if (refcount_dec_and_test(&sess->refcnt)) {
-				if (nr_destroy >= capacity) {
-					capacity = max(8, capacity * 2);
-					to_destroy = krealloc(
-						to_destroy,
-						capacity *
-						sizeof(*to_destroy),
-						KSMBD_DEFAULT_GFP);
-				}
-				if (to_destroy)
-					to_destroy[nr_destroy++] = sess;
-			}
+			if (refcount_dec_and_test(&sess->refcnt))
+				hlist_add_head(&sess->hlist, &to_destroy);
 		}
 	}
 	up_write(&conn->session_lock);
 	mutex_unlock(&sessions_table_lock);
 
-	if (nr_destroy) {
-		int i;
-
+	if (!hlist_empty(&to_destroy)) {
 		synchronize_rcu();
-		for (i = 0; i < nr_destroy; i++)
-			ksmbd_session_destroy(to_destroy[i]);
+		hlist_for_each_entry_safe(sess, n, &to_destroy, hlist)
+			ksmbd_session_destroy(sess);
 	}
-	kfree(to_destroy);
 }
 
 bool is_ksmbd_session_in_connection(struct ksmbd_conn *conn,

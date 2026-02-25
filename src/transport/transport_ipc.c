@@ -154,7 +154,8 @@ static const struct nla_policy ksmbd_nl_policy[KSMBD_EVENT_MAX + 1] = {
 		.len = sizeof(struct ksmbd_witness_iface_list_request),
 	},
 	[KSMBD_EVENT_WITNESS_IFACE_LIST_RESPONSE] = {
-		.len = sizeof(struct ksmbd_witness_iface_list_response),
+		.type = NLA_BINARY,
+		.len = KSMBD_IPC_MAX_PAYLOAD,
 	},
 };
 
@@ -1121,6 +1122,7 @@ static int handle_witness_register_event(struct sk_buff *skb,
 	ret = ksmbd_witness_register(req->client_name,
 				     req->resource_name,
 				     req->resource_type,
+				     req->session_id,
 				     &reg_id);
 
 	memset(&resp, 0, sizeof(resp));

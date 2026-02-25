@@ -171,6 +171,7 @@ ksmbd_witness_resource_lookup(const char *name)
 int ksmbd_witness_register(const char *client_name,
 			   const char *resource_name,
 			   unsigned int type,
+			   u64 session_id,
 			   u32 *reg_id_out)
 {
 	struct ksmbd_witness_registration *reg;
@@ -192,6 +193,7 @@ int ksmbd_witness_register(const char *client_name,
 
 	reg->reg_id = (u32)id;
 	reg->type = type;
+	reg->session_id = session_id;
 	strscpy(reg->client_name, client_name, KSMBD_WITNESS_NAME_MAX);
 	strscpy(reg->resource_name, resource_name, KSMBD_WITNESS_NAME_MAX);
 	INIT_LIST_HEAD(&reg->list);
@@ -293,6 +295,58 @@ int ksmbd_witness_unregister(u32 reg_id)
 }
 
 /**
+ * ksmbd_witness_unregister_session() - remove all registrations for a session
+ * @session_id: the session ID whose registrations should be cleaned up
+ *
+ * Called during session teardown to prevent leaked registrations.
+ * Iterates the global registration list and removes all entries
+ * belonging to the given session.
+ */
+void ksmbd_witness_unregister_session(u64 session_id)
+{
+	struct ksmbd_witness_registration *reg, *tmp;
+	LIST_HEAD(to_free);
+
+	if (!session_id)
+		return;
+
+	/* Collect matching registrations from the global list */
+	spin_lock(&witness_reg_lock);
+	list_for_each_entry_safe(reg, tmp, &witness_registrations,
+				 global_list) {
+		if (reg->session_id == session_id) {
+			list_del_init(&reg->global_list);
+			list_add(&reg->global_list, &to_free);
+		}
+	}
+	spin_unlock(&witness_reg_lock);
+
+	/* Remove from resource subscriber lists and free */
+	list_for_each_entry_safe(reg, tmp, &to_free, global_list) {
+		down_write(&witness_lock);
+		if (!list_empty(&reg->list)) {
+			struct ksmbd_witness_resource *res;
+
+			res = __witness_resource_lookup_locked(
+				reg->resource_name);
+			if (res) {
+				spin_lock(&res->lock);
+				list_del_init(&reg->list);
+				spin_unlock(&res->lock);
+			}
+		}
+		up_write(&witness_lock);
+
+		ksmbd_debug(IPC,
+			    "witness: session cleanup id=%u client=%s sess=%llu\n",
+			    reg->reg_id, reg->client_name, session_id);
+		list_del(&reg->global_list);
+		ida_free(&witness_ida, reg->reg_id);
+		kfree(reg);
+	}
+}
+
+/**
  * ksmbd_witness_registration_count() - count active registrations
  *
  * Return: number of active registrations.
@@ -322,6 +376,10 @@ int ksmbd_witness_registration_count(void)
  * userspace for each subscriber registration.  Userspace (ksmbd.mountd)
  * will then relay this via the DCE/RPC WitnessrAsyncNotify response.
  *
+ * The subscriber list is snapshot under spinlock, then notifications
+ * are sent without any lock held to avoid sleeping under spinlock
+ * (kvzalloc with GFP_KERNEL in the IPC path).
+ *
  * Return: 0 on success, negative errno on failure.
  */
 int ksmbd_witness_notify_state_change(const char *resource_name,
@@ -329,32 +387,70 @@ int ksmbd_witness_notify_state_change(const char *resource_name,
 {
 	struct ksmbd_witness_resource *res;
 	struct ksmbd_witness_registration *reg;
+	u32 *reg_ids = NULL;
+	int count = 0, capacity = 0, i;
 	int ret = 0;
 
-	down_read(&witness_lock);
+	/* Acquire write lock because we modify res->state */
+	down_write(&witness_lock);
 	res = __witness_resource_lookup_locked(resource_name);
 	if (!res) {
-		up_read(&witness_lock);
+		up_write(&witness_lock);
 		return -ENOENT;
 	}
 
 	res->state = new_state;
 
+	/*
+	 * Snapshot the subscriber reg_ids under the spinlock so we can
+	 * drop all locks before doing the allocating IPC sends.
+	 */
+	spin_lock(&res->lock);
+	list_for_each_entry(reg, &res->subscribers, list)
+		capacity++;
+	spin_unlock(&res->lock);
+
+	up_write(&witness_lock);
+
+	if (!capacity)
+		return 0;
+
+	reg_ids = kvzalloc(capacity * sizeof(*reg_ids), KSMBD_DEFAULT_GFP);
+	if (!reg_ids)
+		return -ENOMEM;
+
+	/* Re-acquire locks to snapshot the actual IDs */
+	down_read(&witness_lock);
+	res = __witness_resource_lookup_locked(resource_name);
+	if (!res) {
+		up_read(&witness_lock);
+		kvfree(reg_ids);
+		return -ENOENT;
+	}
+
 	spin_lock(&res->lock);
 	list_for_each_entry(reg, &res->subscribers, list) {
-		ksmbd_debug(IPC,
-			    "witness: notifying client=%s resource=%s state=%u\n",
-			    reg->client_name, resource_name, new_state);
-		ret = ksmbd_ipc_witness_notify(reg->reg_id,
-					       resource_name,
-					       new_state);
-		if (ret)
-			pr_err("witness: failed to notify reg_id=%u: %d\n",
-			       reg->reg_id, ret);
+		if (count >= capacity)
+			break;
+		reg_ids[count++] = reg->reg_id;
 	}
 	spin_unlock(&res->lock);
 	up_read(&witness_lock);
 
+	/* Now send notifications without any lock held */
+	for (i = 0; i < count; i++) {
+		ksmbd_debug(IPC,
+			    "witness: notifying reg_id=%u resource=%s state=%u\n",
+			    reg_ids[i], resource_name, new_state);
+		ret = ksmbd_ipc_witness_notify(reg_ids[i],
+					       resource_name,
+					       new_state);
+		if (ret)
+			pr_err("witness: failed to notify reg_id=%u: %d\n",
+			       reg_ids[i], ret);
+	}
+
+	kvfree(reg_ids);
 	return ret;
 }
 

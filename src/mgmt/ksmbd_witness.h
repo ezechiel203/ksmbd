@@ -69,6 +69,7 @@ struct ksmbd_witness_resource {
  */
 struct ksmbd_witness_registration {
 	u32			reg_id;		/* unique registration ID */
+	u64			session_id;	/* owning session ID, 0 if none */
 	char			client_name[KSMBD_WITNESS_NAME_MAX];
 	char			resource_name[KSMBD_WITNESS_NAME_MAX];
 	unsigned int		type;		/* KSMBD_WITNESS_RESOURCE_* */
@@ -91,8 +92,10 @@ ksmbd_witness_resource_lookup(const char *name);
 int ksmbd_witness_register(const char *client_name,
 			   const char *resource_name,
 			   unsigned int type,
+			   u64 session_id,
 			   u32 *reg_id_out);
 int ksmbd_witness_unregister(u32 reg_id);
+void ksmbd_witness_unregister_session(u64 session_id);
 
 /* State change notification */
 int ksmbd_witness_notify_state_change(const char *resource_name,

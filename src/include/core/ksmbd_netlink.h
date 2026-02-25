@@ -337,7 +337,8 @@ struct ksmbd_witness_register_request {
 	__u32	resource_type;			/* KSMBD_WITNESS_RESOURCE_* */
 	__s8	client_name[KSMBD_WITNESS_NAME_MAX_NL];
 	__s8	resource_name[KSMBD_WITNESS_NAME_MAX_NL];
-	__u32	reserved[8];
+	__u64	session_id;			/* owning session ID */
+	__u32	reserved[6];
 };
 
 /*
