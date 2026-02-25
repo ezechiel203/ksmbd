@@ -1678,6 +1678,69 @@ static int fsctl_query_file_regions_handler(struct ksmbd_work *work,
 }
 
 /*
+ * MS-FSCC 2.3.49 / 2.3.65 FSCTL_GET/SET_INTEGRITY_INFORMATION
+ *
+ * On Windows, used with ReFS for data integrity streams. On Linux,
+ * btrfs has checksumming (always on), ext4 has metadata checksums.
+ * Return default settings matching non-ReFS behavior.
+ */
+
+struct fsctl_get_integrity_info_output {
+	__le16 ChecksumAlgorithm;
+	__le16 Reserved;
+	__le32 Flags;
+	__le32 ChecksumChunkSizeInBytes;
+	__le32 ClusterSizeInBytes;
+} __packed;
+
+#define CHECKSUM_TYPE_NONE		0x0000
+#define FSCTL_INTEGRITY_FLAG_CHECKSUM_ENFORCEMENT_OFF 0x00000001
+
+static int fsctl_get_integrity_info_handler(struct ksmbd_work *work,
+					    u64 id, void *in_buf,
+					    unsigned int in_buf_len,
+					    unsigned int max_out_len,
+					    struct smb2_ioctl_rsp *rsp,
+					    unsigned int *out_len)
+{
+	struct fsctl_get_integrity_info_output *info;
+	unsigned int sz = sizeof(*info);
+
+	if (max_out_len < sz) {
+		rsp->hdr.Status = STATUS_BUFFER_TOO_SMALL;
+		return -ENOSPC;
+	}
+
+	info = (struct fsctl_get_integrity_info_output *)&rsp->Buffer[0];
+	memset(info, 0, sz);
+	info->ChecksumAlgorithm = cpu_to_le16(CHECKSUM_TYPE_NONE);
+	info->Flags = cpu_to_le32(FSCTL_INTEGRITY_FLAG_CHECKSUM_ENFORCEMENT_OFF);
+	info->ChecksumChunkSizeInBytes = cpu_to_le32(0);
+	info->ClusterSizeInBytes = cpu_to_le32(4096);
+
+	*out_len = sz;
+	return 0;
+}
+
+/**
+ * fsctl_set_integrity_info_handler() - FSCTL_SET_INTEGRITY_INFORMATION
+ *
+ * Accept silently. Linux filesystems handle integrity internally
+ * (btrfs checksums, ext4 metadata checksums). Matches Windows
+ * behavior on non-ReFS volumes.
+ */
+static int fsctl_set_integrity_info_handler(struct ksmbd_work *work,
+					    u64 id, void *in_buf,
+					    unsigned int in_buf_len,
+					    unsigned int max_out_len,
+					    struct smb2_ioctl_rsp *rsp,
+					    unsigned int *out_len)
+{
+	*out_len = 0;
+	return 0;
+}
+
+/*
  * ============================================================
  *  Built-in handler table
  * ============================================================
@@ -1922,6 +1985,16 @@ static struct ksmbd_fsctl_handler builtin_fsctl_handlers[] = {
 	{
 		.ctl_code = FSCTL_QUERY_FILE_REGIONS,
 		.handler  = fsctl_query_file_regions_handler,
+		.owner    = THIS_MODULE,
+	},
+	{
+		.ctl_code = FSCTL_GET_INTEGRITY_INFORMATION,
+		.handler  = fsctl_get_integrity_info_handler,
+		.owner    = THIS_MODULE,
+	},
+	{
+		.ctl_code = FSCTL_SET_INTEGRITY_INFORMATION,
+		.handler  = fsctl_set_integrity_info_handler,
 		.owner    = THIS_MODULE,
 	},
 };
