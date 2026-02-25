@@ -1971,6 +1971,26 @@ static int fsctl_offload_write_handler(struct ksmbd_work *work,
 	return -EOPNOTSUPP;
 }
 
+/**
+ * fsctl_srv_read_hash_handler() - FSCTL_SRV_READ_HASH (BranchCache)
+ *
+ * BranchCache content information retrieval. Returns
+ * STATUS_HASH_NOT_PRESENT until full BranchCache is implemented.
+ */
+#define STATUS_HASH_NOT_PRESENT		cpu_to_le32(0xC000A100)
+
+static int fsctl_srv_read_hash_handler(struct ksmbd_work *work,
+				       u64 id, void *in_buf,
+				       unsigned int in_buf_len,
+				       unsigned int max_out_len,
+				       struct smb2_ioctl_rsp *rsp,
+				       unsigned int *out_len)
+{
+	rsp->hdr.Status = STATUS_HASH_NOT_PRESENT;
+	*out_len = 0;
+	return -EOPNOTSUPP;
+}
+
 /*
  * ============================================================
  *  Built-in handler table
@@ -2246,6 +2266,11 @@ static struct ksmbd_fsctl_handler builtin_fsctl_handlers[] = {
 	{
 		.ctl_code = FSCTL_OFFLOAD_WRITE,
 		.handler  = fsctl_offload_write_handler,
+		.owner    = THIS_MODULE,
+	},
+	{
+		.ctl_code = FSCTL_SRV_READ_HASH,
+		.handler  = fsctl_srv_read_hash_handler,
 		.owner    = THIS_MODULE,
 	},
 };
