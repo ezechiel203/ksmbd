@@ -13,6 +13,8 @@
 #include <net/genetlink.h>
 #include <linux/socket.h>
 #include <linux/workqueue.h>
+#include <linux/netdevice.h>
+#include <linux/inetdevice.h>
 
 #include "vfs_cache.h"
 #include "transport_ipc.h"
@@ -24,6 +26,7 @@
 #include "mgmt/user_session.h"
 #include "mgmt/tree_connect.h"
 #include "mgmt/ksmbd_ida.h"
+#include "mgmt/ksmbd_witness.h"
 #include "connection.h"
 #include "transport_tcp.h"
 #include "transport_rdma.h"
@@ -73,6 +76,12 @@ static struct delayed_work ipc_timer_work;
 static int handle_startup_event(struct sk_buff *skb, struct genl_info *info);
 static int handle_unsupported_event(struct sk_buff *skb, struct genl_info *info);
 static int handle_generic_event(struct sk_buff *skb, struct genl_info *info);
+static int handle_witness_register_event(struct sk_buff *skb,
+					 struct genl_info *info);
+static int handle_witness_unregister_event(struct sk_buff *skb,
+					   struct genl_info *info);
+static int handle_witness_iface_list_event(struct sk_buff *skb,
+					   struct genl_info *info);
 static int ksmbd_ipc_heartbeat_request(void);
 
 static const struct nla_policy ksmbd_nl_policy[KSMBD_EVENT_MAX + 1] = {
@@ -125,6 +134,27 @@ static const struct nla_policy ksmbd_nl_policy[KSMBD_EVENT_MAX + 1] = {
 	},
 	[KSMBD_EVENT_LOGIN_RESPONSE_EXT] = {
 		.len = sizeof(struct ksmbd_login_response_ext),
+	},
+	[KSMBD_EVENT_WITNESS_REGISTER] = {
+		.len = sizeof(struct ksmbd_witness_register_request),
+	},
+	[KSMBD_EVENT_WITNESS_REGISTER_RESPONSE] = {
+		.len = sizeof(struct ksmbd_witness_register_response),
+	},
+	[KSMBD_EVENT_WITNESS_UNREGISTER] = {
+		.len = sizeof(struct ksmbd_witness_unregister_request),
+	},
+	[KSMBD_EVENT_WITNESS_UNREGISTER_RESPONSE] = {
+		.len = sizeof(struct ksmbd_witness_unregister_response),
+	},
+	[KSMBD_EVENT_WITNESS_NOTIFY] = {
+		.len = sizeof(struct ksmbd_witness_notify_msg),
+	},
+	[KSMBD_EVENT_WITNESS_IFACE_LIST] = {
+		.len = sizeof(struct ksmbd_witness_iface_list_request),
+	},
+	[KSMBD_EVENT_WITNESS_IFACE_LIST_RESPONSE] = {
+		.len = sizeof(struct ksmbd_witness_iface_list_response),
 	},
 };
 
@@ -219,6 +249,41 @@ static struct genl_ops ksmbd_genl_ops[] = {
 		.doit	= handle_generic_event,
 		.flags	= GENL_ADMIN_PERM,
 	},
+	{
+		.cmd	= KSMBD_EVENT_WITNESS_REGISTER,
+		.doit	= handle_witness_register_event,
+		.flags	= GENL_ADMIN_PERM,
+	},
+	{
+		.cmd	= KSMBD_EVENT_WITNESS_REGISTER_RESPONSE,
+		.doit	= handle_unsupported_event,
+		.flags	= GENL_ADMIN_PERM,
+	},
+	{
+		.cmd	= KSMBD_EVENT_WITNESS_UNREGISTER,
+		.doit	= handle_witness_unregister_event,
+		.flags	= GENL_ADMIN_PERM,
+	},
+	{
+		.cmd	= KSMBD_EVENT_WITNESS_UNREGISTER_RESPONSE,
+		.doit	= handle_unsupported_event,
+		.flags	= GENL_ADMIN_PERM,
+	},
+	{
+		.cmd	= KSMBD_EVENT_WITNESS_NOTIFY,
+		.doit	= handle_unsupported_event,
+		.flags	= GENL_ADMIN_PERM,
+	},
+	{
+		.cmd	= KSMBD_EVENT_WITNESS_IFACE_LIST,
+		.doit	= handle_witness_iface_list_event,
+		.flags	= GENL_ADMIN_PERM,
+	},
+	{
+		.cmd	= KSMBD_EVENT_WITNESS_IFACE_LIST_RESPONSE,
+		.doit	= handle_unsupported_event,
+		.flags	= GENL_ADMIN_PERM,
+	},
 };
 
 static struct genl_family ksmbd_genl_family = {
@@ -231,7 +296,7 @@ static struct genl_family ksmbd_genl_family = {
 	.ops		= ksmbd_genl_ops,
 	.n_ops		= ARRAY_SIZE(ksmbd_genl_ops),
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0)
-	.resv_start_op	= KSMBD_EVENT_LOGIN_RESPONSE_EXT + 1,
+	.resv_start_op	= KSMBD_EVENT_WITNESS_IFACE_LIST_RESPONSE + 1,
 #endif
 };
 
@@ -262,7 +327,10 @@ static void ipc_update_last_active(void)
 static struct ksmbd_ipc_msg *ipc_msg_alloc(size_t sz)
 {
 	struct ksmbd_ipc_msg *msg;
-	size_t msg_sz = sz + sizeof(struct ksmbd_ipc_msg);
+	size_t msg_sz;
+
+	if (check_add_overflow(sz, sizeof(struct ksmbd_ipc_msg), &msg_sz))
+		return NULL;
 
 	msg = kvzalloc(msg_sz, KSMBD_DEFAULT_GFP);
 	if (msg)
@@ -540,10 +608,12 @@ static int ipc_validate_msg(struct ipc_msg_table_entry *entry)
 	{
 		struct ksmbd_share_config_response *resp = entry->response;
 
-		if (resp->payload_sz) {
-			if (resp->payload_sz < resp->veto_list_sz)
-				return -EINVAL;
+		if (resp->payload_sz < resp->veto_list_sz)
+			return -EINVAL;
+		if (resp->veto_list_sz && resp->payload_sz == resp->veto_list_sz)
+			return -EINVAL;
 
+		if (resp->payload_sz) {
 			if (check_add_overflow(sizeof(struct ksmbd_share_config_response),
 					       resp->payload_sz, &msg_sz))
 				return -EINVAL;
@@ -1016,6 +1086,246 @@ static void ipc_timer_heartbeat(struct work_struct *w)
 {
 	if (__ipc_heartbeat())
 		server_queue_ctrl_reset_work();
+}
+
+/* ------------------------------------------------------------------ */
+/* Witness Protocol (MS-SWN) handlers and IPC functions                */
+/* ------------------------------------------------------------------ */
+
+/**
+ * handle_witness_register_event() - handle a witness registration from userspace
+ *
+ * Userspace (ksmbd.mountd) sends this when a client calls WitnessrRegister.
+ * The kernel creates a registration and replies with the reg_id.
+ */
+static int handle_witness_register_event(struct sk_buff *skb,
+					 struct genl_info *info)
+{
+	struct ksmbd_witness_register_request *req;
+	struct ksmbd_witness_register_response resp;
+	struct ksmbd_ipc_msg *msg;
+	u32 reg_id = 0;
+	int ret;
+
+	if (!netlink_capable(skb, CAP_NET_ADMIN))
+		return -EPERM;
+
+	if (!ksmbd_ipc_validate_version(info))
+		return -EINVAL;
+
+	if (!info->attrs[KSMBD_EVENT_WITNESS_REGISTER])
+		return -EINVAL;
+
+	req = nla_data(info->attrs[info->genlhdr->cmd]);
+
+	ret = ksmbd_witness_register(req->client_name,
+				     req->resource_name,
+				     req->resource_type,
+				     &reg_id);
+
+	memset(&resp, 0, sizeof(resp));
+	resp.handle = req->handle;
+	resp.reg_id = reg_id;
+	resp.status = ret ? (__u32)-ret : 0;
+
+	msg = ipc_msg_alloc(sizeof(resp));
+	if (!msg)
+		return -ENOMEM;
+
+	msg->type = KSMBD_EVENT_WITNESS_REGISTER_RESPONSE;
+	memcpy(msg->payload, &resp, sizeof(resp));
+	ret = ipc_msg_send(msg);
+	ipc_msg_free(msg);
+	return ret;
+}
+
+/**
+ * handle_witness_unregister_event() - handle a witness unregistration
+ */
+static int handle_witness_unregister_event(struct sk_buff *skb,
+					   struct genl_info *info)
+{
+	struct ksmbd_witness_unregister_request *req;
+	struct ksmbd_witness_unregister_response resp;
+	struct ksmbd_ipc_msg *msg;
+	int ret;
+
+	if (!netlink_capable(skb, CAP_NET_ADMIN))
+		return -EPERM;
+
+	if (!ksmbd_ipc_validate_version(info))
+		return -EINVAL;
+
+	if (!info->attrs[KSMBD_EVENT_WITNESS_UNREGISTER])
+		return -EINVAL;
+
+	req = nla_data(info->attrs[info->genlhdr->cmd]);
+
+	ret = ksmbd_witness_unregister(req->reg_id);
+
+	memset(&resp, 0, sizeof(resp));
+	resp.handle = req->handle;
+	resp.status = ret ? (__u32)-ret : 0;
+
+	msg = ipc_msg_alloc(sizeof(resp));
+	if (!msg)
+		return -ENOMEM;
+
+	msg->type = KSMBD_EVENT_WITNESS_UNREGISTER_RESPONSE;
+	memcpy(msg->payload, &resp, sizeof(resp));
+	ret = ipc_msg_send(msg);
+	ipc_msg_free(msg);
+	return ret;
+}
+
+/**
+ * handle_witness_iface_list_event() - handle interface list query
+ *
+ * Enumerates network interfaces and returns them to userspace.
+ * Userspace uses this to respond to WitnessrGetInterfaceList.
+ */
+static int handle_witness_iface_list_event(struct sk_buff *skb,
+					   struct genl_info *info)
+{
+	struct ksmbd_witness_iface_list_request *req;
+	struct ksmbd_witness_iface_list_response *resp;
+	struct ksmbd_witness_iface_entry *entry;
+	struct ksmbd_ipc_msg *msg;
+	struct net_device *dev;
+	u32 num_ifaces = 0;
+	size_t payload_sz;
+	size_t total_sz;
+	int ret;
+
+	if (!netlink_capable(skb, CAP_NET_ADMIN))
+		return -EPERM;
+
+	if (!ksmbd_ipc_validate_version(info))
+		return -EINVAL;
+
+	if (!info->attrs[KSMBD_EVENT_WITNESS_IFACE_LIST])
+		return -EINVAL;
+
+	req = nla_data(info->attrs[info->genlhdr->cmd]);
+
+	/* First pass: count interfaces */
+	rcu_read_lock();
+	for_each_netdev_rcu(&init_net, dev) {
+		if (dev->flags & IFF_LOOPBACK)
+			continue;
+		num_ifaces++;
+	}
+	rcu_read_unlock();
+
+	payload_sz = num_ifaces * sizeof(struct ksmbd_witness_iface_entry);
+	total_sz = sizeof(*resp) + payload_sz;
+
+	if (total_sz > KSMBD_IPC_MAX_PAYLOAD)
+		total_sz = KSMBD_IPC_MAX_PAYLOAD;
+
+	msg = ipc_msg_alloc(total_sz);
+	if (!msg)
+		return -ENOMEM;
+
+	msg->type = KSMBD_EVENT_WITNESS_IFACE_LIST_RESPONSE;
+	resp = (struct ksmbd_witness_iface_list_response *)msg->payload;
+	memset(resp, 0, total_sz);
+	resp->handle = req->handle;
+
+	entry = (struct ksmbd_witness_iface_entry *)resp->payload;
+	num_ifaces = 0;
+
+	/* Second pass: fill interface entries */
+	rcu_read_lock();
+	for_each_netdev_rcu(&init_net, dev) {
+		struct in_device *in_dev;
+		const struct in_ifaddr *ifa;
+		size_t offset;
+
+		if (dev->flags & IFF_LOOPBACK)
+			continue;
+
+		offset = (char *)entry - (char *)resp;
+		if (offset + sizeof(*entry) > total_sz)
+			break;
+
+		memset(entry, 0, sizeof(*entry));
+		entry->if_index = dev->ifindex;
+		strscpy(entry->if_name, dev->name, sizeof(entry->if_name));
+		entry->state = (dev->flags & IFF_UP) ?
+			KSMBD_WITNESS_STATE_AVAILABLE :
+			KSMBD_WITNESS_STATE_UNAVAILABLE;
+
+		in_dev = __in_dev_get_rcu(dev);
+		if (in_dev) {
+			in_dev_for_each_ifa_rcu(ifa, in_dev) {
+				snprintf(entry->ipv4_addr,
+					 sizeof(entry->ipv4_addr),
+					 "%pI4", &ifa->ifa_address);
+				entry->capability |=
+					KSMBD_WITNESS_IFACE_CAP_IPV4;
+				break; /* first IPv4 address only */
+			}
+		}
+
+		entry++;
+		num_ifaces++;
+	}
+	rcu_read_unlock();
+
+	resp->num_interfaces = num_ifaces;
+	resp->payload_sz = num_ifaces *
+		sizeof(struct ksmbd_witness_iface_entry);
+
+	ret = ipc_msg_send(msg);
+	ipc_msg_free(msg);
+	return ret;
+}
+
+/**
+ * ksmbd_ipc_witness_notify() - send witness state change to userspace
+ * @reg_id: the registration this notification is for
+ * @resource_name: the resource that changed state
+ * @new_state: the new state value
+ *
+ * This is a one-way notification from kernel to userspace.
+ * Return: 0 on success, negative errno on failure.
+ */
+int ksmbd_ipc_witness_notify(u32 reg_id, const char *resource_name,
+			     int new_state)
+{
+	struct ksmbd_ipc_msg *msg;
+	struct ksmbd_witness_notify_msg *notify;
+	int ret;
+
+	msg = ipc_msg_alloc(sizeof(struct ksmbd_witness_notify_msg));
+	if (!msg)
+		return -ENOMEM;
+
+	msg->type = KSMBD_EVENT_WITNESS_NOTIFY;
+	notify = (struct ksmbd_witness_notify_msg *)msg->payload;
+	memset(notify, 0, sizeof(*notify));
+	notify->reg_id = reg_id;
+	notify->new_state = new_state;
+	strscpy(notify->resource_name, resource_name,
+		KSMBD_WITNESS_NAME_MAX_NL);
+
+	ret = ipc_msg_send(msg);
+	ipc_msg_free(msg);
+	return ret;
+}
+
+/**
+ * ksmbd_ipc_witness_iface_list_request() - request interface list from kernel
+ *
+ * This is called from within the kernel; currently not used since
+ * the interface list query is handled directly in the netlink handler.
+ * Kept as a stub for future use.
+ */
+struct ksmbd_witness_iface_list_response *
+ksmbd_ipc_witness_iface_list_request(void)
+{
+	return NULL;
 }
 
 int ksmbd_ipc_id_alloc(void)

@@ -54,6 +54,18 @@
  *
  *  - KSMBD_EVENT_LOGIN_REQUEST_EXT/RESPONSE_EXT(ksmbd_login_request_ext/response_ext)
  *    This event is to get user account extension info to user IPC daemon.
+ *
+ *  - KSMBD_EVENT_WITNESS_REGISTER(ksmbd_witness_register_request)
+ *    Userspace registers a client for witness (MS-SWN) notifications.
+ *
+ *  - KSMBD_EVENT_WITNESS_UNREGISTER(ksmbd_witness_unregister_request)
+ *    Userspace unregisters a client from witness notifications.
+ *
+ *  - KSMBD_EVENT_WITNESS_NOTIFY(ksmbd_witness_notify_msg)
+ *    Kernel sends a resource state change notification to userspace.
+ *
+ *  - KSMBD_EVENT_WITNESS_IFACE_LIST(ksmbd_witness_iface_list_request)
+ *    Userspace queries available network interfaces.
  */
 
 #define KSMBD_GENL_NAME		"SMBD_GENL"
@@ -295,6 +307,118 @@ struct ksmbd_spnego_authen_response {
 };
 
 /*
+ * Witness Protocol (MS-SWN) netlink message definitions.
+ * These are used for kernel <-> userspace witness communication.
+ */
+
+#define KSMBD_WITNESS_NAME_MAX_NL	256
+
+/*
+ * Witness resource states (mirrors MS-SWN WITNESS_STATE).
+ * These values are shared between kernel and userspace.
+ */
+#define KSMBD_WITNESS_STATE_AVAILABLE		0
+#define KSMBD_WITNESS_STATE_UNAVAILABLE		1
+#define KSMBD_WITNESS_STATE_UNKNOWN		0xFF
+
+/*
+ * Witness resource types (mirrors MS-SWN).
+ */
+#define KSMBD_WITNESS_RESOURCE_IP		0
+#define KSMBD_WITNESS_RESOURCE_SHARE		1
+#define KSMBD_WITNESS_RESOURCE_NODE		2
+
+/*
+ * IPC request: userspace registers a client for witness notifications.
+ * Sent from ksmbd.mountd to kernel when a client calls WitnessrRegister.
+ */
+struct ksmbd_witness_register_request {
+	__u32	handle;				/* IPC handle for response */
+	__u32	resource_type;			/* KSMBD_WITNESS_RESOURCE_* */
+	__s8	client_name[KSMBD_WITNESS_NAME_MAX_NL];
+	__s8	resource_name[KSMBD_WITNESS_NAME_MAX_NL];
+	__u32	reserved[8];
+};
+
+/*
+ * IPC response: kernel returns reg_id to userspace.
+ */
+struct ksmbd_witness_register_response {
+	__u32	handle;				/* IPC handle */
+	__u32	reg_id;				/* assigned registration ID */
+	__u32	status;				/* 0 on success */
+	__u32	reserved[8];
+};
+
+/*
+ * IPC request: userspace unregisters a witness client.
+ */
+struct ksmbd_witness_unregister_request {
+	__u32	handle;
+	__u32	reg_id;				/* registration ID to remove */
+	__u32	reserved[8];
+};
+
+/*
+ * IPC response: kernel acknowledges unregistration.
+ */
+struct ksmbd_witness_unregister_response {
+	__u32	handle;
+	__u32	status;				/* 0 on success */
+	__u32	reserved[8];
+};
+
+/*
+ * IPC notification: kernel sends resource state change to userspace.
+ * This is a one-way message (kernel -> userspace).  Userspace
+ * translates this into a WitnessrAsyncNotify response for the client.
+ */
+struct ksmbd_witness_notify_msg {
+	__u32	reg_id;				/* which registration */
+	__u32	new_state;			/* KSMBD_WITNESS_STATE_* */
+	__s8	resource_name[KSMBD_WITNESS_NAME_MAX_NL];
+	__u32	reserved[8];
+};
+
+/*
+ * IPC request: userspace queries available network interfaces.
+ * Used by WitnessrGetInterfaceList.
+ */
+struct ksmbd_witness_iface_list_request {
+	__u32	handle;
+	__u32	reserved[8];
+};
+
+/*
+ * IPC response: kernel returns interface list.
+ * payload[] contains a sequence of ksmbd_witness_iface_entry structs.
+ */
+struct ksmbd_witness_iface_list_response {
+	__u32	handle;
+	__u32	num_interfaces;
+	__u32	payload_sz;
+	__u32	reserved[8];
+	__u8	payload[];
+};
+
+/*
+ * Single interface entry in the witness interface list response.
+ */
+struct ksmbd_witness_iface_entry {
+	__u32	if_index;			/* net_device ifindex */
+	__u32	state;				/* KSMBD_WITNESS_STATE_* */
+	__u32	capability;			/* flags (e.g., IPv4/IPv6) */
+	__s8	if_name[16];			/* interface name */
+	__s8	ipv4_addr[16];			/* dotted-decimal IPv4 */
+	__s8	ipv6_addr[48];			/* IPv6 address string */
+	__u32	reserved[4];
+};
+
+/* Witness interface capability flags */
+#define KSMBD_WITNESS_IFACE_CAP_IPV4	BIT(0)
+#define KSMBD_WITNESS_IFACE_CAP_IPV6	BIT(1)
+
+/*
  * This also used as NETLINK attribute type value.
  *
  * NOTE:
@@ -329,6 +453,18 @@ enum ksmbd_event {
 
 	KSMBD_EVENT_LOGIN_REQUEST_EXT,
 	KSMBD_EVENT_LOGIN_RESPONSE_EXT,
+
+	/* Witness Protocol (MS-SWN) events */
+	KSMBD_EVENT_WITNESS_REGISTER,
+	KSMBD_EVENT_WITNESS_REGISTER_RESPONSE,
+
+	KSMBD_EVENT_WITNESS_UNREGISTER		= 20,
+	KSMBD_EVENT_WITNESS_UNREGISTER_RESPONSE,
+
+	KSMBD_EVENT_WITNESS_NOTIFY,		/* kernel -> userspace only */
+
+	KSMBD_EVENT_WITNESS_IFACE_LIST,
+	KSMBD_EVENT_WITNESS_IFACE_LIST_RESPONSE,
 
 	__KSMBD_EVENT_MAX,
 	KSMBD_EVENT_MAX = __KSMBD_EVENT_MAX - 1

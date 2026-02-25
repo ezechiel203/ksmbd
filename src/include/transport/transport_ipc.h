@@ -46,4 +46,10 @@ struct ksmbd_rpc_command *ksmbd_rpc_rap(struct ksmbd_session *sess, void *payloa
 void ksmbd_ipc_release(void);
 void ksmbd_ipc_soft_reset(void);
 int ksmbd_ipc_init(void);
+
+/* Witness Protocol (MS-SWN) IPC functions */
+int ksmbd_ipc_witness_notify(u32 reg_id, const char *resource_name,
+			     int new_state);
+struct ksmbd_witness_iface_list_response *
+ksmbd_ipc_witness_iface_list_request(void);
 #endif /* __KSMBD_TRANSPORT_IPC_H__ */
