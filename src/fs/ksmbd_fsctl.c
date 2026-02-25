@@ -1857,6 +1857,121 @@ static int fsctl_set_integrity_info_handler(struct ksmbd_work *work,
 }
 
 /*
+ * MS-FSCC 2.3.53 / 2.3.55 FSCTL_OFFLOAD_READ / FSCTL_OFFLOAD_WRITE
+ *
+ * ODX (Offload Data Transfer) uses opaque tokens. OFFLOAD_READ generates
+ * a server-local token. OFFLOAD_WRITE currently returns STATUS_NOT_SUPPORTED
+ * to trigger COPYCHUNK fallback.
+ */
+
+#define STORAGE_OFFLOAD_TOKEN_SIZE	512
+#define KSMBD_ODX_TOKEN_MAGIC		0x4B534D42  /* "KSMB" */
+
+struct ksmbd_odx_token {
+	__le32 magic;
+	__le64 file_id;
+	__le64 offset;
+	__le64 length;
+	__le64 generation;
+	u8     reserved[512 - 36];
+} __packed;
+
+struct offload_read_input {
+	__le32 Size;
+	__le32 Flags;
+	__le32 TokenTimeToLive;
+	__le32 Reserved;
+	__le64 FileOffset;
+	__le64 CopyLength;
+} __packed;
+
+struct offload_read_output {
+	__le32 Size;
+	__le32 Flags;
+	__le64 TransferLength;
+	u8     Token[STORAGE_OFFLOAD_TOKEN_SIZE];
+} __packed;
+
+static int fsctl_offload_read_handler(struct ksmbd_work *work,
+				      u64 id, void *in_buf,
+				      unsigned int in_buf_len,
+				      unsigned int max_out_len,
+				      struct smb2_ioctl_rsp *rsp,
+				      unsigned int *out_len)
+{
+	struct offload_read_input *input;
+	struct offload_read_output *output;
+	struct ksmbd_odx_token *token;
+	struct ksmbd_file *fp;
+	struct inode *inode;
+	u64 offset, length, file_size;
+	unsigned int out_sz = sizeof(*output);
+
+	if (in_buf_len < sizeof(*input)) {
+		rsp->hdr.Status = STATUS_INVALID_PARAMETER;
+		return -EINVAL;
+	}
+
+	if (max_out_len < out_sz) {
+		rsp->hdr.Status = STATUS_BUFFER_TOO_SMALL;
+		return -ENOSPC;
+	}
+
+	input = (struct offload_read_input *)in_buf;
+	offset = le64_to_cpu(input->FileOffset);
+	length = le64_to_cpu(input->CopyLength);
+
+	fp = ksmbd_lookup_fd_fast(work, id);
+	if (!fp) {
+		rsp->hdr.Status = STATUS_INVALID_HANDLE;
+		return -ENOENT;
+	}
+
+	inode = file_inode(fp->filp);
+	file_size = i_size_read(inode);
+
+	/* Clamp transfer length to available data */
+	if (offset >= file_size)
+		length = 0;
+	else if (offset + length > file_size)
+		length = file_size - offset;
+
+	output = (struct offload_read_output *)&rsp->Buffer[0];
+	memset(output, 0, out_sz);
+	output->Size = cpu_to_le32(out_sz);
+	output->TransferLength = cpu_to_le64(length);
+
+	/* Build server-local token */
+	token = (struct ksmbd_odx_token *)output->Token;
+	memset(token, 0, STORAGE_OFFLOAD_TOKEN_SIZE);
+	token->magic = cpu_to_le32(KSMBD_ODX_TOKEN_MAGIC);
+	token->file_id = cpu_to_le64(inode->i_ino);
+	token->offset = cpu_to_le64(offset);
+	token->length = cpu_to_le64(length);
+	token->generation = cpu_to_le64(inode->i_generation);
+
+	*out_len = out_sz;
+	ksmbd_fd_put(work, fp);
+	return 0;
+}
+
+static int fsctl_offload_write_handler(struct ksmbd_work *work,
+				       u64 id, void *in_buf,
+				       unsigned int in_buf_len,
+				       unsigned int max_out_len,
+				       struct smb2_ioctl_rsp *rsp,
+				       unsigned int *out_len)
+{
+	/*
+	 * Full ODX write requires source file lookup by token.
+	 * Return STATUS_NOT_SUPPORTED to trigger COPYCHUNK fallback.
+	 */
+	rsp->hdr.Status = STATUS_NOT_SUPPORTED;
+	*out_len = 0;
+	return -EOPNOTSUPP;
+}
+
+/*
  * ============================================================
  *  Built-in handler table
  * ============================================================
@@ -2121,6 +2236,16 @@ static struct ksmbd_fsctl_handler builtin_fsctl_handlers[] = {
 	{
 		.ctl_code = FSCTL_MARK_HANDLE,
 		.handler  = fsctl_mark_handle_handler,
+		.owner    = THIS_MODULE,
+	},
+	{
+		.ctl_code = FSCTL_OFFLOAD_READ,
+		.handler  = fsctl_offload_read_handler,
+		.owner    = THIS_MODULE,
+	},
+	{
+		.ctl_code = FSCTL_OFFLOAD_WRITE,
+		.handler  = fsctl_offload_write_handler,
 		.owner    = THIS_MODULE,
 	},
 };
