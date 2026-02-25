@@ -32,6 +32,7 @@
 #include "ksmbd_resilient.h"
 #include "ksmbd_quota.h"
 #include "ksmbd_app_instance.h"
+#include "ksmbd_rsvd.h"
 #include "ksmbd_fsctl_extra.h"
 #include "ksmbd_hooks.h"
 #include "ksmbd_buffer.h"
@@ -705,6 +706,10 @@ static int __init ksmbd_server_init(void)
 	if (ret)
 		goto err_app_instance;
 
+	ret = ksmbd_rsvd_init();
+	if (ret)
+		goto err_rsvd;
+
 	ret = ksmbd_fsctl_extra_init();
 	if (ret)
 		goto err_fsctl_extra;
@@ -724,6 +729,8 @@ err_witness:
 err_hooks:
 	ksmbd_fsctl_extra_exit();
 err_fsctl_extra:
+	ksmbd_rsvd_exit();
+err_rsvd:
 	ksmbd_app_instance_exit();
 err_app_instance:
 	ksmbd_quota_exit();
@@ -778,6 +785,7 @@ static void __exit ksmbd_server_exit(void)
 	ksmbd_witness_exit();
 	ksmbd_hooks_exit();
 	ksmbd_fsctl_extra_exit();
+	ksmbd_rsvd_exit();
 	ksmbd_app_instance_exit();
 	ksmbd_quota_exit();
 	ksmbd_resilient_exit();

@@ -63,6 +63,7 @@ ksmbd-y +=	src/protocol/smb2/smb2_pdu_common.o \
 		src/fs/ksmbd_notify.o src/fs/ksmbd_reparse.o \
 		src/fs/ksmbd_resilient.o src/fs/ksmbd_quota.o \
 		src/fs/ksmbd_app_instance.o src/fs/ksmbd_fsctl_extra.o \
+		src/fs/ksmbd_rsvd.o \
 		src/core/ksmbd_hooks.o
 
 ifeq ($(CONFIG_KSMBD_FRUIT),y)
