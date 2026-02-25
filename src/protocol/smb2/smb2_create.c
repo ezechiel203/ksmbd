@@ -1720,6 +1720,8 @@ int smb2_open(struct ksmbd_work *work)
 	 */
 	down_write(&fp->f_ci->m_lock);
 	list_add(&fp->node, &fp->f_ci->m_fp_list);
+	if (posix_ctxt)
+		ksmbd_inode_set_posix(fp->f_ci);
 	up_write(&fp->f_ci->m_lock);
 
 	if (req->CreateContextsOffset) {
@@ -1728,8 +1730,14 @@ int smb2_open(struct ksmbd_work *work)
 			goto err_out1;
 	}
 
-	/* Check delete pending among previous fp before oplock break */
-	if (ksmbd_inode_pending_delete(fp)) {
+	/*
+	 * Check delete pending among previous fp before oplock break.
+	 * In POSIX mode, allow opens to succeed even when delete is
+	 * pending -- the file has already been unlinked from the
+	 * directory namespace and data persists until the last handle
+	 * closes (POSIX unlink semantics).
+	 */
+	if (!posix_ctxt && ksmbd_inode_pending_delete(fp)) {
 		rc = -EBUSY;
 		goto err_out;
 	}

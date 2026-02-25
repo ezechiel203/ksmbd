@@ -1864,7 +1864,9 @@ static int __ksmbd_vfs_rename(struct ksmbd_work *work,
 	}
 
 	err = -ENOTEMPTY;
-	if (dst_dent != trap_dent && !d_really_is_positive(dst_dent)) {
+	if (dst_dent != trap_dent &&
+	    (!d_really_is_positive(dst_dent) ||
+	     (work && work->tcon && work->tcon->posix_extensions))) {
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 12, 0)
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
 		struct renamedata rd = {

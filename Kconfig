@@ -65,6 +65,27 @@ config SMB_SERVER_SMBDIRECT
 	  SMB Direct allows transferring SMB packets over RDMA. If unsure,
 	  say N.
 
+config SMB_SERVER_QUIC
+	bool "Support for SMB over QUIC transport"
+	depends on SMB_SERVER
+	depends on NET
+	default n
+
+	help
+	  Enables SMB over QUIC transport support (port 443).
+
+	  This provides a kernel-side unix domain socket bridge that
+	  communicates with a userspace QUIC proxy.  The proxy handles
+	  QUIC/TLS 1.3 connection termination and client certificate
+	  authentication, then forwards decrypted SMB2 PDU streams to
+	  the kernel via a unix domain socket at /run/ksmbd/quic.sock.
+
+	  This allows SMB clients to securely access shares over the
+	  internet without requiring a VPN.
+
+	  A separate userspace QUIC proxy daemon (not included) is
+	  required.  If unsure, say N.
+
 config KSMBD_FRUIT
 	bool "Support for Apple SMB extensions (macOS compatibility)"
 	depends on SMB_SERVER

@@ -1057,6 +1057,8 @@ static int find_file_posix_info(struct smb2_query_info_rsp *rsp,
 		file_info->AllocationSize = cpu_to_le64(fp->stream.size);
 	}
 	file_info->HardLinks = cpu_to_le32(stat.nlink);
+	file_info->ReparseTag =
+		smb2_get_reparse_tag_special_file(stat.mode);
 	file_info->Mode = cpu_to_le32(stat.mode & 0777);
 	switch (stat.mode & S_IFMT) {
 	case S_IFDIR:
@@ -1079,6 +1081,7 @@ static int find_file_posix_info(struct smb2_query_info_rsp *rsp,
 	}
 
 	file_info->DeviceId = cpu_to_le32(stat.rdev);
+	file_info->Zero = 0;
 	/*
 	 * Sids(32) contain two sids(Domain sid(16), UNIX group sid(16)).
 	 * UNIX sid(16) = revision(1) + num_subauth(1) + authority(6) +
@@ -1765,7 +1768,12 @@ static int smb2_rename(struct ksmbd_work *work,
 		goto out;
 	}
 
-	if (!file_info->ReplaceIfExists)
+	/*
+	 * POSIX rename semantics: always allow atomic replace of the
+	 * target, even if it is currently open. This matches the
+	 * POSIX rename(2) behavior.
+	 */
+	if (!file_info->ReplaceIfExists && !fp->is_posix_ctxt)
 		flags = RENAME_NOREPLACE;
 
 	rc = ksmbd_vfs_rename(work, &fp->filp->f_path, new_name, flags);
@@ -1821,7 +1829,7 @@ static int smb2_rename(struct ksmbd_work *work,
 		goto out;
 	}
 
-	if (strchr(new_name, ':')) {
+	if (fp->is_posix_ctxt == false && strchr(new_name, ':')) {
 		int s_type;
 		char *xattr_stream_name, *stream_name = NULL;
 		size_t xattr_stream_size;
@@ -1879,7 +1887,11 @@ static int smb2_rename(struct ksmbd_work *work,
 		goto out;
 	}
 
-	if (file_info->ReplaceIfExists) {
+	/*
+	 * POSIX rename semantics: always allow atomic replace of the
+	 * target, even if it is currently open.
+	 */
+	if (file_info->ReplaceIfExists || fp->is_posix_ctxt) {
 		if (file_present) {
 			rc = ksmbd_vfs_remove_file(work, new_name);
 			if (rc) {

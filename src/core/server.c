@@ -14,6 +14,7 @@
 #include <linux/moduleparam.h>
 
 #include "server.h"
+#include "smb2pdu.h"
 #include "smb_common.h"
 #include "smbstatus.h"
 #include "connection.h"
@@ -186,6 +187,18 @@ static void __handle_ksmbd_work(struct ksmbd_work *work,
 	int rc;
 	bool is_chained = false;
 
+	/*
+	 * Handle compressed requests: decompress before any other
+	 * processing. After decompression, the request buffer contains
+	 * a standard SMB2 message (or an encrypted transform message
+	 * that was compressed).
+	 */
+	if (smb2_is_compression_transform_hdr(work->request_buf)) {
+		rc = smb2_decompress_req(work);
+		if (rc < 0)
+			return;
+	}
+
 	if (conn->ops->is_transform_hdr &&
 	    conn->ops->is_transform_hdr(work->request_buf)) {
 		rc = conn->ops->decrypt_req(work);
@@ -265,6 +278,16 @@ send:
 		rc = conn->ops->encrypt_resp(work);
 		if (rc < 0)
 			conn->ops->set_rsp_status(work, STATUS_DATA_ERROR);
+	} else {
+		/*
+		 * Compress the response if compression was negotiated and
+		 * the response is not encrypted. Compression and encryption
+		 * are mutually exclusive per MS-SMB2 - compressed messages
+		 * should not also be encrypted (the client should negotiate
+		 * one or the other, or compress-then-encrypt which is
+		 * handled differently).
+		 */
+		smb2_compress_resp(work);
 	}
 	if (work->sess)
 		ksmbd_user_session_put(work->sess);

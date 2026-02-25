@@ -133,6 +133,17 @@ static void build_rdma_transform_ctxt(
 	pneg_ctxt->DataLength = cpu_to_le16(data_len);
 }
 
+static void build_transport_cap_ctxt(
+				struct smb2_transport_capabilities *pneg_ctxt)
+{
+	pneg_ctxt->ContextType = SMB2_TRANSPORT_CAPABILITIES;
+	pneg_ctxt->DataLength =
+		cpu_to_le16(sizeof(struct smb2_transport_capabilities)
+			    - sizeof(struct smb2_neg_context));
+	pneg_ctxt->Reserved = cpu_to_le32(0);
+	pneg_ctxt->Flags = SMB2_ACCEPT_TRANSPORT_LEVEL_SECURITY;
+}
+
 static void build_posix_ctxt(struct smb2_posix_neg_context *pneg_ctxt)
 {
 	pneg_ctxt->ContextType = SMB2_POSIX_EXTENSIONS_AVAILABLE;
@@ -227,6 +238,17 @@ static unsigned int assemble_neg_contexts(struct ksmbd_conn *conn,
 			     + conn->rdma_transform_count * sizeof(__le16);
 	}
 
+	if (conn->transport_secured) {
+		ctxt_size = round_up(ctxt_size, 8);
+		ksmbd_debug(SMB,
+			    "assemble SMB2_TRANSPORT_CAPABILITIES context\n");
+		build_transport_cap_ctxt(
+				(struct smb2_transport_capabilities *)
+				(pneg_ctxt + ctxt_size));
+		neg_ctxt_cnt++;
+		ctxt_size += sizeof(struct smb2_transport_capabilities);
+	}
+
 	rsp->NegotiateContextCount = cpu_to_le16(neg_ctxt_cnt);
 	return ctxt_size + AUTH_GSS_PADDING;
 }
@@ -308,46 +330,51 @@ bool smb3_encryption_negotiated(struct ksmbd_conn *conn)
 	    conn->cipher_type;
 }
 
-static __le32 decode_compress_ctxt(struct ksmbd_conn *conn,
-				   struct smb2_compression_ctx *pneg_ctxt,
-				   int ctxt_len)
+static void decode_compress_ctxt(struct ksmbd_conn *conn,
+				 struct smb2_compression_ctx *pneg_ctxt,
+				 int ctxt_len)
 {
-	int cmp_cnt;
-	int i, cmps_size;
+	int algo_cnt, i, algos_size;
+
+	conn->compress_algorithm = SMB3_COMPRESS_NONE;
 
 	if (sizeof(struct smb2_compression_ctx) > ctxt_len) {
-		pr_err_ratelimited("Invalid SMB2_COMPRESSION_CAPABILITIES context size\n");
-		return STATUS_INVALID_PARAMETER;
+		pr_err("Invalid SMB2_COMPRESSION_CAPABILITIES context length\n");
+		return;
 	}
 
-	cmp_cnt = le16_to_cpu(pneg_ctxt->CompressionAlgorithmCount);
-	if (cmp_cnt <= 0)
-		return STATUS_INVALID_PARAMETER;
+	algo_cnt = le16_to_cpu(pneg_ctxt->CompressionAlgorithmCount);
+	algos_size = algo_cnt * sizeof(__le16);
 
-	cmps_size = cmp_cnt * sizeof(__le16);
-	if (sizeof(struct smb2_compression_ctx) + cmps_size > ctxt_len) {
-		pr_err_ratelimited("Invalid compression algorithm count(%d)\n",
-				   cmp_cnt);
-		return STATUS_INVALID_PARAMETER;
+	if (sizeof(struct smb2_compression_ctx) + algos_size > ctxt_len) {
+		pr_err("Invalid compression algorithm count(%d)\n", algo_cnt);
+		return;
 	}
 
 	/*
-	 * Keep compression disabled for data transport until SMB2 compression
-	 * transform handling is implemented in the request/response path.
+	 * Select the best compression algorithm supported by both sides.
+	 * Preference order: LZ4 > Pattern_V1 > LZ77+Huffman > LZ77 > LZNT1
+	 * For now, only LZ4 and Pattern_V1 are fully implemented.
 	 */
-	conn->compress_algorithm = SMB3_COMPRESS_NONE;
-
-	for (i = 0; i < cmp_cnt; i++) {
-		if (pneg_ctxt->CompressionAlgorithms[i] == SMB3_COMPRESS_LZNT1 ||
-		    pneg_ctxt->CompressionAlgorithms[i] == SMB3_COMPRESS_LZ77 ||
-		    pneg_ctxt->CompressionAlgorithms[i] == SMB3_COMPRESS_LZ77_HUFF) {
-			ksmbd_debug(SMB, "Compression algorithm offered: 0x%x\n",
-				    le16_to_cpu(pneg_ctxt->CompressionAlgorithms[i]));
-			break;
+	for (i = 0; i < algo_cnt; i++) {
+		if (pneg_ctxt->CompressionAlgorithms[i] == SMB3_COMPRESS_LZ4) {
+			conn->compress_algorithm = SMB3_COMPRESS_LZ4;
+			ksmbd_debug(SMB, "Selected compression algorithm: LZ4\n");
+			return;
 		}
 	}
 
-	return STATUS_SUCCESS;
+	for (i = 0; i < algo_cnt; i++) {
+		if (pneg_ctxt->CompressionAlgorithms[i] ==
+		    SMB3_COMPRESS_PATTERN_V1) {
+			conn->compress_algorithm = SMB3_COMPRESS_PATTERN_V1;
+			ksmbd_debug(SMB,
+				    "Selected compression algorithm: Pattern_V1\n");
+			return;
+		}
+	}
+
+	ksmbd_debug(SMB, "No mutually supported compression algorithm found\n");
 }
 
 static void decode_sign_cap_ctxt(struct ksmbd_conn *conn,
@@ -399,6 +426,21 @@ static void decode_sign_cap_ctxt(struct ksmbd_conn *conn,
 			    le16_to_cpu(best_algo));
 		conn->signing_negotiated = true;
 		conn->signing_algorithm = best_algo;
+	}
+}
+
+static void decode_transport_cap_ctxt(struct ksmbd_conn *conn,
+				      struct smb2_transport_capabilities *pneg_ctxt,
+				      int ctxt_len)
+{
+	if (sizeof(struct smb2_transport_capabilities) > ctxt_len) {
+		pr_err("Invalid SMB2_TRANSPORT_CAPABILITIES context size\n");
+		return;
+	}
+
+	if (pneg_ctxt->Flags & SMB2_ACCEPT_TRANSPORT_LEVEL_SECURITY) {
+		ksmbd_debug(SMB, "Client supports transport-level security\n");
+		conn->transport_secured = true;
 	}
 }
 
@@ -503,20 +545,14 @@ static __le32 deassemble_neg_contexts(struct ksmbd_conn *conn,
 					    (struct smb2_encryption_neg_context *)pctx,
 					    ctxt_len);
 		} else if (pctx->ContextType == SMB2_COMPRESSION_CAPABILITIES) {
-			__le32 cstatus;
-
 			ksmbd_debug(SMB,
 				    "deassemble SMB2_COMPRESSION_CAPABILITIES context\n");
 			if (compress_ctxt_seen)
 				break;
 
-			cstatus = decode_compress_ctxt(conn,
-						       (struct smb2_compression_ctx *)pctx,
-						       ctxt_len);
-			if (cstatus != STATUS_SUCCESS) {
-				status = cstatus;
-				break;
-			}
+			decode_compress_ctxt(conn,
+					     (struct smb2_compression_ctx *)pctx,
+					     ctxt_len);
 			compress_ctxt_seen = true;
 		} else if (pctx->ContextType == SMB2_NETNAME_NEGOTIATE_CONTEXT_ID) {
 			ksmbd_debug(SMB,
@@ -525,6 +561,13 @@ static __le32 deassemble_neg_contexts(struct ksmbd_conn *conn,
 			ksmbd_debug(SMB,
 				    "deassemble SMB2_POSIX_EXTENSIONS_AVAILABLE context\n");
 			conn->posix_ext_supported = true;
+		} else if (pctx->ContextType == SMB2_TRANSPORT_CAPABILITIES) {
+			ksmbd_debug(SMB,
+				    "deassemble SMB2_TRANSPORT_CAPABILITIES context\n");
+
+			decode_transport_cap_ctxt(conn,
+						  (struct smb2_transport_capabilities *)pctx,
+						  ctxt_len);
 		} else if (pctx->ContextType == SMB2_RDMA_TRANSFORM_CAPABILITIES) {
 			ksmbd_debug(SMB,
 				    "deassemble SMB2_RDMA_TRANSFORM_CAPABILITIES context\n");

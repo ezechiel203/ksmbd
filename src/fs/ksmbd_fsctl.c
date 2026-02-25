@@ -25,6 +25,7 @@
 #include <linux/ethtool.h>
 
 #include "ksmbd_fsctl.h"
+#include "ksmbd_branchcache.h"
 #include "smb2pdu.h"
 #include "smbfsctl.h"
 #include "smbstatus.h"
@@ -2245,11 +2246,10 @@ out:
 /**
  * fsctl_srv_read_hash_handler() - FSCTL_SRV_READ_HASH (BranchCache)
  *
- * BranchCache content information retrieval. Returns
- * STATUS_HASH_NOT_PRESENT until full BranchCache is implemented.
+ * BranchCache content information retrieval per MS-PCCRC.
+ * Computes Content Information V1 (SHA-256) hashes for the requested
+ * file range and returns them to the client for peer-to-peer caching.
  */
-#define STATUS_HASH_NOT_PRESENT		cpu_to_le32(0xC000A100)
-
 static int fsctl_srv_read_hash_handler(struct ksmbd_work *work,
 				       u64 id, void *in_buf,
 				       unsigned int in_buf_len,
@@ -2257,9 +2257,43 @@ static int fsctl_srv_read_hash_handler(struct ksmbd_work *work,
 				       struct smb2_ioctl_rsp *rsp,
 				       unsigned int *out_len)
 {
-	rsp->hdr.Status = STATUS_HASH_NOT_PRESENT;
-	*out_len = 0;
-	return -EOPNOTSUPP;
+	struct ksmbd_file *fp;
+	int ret;
+
+	if (in_buf_len < sizeof(struct srv_read_hash_req)) {
+		*out_len = 0;
+		return -EINVAL;
+	}
+
+	fp = ksmbd_lookup_fd_fast(work, id);
+	if (!fp) {
+		*out_len = 0;
+		return -ENOENT;
+	}
+
+	ret = ksmbd_branchcache_read_hash(work, fp,
+					  in_buf, in_buf_len,
+					  &rsp->Buffer[0],
+					  max_out_len);
+	ksmbd_fd_put(work, fp);
+
+	if (ret == -EOPNOTSUPP) {
+		rsp->hdr.Status = STATUS_HASH_NOT_PRESENT;
+		*out_len = 0;
+		return -EOPNOTSUPP;
+	}
+	if (ret == -E2BIG) {
+		rsp->hdr.Status = STATUS_BUFFER_OVERFLOW;
+		*out_len = 0;
+		return -EOPNOTSUPP;
+	}
+	if (ret < 0) {
+		*out_len = 0;
+		return ret;
+	}
+
+	*out_len = ret;
+	return 0;
 }
 
 /*

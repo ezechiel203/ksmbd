@@ -33,7 +33,7 @@ ksmbd-y :=	src/encoding/unicode.o src/core/auth.o src/fs/vfs.o \
 		src/fs/vfs_cache.o src/core/connection.o src/core/crypto_ctx.o \
 		src/core/server.o src/core/misc.o src/fs/oplock.o \
 		src/core/ksmbd_work.o src/fs/smbacl.o src/encoding/ndr.o \
-		src/core/ksmbd_buffer.o \
+		src/core/ksmbd_buffer.o src/core/smb2_compress.o \
 		src/mgmt/ksmbd_ida.o src/mgmt/user_config.o \
 		src/mgmt/share_config.o src/mgmt/tree_connect.o \
 		src/mgmt/user_session.o src/mgmt/ksmbd_witness.o \
@@ -64,6 +64,7 @@ ksmbd-y +=	src/protocol/smb2/smb2_pdu_common.o \
 		src/fs/ksmbd_resilient.o src/fs/ksmbd_quota.o \
 		src/fs/ksmbd_app_instance.o src/fs/ksmbd_fsctl_extra.o \
 		src/fs/ksmbd_rsvd.o \
+		src/fs/ksmbd_branchcache.o \
 		src/core/ksmbd_hooks.o
 
 ifeq ($(CONFIG_KSMBD_FRUIT),y)
@@ -85,6 +86,15 @@ ksmbd-$(CONFIG_SMB_INSECURE_SERVER) += src/protocol/smb1/smb1pdu.o \
 		src/protocol/smb1/smb1ops.o src/protocol/smb1/smb1misc.o \
 		src/protocol/common/netmisc.o
 ksmbd-$(CONFIG_SMB_SERVER_SMBDIRECT) += src/transport/transport_rdma.o
+
+# SMB over QUIC transport (userspace proxy bridge).
+# Set CONFIG_SMB_SERVER_QUIC=y to enable, =n or unset to disable.
+CONFIG_SMB_SERVER_QUIC ?= n
+
+ifeq ($(CONFIG_SMB_SERVER_QUIC),y)
+ccflags-y += -DCONFIG_SMB_SERVER_QUIC
+ksmbd-y += src/transport/transport_quic.o
+endif
 else
 # For external module build
 KDIR ?= /lib/modules/$(shell uname -r)/build

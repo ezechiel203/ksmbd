@@ -257,6 +257,7 @@ struct preauth_integrity_info {
 #define SMB2_ENCRYPTION_CAPABILITIES		cpu_to_le16(2)
 #define SMB2_COMPRESSION_CAPABILITIES		cpu_to_le16(3)
 #define SMB2_NETNAME_NEGOTIATE_CONTEXT_ID	cpu_to_le16(5)
+#define SMB2_TRANSPORT_CAPABILITIES		cpu_to_le16(6)
 #define SMB2_RDMA_TRANSFORM_CAPABILITIES	cpu_to_le16(7)
 #define SMB2_SIGNING_CAPABILITIES		cpu_to_le16(8)
 #define SMB2_POSIX_EXTENSIONS_AVAILABLE		cpu_to_le16(0x100)
@@ -306,6 +307,8 @@ struct smb2_encryption_neg_context {
 #define SMB3_COMPRESS_LZNT1	cpu_to_le16(0x0001)
 #define SMB3_COMPRESS_LZ77	cpu_to_le16(0x0002)
 #define SMB3_COMPRESS_LZ77_HUFF	cpu_to_le16(0x0003)
+#define SMB3_COMPRESS_PATTERN_V1 cpu_to_le16(0x0004)
+#define SMB3_COMPRESS_LZ4	cpu_to_le16(0x0005)
 
 struct smb2_compression_ctx {
 	__le16	ContextType; /* 3 */
@@ -316,6 +319,28 @@ struct smb2_compression_ctx {
 	__le32	Reserved1;
 	__le16	CompressionAlgorithms[];
 } __packed;
+
+/* SMB2 Compression Transform Header (MS-SMB2 2.2.42) */
+struct smb2_compression_transform_hdr {
+	__le32 ProtocolId;        /* 0xFC534D42 */
+	__le32 OriginalCompressedSegmentSize;
+	__le16 CompressionAlgorithm;
+	__le16 Flags;
+	__le32 Offset;
+} __packed;
+
+/* Chained compression payload header (MS-SMB2 2.2.42.1) */
+struct smb2_compression_chained_payload_hdr {
+	__le16 CompressionAlgorithm;
+	__le16 Flags;
+	__le32 Length;
+} __packed;
+
+#define SMB2_COMPRESSION_FLAG_NONE	0x0000
+#define SMB2_COMPRESSION_FLAG_CHAINED	0x0001
+
+/* Minimum message size to consider for compression */
+#define SMB2_COMPRESSION_THRESHOLD	1024
 
 #define POSIX_CTXT_DATA_LEN     16
 struct smb2_posix_neg_context {
@@ -358,6 +383,21 @@ struct smb2_signing_capabilities {
 	__le32	Reserved;
 	__le16	SigningAlgorithmCount;
 	__le16	SigningAlgorithms[];
+} __packed;
+
+/*
+ * Transport Capabilities negotiate context [MS-SMB2] 2.2.3.1.6
+ * ContextType 0x0006: indicates transport-level encryption is in use
+ * (e.g., SMB over QUIC with TLS 1.3).  When present, the server may
+ * skip SMB-level encryption since the transport already provides it.
+ */
+#define SMB2_ACCEPT_TRANSPORT_LEVEL_SECURITY	cpu_to_le32(0x00000001)
+
+struct smb2_transport_capabilities {
+	__le16	ContextType; /* 6 */
+	__le16	DataLength;
+	__le32	Reserved;
+	__le32	Flags;		/* SMB2_ACCEPT_TRANSPORT_LEVEL_SECURITY */
 } __packed;
 
 struct smb2_negotiate_rsp {
@@ -1842,6 +1882,11 @@ int smb3_encrypt_resp(struct ksmbd_work *work);
 bool smb3_11_final_sess_setup_resp(struct ksmbd_work *work);
 int smb2_set_rsp_credits(struct ksmbd_work *work);
 bool smb3_encryption_negotiated(struct ksmbd_conn *conn);
+
+/* smb2 compression functions */
+bool smb2_is_compression_transform_hdr(void *buf);
+int smb2_decompress_req(struct ksmbd_work *work);
+int smb2_compress_resp(struct ksmbd_work *work);
 
 /* smb2 misc functions */
 int ksmbd_smb2_check_message(struct ksmbd_work *work);

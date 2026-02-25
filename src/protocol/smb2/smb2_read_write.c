@@ -46,6 +46,7 @@
 
 #include "server.h"
 #include "smb_common.h"
+#include "ksmbd_branchcache.h"
 #include "smbstatus.h"
 #include "ksmbd_work.h"
 #include "mgmt/user_config.h"
@@ -651,6 +652,9 @@ int smb2_write(struct ksmbd_work *work)
 			goto out;
 		}
 	}
+
+	/* Invalidate BranchCache hashes on successful write */
+	ksmbd_branchcache_invalidate(fp);
 
 	rsp->StructureSize = cpu_to_le16(17);
 	rsp->DataOffset = 0;

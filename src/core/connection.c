@@ -18,6 +18,7 @@
 #include "connection.h"
 #include "transport_tcp.h"
 #include "transport_rdma.h"
+#include "transport_quic.h"
 #include "smb2fruit.h"
 
 static DEFINE_MUTEX(init_lock);
@@ -663,6 +664,12 @@ int ksmbd_conn_transport_init(void)
 		pr_err("Failed to init RDMA subsystem: %d\n", ret);
 		goto out;
 	}
+
+	ret = ksmbd_quic_init();
+	if (ret) {
+		pr_err("Failed to init QUIC subsystem: %d\n", ret);
+		goto out;
+	}
 out:
 	mutex_unlock(&init_lock);
 	return ret;
@@ -703,6 +710,7 @@ void ksmbd_conn_transport_destroy(void)
 	mutex_lock(&init_lock);
 	ksmbd_tcp_destroy();
 	ksmbd_rdma_stop_listening();
+	ksmbd_quic_destroy();
 	stop_sessions();
 	ksmbd_rdma_destroy();
 	mutex_unlock(&init_lock);

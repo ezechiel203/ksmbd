@@ -31,19 +31,6 @@ static const char *basechars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_-!@#$%";
 #define KSMBD_MIN_SUPPORTED_HEADER_SIZE	(sizeof(struct smb2_hdr))
 #endif
 
-/*
- * SMB2 compression transform header (MS-SMB2 2.2.42, unchained form).
- * KSMBD currently supports pass-through for CompressionAlgorithm == NONE.
- */
-struct smb2_compression_transform_hdr {
-	__le32 ProtocolId;
-	__le32 OriginalCompressedSegmentSize;
-	__le16 CompressionAlgorithm;
-	__le16 Flags;
-	__le32 Offset;
-	__u8 Data[];
-} __packed;
-
 struct smb_protocol {
 	int		index;
 	char		*name;
@@ -213,31 +200,10 @@ bool ksmbd_smb_request(struct ksmbd_conn *conn)
 
 	proto = (__le32 *)smb2_get_msg(conn->request_buf);
 	if (*proto == SMB2_COMPRESSION_TRANSFORM_ID) {
-		struct smb2_compression_transform_hdr *chdr;
-		unsigned int pdu_len;
-		unsigned int payload_off;
-		unsigned int plain_len;
-
-		chdr = (struct smb2_compression_transform_hdr *)proto;
-		pdu_len = get_rfc1002_len(conn->request_buf);
-		if (pdu_len < sizeof(*chdr))
+		/* Accept compression transform if compression negotiated */
+		if (conn->compress_algorithm == SMB3_COMPRESS_NONE)
 			return false;
-
-		if (chdr->CompressionAlgorithm != SMB3_COMPRESS_NONE ||
-		    le16_to_cpu(chdr->Flags) != 0)
-			return false;
-
-		payload_off = sizeof(*chdr) + le32_to_cpu(chdr->Offset);
-		if (payload_off > pdu_len)
-			return false;
-
-		plain_len = le32_to_cpu(chdr->OriginalCompressedSegmentSize);
-		if (plain_len != pdu_len - payload_off)
-			return false;
-
-		memmove(proto, (char *)proto + payload_off, plain_len);
-		*(__be32 *)conn->request_buf = cpu_to_be32(plain_len);
-		proto = (__le32 *)smb2_get_msg(conn->request_buf);
+		return true;
 	}
 
 	if (*proto != SMB1_PROTO_NUMBER &&

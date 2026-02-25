@@ -29,6 +29,7 @@
 #define S_DEL_PENDING			1
 #define S_DEL_ON_CLS			2
 #define S_DEL_ON_CLS_STREAM		8
+#define S_POSIX_OPENED			16
 
 static unsigned int inode_hash_mask __read_mostly;
 static unsigned int inode_hash_shift __read_mostly;
@@ -189,6 +190,17 @@ void ksmbd_fd_set_delete_on_close(struct ksmbd_file *fp,
 	up_write(&ci->m_lock);
 }
 
+/**
+ * ksmbd_inode_set_posix() - mark inode as having a POSIX context handle
+ * @ci:	ksmbd inode
+ *
+ * Must be called with ci->m_lock held for writing.
+ */
+void ksmbd_inode_set_posix(struct ksmbd_inode *ci)
+{
+	ci->m_flags |= S_POSIX_OPENED;
+}
+
 static void ksmbd_inode_hash(struct ksmbd_inode *ci)
 {
 	unsigned long bucket =
@@ -337,7 +349,44 @@ static void __ksmbd_inode_close(struct ksmbd_file *fp)
 		}
 	}
 
-	if (atomic_dec_and_test(&ci->m_count)) {
+	/*
+	 * POSIX unlink semantics: when the inode was opened with POSIX
+	 * context and DELETE_ON_CLOSE is set, unlink from the directory
+	 * immediately on any handle close. The VFS keeps the inode
+	 * alive until the last kernel fd closes, which is the standard
+	 * POSIX unlink() behavior.
+	 *
+	 * Windows semantics: defer deletion until the last SMB handle
+	 * closes (atomic_dec_and_test on m_count).
+	 */
+	if (!atomic_dec_and_test(&ci->m_count)) {
+		bool do_unlink = false;
+
+		down_write(&ci->m_lock);
+		if ((ci->m_flags & S_POSIX_OPENED) &&
+		    (ci->m_flags & (S_DEL_ON_CLS | S_DEL_PENDING))) {
+			ci->m_flags &= ~(S_DEL_ON_CLS | S_DEL_PENDING);
+			do_unlink = true;
+		}
+		up_write(&ci->m_lock);
+
+		if (do_unlink) {
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 4, 0)
+			dentry = filp->f_path.dentry;
+			dir = dentry->d_parent;
+#endif
+
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 4, 0)
+			ksmbd_vfs_unlink(filp);
+#else
+			ksmbd_vfs_unlink(file_mnt_idmap(filp), dir, dentry);
+#endif
+#else
+			ksmbd_vfs_unlink(file_mnt_user_ns(filp), dir, dentry);
+#endif
+		}
+	} else {
 		bool do_unlink = false;
 
 		down_write(&ci->m_lock);
