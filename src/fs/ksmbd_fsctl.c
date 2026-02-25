@@ -1488,6 +1488,59 @@ out:
 }
 
 /*
+ * MS-FSCC 2.3.22 FSCTL_FILESYSTEM_GET_STATISTICS
+ *
+ * Return filesystem type + basic statistics. Since Linux doesn't expose
+ * per-type stats in the Windows format, we return the base structure with
+ * NTFS type identifier and zero-filled counters.
+ */
+
+#define FILESYSTEM_STATISTICS_TYPE_NTFS	0x0002
+
+struct filesystem_statistics {
+	__le16 FileSystemType;
+	__le16 Version;
+	__le32 SizeOfCompleteStructure;
+	__le32 UserFileReads;
+	__le32 UserFileReadBytes;
+	__le32 UserDiskReads;
+	__le32 UserFileWrites;
+	__le32 UserFileWriteBytes;
+	__le32 UserDiskWrites;
+	__le32 MetaDataReads;
+	__le32 MetaDataReadBytes;
+	__le32 MetaDataDiskReads;
+	__le32 MetaDataWrites;
+	__le32 MetaDataWriteBytes;
+	__le32 MetaDataDiskWrites;
+} __packed;
+
+static int fsctl_filesystem_get_stats_handler(struct ksmbd_work *work,
+					      u64 id, void *in_buf,
+					      unsigned int in_buf_len,
+					      unsigned int max_out_len,
+					      struct smb2_ioctl_rsp *rsp,
+					      unsigned int *out_len)
+{
+	struct filesystem_statistics *stats;
+	unsigned int struct_sz = sizeof(struct filesystem_statistics);
+
+	if (max_out_len < struct_sz) {
+		rsp->hdr.Status = STATUS_BUFFER_TOO_SMALL;
+		return -ENOSPC;
+	}
+
+	stats = (struct filesystem_statistics *)&rsp->Buffer[0];
+	memset(stats, 0, struct_sz);
+	stats->FileSystemType = cpu_to_le16(FILESYSTEM_STATISTICS_TYPE_NTFS);
+	stats->Version = cpu_to_le16(1);
+	stats->SizeOfCompleteStructure = cpu_to_le32(struct_sz);
+
+	*out_len = struct_sz;
+	return 0;
+}
+
+/*
  * ============================================================
  *  Built-in handler table
  * ============================================================
@@ -1591,7 +1644,7 @@ static struct ksmbd_fsctl_handler builtin_fsctl_handlers[] = {
 	},
 	{
 		.ctl_code = FSCTL_FILESYSTEM_GET_STATS,
-		.handler  = fsctl_stub_query_u32_zero_handler,
+		.handler  = fsctl_filesystem_get_stats_handler,
 		.owner    = THIS_MODULE,
 	},
 	{
