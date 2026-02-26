@@ -316,7 +316,7 @@ struct smb2_compression_ctx {
 	__le32	Reserved;
 	__le16	CompressionAlgorithmCount;
 	__le16	Padding;
-	__le32	Reserved1;
+	__le32	Flags; /* MS-SMB2 2.2.3.1.3: 0 = no chaining, 1 = chained */
 	__le16	CompressionAlgorithms[];
 } __packed;
 

@@ -1,0 +1,154 @@
+test/ksmbd_test_ndr.c:105:	n.data = kzalloc(4, GFP_KERNEL);
+src/transport/transport_tcp.c:92:	t = kzalloc(sizeof(*t), KSMBD_DEFAULT_GFP);
+src/transport/transport_tcp.c:474: * This avoids the intermediate kvzalloc bounce buffer used in the
+src/transport/transport_tcp.c:802:	iface = kzalloc(sizeof(struct interface), KSMBD_DEFAULT_GFP);
+test/ksmbd_test_fsctl_dispatch.c:121:	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
+src/fs/vfs.c:21:#include <linux/vmalloc.h>
+src/fs/vfs.c:649:			stream_buf = kvzalloc(AFP_AFPINFO_SIZE,
+src/fs/vfs.c:908:		wbuf = kvzalloc(size, KSMBD_DEFAULT_GFP);
+src/fs/vfs.c:1345:	name = kmalloc(file_pathlen + 1, KSMBD_DEFAULT_GFP);
+src/fs/vfs.c:2083:	path_buf = kmalloc(PATH_MAX, KSMBD_DEFAULT_GFP);
+src/fs/vfs.c:2198:	vlist = kvzalloc(size, KSMBD_DEFAULT_GFP);
+src/fs/vfs.c:2264:	buf = kmalloc(xattr_len + 1, KSMBD_DEFAULT_GFP);
+src/fs/vfs.c:2524:	smb_acl = kzalloc(sizeof(struct xattr_smb_acl) +
+src/transport/transport_rdma.c:362:	t = kzalloc(sizeof(*t), KSMBD_DEFAULT_GFP);
+src/transport/transport_rdma.c:1477:		msg = kzalloc(struct_size(msg, sg_list, SG_CHUNK_SIZE),
+src/transport/transport_rdma.c:2234:	smb_dev = kzalloc(sizeof(*smb_dev), KSMBD_DEFAULT_GFP);
+test/ksmbd_test_auth.c:202:	buf = kzalloc(TEST_AUTH_GSS_LENGTH, GFP_KERNEL);
+test/ksmbd_test_buffer.c:18:#include <linux/vmalloc.h>
+test/ksmbd_test_buffer.c:80:		entry = kvzalloc(sizeof(*entry) + buf_size, GFP_KERNEL);
+test/ksmbd_test_buffer.c:130:		entry = kvzalloc(sizeof(*entry) + pool->buf_size, GFP_KERNEL);
+test/ksmbd_test_buffer.c:137:	/* Size exceeds largest pool tier, fall back to kvzalloc */
+test/ksmbd_test_buffer.c:138:	entry = kvzalloc(sizeof(*entry) + size, GFP_KERNEL);
+test/ksmbd_test_buffer.c:184:	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
+test/ksmbd_test_buffer.c:276:	entry = kvzalloc(sizeof(*entry) + 64, GFP_KERNEL);
+test/ksmbd_test_buffer.c:296:	entry = kvzalloc(sizeof(*entry) + 64, GFP_KERNEL);
+test/ksmbd_test_buffer.c:359: * test_get_oversized_fallback - oversized request uses kvzalloc fallback
+test/ksmbd_test_buffer.c:441:	/* One more get should still succeed via kvzalloc fallback */
+src/fs/oplock.c:105:	lease = kmalloc(sizeof(struct lease), KSMBD_DEFAULT_GFP);
+src/fs/oplock.c:911:	br_info = kmalloc(sizeof(struct oplock_break_info), KSMBD_DEFAULT_GFP);
+src/fs/oplock.c:1016:	br_info = kmalloc(sizeof(struct lease_break_info), KSMBD_DEFAULT_GFP);
+src/fs/oplock.c:1266:	lb = kmalloc(sizeof(struct lease_table), KSMBD_DEFAULT_GFP);
+src/fs/oplock.c:1752:	lreq = kzalloc(sizeof(struct lease_ctx_info), KSMBD_DEFAULT_GFP);
+src/transport/transport_ipc.c:270:	msg = kvzalloc(msg_sz, KSMBD_DEFAULT_GFP);
+src/transport/transport_ipc.c:316:		entry->response = kvzalloc(sz, KSMBD_DEFAULT_GFP);
+test/ksmbd_test_create_ctx.c:75:	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
+test/ksmbd_test_conn_hash.c:90:	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
+test/ksmbd_test_conn_hash.c:275:	entries = kcalloc(n, sizeof(*entries), GFP_KERNEL);
+test/ksmbd_test_hooks.c:126:	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
+test/fuzz/dfs_referral_fuzz.c:155:	test_buf = kzalloc(256, GFP_KERNEL);
+test/fuzz/ndr_fuzz.c:343:	acl.sd_buf = kzalloc(acl.sd_size, GFP_KERNEL);
+test/fuzz/ndr_fuzz.c:364:	test_buf = kzalloc(512, GFP_KERNEL);
+test/fuzz/negotiate_context_fuzz.c:192:	test_buf = kzalloc(256, GFP_KERNEL);
+test/fuzz/quota_request_fuzz.c:262:	test_buf = kzalloc(512, GFP_KERNEL);
+src/fs/ksmbd_reparse.c:466:		link_copy = kzalloc(link_len + 1, KSMBD_DEFAULT_GFP);
+src/fs/ksmbd_reparse.c:480:		ucs2_buf = kzalloc((link_len + 1) * 2,
+test/fuzz/security_descriptor_fuzz.c:306:	test_buf = kzalloc(256, GFP_KERNEL);
+src/protocol/common/smb_common.c:403:	work->response_buf = kzalloc(MAX_CIFS_SMALL_BUFFER_SIZE,
+src/fs/smbacl.c:419:	state->users = kzalloc(alloc, KSMBD_DEFAULT_GFP);
+src/fs/smbacl.c:422:	state->groups = kzalloc(alloc, KSMBD_DEFAULT_GFP);
+src/fs/smbacl.c:694:		sid = kmalloc(sizeof(struct smb_sid), KSMBD_DEFAULT_GFP);
+src/fs/smbacl.c:795:		sid = kmalloc(sizeof(struct smb_sid), KSMBD_DEFAULT_GFP);
+src/fs/smbacl.c:1226:	nowner_sid_ptr = kmalloc(sizeof(struct smb_sid),
+src/fs/smbacl.c:1236:	ngroup_sid_ptr = kmalloc(sizeof(struct smb_sid),
+src/fs/smbacl.c:1455:	aces_base = kmalloc(aces_buf_size, KSMBD_DEFAULT_GFP);
+src/fs/smbacl.c:1570:		pntsd = kzalloc(pntsd_alloc_size, KSMBD_DEFAULT_GFP);
+src/protocol/smb2/smb2_notify.c:86:	argv = kmalloc(sizeof(void *), KSMBD_DEFAULT_GFP);
+test/fuzz/create_context_fuzz.c:249:	test_buf = kzalloc(256, GFP_KERNEL);
+src/encoding/unicode.c:345:		dst = kmalloc(len, KSMBD_DEFAULT_GFP);
+src/encoding/unicode.c:357:		dst = kmalloc(len, KSMBD_DEFAULT_GFP);
+test/fuzz/query_set_info_fuzz.c:267:	test_buf = kzalloc(256, GFP_KERNEL);
+test/fuzz/lock_request_fuzz.c:237:	test_buf = kzalloc(512, GFP_KERNEL);
+src/protocol/smb2/smb2_query_set.c:560:		stream_buf = kmalloc(streamlen + 1, KSMBD_DEFAULT_GFP);
+src/protocol/smb2/smb2_query_set.c:1558:	pathname = kmalloc(PATH_MAX, KSMBD_DEFAULT_GFP);
+src/protocol/smb2/smb2_query_set.c:1689:	pathname = kmalloc(PATH_MAX, KSMBD_DEFAULT_GFP);
+src/fs/ksmbd_notify.c:362:	watch = kzalloc(sizeof(*watch), KSMBD_DEFAULT_GFP);
+test/fuzz/reparse_point_fuzz.c:265:	test_buf = kzalloc(256, GFP_KERNEL);
+test/fuzz/asn1_fuzz.c:69:	*oid = kmalloc(vlen * sizeof(unsigned long), GFP_KERNEL);
+src/encoding/asn1.c:71:	*oid = kmalloc(vlen * sizeof(unsigned long), KSMBD_DEFAULT_GFP);
+src/encoding/asn1.c:197:	buf = kmalloc(total_len, KSMBD_DEFAULT_GFP);
+src/encoding/asn1.c:233:	buf = kmalloc(total_len, KSMBD_DEFAULT_GFP);
+test/fuzz/path_parse_fuzz.c:73:	filename = kmalloc(len + 1, GFP_KERNEL);
+test/fuzz/path_parse_fuzz.c:116:	path = kmalloc(len + 1, GFP_KERNEL);
+test/fuzz/path_parse_fuzz.c:157:	path = kmalloc(len + 1, GFP_KERNEL);
+test/fuzz/path_parse_fuzz.c:198:	path = kmalloc(len + 1, GFP_KERNEL);
+test/fuzz/path_parse_fuzz.c:240:	filename = kmalloc(len + 1, GFP_KERNEL);
+test/fuzz/path_parse_fuzz.c:320:	str = kmalloc(str_len + 1, GFP_KERNEL);
+test/fuzz/path_parse_fuzz.c:321:	pattern = kmalloc(pat_len + 1, GFP_KERNEL);
+src/protocol/smb2/smb2_session.c:163:	neg_blob = kzalloc(sz, KSMBD_DEFAULT_GFP);
+src/protocol/smb2/smb2_session.c:373:			chann = kmalloc(sizeof(struct channel), KSMBD_DEFAULT_GFP);
+src/protocol/smb2/smb2_session.c:480:			chann = kmalloc(sizeof(struct channel), KSMBD_DEFAULT_GFP);
+src/protocol/smb2/smb2_negotiate.c:560:			kzalloc(sizeof(struct preauth_integrity_info),
+src/encoding/ndr.c:32:	data = krealloc(n->data, new_sz, KSMBD_DEFAULT_GFP);
+src/encoding/ndr.c:222:	n->data = kzalloc(n->length, KSMBD_DEFAULT_GFP);
+src/encoding/ndr.c:411:	n->data = kzalloc(n->length, KSMBD_DEFAULT_GFP);
+src/encoding/ndr.c:497:	n->data = kzalloc(n->length, KSMBD_DEFAULT_GFP);
+src/encoding/ndr.c:622:	acl->sd_buf = kzalloc(acl->sd_size, KSMBD_DEFAULT_GFP);
+src/protocol/smb2/smb2_lock.c:231:	lock = kzalloc(sizeof(struct ksmbd_lock), KSMBD_DEFAULT_GFP);
+src/protocol/smb2/smb2_lock.c:583:				argv = kmalloc(sizeof(void *), KSMBD_DEFAULT_GFP);
+src/fs/vfs_cache.c:13:#include <linux/vmalloc.h>
+src/fs/vfs_cache.c:240:	ci = kmalloc(sizeof(struct ksmbd_inode), KSMBD_DEFAULT_GFP);
+src/fs/vfs_cache.c:288:	inode_hashtable = vmalloc(size);
+src/fs/vfs_cache.c:641:	pathname = kmalloc(PATH_MAX, KSMBD_DEFAULT_GFP);
+src/fs/vfs_cache.c:1135:	pathname = kmalloc(PATH_MAX, KSMBD_DEFAULT_GFP);
+src/fs/vfs_cache.c:1201:	ft->idr = kzalloc(sizeof(struct idr), KSMBD_DEFAULT_GFP);
+src/protocol/smb1/smb1pdu.c:11:#include <linux/vmalloc.h>
+src/protocol/smb1/smb1pdu.c:800:	pattern = kmalloc(pattern_len + 1, KSMBD_DEFAULT_GFP);
+src/protocol/smb1/smb1pdu.c:1194:			neg_blob = kmalloc(sz, KSMBD_DEFAULT_GFP);
+src/protocol/smb1/smb1pdu.c:1644:	lock = kzalloc(sizeof(struct ksmbd_lock), KSMBD_DEFAULT_GFP);
+src/protocol/smb1/smb1pdu.c:2515:	src = kzalloc(le16_to_cpu(req->NameLength) + 2, KSMBD_DEFAULT_GFP);
+src/protocol/smb1/smb1pdu.c:3931:	buf = vmalloc(XATTR_SIZE_MAX);
+src/protocol/smb1/smb1pdu.c:4030:	buf = kzalloc((CIFS_MF_SYMLINK_LINK_MAXLEN), KSMBD_DEFAULT_GFP);
+src/protocol/smb1/smb1pdu.c:5556:		attr_name = kmalloc(XATTR_NAME_MAX + 1, KSMBD_DEFAULT_GFP);
+src/protocol/smb1/smb1pdu.c:6253:	d_info.smb1_name = kmalloc(NAME_MAX + 1, KSMBD_DEFAULT_GFP);
+src/protocol/smb1/smb1pdu.c:6510:	d_info.smb1_name = kmalloc(NAME_MAX + 1, KSMBD_DEFAULT_GFP);
+src/protocol/smb2/smb2fruit.c:106:		conn->fruit_state = kzalloc(sizeof(struct fruit_conn_state),
+src/protocol/smb2/smb2fruit.c:294:	*response_data = kzalloc(size, GFP_KERNEL);
+src/protocol/smb2/smb2_create.c:238:	attr_name = kmalloc(XATTR_NAME_MAX + 1, KSMBD_DEFAULT_GFP);
+src/protocol/smb2/smb2_create.c:1131:			snap_path = kzalloc(PATH_MAX,
+src/protocol/smb2/smb2_create.c:1502:					pntsd = kmalloc(sd_buf_size,
+src/protocol/smb2/smb2_create.c:1704:					client_info = kzalloc(sizeof(struct fruit_client_info),
+src/core/ksmbd_buffer.c:7: *   Pre-allocates buffers in two tiers to reduce kvzalloc() overhead
+src/core/ksmbd_buffer.c:13:#include <linux/vmalloc.h>
+src/core/ksmbd_buffer.c:69:		entry = kvzalloc(sizeof(*entry) + buf_size,
+src/core/ksmbd_buffer.c:153: * Otherwise falls back to kvzalloc().
+src/core/ksmbd_buffer.c:178:		entry = kvzalloc(sizeof(*entry) + pool->buf_size,
+src/core/ksmbd_buffer.c:186:	/* Size exceeds largest pool tier, fall back to kvzalloc */
+src/core/ksmbd_buffer.c:187:	entry = kvzalloc(sizeof(*entry) + size, KSMBD_DEFAULT_GFP);
+src/protocol/smb2/smb2_pdu_common.c:562:	work->response_buf = kvzalloc(sz, KSMBD_DEFAULT_GFP);
+src/protocol/smb2/smb2_pdu_common.c:1103:	tr_buf = kzalloc(sizeof(struct smb2_transform_hdr) + 4, KSMBD_DEFAULT_GFP);
+src/core/auth.c:263:	uniname = kzalloc(2 + UNICODE_LEN(len), KSMBD_DEFAULT_GFP);
+src/core/auth.c:287:	domain = kzalloc(2 + UNICODE_LEN(len), KSMBD_DEFAULT_GFP);
+src/core/auth.c:409:	construct = kzalloc(len, KSMBD_DEFAULT_GFP);
+src/core/auth.c:648:		ctx_arc4 = kmalloc(sizeof(*ctx_arc4), KSMBD_DEFAULT_GFP);
+src/core/auth.c:743:	name = kmalloc(2 + UNICODE_LEN(len), KSMBD_DEFAULT_GFP);
+src/core/auth.c:1095:	aad_buf = kzalloc(total_len, KSMBD_DEFAULT_GFP);
+src/core/auth.c:1504:	nr_entries = kcalloc(nvec, sizeof(int), KSMBD_DEFAULT_GFP);
+src/core/auth.c:1644:	iv = kzalloc(iv_len, KSMBD_DEFAULT_GFP);
+src/core/misc.c:175:	pathname = kmalloc(PATH_MAX, KSMBD_DEFAULT_GFP);
+src/core/misc.c:192:	nt_pathname = kmalloc(prefix + ab_pathname_len + 1, KSMBD_DEFAULT_GFP);
+src/core/misc.c:247:	cf_name = kzalloc(KSMBD_REQ_MAX_SHARE_NAME, KSMBD_DEFAULT_GFP);
+src/core/misc.c:309:	new_name = kmalloc(path_len + name_len + 2, KSMBD_DEFAULT_GFP);
+src/core/misc.c:335:	out_path = kzalloc(path_len + 2, KSMBD_DEFAULT_GFP);
+src/core/misc.c:409:	new_name = kmalloc(path_len + name_len + 2, KSMBD_DEFAULT_GFP);
+src/core/misc.c:440:	conv = kmalloc(sz + 2, KSMBD_DEFAULT_GFP);
+src/core/crypto_ctx.c:101:	shash = kzalloc(sizeof(*shash) + crypto_shash_descsize(tfm),
+src/core/crypto_ctx.c:154:		ctx = kzalloc(sizeof(struct ksmbd_crypto_ctx),
+src/core/crypto_ctx.c:303:	ctx = kzalloc(sizeof(struct ksmbd_crypto_ctx), KSMBD_DEFAULT_GFP);
+src/core/ksmbd_work.c:32:		work->iov = kzalloc(sizeof(struct kvec) * work->iov_alloc_cnt,
+src/core/ksmbd_work.c:127:		ar = kmalloc(sizeof(struct aux_read), KSMBD_DEFAULT_GFP);
+src/core/ksmbd_work.c:136:		new = krealloc(work->iov,
+src/core/ksmbd_work.c:182:	work->response_buf = kzalloc(MAX_CIFS_SMALL_BUFFER_SIZE, KSMBD_DEFAULT_GFP);
+src/core/connection.c:136:	conn = kzalloc(sizeof(struct ksmbd_conn), KSMBD_DEFAULT_GFP);
+src/core/server.c:433:	ctrl = kmalloc(sizeof(struct server_ctrl_struct), KSMBD_DEFAULT_GFP);
+src/mgmt/user_session.c:109:	entry = kzalloc(sizeof(struct ksmbd_session_rpc), KSMBD_DEFAULT_GFP);
+src/mgmt/user_session.c:290:						to_destroy = krealloc(
+src/mgmt/user_session.c:326:					to_destroy = krealloc(
+src/mgmt/user_session.c:449:	sess = kmalloc(sizeof(struct preauth_session), KSMBD_DEFAULT_GFP);
+src/mgmt/user_session.c:561:	sess = kzalloc(sizeof(struct ksmbd_session), KSMBD_DEFAULT_GFP);
+src/mgmt/share_config.c:124:		p = kzalloc(sizeof(struct ksmbd_veto_pattern), KSMBD_DEFAULT_GFP);
+src/mgmt/share_config.c:172:	share = kzalloc(sizeof(struct ksmbd_share_config), KSMBD_DEFAULT_GFP);
+src/mgmt/tree_connect.c:34:	tree_conn = kzalloc(sizeof(struct ksmbd_tree_connect),
+src/include/core/ksmbd_buffer.h:35: * Otherwise falls back to kvzalloc().
+src/mgmt/user_config.c:40:	user = kmalloc(sizeof(struct ksmbd_user), KSMBD_DEFAULT_GFP);
+src/mgmt/user_config.c:49:	user->passkey = kmalloc(resp->hash_sz, KSMBD_DEFAULT_GFP);

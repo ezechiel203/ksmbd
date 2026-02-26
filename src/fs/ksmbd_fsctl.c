@@ -1865,8 +1865,12 @@ struct ksmbd_odx_token {
 	__le64 length;
 	__le64 generation;
 	u8     nonce[16];
-	u8     reserved[512 - 36 - 16];
+	u8     reserved[STORAGE_OFFLOAD_TOKEN_SIZE -
+			sizeof(__le32) - sizeof(__le64) * 4 - 16];
 } __packed;
+
+static_assert(sizeof(struct ksmbd_odx_token) == STORAGE_OFFLOAD_TOKEN_SIZE,
+	      "ksmbd_odx_token must be exactly STORAGE_OFFLOAD_TOKEN_SIZE bytes");
 
 /*
  * Server-side ODX token registry.  Each token issued by OFFLOAD_READ is
@@ -2014,6 +2018,13 @@ static int fsctl_offload_read_handler(struct ksmbd_work *work,
 	}
 
 	input = (struct offload_read_input *)in_buf;
+
+	/* Validate the input Size field per MS-FSCC */
+	if (le32_to_cpu(input->Size) < sizeof(*input)) {
+		rsp->hdr.Status = STATUS_INVALID_PARAMETER;
+		return -EINVAL;
+	}
+
 	offset = le64_to_cpu(input->FileOffset);
 	length = le64_to_cpu(input->CopyLength);
 
@@ -2021,6 +2032,13 @@ static int fsctl_offload_read_handler(struct ksmbd_work *work,
 	if (!fp) {
 		rsp->hdr.Status = STATUS_INVALID_HANDLE;
 		return -ENOENT;
+	}
+
+	/* Verify the handle has read access */
+	if (!(fp->daccess & (FILE_READ_DATA_LE | FILE_GENERIC_READ_LE))) {
+		ksmbd_fd_put(work, fp);
+		rsp->hdr.Status = STATUS_ACCESS_DENIED;
+		return -EACCES;
 	}
 
 	inode = file_inode(fp->filp);
@@ -2102,12 +2120,18 @@ static int fsctl_offload_write_handler(struct ksmbd_work *work,
 	input = (struct offload_write_input *)in_buf;
 	token = (struct ksmbd_odx_token *)input->Token;
 
+	/* Validate the input Size field per MS-FSCC */
+	if (le32_to_cpu(input->Size) < sizeof(*input)) {
+		rsp->hdr.Status = STATUS_INVALID_PARAMETER;
+		return -EINVAL;
+	}
+
 	/* Validate the ODX token magic */
 	if (le32_to_cpu(token->magic) != KSMBD_ODX_TOKEN_MAGIC) {
 		ksmbd_debug(SMB,
 			    "OFFLOAD_WRITE: invalid token magic 0x%08x\n",
 			    le32_to_cpu(token->magic));
-		rsp->hdr.Status = STATUS_INVALID_PARAMETER;
+		rsp->hdr.Status = STATUS_INVALID_TOKEN;
 		return -EINVAL;
 	}
 
@@ -2119,7 +2143,7 @@ static int fsctl_offload_write_handler(struct ksmbd_work *work,
 	if (!odx_token_validate(token)) {
 		ksmbd_debug(SMB,
 			    "OFFLOAD_WRITE: token validation failed (forged or reused)\n");
-		rsp->hdr.Status = STATUS_INVALID_PARAMETER;
+		rsp->hdr.Status = STATUS_INVALID_TOKEN;
 		return -EINVAL;
 	}
 
@@ -2134,12 +2158,16 @@ static int fsctl_offload_write_handler(struct ksmbd_work *work,
 	 * The actual source offset = token->offset + TransferOffset.
 	 * The available length from that point = token->length - TransferOffset.
 	 */
-	if (xfer_off < 0 || xfer_off > token_len) {
+	if (token_off < 0 || xfer_off < 0 || xfer_off > token_len) {
 		rsp->hdr.Status = STATUS_INVALID_PARAMETER;
 		return -EINVAL;
 	}
 
-	src_off = token_off + xfer_off;
+	/* Guard against signed overflow in token_off + xfer_off */
+	if (check_add_overflow(token_off, xfer_off, &src_off)) {
+		rsp->hdr.Status = STATUS_INVALID_PARAMETER;
+		return -EINVAL;
+	}
 
 	/* Clamp copy length to the available token range */
 	if (copy_len == 0)
@@ -2171,6 +2199,13 @@ static int fsctl_offload_write_handler(struct ksmbd_work *work,
 			    le64_to_cpu(token->file_id));
 		rsp->hdr.Status = STATUS_FILE_CLOSED;
 		ret = -ENOENT;
+		goto out;
+	}
+
+	/* Verify the source handle has read access */
+	if (!(src_fp->daccess & (FILE_READ_DATA_LE | FILE_GENERIC_READ_LE))) {
+		rsp->hdr.Status = STATUS_ACCESS_DENIED;
+		ret = -EACCES;
 		goto out;
 	}
 

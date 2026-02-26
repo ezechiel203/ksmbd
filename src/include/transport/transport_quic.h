@@ -40,7 +40,8 @@
 
 /**
  * struct ksmbd_quic_conn_info - per-connection metadata from proxy
- * @client_addr:	Client IP address (network byte order)
+ * @addr_family:	AF_INET or AF_INET6
+ * @client_addr:	Client IPv4 or IPv6 address (network byte order)
  * @client_port:	Client port (host byte order)
  * @flags:		KSMBD_QUIC_F_* flags
  * @reserved:		Padding for alignment
@@ -49,10 +50,14 @@
  * accepted unix domain socket connection, before any SMB2 data.
  */
 struct ksmbd_quic_conn_info {
-	__be32		client_addr;
+	__u16		addr_family;	/* AF_INET or AF_INET6 */
 	__u16		client_port;
 	__u16		flags;
-	__u8		reserved[8];
+	__u16		reserved;
+	union {
+		__be32	v4;		/* IPv4 address */
+		__u8	v6[16];		/* IPv6 address */
+	} client_addr;
 } __packed;
 
 #ifdef CONFIG_SMB_SERVER_QUIC

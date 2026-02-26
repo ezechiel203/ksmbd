@@ -1083,9 +1083,10 @@ static int find_file_posix_info(struct smb2_query_info_rsp *rsp,
 	file_info->DeviceId = cpu_to_le32(stat.rdev);
 	file_info->Zero = 0;
 	/*
-	 * Sids(32) contain two sids(Domain sid(16), UNIX group sid(16)).
-	 * UNIX sid(16) = revision(1) + num_subauth(1) + authority(6) +
-	 *		  sub_auth(4 * 1(num_subauth)) + RID(4).
+	 * Sids(32) contain owner sid(16) + group sid(16).
+	 * Each UNIX SID(16) = revision(1) + sub_authority_count(1) +
+	 *     authority(6) + sub_auth[0](4) + sub_auth[1](4).
+	 * (2 sub-authorities; the second is the UID/GID RID)
 	 */
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 12, 0)
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0)

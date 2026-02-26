@@ -386,7 +386,7 @@ static int rsvd_dispatch_tunnel_op(struct ksmbd_work *work,
 		ksmbd_debug(SMB,
 			    "RSVD: unknown version bits 0x%08x in opcode 0x%08x\n",
 			    ver_bits, opcode);
-		rsp->hdr.Status = STATUS_INVALID_DEVICE_REQUEST;
+		rsp->hdr.Status = cpu_to_le32(STATUS_SVHDX_VERSION_MISMATCH);
 		return -EINVAL;
 	}
 
@@ -454,11 +454,11 @@ static int rsvd_dispatch_tunnel_op(struct ksmbd_work *work,
 	case RSVD_TUNNEL_SCSI_OPERATION:
 		/*
 		 * SCSI passthrough requires actual block device access.
-		 * Not implemented -- return invalid device request.
+		 * Not implemented -- return STATUS_NOT_SUPPORTED.
 		 */
 		ksmbd_debug(SMB,
 			    "RSVD: SCSI tunnel operation not implemented\n");
-		tunnel_status = cpu_to_le32(0xC0000010); /* STATUS_INVALID_DEVICE_REQUEST */
+		tunnel_status = cpu_to_le32(0xC00000BB); /* STATUS_NOT_SUPPORTED */
 		payload_out_len = 0;
 		break;
 

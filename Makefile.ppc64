@@ -1,0 +1,22 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+#
+# PowerPC64 cross-build + remote deploy wrapper
+#
+# Usage: make -f Makefile.ppc64 <target>
+#
+
+# Kernel ARCH for PPC64 targets is "powerpc".
+ARCH ?= powerpc
+ARCH_LABEL := PowerPC64
+CROSS_COMPILE ?= powerpc64le-linux-gnu-
+KERNEL_VERSION ?= 6.1.0
+
+PPC64_HOST ?=
+PPC64_REMOTE_TMP ?= /tmp/ksmbd.ko
+REMOTE_HOST ?= $(PPC64_HOST)
+REMOTE_TMP ?= $(PPC64_REMOTE_TMP)
+HOST_VAR_HINT := PPC64_HOST
+TMP_VAR_HINT := PPC64_REMOTE_TMP
+EXPECTED_REMOTE_ARCH_RE := ^(ppc64|ppc64le|powerpc64|powerpc64le)$
+
+include Makefile.cross

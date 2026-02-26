@@ -51,6 +51,8 @@ struct pccrc_cache_header {
 	__le64 mtime_sec;	/* file mtime seconds at cache time */
 	__le32 mtime_nsec;	/* file mtime nanoseconds at cache time */
 	__le64 file_size;	/* file size at cache time */
+	__le64 hash_offset;	/* starting offset for the hashed range */
+	__le32 hash_length;	/* length of the hashed range */
 	__le32 num_segments;	/* number of cached segment hashes */
 	/* Followed by: num_segments * PCCRC_V1_HASH_SIZE bytes of hashes */
 } __packed;
@@ -274,16 +276,19 @@ static void get_file_mtime(struct file *filp, u64 *sec, u32 *nsec)
 /**
  * try_load_cached_hashes - Attempt to load cached segment hashes from xattr
  * @fp:			ksmbd file pointer
+ * @offset:		starting offset of the hashed range
+ * @length:		length of the hashed range
  * @num_segments:	expected number of segments
  * @hashes:		output buffer for segment hashes (pre-allocated)
  *
  * Checks the pccrc xattr cache for valid hash data. Validates that
- * file mtime and size match the cached values.
+ * file mtime, size, offset, and length match the cached values.
  *
  * Return: 0 on success (cache hit), negative errno on failure (cache miss)
  */
-static int try_load_cached_hashes(struct ksmbd_file *fp,
-				  unsigned int num_segments, u8 *hashes)
+static int try_load_cached_hashes(struct ksmbd_file *fp, loff_t offset,
+				  u32 length, unsigned int num_segments,
+				  u8 *hashes)
 {
 	struct file *filp = fp->filp;
 	struct dentry *dentry = filp->f_path.dentry;
@@ -334,7 +339,9 @@ static int try_load_cached_hashes(struct ksmbd_file *fp,
 
 	if (le64_to_cpu(cache_hdr->mtime_sec) != mtime_sec ||
 	    le32_to_cpu(cache_hdr->mtime_nsec) != mtime_nsec ||
-	    le64_to_cpu(cache_hdr->file_size) != (u64)file_size) {
+	    le64_to_cpu(cache_hdr->file_size) != (u64)file_size ||
+	    le64_to_cpu(cache_hdr->hash_offset) != (u64)offset ||
+	    le32_to_cpu(cache_hdr->hash_length) != length) {
 		rc = -ESTALE;
 		goto out;
 	}
@@ -352,15 +359,19 @@ out:
 /**
  * save_cached_hashes - Store computed segment hashes in xattr cache
  * @fp:			ksmbd file pointer
+ * @offset:		starting offset of the hashed range
+ * @length:		length of the hashed range
  * @num_segments:	number of segments
  * @hashes:		segment hash data to cache
  *
- * Stores segment hashes along with file mtime and size for validation.
+ * Stores segment hashes along with file mtime, size, offset, and length
+ * for validation.
  *
  * Return: 0 on success, negative errno on failure (non-fatal)
  */
-static int save_cached_hashes(struct ksmbd_file *fp,
-			      unsigned int num_segments, const u8 *hashes)
+static int save_cached_hashes(struct ksmbd_file *fp, loff_t offset,
+			      u32 length, unsigned int num_segments,
+			      const u8 *hashes)
 {
 	struct file *filp = fp->filp;
 	struct pccrc_cache_header *cache_hdr;
@@ -381,6 +392,8 @@ static int save_cached_hashes(struct ksmbd_file *fp,
 	cache_hdr->mtime_sec = cpu_to_le64(mtime_sec);
 	cache_hdr->mtime_nsec = cpu_to_le32(mtime_nsec);
 	cache_hdr->file_size = cpu_to_le64(i_size_read(file_inode(filp)));
+	cache_hdr->hash_offset = cpu_to_le64(offset);
+	cache_hdr->hash_length = cpu_to_le32(length);
 	cache_hdr->num_segments = cpu_to_le32(num_segments);
 
 	memcpy((u8 *)cache_hdr + sizeof(struct pccrc_cache_header),
@@ -423,7 +436,7 @@ static int compute_file_hashes_v1(struct ksmbd_file *fp, loff_t offset,
 	int rc;
 
 	/* Try loading from xattr cache first */
-	rc = try_load_cached_hashes(fp, num_segments, hashes);
+	rc = try_load_cached_hashes(fp, offset, length, num_segments, hashes);
 	if (rc == 0) {
 		ksmbd_debug(VFS, "branchcache: using cached hashes\n");
 		return 0;
@@ -448,7 +461,7 @@ static int compute_file_hashes_v1(struct ksmbd_file *fp, loff_t offset,
 	}
 
 	/* Cache the computed hashes (best effort, ignore failures) */
-	save_cached_hashes(fp, num_segments, hashes);
+	save_cached_hashes(fp, offset, length, num_segments, hashes);
 
 	return 0;
 }
@@ -508,15 +521,15 @@ static int build_content_info_v1(struct ksmbd_file *fp, loff_t offset,
 	}
 
 	/* Compute segment hashes */
-	segment_hashes = kzalloc((size_t)num_segments * PCCRC_V1_HASH_SIZE,
-				 KSMBD_DEFAULT_GFP);
+	segment_hashes = kvzalloc((size_t)num_segments * PCCRC_V1_HASH_SIZE,
+				  KSMBD_DEFAULT_GFP);
 	if (!segment_hashes)
 		return -ENOMEM;
 
 	rc = compute_file_hashes_v1(fp, offset, length, segment_hashes,
 				    num_segments);
 	if (rc) {
-		kfree(segment_hashes);
+		kvfree(segment_hashes);
 		return rc;
 	}
 
@@ -560,13 +573,13 @@ static int build_content_info_v1(struct ksmbd_file *fp, loff_t offset,
 		/* Compute segment secret = HMAC-SHA256(Ks, HoD) */
 		rc = compute_segment_secret_v1(hash, secret);
 		if (rc) {
-			kfree(segment_hashes);
+			kvfree(segment_hashes);
 			return rc;
 		}
 		memcpy(seg[i].SegmentSecret, secret, PCCRC_V1_HASH_SIZE);
 	}
 
-	kfree(segment_hashes);
+	kvfree(segment_hashes);
 	return (int)total_size;
 }
 

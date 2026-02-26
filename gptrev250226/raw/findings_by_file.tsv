@@ -1,0 +1,10 @@
+Makefile	KSMBD-F012
+build_arm64.sh	KSMBD-F008
+build_ksmbd.sh	KSMBD-F007
+ksmbd-tools/mountd/ipc.c	KSMBD-F011
+run_tests.sh	KSMBD-F005,KSMBD-F006
+src/fs/ksmbd_fsctl.c	KSMBD-F002,KSMBD-F010
+src/fs/ksmbd_reparse.c	KSMBD-F009
+src/mgmt/share_config.c	KSMBD-F003
+src/mgmt/user_session.c	KSMBD-F004
+src/protocol/smb2/smb2_session.c	KSMBD-F001

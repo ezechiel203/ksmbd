@@ -303,10 +303,25 @@ static int read_conn_info(struct quic_transport *t)
 		return ret < 0 ? ret : -EIO;
 	}
 
-	ksmbd_debug(CONN, "QUIC proxy connection: client %pI4:%u flags=0x%x\n",
-		    &t->conn_info.client_addr,
-		    t->conn_info.client_port,
-		    t->conn_info.flags);
+	if (t->conn_info.addr_family != AF_INET &&
+	    t->conn_info.addr_family != AF_INET6) {
+		pr_err("Invalid QUIC client address family: %u\n",
+		       t->conn_info.addr_family);
+		return -EINVAL;
+	}
+
+	if (t->conn_info.addr_family == AF_INET6)
+		ksmbd_debug(CONN,
+			    "QUIC proxy connection: client %pI6:%u flags=0x%x\n",
+			    t->conn_info.client_addr.v6,
+			    t->conn_info.client_port,
+			    t->conn_info.flags);
+	else
+		ksmbd_debug(CONN,
+			    "QUIC proxy connection: client %pI4:%u flags=0x%x\n",
+			    &t->conn_info.client_addr.v4,
+			    t->conn_info.client_port,
+			    t->conn_info.flags);
 
 	return 0;
 }
@@ -346,9 +361,15 @@ static struct quic_transport *alloc_transport(struct socket *client_sk)
 	/*
 	 * Store the real client address from the proxy info so that
 	 * per-IP connection limiting works correctly.
+	 * For IPv6, use the lower 32 bits of the address for hashing.
 	 */
-	conn->inet_addr = t->conn_info.client_addr;
-	conn->inet_hash = ipv4_addr_hash(t->conn_info.client_addr);
+	if (t->conn_info.addr_family == AF_INET6) {
+		memcpy(&conn->inet_addr,
+		       &t->conn_info.client_addr.v6[12], 4);
+	} else {
+		conn->inet_addr = t->conn_info.client_addr.v4;
+	}
+	conn->inet_hash = ipv4_addr_hash(conn->inet_addr);
 
 	ksmbd_conn_hash_add(conn, conn->inet_hash);
 
@@ -383,7 +404,7 @@ static int ksmbd_quic_new_connection(struct socket *client_sk,
 	handler = kthread_run(ksmbd_conn_handler_loop,
 			      KSMBD_TRANS(t)->conn,
 			      "ksmbd-quic:%pI4",
-			      &t->conn_info.client_addr);
+			      &KSMBD_TRANS(t)->conn->inet_addr);
 	if (IS_ERR(handler)) {
 		pr_err("Cannot start QUIC connection handler: %ld\n",
 		       PTR_ERR(handler));

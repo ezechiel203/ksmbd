@@ -94,7 +94,7 @@ static void build_compress_ctxt(struct smb2_compression_ctx *pneg_ctxt,
 	pneg_ctxt->Reserved = cpu_to_le32(0);
 	pneg_ctxt->CompressionAlgorithmCount = cpu_to_le16(1);
 	pneg_ctxt->Padding = cpu_to_le16(0);
-	pneg_ctxt->Reserved1 = cpu_to_le32(0);
+	pneg_ctxt->Flags = cpu_to_le32(0);
 	pneg_ctxt->CompressionAlgorithms[0] = alg_type;
 }
 

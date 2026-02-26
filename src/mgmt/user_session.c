@@ -451,8 +451,8 @@ void destroy_previous_session(struct ksmbd_conn *conn,
 	down_write(&conn->session_lock);
 	rcu_read_lock();
 	prev_sess = __session_lookup(id);
-	if (prev_sess)
-		ksmbd_user_session_get(prev_sess);
+	if (prev_sess && !refcount_inc_not_zero(&prev_sess->refcnt))
+		prev_sess = NULL;
 	rcu_read_unlock();
 	if (!prev_sess)
 		goto out;

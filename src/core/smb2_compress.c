@@ -327,11 +327,21 @@ int smb2_decompress_req(struct ksmbd_work *work)
 
 	/*
 	 * Sanity check: original_size should be reasonable.
-	 * Limit to 16MB to prevent memory abuse.
+	 * Cap at the smaller of 16MB and the negotiated max_write_size
+	 * to prevent memory abuse via crafted compression headers.
 	 */
-	if (original_size > (16 * 1024 * 1024)) {
-		pr_err("Decompressed size too large: %u\n", original_size);
-		return -ECONNABORTED;
+	{
+		unsigned int max_allowed = 16 * 1024 * 1024;
+		struct ksmbd_conn *conn = work->conn;
+
+		if (conn && conn->vals && conn->vals->max_write_size)
+			max_allowed = min_t(unsigned int, max_allowed,
+					    conn->vals->max_write_size);
+		if (original_size > max_allowed) {
+			pr_err("Decompressed size too large: %u (max %u)\n",
+			       original_size, max_allowed);
+			return -ECONNABORTED;
+		}
 	}
 
 	/*

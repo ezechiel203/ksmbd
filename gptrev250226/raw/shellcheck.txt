@@ -1,0 +1,328 @@
+
+In ./build_arm64.sh line 215:
+        make_flags="$make_flags EXTRA_CFLAGS='-g -DDEBUG'"
+                               ^------------------------^ SC2089 (warning): Quotes/backslashes will be treated literally. Use an array.
+
+
+In ./build_arm64.sh line 225:
+    if make $make_flags modules; then
+            ^---------^ SC2090 (warning): Quotes/backslashes in this variable will not be respected.
+
+
+In ./build_arm64.sh line 234:
+        local module_size=$(ls -lh "$PROJECT_ROOT/ksmbd.ko" | awk '{print $5}')
+              ^---------^ SC2155 (warning): Declare and assign separately to avoid masking return values.
+
+
+In ./build_arm64.sh line 261:
+    local module_arch=$(file "$module_file")
+          ^---------^ SC2155 (warning): Declare and assign separately to avoid masking return values.
+
+
+In ./build_arm64.sh line 269:
+        local missing_symbols=$("${CROSS_COMPILE}nm" "$module_file" | grep -E " U " | wc -l)
+              ^-------------^ SC2155 (warning): Declare and assign separately to avoid masking return values.
+
+
+In ./build_ksmbd.sh line 6:
+#!/bin/sh
+^-- SC1128 (error): The shebang must be on the first line. Delete blanks and move comments.
+
+
+In ./build_ksmbd.sh line 11:
+function is_module
+^-- SC2113 (warning): 'function' keyword is non-standard. Use 'foo()' instead of 'function foo'.
+
+
+In ./build_ksmbd.sh line 13:
+	local ok=$(cat "$KERNEL_SRC"/.config | grep "CONFIG_SMB_SERVER=m")
+        ^------^ SC3043 (warning): In POSIX sh, 'local' is undefined.
+              ^-- SC2155 (warning): Declare and assign separately to avoid masking return values.
+                 ^-- SC2046 (warning): Quote this to prevent word splitting.
+
+
+In ./build_ksmbd.sh line 15:
+	if [ "z$ok" == "z" ]; then
+                    ^-- SC3014 (warning): In POSIX sh, == in place of = is undefined.
+
+
+In ./build_ksmbd.sh line 24:
+function patch_fs_config
+^-- SC2113 (warning): 'function' keyword is non-standard. Use 'foo()' instead of 'function foo'.
+
+
+In ./build_ksmbd.sh line 26:
+	local ok=$(pwd |  grep -c "fs/smbd")
+        ^------^ SC3043 (warning): In POSIX sh, 'local' is undefined.
+              ^-- SC2155 (warning): Declare and assign separately to avoid masking return values.
+                 ^-------------------------^ SC2046 (warning): Quote this to prevent word splitting.
+
+
+In ./build_ksmbd.sh line 39:
+	if [ "z$ok" == "z" ]; then
+                    ^-- SC3014 (warning): In POSIX sh, == in place of = is undefined.
+
+
+In ./build_ksmbd.sh line 45:
+	if [ "z$ok" == "z" ]; then
+                    ^-- SC3014 (warning): In POSIX sh, == in place of = is undefined.
+
+
+In ./build_ksmbd.sh line 46:
+		ok=$(cat "$KERNEL_SRC"/fs/Kconfig \
+                   ^-- SC2327 (warning): This command substitution will be empty because the command's output gets redirected away.
+
+
+In ./build_ksmbd.sh line 48:
+			> "$KERNEL_SRC"/fs/Kconfig.new)
+                        ^----------------------------^ SC2328 (error): This redirection takes output away from the command substitution (use tee to duplicate).
+
+
+In ./build_ksmbd.sh line 56:
+	if [ "z$ok" == "z" ]; then
+                    ^-- SC3014 (warning): In POSIX sh, == in place of = is undefined.
+
+
+In ./build_ksmbd.sh line 57:
+		ok=$(echo "CONFIG_NETWORK_FILESYSTEMS=y" \
+                   ^-- SC2327 (warning): This command substitution will be empty because the command's output gets redirected away.
+
+
+In ./build_ksmbd.sh line 58:
+			>> "$KERNEL_SRC"/.config)
+                        ^----------------------^ SC2328 (error): This redirection takes output away from the command substitution (use tee to duplicate).
+
+
+In ./build_ksmbd.sh line 65:
+	if [ "z$ok" == "z1" ]; then
+                    ^-- SC3014 (warning): In POSIX sh, == in place of = is undefined.
+
+
+In ./build_ksmbd.sh line 66:
+		ok=$(echo "CONFIG_SMB_SERVER=m" >> "$KERNEL_SRC"/.config)
+                   ^-- SC2327 (warning): This command substitution will be empty because the command's output gets redirected away.
+                                                ^----------------------^ SC2328 (error): This redirection takes output away from the command substitution (use tee to duplicate).
+
+
+In ./build_ksmbd.sh line 70:
+		ok=$(echo "CONFIG_SMB_INSECURE_SERVER=y" \
+                   ^-- SC2327 (warning): This command substitution will be empty because the command's output gets redirected away.
+
+
+In ./build_ksmbd.sh line 71:
+			>> "$KERNEL_SRC"/.config)
+                        ^----------------------^ SC2328 (error): This redirection takes output away from the command substitution (use tee to duplicate).
+
+
+In ./build_ksmbd.sh line 78:
+function ksmbd_module_make
+^-- SC2113 (warning): 'function' keyword is non-standard. Use 'foo()' instead of 'function foo'.
+
+
+In ./build_ksmbd.sh line 82:
+	local c="make "$COMP_FLAGS" -C "$KERNEL_SRC" M="$KERNEL_SRC"/fs/smbd"
+        ^-----^ SC3043 (warning): In POSIX sh, 'local' is undefined.
+                       ^---------^ SC2027 (warning): The surrounding quotes actually unquote this. Remove or escape them.
+                                        ^---------^ SC2027 (warning): The surrounding quotes actually unquote this. Remove or escape them.
+                                                        ^---------^ SC2027 (warning): The surrounding quotes actually unquote this. Remove or escape them.
+
+
+In ./build_ksmbd.sh line 86:
+	cd "$KERNEL_SRC"
+        ^--------------^ SC2164 (warning): Use 'cd ... || exit' or 'cd ... || return' in case cd fails.
+
+Did you mean:
+	cd "$KERNEL_SRC" || exit
+
+
+In ./build_ksmbd.sh line 89:
+	cd "$KERNEL_SRC"/fs/smbd
+        ^----------------------^ SC2164 (warning): Use 'cd ... || exit' or 'cd ... || return' in case cd fails.
+
+Did you mean:
+	cd "$KERNEL_SRC"/fs/smbd || exit
+
+
+In ./build_ksmbd.sh line 96:
+function ksmbd_module_install
+^-- SC2113 (warning): 'function' keyword is non-standard. Use 'foo()' instead of 'function foo'.
+
+
+In ./build_ksmbd.sh line 100:
+	local ok=$(lsmod | grep -c smbd)
+        ^------^ SC3043 (warning): In POSIX sh, 'local' is undefined.
+              ^-- SC2155 (warning): Declare and assign separately to avoid masking return values.
+                 ^---------------------^ SC2046 (warning): Quote this to prevent word splitting.
+
+
+In ./build_ksmbd.sh line 101:
+	if [ "z$ok" == "z1" ]; then
+                    ^-- SC3014 (warning): In POSIX sh, == in place of = is undefined.
+
+
+In ./build_ksmbd.sh line 110:
+	if [ "z$ok" == "z1" ]; then
+                    ^-- SC3014 (warning): In POSIX sh, == in place of = is undefined.
+
+
+In ./build_ksmbd.sh line 120:
+	cd "$KERNEL_SRC"
+        ^--------------^ SC2164 (warning): Use 'cd ... || exit' or 'cd ... || return' in case cd fails.
+
+Did you mean:
+	cd "$KERNEL_SRC" || exit
+
+
+In ./build_ksmbd.sh line 122:
+		sudo rm /lib/modules/$(uname -r)/kernel/fs/smbd/smbd.ko*
+                                     ^---------^ SC2046 (warning): Quote this to prevent word splitting.
+
+
+In ./build_ksmbd.sh line 124:
+			/lib/modules/$(uname -r)/kernel/fs/smbd/smbd.ko
+                                     ^---------^ SC2046 (warning): Quote this to prevent word splitting.
+
+
+In ./build_ksmbd.sh line 126:
+		local VER=$(make kernelrelease)
+                ^-------^ SC3043 (warning): In POSIX sh, 'local' is undefined.
+                      ^-^ SC2155 (warning): Declare and assign separately to avoid masking return values.
+                          ^-------------------^ SC2046 (warning): Quote this to prevent word splitting.
+
+
+In ./build_ksmbd.sh line 131:
+		local VER=$(make kernelrelease)
+                ^-------^ SC3043 (warning): In POSIX sh, 'local' is undefined.
+                      ^-^ SC2155 (warning): Declare and assign separately to avoid masking return values.
+                          ^-------------------^ SC2046 (warning): Quote this to prevent word splitting.
+
+
+In ./build_ksmbd.sh line 134:
+	cd "$KERNEL_SRC"/fs/smbd
+        ^----------------------^ SC2164 (warning): Use 'cd ... || exit' or 'cd ... || return' in case cd fails.
+
+Did you mean:
+	cd "$KERNEL_SRC"/fs/smbd || exit
+
+
+In ./build_ksmbd.sh line 137:
+function ksmbd_module_clean
+^-- SC2113 (warning): 'function' keyword is non-standard. Use 'foo()' instead of 'function foo'.
+
+
+In ./build_ksmbd.sh line 141:
+	cd "$KERNEL_SRC"
+        ^--------------^ SC2164 (warning): Use 'cd ... || exit' or 'cd ... || return' in case cd fails.
+
+Did you mean:
+	cd "$KERNEL_SRC" || exit
+
+
+In ./build_ksmbd.sh line 143:
+	cd "$KERNEL_SRC"/fs/smbd
+        ^----------------------^ SC2164 (warning): Use 'cd ... || exit' or 'cd ... || return' in case cd fails.
+
+Did you mean:
+	cd "$KERNEL_SRC"/fs/smbd || exit
+
+
+In ./build_ksmbd.sh line 146:
+function main
+^-- SC2113 (warning): 'function' keyword is non-standard. Use 'foo()' instead of 'function foo'.
+
+
+In ./ksmbd-tools/tests/test_integration.sh line 74:
+trap "rm -rf $SYMDIR $TMPDIR" EXIT
+             ^-----^ SC2064 (warning): Use single quotes, otherwise this expands now rather than when signalled.
+                     ^-----^ SC2064 (warning): Use single quotes, otherwise this expands now rather than when signalled.
+
+
+In ./run_tests.sh line 29:
+WHITE='\033[0;37m'
+^---^ SC2034 (warning): WHITE appears unused. Verify use (or export if used externally).
+
+
+In ./run_tests.sh line 35:
+BUILD_ONLY=false
+^--------^ SC2034 (warning): BUILD_ONLY appears unused. Verify use (or export if used externally).
+
+
+In ./run_tests.sh line 50:
+EXIT_RUNTIME_ERROR=4
+^----------------^ SC2034 (warning): EXIT_RUNTIME_ERROR appears unused. Verify use (or export if used externally).
+
+
+In ./run_tests.sh line 315:
+    local build_start=$(date +%s)
+          ^---------^ SC2155 (warning): Declare and assign separately to avoid masking return values.
+
+
+In ./run_tests.sh line 323:
+    local build_end=$(date +%s)
+          ^-------^ SC2155 (warning): Declare and assign separately to avoid masking return values.
+
+
+In ./run_tests.sh line 333:
+    local extra_args=()
+          ^--------^ SC2034 (warning): extra_args appears unused. Verify use (or export if used externally).
+
+
+In ./run_tests.sh line 338:
+    local cmd_desc=""
+          ^------^ SC2034 (warning): cmd_desc appears unused. Verify use (or export if used externally).
+
+
+In ./run_tests.sh line 402:
+    local test_start=$(date +%s)
+          ^--------^ SC2155 (warning): Declare and assign separately to avoid masking return values.
+
+
+In ./run_tests.sh line 415:
+    local test_end=$(date +%s)
+          ^------^ SC2155 (warning): Declare and assign separately to avoid masking return values.
+
+
+In ./run_tests.sh line 472:
+    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+          ^-------^ SC2155 (warning): Declare and assign separately to avoid masking return values.
+
+
+In ./run_tests.sh line 473:
+    local git_commit=$(git rev-parse HEAD 2>/dev/null || echo "unknown")
+          ^--------^ SC2155 (warning): Declare and assign separately to avoid masking return values.
+
+
+In ./run_tests.sh line 474:
+    local git_branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "unknown")
+          ^--------^ SC2155 (warning): Declare and assign separately to avoid masking return values.
+
+
+In ./run_tests.sh line 543:
+        local file_size=$(stat -c%s "$file" 2>/dev/null || echo "unknown")
+              ^-------^ SC2155 (warning): Declare and assign separately to avoid masking return values.
+
+
+In ./run_tests.sh line 553:
+    local start_time=$(date +%s)
+          ^--------^ SC2155 (warning): Declare and assign separately to avoid masking return values.
+
+
+In ./run_tests.sh line 596:
+    local end_time=$(date +%s)
+          ^------^ SC2155 (warning): Declare and assign separately to avoid masking return values.
+
+
+In ./setup_arm64_build.sh line 134:
+    local kernel_major=$(echo "$KERNEL_VERSION" | cut -d. -f1,2)
+          ^----------^ SC2155 (warning): Declare and assign separately to avoid masking return values.
+
+
+In ksmbd-tools/tests/test_integration.sh line 74:
+trap "rm -rf $SYMDIR $TMPDIR" EXIT
+             ^-----^ SC2064 (warning): Use single quotes, otherwise this expands now rather than when signalled.
+                     ^-----^ SC2064 (warning): Use single quotes, otherwise this expands now rather than when signalled.
+
+For more information:
+  https://www.shellcheck.net/wiki/SC1128 -- The shebang must be on the first ...
+  https://www.shellcheck.net/wiki/SC2328 -- This redirection takes output awa...
+  https://www.shellcheck.net/wiki/SC2027 -- The surrounding quotes actually u...

@@ -577,7 +577,7 @@ out:
 
 static int ipc_validate_msg(struct ipc_msg_table_entry *entry)
 {
-	unsigned int msg_sz = entry->msg_sz;
+	unsigned int msg_sz = 0;
 
 	if (entry->msg_sz > KSMBD_IPC_MAX_PAYLOAD)
 		return -EINVAL;
@@ -587,8 +587,8 @@ static int ipc_validate_msg(struct ipc_msg_table_entry *entry)
 	{
 		struct ksmbd_rpc_command *resp = entry->response;
 
-		if (check_add_overflow(sizeof(struct ksmbd_rpc_command),
-				       resp->payload_sz, &msg_sz))
+		msg_sz = sizeof(struct ksmbd_rpc_command);
+		if (check_add_overflow(msg_sz, resp->payload_sz, &msg_sz))
 			return -EINVAL;
 		break;
 	}
@@ -597,11 +597,11 @@ static int ipc_validate_msg(struct ipc_msg_table_entry *entry)
 		struct ksmbd_spnego_authen_response *resp = entry->response;
 		unsigned int payload_sz;
 
+		msg_sz = sizeof(struct ksmbd_spnego_authen_response);
 		if (check_add_overflow(resp->session_key_len,
 				       resp->spnego_blob_len, &payload_sz))
 			return -EINVAL;
-		if (check_add_overflow(sizeof(struct ksmbd_spnego_authen_response),
-				       payload_sz, &msg_sz))
+		if (check_add_overflow(msg_sz, payload_sz, &msg_sz))
 			return -EINVAL;
 		break;
 	}
@@ -609,22 +609,21 @@ static int ipc_validate_msg(struct ipc_msg_table_entry *entry)
 	{
 		struct ksmbd_share_config_response *resp = entry->response;
 
+		msg_sz = sizeof(struct ksmbd_share_config_response);
 		if (resp->payload_sz < resp->veto_list_sz)
 			return -EINVAL;
 		if (resp->veto_list_sz && resp->payload_sz == resp->veto_list_sz)
 			return -EINVAL;
 
-		if (resp->payload_sz) {
-			if (check_add_overflow(sizeof(struct ksmbd_share_config_response),
-					       resp->payload_sz, &msg_sz))
-				return -EINVAL;
-		}
+		if (check_add_overflow(msg_sz, resp->payload_sz, &msg_sz))
+			return -EINVAL;
 		break;
 	}
 	case KSMBD_EVENT_LOGIN_REQUEST_EXT:
 	{
 		struct ksmbd_login_response_ext *resp = entry->response;
 
+		msg_sz = sizeof(struct ksmbd_login_response_ext);
 		if (resp->ngroups) {
 			unsigned int groups_sz;
 
@@ -632,12 +631,13 @@ static int ipc_validate_msg(struct ipc_msg_table_entry *entry)
 					       (unsigned int)sizeof(gid_t),
 					       &groups_sz))
 				return -EINVAL;
-			if (check_add_overflow(sizeof(struct ksmbd_login_response_ext),
-					       groups_sz, &msg_sz))
+			if (check_add_overflow(msg_sz, groups_sz, &msg_sz))
 				return -EINVAL;
 		}
 		break;
 	}
+	default:
+		return 0;
 	}
 
 	return entry->msg_sz != msg_sz ? -EINVAL : 0;

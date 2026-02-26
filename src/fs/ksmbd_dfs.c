@@ -231,7 +231,7 @@ static int dfs_build_referral_response(struct ksmbd_work *work,
 	struct resp_get_dfs_referral *dfs_rsp;
 	__u8 *entry_ptr;
 	__u8 *dfs_path_utf16 = NULL, *target_utf16 = NULL;
-	unsigned int dfs_path_len, target_len;
+	unsigned int dfs_path_len = 0, target_len = 0;
 	unsigned int fixed_size, entry_size, total_out;
 	unsigned int path_off, alt_path_off, node_off;
 	int req_name_len;
