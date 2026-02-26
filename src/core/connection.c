@@ -689,10 +689,18 @@ again:
 			t = conn->transport;
 			ksmbd_conn_set_exiting(conn);
 			if (t->ops->shutdown) {
-				refcount_inc(&conn->refcnt);
+				/*
+				 * Take a temporary reference while dropping the
+				 * hash lock to invoke transport shutdown.
+				 * The connection can concurrently race to its
+				 * final put, so only take the ref if still live
+				 * and release it through ksmbd_conn_free().
+				 */
+				if (!refcount_inc_not_zero(&conn->refcnt))
+					continue;
 				spin_unlock(&conn_hash[i].lock);
 				t->ops->shutdown(t);
-				refcount_dec(&conn->refcnt);
+				ksmbd_conn_free(conn);
 				goto again;
 			}
 		}

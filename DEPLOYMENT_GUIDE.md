@@ -216,22 +216,32 @@ user ALL=(root) NOPASSWD:/usr/bin/install,/usr/sbin/depmod,/usr/sbin/modprobe
 
 ## 7. Install ksmbd-tools
 
-If your distro does not provide `ksmbd-tools`, build from included source:
+Install the bundled `ksmbd-tools` under `/opt/usr`:
 
 ```bash
 cd ksmbd-tools
-./autogen.sh
-./configure --with-rundir=/run
-make -j"$(nproc)"
-sudo make install
+sudo ./scripts/install_ksmbd_tools_optusr.sh
 ```
+
+The installer:
+
+- Installs tools under `/opt/usr` (`/opt/usr/sbin`, `/opt/usr/etc/ksmbd`, etc.).
+- Adds `/opt/usr/sbin` and `/opt/usr/bin` to `PATH` via `/etc/profile.d/ksmbd-tools-optusr-path.sh`.
+- Installs rollback script at `/opt/usr/sbin/ksmbd-tools-uninstall-optusr`.
+- Saves install state/backups in `/var/lib/ksmbd-tools-optusr`.
 
 Verify:
 
 ```bash
-command -v ksmbd.mountd
-command -v ksmbd.adduser
-command -v ksmbd.control
+test -x /opt/usr/sbin/ksmbd.mountd
+test -x /opt/usr/sbin/ksmbd.adduser
+test -x /opt/usr/sbin/ksmbd.control
+```
+
+Uninstall and fully roll back to pre-install file state:
+
+```bash
+sudo /opt/usr/sbin/ksmbd-tools-uninstall-optusr
 ```
 
 ## 8. Base Server Configuration
@@ -239,12 +249,12 @@ command -v ksmbd.control
 Create config directory and data directories:
 
 ```bash
-sudo mkdir -p /etc/ksmbd
+sudo mkdir -p /opt/usr/etc/ksmbd
 sudo mkdir -p /srv/ksmbd/public
 sudo mkdir -p /var/lib/ksmbd
 ```
 
-Create `/etc/ksmbd/ksmbd.conf`:
+Create `/opt/usr/etc/ksmbd/ksmbd.conf`:
 
 ```ini
 [global]
@@ -271,13 +281,13 @@ sudo chmod -R 0755 /srv/ksmbd
 Create SMB user:
 
 ```bash
-sudo ksmbd.adduser -a smbuser
+sudo /opt/usr/sbin/ksmbd.adduser -a smbuser
 ```
 
 Start daemon:
 
 ```bash
-sudo ksmbd.mountd
+sudo /opt/usr/sbin/ksmbd.mountd
 ```
 
 Run daemon with systemd (recommended for servers):
@@ -291,7 +301,7 @@ Wants=network-online.target
 
 [Service]
 Type=simple
-ExecStart=/usr/sbin/ksmbd.mountd
+ExecStart=/opt/usr/sbin/ksmbd.mountd
 Restart=on-failure
 RestartSec=2
 
