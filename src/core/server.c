@@ -37,11 +37,16 @@
 #include "ksmbd_fsctl_extra.h"
 #include "ksmbd_hooks.h"
 #include "ksmbd_buffer.h"
+#include "ksmbd_branchcache.h"
+#include "ksmbd_md4.h"
 #include "mgmt/ksmbd_witness.h"
 
-extern int ksmbd_debugfs_init(void);
-extern void ksmbd_debugfs_exit(void);
-
+/*
+ * ksmbd_debug_types is read from hot paths (ksmbd_debug() macro)
+ * and written only from the sysfs debug_store handler.  A torn read
+ * is benign -- it may briefly show stale debug flags -- so we
+ * deliberately avoid atomic_t / locking overhead here.
+ */
 int ksmbd_debug_types;
 
 struct ksmbd_server_config server_conf;
@@ -251,9 +256,12 @@ static void __handle_ksmbd_work(struct ksmbd_work *work,
 		 * granted in hdr of smb2 response.
 		 */
 		if (conn->ops->set_rsp_credits) {
-			spin_lock(&conn->credits_lock);
+			ksmbd_debug(SMB,
+				    "credit_rsp: dispatch cmd=%u total=%u out=%u granted_total=%u\n",
+				    command, conn->total_credits,
+				    conn->outstanding_credits,
+				    work->credits_granted);
 			rc = conn->ops->set_rsp_credits(work);
-			spin_unlock(&conn->credits_lock);
 			if (rc < 0) {
 				conn->ops->set_rsp_status(work,
 					STATUS_INVALID_PARAMETER);
@@ -341,7 +349,7 @@ static int queue_ksmbd_work(struct ksmbd_conn *conn)
 
 	err = ksmbd_init_smb_server(conn);
 	if (err)
-		return 0;
+		return err;
 
 	work = ksmbd_alloc_work_struct();
 	if (!work) {
@@ -350,13 +358,24 @@ static int queue_ksmbd_work(struct ksmbd_conn *conn)
 	}
 
 	work->conn = conn;
+	/*
+	 * Ownership transfer: the request buffer moves from the
+	 * connection to the work struct.  After this assignment,
+	 * conn->request_buf is set to NULL to indicate the connection
+	 * no longer owns the buffer.  The work struct (and ultimately
+	 * ksmbd_free_work_struct()) is now responsible for freeing it.
+	 *
+	 * This pattern must be maintained: every buffer must have
+	 * exactly one owner at any point in time.
+	 */
+	WARN_ON_ONCE(!conn->request_buf);
 	work->request_buf = conn->request_buf;
 	conn->request_buf = NULL;
 
 	ksmbd_conn_enqueue_request(work);
 	ksmbd_conn_r_count_inc(conn);
 	/* update activity on connection */
-	conn->last_active = jiffies;
+	WRITE_ONCE(conn->last_active, jiffies);
 	INIT_WORK(&work->work, handle_ksmbd_work);
 	ksmbd_queue_work(work);
 	return 0;
@@ -499,8 +518,9 @@ static ssize_t stats_show(struct class *class, struct class_attribute *attr,
 	if (cur_state >= ARRAY_SIZE(state))
 		cur_state = SERVER_STATE_SHUTTING_DOWN;
 	return sysfs_emit(buf, "%d %s %d %lu\n", stats_version,
-			  state[cur_state], server_conf.tcp_port,
-			  server_conf.ipc_last_active / HZ);
+			  state[cur_state],
+			  READ_ONCE(server_conf.tcp_port),
+			  READ_ONCE(server_conf.ipc_last_active) / HZ);
 }
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 4, 0)
@@ -632,10 +652,14 @@ static int __init ksmbd_server_init(void)
 		return ret;
 	}
 
+	ret = ksmbd_md4_register();
+	if (ret)
+		goto err_config_exit;
+
 	ret = class_register(&ksmbd_control_class);
 	if (ret) {
 		pr_err("Unable to register ksmbd-control class\n");
-		goto err_config_exit;
+		goto err_md4_unregister;
 	}
 
 	ksmbd_server_tcp_callbacks_init();
@@ -680,10 +704,13 @@ static int __init ksmbd_server_init(void)
 	if (ret)
 		goto err_crypto_destroy;
 
+	/* Generate random BranchCache server secret */
+	ksmbd_branchcache_generate_secret();
+
 	/* Initialize Fruit SMB extensions */
 	ret = fruit_init_module();
 	if (ret)
-		goto err_crypto_destroy;
+		goto err_workqueue_destroy;
 
 	ret = ksmbd_debugfs_init();
 	if (ret)
@@ -776,6 +803,9 @@ err_dfs:
 err_fsctl:
 	ksmbd_debugfs_exit();
 err_debugfs:
+	fruit_cleanup_module();
+err_workqueue_destroy:
+	ksmbd_workqueue_destroy();
 err_crypto_destroy:
 	ksmbd_crypto_destroy();
 err_release_inode_hash:
@@ -794,6 +824,8 @@ err_destroy_work_pools:
 	ksmbd_work_pool_destroy();
 err_unregister:
 	class_unregister(&ksmbd_control_class);
+err_md4_unregister:
+	ksmbd_md4_unregister();
 err_config_exit:
 	ksmbd_config_exit();
 
@@ -825,6 +857,7 @@ static void __exit ksmbd_server_exit(void)
 
 	/* Cleanup Fruit SMB extensions */
 	fruit_cleanup_module();
+	ksmbd_md4_unregister();
 }
 
 MODULE_AUTHOR("Namjae Jeon <linkinjeon@kernel.org>");

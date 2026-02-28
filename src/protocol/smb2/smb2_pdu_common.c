@@ -6,12 +6,6 @@
  *   smb2_pdu_common.c - Shared helpers, signing, encryption, credit management
  */
 
-// SPDX-License-Identifier: GPL-2.0-or-later
-/*
- *   Copyright (C) 2016 Namjae Jeon <linkinjeon@kernel.org>
- *   Copyright (C) 2018 Samsung Electronics Co., Ltd.
- */
-
 #include <linux/inetdevice.h>
 #include <net/addrconf.h>
 #include <linux/syscalls.h>
@@ -120,6 +114,12 @@ int smb2_get_ksmbd_tcon(struct ksmbd_work *work)
 			pr_err_ratelimited("tree id(%u) is different with id(%u) in first operation\n",
 					   tree_id, work->tcon->id);
 			return -EINVAL;
+		}
+		if (tree_id == UINT_MAX) {
+			struct smb2_hdr *hdr = ksmbd_req_buf_next(work);
+
+			if (!(hdr->Flags & SMB2_FLAGS_RELATED_OPERATIONS))
+				return -EINVAL;
 		}
 		return 1;
 	}
@@ -331,7 +331,15 @@ int smb2_set_rsp_credits(struct ksmbd_work *work)
 
 	credit_charge = max_t(unsigned short,
 			      le16_to_cpu(req_hdr->CreditCharge), 1);
+
+	ksmbd_debug(SMB,
+		    "credit_rsp: lock_enter cmd=%u charge=%u req=%u total=%u out=%u granted_total=%u\n",
+		    le16_to_cpu(req_hdr->Command), credit_charge,
+		    le16_to_cpu(req_hdr->CreditRequest), conn->total_credits,
+		    conn->outstanding_credits, work->credits_granted);
+	spin_lock(&conn->credits_lock);
 	if (credit_charge > conn->total_credits) {
+		spin_unlock(&conn->credits_lock);
 		ksmbd_debug(SMB, "Insufficient credits granted, given: %u, granted: %u\n",
 			    credit_charge, conn->total_credits);
 		return -EINVAL;
@@ -362,6 +370,12 @@ int smb2_set_rsp_credits(struct ksmbd_work *work)
 
 	conn->total_credits += credits_granted;
 	work->credits_granted += credits_granted;
+	ksmbd_debug(SMB,
+		    "credit_rsp: lock_exit cmd=%u charge=%u req=%u granted=%u total=%u out=%u granted_total=%u\n",
+		    le16_to_cpu(req_hdr->Command), credit_charge,
+		    credits_requested, credits_granted, conn->total_credits,
+		    conn->outstanding_credits, work->credits_granted);
+	spin_unlock(&conn->credits_lock);
 
 	if (!req_hdr->NextCommand) {
 		/* Update CreditRequest in last request */
@@ -478,16 +492,13 @@ bool is_chained_smb2_message(struct ksmbd_work *work)
 		return true;
 	} else if (work->next_smb2_rcv_hdr_off) {
 		/*
-		 * This is last request in chained command,
-		 * align response to 8 byte
+		 * This is the last request in a chained command.
+		 * Per MS-SMB2 3.3.4.1.4, the last response in a
+		 * compound should NOT be padded -- only intermediate
+		 * responses need 8-byte alignment padding.  Signing
+		 * must cover the actual response size, not a padded
+		 * length.
 		 */
-		len = ALIGN(get_rfc1002_len(work->response_buf), 8);
-		len = len - get_rfc1002_len(work->response_buf);
-		if (len) {
-			ksmbd_debug(SMB, "padding len %u\n", len);
-			work->iov[work->iov_idx].iov_len += len;
-			inc_rfc1001_len(work->response_buf, len);
-		}
 		work->curr_smb2_rsp_hdr_off = work->next_smb2_rsp_hdr_off;
 	}
 	return false;
@@ -607,6 +618,12 @@ int smb2_check_user_session(struct ksmbd_work *work)
 			pr_err_ratelimited("session id(%llu) is different with the first operation(%lld)\n",
 					   sess_id, work->sess->id);
 			return -EINVAL;
+		}
+		if (sess_id == ULLONG_MAX) {
+			struct smb2_hdr *hdr = ksmbd_req_buf_next(work);
+
+			if (!(hdr->Flags & SMB2_FLAGS_RELATED_OPERATIONS))
+				return -EINVAL;
 		}
 		return 1;
 	}
@@ -806,6 +823,9 @@ int smb2_check_sign_req(struct ksmbd_work *work)
 	struct kvec iov[1];
 	size_t len;
 
+	if (!work->sess)
+		return 0;
+
 	hdr = smb2_get_msg(work->request_buf);
 	if (work->next_smb2_rcv_hdr_off)
 		hdr = ksmbd_req_buf_next(work);
@@ -853,9 +873,23 @@ void smb2_set_sign_rsp(struct ksmbd_work *work)
 	memset(hdr->Signature, 0, SMB2_SIGNATURE_SIZE);
 
 	if (hdr->Command == SMB2_READ) {
+		if (work->iov_idx == 0)
+			return;
+		/* Need at least 2 iov entries: header + read data */
+		if (work->iov_idx < 1 ||
+		    work->iov_idx + 1 > work->iov_cnt) {
+			pr_err("invalid iov state for READ signing: idx=%d cnt=%d\n",
+			       work->iov_idx, work->iov_cnt);
+			return;
+		}
 		iov = &work->iov[work->iov_idx - 1];
 		n_vec++;
 	} else {
+		if (work->iov_idx >= work->iov_cnt) {
+			pr_err("invalid iov index for signing: idx=%d cnt=%d\n",
+			       work->iov_idx, work->iov_cnt);
+			return;
+		}
 		iov = &work->iov[work->iov_idx];
 	}
 
@@ -880,6 +914,9 @@ int smb3_check_sign_req(struct ksmbd_work *work)
 	char signature[SMB2_CMACAES_SIZE];
 	struct kvec iov[1];
 	size_t len;
+
+	if (!work->sess)
+		return 0;
 
 	hdr = smb2_get_msg(work->request_buf);
 	if (work->next_smb2_rcv_hdr_off)
@@ -968,9 +1005,23 @@ void smb3_set_sign_rsp(struct ksmbd_work *work)
 	memset(hdr->Signature, 0, SMB2_SIGNATURE_SIZE);
 
 	if (hdr->Command == SMB2_READ) {
+		if (work->iov_idx == 0)
+			return;
+		/* Need at least 2 iov entries: header + read data */
+		if (work->iov_idx < 1 ||
+		    work->iov_idx + 1 > work->iov_cnt) {
+			pr_err("invalid iov state for READ signing: idx=%d cnt=%d\n",
+			       work->iov_idx, work->iov_cnt);
+			return;
+		}
 		iov = &work->iov[work->iov_idx - 1];
 		n_vec++;
 	} else {
+		if (work->iov_idx >= work->iov_cnt) {
+			pr_err("invalid iov index for signing: idx=%d cnt=%d\n",
+			       work->iov_idx, work->iov_cnt);
+			return;
+		}
 		iov = &work->iov[work->iov_idx];
 	}
 
@@ -1006,22 +1057,25 @@ void smb3_preauth_hash_rsp(struct ksmbd_work *work)
 						 conn->preauth_info->Preauth_HashValue);
 
 	if (le16_to_cpu(rsp->Command) == SMB2_SESSION_SETUP_HE && sess) {
-		__u8 *hash_value;
-
 		if (conn->binding) {
 			struct preauth_session *preauth_sess;
 
+			down_write(&conn->session_lock);
 			preauth_sess = ksmbd_preauth_session_lookup(conn, sess->id);
-			if (!preauth_sess)
+			if (!preauth_sess) {
+				up_write(&conn->session_lock);
 				return;
-			hash_value = preauth_sess->Preauth_HashValue;
+			}
+			ksmbd_gen_preauth_integrity_hash(conn, work->response_buf,
+							 preauth_sess->Preauth_HashValue);
+			up_write(&conn->session_lock);
+			return;
 		} else {
-			hash_value = sess->Preauth_HashValue;
-			if (!hash_value)
+			if (!sess->Preauth_HashValue)
 				return;
+			ksmbd_gen_preauth_integrity_hash(conn, work->response_buf,
+							 sess->Preauth_HashValue);
 		}
-		ksmbd_gen_preauth_integrity_hash(conn, work->response_buf,
-						 hash_value);
 	}
 }
 
@@ -1150,19 +1204,21 @@ int smb3_decrypt_req(struct ksmbd_work *work)
 				   le64_to_cpu(tr_hdr->SessionId));
 		return -ECONNABORTED;
 	}
-	ksmbd_user_session_put(sess);
 
 	iov[0].iov_base = buf;
 	iov[0].iov_len = sizeof(struct smb2_transform_hdr) + 4;
 	iov[1].iov_base = buf + sizeof(struct smb2_transform_hdr) + 4;
 	iov[1].iov_len = buf_data_size;
 	rc = ksmbd_crypt_message(work, iov, 2, 0);
-	if (rc)
+	if (rc) {
+		ksmbd_user_session_put(sess);
 		return rc;
+	}
 
 	memmove(buf + 4, iov[1].iov_base, buf_data_size);
 	*(__be32 *)buf = cpu_to_be32(buf_data_size);
 
+	ksmbd_user_session_put(sess);
 	return rc;
 }
 

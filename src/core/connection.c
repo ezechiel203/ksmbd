@@ -8,24 +8,28 @@
 #include <linux/freezer.h>
 #include <linux/module.h>
 #include <linux/overflow.h>
+#include <linux/rcupdate.h>
 
 #include "server.h"
 #include "smb_common.h"
 #ifdef CONFIG_SMB_INSECURE_SERVER
 #include "smb1pdu.h"
 #endif
+#include "smb2pdu.h"
 #include "mgmt/ksmbd_ida.h"
 #include "connection.h"
 #include "transport_tcp.h"
 #include "transport_rdma.h"
 #include "transport_quic.h"
 #include "smb2fruit.h"
+#include "mgmt/user_session.h"
 
 static DEFINE_MUTEX(init_lock);
 
 static struct ksmbd_conn_ops default_conn_ops;
 
 struct ksmbd_conn_hash_bucket conn_hash[CONN_HASH_SIZE];
+atomic_t conn_hash_count = ATOMIC_INIT(0);
 
 /**
  * ksmbd_conn_hash_init() - initialize per-bucket locks for conn hash
@@ -38,6 +42,7 @@ void ksmbd_conn_hash_init(void)
 		INIT_HLIST_HEAD(&conn_hash[i].head);
 		spin_lock_init(&conn_hash[i].lock);
 	}
+	atomic_set(&conn_hash_count, 0);
 }
 
 /**
@@ -51,6 +56,7 @@ void ksmbd_conn_hash_add(struct ksmbd_conn *conn, unsigned int key)
 
 	spin_lock(&conn_hash[bkt].lock);
 	hlist_add_head(&conn->hlist, &conn_hash[bkt].head);
+	atomic_inc(&conn_hash_count);
 	spin_unlock(&conn_hash[bkt].lock);
 }
 
@@ -63,28 +69,24 @@ void ksmbd_conn_hash_del(struct ksmbd_conn *conn)
 	unsigned int bkt = hash_min(conn->inet_hash, CONN_HASH_BITS);
 
 	spin_lock(&conn_hash[bkt].lock);
-	hlist_del_init(&conn->hlist);
+	if (!hlist_unhashed(&conn->hlist)) {
+		hlist_del_init(&conn->hlist);
+		atomic_dec(&conn_hash_count);
+	}
 	spin_unlock(&conn_hash[bkt].lock);
 }
 
 /**
- * ksmbd_conn_hash_empty() - check if the connection hash is empty
+ * ksmbd_conn_hash_empty() - atomically check if the connection hash is empty
+ *
+ * Uses a global atomic counter to avoid TOCTOU races that could occur
+ * when checking individual buckets non-atomically.
  *
  * Return:	true if no connections remain
  */
 bool ksmbd_conn_hash_empty(void)
 {
-	int i;
-
-	for (i = 0; i < CONN_HASH_SIZE; i++) {
-		spin_lock(&conn_hash[i].lock);
-		if (!hlist_empty(&conn_hash[i].head)) {
-			spin_unlock(&conn_hash[i].lock);
-			return false;
-		}
-		spin_unlock(&conn_hash[i].lock);
-	}
-	return true;
+	return atomic_read(&conn_hash_count) == 0;
 }
 
 /**
@@ -97,9 +99,18 @@ bool ksmbd_conn_hash_empty(void)
  */
 static void ksmbd_conn_cleanup(struct ksmbd_conn *conn)
 {
+	struct preauth_session *p, *tmp;
+
 	ksmbd_conn_hash_del(conn);
 
 	xa_destroy(&conn->sessions);
+
+	list_for_each_entry_safe(p, tmp, &conn->preauth_sess_table,
+				 preauth_entry) {
+		list_del(&p->preauth_entry);
+		kfree(p);
+	}
+
 	kvfree(conn->request_buf);
 	kfree(conn->preauth_info);
 	kfree(conn->vals);
@@ -172,6 +183,7 @@ struct ksmbd_conn *ksmbd_conn_alloc(void)
 	INIT_LIST_HEAD(&conn->lock_list);
 
 	init_rwsem(&conn->session_lock);
+	INIT_LIST_HEAD(&conn->preauth_sess_table);
 
 	return conn;
 }
@@ -230,11 +242,12 @@ void ksmbd_conn_try_dequeue_request(struct ksmbd_work *work)
 	if (waitqueue_active(&conn->req_running_q))
 		wake_up(&conn->req_running_q);
 
-	if (list_empty(&work->request_entry) &&
-	    list_empty(&work->async_request_entry))
-		return;
-
 	spin_lock(&conn->request_lock);
+	if (list_empty(&work->request_entry) &&
+	    list_empty(&work->async_request_entry)) {
+		spin_unlock(&conn->request_lock);
+		return;
+	}
 	list_del_init(&work->request_entry);
 	spin_unlock(&conn->request_lock);
 	if (work->asynchronous)
@@ -261,9 +274,11 @@ void ksmbd_all_conn_set_status(u64 sess_id, u32 status)
 	for (i = 0; i < CONN_HASH_SIZE; i++) {
 		spin_lock(&conn_hash[i].lock);
 		hlist_for_each_entry(conn, &conn_hash[i].head, hlist) {
+			rcu_read_lock();
 			if (conn->binding ||
 			    xa_load(&conn->sessions, sess_id))
 				WRITE_ONCE(conn->status, status);
+			rcu_read_unlock();
 		}
 		spin_unlock(&conn_hash[i].lock);
 	}
@@ -283,19 +298,33 @@ int ksmbd_conn_wait_idle_sess_id(struct ksmbd_conn *curr_conn,
 				 u64 sess_id)
 {
 	struct ksmbd_conn *conn;
-	int rc, retry_count = 0, max_timeout = 120;
+	int rc, retry_count = 0;
 	int rcount, i;
 
+	/*
+	 * Maximum total retries to prevent infinite loops.  Each retry
+	 * waits up to 1 second (HZ), so 120 retries = 120 seconds max.
+	 */
+#define WAIT_IDLE_MAX_RETRIES	120
+
 retry_idle:
-	if (retry_count >= max_timeout)
+	if (retry_count >= WAIT_IDLE_MAX_RETRIES) {
+		pr_err_ratelimited("wait_idle_sess_id: timed out after %d retries for session %llu\n",
+				   retry_count, sess_id);
 		return -EIO;
+	}
 
 	for (i = 0; i < CONN_HASH_SIZE; i++) {
 		spin_lock(&conn_hash[i].lock);
 		hlist_for_each_entry(conn, &conn_hash[i].head,
 				     hlist) {
-			if (!conn->binding &&
-			    !xa_load(&conn->sessions, sess_id))
+			bool has_sess;
+
+			rcu_read_lock();
+			has_sess = conn->binding ||
+				   xa_load(&conn->sessions, sess_id);
+			rcu_read_unlock();
+			if (!has_sess)
 				continue;
 
 			rcount = (conn == curr_conn) ? 2 : 1;
@@ -308,15 +337,13 @@ retry_idle:
 					    &conn->req_running)
 					    < rcount,
 					HZ);
-				if (!rc) {
-					retry_count++;
-					goto retry_idle;
-				}
 				/*
-				 * Restart from beginning after
-				 * sleeping: bucket contents may
-				 * have changed.
+				 * Count every restart toward the limit,
+				 * whether the wait timed out or succeeded,
+				 * to prevent infinite loops when requests
+				 * keep arriving between checks.
 				 */
+				retry_count++;
 				goto retry_idle;
 			}
 		}
@@ -329,6 +356,7 @@ retry_idle:
 int ksmbd_conn_write(struct ksmbd_work *work)
 {
 	struct ksmbd_conn *conn = work->conn;
+	size_t expected_len = 0;
 	int sent;
 
 	if (!work->response_buf) {
@@ -356,6 +384,7 @@ int ksmbd_conn_write(struct ksmbd_work *work)
 			len += iov[iov_idx++].iov_len;
 		}
 
+		expected_len = len;
 		ksmbd_conn_lock(conn);
 		sent = conn->transport->ops->writev(conn->transport, &iov[0],
 				iov_idx, len, work->need_invalidate_rkey,
@@ -368,6 +397,7 @@ int ksmbd_conn_write(struct ksmbd_work *work)
 		if (work->sendfile)
 			len -= work->sendfile_count;
 
+		expected_len = len;
 		ksmbd_conn_lock(conn);
 		sent = conn->transport->ops->writev(conn->transport,
 						    work->iov,
@@ -392,6 +422,7 @@ int ksmbd_conn_write(struct ksmbd_work *work)
 		if (work->sendfile)
 			len -= work->sendfile_count;
 
+		expected_len = len;
 		ksmbd_conn_lock(conn);
 		sent = conn->transport->ops->writev(conn->transport,
 						    work->iov,
@@ -406,6 +437,10 @@ int ksmbd_conn_write(struct ksmbd_work *work)
 		pr_err("Failed to send message: %d\n", sent);
 		return sent;
 	}
+
+	if (sent != expected_len)
+		pr_warn_ratelimited("Short write: sent %d of %zu bytes\n",
+				    sent, expected_len);
 
 	/* Send file data via zero-copy after the header */
 	if (work->sendfile && conn->transport->ops->sendfile) {
@@ -473,10 +508,11 @@ bool ksmbd_conn_alive(struct ksmbd_conn *conn)
 	 * is bigger than deadtime user configured and opening file count is
 	 * zero.
 	 */
-	if (server_conf.deadtime > 0 &&
-	    time_after(jiffies, conn->last_active + server_conf.deadtime)) {
+	if (READ_ONCE(server_conf.deadtime) > 0 &&
+	    time_after(jiffies, READ_ONCE(conn->last_active) +
+		       READ_ONCE(server_conf.deadtime))) {
 		ksmbd_debug(CONN, "No response from client in %lu minutes\n",
-			    server_conf.deadtime / SMB_ECHO_INTERVAL);
+			    READ_ONCE(server_conf.deadtime) / SMB_ECHO_INTERVAL);
 		return false;
 	}
 	return true;
@@ -507,8 +543,8 @@ int ksmbd_conn_handler_loop(void *p)
 	if (t->ops->prepare && t->ops->prepare(t))
 		goto out;
 
-	max_req = server_conf.max_inflight_req;
-	conn->last_active = jiffies;
+	max_req = READ_ONCE(server_conf.max_inflight_req);
+	WRITE_ONCE(conn->last_active, jiffies);
 	set_freezable();
 	while (ksmbd_conn_alive(conn)) {
 		if (try_to_freeze())
@@ -530,25 +566,32 @@ recheck:
 			goto recheck;
 		}
 
-		size = t->ops->read(t, hdr_buf, sizeof(hdr_buf), -1);
-		if (size != sizeof(hdr_buf))
-			break;
+			size = t->ops->read(t, hdr_buf, sizeof(hdr_buf), -1);
+			if (size != sizeof(hdr_buf))
+				break;
 
-		pdu_size = get_rfc1002_len(hdr_buf);
-		ksmbd_debug(CONN, "RFC1002 header %u bytes\n", pdu_size);
+			pdu_size = get_rfc1002_len(hdr_buf);
+			ksmbd_debug(CONN,
+				    "RFC1002 hdr=%02x %02x %02x %02x len=%u status=%d\n",
+				    (u8)hdr_buf[0], (u8)hdr_buf[1],
+				    (u8)hdr_buf[2], (u8)hdr_buf[3], pdu_size,
+				    READ_ONCE(conn->status));
 
-		if (ksmbd_conn_good(conn))
+		if (ksmbd_conn_good(conn) && conn->vals)
 			max_allowed_pdu_size =
 				SMB3_MAX_MSGSIZE + conn->vals->max_write_size;
 		else
 			max_allowed_pdu_size = SMB3_MAX_MSGSIZE;
 
-		if (pdu_size > max_allowed_pdu_size) {
-			pr_err_ratelimited("PDU length(%u) excceed maximum allowed pdu size(%u) on connection(%d)\n",
-					pdu_size, max_allowed_pdu_size,
-					READ_ONCE(conn->status));
-			break;
-		}
+			if (pdu_size > max_allowed_pdu_size) {
+				pr_err_ratelimited("PDU length(%u) excceed maximum allowed pdu size(%u) on connection(%d)\n",
+						pdu_size, max_allowed_pdu_size,
+						READ_ONCE(conn->status));
+				pr_err_ratelimited("Invalid RFC1002 hdr bytes: %02x %02x %02x %02x\n",
+						   (u8)hdr_buf[0], (u8)hdr_buf[1],
+						   (u8)hdr_buf[2], (u8)hdr_buf[3]);
+				break;
+			}
 
 		/*
 		 * Check maximum pdu size(0x00FFFFFF).
@@ -579,11 +622,72 @@ recheck:
 			break;
 		}
 
-		if (size != pdu_size) {
-			pr_err("PDU error. Read: %d, Expected: %d\n",
-			       size, pdu_size);
-			continue;
-		}
+			if (size != pdu_size) {
+				pr_err("PDU error. Read: %d, Expected: %d\n",
+				       size, pdu_size);
+				continue;
+			}
+
+			if (pdu_size >= sizeof(struct smb2_sess_setup_req)) {
+				struct smb2_sess_setup_req *sess_req;
+				unsigned int expected_pdu, extra;
+
+				sess_req = smb2_get_msg(conn->request_buf);
+				if (sess_req->hdr.ProtocolId == SMB2_PROTO_NUMBER &&
+				    le16_to_cpu(sess_req->hdr.Command) ==
+				    SMB2_SESSION_SETUP_HE) {
+					expected_pdu =
+						le16_to_cpu(sess_req->SecurityBufferOffset) +
+						le16_to_cpu(sess_req->SecurityBufferLength);
+
+					if (expected_pdu > pdu_size &&
+					    expected_pdu <= MAX_STREAM_PROT_LEN) {
+						char *new_buf;
+
+						extra = expected_pdu - pdu_size;
+						if (check_add_overflow(expected_pdu, 5u,
+								       (unsigned int *)&size))
+							break;
+
+						new_buf = kvmalloc(size, KSMBD_DEFAULT_GFP);
+						if (!new_buf)
+							break;
+
+						memcpy(new_buf, conn->request_buf,
+						       pdu_size + 4);
+						kvfree(conn->request_buf);
+						conn->request_buf = new_buf;
+
+						size = t->ops->read(t,
+								   conn->request_buf + 4 + pdu_size,
+								   extra, 2);
+						if (size != extra) {
+							pr_err("SESSION_SETUP extension read failed: %d expected %u\n",
+							       size, extra);
+							break;
+						}
+
+						inc_rfc1001_len(conn->request_buf, extra);
+						pr_warn_ratelimited(
+							"SESSION_SETUP frame length corrected: rfc=%u expected=%u extra=%u\n",
+							pdu_size, expected_pdu, extra);
+						pdu_size = expected_pdu;
+					}
+				}
+			}
+
+			/*
+			 * Trace parsed protocol signature after payload read to
+			 * diagnose framing/stream-desync issues.
+			 */
+			if (pdu_size >= 4) {
+				u8 *msg = conn->request_buf + 4;
+
+				ksmbd_debug(CONN,
+					    "PDU sig=%02x %02x %02x %02x pdu=%u req_running=%d\n",
+					    msg[0], msg[1], msg[2], msg[3],
+					    pdu_size, atomic_read(&conn->req_running));
+			}
 
 		if (!ksmbd_smb_request(conn))
 			break;
@@ -662,24 +766,36 @@ int ksmbd_conn_transport_init(void)
 	ret = ksmbd_rdma_init();
 	if (ret) {
 		pr_err("Failed to init RDMA subsystem: %d\n", ret);
-		goto out;
+		goto err_tcp;
 	}
 
 	ret = ksmbd_quic_init();
 	if (ret) {
 		pr_err("Failed to init QUIC subsystem: %d\n", ret);
-		goto out;
+		goto err_rdma;
 	}
+
+	mutex_unlock(&init_lock);
+	return 0;
+
+err_rdma:
+	ksmbd_rdma_destroy();
+err_tcp:
+	ksmbd_tcp_destroy();
 out:
 	mutex_unlock(&init_lock);
 	return ret;
 }
+
+/* Maximum retries for stop_sessions: 300 * 100ms = 30 seconds */
+#define STOP_SESSIONS_MAX_RETRIES	300
 
 static void stop_sessions(void)
 {
 	struct ksmbd_conn *conn;
 	struct ksmbd_transport *t;
 	int i;
+	int retries = 0;
 
 again:
 	for (i = 0; i < CONN_HASH_SIZE; i++) {
@@ -708,6 +824,40 @@ again:
 	}
 
 	if (!ksmbd_conn_hash_empty()) {
+		if (++retries > STOP_SESSIONS_MAX_RETRIES) {
+			int leaked = 0;
+
+			/*
+			 * Force-release remaining connections to avoid
+			 * leaking resources on module unload.  At this
+			 * point listeners are already torn down, so no
+			 * new connections can arrive.
+			 */
+			for (i = 0; i < CONN_HASH_SIZE; i++) {
+				spin_lock(&conn_hash[i].lock);
+				hlist_for_each_entry(conn, &conn_hash[i].head,
+						     hlist)
+					leaked++;
+				spin_unlock(&conn_hash[i].lock);
+			}
+			pr_crit("stop_sessions: giving up after %d retries - %d connections leaked, forcing cleanup\n",
+				retries, leaked);
+
+			for (i = 0; i < CONN_HASH_SIZE; i++) {
+restart:
+				spin_lock(&conn_hash[i].lock);
+				hlist_for_each_entry(conn, &conn_hash[i].head,
+						     hlist) {
+					if (!refcount_inc_not_zero(&conn->refcnt))
+						continue;
+					spin_unlock(&conn_hash[i].lock);
+					ksmbd_conn_free(conn);
+					goto restart;
+				}
+				spin_unlock(&conn_hash[i].lock);
+			}
+			return;
+		}
 		msleep(100);
 		goto again;
 	}

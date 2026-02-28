@@ -41,6 +41,7 @@ struct interface {
 };
 
 static LIST_HEAD(iface_list);
+static DEFINE_MUTEX(iface_list_lock);
 
 static int bind_additional_ifaces;
 
@@ -81,6 +82,30 @@ static inline void ksmbd_tcp_reuseaddr(struct socket *sock)
 			  sizeof(val));
 #else
 	sock_set_reuseaddr(sock->sk);
+#endif
+}
+
+static inline void ksmbd_tcp_keepalive(struct socket *sock)
+{
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 8, 0)
+	int val = 1;
+
+	kernel_setsockopt(sock, SOL_SOCKET, SO_KEEPALIVE, (char *)&val,
+			  sizeof(val));
+	val = 120;
+	kernel_setsockopt(sock, SOL_TCP, TCP_KEEPIDLE, (char *)&val,
+			  sizeof(val));
+	val = 30;
+	kernel_setsockopt(sock, SOL_TCP, TCP_KEEPINTVL, (char *)&val,
+			  sizeof(val));
+	val = 3;
+	kernel_setsockopt(sock, SOL_TCP, TCP_KEEPCNT, (char *)&val,
+			  sizeof(val));
+#else
+	tcp_sock_set_keepidle(sock->sk, 120);
+	tcp_sock_set_keepintvl(sock->sk, 30);
+	tcp_sock_set_keepcnt(sock->sk, 3);
+	sock_set_keepalive(sock->sk);
 #endif
 }
 
@@ -170,30 +195,6 @@ static unsigned int kvec_array_init(struct kvec *new, struct kvec *iov,
 }
 
 /**
- * get_conn_iovec() - get connection iovec for reading from socket
- * @t:		TCP transport instance
- * @nr_segs:	number of segments in iov
- *
- * Return:	return existing or newly allocate iovec
- */
-static struct kvec *get_conn_iovec(struct tcp_transport *t, unsigned int nr_segs)
-{
-	struct kvec *new_iov;
-
-	if (t->iov && nr_segs <= t->nr_iov)
-		return t->iov;
-
-	/* not big enough -- allocate a new one and release the old */
-	new_iov = kmalloc_array(nr_segs, sizeof(*new_iov), KSMBD_DEFAULT_GFP);
-	if (new_iov) {
-		kfree(t->iov);
-		t->iov = new_iov;
-		t->nr_iov = nr_segs;
-	}
-	return new_iov;
-}
-
-/**
  * ksmbd_tcp_new_connection() - create a new tcp session on mount
  * @client_sk:	socket associated with new connection
  *
@@ -248,6 +249,12 @@ static int ksmbd_kthread_fn(void *p)
 		if (!iface->ksmbd_socket) {
 			break;
 		}
+		/*
+		 * Blocking accept (flags=0) is intentional: the listener
+		 * thread sleeps in kernel_accept() until a new connection
+		 * arrives or the socket is shut down, which is the standard
+		 * pattern for kernel server threads.
+		 */
 		ret = kernel_accept(iface->ksmbd_socket, &client_sk, 0);
 		if (ret == -EINVAL || ret == -ESHUTDOWN ||
 		    ret == -EBADF || ret == -ENOTSOCK)
@@ -312,7 +319,7 @@ static int ksmbd_kthread_fn(void *p)
 
 skip_max_ip_conns_limit:
 		if (server_conf.max_connections &&
-		    atomic_inc_return(&active_num_conn) >= server_conf.max_connections) {
+		    atomic_inc_return(&active_num_conn) > server_conf.max_connections) {
 			pr_info_ratelimited("Limit the maximum number of connections(%u)\n",
 					    atomic_read(&active_num_conn));
 			atomic_dec(&active_num_conn);
@@ -323,6 +330,7 @@ skip_max_ip_conns_limit:
 		ksmbd_debug(CONN, "connect success: accepted new connection\n");
 		client_sk->sk->sk_rcvtimeo = KSMBD_TCP_RECV_TIMEOUT;
 		client_sk->sk->sk_sndtimeo = KSMBD_TCP_SEND_TIMEOUT;
+		ksmbd_tcp_keepalive(client_sk);
 
 		if (ksmbd_tcp_new_connection(client_sk)) {
 			if (server_conf.max_connections)
@@ -382,7 +390,7 @@ static int ksmbd_tcp_readv(struct tcp_transport *t, struct kvec *iov_orig,
 	struct kvec *iov;
 	struct ksmbd_conn *conn = KSMBD_TRANS(t)->conn;
 
-	iov = get_conn_iovec(t, nr_segs);
+	iov = kmalloc_array(nr_segs, sizeof(*iov), KSMBD_DEFAULT_GFP);
 	if (!iov)
 		return -ENOMEM;
 
@@ -395,15 +403,15 @@ static int ksmbd_tcp_readv(struct tcp_transport *t, struct kvec *iov_orig,
 		if (!ksmbd_conn_alive(conn)) {
 			total_read = -ESHUTDOWN;
 			break;
-			}
-			segs = kvec_array_init(iov, iov_orig, nr_segs, total_read);
-			if (!segs) {
-				total_read = -EIO;
-				break;
-			}
+		}
+		segs = kvec_array_init(iov, iov_orig, nr_segs, total_read);
+		if (!segs) {
+			total_read = -EIO;
+			break;
+		}
 
-			length = kernel_recvmsg(t->sock, &ksmbd_msg,
-						iov, segs, to_read, 0);
+		length = kernel_recvmsg(t->sock, &ksmbd_msg,
+					iov, segs, to_read, 0);
 
 		if (length == -EINTR) {
 			total_read = -ESHUTDOWN;
@@ -431,6 +439,7 @@ static int ksmbd_tcp_readv(struct tcp_transport *t, struct kvec *iov_orig,
 			break;
 		}
 	}
+	kfree(iov);
 	return total_read;
 }
 
@@ -467,27 +476,36 @@ static int ksmbd_tcp_writev(struct ksmbd_transport *t, struct kvec *iov,
 	int total_sent = 0;
 	int ret;
 
-	cur_iov = get_conn_iovec(tcp_t, nvecs);
+	cur_iov = kmalloc_array(nvecs, sizeof(*cur_iov), KSMBD_DEFAULT_GFP);
 	if (!cur_iov)
 		return -ENOMEM;
 
 	while (total_sent < size) {
-		if (!ksmbd_conn_alive(KSMBD_TRANS(tcp_t)->conn))
-			return -ESHUTDOWN;
+		if (!ksmbd_conn_alive(KSMBD_TRANS(tcp_t)->conn)) {
+			ret = -ESHUTDOWN;
+			goto out;
+		}
 
 		segs = kvec_array_init(cur_iov, iov, nvecs, total_sent);
-		if (!segs)
-			return -EIO;
+		if (!segs) {
+			ret = -EIO;
+			goto out;
+		}
 
 		ret = kernel_sendmsg(tcp_t->sock, &smb_msg, cur_iov, segs,
 				     size - total_sent);
-		if (ret <= 0)
-			return ret ? ret : -EPIPE;
+		if (ret <= 0) {
+			ret = ret ? ret : -EPIPE;
+			goto out;
+		}
 
 		total_sent += ret;
 	}
 
-	return total_sent;
+	ret = total_sent;
+out:
+	kfree(cur_iov);
+	return ret;
 }
 
 /**
@@ -522,7 +540,7 @@ static int ksmbd_tcp_sendfile(struct ksmbd_transport *t, struct file *filp,
 		int nr_pages, i;
 
 		if (!ksmbd_conn_alive(KSMBD_TRANS(tcp_t)->conn))
-			return -ESHUTDOWN;
+			return total_sent ? total_sent : -ESHUTDOWN;
 
 		chunk = min_t(size_t, count,
 			      KSMBD_SENDFILE_MAX_PAGES * PAGE_SIZE);
@@ -587,6 +605,8 @@ static int ksmbd_tcp_sendfile(struct ksmbd_transport *t, struct file *filp,
 			if (ret <= 0) {
 				for (i = 0; i < nr_pages; i++)
 					put_page(pages[i]);
+				if (total_sent > 0)
+					return total_sent;
 				return ret ? ret : -EPIPE;
 			}
 
@@ -743,9 +763,14 @@ struct interface *ksmbd_find_netdev_name_iface_list(char *netdev_name)
 {
 	struct interface *iface;
 
-	list_for_each_entry(iface, &iface_list, entry)
-		if (!strcmp(iface->name, netdev_name))
+	mutex_lock(&iface_list_lock);
+	list_for_each_entry(iface, &iface_list, entry) {
+		if (!strcmp(iface->name, netdev_name)) {
+			mutex_unlock(&iface_list_lock);
 			return iface;
+		}
+	}
+	mutex_unlock(&iface_list_lock);
 	return NULL;
 }
 
@@ -829,6 +854,7 @@ void ksmbd_tcp_destroy(void)
 
 	unregister_netdevice_notifier(&ksmbd_netdev_notifier);
 
+	mutex_lock(&iface_list_lock);
 	list_for_each_entry_safe(iface, tmp, &iface_list, entry) {
 		if (iface->ksmbd_socket)
 			kernel_sock_shutdown(iface->ksmbd_socket, SHUT_RDWR);
@@ -843,6 +869,7 @@ void ksmbd_tcp_destroy(void)
 		kfree(iface->name);
 		kfree(iface);
 	}
+	mutex_unlock(&iface_list_lock);
 }
 
 static struct interface *alloc_iface(char *ifname)
@@ -860,12 +887,15 @@ static struct interface *alloc_iface(char *ifname)
 
 	iface->name = ifname;
 	iface->state = IFACE_STATE_DOWN;
+	mutex_lock(&iface_list_lock);
 	list_add(&iface->entry, &iface_list);
+	mutex_unlock(&iface_list_lock);
 	return iface;
 }
 
 int ksmbd_tcp_set_interfaces(char *ifc_list, int ifc_list_sz)
 {
+	struct interface *iface, *tmp;
 	int sz = 0;
 
 	if (!ifc_list_sz) {
@@ -874,8 +904,17 @@ int ksmbd_tcp_set_interfaces(char *ifc_list, int ifc_list_sz)
 	}
 
 	while (ifc_list_sz > 0) {
-		if (!alloc_iface(kstrdup(ifc_list, KSMBD_DEFAULT_GFP)))
+		if (!alloc_iface(kstrdup(ifc_list, KSMBD_DEFAULT_GFP))) {
+			mutex_lock(&iface_list_lock);
+			list_for_each_entry_safe(iface, tmp, &iface_list,
+						 entry) {
+				list_del(&iface->entry);
+				kfree(iface->name);
+				kfree(iface);
+			}
+			mutex_unlock(&iface_list_lock);
 			return -ENOMEM;
+		}
 
 		sz = strlen(ifc_list);
 		if (!sz)

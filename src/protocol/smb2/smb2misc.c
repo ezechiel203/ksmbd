@@ -7,6 +7,7 @@
 #include "glob.h"
 #include "nterr.h"
 #include "smb2pdu.h"
+#include "smb2pdu_internal.h"
 #include "smb_common.h"
 #include "smbstatus.h"
 #include "mgmt/user_session.h"
@@ -176,7 +177,7 @@ static int smb2_get_data_area_len(unsigned int *off, unsigned int *len,
 		unsigned short lock_count;
 
 		lock_count = le16_to_cpu(((struct smb2_lock_req *)hdr)->LockCount);
-		if (lock_count > 64) {
+		if (lock_count > KSMBD_MAX_LOCK_COUNT) {
 			ksmbd_debug(SMB, "Too many lock elements: %d\n",
 				    lock_count);
 			return -EINVAL;
@@ -340,6 +341,14 @@ static int smb2_validate_credit_charge(struct ksmbd_conn *conn,
 	case SMB2_CANCEL:
 		return 0;
 	default:
+		/*
+		 * For unknown/unhandled commands, default to a credit charge
+		 * of 1 (the minimum). This is intentional per MS-SMB2:
+		 * commands without large payloads require only a single credit.
+		 */
+		ksmbd_debug(SMB,
+			    "Unknown command %u in credit charge validation, defaulting to 1\n",
+			    le16_to_cpu(hdr->Command));
 		req_len = 1;
 		break;
 	}
@@ -347,6 +356,12 @@ static int smb2_validate_credit_charge(struct ksmbd_conn *conn,
 	credit_charge = max_t(unsigned short, credit_charge, 1);
 	max_len = max_t(u64, req_len, expect_resp_len);
 	calc_credit_num = DIV_ROUND_UP(max_len, SMB2_MAX_BUFFER_SIZE);
+
+	ksmbd_debug(SMB,
+		    "credit_check: cmd=%u charge=%u calc=%u req_len=%llu resp_len=%llu total=%u out=%u\n",
+		    le16_to_cpu(hdr->Command), credit_charge, calc_credit_num,
+		    req_len, expect_resp_len, conn->total_credits,
+		    conn->outstanding_credits);
 
 	if (credit_charge < calc_credit_num) {
 		ksmbd_debug(SMB, "Insufficient credit charge, given: %d, needed: %d\n",
@@ -357,6 +372,10 @@ static int smb2_validate_credit_charge(struct ksmbd_conn *conn,
 		return 1;
 	}
 
+	ksmbd_debug(SMB,
+		    "credit_check: lock_enter cmd=%u charge=%u total=%u out=%u\n",
+		    le16_to_cpu(hdr->Command), credit_charge, conn->total_credits,
+		    conn->outstanding_credits);
 	spin_lock(&conn->credits_lock);
 	if (credit_charge > conn->total_credits) {
 		ksmbd_debug(SMB, "Insufficient credits granted, given: %u, granted: %u\n",
@@ -369,6 +388,10 @@ static int smb2_validate_credit_charge(struct ksmbd_conn *conn,
 	} else {
 		conn->outstanding_credits += credit_charge;
 	}
+	ksmbd_debug(SMB,
+		    "credit_check: lock_exit cmd=%u ret=%d total=%u out=%u\n",
+		    le16_to_cpu(hdr->Command), ret, conn->total_credits,
+		    conn->outstanding_credits);
 	spin_unlock(&conn->credits_lock);
 
 	return ret;
@@ -454,13 +477,6 @@ int ksmbd_smb2_check_message(struct ksmbd_work *work)
 			goto validate_credit;
 
 		/*
-		 * SMB2 NEGOTIATE request will be validated when message
-		 * handling proceeds.
-		 */
-		if (command == SMB2_NEGOTIATE_HE)
-			goto validate_credit;
-
-		/*
 		 * Allow a message that padded to 8byte boundary.
 		 * Linux 4.19.217 with smb 3.0.2 are sometimes
 		 * sending messages where the cls_len is exactly
@@ -468,6 +484,34 @@ int ksmbd_smb2_check_message(struct ksmbd_work *work)
 		 */
 		if (clc_len < len && (len - clc_len) <= 8)
 			goto validate_credit;
+
+		/*
+		 * Negotiate request size cannot be precisely calculated
+		 * because it contains a variable-length Dialects array
+		 * and optional negotiate contexts (SMB3.1.1).
+		 */
+		if (command == SMB2_NEGOTIATE_HE)
+			goto validate_credit;
+
+		if (command == SMB2_SESSION_SETUP_HE) {
+			struct smb2_sess_setup_req *req =
+				(struct smb2_sess_setup_req *)hdr;
+
+			pr_err_ratelimited(
+				"SESSION_SETUP size mismatch: len=%u calc=%u sec_off=%u sec_len=%u struct2=%u flags=0x%x mid=%llu\n",
+				len, clc_len,
+				le16_to_cpu(req->SecurityBufferOffset),
+				le16_to_cpu(req->SecurityBufferLength),
+				le16_to_cpu(pdu->StructureSize2),
+				req->Flags, le64_to_cpu(hdr->MessageId));
+			pr_err_ratelimited("SESSION_SETUP len mismatch tolerated for auth parse\n");
+
+			/*
+			 * Be tolerant here and let smb2_sess_setup() perform
+			 * final bounds validation/clamping for the security blob.
+			 */
+			goto validate_credit;
+		}
 
 		pr_err_ratelimited(
 			    "cli req too short, len %d not %d. cmd:%d mid:%llu\n",
@@ -478,9 +522,28 @@ int ksmbd_smb2_check_message(struct ksmbd_work *work)
 	}
 
 validate_credit:
-	if ((work->conn->vals->capabilities & SMB2_GLOBAL_CAP_LARGE_MTU) &&
-	    smb2_validate_credit_charge(work->conn, hdr))
-		return 1;
+	if (work->conn->vals->capabilities & SMB2_GLOBAL_CAP_LARGE_MTU) {
+		if (smb2_validate_credit_charge(work->conn, hdr))
+			return 1;
+	} else {
+		/*
+		 * SMB 2.0.2 doesn't support multi-credit requests
+		 * (CreditCharge is reserved/zero per spec). Charge 1
+		 * credit per request to keep outstanding_credits in
+		 * sync with smb2_set_rsp_credits().
+		 */
+		spin_lock(&work->conn->credits_lock);
+		if (work->conn->outstanding_credits + 1 >
+		    work->conn->total_credits) {
+			spin_unlock(&work->conn->credits_lock);
+			pr_err_ratelimited("Outstanding credit overflow, total %u outstanding %u\n",
+					   work->conn->total_credits,
+					   work->conn->outstanding_credits);
+			return 1;
+		}
+		work->conn->outstanding_credits++;
+		spin_unlock(&work->conn->credits_lock);
+	}
 
 	return 0;
 }
