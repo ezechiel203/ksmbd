@@ -22,7 +22,12 @@
 #include "smb2fruit.h"
 #include "ksmbd_feature.h"
 
-#define KSMBD_SOCKET_BACKLOG		16
+/*
+ * Listen backlog for the TCP accept queue.  A value of 64 handles
+ * short connection bursts without dropping SYN requests while staying
+ * within reasonable kernel memory limits.
+ */
+#define KSMBD_SOCKET_BACKLOG		64
 
 enum {
 	KSMBD_SESS_NEW = 0,
@@ -89,6 +94,7 @@ struct ksmbd_conn {
 	struct preauth_integrity_info	*preauth_info;
 
 	bool				need_neg;
+	bool				smb1_conn;
 	unsigned int			auth_mechs;
 	unsigned int			preferred_auth_mech;
 	bool				sign;
@@ -122,6 +128,9 @@ struct ksmbd_conn {
 	bool				binding;
 	refcount_t			refcnt;
 	unsigned long			features;  /* per-connection negotiated features */
+
+	/* Per-connection fsnotify watch count to prevent memory DoS */
+	atomic_t			notify_watch_count;
 
 #ifdef CONFIG_SMB_INSECURE_SERVER
 	/* Negotiated CIFS UNIX extension capabilities (SMB1 only) */
@@ -185,6 +194,7 @@ struct ksmbd_conn_hash_bucket {
 };
 
 extern struct ksmbd_conn_hash_bucket conn_hash[CONN_HASH_SIZE];
+extern atomic_t conn_hash_count;
 
 void ksmbd_conn_hash_init(void);
 void ksmbd_conn_hash_add(struct ksmbd_conn *conn, unsigned int key);
@@ -289,4 +299,4 @@ static inline void ksmbd_conn_set_releasing(struct ksmbd_conn *conn)
 }
 
 void ksmbd_all_conn_set_status(u64 sess_id, u32 status);
-#endif /* __CONNECTION_H__ */
+#endif /* __KSMBD_CONNECTION_H__ */

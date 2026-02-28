@@ -25,6 +25,7 @@ ifeq "$(CONFIG_SMB_SERVER_SMBDIRECT)" "y"
 ifneq "$(SMBDIRECT_SUPPORTED)" "y"
 $(error CONFIG_SMB_SERVER_SMBDIRECT is supported in the kernel above 4.12 version)
 endif
+ccflags-y += -DKSMBD_SMBDIRECT
 endif
 
 obj-$(CONFIG_SMB_SERVER) += ksmbd.o
@@ -34,6 +35,7 @@ ksmbd-y :=	src/encoding/unicode.o src/core/auth.o src/fs/vfs.o \
 		src/core/server.o src/core/misc.o src/fs/oplock.o \
 		src/core/ksmbd_work.o src/fs/smbacl.o src/encoding/ndr.o \
 		src/core/ksmbd_buffer.o src/core/smb2_compress.o \
+		src/core/ksmbd_md4.o \
 		src/mgmt/ksmbd_ida.o src/mgmt/user_config.o \
 		src/mgmt/share_config.o src/mgmt/tree_connect.o \
 		src/mgmt/user_session.o src/mgmt/ksmbd_witness.o \
@@ -82,13 +84,15 @@ $(obj)/src/encoding/ksmbd_spnego_negtokentarg.asn1.o: \
 	$(obj)/src/encoding/ksmbd_spnego_negtokentarg.asn1.c \
 	$(obj)/src/encoding/ksmbd_spnego_negtokentarg.asn1.h
 
+ifeq ($(CONFIG_SMB_INSECURE_SERVER),y)
+ccflags-y += -DCONFIG_SMB_INSECURE_SERVER
+endif
 ksmbd-$(CONFIG_SMB_INSECURE_SERVER) += src/protocol/smb1/smb1pdu.o \
 		src/protocol/smb1/smb1ops.o src/protocol/smb1/smb1misc.o \
 		src/protocol/common/netmisc.o
 ksmbd-$(CONFIG_SMB_SERVER_SMBDIRECT) += src/transport/transport_rdma.o
 
 # SMB over QUIC transport (userspace proxy bridge).
-# Set CONFIG_SMB_SERVER_QUIC=y to enable, =n or unset to disable.
 CONFIG_SMB_SERVER_QUIC ?= n
 
 ifeq ($(CONFIG_SMB_SERVER_QUIC),y)
@@ -127,6 +131,13 @@ else
 LOCAL_ARCH := $(UNAME_M)
 endif
 ARCH ?= $(LOCAL_ARCH)
+EXTERNAL_SMBDIRECT ?= n
+
+# Enable all features by default for external module builds.
+# Set to 'n' on the command line to disable individual features.
+CONFIG_SMB_INSECURE_SERVER ?= y
+CONFIG_KSMBD_FRUIT ?= y
+CONFIG_SMB_SERVER_QUIC ?= y
 
 export CONFIG_SMB_SERVER := m
 
@@ -145,11 +156,21 @@ check-kdir:
 	fi
 
 all: check-kdir
-	$(MAKE) -C $(KDIR) M=$(PWD) ARCH=$(ARCH) modules
+	$(MAKE) -C $(KDIR) M=$(PWD) ARCH=$(ARCH) \
+		CONFIG_SMB_SERVER_SMBDIRECT=$(EXTERNAL_SMBDIRECT) \
+		CONFIG_SMB_INSECURE_SERVER=$(CONFIG_SMB_INSECURE_SERVER) \
+		CONFIG_KSMBD_FRUIT=$(CONFIG_KSMBD_FRUIT) \
+		CONFIG_SMB_SERVER_QUIC=$(CONFIG_SMB_SERVER_QUIC) \
+		modules
 
 clean:
 	@if [ -d "$(KDIR)" ]; then \
-		$(MAKE) -C $(KDIR) M=$(PWD) ARCH=$(ARCH) clean; \
+		$(MAKE) -C $(KDIR) M=$(PWD) ARCH=$(ARCH) \
+			CONFIG_SMB_SERVER_SMBDIRECT=$(EXTERNAL_SMBDIRECT) \
+			CONFIG_SMB_INSECURE_SERVER=$(CONFIG_SMB_INSECURE_SERVER) \
+			CONFIG_KSMBD_FRUIT=$(CONFIG_KSMBD_FRUIT) \
+			CONFIG_SMB_SERVER_QUIC=$(CONFIG_SMB_SERVER_QUIC) \
+			clean; \
 	fi
 	rm -rf .tmp_versions
 
@@ -226,6 +247,7 @@ help:
 	@echo "  KDIR=<kernel build dir> (default: /lib/modules/\$$(uname -r)/build)"
 	@echo "  MDIR=<module dir root>  (default: /lib/modules/\$$(uname -r))"
 	@echo "  ARCH=<kbuild arch>      (default: auto-detected from uname -m: $(LOCAL_ARCH))"
+	@echo "  EXTERNAL_SMBDIRECT=<y|n> (default: n; enable SMBDIRECT/RDMA build)"
 	@echo "  PKGVER=<dkms version>   (default: git short SHA or timestamp)"
 	@echo "  REMOTE_HOST=<user@host> (generic fallback for remote deploy targets)"
 	@echo "  REMOTE_TMP=<remote path> (default: /tmp/ksmbd.ko)"

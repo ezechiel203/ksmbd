@@ -128,7 +128,9 @@ int ksmbd_lookup_protocol_idx(char *str)
 	int offt = ARRAY_SIZE(smb1_protos) - 1;
 
 	while (offt >= 0) {
-		if (!strcmp(str, smb1_protos[offt].prot)) {
+		if (!strcmp(str, smb1_protos[offt].prot) ||
+		    (smb1_protos[offt].index == SMB1_PROT &&
+		     !strcmp(str, "SMB1"))) {
 			ksmbd_debug(SMB, "selected %s dialect idx = %d\n",
 				    smb1_protos[offt].prot, offt);
 			return smb1_protos[offt].index;
@@ -257,13 +259,19 @@ static int ksmbd_lookup_dialect_by_name(char *cli_dialects, __le16 byte_count)
 				break;
 			ksmbd_debug(SMB, "client requested dialect %s\n",
 				    dialect);
-			if (!strcmp(dialect, smb1_protos[i].name)) {
+			if (!strcmp(dialect, smb1_protos[i].name) ||
+		    (smb1_protos[i].index == SMB1_PROT &&
+		     !strcmp(dialect, "\2NT LANMAN 1.0"))) {
 				if (supported_protocol(smb1_protos[i].index)) {
 					ksmbd_debug(SMB,
 						    "selected %s dialect\n",
 						    smb1_protos[i].name);
-					if (smb1_protos[i].index == SMB1_PROT)
+					if (smb1_protos[i].index == SMB1_PROT) {
+						pr_warn_ratelimited("ksmbd: negotiated deprecated SMB1 protocol - avoid in production\n");
 						return seq_num;
+					}
+					if (smb1_protos[i].index == SMB2_PROT)
+						pr_warn_ratelimited("ksmbd: negotiated deprecated SMB2.0.2 protocol - avoid in production\n");
 					return smb1_protos[i].prot_id;
 				}
 			}
@@ -292,6 +300,8 @@ int ksmbd_lookup_dialect_by_id(__le16 *cli_dialects, __le16 dialects_count)
 			if (supported_protocol(smb2_protos[i].index)) {
 				ksmbd_debug(SMB, "selected %s dialect\n",
 					    smb2_protos[i].name);
+				if (smb2_protos[i].index == SMB2_PROT)
+					pr_warn_ratelimited("ksmbd: negotiated deprecated SMB2.0.2 protocol - avoid in production\n");
 				return smb2_protos[i].prot_id;
 			}
 		}
@@ -456,6 +466,7 @@ static int init_smb1_server(struct ksmbd_conn *conn)
 	conn->ops = &smb1_server_ops;
 	conn->cmds = smb1_server_cmds;
 	conn->max_cmds = ARRAY_SIZE(smb1_server_cmds);
+	conn->smb1_conn = true;
 	return 0;
 }
 #endif
@@ -466,10 +477,13 @@ int ksmbd_init_smb_server(struct ksmbd_conn *conn)
 
 	proto = *(__le32 *)((struct smb_hdr *)conn->request_buf)->Protocol;
 	if (conn->need_neg == false) {
-		if (proto == SMB1_PROTO_NUMBER)
+		/* After negotiate, reject SMB1 only on upgraded connections */
+		if (proto == SMB1_PROTO_NUMBER && !conn->smb1_conn)
 			return -EINVAL;
 		return 0;
 	}
+
+	conn->need_neg = false;
 
 	if (proto == SMB1_PROTO_NUMBER)
 		return init_smb1_server(conn);
@@ -660,6 +674,16 @@ int ksmbd_smb_negotiate_common(struct ksmbd_work *work, unsigned int command)
 
 	if (command == SMB_COM_NEGOTIATE) {
 		if (__smb2_negotiate(conn)) {
+			/*
+			 * SMB1 NEGOTIATE with SMB2 dialect(s): upgrade to
+			 * SMB2. Force wildcard dialect 0x02FF so the client
+			 * sends a full SMB2 NEGOTIATE for proper dialect
+			 * selection.
+			 */
+			conn->dialect = SMB2X_PROT_ID;
+			conn->smb1_conn = false;
+			kfree(conn->vals);
+			conn->vals = NULL;
 			ret = init_smb3_11_server(conn);
 			if (ret)
 				return ret;

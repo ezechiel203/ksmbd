@@ -6,12 +6,6 @@
  *   smb2_negotiate.c - Negotiate contexts + SMB2_NEGOTIATE handler
  */
 
-// SPDX-License-Identifier: GPL-2.0-or-later
-/*
- *   Copyright (C) 2016 Namjae Jeon <linkinjeon@kernel.org>
- *   Copyright (C) 2018 Samsung Electronics Co., Ltd.
- */
-
 #include <linux/inetdevice.h>
 #include <net/addrconf.h>
 #include <linux/syscalls.h>
@@ -21,6 +15,7 @@
 #include <linux/falloc.h>
 #include <linux/crc32.h>
 #include <linux/mount.h>
+#include <linux/overflow.h>
 #include <linux/version.h>
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
 #include <linux/filelock.h>
@@ -167,46 +162,65 @@ static void build_posix_ctxt(struct smb2_posix_neg_context *pneg_ctxt)
 	pneg_ctxt->Name[15] = 0x7C;
 }
 
-static unsigned int assemble_neg_contexts(struct ksmbd_conn *conn,
-				  struct smb2_negotiate_rsp *rsp)
+static int assemble_neg_contexts(struct ksmbd_conn *conn,
+				 struct smb2_negotiate_rsp *rsp,
+				 unsigned int buf_len)
 {
-	char * const pneg_ctxt = (char *)rsp +
-			le32_to_cpu(rsp->NegotiateContextOffset);
+	unsigned int neg_ctxt_off = le32_to_cpu(rsp->NegotiateContextOffset);
+	char * const pneg_ctxt = (char *)rsp + neg_ctxt_off;
+	unsigned int buf_remaining;
 	int neg_ctxt_cnt = 1;
 	int ctxt_size;
 
+	if (neg_ctxt_off > buf_len)
+		return -EINVAL;
+	buf_remaining = buf_len - neg_ctxt_off;
+
 	ksmbd_debug(SMB,
 		    "assemble SMB2_PREAUTH_INTEGRITY_CAPABILITIES context\n");
+	if (sizeof(struct smb2_preauth_neg_context) > buf_remaining)
+		return -EINVAL;
 	build_preauth_ctxt((struct smb2_preauth_neg_context *)pneg_ctxt,
 			   conn->preauth_info->Preauth_HashId);
 	ctxt_size = sizeof(struct smb2_preauth_neg_context);
 
 	if (conn->cipher_type) {
+		unsigned int next_size;
+
 		/* Round to 8 byte boundary */
 		ctxt_size = round_up(ctxt_size, 8);
+		next_size = sizeof(struct smb2_encryption_neg_context) + 2;
+		if (ctxt_size + next_size > buf_remaining)
+			return -EINVAL;
 		ksmbd_debug(SMB,
 			    "assemble SMB2_ENCRYPTION_CAPABILITIES context\n");
 		build_encrypt_ctxt((struct smb2_encryption_neg_context *)
 				   (pneg_ctxt + ctxt_size),
 				   conn->cipher_type);
 		neg_ctxt_cnt++;
-		ctxt_size += sizeof(struct smb2_encryption_neg_context) + 2;
+		ctxt_size += next_size;
 	}
 
 	if (conn->compress_algorithm != SMB3_COMPRESS_NONE) {
+		unsigned int next_size;
+
 		ctxt_size = round_up(ctxt_size, 8);
+		next_size = sizeof(struct smb2_compression_ctx) + sizeof(__le16);
+		if (ctxt_size + next_size > buf_remaining)
+			return -EINVAL;
 		ksmbd_debug(SMB,
 			    "assemble SMB2_COMPRESSION_CAPABILITIES context\n");
 		build_compress_ctxt((struct smb2_compression_ctx *)
 				    (pneg_ctxt + ctxt_size),
 				    conn->compress_algorithm);
 		neg_ctxt_cnt++;
-		ctxt_size += sizeof(struct smb2_compression_ctx) +
-			     sizeof(__le16);
+		ctxt_size += next_size;
 	}
 
 	if (conn->posix_ext_supported) {
 		ctxt_size = round_up(ctxt_size, 8);
+		if (ctxt_size + sizeof(struct smb2_posix_neg_context) > buf_remaining)
+			return -EINVAL;
 		ksmbd_debug(SMB,
 			    "assemble SMB2_POSIX_EXTENSIONS_AVAILABLE context\n");
 		build_posix_ctxt((struct smb2_posix_neg_context *)
@@ -216,30 +230,42 @@ static unsigned int assemble_neg_contexts(struct ksmbd_conn *conn,
 	}
 
 	if (conn->signing_negotiated) {
+		unsigned int next_size;
+
 		ctxt_size = round_up(ctxt_size, 8);
+		next_size = sizeof(struct smb2_signing_capabilities) + 2;
+		if (ctxt_size + next_size > buf_remaining)
+			return -EINVAL;
 		ksmbd_debug(SMB,
 			    "assemble SMB2_SIGNING_CAPABILITIES context\n");
 		build_sign_cap_ctxt((struct smb2_signing_capabilities *)
 				    (pneg_ctxt + ctxt_size),
 				    conn->signing_algorithm);
 		neg_ctxt_cnt++;
-		ctxt_size += sizeof(struct smb2_signing_capabilities) + 2;
+		ctxt_size += next_size;
 	}
 
 	if (conn->rdma_transform_count) {
+		unsigned int next_size;
+
 		ctxt_size = round_up(ctxt_size, 8);
+		next_size = sizeof(struct smb2_rdma_transform_capabilities)
+			    + conn->rdma_transform_count * sizeof(__le16);
+		if (ctxt_size + next_size > buf_remaining)
+			return -EINVAL;
 		ksmbd_debug(SMB,
 			    "assemble SMB2_RDMA_TRANSFORM_CAPABILITIES context\n");
 		build_rdma_transform_ctxt(
 			(struct smb2_rdma_transform_capabilities *)
 			(pneg_ctxt + ctxt_size), conn);
 		neg_ctxt_cnt++;
-		ctxt_size += sizeof(struct smb2_rdma_transform_capabilities)
-			     + conn->rdma_transform_count * sizeof(__le16);
+		ctxt_size += next_size;
 	}
 
 	if (conn->transport_secured) {
 		ctxt_size = round_up(ctxt_size, 8);
+		if (ctxt_size + sizeof(struct smb2_transport_capabilities) > buf_remaining)
+			return -EINVAL;
 		ksmbd_debug(SMB,
 			    "assemble SMB2_TRANSPORT_CAPABILITIES context\n");
 		build_transport_cap_ctxt(
@@ -276,8 +302,8 @@ static void decode_encrypt_ctxt(struct ksmbd_conn *conn,
 				struct smb2_encryption_neg_context *pneg_ctxt,
 				int ctxt_len)
 {
-	int cph_cnt;
-	int i, cphs_size;
+	int cph_cnt, i;
+	size_t cphs_size;
 
 	if (sizeof(struct smb2_encryption_neg_context) > ctxt_len) {
 		pr_err_ratelimited("Invalid SMB2_ENCRYPTION_CAPABILITIES context size\n");
@@ -287,10 +313,13 @@ static void decode_encrypt_ctxt(struct ksmbd_conn *conn,
 	conn->cipher_type = 0;
 
 	cph_cnt = le16_to_cpu(pneg_ctxt->CipherCount);
-	cphs_size = cph_cnt * sizeof(__le16);
+	if (check_mul_overflow((size_t)cph_cnt, sizeof(__le16), &cphs_size)) {
+		pr_err_ratelimited("Cipher count overflow(%d)\n", cph_cnt);
+		return;
+	}
 
 	if (sizeof(struct smb2_encryption_neg_context) + cphs_size >
-	    ctxt_len) {
+	    (size_t)ctxt_len) {
 		pr_err_ratelimited("Invalid cipher count(%d)\n", cph_cnt);
 		return;
 	}
@@ -334,7 +363,8 @@ static void decode_compress_ctxt(struct ksmbd_conn *conn,
 				 struct smb2_compression_ctx *pneg_ctxt,
 				 int ctxt_len)
 {
-	int algo_cnt, i, algos_size;
+	int algo_cnt, i;
+	size_t algos_size;
 
 	conn->compress_algorithm = SMB3_COMPRESS_NONE;
 
@@ -344,9 +374,12 @@ static void decode_compress_ctxt(struct ksmbd_conn *conn,
 	}
 
 	algo_cnt = le16_to_cpu(pneg_ctxt->CompressionAlgorithmCount);
-	algos_size = algo_cnt * sizeof(__le16);
+	if (check_mul_overflow((size_t)algo_cnt, sizeof(__le16), &algos_size)) {
+		pr_err("Compression algorithm count overflow(%d)\n", algo_cnt);
+		return;
+	}
 
-	if (sizeof(struct smb2_compression_ctx) + algos_size > ctxt_len) {
+	if (sizeof(struct smb2_compression_ctx) + algos_size > (size_t)ctxt_len) {
 		pr_err("Invalid compression algorithm count(%d)\n", algo_cnt);
 		return;
 	}
@@ -393,7 +426,9 @@ static void decode_sign_cap_ctxt(struct ksmbd_conn *conn,
 
 	conn->signing_negotiated = false;
 	sign_algo_cnt = le16_to_cpu(pneg_ctxt->SigningAlgorithmCount);
-	sign_alos_size = sign_algo_cnt * sizeof(__le16);
+	if (check_mul_overflow((int)sign_algo_cnt, (int)sizeof(__le16), &sign_alos_size))
+		return;
+
 
 	if (sizeof(struct smb2_signing_capabilities) + sign_alos_size >
 	    ctxt_len) {
@@ -464,7 +499,8 @@ static void decode_rdma_transform_ctxt(struct ksmbd_conn *conn,
 		return;
 	}
 
-	xforms_size = xform_cnt * sizeof(__le16);
+	if (check_mul_overflow((int)xform_cnt, (int)sizeof(__le16), &xforms_size))
+		return;
 
 	if (sizeof(struct smb2_rdma_transform_capabilities) + xforms_size >
 	    ctxt_len) {
@@ -496,7 +532,7 @@ static __le32 deassemble_neg_contexts(struct ksmbd_conn *conn,
 	unsigned int offset = le32_to_cpu(req->NegotiateContextOffset);
 	unsigned int neg_ctxt_cnt = le16_to_cpu(req->NegotiateContextCount);
 	bool compress_ctxt_seen = false;
-	__le32 status = STATUS_INVALID_PARAMETER;
+	__le32 status = STATUS_SUCCESS;
 
 	ksmbd_debug(SMB, "decoding %d negotiate contexts\n", neg_ctxt_cnt);
 	if (len_of_smb <= offset) {
@@ -506,8 +542,14 @@ static __le32 deassemble_neg_contexts(struct ksmbd_conn *conn,
 
 	len_of_ctxts = len_of_smb - offset;
 
-	if (neg_ctxt_cnt > 16) {
-		pr_err_ratelimited("Too many negotiate contexts: %d\n", neg_ctxt_cnt);
+	/*
+	 * Cap negotiate context count to prevent excessive processing.
+	 * MS-SMB2 defines a small number of context types; 16 is generous.
+	 */
+#define SMB2_MAX_NEG_CTXTS	16
+	if (neg_ctxt_cnt > SMB2_MAX_NEG_CTXTS) {
+		pr_warn_ratelimited("Too many negotiate contexts (%d > %d), rejecting\n",
+				    neg_ctxt_cnt, SMB2_MAX_NEG_CTXTS);
 		return STATUS_INVALID_PARAMETER;
 	}
 
@@ -663,6 +705,11 @@ int smb2_handle_negotiate(struct ksmbd_work *work)
 	}
 
 	conn->cli_cap = le32_to_cpu(req->Capabilities);
+
+	/* Free previous vals from ksmbd_init_smb_server() or upgrade path */
+	kfree(conn->vals);
+	conn->vals = NULL;
+
 	switch (conn->dialect) {
 	case SMB311_PROT_ID:
 		conn->preauth_info =
@@ -699,7 +746,15 @@ int smb2_handle_negotiate(struct ksmbd_work *work)
 						 conn->preauth_info->Preauth_HashValue);
 		rsp->NegotiateContextOffset =
 				cpu_to_le32(OFFSET_OF_NEG_CONTEXT);
-		neg_ctxt_len = assemble_neg_contexts(conn, rsp);
+		rc = assemble_neg_contexts(conn, rsp, work->response_sz);
+		if (rc < 0) {
+			rsp->hdr.Status = STATUS_INVALID_PARAMETER;
+			kfree(conn->preauth_info);
+			conn->preauth_info = NULL;
+			goto err_out;
+		}
+		neg_ctxt_len = (unsigned int)rc;
+		rc = 0;
 		break;
 	case SMB302_PROT_ID:
 		rc = init_smb3_02_server(conn);
@@ -747,7 +802,7 @@ int smb2_handle_negotiate(struct ksmbd_work *work)
 	rsp->MaxReadSize = cpu_to_le32(conn->vals->max_read_size);
 	rsp->MaxWriteSize = cpu_to_le32(conn->vals->max_write_size);
 
-	if (conn->dialect > SMB20_PROT_ID) {
+	if (conn->dialect >= SMB20_PROT_ID) {
 		memcpy(conn->ClientGUID, req->ClientGUID,
 		       SMB2_CLIENT_GUID_SIZE);
 		conn->cli_sec_mode = le16_to_cpu(req->SecurityMode);

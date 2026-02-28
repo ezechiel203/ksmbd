@@ -92,5 +92,6 @@ int init_smb1_server(struct ksmbd_conn *conn)
 	conn->ops = &smb1_server_ops;
 	conn->cmds = smb1_server_cmds;
 	conn->max_cmds = ARRAY_SIZE(smb1_server_cmds);
+	conn->smb1_conn = true;
 	return 0;
 }
