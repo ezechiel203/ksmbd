@@ -1,0 +1,215 @@
+smbtorture 4.23.6
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772857330
+time: 2026-03-07 04:22:10.744342
+progress: 33
+test: create-blob
+time: 2026-03-07 04:22:10.745123
+time: 2026-03-07 04:22:11.234830
+success: create-blob
+test: open-oplock
+time: 2026-03-07 04:22:11.234882
+time: 2026-03-07 04:22:15.063701
+success: open-oplock
+test: open-lease
+time: 2026-03-07 04:22:15.063765
+time: 2026-03-07 04:22:19.807660
+success: open-lease
+test: reopen1
+time: 2026-03-07 04:22:19.807703
+time: 2026-03-07 04:22:20.051607
+success: reopen1
+test: reopen1a
+time: 2026-03-07 04:22:20.051652
+time: 2026-03-07 04:22:20.533850
+success: reopen1a
+test: reopen1a-lease
+time: 2026-03-07 04:22:20.533900
+time: 2026-03-07 04:22:21.432942
+success: reopen1a-lease
+test: reopen2
+time: 2026-03-07 04:22:21.432992
+time: 2026-03-07 04:22:22.005173
+success: reopen2
+test: reopen2b
+time: 2026-03-07 04:22:22.005221
+time: 2026-03-07 04:22:22.393515
+success: reopen2b
+test: reopen2c
+time: 2026-03-07 04:22:22.393561
+time: 2026-03-07 04:22:22.767793
+success: reopen2c
+test: reopen2-lease
+time: 2026-03-07 04:22:22.767861
+time: 2026-03-07 04:22:23.396144
+success: reopen2-lease
+test: reopen2-lease-v2
+time: 2026-03-07 04:22:23.396186
+time: 2026-03-07 04:22:24.217294
+success: reopen2-lease-v2
+test: durable-v2-setinfo
+time: 2026-03-07 04:22:24.217415
+time: 2026-03-07 04:22:24.830237
+success: durable-v2-setinfo
+test: lock-oplock
+time: 2026-03-07 04:22:24.830279
+time: 2026-03-07 04:22:25.229724
+success: lock-oplock
+test: lock-lease
+time: 2026-03-07 04:22:25.229771
+time: 2026-03-07 04:22:25.916882
+success: lock-lease
+test: lock-noW-lease
+time: 2026-03-07 04:22:25.916938
+time: 2026-03-07 04:22:26.539414
+success: lock-noW-lease
+test: stat-and-lease
+time: 2026-03-07 04:22:26.539463
+time: 2026-03-07 04:22:27.186155
+success: stat-and-lease
+test: nonstat-and-lease
+time: 2026-03-07 04:22:27.186201
+time: 2026-03-07 04:22:27.888584
+failure: nonstat-and-lease [
+../../source4/torture/smb2/durable_v2_open.c:2295: (&io)->out.lease_response_v2.lease_state was 7 (0x7), expected 3 (0x3): ../../source4/torture/smb2/durable_v2_open.c:2295
+]
+test: statRH-and-lease
+time: 2026-03-07 04:22:27.888632
+time: 2026-03-07 04:22:28.622195
+success: statRH-and-lease
+test: two-same-lease
+time: 2026-03-07 04:22:28.622246
+time: 2026-03-07 04:22:29.323863
+success: two-same-lease
+test: two-different-lease
+time: 2026-03-07 04:22:29.323910
+time: 2026-03-07 04:22:29.980333
+success: two-different-lease
+test: keep-disconnected-rh-with-stat-open
+time: 2026-03-07 04:22:29.980400
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+time: 2026-03-07 04:22:35.041133
+success: keep-disconnected-rh-with-stat-open
+test: keep-disconnected-rh-with-rh-open
+time: 2026-03-07 04:22:35.041199
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+time: 2026-03-07 04:22:37.481535
+failure: keep-disconnected-rh-with-rh-open [
+../../source4/torture/smb2/durable_v2_open.c:3200: (&io)->out.lease_response_v2.lease_state was 1 (0x1), expected 3 (0x3): ../../source4/torture/smb2/durable_v2_open.c:3200
+]
+test: keep-disconnected-rh-with-rwh-open
+time: 2026-03-07 04:22:37.481587
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+time: 2026-03-07 04:22:39.924537
+failure: keep-disconnected-rh-with-rwh-open [
+../../source4/torture/smb2/durable_v2_open.c:3431: (&io)->out.lease_response_v2.lease_state was 1 (0x1), expected 3 (0x3): ../../source4/torture/smb2/durable_v2_open.c:3431
+]
+test: keep-disconnected-rwh-with-stat-open
+time: 2026-03-07 04:22:39.924589
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+time: 2026-03-07 04:22:44.957004
+success: keep-disconnected-rwh-with-stat-open
+test: purge-disconnected-rwh-with-rwh-open
+time: 2026-03-07 04:22:44.957051
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+time: 2026-03-07 04:22:50.342827
+success: purge-disconnected-rwh-with-rwh-open
+test: purge-disconnected-rwh-with-rh-open
+time: 2026-03-07 04:22:50.342870
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+time: 2026-03-07 04:22:55.258126
+success: purge-disconnected-rwh-with-rh-open
+test: purge-disconnected-rh-with-share-none-open
+time: 2026-03-07 04:22:55.258172
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+time: 2026-03-07 04:23:00.129724
+success: purge-disconnected-rh-with-share-none-open
+test: purge-disconnected-rh-with-write
+time: 2026-03-07 04:23:00.129780
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+transport[0x55fc257fdf90] Skip acking to 0x0 () in lease handler
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+time: 2026-03-07 04:23:07.043545
+success: purge-disconnected-rh-with-write
+test: purge-disconnected-rh-with-rename
+time: 2026-03-07 04:23:07.043589
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+transport[0x55fc2553a9f0] acking to 0x1 (R) in lease handler
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+time: 2026-03-07 04:23:14.049313
+success: purge-disconnected-rh-with-rename
+test: app-instance
+time: 2026-03-07 04:23:14.049373
+time: 2026-03-07 04:23:14.469093
+success: app-instance
+test: persistent-open-oplock
+time: 2026-03-07 04:23:14.469149
+time: 2026-03-07 04:23:18.400211
+success: persistent-open-oplock
+test: persistent-open-lease
+time: 2026-03-07 04:23:18.400260
+time: 2026-03-07 04:23:23.725660
+success: persistent-open-lease
+test: reconnect-twice
+time: 2026-03-07 04:23:23.725710
+time: 2026-03-07 04:23:30.337159
+success: reconnect-twice

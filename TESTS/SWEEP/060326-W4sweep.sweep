@@ -1,0 +1,75 @@
+=== SMB2 Sweep: ven. 06 mars 2026 03:12:51 CET ===
+SSH=13022  SMB=13445
+Output: /tmp/sweep-20260306-031251
+
+Restarting ksmbd...
+  smb2.compound ... P=0 F=0 S=0 E=0
+  smb2.compound_async ... P=0 F=0 S=0 E=0
+  smb2.compound_find ... P=0 F=0 S=0 E=0
+  smb2.connect ... P=0 F=0 S=0 E=0
+  smb2.create ... [ksmbd.control/835]: ERROR: Can't kill ksmbd
+[ksmbd.mountd/909]: INFO: Started manager
+P=0 F=0 S=0 E=0
+  smb2.credits ... P=3 F=7 S=0 E=0
+  smb2.delete-on-close-perms ... [ksmbd.control/839]: ERROR: Can't kill ksmbd
+[ksmbd.mountd/913]: INFO: Started manager
+P=0 F=0 S=0 E=0
+  smb2.dir ... [ksmbd.control/1129]: ERROR: Invalid lock entry `914'
+[ksmbd.control/1129]: INFO: Killed ksmbd
+[ksmbd.mountd/1188]: INFO: Started manager
+P=6 F=3 S=0 E=0
+  smb2.dirlease ... [ksmbd.control/1448]: ERROR: Invalid lock entry `1189'
+[ksmbd.control/1448]: INFO: Killed ksmbd
+[ksmbd.mountd/1508]: INFO: Started manager
+P=3 F=15 S=0 E=0
+  smb2.dosmode ... P=0 F=1 S=0 E=0
+  smb2.durable-open ... P=21 F=4 S=1 E=0
+  smb2.durable-v2-open ... [ksmbd.control/827]: ERROR: Can't kill ksmbd
+[ksmbd.mountd/920]: INFO: Started manager
+P=0 F=0 S=0 E=0
+  smb2.getinfo ... [ksmbd.control/1085]: INFO: Terminated mountd
+[ksmbd.control/1085]: INFO: Killed ksmbd
+[ksmbd.mountd/1126]: INFO: Started manager
+P=8 F=0 S=0 E=0
+  smb2.ioctl ... [ksmbd.control/1539]: INFO: Terminated mountd
+[ksmbd.control/1539]: INFO: Killed ksmbd
+[ksmbd.mountd/1573]: INFO: Started manager
+P=42 F=18 S=15 E=0
+  smb2.lease ... [ksmbd.control/1931]: ERROR: Invalid lock entry `1574'
+[ksmbd.control/1931]: INFO: Killed ksmbd
+[ksmbd.mountd/1982]: INFO: Started manager
+P=27 F=17 S=1 E=0
+  smb2.lock ... [ksmbd.control/2303]: INFO: Terminated mountd
+[ksmbd.control/2303]: INFO: Killed ksmbd
+[ksmbd.mountd/2358]: INFO: Started manager
+P=22 F=0 S=4 E=0
+  smb2.maxfid ... P=1 F=0 S=0 E=0
+  smb2.maximum_allowed ... P=1 F=1 S=0 E=0
+  smb2.mkdir ... P=0 F=1 S=0 E=0
+  smb2.mux ... P=0 F=0 S=0 E=0
+  smb2.notify ... TIMEOUT (180s)
+P=9 F=9 S=0 E=0
+  smb2.openattr ... P=0 F=0 S=0 E=0
+  smb2.oplock ... [ksmbd.control/831]: ERROR: Can't kill ksmbd
+[ksmbd.mountd/921]: INFO: Started manager
+P=0 F=0 S=0 E=0
+  smb2.read ... P=1 F=3 S=1 E=0
+  smb2.rename ... P=12 F=1 S=0 E=0
+  smb2.replay ... [ksmbd.control/2223]: INFO: Terminated mountd
+[ksmbd.control/2223]: INFO: Killed ksmbd
+TIMEOUT (180s)
+P=10 F=9 S=0 E=0
+  smb2.rw ... P=0 F=0 S=0 E=0
+  smb2.secleak ... P=0 F=0 S=0 E=0
+  smb2.session ... [ksmbd.control/827]: ERROR: Can't kill ksmbd
+[ksmbd.mountd/886]: INFO: Started manager
+P=0 F=0 S=0 E=0
+  smb2.setinfo ... P=1 F=0 S=0 E=0
+  smb2.streams ... [ksmbd.control/1161]: INFO: Terminated mountd
+[ksmbd.control/1161]: INFO: Killed ksmbd
+[ksmbd.mountd/1202]: INFO: Started manager
+P=13 F=1 S=0 E=0
+  smb2.zero-data-ioctl ... P=0 F=1 S=0 E=0
+P=0 F=1 S=0 E=0
+vm/sweep-smb2.sh: ligne 197: erreur de syntaxe près du symbole inattendu « done »
+vm/sweep-smb2.sh: ligne 197: `done'

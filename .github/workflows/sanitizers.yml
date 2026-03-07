@@ -1,0 +1,143 @@
+name: KASAN/KCSAN/UBSAN Sanitizer CI
+
+on:
+  push:
+    branches:
+      - master
+      - next
+  pull_request:
+    branches:
+      - master
+      - next
+
+jobs:
+  sanitizer-build:
+    name: Build with KASAN + KCSAN + UBSAN + LOCKDEP
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential libelf-dev bc flex bison \
+            libssl-dev wget qemu-system-x86 cpio
+
+      - name: Download and prepare kernel source
+        run: |
+          KVER="6.6.70"
+          wget -q "https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-${KVER}.tar.xz"
+          tar xf "linux-${KVER}.tar.xz"
+          mv "linux-${KVER}" linux-src
+
+      - name: Configure kernel with sanitizers (UML)
+        run: |
+          cd linux-src
+          # Start with UML defconfig for fast in-process testing
+          make ARCH=um defconfig
+
+          # Copy ksmbd into kernel tree
+          mkdir -p fs/ksmbd
+          cp -ar "$GITHUB_WORKSPACE"/*.c "$GITHUB_WORKSPACE"/*.h fs/ksmbd/ 2>/dev/null || true
+          cp -ar "$GITHUB_WORKSPACE"/mgmt fs/ksmbd/ 2>/dev/null || true
+          cp -ar "$GITHUB_WORKSPACE"/Kconfig fs/ksmbd/
+          cp -ar "$GITHUB_WORKSPACE"/Makefile.ksmbd fs/ksmbd/Makefile 2>/dev/null || true
+
+          # Enable ksmbd
+          echo 'source "fs/ksmbd/Kconfig"' >> fs/Kconfig
+          echo 'obj-$(CONFIG_SMB_SERVER) += ksmbd/' >> fs/Makefile
+
+          # Enable sanitizers and debug options
+          ./scripts/config --enable CONFIG_KASAN
+          ./scripts/config --set-val CONFIG_KASAN_INLINE y
+          ./scripts/config --enable CONFIG_UBSAN
+          ./scripts/config --enable CONFIG_UBSAN_BOUNDS
+          ./scripts/config --enable CONFIG_UBSAN_SHIFT
+          ./scripts/config --enable CONFIG_UBSAN_DIV_ZERO
+          ./scripts/config --enable CONFIG_UBSAN_BOOL
+          ./scripts/config --enable CONFIG_UBSAN_ENUM
+          ./scripts/config --enable CONFIG_LOCKDEP
+          ./scripts/config --enable CONFIG_PROVE_LOCKING
+          ./scripts/config --enable CONFIG_DEBUG_LOCK_ALLOC
+          ./scripts/config --enable CONFIG_DEBUG_ATOMIC_SLEEP
+
+          # Enable ksmbd with insecure protocols for coverage
+          ./scripts/config --set-val CONFIG_SMB_SERVER m
+          ./scripts/config --set-val CONFIG_SMB_INSECURE_SERVER y
+          ./scripts/config --set-val CONFIG_SMB_SERVER_CHECK_CAP_NET_ADMIN y
+
+          # Required crypto
+          ./scripts/config --enable CONFIG_CRYPTO_MD5
+          ./scripts/config --enable CONFIG_CRYPTO_HMAC
+          ./scripts/config --enable CONFIG_CRYPTO_ECB
+          ./scripts/config --enable CONFIG_CRYPTO_LIB_DES
+          ./scripts/config --enable CONFIG_CRYPTO_SHA256
+          ./scripts/config --enable CONFIG_CRYPTO_CMAC
+          ./scripts/config --enable CONFIG_CRYPTO_SHA512
+          ./scripts/config --enable CONFIG_CRYPTO_CCM
+          ./scripts/config --enable CONFIG_CRYPTO_GCM
+          ./scripts/config --enable CONFIG_ASN1
+          ./scripts/config --enable CONFIG_OID_REGISTRY
+
+          # KUnit for test execution
+          ./scripts/config --enable CONFIG_KUNIT
+
+          yes "" | make ARCH=um olddefconfig
+
+      - name: Build kernel with sanitizers
+        run: |
+          cd linux-src
+          make ARCH=um -j$(nproc) 2>&1 | tee build.log
+          # Check for KASAN/UBSAN-related build errors
+          if grep -qE "error:" build.log; then
+            echo "::error::Build failed with sanitizers enabled"
+            tail -50 build.log
+            exit 1
+          fi
+
+      - name: Build ksmbd module
+        run: |
+          cd linux-src
+          make ARCH=um -j$(nproc) fs/ksmbd/ksmbd.ko 2>&1 | tee ksmbd-build.log
+          if grep -qE "error:" ksmbd-build.log; then
+            echo "::error::ksmbd module build failed under sanitizers"
+            exit 1
+          fi
+
+      - name: Run UML kernel and check for sanitizer reports
+        run: |
+          cd linux-src
+          # Run UML kernel briefly to load module and check for immediate issues
+          timeout 30 ./linux mem=512M rootfstype=hostfs rw \
+            init=/bin/sh -- -c "
+              insmod fs/ksmbd/ksmbd.ko 2>&1 || true
+              dmesg | grep -iE 'KASAN|UBSAN|BUG:|WARNING:|lockdep' > /tmp/sanitizer.log 2>&1
+              cat /tmp/sanitizer.log
+              rmmod ksmbd 2>/dev/null || true
+              halt -f
+            " 2>&1 | tee uml-output.log || true
+
+      - name: Check for sanitizer violations
+        run: |
+          if [ -f linux-src/uml-output.log ]; then
+            if grep -qiE "KASAN|UBSAN|BUG:|WARNING:" linux-src/uml-output.log; then
+              echo "::error::Sanitizer violations detected!"
+              grep -iE "KASAN|UBSAN|BUG:|WARNING:" linux-src/uml-output.log
+              exit 1
+            fi
+          fi
+          echo "No sanitizer violations detected."
+
+      - name: Upload build logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sanitizer-build-logs
+          path: |
+            linux-src/build.log
+            linux-src/ksmbd-build.log
+            linux-src/uml-output.log
+          retention-days: 14

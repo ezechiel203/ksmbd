@@ -1,0 +1,2571 @@
+{
+  "suite": "ksmbd-torture",
+  "version": "1.0.0",
+  "timestamp": "2026-03-07T10:17:23Z",
+  "vm": "custom",
+  "server_version": "ksmbd ",
+  "kernel_version": "6.18.13-arch1-1",
+  "duration_ms": 766953,
+  "summary": {
+    "total": 290,
+    "pass": 258,
+    "fail": 25,
+    "skip": 7,
+    "crash": 0
+  },
+  "categories": [
+    {
+      "id": "T01",
+      "duration_ms": 72943,
+      "pass": 15,
+      "fail": 4,
+      "skip": 0,
+      "crash": 0,
+      "health": "OK",
+      "tests": [
+        {
+          "id": "T01.01",
+          "name": "test_negotiate_smb2_02",
+          "status": "FAIL",
+          "duration_ms": 2439,
+          "message": "smbclient connection failed: expected exit code 0, got 1"
+        }
+        ,
+        {
+          "id": "T01.02",
+          "name": "test_negotiate_smb2_10",
+          "status": "FAIL",
+          "duration_ms": 1802,
+          "message": "smbclient connection failed: expected exit code 0, got 1"
+        }
+        ,
+        {
+          "id": "T01.03",
+          "name": "test_negotiate_smb3_00",
+          "status": "PASS",
+          "duration_ms": 1157,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T01.04",
+          "name": "test_negotiate_smb3_02",
+          "status": "PASS",
+          "duration_ms": 4380,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T01.05",
+          "name": "test_negotiate_smb3_11",
+          "status": "PASS",
+          "duration_ms": 859,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T01.06",
+          "name": "test_negotiate_multi_dialect",
+          "status": "FAIL",
+          "duration_ms": 10133,
+          "message": "TIMEOUT after 10s"
+        }
+        ,
+        {
+          "id": "T01.07",
+          "name": "test_negotiate_smb1_upgrade",
+          "status": "FAIL",
+          "duration_ms": 5640,
+          "message": "smbclient with NT1 min protocol failed: expected exit code 0, got 1"
+        }
+        ,
+        {
+          "id": "T01.08",
+          "name": "test_negotiate_second_reject",
+          "status": "PASS",
+          "duration_ms": 3158,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T01.09",
+          "name": "test_negotiate_zero_dialects",
+          "status": "PASS",
+          "duration_ms": 1721,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T01.10",
+          "name": "test_negotiate_dup_preauth_ctx",
+          "status": "PASS",
+          "duration_ms": 2723,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T01.11",
+          "name": "test_negotiate_dup_encrypt_ctx",
+          "status": "PASS",
+          "duration_ms": 8108,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T01.12",
+          "name": "test_negotiate_dup_compress_ctx",
+          "status": "PASS",
+          "duration_ms": 4516,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T01.13",
+          "name": "test_negotiate_zero_signing_alg",
+          "status": "PASS",
+          "duration_ms": 881,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T01.14",
+          "name": "test_negotiate_zero_compress_alg",
+          "status": "PASS",
+          "duration_ms": 4842,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T01.15",
+          "name": "test_negotiate_no_preauth_311",
+          "status": "PASS",
+          "duration_ms": 2367,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T01.16",
+          "name": "test_negotiate_signing_fallback",
+          "status": "PASS",
+          "duration_ms": 1427,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T01.17",
+          "name": "test_negotiate_cipher_prefer",
+          "status": "PASS",
+          "duration_ms": 4633,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T01.18",
+          "name": "test_negotiate_capabilities",
+          "status": "PASS",
+          "duration_ms": 3522,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T01.20",
+          "name": "test_negotiate_max_transact",
+          "status": "PASS",
+          "duration_ms": 2633,
+          "message": ""
+        }
+      ]
+    }
+    ,
+    {
+      "id": "T02",
+      "duration_ms": 64324,
+      "pass": 15,
+      "fail": 3,
+      "skip": 0,
+      "crash": 0,
+      "health": "OK",
+      "tests": [
+        {
+          "id": "T02.02",
+          "name": "test_session_invalid_password",
+          "status": "FAIL",
+          "duration_ms": 2162,
+          "message": "expected auth failure: 'LOGON_FAILURE\\|NT_STATUS_\\|session setup failed' not found in output"
+        }
+        ,
+        {
+          "id": "T02.03",
+          "name": "test_session_invalid_user",
+          "status": "FAIL",
+          "duration_ms": 914,
+          "message": "should have failed with invalid user: got unexpected value '0'"
+        }
+        ,
+        {
+          "id": "T02.04",
+          "name": "test_session_guest",
+          "status": "PASS",
+          "duration_ms": 901,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T02.05",
+          "name": "test_session_anonymous",
+          "status": "PASS",
+          "duration_ms": 5159,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T02.06",
+          "name": "test_session_anonymous_reauth",
+          "status": "PASS",
+          "duration_ms": 1095,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T02.13",
+          "name": "test_session_logoff",
+          "status": "PASS",
+          "duration_ms": 2973,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T02.14",
+          "name": "test_session_double_logoff",
+          "status": "PASS",
+          "duration_ms": 679,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T02.19",
+          "name": "test_session_sign_hmac_sha256",
+          "status": "PASS",
+          "duration_ms": 2736,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T02.20",
+          "name": "test_session_sign_aes_cmac",
+          "status": "PASS",
+          "duration_ms": 879,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T02.21",
+          "name": "test_session_sign_aes_gmac",
+          "status": "PASS",
+          "duration_ms": 2850,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T02.24",
+          "name": "test_session_encryption_enforce",
+          "status": "PASS",
+          "duration_ms": 3412,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T02.25",
+          "name": "test_session_preauth_integrity",
+          "status": "PASS",
+          "duration_ms": 1199,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T02.28",
+          "name": "test_session_spnego_negotiate",
+          "status": "PASS",
+          "duration_ms": 2964,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T02.29",
+          "name": "test_session_zero_security_buffer",
+          "status": "FAIL",
+          "duration_ms": 11751,
+          "message": "TIMEOUT after 10s"
+        }
+        ,
+        {
+          "id": "T02.30",
+          "name": "test_session_oversized_security_buffer",
+          "status": "PASS",
+          "duration_ms": 5012,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T02.31",
+          "name": "test_session_cancel_in_progress",
+          "status": "PASS",
+          "duration_ms": 1636,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T02.32",
+          "name": "test_session_signing_required",
+          "status": "PASS",
+          "duration_ms": 4635,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T02.33",
+          "name": "test_session_channel_sequence_init",
+          "status": "PASS",
+          "duration_ms": 3436,
+          "message": ""
+        }
+      ]
+    }
+    ,
+    {
+      "id": "T03",
+      "duration_ms": 40204,
+      "pass": 13,
+      "fail": 2,
+      "skip": 2,
+      "crash": 0,
+      "health": "OK",
+      "tests": [
+        {
+          "id": "T03.01",
+          "name": "test_tree_connect_disk_share",
+          "status": "PASS",
+          "duration_ms": 919,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T03.02",
+          "name": "test_tree_connect_ipc",
+          "status": "PASS",
+          "duration_ms": 807,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T03.03",
+          "name": "test_tree_connect_nonexistent",
+          "status": "FAIL",
+          "duration_ms": 1059,
+          "message": "expected BAD_NETWORK_NAME error: 'BAD_NETWORK_NAME\\|NT_STATUS_\\|tree connect' not found in output"
+        }
+        ,
+        {
+          "id": "T03.04",
+          "name": "test_tree_connect_long_name",
+          "status": "PASS",
+          "duration_ms": 1658,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T03.05",
+          "name": "test_tree_connect_no_session",
+          "status": "PASS",
+          "duration_ms": 8215,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T03.06",
+          "name": "test_tree_disconnect",
+          "status": "PASS",
+          "duration_ms": 2368,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T03.07",
+          "name": "test_tree_disconnect_double",
+          "status": "PASS",
+          "duration_ms": 647,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T03.09",
+          "name": "test_tree_connect_access_denied",
+          "status": "PASS",
+          "duration_ms": 640,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T03.10",
+          "name": "test_tree_connect_host_denied",
+          "status": "SKIP",
+          "duration_ms": 769,
+          "message": "SKIP: host allow test requires specific server config"
+        }
+        ,
+        {
+          "id": "T03.11",
+          "name": "test_tree_connect_extension_present",
+          "status": "PASS",
+          "duration_ms": 1297,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T03.12",
+          "name": "test_tree_connect_extension_bad_offset",
+          "status": "PASS",
+          "duration_ms": 2830,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T03.13",
+          "name": "test_tree_connect_encrypt_share",
+          "status": "PASS",
+          "duration_ms": 1718,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T03.14",
+          "name": "test_tree_connect_readonly_share",
+          "status": "SKIP",
+          "duration_ms": 967,
+          "message": "SKIP: requires readonly share configuration"
+        }
+        ,
+        {
+          "id": "T03.15",
+          "name": "test_tree_connect_case_insensitive",
+          "status": "PASS",
+          "duration_ms": 1481,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T03.16",
+          "name": "test_tree_connect_unc_format",
+          "status": "PASS",
+          "duration_ms": 5538,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T03.17",
+          "name": "test_tree_connect_multiple_trees",
+          "status": "FAIL",
+          "duration_ms": 1703,
+          "message": "second tree connect failed: expected exit code 0, got 1"
+        }
+        ,
+        {
+          "id": "T03.18",
+          "name": "test_tree_connect_invalid_tid_usage",
+          "status": "PASS",
+          "duration_ms": 717,
+          "message": ""
+        }
+      ]
+    }
+    ,
+    {
+      "id": "T04",
+      "duration_ms": 144052,
+      "pass": 42,
+      "fail": 7,
+      "skip": 2,
+      "crash": 0,
+      "health": "OK",
+      "tests": [
+        {
+          "id": "T04.01",
+          "name": "test_create_supersede_new",
+          "status": "PASS",
+          "duration_ms": 1262,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T04.02",
+          "name": "test_create_supersede_existing",
+          "status": "PASS",
+          "duration_ms": 2931,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T04.03",
+          "name": "test_create_open_existing",
+          "status": "PASS",
+          "duration_ms": 1339,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T04.04",
+          "name": "test_create_open_nonexistent",
+          "status": "FAIL",
+          "duration_ms": 669,
+          "message": "expected error for nonexistent file: 'NT_STATUS_\\|ERR\\|not found\\|NO_SUCH_FILE' not found in output"
+        }
+        ,
+        {
+          "id": "T04.05",
+          "name": "test_create_create_new",
+          "status": "PASS",
+          "duration_ms": 936,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T04.06",
+          "name": "test_create_create_existing",
+          "status": "PASS",
+          "duration_ms": 1537,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T04.07",
+          "name": "test_create_open_if_new",
+          "status": "PASS",
+          "duration_ms": 880,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T04.08",
+          "name": "test_create_open_if_existing",
+          "status": "PASS",
+          "duration_ms": 873,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T04.09",
+          "name": "test_create_overwrite_existing",
+          "status": "PASS",
+          "duration_ms": 1615,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T04.10",
+          "name": "test_create_overwrite_nonexistent",
+          "status": "PASS",
+          "duration_ms": 1798,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T04.11",
+          "name": "test_create_overwrite_if_new",
+          "status": "PASS",
+          "duration_ms": 1803,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T04.12",
+          "name": "test_create_overwrite_if_existing",
+          "status": "PASS",
+          "duration_ms": 2997,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T04.13",
+          "name": "test_create_invalid_disposition",
+          "status": "PASS",
+          "duration_ms": 4301,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T04.14",
+          "name": "test_create_supersede_directory",
+          "status": "PASS",
+          "duration_ms": 5298,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T04.15",
+          "name": "test_create_access_mask_validate",
+          "status": "PASS",
+          "duration_ms": 2655,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T04.16",
+          "name": "test_create_maximum_allowed",
+          "status": "PASS",
+          "duration_ms": 924,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T04.17",
+          "name": "test_create_read_attributes_only",
+          "status": "FAIL",
+          "duration_ms": 10818,
+          "message": "TIMEOUT after 10s"
+        }
+        ,
+        {
+          "id": "T04.18",
+          "name": "test_create_synchronize_only",
+          "status": "PASS",
+          "duration_ms": 7623,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T04.19",
+          "name": "test_create_delete_access",
+          "status": "FAIL",
+          "duration_ms": 934,
+          "message": "Can't load /etc/samba/smb.conf - run testparm to debug it\nputting file /tmp/tmp.hjmmRABGi0 as \\t04_delacc.txt (130000.0 kB/s) (average inf kB/s)\nCan't load /etc/samba/smb.conf - run testparm to debug it\nfile should be deleted: 'NT_STATUS_\\|NO_SUCH_FILE\\|not found' not found in output"
+        }
+        ,
+        {
+          "id": "T04.20",
+          "name": "test_create_write_dac",
+          "status": "PASS",
+          "duration_ms": 857,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T04.21",
+          "name": "test_create_write_owner",
+          "status": "PASS",
+          "duration_ms": 6723,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T04.22",
+          "name": "test_create_generic_all",
+          "status": "PASS",
+          "duration_ms": 5023,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T04.23",
+          "name": "test_create_generic_read_write",
+          "status": "PASS",
+          "duration_ms": 1391,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T04.24",
+          "name": "test_create_no_access",
+          "status": "PASS",
+          "duration_ms": 568,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T04.25",
+          "name": "test_create_zero_length_name",
+          "status": "FAIL",
+          "duration_ms": 718,
+          "message": "root directory listing expected: 'blocks\\|.' not found in output"
+        }
+        ,
+        {
+          "id": "T04.26",
+          "name": "test_create_odd_name_length",
+          "status": "PASS",
+          "duration_ms": 725,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T04.27",
+          "name": "test_create_path_separator",
+          "status": "PASS",
+          "duration_ms": 1404,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T04.28",
+          "name": "test_create_trailing_backslash",
+          "status": "PASS",
+          "duration_ms": 917,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T04.29",
+          "name": "test_create_dot_dot_escape",
+          "status": "PASS",
+          "duration_ms": 1603,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T04.30",
+          "name": "test_create_long_filename",
+          "status": "PASS",
+          "duration_ms": 3190,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T04.31",
+          "name": "test_create_special_chars",
+          "status": "FAIL",
+          "duration_ms": 10570,
+          "message": "TIMEOUT after 10s"
+        }
+        ,
+        {
+          "id": "T04.32",
+          "name": "test_create_case_sensitivity",
+          "status": "FAIL",
+          "duration_ms": 11346,
+          "message": "TIMEOUT after 10s"
+        }
+        ,
+        {
+          "id": "T04.33",
+          "name": "test_create_directory_file",
+          "status": "PASS",
+          "duration_ms": 4532,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T04.34",
+          "name": "test_create_directory_file_on_file",
+          "status": "PASS",
+          "duration_ms": 6904,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T04.35",
+          "name": "test_create_non_directory_on_dir",
+          "status": "FAIL",
+          "duration_ms": 1023,
+          "message": "Can't load /etc/samba/smb.conf - run testparm to debug it\nshould fail when treating directory as file: 'NT_STATUS_\\|IS_A_DIRECTORY\\|error\\|ERR' not found in output"
+        }
+        ,
+        {
+          "id": "T04.36",
+          "name": "test_create_delete_on_close",
+          "status": "PASS",
+          "duration_ms": 3007,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T04.37",
+          "name": "test_create_delete_on_close_no_delete",
+          "status": "PASS",
+          "duration_ms": 6120,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T04.38",
+          "name": "test_create_delete_on_close_readonly",
+          "status": "PASS",
+          "duration_ms": 2539,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T04.39",
+          "name": "test_create_reparse_point_symlink",
+          "status": "SKIP",
+          "duration_ms": 1778,
+          "message": "SKIP: requires symlink setup on server"
+        }
+        ,
+        {
+          "id": "T04.40",
+          "name": "test_create_complete_if_oplocked",
+          "status": "PASS",
+          "duration_ms": 1867,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T04.41",
+          "name": "test_create_open_requiring_oplock",
+          "status": "PASS",
+          "duration_ms": 503,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T04.42",
+          "name": "test_create_no_intermediate_buffering",
+          "status": "PASS",
+          "duration_ms": 2778,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T04.43",
+          "name": "test_create_ctx_mxac",
+          "status": "PASS",
+          "duration_ms": 838,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T04.44",
+          "name": "test_create_ctx_qfid",
+          "status": "PASS",
+          "duration_ms": 723,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T04.45",
+          "name": "test_create_ctx_secd",
+          "status": "PASS",
+          "duration_ms": 595,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T04.49",
+          "name": "test_create_ctx_twrp",
+          "status": "SKIP",
+          "duration_ms": 3040,
+          "message": "SKIP: VSS snapshots not configured"
+        }
+        ,
+        {
+          "id": "T04.51",
+          "name": "test_create_ctx_aapl",
+          "status": "PASS",
+          "duration_ms": 1427,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T04.52",
+          "name": "test_create_ctx_alsi",
+          "status": "PASS",
+          "duration_ms": 483,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T04.53",
+          "name": "test_create_ctx_posix",
+          "status": "PASS",
+          "duration_ms": 1195,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T04.54",
+          "name": "test_create_ctx_ea_buffer",
+          "status": "PASS",
+          "duration_ms": 728,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T04.60",
+          "name": "test_create_pending_delete",
+          "status": "PASS",
+          "duration_ms": 835,
+          "message": ""
+        }
+      ]
+    }
+    ,
+    {
+      "id": "T05",
+      "duration_ms": 25130,
+      "pass": 13,
+      "fail": 1,
+      "skip": 1,
+      "crash": 0,
+      "health": "OK",
+      "tests": [
+        {
+          "id": "T05.01",
+          "name": "test_read_normal",
+          "status": "PASS",
+          "duration_ms": 1258,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T05.03",
+          "name": "test_read_at_eof",
+          "status": "PASS",
+          "duration_ms": 2609,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T05.04",
+          "name": "test_read_past_eof",
+          "status": "PASS",
+          "duration_ms": 3791,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T05.05",
+          "name": "test_read_zero_length",
+          "status": "PASS",
+          "duration_ms": 644,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T05.06",
+          "name": "test_read_directory_handle",
+          "status": "FAIL",
+          "duration_ms": 2136,
+          "message": "Can't load /etc/samba/smb.conf - run testparm to debug it\nreading directory should fail: 'NT_STATUS_\\|error\\|ERR\\|IS_A_DIRECTORY' not found in output"
+        }
+        ,
+        {
+          "id": "T05.07",
+          "name": "test_read_pipe",
+          "status": "PASS",
+          "duration_ms": 922,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T05.08",
+          "name": "test_read_no_access",
+          "status": "PASS",
+          "duration_ms": 757,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T05.09",
+          "name": "test_read_negative_offset",
+          "status": "PASS",
+          "duration_ms": 614,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T05.10",
+          "name": "test_read_offset_overflow",
+          "status": "PASS",
+          "duration_ms": 513,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T05.11",
+          "name": "test_read_rdma_channel",
+          "status": "SKIP",
+          "duration_ms": 537,
+          "message": "SKIP: RDMA not available in test environment"
+        }
+        ,
+        {
+          "id": "T05.14",
+          "name": "test_read_unbuffered_flag",
+          "status": "PASS",
+          "duration_ms": 549,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T05.15",
+          "name": "test_read_compressed_flag",
+          "status": "PASS",
+          "duration_ms": 642,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T05.16",
+          "name": "test_read_invalid_fid",
+          "status": "PASS",
+          "duration_ms": 574,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T05.17",
+          "name": "test_read_compound_fid",
+          "status": "PASS",
+          "duration_ms": 678,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T05.18",
+          "name": "test_read_mincount",
+          "status": "PASS",
+          "duration_ms": 518,
+          "message": ""
+        }
+      ]
+    }
+    ,
+    {
+      "id": "T06",
+      "duration_ms": 45171,
+      "pass": 17,
+      "fail": 0,
+      "skip": 1,
+      "crash": 0,
+      "health": "OK",
+      "tests": [
+        {
+          "id": "T06.01",
+          "name": "test_write_normal",
+          "status": "PASS",
+          "duration_ms": 1117,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T06.02",
+          "name": "test_write_append_sentinel",
+          "status": "PASS",
+          "duration_ms": 4569,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T06.03",
+          "name": "test_write_append_no_access",
+          "status": "PASS",
+          "duration_ms": 1329,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T06.04",
+          "name": "test_write_pipe",
+          "status": "PASS",
+          "duration_ms": 673,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T06.05",
+          "name": "test_write_append_only_non_eof",
+          "status": "PASS",
+          "duration_ms": 4168,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T06.06",
+          "name": "test_write_no_access",
+          "status": "PASS",
+          "duration_ms": 7888,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T06.07",
+          "name": "test_write_negative_offset",
+          "status": "PASS",
+          "duration_ms": 4774,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T06.08",
+          "name": "test_write_offset_overflow",
+          "status": "PASS",
+          "duration_ms": 704,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T06.09",
+          "name": "test_write_zero_length",
+          "status": "PASS",
+          "duration_ms": 661,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T06.10",
+          "name": "test_write_through_flag",
+          "status": "PASS",
+          "duration_ms": 579,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T06.11",
+          "name": "test_write_exceeds_max",
+          "status": "PASS",
+          "duration_ms": 634,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T06.12",
+          "name": "test_write_readonly_share",
+          "status": "SKIP",
+          "duration_ms": 641,
+          "message": "SKIP: requires read-only share configuration"
+        }
+        ,
+        {
+          "id": "T06.13",
+          "name": "test_write_channel_sequence_valid",
+          "status": "PASS",
+          "duration_ms": 990,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T06.14",
+          "name": "test_write_channel_sequence_stale",
+          "status": "PASS",
+          "duration_ms": 7222,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T06.15",
+          "name": "test_write_compound_fid",
+          "status": "PASS",
+          "duration_ms": 648,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T06.18",
+          "name": "test_write_unbuffered_flag",
+          "status": "PASS",
+          "duration_ms": 617,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T06.21",
+          "name": "test_write_data_offset_check",
+          "status": "PASS",
+          "duration_ms": 1153,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T06.22",
+          "name": "test_write_invalid_fid",
+          "status": "PASS",
+          "duration_ms": 985,
+          "message": ""
+        }
+      ]
+    }
+    ,
+    {
+      "id": "T07",
+      "duration_ms": 12257,
+      "pass": 6,
+      "fail": 0,
+      "skip": 0,
+      "crash": 0,
+      "health": "OK",
+      "tests": [
+        {
+          "id": "T07.01",
+          "name": "test_close_normal",
+          "status": "PASS",
+          "duration_ms": 1000,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T07.02",
+          "name": "test_close_postquery_flag",
+          "status": "PASS",
+          "duration_ms": 1376,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T07.03",
+          "name": "test_close_invalid_fid",
+          "status": "PASS",
+          "duration_ms": 893,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T07.04",
+          "name": "test_close_double",
+          "status": "PASS",
+          "duration_ms": 1551,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T07.05",
+          "name": "test_close_directory",
+          "status": "PASS",
+          "duration_ms": 970,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T07.08",
+          "name": "test_close_compound_fid",
+          "status": "PASS",
+          "duration_ms": 938,
+          "message": ""
+        }
+      ]
+    }
+    ,
+    {
+      "id": "T08",
+      "duration_ms": 31148,
+      "pass": 10,
+      "fail": 0,
+      "skip": 0,
+      "crash": 0,
+      "health": "OK",
+      "tests": [
+        {
+          "id": "T08.01",
+          "name": "test_flush_normal",
+          "status": "PASS",
+          "duration_ms": 1351,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T08.02",
+          "name": "test_flush_no_write_access",
+          "status": "PASS",
+          "duration_ms": 4247,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T08.03",
+          "name": "test_flush_invalid_fid",
+          "status": "PASS",
+          "duration_ms": 5593,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T08.04",
+          "name": "test_flush_directory",
+          "status": "PASS",
+          "duration_ms": 1292,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T08.05",
+          "name": "test_flush_pipe",
+          "status": "PASS",
+          "duration_ms": 1124,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T08.06",
+          "name": "test_flush_compound_fid",
+          "status": "PASS",
+          "duration_ms": 3379,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T08.07",
+          "name": "test_flush_channel_sequence",
+          "status": "PASS",
+          "duration_ms": 596,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T08.08",
+          "name": "test_flush_readonly_handle",
+          "status": "PASS",
+          "duration_ms": 3737,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T08.09",
+          "name": "test_flush_after_write",
+          "status": "PASS",
+          "duration_ms": 2147,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T08.10",
+          "name": "test_flush_no_pending_data",
+          "status": "PASS",
+          "duration_ms": 1484,
+          "message": ""
+        }
+      ]
+    }
+    ,
+    {
+      "id": "T09",
+      "duration_ms": 41570,
+      "pass": 17,
+      "fail": 2,
+      "skip": 0,
+      "crash": 0,
+      "health": "OK",
+      "tests": [
+        {
+          "id": "T09.01",
+          "name": "test_dir_full_directory_info",
+          "status": "PASS",
+          "duration_ms": 876,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T09.02",
+          "name": "test_dir_both_directory_info",
+          "status": "PASS",
+          "duration_ms": 4374,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T09.03",
+          "name": "test_dir_directory_info",
+          "status": "PASS",
+          "duration_ms": 702,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T09.04",
+          "name": "test_dir_names_only",
+          "status": "PASS",
+          "duration_ms": 866,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T09.05",
+          "name": "test_dir_id_both_directory",
+          "status": "PASS",
+          "duration_ms": 1016,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T09.06",
+          "name": "test_dir_id_full_directory",
+          "status": "PASS",
+          "duration_ms": 4702,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T09.07",
+          "name": "test_dir_id_extd_directory",
+          "status": "PASS",
+          "duration_ms": 926,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T09.08",
+          "name": "test_dir_wildcard_star",
+          "status": "PASS",
+          "duration_ms": 995,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T09.09",
+          "name": "test_dir_wildcard_question",
+          "status": "PASS",
+          "duration_ms": 1755,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T09.10",
+          "name": "test_dir_wildcard_dos_star",
+          "status": "PASS",
+          "duration_ms": 1390,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T09.11",
+          "name": "test_dir_wildcard_dos_question",
+          "status": "PASS",
+          "duration_ms": 606,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T09.12",
+          "name": "test_dir_wildcard_dos_dot",
+          "status": "PASS",
+          "duration_ms": 1187,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T09.13",
+          "name": "test_dir_restart_scans",
+          "status": "PASS",
+          "duration_ms": 3328,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T09.14",
+          "name": "test_dir_reopen_restart",
+          "status": "PASS",
+          "duration_ms": 570,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T09.15",
+          "name": "test_dir_single_entry",
+          "status": "PASS",
+          "duration_ms": 531,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T09.16",
+          "name": "test_dir_empty_directory",
+          "status": "FAIL",
+          "duration_ms": 658,
+          "message": "Can't load /etc/samba/smb.conf - run testparm to debug it\ndot entry missing: '\\.' not found in output"
+        }
+        ,
+        {
+          "id": "T09.20",
+          "name": "test_dir_file_index",
+          "status": "PASS",
+          "duration_ms": 528,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T09.21",
+          "name": "test_dir_invalid_info_level",
+          "status": "PASS",
+          "duration_ms": 972,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T09.22",
+          "name": "test_dir_output_buffer_overflow",
+          "status": "FAIL",
+          "duration_ms": 10084,
+          "message": "TIMEOUT after 10s"
+        }
+      ]
+    }
+    ,
+    {
+      "id": "T10",
+      "duration_ms": 41660,
+      "pass": 14,
+      "fail": 4,
+      "skip": 0,
+      "crash": 0,
+      "health": "OK",
+      "tests": [
+        {
+          "id": "T10.01",
+          "name": "test_query_file_basic",
+          "status": "FAIL",
+          "duration_ms": 1002,
+          "message": "Can't load /etc/samba/smb.conf - run testparm to debug it\nputting file /tmp/tmp.tkzfOujj2c as \\t10_basic.txt (10.7 kB/s) (average 10.7 kB/s)\nbasic info missing: 'create_time\\|attributes' not found in output"
+        }
+        ,
+        {
+          "id": "T10.02",
+          "name": "test_query_file_standard",
+          "status": "PASS",
+          "duration_ms": 1242,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T10.03",
+          "name": "test_query_file_internal",
+          "status": "FAIL",
+          "duration_ms": 10443,
+          "message": "TIMEOUT after 10s"
+        }
+        ,
+        {
+          "id": "T10.04",
+          "name": "test_query_file_ea",
+          "status": "PASS",
+          "duration_ms": 3142,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T10.05",
+          "name": "test_query_file_access",
+          "status": "PASS",
+          "duration_ms": 600,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T10.06",
+          "name": "test_query_file_position",
+          "status": "PASS",
+          "duration_ms": 512,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T10.07",
+          "name": "test_query_file_mode",
+          "status": "PASS",
+          "duration_ms": 1017,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T10.08",
+          "name": "test_query_file_alignment",
+          "status": "PASS",
+          "duration_ms": 692,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T10.09",
+          "name": "test_query_file_all",
+          "status": "FAIL",
+          "duration_ms": 1180,
+          "message": "Can't load /etc/samba/smb.conf - run testparm to debug it\nputting file /tmp/tmp.Y6N5AoghkN as \\t10_all.txt (140000.0 kB/s) (average inf kB/s)\nall info missing fields: 'create_time\\|attributes\\|stream' not found in output"
+        }
+        ,
+        {
+          "id": "T10.10",
+          "name": "test_query_file_alternate_name",
+          "status": "PASS",
+          "duration_ms": 3002,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T10.11",
+          "name": "test_query_file_stream",
+          "status": "FAIL",
+          "duration_ms": 1263,
+          "message": "Can't load /etc/samba/smb.conf - run testparm to debug it\nputting file /tmp/tmp.cLfgQOwk3D as \\t10_stream.txt (5.4 kB/s) (average 5.4 kB/s)\nstream info expected: 'stream\\|::' not found in output"
+        }
+        ,
+        {
+          "id": "T10.12",
+          "name": "test_query_file_compression",
+          "status": "PASS",
+          "duration_ms": 1995,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T10.13",
+          "name": "test_query_file_network_open",
+          "status": "PASS",
+          "duration_ms": 664,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T10.14",
+          "name": "test_query_file_attribute_tag",
+          "status": "PASS",
+          "duration_ms": 3253,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T10.15",
+          "name": "test_query_file_id",
+          "status": "PASS",
+          "duration_ms": 1434,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T10.16",
+          "name": "test_query_file_stat",
+          "status": "PASS",
+          "duration_ms": 3063,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T10.17",
+          "name": "test_query_file_stat_lx",
+          "status": "PASS",
+          "duration_ms": 650,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T10.18",
+          "name": "test_query_file_full_ea",
+          "status": "PASS",
+          "duration_ms": 600,
+          "message": ""
+        }
+      ]
+    }
+    ,
+    {
+      "id": "T11",
+      "duration_ms": 11999,
+      "pass": 8,
+      "fail": 0,
+      "skip": 0,
+      "crash": 0,
+      "health": "OK",
+      "tests": [
+        {
+          "id": "T11.01",
+          "name": "test_query_fs_volume",
+          "status": "PASS",
+          "duration_ms": 656,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T11.02",
+          "name": "test_query_fs_size",
+          "status": "PASS",
+          "duration_ms": 622,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T11.03",
+          "name": "test_query_fs_device",
+          "status": "PASS",
+          "duration_ms": 601,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T11.04",
+          "name": "test_query_fs_attribute",
+          "status": "PASS",
+          "duration_ms": 2373,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T11.05",
+          "name": "test_query_fs_full_size",
+          "status": "PASS",
+          "duration_ms": 524,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T11.06",
+          "name": "test_query_fs_sector_size",
+          "status": "PASS",
+          "duration_ms": 1509,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T11.07",
+          "name": "test_query_fs_object_id",
+          "status": "PASS",
+          "duration_ms": 600,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T11.08",
+          "name": "test_query_fs_control",
+          "status": "PASS",
+          "duration_ms": 601,
+          "message": ""
+        }
+      ]
+    }
+    ,
+    {
+      "id": "T12",
+      "duration_ms": 55403,
+      "pass": 13,
+      "fail": 1,
+      "skip": 0,
+      "crash": 0,
+      "health": "OK",
+      "tests": [
+        {
+          "id": "T12.01",
+          "name": "test_set_file_basic",
+          "status": "PASS",
+          "duration_ms": 1926,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T12.02",
+          "name": "test_set_file_allocation",
+          "status": "PASS",
+          "duration_ms": 1562,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T12.03",
+          "name": "test_set_file_eof",
+          "status": "PASS",
+          "duration_ms": 1992,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T12.04",
+          "name": "test_set_file_rename",
+          "status": "PASS",
+          "duration_ms": 1117,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T12.05",
+          "name": "test_set_file_rename_ex",
+          "status": "PASS",
+          "duration_ms": 6980,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T12.06",
+          "name": "test_set_file_link",
+          "status": "PASS",
+          "duration_ms": 713,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T12.07",
+          "name": "test_set_file_disposition",
+          "status": "PASS",
+          "duration_ms": 8987,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T12.08",
+          "name": "test_set_file_disposition_ex",
+          "status": "PASS",
+          "duration_ms": 7480,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T12.09",
+          "name": "test_set_file_position",
+          "status": "PASS",
+          "duration_ms": 2284,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T12.10",
+          "name": "test_set_file_mode",
+          "status": "PASS",
+          "duration_ms": 535,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T12.11",
+          "name": "test_set_file_full_ea",
+          "status": "PASS",
+          "duration_ms": 2667,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T12.13",
+          "name": "test_set_security_sacl",
+          "status": "PASS",
+          "duration_ms": 774,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T12.14",
+          "name": "test_set_security_owner",
+          "status": "PASS",
+          "duration_ms": 632,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T12.16",
+          "name": "test_timestamp_negative_100ns",
+          "status": "FAIL",
+          "duration_ms": 10012,
+          "message": "TIMEOUT after 10s"
+        }
+      ]
+    }
+    ,
+    {
+      "id": "T13",
+      "duration_ms": 36527,
+      "pass": 22,
+      "fail": 0,
+      "skip": 0,
+      "crash": 0,
+      "health": "OK",
+      "tests": [
+        {
+          "id": "T13.01",
+          "name": "test_lock_exclusive",
+          "status": "PASS",
+          "duration_ms": 954,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T13.02",
+          "name": "test_lock_shared",
+          "status": "PASS",
+          "duration_ms": 725,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T13.03",
+          "name": "test_lock_exclusive_fail_immediately",
+          "status": "PASS",
+          "duration_ms": 806,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T13.04",
+          "name": "test_lock_shared_fail_immediately",
+          "status": "PASS",
+          "duration_ms": 528,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T13.05",
+          "name": "test_lock_unlock",
+          "status": "PASS",
+          "duration_ms": 770,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T13.06",
+          "name": "test_lock_unlock_no_match",
+          "status": "PASS",
+          "duration_ms": 581,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T13.07",
+          "name": "test_lock_zero_byte",
+          "status": "PASS",
+          "duration_ms": 914,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T13.08",
+          "name": "test_lock_full_range",
+          "status": "PASS",
+          "duration_ms": 778,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T13.09",
+          "name": "test_lock_wrap_past_u64",
+          "status": "PASS",
+          "duration_ms": 871,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T13.10",
+          "name": "test_lock_beyond_offset_max",
+          "status": "PASS",
+          "duration_ms": 636,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T13.11",
+          "name": "test_lock_count_zero",
+          "status": "PASS",
+          "duration_ms": 664,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T13.12",
+          "name": "test_lock_count_max",
+          "status": "PASS",
+          "duration_ms": 579,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T13.18",
+          "name": "test_lock_mixed_lock_unlock",
+          "status": "PASS",
+          "duration_ms": 540,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T13.20",
+          "name": "test_lock_sequence_replay_invalid",
+          "status": "PASS",
+          "duration_ms": 912,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T13.21",
+          "name": "test_lock_sequence_sentinel_0xff",
+          "status": "PASS",
+          "duration_ms": 546,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T13.22",
+          "name": "test_lock_sequence_indices_1_64",
+          "status": "PASS",
+          "duration_ms": 695,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T13.23",
+          "name": "test_lock_sequence_store_after",
+          "status": "PASS",
+          "duration_ms": 3655,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T13.25",
+          "name": "test_lock_channel_sequence",
+          "status": "PASS",
+          "duration_ms": 3539,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T13.26",
+          "name": "test_lock_fl_end_inclusive",
+          "status": "PASS",
+          "duration_ms": 1660,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T13.28",
+          "name": "test_lock_downgrade_excl_to_shared",
+          "status": "PASS",
+          "duration_ms": 3327,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T13.31",
+          "name": "test_lock_invalid_flags",
+          "status": "PASS",
+          "duration_ms": 2932,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T13.32",
+          "name": "test_lock_invalid_fid",
+          "status": "PASS",
+          "duration_ms": 2114,
+          "message": ""
+        }
+      ]
+    }
+    ,
+    {
+      "id": "T17",
+      "duration_ms": 27673,
+      "pass": 14,
+      "fail": 0,
+      "skip": 0,
+      "crash": 0,
+      "health": "OK",
+      "tests": [
+        {
+          "id": "T17.01",
+          "name": "test_compound_create_read_close",
+          "status": "PASS",
+          "duration_ms": 893,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T17.02",
+          "name": "test_compound_create_write_close",
+          "status": "PASS",
+          "duration_ms": 2082,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T17.03",
+          "name": "test_compound_fid_sentinel",
+          "status": "PASS",
+          "duration_ms": 6189,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T17.04",
+          "name": "test_compound_non_create_fid",
+          "status": "PASS",
+          "duration_ms": 1311,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T17.05",
+          "name": "test_compound_error_cascade_create",
+          "status": "PASS",
+          "duration_ms": 688,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T17.06",
+          "name": "test_compound_error_no_cascade",
+          "status": "PASS",
+          "duration_ms": 701,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T17.07",
+          "name": "test_compound_flush_close",
+          "status": "PASS",
+          "duration_ms": 1085,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T17.08",
+          "name": "test_compound_flush_flush",
+          "status": "PASS",
+          "duration_ms": 1932,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T17.09",
+          "name": "test_compound_rename",
+          "status": "PASS",
+          "duration_ms": 761,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T17.10",
+          "name": "test_compound_query_set",
+          "status": "PASS",
+          "duration_ms": 1656,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T17.12",
+          "name": "test_compound_padding",
+          "status": "PASS",
+          "duration_ms": 604,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T17.13",
+          "name": "test_compound_unrelated",
+          "status": "PASS",
+          "duration_ms": 904,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T17.14",
+          "name": "test_compound_max_depth",
+          "status": "PASS",
+          "duration_ms": 3938,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T17.15",
+          "name": "test_compound_ioctl_fid",
+          "status": "PASS",
+          "duration_ms": 655,
+          "message": ""
+        }
+      ]
+    }
+    ,
+    {
+      "id": "T19",
+      "duration_ms": 12122,
+      "pass": 6,
+      "fail": 0,
+      "skip": 0,
+      "crash": 0,
+      "health": "OK",
+      "tests": [
+        {
+          "id": "T19.01",
+          "name": "test_ioctl_validate_negotiate",
+          "status": "PASS",
+          "duration_ms": 2142,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T19.02",
+          "name": "test_ioctl_validate_negotiate_mismatch",
+          "status": "PASS",
+          "duration_ms": 1272,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T19.03",
+          "name": "test_ioctl_validate_flags_check",
+          "status": "PASS",
+          "duration_ms": 633,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T19.04",
+          "name": "test_ioctl_invalid_fid",
+          "status": "PASS",
+          "duration_ms": 574,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T19.05",
+          "name": "test_ioctl_unknown_code",
+          "status": "PASS",
+          "duration_ms": 549,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T19.06",
+          "name": "test_ioctl_channel_sequence",
+          "status": "PASS",
+          "duration_ms": 1309,
+          "message": ""
+        }
+      ]
+    }
+    ,
+    {
+      "id": "T20",
+      "duration_ms": 5965,
+      "pass": 3,
+      "fail": 0,
+      "skip": 1,
+      "crash": 0,
+      "health": "OK",
+      "tests": [
+        {
+          "id": "T20.01",
+          "name": "test_ioctl_query_network_iface",
+          "status": "PASS",
+          "duration_ms": 700,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T20.02",
+          "name": "test_ioctl_query_network_iface_win",
+          "status": "PASS",
+          "duration_ms": 471,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T20.03",
+          "name": "test_ioctl_query_network_iface_rdma",
+          "status": "SKIP",
+          "duration_ms": 564,
+          "message": "SKIP: RDMA not available"
+        }
+        ,
+        {
+          "id": "T20.04",
+          "name": "test_ioctl_query_network_iface_rss",
+          "status": "PASS",
+          "duration_ms": 652,
+          "message": ""
+        }
+      ]
+    }
+    ,
+    {
+      "id": "T21",
+      "duration_ms": 22594,
+      "pass": 2,
+      "fail": 1,
+      "skip": 0,
+      "crash": 0,
+      "health": "OK",
+      "tests": [
+        {
+          "id": "T21.03",
+          "name": "test_ioctl_copychunk_resume_key",
+          "status": "PASS",
+          "duration_ms": 1675,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T21.04",
+          "name": "test_ioctl_copychunk_invalid_key",
+          "status": "FAIL",
+          "duration_ms": 10284,
+          "message": "TIMEOUT after 10s"
+        }
+        ,
+        {
+          "id": "T21.08",
+          "name": "test_ioctl_copychunk_zero_chunks",
+          "status": "PASS",
+          "duration_ms": 6191,
+          "message": ""
+        }
+      ]
+    }
+    ,
+    {
+      "id": "T22",
+      "duration_ms": 13532,
+      "pass": 8,
+      "fail": 0,
+      "skip": 0,
+      "crash": 0,
+      "health": "OK",
+      "tests": [
+        {
+          "id": "T22.01",
+          "name": "test_ioctl_set_sparse",
+          "status": "PASS",
+          "duration_ms": 800,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T22.02",
+          "name": "test_ioctl_set_sparse_no_buffer",
+          "status": "PASS",
+          "duration_ms": 946,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T22.03",
+          "name": "test_ioctl_set_sparse_clear",
+          "status": "PASS",
+          "duration_ms": 856,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T22.04",
+          "name": "test_ioctl_query_allocated_ranges",
+          "status": "PASS",
+          "duration_ms": 729,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T22.05",
+          "name": "test_ioctl_set_zero_data",
+          "status": "PASS",
+          "duration_ms": 622,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T22.06",
+          "name": "test_ioctl_set_zero_data_no_write",
+          "status": "PASS",
+          "duration_ms": 2905,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T22.07",
+          "name": "test_ioctl_file_level_trim",
+          "status": "PASS",
+          "duration_ms": 932,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T22.08",
+          "name": "test_ioctl_file_level_trim_no_write",
+          "status": "PASS",
+          "duration_ms": 596,
+          "message": ""
+        }
+      ]
+    }
+    ,
+    {
+      "id": "T23",
+      "duration_ms": 15933,
+      "pass": 5,
+      "fail": 0,
+      "skip": 0,
+      "crash": 0,
+      "health": "OK",
+      "tests": [
+        {
+          "id": "T23.01",
+          "name": "test_ioctl_get_compression",
+          "status": "PASS",
+          "duration_ms": 1445,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T23.02",
+          "name": "test_ioctl_set_compression",
+          "status": "PASS",
+          "duration_ms": 1375,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T23.03",
+          "name": "test_ioctl_get_integrity",
+          "status": "PASS",
+          "duration_ms": 3757,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T23.04",
+          "name": "test_ioctl_set_integrity",
+          "status": "PASS",
+          "duration_ms": 691,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T23.06",
+          "name": "test_ioctl_query_file_regions",
+          "status": "PASS",
+          "duration_ms": 768,
+          "message": ""
+        }
+      ]
+    }
+    ,
+    {
+      "id": "T24",
+      "duration_ms": 19158,
+      "pass": 6,
+      "fail": 0,
+      "skip": 0,
+      "crash": 0,
+      "health": "OK",
+      "tests": [
+        {
+          "id": "T24.01",
+          "name": "test_ioctl_pipe_transceive",
+          "status": "PASS",
+          "duration_ms": 761,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T24.02",
+          "name": "test_ioctl_pipe_peek",
+          "status": "PASS",
+          "duration_ms": 669,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T24.03",
+          "name": "test_ioctl_pipe_wait",
+          "status": "PASS",
+          "duration_ms": 2169,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T24.04",
+          "name": "test_ioctl_pipe_wait_timeout",
+          "status": "PASS",
+          "duration_ms": 4660,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T24.05",
+          "name": "test_ioctl_pipe_wait_no_buffer",
+          "status": "PASS",
+          "duration_ms": 3889,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T24.06",
+          "name": "test_ioctl_pipe_transceive_large",
+          "status": "PASS",
+          "duration_ms": 764,
+          "message": ""
+        }
+      ]
+    }
+    ,
+    {
+      "id": "T25",
+      "duration_ms": 27130,
+      "pass": 9,
+      "fail": 0,
+      "skip": 0,
+      "crash": 0,
+      "health": "DMESG: [249138.942446] BUG: KFENCE: memory corruption in ksmbd_free_work_struct+0x40/0x140 [ksmbd];;CRASH: [249138.942446] BUG: KFENCE: memory corruption in ksmbd_free_work_struct+0x40/0x140 [ksmbd]",
+      "tests": [
+        {
+          "id": "T25.02",
+          "name": "test_ioctl_is_pathname_valid",
+          "status": "PASS",
+          "duration_ms": 1110,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T25.03",
+          "name": "test_ioctl_is_volume_dirty",
+          "status": "PASS",
+          "duration_ms": 1000,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T25.04",
+          "name": "test_ioctl_lock_volume",
+          "status": "PASS",
+          "duration_ms": 1838,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T25.05",
+          "name": "test_ioctl_unlock_volume",
+          "status": "PASS",
+          "duration_ms": 3341,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T25.08",
+          "name": "test_ioctl_set_object_id",
+          "status": "PASS",
+          "duration_ms": 3291,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T25.09",
+          "name": "test_ioctl_delete_object_id",
+          "status": "PASS",
+          "duration_ms": 1062,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T25.10",
+          "name": "test_ioctl_srv_read_hash",
+          "status": "PASS",
+          "duration_ms": 1061,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T25.13",
+          "name": "test_ioctl_mark_handle",
+          "status": "PASS",
+          "duration_ms": 5912,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T25.14",
+          "name": "test_ioctl_query_on_disk_volume",
+          "status": "PASS",
+          "duration_ms": 3524,
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "health_events": [
+    "T25: DMESG: [249138.942446] BUG: KFENCE: memory corruption in ksmbd_free_work_struct+0x40/0x140 [ksmbd];;CRASH: [249138.942446] BUG: KFENCE: memory corruption in ksmbd_free_work_struct+0x40/0x140 [ksmbd]"
+  ]
+}

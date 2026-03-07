@@ -1,0 +1,1989 @@
+{
+  "name": "apple_smb_extensions_performance",
+  "value": 3856814.157142857,
+  "children": [
+    {
+      "name": "connection_setup",
+      "value": 3.7,
+      "children": [
+        {
+          "name": "socket_accept",
+          "value": 2.0,
+          "children": []
+        },
+        {
+          "name": "protocol_negotiation",
+          "value": 1.5,
+          "children": []
+        },
+        {
+          "name": "aapl_detection",
+          "value": 0.2,
+          "children": [
+            {
+              "name": "magic_value_check",
+              "value": 0.2,
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "connection_setup",
+      "value": 7.8,
+      "children": [
+        {
+          "name": "socket_accept",
+          "value": 2.0,
+          "children": []
+        },
+        {
+          "name": "protocol_negotiation",
+          "value": 1.5,
+          "children": []
+        },
+        {
+          "name": "aapl_detection",
+          "value": 2.8,
+          "children": [
+            {
+              "name": "magic_value_check",
+              "value": 0.1,
+              "children": []
+            },
+            {
+              "name": "context_validation",
+              "value": 2.7,
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "aapl_capability_negotiation",
+          "value": 1.5,
+          "children": [
+            {
+              "name": "memory_allocation",
+              "value": 0.5,
+              "children": []
+            },
+            {
+              "name": "capability_parsing",
+              "value": 0.7,
+              "children": []
+            },
+            {
+              "name": "feature_negotiation",
+              "value": 0.3,
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "smb2_smb2_create_req",
+      "value": 15.0,
+      "children": [
+        {
+          "name": "aapl_detection",
+          "value": 0.2,
+          "children": []
+        }
+      ]
+    },
+    {
+      "name": "smb2_smb2_create_req",
+      "value": 15.0,
+      "children": [
+        {
+          "name": "aapl_detection",
+          "value": 2.8,
+          "children": []
+        },
+        {
+          "name": "aapl_context_parsing",
+          "value": 2.0,
+          "children": []
+        },
+        {
+          "name": "aapl_capability_negotiation",
+          "value": 5.0,
+          "children": []
+        }
+      ]
+    },
+    {
+      "name": "smb2_smb2_query_directory",
+      "value": 45.0,
+      "children": [
+        {
+          "name": "aapl_detection",
+          "value": 0.2,
+          "children": []
+        }
+      ]
+    },
+    {
+      "name": "smb2_smb2_query_directory",
+      "value": 3.2142857142857144,
+      "children": [
+        {
+          "name": "aapl_detection",
+          "value": 2.8,
+          "children": []
+        },
+        {
+          "name": "aapl_context_parsing",
+          "value": 2.0,
+          "children": []
+        },
+        {
+          "name": "aapl_capability_negotiation",
+          "value": 5.0,
+          "children": []
+        }
+      ]
+    },
+    {
+      "name": "memory_allocation_apple",
+      "value": 0.3,
+      "children": [
+        {
+          "name": "kzalloc_basic_state",
+          "value": 0.3,
+          "children": []
+        }
+      ]
+    },
+    {
+      "name": "memory_allocation_non_apple",
+      "value": 0.3,
+      "children": [
+        {
+          "name": "kzalloc_basic_state",
+          "value": 0.3,
+          "children": []
+        }
+      ]
+    },
+    {
+      "name": "network_io_baseline",
+      "value": 8.0,
+      "children": [
+        {
+          "name": "tcp_send",
+          "value": 4.0,
+          "children": []
+        },
+        {
+          "name": "tcp_receive",
+          "value": 4.0,
+          "children": []
+        }
+      ]
+    },
+    {
+      "name": "network_io_apple",
+      "value": 8.2,
+      "children": [
+        {
+          "name": "tcp_send",
+          "value": 4.0,
+          "children": []
+        },
+        {
+          "name": "aapl_context_data",
+          "value": 0.2,
+          "children": []
+        },
+        {
+          "name": "tcp_receive",
+          "value": 4.0,
+          "children": []
+        }
+      ]
+    },
+    {
+      "name": "directory_traversal_comparison",
+      "value": 107.14285714285714,
+      "children": [
+        {
+          "name": "baseline_non_apple",
+          "value": 100.0,
+          "children": [
+            {
+              "name": "filesystem_scan",
+              "value": 60.0,
+              "children": []
+            },
+            {
+              "name": "attribute_queries",
+              "value": 25.0,
+              "children": []
+            },
+            {
+              "name": "network_transmission",
+              "value": 15.0,
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "apple_extensions",
+          "value": 7.142857142857143,
+          "children": [
+            {
+              "name": "readdir_attrs_bulk",
+              "value": 4.0,
+              "children": []
+            },
+            {
+              "name": "file_id_optimization",
+              "value": 2.0,
+              "children": []
+            },
+            {
+              "name": "cached_volume_caps",
+              "value": 0.5,
+              "children": []
+            },
+            {
+              "name": "network_transmission",
+              "value": 0.7,
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "concurrent_operations_10_clients",
+      "value": 50.5,
+      "children": [
+        {
+          "name": "client_1_apple",
+          "value": 5.05,
+          "children": [
+            {
+              "name": "connection_setup",
+              "value": 7.8,
+              "children": [
+                {
+                  "name": "socket_accept",
+                  "value": 2.0,
+                  "children": []
+                },
+                {
+                  "name": "protocol_negotiation",
+                  "value": 1.5,
+                  "children": []
+                },
+                {
+                  "name": "aapl_detection",
+                  "value": 2.8,
+                  "children": [
+                    {
+                      "name": "magic_value_check",
+                      "value": 0.1,
+                      "children": []
+                    },
+                    {
+                      "name": "context_validation",
+                      "value": 2.7,
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "aapl_capability_negotiation",
+                  "value": 1.5,
+                  "children": [
+                    {
+                      "name": "memory_allocation",
+                      "value": 0.5,
+                      "children": []
+                    },
+                    {
+                      "name": "capability_parsing",
+                      "value": 0.7,
+                      "children": []
+                    },
+                    {
+                      "name": "feature_negotiation",
+                      "value": 0.3,
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "client_2_apple",
+          "value": 5.05,
+          "children": [
+            {
+              "name": "connection_setup",
+              "value": 7.8,
+              "children": [
+                {
+                  "name": "socket_accept",
+                  "value": 2.0,
+                  "children": []
+                },
+                {
+                  "name": "protocol_negotiation",
+                  "value": 1.5,
+                  "children": []
+                },
+                {
+                  "name": "aapl_detection",
+                  "value": 2.8,
+                  "children": [
+                    {
+                      "name": "magic_value_check",
+                      "value": 0.1,
+                      "children": []
+                    },
+                    {
+                      "name": "context_validation",
+                      "value": 2.7,
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "aapl_capability_negotiation",
+                  "value": 1.5,
+                  "children": [
+                    {
+                      "name": "memory_allocation",
+                      "value": 0.5,
+                      "children": []
+                    },
+                    {
+                      "name": "capability_parsing",
+                      "value": 0.7,
+                      "children": []
+                    },
+                    {
+                      "name": "feature_negotiation",
+                      "value": 0.3,
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "client_3_apple",
+          "value": 5.05,
+          "children": [
+            {
+              "name": "connection_setup",
+              "value": 7.8,
+              "children": [
+                {
+                  "name": "socket_accept",
+                  "value": 2.0,
+                  "children": []
+                },
+                {
+                  "name": "protocol_negotiation",
+                  "value": 1.5,
+                  "children": []
+                },
+                {
+                  "name": "aapl_detection",
+                  "value": 2.8,
+                  "children": [
+                    {
+                      "name": "magic_value_check",
+                      "value": 0.1,
+                      "children": []
+                    },
+                    {
+                      "name": "context_validation",
+                      "value": 2.7,
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "aapl_capability_negotiation",
+                  "value": 1.5,
+                  "children": [
+                    {
+                      "name": "memory_allocation",
+                      "value": 0.5,
+                      "children": []
+                    },
+                    {
+                      "name": "capability_parsing",
+                      "value": 0.7,
+                      "children": []
+                    },
+                    {
+                      "name": "feature_negotiation",
+                      "value": 0.3,
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "client_4_apple",
+          "value": 5.05,
+          "children": [
+            {
+              "name": "connection_setup",
+              "value": 7.8,
+              "children": [
+                {
+                  "name": "socket_accept",
+                  "value": 2.0,
+                  "children": []
+                },
+                {
+                  "name": "protocol_negotiation",
+                  "value": 1.5,
+                  "children": []
+                },
+                {
+                  "name": "aapl_detection",
+                  "value": 2.8,
+                  "children": [
+                    {
+                      "name": "magic_value_check",
+                      "value": 0.1,
+                      "children": []
+                    },
+                    {
+                      "name": "context_validation",
+                      "value": 2.7,
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "aapl_capability_negotiation",
+                  "value": 1.5,
+                  "children": [
+                    {
+                      "name": "memory_allocation",
+                      "value": 0.5,
+                      "children": []
+                    },
+                    {
+                      "name": "capability_parsing",
+                      "value": 0.7,
+                      "children": []
+                    },
+                    {
+                      "name": "feature_negotiation",
+                      "value": 0.3,
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "client_5_apple",
+          "value": 5.05,
+          "children": [
+            {
+              "name": "connection_setup",
+              "value": 7.8,
+              "children": [
+                {
+                  "name": "socket_accept",
+                  "value": 2.0,
+                  "children": []
+                },
+                {
+                  "name": "protocol_negotiation",
+                  "value": 1.5,
+                  "children": []
+                },
+                {
+                  "name": "aapl_detection",
+                  "value": 2.8,
+                  "children": [
+                    {
+                      "name": "magic_value_check",
+                      "value": 0.1,
+                      "children": []
+                    },
+                    {
+                      "name": "context_validation",
+                      "value": 2.7,
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "aapl_capability_negotiation",
+                  "value": 1.5,
+                  "children": [
+                    {
+                      "name": "memory_allocation",
+                      "value": 0.5,
+                      "children": []
+                    },
+                    {
+                      "name": "capability_parsing",
+                      "value": 0.7,
+                      "children": []
+                    },
+                    {
+                      "name": "feature_negotiation",
+                      "value": 0.3,
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "client_6_windows",
+          "value": 5.05,
+          "children": [
+            {
+              "name": "connection_setup",
+              "value": 3.7,
+              "children": [
+                {
+                  "name": "socket_accept",
+                  "value": 2.0,
+                  "children": []
+                },
+                {
+                  "name": "protocol_negotiation",
+                  "value": 1.5,
+                  "children": []
+                },
+                {
+                  "name": "aapl_detection",
+                  "value": 0.2,
+                  "children": [
+                    {
+                      "name": "magic_value_check",
+                      "value": 0.2,
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "client_7_windows",
+          "value": 5.05,
+          "children": [
+            {
+              "name": "connection_setup",
+              "value": 3.7,
+              "children": [
+                {
+                  "name": "socket_accept",
+                  "value": 2.0,
+                  "children": []
+                },
+                {
+                  "name": "protocol_negotiation",
+                  "value": 1.5,
+                  "children": []
+                },
+                {
+                  "name": "aapl_detection",
+                  "value": 0.2,
+                  "children": [
+                    {
+                      "name": "magic_value_check",
+                      "value": 0.2,
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "client_8_windows",
+          "value": 5.05,
+          "children": [
+            {
+              "name": "connection_setup",
+              "value": 3.7,
+              "children": [
+                {
+                  "name": "socket_accept",
+                  "value": 2.0,
+                  "children": []
+                },
+                {
+                  "name": "protocol_negotiation",
+                  "value": 1.5,
+                  "children": []
+                },
+                {
+                  "name": "aapl_detection",
+                  "value": 0.2,
+                  "children": [
+                    {
+                      "name": "magic_value_check",
+                      "value": 0.2,
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "client_9_windows",
+          "value": 5.05,
+          "children": [
+            {
+              "name": "connection_setup",
+              "value": 3.7,
+              "children": [
+                {
+                  "name": "socket_accept",
+                  "value": 2.0,
+                  "children": []
+                },
+                {
+                  "name": "protocol_negotiation",
+                  "value": 1.5,
+                  "children": []
+                },
+                {
+                  "name": "aapl_detection",
+                  "value": 0.2,
+                  "children": [
+                    {
+                      "name": "magic_value_check",
+                      "value": 0.2,
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "client_10_windows",
+          "value": 5.05,
+          "children": [
+            {
+              "name": "connection_setup",
+              "value": 3.7,
+              "children": [
+                {
+                  "name": "socket_accept",
+                  "value": 2.0,
+                  "children": []
+                },
+                {
+                  "name": "protocol_negotiation",
+                  "value": 1.5,
+                  "children": []
+                },
+                {
+                  "name": "aapl_detection",
+                  "value": 0.2,
+                  "children": [
+                    {
+                      "name": "magic_value_check",
+                      "value": 0.2,
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "concurrent_operations_100_clients",
+      "value": 550.0,
+      "children": [
+        {
+          "name": "client_1_apple",
+          "value": 5.5,
+          "children": [
+            {
+              "name": "connection_setup",
+              "value": 7.8,
+              "children": [
+                {
+                  "name": "socket_accept",
+                  "value": 2.0,
+                  "children": []
+                },
+                {
+                  "name": "protocol_negotiation",
+                  "value": 1.5,
+                  "children": []
+                },
+                {
+                  "name": "aapl_detection",
+                  "value": 2.8,
+                  "children": [
+                    {
+                      "name": "magic_value_check",
+                      "value": 0.1,
+                      "children": []
+                    },
+                    {
+                      "name": "context_validation",
+                      "value": 2.7,
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "aapl_capability_negotiation",
+                  "value": 1.5,
+                  "children": [
+                    {
+                      "name": "memory_allocation",
+                      "value": 0.5,
+                      "children": []
+                    },
+                    {
+                      "name": "capability_parsing",
+                      "value": 0.7,
+                      "children": []
+                    },
+                    {
+                      "name": "feature_negotiation",
+                      "value": 0.3,
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "client_2_apple",
+          "value": 5.5,
+          "children": [
+            {
+              "name": "connection_setup",
+              "value": 7.8,
+              "children": [
+                {
+                  "name": "socket_accept",
+                  "value": 2.0,
+                  "children": []
+                },
+                {
+                  "name": "protocol_negotiation",
+                  "value": 1.5,
+                  "children": []
+                },
+                {
+                  "name": "aapl_detection",
+                  "value": 2.8,
+                  "children": [
+                    {
+                      "name": "magic_value_check",
+                      "value": 0.1,
+                      "children": []
+                    },
+                    {
+                      "name": "context_validation",
+                      "value": 2.7,
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "aapl_capability_negotiation",
+                  "value": 1.5,
+                  "children": [
+                    {
+                      "name": "memory_allocation",
+                      "value": 0.5,
+                      "children": []
+                    },
+                    {
+                      "name": "capability_parsing",
+                      "value": 0.7,
+                      "children": []
+                    },
+                    {
+                      "name": "feature_negotiation",
+                      "value": 0.3,
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "client_3_apple",
+          "value": 5.5,
+          "children": [
+            {
+              "name": "connection_setup",
+              "value": 7.8,
+              "children": [
+                {
+                  "name": "socket_accept",
+                  "value": 2.0,
+                  "children": []
+                },
+                {
+                  "name": "protocol_negotiation",
+                  "value": 1.5,
+                  "children": []
+                },
+                {
+                  "name": "aapl_detection",
+                  "value": 2.8,
+                  "children": [
+                    {
+                      "name": "magic_value_check",
+                      "value": 0.1,
+                      "children": []
+                    },
+                    {
+                      "name": "context_validation",
+                      "value": 2.7,
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "aapl_capability_negotiation",
+                  "value": 1.5,
+                  "children": [
+                    {
+                      "name": "memory_allocation",
+                      "value": 0.5,
+                      "children": []
+                    },
+                    {
+                      "name": "capability_parsing",
+                      "value": 0.7,
+                      "children": []
+                    },
+                    {
+                      "name": "feature_negotiation",
+                      "value": 0.3,
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "client_4_apple",
+          "value": 5.5,
+          "children": [
+            {
+              "name": "connection_setup",
+              "value": 7.8,
+              "children": [
+                {
+                  "name": "socket_accept",
+                  "value": 2.0,
+                  "children": []
+                },
+                {
+                  "name": "protocol_negotiation",
+                  "value": 1.5,
+                  "children": []
+                },
+                {
+                  "name": "aapl_detection",
+                  "value": 2.8,
+                  "children": [
+                    {
+                      "name": "magic_value_check",
+                      "value": 0.1,
+                      "children": []
+                    },
+                    {
+                      "name": "context_validation",
+                      "value": 2.7,
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "aapl_capability_negotiation",
+                  "value": 1.5,
+                  "children": [
+                    {
+                      "name": "memory_allocation",
+                      "value": 0.5,
+                      "children": []
+                    },
+                    {
+                      "name": "capability_parsing",
+                      "value": 0.7,
+                      "children": []
+                    },
+                    {
+                      "name": "feature_negotiation",
+                      "value": 0.3,
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "client_5_apple",
+          "value": 5.5,
+          "children": [
+            {
+              "name": "connection_setup",
+              "value": 7.8,
+              "children": [
+                {
+                  "name": "socket_accept",
+                  "value": 2.0,
+                  "children": []
+                },
+                {
+                  "name": "protocol_negotiation",
+                  "value": 1.5,
+                  "children": []
+                },
+                {
+                  "name": "aapl_detection",
+                  "value": 2.8,
+                  "children": [
+                    {
+                      "name": "magic_value_check",
+                      "value": 0.1,
+                      "children": []
+                    },
+                    {
+                      "name": "context_validation",
+                      "value": 2.7,
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "aapl_capability_negotiation",
+                  "value": 1.5,
+                  "children": [
+                    {
+                      "name": "memory_allocation",
+                      "value": 0.5,
+                      "children": []
+                    },
+                    {
+                      "name": "capability_parsing",
+                      "value": 0.7,
+                      "children": []
+                    },
+                    {
+                      "name": "feature_negotiation",
+                      "value": 0.3,
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "client_6_apple",
+          "value": 5.5,
+          "children": [
+            {
+              "name": "connection_setup",
+              "value": 7.8,
+              "children": [
+                {
+                  "name": "socket_accept",
+                  "value": 2.0,
+                  "children": []
+                },
+                {
+                  "name": "protocol_negotiation",
+                  "value": 1.5,
+                  "children": []
+                },
+                {
+                  "name": "aapl_detection",
+                  "value": 2.8,
+                  "children": [
+                    {
+                      "name": "magic_value_check",
+                      "value": 0.1,
+                      "children": []
+                    },
+                    {
+                      "name": "context_validation",
+                      "value": 2.7,
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "aapl_capability_negotiation",
+                  "value": 1.5,
+                  "children": [
+                    {
+                      "name": "memory_allocation",
+                      "value": 0.5,
+                      "children": []
+                    },
+                    {
+                      "name": "capability_parsing",
+                      "value": 0.7,
+                      "children": []
+                    },
+                    {
+                      "name": "feature_negotiation",
+                      "value": 0.3,
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "client_7_apple",
+          "value": 5.5,
+          "children": [
+            {
+              "name": "connection_setup",
+              "value": 7.8,
+              "children": [
+                {
+                  "name": "socket_accept",
+                  "value": 2.0,
+                  "children": []
+                },
+                {
+                  "name": "protocol_negotiation",
+                  "value": 1.5,
+                  "children": []
+                },
+                {
+                  "name": "aapl_detection",
+                  "value": 2.8,
+                  "children": [
+                    {
+                      "name": "magic_value_check",
+                      "value": 0.1,
+                      "children": []
+                    },
+                    {
+                      "name": "context_validation",
+                      "value": 2.7,
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "aapl_capability_negotiation",
+                  "value": 1.5,
+                  "children": [
+                    {
+                      "name": "memory_allocation",
+                      "value": 0.5,
+                      "children": []
+                    },
+                    {
+                      "name": "capability_parsing",
+                      "value": 0.7,
+                      "children": []
+                    },
+                    {
+                      "name": "feature_negotiation",
+                      "value": 0.3,
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "client_8_apple",
+          "value": 5.5,
+          "children": [
+            {
+              "name": "connection_setup",
+              "value": 7.8,
+              "children": [
+                {
+                  "name": "socket_accept",
+                  "value": 2.0,
+                  "children": []
+                },
+                {
+                  "name": "protocol_negotiation",
+                  "value": 1.5,
+                  "children": []
+                },
+                {
+                  "name": "aapl_detection",
+                  "value": 2.8,
+                  "children": [
+                    {
+                      "name": "magic_value_check",
+                      "value": 0.1,
+                      "children": []
+                    },
+                    {
+                      "name": "context_validation",
+                      "value": 2.7,
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "aapl_capability_negotiation",
+                  "value": 1.5,
+                  "children": [
+                    {
+                      "name": "memory_allocation",
+                      "value": 0.5,
+                      "children": []
+                    },
+                    {
+                      "name": "capability_parsing",
+                      "value": 0.7,
+                      "children": []
+                    },
+                    {
+                      "name": "feature_negotiation",
+                      "value": 0.3,
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "client_9_apple",
+          "value": 5.5,
+          "children": [
+            {
+              "name": "connection_setup",
+              "value": 7.8,
+              "children": [
+                {
+                  "name": "socket_accept",
+                  "value": 2.0,
+                  "children": []
+                },
+                {
+                  "name": "protocol_negotiation",
+                  "value": 1.5,
+                  "children": []
+                },
+                {
+                  "name": "aapl_detection",
+                  "value": 2.8,
+                  "children": [
+                    {
+                      "name": "magic_value_check",
+                      "value": 0.1,
+                      "children": []
+                    },
+                    {
+                      "name": "context_validation",
+                      "value": 2.7,
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "aapl_capability_negotiation",
+                  "value": 1.5,
+                  "children": [
+                    {
+                      "name": "memory_allocation",
+                      "value": 0.5,
+                      "children": []
+                    },
+                    {
+                      "name": "capability_parsing",
+                      "value": 0.7,
+                      "children": []
+                    },
+                    {
+                      "name": "feature_negotiation",
+                      "value": 0.3,
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "client_10_apple",
+          "value": 5.5,
+          "children": [
+            {
+              "name": "connection_setup",
+              "value": 7.8,
+              "children": [
+                {
+                  "name": "socket_accept",
+                  "value": 2.0,
+                  "children": []
+                },
+                {
+                  "name": "protocol_negotiation",
+                  "value": 1.5,
+                  "children": []
+                },
+                {
+                  "name": "aapl_detection",
+                  "value": 2.8,
+                  "children": [
+                    {
+                      "name": "magic_value_check",
+                      "value": 0.1,
+                      "children": []
+                    },
+                    {
+                      "name": "context_validation",
+                      "value": 2.7,
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "aapl_capability_negotiation",
+                  "value": 1.5,
+                  "children": [
+                    {
+                      "name": "memory_allocation",
+                      "value": 0.5,
+                      "children": []
+                    },
+                    {
+                      "name": "capability_parsing",
+                      "value": 0.7,
+                      "children": []
+                    },
+                    {
+                      "name": "feature_negotiation",
+                      "value": 0.3,
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "concurrent_operations_1000_clients",
+      "value": 10000.0,
+      "children": [
+        {
+          "name": "client_1_apple",
+          "value": 10.0,
+          "children": [
+            {
+              "name": "connection_setup",
+              "value": 7.8,
+              "children": [
+                {
+                  "name": "socket_accept",
+                  "value": 2.0,
+                  "children": []
+                },
+                {
+                  "name": "protocol_negotiation",
+                  "value": 1.5,
+                  "children": []
+                },
+                {
+                  "name": "aapl_detection",
+                  "value": 2.8,
+                  "children": [
+                    {
+                      "name": "magic_value_check",
+                      "value": 0.1,
+                      "children": []
+                    },
+                    {
+                      "name": "context_validation",
+                      "value": 2.7,
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "aapl_capability_negotiation",
+                  "value": 1.5,
+                  "children": [
+                    {
+                      "name": "memory_allocation",
+                      "value": 0.5,
+                      "children": []
+                    },
+                    {
+                      "name": "capability_parsing",
+                      "value": 0.7,
+                      "children": []
+                    },
+                    {
+                      "name": "feature_negotiation",
+                      "value": 0.3,
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "client_2_apple",
+          "value": 10.0,
+          "children": [
+            {
+              "name": "connection_setup",
+              "value": 7.8,
+              "children": [
+                {
+                  "name": "socket_accept",
+                  "value": 2.0,
+                  "children": []
+                },
+                {
+                  "name": "protocol_negotiation",
+                  "value": 1.5,
+                  "children": []
+                },
+                {
+                  "name": "aapl_detection",
+                  "value": 2.8,
+                  "children": [
+                    {
+                      "name": "magic_value_check",
+                      "value": 0.1,
+                      "children": []
+                    },
+                    {
+                      "name": "context_validation",
+                      "value": 2.7,
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "aapl_capability_negotiation",
+                  "value": 1.5,
+                  "children": [
+                    {
+                      "name": "memory_allocation",
+                      "value": 0.5,
+                      "children": []
+                    },
+                    {
+                      "name": "capability_parsing",
+                      "value": 0.7,
+                      "children": []
+                    },
+                    {
+                      "name": "feature_negotiation",
+                      "value": 0.3,
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "client_3_apple",
+          "value": 10.0,
+          "children": [
+            {
+              "name": "connection_setup",
+              "value": 7.8,
+              "children": [
+                {
+                  "name": "socket_accept",
+                  "value": 2.0,
+                  "children": []
+                },
+                {
+                  "name": "protocol_negotiation",
+                  "value": 1.5,
+                  "children": []
+                },
+                {
+                  "name": "aapl_detection",
+                  "value": 2.8,
+                  "children": [
+                    {
+                      "name": "magic_value_check",
+                      "value": 0.1,
+                      "children": []
+                    },
+                    {
+                      "name": "context_validation",
+                      "value": 2.7,
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "aapl_capability_negotiation",
+                  "value": 1.5,
+                  "children": [
+                    {
+                      "name": "memory_allocation",
+                      "value": 0.5,
+                      "children": []
+                    },
+                    {
+                      "name": "capability_parsing",
+                      "value": 0.7,
+                      "children": []
+                    },
+                    {
+                      "name": "feature_negotiation",
+                      "value": 0.3,
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "client_4_apple",
+          "value": 10.0,
+          "children": [
+            {
+              "name": "connection_setup",
+              "value": 7.8,
+              "children": [
+                {
+                  "name": "socket_accept",
+                  "value": 2.0,
+                  "children": []
+                },
+                {
+                  "name": "protocol_negotiation",
+                  "value": 1.5,
+                  "children": []
+                },
+                {
+                  "name": "aapl_detection",
+                  "value": 2.8,
+                  "children": [
+                    {
+                      "name": "magic_value_check",
+                      "value": 0.1,
+                      "children": []
+                    },
+                    {
+                      "name": "context_validation",
+                      "value": 2.7,
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "aapl_capability_negotiation",
+                  "value": 1.5,
+                  "children": [
+                    {
+                      "name": "memory_allocation",
+                      "value": 0.5,
+                      "children": []
+                    },
+                    {
+                      "name": "capability_parsing",
+                      "value": 0.7,
+                      "children": []
+                    },
+                    {
+                      "name": "feature_negotiation",
+                      "value": 0.3,
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "client_5_apple",
+          "value": 10.0,
+          "children": [
+            {
+              "name": "connection_setup",
+              "value": 7.8,
+              "children": [
+                {
+                  "name": "socket_accept",
+                  "value": 2.0,
+                  "children": []
+                },
+                {
+                  "name": "protocol_negotiation",
+                  "value": 1.5,
+                  "children": []
+                },
+                {
+                  "name": "aapl_detection",
+                  "value": 2.8,
+                  "children": [
+                    {
+                      "name": "magic_value_check",
+                      "value": 0.1,
+                      "children": []
+                    },
+                    {
+                      "name": "context_validation",
+                      "value": 2.7,
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "aapl_capability_negotiation",
+                  "value": 1.5,
+                  "children": [
+                    {
+                      "name": "memory_allocation",
+                      "value": 0.5,
+                      "children": []
+                    },
+                    {
+                      "name": "capability_parsing",
+                      "value": 0.7,
+                      "children": []
+                    },
+                    {
+                      "name": "feature_negotiation",
+                      "value": 0.3,
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "client_6_apple",
+          "value": 10.0,
+          "children": [
+            {
+              "name": "connection_setup",
+              "value": 7.8,
+              "children": [
+                {
+                  "name": "socket_accept",
+                  "value": 2.0,
+                  "children": []
+                },
+                {
+                  "name": "protocol_negotiation",
+                  "value": 1.5,
+                  "children": []
+                },
+                {
+                  "name": "aapl_detection",
+                  "value": 2.8,
+                  "children": [
+                    {
+                      "name": "magic_value_check",
+                      "value": 0.1,
+                      "children": []
+                    },
+                    {
+                      "name": "context_validation",
+                      "value": 2.7,
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "aapl_capability_negotiation",
+                  "value": 1.5,
+                  "children": [
+                    {
+                      "name": "memory_allocation",
+                      "value": 0.5,
+                      "children": []
+                    },
+                    {
+                      "name": "capability_parsing",
+                      "value": 0.7,
+                      "children": []
+                    },
+                    {
+                      "name": "feature_negotiation",
+                      "value": 0.3,
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "client_7_apple",
+          "value": 10.0,
+          "children": [
+            {
+              "name": "connection_setup",
+              "value": 7.8,
+              "children": [
+                {
+                  "name": "socket_accept",
+                  "value": 2.0,
+                  "children": []
+                },
+                {
+                  "name": "protocol_negotiation",
+                  "value": 1.5,
+                  "children": []
+                },
+                {
+                  "name": "aapl_detection",
+                  "value": 2.8,
+                  "children": [
+                    {
+                      "name": "magic_value_check",
+                      "value": 0.1,
+                      "children": []
+                    },
+                    {
+                      "name": "context_validation",
+                      "value": 2.7,
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "aapl_capability_negotiation",
+                  "value": 1.5,
+                  "children": [
+                    {
+                      "name": "memory_allocation",
+                      "value": 0.5,
+                      "children": []
+                    },
+                    {
+                      "name": "capability_parsing",
+                      "value": 0.7,
+                      "children": []
+                    },
+                    {
+                      "name": "feature_negotiation",
+                      "value": 0.3,
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "client_8_apple",
+          "value": 10.0,
+          "children": [
+            {
+              "name": "connection_setup",
+              "value": 7.8,
+              "children": [
+                {
+                  "name": "socket_accept",
+                  "value": 2.0,
+                  "children": []
+                },
+                {
+                  "name": "protocol_negotiation",
+                  "value": 1.5,
+                  "children": []
+                },
+                {
+                  "name": "aapl_detection",
+                  "value": 2.8,
+                  "children": [
+                    {
+                      "name": "magic_value_check",
+                      "value": 0.1,
+                      "children": []
+                    },
+                    {
+                      "name": "context_validation",
+                      "value": 2.7,
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "aapl_capability_negotiation",
+                  "value": 1.5,
+                  "children": [
+                    {
+                      "name": "memory_allocation",
+                      "value": 0.5,
+                      "children": []
+                    },
+                    {
+                      "name": "capability_parsing",
+                      "value": 0.7,
+                      "children": []
+                    },
+                    {
+                      "name": "feature_negotiation",
+                      "value": 0.3,
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "client_9_apple",
+          "value": 10.0,
+          "children": [
+            {
+              "name": "connection_setup",
+              "value": 7.8,
+              "children": [
+                {
+                  "name": "socket_accept",
+                  "value": 2.0,
+                  "children": []
+                },
+                {
+                  "name": "protocol_negotiation",
+                  "value": 1.5,
+                  "children": []
+                },
+                {
+                  "name": "aapl_detection",
+                  "value": 2.8,
+                  "children": [
+                    {
+                      "name": "magic_value_check",
+                      "value": 0.1,
+                      "children": []
+                    },
+                    {
+                      "name": "context_validation",
+                      "value": 2.7,
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "aapl_capability_negotiation",
+                  "value": 1.5,
+                  "children": [
+                    {
+                      "name": "memory_allocation",
+                      "value": 0.5,
+                      "children": []
+                    },
+                    {
+                      "name": "capability_parsing",
+                      "value": 0.7,
+                      "children": []
+                    },
+                    {
+                      "name": "feature_negotiation",
+                      "value": 0.3,
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "client_10_apple",
+          "value": 10.0,
+          "children": [
+            {
+              "name": "connection_setup",
+              "value": 7.8,
+              "children": [
+                {
+                  "name": "socket_accept",
+                  "value": 2.0,
+                  "children": []
+                },
+                {
+                  "name": "protocol_negotiation",
+                  "value": 1.5,
+                  "children": []
+                },
+                {
+                  "name": "aapl_detection",
+                  "value": 2.8,
+                  "children": [
+                    {
+                      "name": "magic_value_check",
+                      "value": 0.1,
+                      "children": []
+                    },
+                    {
+                      "name": "context_validation",
+                      "value": 2.7,
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "aapl_capability_negotiation",
+                  "value": 1.5,
+                  "children": [
+                    {
+                      "name": "memory_allocation",
+                      "value": 0.5,
+                      "children": []
+                    },
+                    {
+                      "name": "capability_parsing",
+                      "value": 0.7,
+                      "children": []
+                    },
+                    {
+                      "name": "feature_negotiation",
+                      "value": 0.3,
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "stress_test_300s",
+      "value": 3846000.0,
+      "children": [
+        {
+          "name": "apple_client_operations",
+          "value": 1500000.0,
+          "children": [
+            {
+              "name": "connection_setup",
+              "value": 936000.0,
+              "children": []
+            },
+            {
+              "name": "directory_operations",
+              "value": 384000.0,
+              "children": []
+            },
+            {
+              "name": "file_operations",
+              "value": 180000.0,
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "non_apple_client_operations",
+          "value": 1835999.9999999998,
+          "children": [
+            {
+              "name": "connection_setup",
+              "value": 666000.0,
+              "children": []
+            },
+            {
+              "name": "directory_operations",
+              "value": 900000.0,
+              "children": []
+            },
+            {
+              "name": "file_operations",
+              "value": 270000.0,
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "memory_management",
+          "value": 240000.0,
+          "children": [
+            {
+              "name": "allocations",
+              "value": 150000.0,
+              "children": []
+            },
+            {
+              "name": "deallocations",
+              "value": 90000.0,
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "lock_contention",
+          "value": 30000.0,
+          "children": []
+        }
+      ]
+    }
+  ]
+}

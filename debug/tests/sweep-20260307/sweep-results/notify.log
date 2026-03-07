@@ -1,0 +1,16 @@
+smbtorture 4.23.6
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772857710
+time: 2026-03-07 04:28:30.472724
+progress: 23
+test: valid-req
+time: 2026-03-07 04:28:30.473392
+TESTING VALIDITY OF CHANGE NOTIFY REQUEST
+time: 2026-03-07 04:29:35.386679
+failure: valid-req [
+(../../source4/torture/smb2/notify.c:121) Incorrect status NT_STATUS_CONNECTION_DISCONNECTED - should be NT_STATUS_OK
+]
+test: tcon
+time: 2026-03-07 04:29:35.386733
+TESTING SIMPLE CHANGE NOTIFY
+Testing notify mkdir

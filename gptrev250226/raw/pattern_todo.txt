@@ -1,0 +1,37 @@
+ksmbd-tools/tests/test_config_parser.c:43:	fd = g_file_open_tmp("ksmbd-test-XXXXXX.conf", &path, &error);
+src/protocol/common/smb_common.c:548: * TODO: Though this function conforms the restriction of 8.3 Filename spec,
+src/include/protocol/smb2pdu.h:108:/* BB FIXME - analyze following length BB */
+ksmbd-tools/adduser/md4_hash.c:70:/* XXX: this stuff can be optimized */
+src/protocol/smb1/smb1misc.c:20: * TODO: properly check client authetication and tree authentication
+src/protocol/smb1/smb1misc.c:35:	/* TODO : check for oplock break */
+src/transport/transport_rdma.c:1260:	//FIXME: skip RFC1002 header..
+src/protocol/smb1/smb1pdu.c:2683:	/* TODO:
+src/protocol/smb1/smb1pdu.c:2863:	/* TODO: is it normal file, named pipe, printer, modem etc*/
+src/protocol/smb1/smb1pdu.c:2993:	 * TODO: linux cifs client does not send LastWriteTime,
+src/protocol/smb1/smb1pdu.c:4752:		/* TODO: process caps */
+src/protocol/smb1/smb1pdu.c:5411:	/* TODO: check dos mode and acl bits if req->Attributes nonzero */
+src/protocol/smb1/smb1pdu.c:7361:	/* TODO: check dos mode and acl bits if req->Attributes nonzero */
+src/protocol/smb1/smb1pdu.c:8799:	 * FIXME: signed tree connect failed by signing error
+src/fs/ksmbd_reparse.c:388:	 * TODO: implement atomic file-to-symlink replacement
+src/fs/ksmbd_reparse.c:662:	 * TODO: implement symlink-to-file conversion
+src/fs/ksmbd_info.c:11: *   TODO: Incrementally migrate info-level handlers from the monolithic
+src/encoding/unicode.c:433:		 * FIXME: We can not handle remapping backslash (UNI_SLASH)
+src/fs/ksmbd_fsctl.c:158:	 * TODO: This is dummy implementation to pass smbtorture
+src/protocol/smb2/smb2_query_set.c:1205:		 * TODO : The current implementation is based on
+src/protocol/smb2/smb2_query_set.c:1862:	 * TODO : It's working fine only when store dos attributes
+src/protocol/smb2/smb2_query_set.c:2100:	 * TODO : need to implement consideration for
+src/core/misc.c:23: * TODO : implement consideration about DOS_DOT, DOS_QM and DOS_STAR
+src/core/misc.c:444:	/* XXX */
+src/protocol/smb2/smb2_session.c:720:			/* TODO: need one more negotiation */
+src/protocol/smb2/smb2_pdu_common.c:354:	 * TODO: Need to adjuct CreditRequest value according to
+src/core/auth.c:619:	/* TODO : use domain name that imported from configuration file */
+src/protocol/smb2/smb2_create.c:1056:		 * TODO: dispatch to registered create context handlers
+src/protocol/smb2/smb2_ioctl.c:512:	/* TODO: migrate to registered handler */
+src/protocol/smb2/smb2_ioctl.c:519:	/* TODO: migrate to registered handler */
+src/protocol/smb2/smb2_ioctl.c:534:	/* TODO: migrate to registered handler */
+src/protocol/smb2/smb2_ioctl.c:565:	/* TODO: migrate to registered handler */
+src/protocol/smb2/smb2_ioctl.c:576:	/* TODO: migrate to registered handler */
+src/protocol/smb2/smb2_ioctl.c:620:	/* TODO: migrate to registered handler */
+src/protocol/smb2/smb2_ioctl.c:641:	/* TODO: migrate to registered handler */
+src/protocol/smb2/smb2_ioctl.c:662:	/* TODO: migrate to registered handler */
+src/protocol/smb2/smb2_ioctl.c:695:		 * XXX: It is not clear if FSCTL_DUPLICATE_EXTENTS_TO_FILE

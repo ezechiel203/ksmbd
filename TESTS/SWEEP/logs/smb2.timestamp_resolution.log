@@ -1,0 +1,14 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772585237
+time: 2026-03-04 00:47:17.969452
+progress: 1
+test: resolution1
+time: 2026-03-04 00:47:17.971096
+Write without delay, expect no write-time change
+Initial: Wed Mar  4 01:47:18 2026 CET
+Close: Wed Mar  4 01:47:18 2026 CET
+time: 2026-03-04 00:47:18.018105
+failure: resolution1 [
+../../source4/torture/smb2/timestamps.c:2011: finfo1.basic_info.out.write_time was 134170588380780000 (0x1DCAB7073BDD5E0), expected 134170588380830000 (0x1DCAB7073BE9930): Write time changed (wrong!)
+]

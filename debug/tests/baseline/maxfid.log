@@ -1,0 +1,8 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772499777
+time: 2026-03-03 01:02:57.902299
+test: maxfid
+time: 2026-03-03 01:02:57.903222
+Creating subdirectories
+Testing maximum number of open files

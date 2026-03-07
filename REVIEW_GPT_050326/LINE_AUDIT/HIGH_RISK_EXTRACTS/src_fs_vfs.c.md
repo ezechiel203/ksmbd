@@ -1,0 +1,239 @@
+# src/fs/vfs.c
+
+Risk-tagged lines (LOCK/LIFETIME/WAIT_LOOP/ERROR_PATH/MEM_BOUNDS/PROTO_GATE):
+
+- L00118 [ERROR_PATH|] `		return -ENOENT;`
+- L00164 [ERROR_PATH|] `		return -ENOENT;`
+- L00174 [ERROR_PATH|] `			return -ENOENT;`
+- L00188 [ERROR_PATH|] `				return -ENOENT;`
+- L00204 [ERROR_PATH|] `		return -ENOENT;`
+- L00223 [ERROR_PATH|] `		return -ENOENT;`
+- L00235 [ERROR_PATH|] `			return -ENOENT;`
+- L00279 [ERROR_PATH|] `		goto out_err;`
+- L00285 [ERROR_PATH|] `		goto out_err;`
+- L00450 [ERROR_PATH|] `			pr_err("path create failed for %s, err %d\n",`
+- L00475 [ERROR_PATH|] `		pr_err("File(%s): creation failed (err:%d)\n", name, err);`
+- L00567 [ERROR_PATH|] `			goto out_err;`
+- L00572 [ERROR_PATH|] `			goto out_err;`
+- L00587 [ERROR_PATH|] `		pr_err("mkdir(%s): creation failed (err:%d)\n", name, err);`
+- L00604 [ERROR_PATH|] `		goto out;`
+- L00621 [ERROR_PATH|] `			pr_err("failed to get xattr in file\n");`
+- L00658 [MEM_BOUNDS|] `			stream_buf = kvzalloc(AFP_AFPINFO_SIZE,`
+- L00661 [ERROR_PATH|] `				return -ENOMEM;`
+- L00671 [ERROR_PATH|] `			goto have_data;`
+- L00682 [ERROR_PATH|] `		goto free_buf;`
+- L00689 [MEM_BOUNDS|] `	memcpy(buf, &stream_buf[*pos], count);`
+- L00722 [LOCK|] `	spin_lock(&ctx->flc_lock);`
+- L00736 [ERROR_PATH|] `					pr_err("not allow write by shared lock\n");`
+- L00738 [ERROR_PATH|] `					goto out;`
+- L00752 [ERROR_PATH|] `					pr_err("not allow rw access by exclusive lock from other opens\n");`
+- L00753 [ERROR_PATH|] `					goto out;`
+- L00759 [LOCK|] `	spin_unlock(&ctx->flc_lock);`
+- L00781 [ERROR_PATH|] `		return -EISDIR;`
+- L00788 [ERROR_PATH|] `			pr_err("no right to read(%pD)\n", fp->filp);`
+- L00789 [ERROR_PATH|] `			return -EACCES;`
+- L00801 [ERROR_PATH|] `			pr_err("unable to read due to lock\n");`
+- L00802 [ERROR_PATH|] `			return -EAGAIN;`
+- L00808 [ERROR_PATH|] `		pr_err("smb read failed, err = %zd\n", nbytes);`
+- L00840 [ERROR_PATH|] `		return -EISDIR;`
+- L00847 [ERROR_PATH|] `			pr_err("no right to read(%pD)\n", fp->filp);`
+- L00848 [ERROR_PATH|] `			return -EACCES;`
+- L00854 [ERROR_PATH|] `		return -EOPNOTSUPP;`
+- L00861 [ERROR_PATH|] `			pr_err("unable to read due to lock\n");`
+- L00862 [ERROR_PATH|] `			return -EAGAIN;`
+- L00893 [ERROR_PATH|] `		pr_err("stream write position %lld is out of bounds\n",	*pos);`
+- L00894 [ERROR_PATH|] `		return -EINVAL;`
+- L00913 [ERROR_PATH|] `		pr_err("not found stream in xattr : %zd\n", v_len);`
+- L00915 [ERROR_PATH|] `		goto out;`
+- L00919 [MEM_BOUNDS|] `		wbuf = kvzalloc(size, KSMBD_DEFAULT_GFP);`
+- L00922 [ERROR_PATH|] `			goto out;`
+- L00926 [MEM_BOUNDS|] `			memcpy(wbuf, stream_buf, v_len);`
+- L00931 [MEM_BOUNDS|] `	memcpy(&stream_buf[*pos], buf, count);`
+- L00945 [ERROR_PATH|] `		goto out;`
+- L01000 [ERROR_PATH|] `			pr_err("no right to write(%pD)\n", fp->filp);`
+- L01002 [ERROR_PATH|] `			goto out;`
+- L01012 [ERROR_PATH|] `		goto out;`
+- L01018 [ERROR_PATH|] `			pr_err("unable to write due to lock\n");`
+- L01020 [ERROR_PATH|] `			goto out;`
+- L01033 [ERROR_PATH|] `		goto out;`
+- L01047 [ERROR_PATH|] `			pr_err("fsync failed for filename = %pD, err = %d\n",`
+- L01068 [ERROR_PATH|] `		pr_err("getattr failed, err %d\n", err);`
+- L01131 [ERROR_PATH|] `		return -ENOMEM;`
+- L01141 [ERROR_PATH|] `			return -ENOENT;`
+- L01154 [ERROR_PATH|] `			pr_err("failed to get filp for fid %llu\n", fid);`
+- L01155 [ERROR_PATH|] `			return -ENOENT;`
+- L01178 [ERROR_PATH|] `		goto out;`
+- L01187 [ERROR_PATH|] `		goto out;`
+- L01194 [ERROR_PATH|] `			goto out;`
+- L01244 [ERROR_PATH|] `		pr_err("Symlink target '%s' escapes share boundary\n", name);`
+- L01245 [ERROR_PATH|] `		return -EACCES;`
+- L01249 [ERROR_PATH|] `		return -ENOMEM;`
+- L01259 [ERROR_PATH|] `		pr_err("path create failed for %s, err %d\n", name, err);`
+- L01304 [ERROR_PATH|] `		return -ENOENT;`
+- L01308 [ERROR_PATH|] `		return -EINVAL;`
+- L01314 [ERROR_PATH|] `		pr_err("readlink failed, err = %d\n", err);`
+- L01322 [MEM_BOUNDS|] `	memcpy(buf, link, len);`
+- L01332 [ERROR_PATH|] `		pr_err("readlink failed, err = %d\n", err);`
+- L01362 [MEM_BOUNDS|] `	name = kmalloc(file_pathlen + 1, KSMBD_DEFAULT_GFP);`
+- L01364 [ERROR_PATH|] `		return -ENOMEM;`
+- L01366 [MEM_BOUNDS|] `	memcpy(name, dir_path, dir_pathlen);`
+- L01368 [MEM_BOUNDS|] `	memcpy(name + dir_pathlen + 1, de_name, de_name_len);`
+- L01373 [ERROR_PATH|] `		pr_err("lookup failed: %s [%d]\n", name, rc);`
+- L01375 [ERROR_PATH|] `		return -ENOMEM;`
+- L01407 [ERROR_PATH|] `		pr_err("failed to get filp for fid %llu\n", fid);`
+- L01408 [ERROR_PATH|] `		return -ENOENT;`
+- L01412 [ERROR_PATH|] `		pr_err("smb fsync failed, err = %d\n", err);`
+- L01427 [ERROR_PATH|] `				pr_err("smb fullfsync flush failed, err = %d\n",`
+- L01451 [ERROR_PATH|] `		return -ENOMEM;`
+- L01455 [ERROR_PATH|] `		goto out_err;`
+- L01496 [ERROR_PATH|] `		return -ENOMEM;`
+- L01525 [ERROR_PATH|] `		goto out_err;`
+- L01581 [ERROR_PATH|] `		return -ENOMEM;`
+- L01589 [ERROR_PATH|] `		pr_err("cannot get linux path for %s, err = %d\n",`
+- L01591 [ERROR_PATH|] `		goto out1;`
+- L01599 [ERROR_PATH|] `		pr_err("path create err for %s, err %d\n", newname, err);`
+- L01600 [ERROR_PATH|] `		goto out2;`
+- L01605 [ERROR_PATH|] `		pr_err("vfs_link failed err %d\n", err);`
+- L01606 [ERROR_PATH|] `		goto out3;`
+- L01657 [ERROR_PATH|] `		return -ENOMEM;`
+- L01662 [ERROR_PATH|] `		goto revert_fsids;`
+- L01680 [ERROR_PATH|] `		goto out1;`
+- L01684 [ERROR_PATH|] `		goto out2;`
+- L01689 [ERROR_PATH|] `		goto out2;`
+- L01694 [ERROR_PATH|] `		goto out_drop_write;`
+- L01700 [ERROR_PATH|] `		goto out3;`
+- L01705 [PROTO_GATE|] `	 * block the rename with STATUS_SHARING_VIOLATION.  This matches`
+- L01715 [ERROR_PATH|] `			goto out3;`
+- L01723 [PROTO_GATE|] `	 * rename (Windows semantics: STATUS_ACCESS_DENIED).`
+- L01735 [LOCK|] `		spin_lock(&old_child->d_lock);`
+- L01741 [LOCK|] `			spin_unlock(&old_child->d_lock);`
+- L01750 [ERROR_PATH|] `				goto out3;`
+- L01753 [LOCK|] `			spin_lock(&old_child->d_lock);`
+- L01755 [LOCK|] `		spin_unlock(&old_child->d_lock);`
+- L01757 [LOCK|] `		spin_lock(&old_child->d_lock);`
+- L01762 [LOCK|] `			spin_unlock(&old_child->d_lock);`
+- L01771 [ERROR_PATH|] `				goto out3;`
+- L01774 [LOCK|] `			spin_lock(&old_child->d_lock);`
+- L01776 [LOCK|] `		spin_unlock(&old_child->d_lock);`
+- L01789 [ERROR_PATH|] `		goto out3;`
+- L01794 [ERROR_PATH|] `		goto out4;`
+- L01804 [ERROR_PATH|] `		goto out4;`
+- L01811 [ERROR_PATH|] `		goto out4;`
+- L01816 [ERROR_PATH|] `		goto out4;`
+- L01857 [ERROR_PATH|] `		goto retry;`
+- L01871 [LOCK|] `	spin_lock(&src_dent->d_lock);`
+- L01880 [LOCK|] `			spin_unlock(&src_dent->d_lock);`
+- L01882 [ERROR_PATH|] `			return -EACCES;`
+- L01885 [LOCK|] `	spin_unlock(&src_dent->d_lock);`
+- L01920 [ERROR_PATH|] `		return -ENOENT;`
+- L01922 [ERROR_PATH|] `		return -ENOENT;`
+- L01924 [ERROR_PATH|] `		return -ENOENT;`
+- L01926 [ERROR_PATH|] `		return -EINVAL;`
+- L01929 [ERROR_PATH|] `		return -ENOMEM;`
+- L01948 [ERROR_PATH|] `		pr_err("lookup failed %s [%d]\n", dst_name, err);`
+- L01949 [ERROR_PATH|] `		goto out;`
+- L01987 [ERROR_PATH|] `		pr_err("vfs_rename failed err %d\n", err);`
+- L02023 [ERROR_PATH|] `		goto out;`
+- L02049 [ERROR_PATH|] `		goto out_lock;`
+- L02055 [ERROR_PATH|] `		goto out_lock;`
+- L02104 [ERROR_PATH|] `		return -EINVAL;`
+- L02123 [ERROR_PATH|] `			pr_err("failed due to lock\n");`
+- L02124 [ERROR_PATH|] `			return -EAGAIN;`
+- L02130 [ERROR_PATH|] `		pr_err("truncate failed, err %d\n", err);`
+- L02157 [ERROR_PATH|] `		return -ENOENT;`
+- L02162 [ERROR_PATH|] `		return -ENOENT;`
+- L02166 [ERROR_PATH|] `		pr_err("resolve_fileid: inode %llu is outside share boundary\n",`
+- L02169 [ERROR_PATH|] `		return -EACCES;`
+- L02172 [MEM_BOUNDS|] `	path_buf = kmalloc(PATH_MAX, KSMBD_DEFAULT_GFP);`
+- L02175 [ERROR_PATH|] `		return -ENOMEM;`
+- L02193 [ERROR_PATH|] `		return -ENAMETOOLONG;`
+- L02196 [MEM_BOUNDS|] `	memcpy(buf, resolved, len + 1);`
+- L02289 [MEM_BOUNDS|] `	vlist = kvzalloc(size, KSMBD_DEFAULT_GFP);`
+- L02291 [ERROR_PATH|] `		return -ENOMEM;`
+- L02298 [ERROR_PATH|] `		goto retry;`
+- L02361 [MEM_BOUNDS|] `	buf = kmalloc(xattr_len + 1, KSMBD_DEFAULT_GFP);`
+- L02363 [ERROR_PATH|] `		return -ENOMEM;`
+- L02450 [ERROR_PATH|] `		return -ENOMEM;`
+- L02520 [ERROR_PATH|] `		goto out;`
+- L02523 [ERROR_PATH|] `		goto out;`
+- L02528 [ERROR_PATH|] `		goto out;`
+- L02571 [ERROR_PATH|] `		goto out;`
+- L02574 [ERROR_PATH|] `		goto out;`
+- L02624 [MEM_BOUNDS|] `	    check_add_overflow(sizeof(struct xattr_smb_acl), alloc_size, &alloc_size))`
+- L02625 [ERROR_PATH|] `		goto out;`
+- L02627 [MEM_BOUNDS|] `	smb_acl = kzalloc(alloc_size, KSMBD_DEFAULT_GFP);`
+- L02629 [ERROR_PATH|] `		goto out;`
+- L02665 [ERROR_PATH|] `			pr_err("unknown type : 0x%x\n", pa_entry->e_tag);`
+- L02666 [ERROR_PATH|] `			goto out;`
+- L02702 [MEM_BOUNDS|] `	memcpy(acl.desc, "posix_acl", 9);`
+- L02708 [ERROR_PATH|] `		return -EINVAL;`
+- L02722 [ERROR_PATH|] `		pr_err("failed to generate hash for ndr acl\n");`
+- L02747 [ERROR_PATH|] `		pr_err("failed to encode ndr to posix acl\n");`
+- L02748 [ERROR_PATH|] `		goto out;`
+- L02754 [ERROR_PATH|] `		pr_err("failed to generate hash for ndr acl\n");`
+- L02755 [ERROR_PATH|] `		goto out;`
+- L02760 [ERROR_PATH|] `		pr_err("failed to encode ndr to posix acl\n");`
+- L02761 [ERROR_PATH|] `		goto out;`
+- L02772 [ERROR_PATH|] `		pr_err("Failed to store XATTR ntacl :%d\n", rc);`
+- L02810 [ERROR_PATH|] `		goto free_n_data;`
+- L02833 [ERROR_PATH|] `		pr_err("failed to encode ndr to posix acl\n");`
+- L02834 [ERROR_PATH|] `		goto out_free;`
+- L02839 [ERROR_PATH|] `		pr_err("failed to generate hash for ndr acl\n");`
+- L02840 [ERROR_PATH|] `		goto out_free;`
+- L02844 [ERROR_PATH|] `		pr_err("hash value diff\n");`
+- L02846 [ERROR_PATH|] `		goto out_free;`
+- L02851 [ERROR_PATH|] `		pr_err("sd size is invalid\n");`
+- L02852 [ERROR_PATH|] `		goto out_free;`
+- L02858 [ERROR_PATH|] `		pr_err("invalid NTSD offset: underflow detected\n");`
+- L02860 [ERROR_PATH|] `		goto out_free;`
+- L02961 [LOCK|] `		spin_lock(&filp->f_lock);`
+- L02963 [LOCK|] `		spin_unlock(&filp->f_lock);`
+- L02965 [LOCK|] `		spin_lock(&filp->f_lock);`
+- L02967 [LOCK|] `		spin_unlock(&filp->f_lock);`
+- L02977 [ERROR_PATH|] `		return -EAGAIN;`
+- L03012 [MEM_BOUNDS|] `		zbuf = kzalloc(PAGE_SIZE, GFP_KERNEL);`
+- L03014 [ERROR_PATH|] `			return -ENOMEM;`
+- L03047 [ERROR_PATH|] `		return -EFBIG;`
+- L03090 [PROTO_GATE|] `	 * STATUS_BUFFER_OVERFLOW per MS-FSCC.`
+- L03146 [ERROR_PATH|] `		goto out;`
+- L03236 [ERROR_PATH|] `		pr_err("dentry open failed, err %d\n", err);`
+- L03243 [ERROR_PATH|] `		pr_err_ratelimited("path escapes share root\n");`
+- L03254 [ERROR_PATH|] `		pr_err("id insert failed\n");`
+- L03255 [ERROR_PATH|] `		goto err_out;`
+- L03263 [ERROR_PATH|] `			goto err_out;`
+- L03272 [ERROR_PATH|] `		pr_err("err : %d\n", err);`
+- L03301 [ERROR_PATH|] `		return -ENOTEMPTY;`
+- L03360 [MEM_BOUNDS|] `		memcpy((char *)buf->private, name, buf->used);`
+- L03365 [ERROR_PATH|] `		return -EEXIST;`
+- L03445 [ERROR_PATH|] `			goto out;`
+- L03448 [ERROR_PATH|] `			goto retry;`
+- L03459 [ERROR_PATH|] `			goto out;`
+- L03552 [ERROR_PATH|] `			return -ENOMEM;`
+- L03574 [ERROR_PATH|] `				goto out;`
+- L03584 [ERROR_PATH|] `				goto out;`
+- L03587 [ERROR_PATH|] `				goto out;`
+- L03615 [ERROR_PATH|] `		goto free_abs_name;`
+- L03626 [ERROR_PATH|] `			goto free_abs_name;`
+- L03634 [ERROR_PATH|] `			goto out;`
+- L03650 [ERROR_PATH|] `				goto out;`
+- L03660 [ERROR_PATH|] `				goto out;`
+- L03665 [ERROR_PATH|] `				goto out;`
+- L03702 [PROTO_GATE|] `	 * clients using SMB2_INDEX_SPECIFIED get correct resume positions.`
+- L03796 [ERROR_PATH|] `		goto out;`
+- L03830 [ERROR_PATH|] `		return -ENOMEM;`
+- L03857 [ERROR_PATH|] `		pr_err("no right to read(%pD)\n", src_fp->filp);`
+- L03858 [ERROR_PATH|] `		return -EACCES;`
+- L03861 [ERROR_PATH|] `		pr_err("no right to write(%pD)\n", dst_fp->filp);`
+- L03862 [ERROR_PATH|] `		return -EACCES;`
+- L03866 [ERROR_PATH|] `		return -EBADF;`
+- L03878 [ERROR_PATH|] `				return -EAGAIN;`
+- L03881 [ERROR_PATH|] `				return -EAGAIN;`
+- L03910 [MEM_BOUNDS|] `			bounce = kvmalloc(len, GFP_KERNEL);`
+- L03964 [WAIT_LOOP|] `	wait_event_interruptible(flock->c.flc_wait, !flock->c.flc_blocker);`
+- L03966 [WAIT_LOOP|] `	wait_event_interruptible(flock->fl_wait, !flock->fl_blocker);`
+- L03973 [WAIT_LOOP|] `	return wait_event_interruptible_timeout(flock->c.flc_wait,`
+- L03976 [WAIT_LOOP|] `	return wait_event_interruptible_timeout(flock->fl_wait,`
+- L04002 [ERROR_PATH|] `		return -EOPNOTSUPP;`
+- L04024 [ERROR_PATH|] `		return -ENOMEM;`
+- L04084 [ERROR_PATH|] `		return -EOPNOTSUPP;`
+- L04092 [ERROR_PATH|] `		return -ENOENT;`

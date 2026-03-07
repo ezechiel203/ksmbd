@@ -1,0 +1,6 @@
+==> Starting VM10
+  Disk:       /home/ezechiel203/ksmbd/vm/arch-ksmbd-VM10.qcow2
+  SMB:        localhost:20445 -> 445
+  QUIC/proxy: localhost:20443 -> 443 (tcp+udp)
+  SSH:        localhost:20022 -> 22
+  Serial log: /home/ezechiel203/ksmbd/vm/qemu-serial-VM10.log

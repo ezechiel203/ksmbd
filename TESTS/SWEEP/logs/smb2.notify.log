@@ -1,0 +1,8 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772587634
+time: 2026-03-04 01:27:14.740287
+progress: 23
+test: valid-req
+time: 2026-03-04 01:27:14.740766
+TESTING VALIDITY OF CHANGE NOTIFY REQUEST

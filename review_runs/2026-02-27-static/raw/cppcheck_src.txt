@@ -1,0 +1,288 @@
+src/core/auth.c:656:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 9, 0)
+ ^
+src/core/compat.c:10:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 6, 0)
+ ^
+src/core/connection.c:147:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 17, 0)
+ ^
+src/core/ksmbd_work.c:89:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 18, 0)
+ ^
+src/core/misc.c:298:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 6, 0)
+ ^
+src/core/server.c:479:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 4, 0)
+ ^
+src/core/smb2_compress.c:308:6: style: The scope of the variable 'rc' can be reduced. [variableScope]
+ int rc;
+     ^
+src/core/smb2_compress.c:281:41: style: Variable 'hdr' can be declared as pointer to const [constVariablePointer]
+ struct smb2_compression_transform_hdr *hdr = smb2_get_msg(buf);
+                                        ^
+src/core/smb2_compress.c:306:8: style: Variable 'uncompressed_part' can be declared as pointer to const [constVariablePointer]
+ char *uncompressed_part;
+       ^
+src/core/smb2_compress.c:307:8: style: Variable 'compressed_part' can be declared as pointer to const [constVariablePointer]
+ char *compressed_part;
+       ^
+src/core/smb2_compress.c:449:21: style: Variable 'conn' can be declared as pointer to const [constVariablePointer]
+ struct ksmbd_conn *conn = work->conn;
+                    ^
+src/core/smb2_compress.c:564:26: portability: 'comp_transform_buf' is of type 'void *'. When using void pointers in calculations, the behaviour is undefined. [arithOperationsOnVoidPointer]
+     (comp_transform_buf + 4);
+                         ^
+src/core/smb2_compress.c:572:28: portability: 'comp_transform_buf' is of type 'void *'. When using void pointers in calculations, the behaviour is undefined. [arithOperationsOnVoidPointer]
+ memcpy(comp_transform_buf + 4 +
+                           ^
+src/core/smb2_compress.c:572:32: portability: 'comp_transform_buf+4' is of type 'void *'. When using void pointers in calculations, the behaviour is undefined. [arithOperationsOnVoidPointer]
+ memcpy(comp_transform_buf + 4 +
+                               ^
+src/core/smb2_compress.c:577:28: portability: 'comp_transform_buf' is of type 'void *'. When using void pointers in calculations, the behaviour is undefined. [arithOperationsOnVoidPointer]
+ memcpy(comp_transform_buf + 4 +
+                           ^
+src/core/smb2_compress.c:577:32: portability: 'comp_transform_buf+4' is of type 'void *'. When using void pointers in calculations, the behaviour is undefined. [arithOperationsOnVoidPointer]
+ memcpy(comp_transform_buf + 4 +
+                               ^
+src/core/smb2_compress.c:578:55: portability: 'comp_transform_buf+4+sizeof(struct smb2_compression_transform_hdr)' is of type 'void *'. When using void pointers in calculations, the behaviour is undefined. [arithOperationsOnVoidPointer]
+        sizeof(struct smb2_compression_transform_hdr) +
+                                                      ^
+src/encoding/asn1.c:110:35: style: Parameter 'oid1' can be declared as pointer to const [constParameterPointer]
+static bool oid_eq(unsigned long *oid1, unsigned int oid1len,
+                                  ^
+src/encoding/asn1.c:111:21: style: Parameter 'oid2' can be declared as pointer to const [constParameterPointer]
+     unsigned long *oid2, unsigned int oid2len)
+                    ^
+src/encoding/asn1.c:184:13: style: Parameter 'ntlm_blob' can be declared as pointer to const [constParameterPointer]
+      char *ntlm_blob, int ntlm_blob_len)
+            ^
+src/encoding/ndr.c:9:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 12, 0)
+ ^
+src/encoding/unicode.c:12:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 12, 0)
+ ^
+src/fs/ksmbd_app_instance.c:83:25: style: Parameter 'fp' can be declared as pointer to const [constParameterPointer]
+     struct ksmbd_file *fp,
+                        ^
+src/fs/ksmbd_branchcache.c:264:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0)
+ ^
+src/fs/ksmbd_create_ctx.c:217:7: style: Condition 'ret' is always false [knownConditionTrueFalse]
+  if (ret) {
+      ^
+src/fs/ksmbd_create_ctx.c:215:38: note: Calling function 'ksmbd_register_create_context' returns 0
+  ret = ksmbd_register_create_context(
+                                     ^
+src/fs/ksmbd_create_ctx.c:215:38: note: Assignment 'ret=ksmbd_register_create_context(&builtin_create_ctx_handlers[i])', assigned value is 0
+  ret = ksmbd_register_create_context(
+                                     ^
+src/fs/ksmbd_create_ctx.c:217:7: note: Condition 'ret' is always false
+  if (ret) {
+      ^
+src/fs/ksmbd_create_ctx.c:113:47: style: Parameter 'work' can be declared as pointer to const. However it seems that 'mxac_on_request' is a callback function, if 'work' is declared with const you might also need to cast function pointer(s). [constParameterCallback]
+static int mxac_on_request(struct ksmbd_work *work,
+                                              ^
+src/fs/ksmbd_create_ctx.c:190:17: note: You might need to cast the function pointer here
+  .on_request = mxac_on_request,
+                ^
+src/fs/ksmbd_create_ctx.c:113:47: note: Parameter 'work' can be declared as pointer to const
+static int mxac_on_request(struct ksmbd_work *work,
+                                              ^
+src/fs/ksmbd_create_ctx.c:114:26: style: Parameter 'fp' can be declared as pointer to const. However it seems that 'mxac_on_request' is a callback function, if 'fp' is declared with const you might also need to cast function pointer(s). [constParameterCallback]
+      struct ksmbd_file *fp,
+                         ^
+src/fs/ksmbd_create_ctx.c:190:17: note: You might need to cast the function pointer here
+  .on_request = mxac_on_request,
+                ^
+src/fs/ksmbd_create_ctx.c:114:26: note: Parameter 'fp' can be declared as pointer to const
+      struct ksmbd_file *fp,
+                         ^
+src/fs/ksmbd_create_ctx.c:151:47: style: Parameter 'work' can be declared as pointer to const. However it seems that 'qfid_on_request' is a callback function, if 'work' is declared with const you might also need to cast function pointer(s). [constParameterCallback]
+static int qfid_on_request(struct ksmbd_work *work,
+                                              ^
+src/fs/ksmbd_create_ctx.c:197:17: note: You might need to cast the function pointer here
+  .on_request = qfid_on_request,
+                ^
+src/fs/ksmbd_create_ctx.c:151:47: note: Parameter 'work' can be declared as pointer to const
+static int qfid_on_request(struct ksmbd_work *work,
+                                              ^
+src/fs/ksmbd_create_ctx.c:152:26: style: Parameter 'fp' can be declared as pointer to const. However it seems that 'qfid_on_request' is a callback function, if 'fp' is declared with const you might also need to cast function pointer(s). [constParameterCallback]
+      struct ksmbd_file *fp,
+                         ^
+src/fs/ksmbd_create_ctx.c:197:17: note: You might need to cast the function pointer here
+  .on_request = qfid_on_request,
+                ^
+src/fs/ksmbd_create_ctx.c:152:26: note: Parameter 'fp' can be declared as pointer to const
+      struct ksmbd_file *fp,
+                         ^
+src/fs/ksmbd_fsctl.c:172:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+ ^
+src/fs/ksmbd_info.c:859:72: style: Parameter 'conn' can be declared as pointer to const [constParameterPointer]
+static void ksmbd_info_fill_remote_protocol_version(struct ksmbd_conn *conn,
+                                                                       ^
+src/fs/ksmbd_notify.c:493:19: style: The scope of the variable 'hdr' can be reduced. [variableScope]
+ struct smb2_hdr *hdr;
+                  ^
+src/fs/ksmbd_notify.c:524:28: style: The scope of the variable 'rsp' can be reduced. [variableScope]
+   struct smb2_notify_rsp *rsp;
+                           ^
+src/fs/ksmbd_notify.c:258:26: style: Parameter 'group' can be declared as pointer to const. However it seems that 'ksmbd_notify_handle_event' is a callback function, if 'group' is declared with const you might also need to cast function pointer(s). [constParameterCallback]
+  struct fsnotify_group *group,
+                         ^
+src/fs/ksmbd_notify.c:321:18: note: You might need to cast the function pointer here
+ .handle_event = ksmbd_notify_handle_event,
+                 ^
+src/fs/ksmbd_notify.c:258:26: note: Parameter 'group' can be declared as pointer to const
+  struct fsnotify_group *group,
+                         ^
+src/fs/ksmbd_notify.c:493:19: style: Variable 'hdr' can be declared as pointer to const [constVariablePointer]
+ struct smb2_hdr *hdr;
+                  ^
+src/fs/ksmbd_quota.c:259:20: style: Variable 'sid' can be declared as pointer to const [constVariablePointer]
+   struct smb_sid *sid;
+                   ^
+src/fs/ksmbd_quota.c:324:19: style: Variable 'sid' can be declared as pointer to const [constVariablePointer]
+  struct smb_sid *sid;
+                  ^
+src/fs/ksmbd_quota.c:243:26: portability: '(void*)req' is of type 'void *'. When using void pointers in calculations, the behaviour is undefined. [arithOperationsOnVoidPointer]
+ input_buf = (void *)req + le16_to_cpu(req->InputBufferOffset) -
+                         ^
+src/fs/ksmbd_quota.c:254:32: portability: '(void*)qqi' is of type 'void *'. When using void pointers in calculations, the behaviour is undefined. [arithOperationsOnVoidPointer]
+  void *sid_list = (void *)qqi + sizeof(*qqi);
+                               ^
+src/fs/ksmbd_quota.c:268:50: portability: 'sid_list' is of type 'void *'. When using void pointers in calculations, the behaviour is undefined. [arithOperationsOnVoidPointer]
+   gqi = (struct file_get_quota_info *)(sid_list + offset);
+                                                 ^
+src/fs/ksmbd_reparse.c:79:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+ ^
+src/fs/ksmbd_vss.c:262:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0)
+ ^
+src/fs/oplock.c:1968:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+ ^
+src/fs/smbacl.c:14:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 17, 0)
+ ^
+src/fs/vfs.c:10:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+ ^
+src/fs/vfs_cache.c:9:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+ ^
+src/mgmt/ksmbd_witness.c:127:2: error: There is an unknown macro here somewhere. Configuration is required. If list_for_each_entry_safe is a macro then please configure it. [unknownMacro]
+ list_for_each_entry_safe(reg, tmp, &res->subscribers, list)
+ ^
+src/mgmt/share_config.h:44:53: style: Parameter 'share' can be declared as pointer to const [constParameterPointer]
+share_config_create_mode(struct ksmbd_share_config *share,
+                                                    ^
+src/mgmt/share_config.h:53:56: style: Parameter 'share' can be declared as pointer to const [constParameterPointer]
+share_config_directory_mode(struct ksmbd_share_config *share,
+                                                       ^
+src/mgmt/share_config.h:61:69: style: Parameter 'share' can be declared as pointer to const [constParameterPointer]
+static inline int test_share_config_flag(struct ksmbd_share_config *share,
+                                                                    ^
+src/mgmt/user_config.h:25:50: style: Parameter 'user' can be declared as pointer to const [constParameterPointer]
+static inline bool user_guest(struct ksmbd_user *user)
+                                                 ^
+src/mgmt/user_config.h:35:53: style: Parameter 'user' can be declared as pointer to const [constParameterPointer]
+static inline int test_user_flag(struct ksmbd_user *user, int flag)
+                                                    ^
+src/mgmt/user_config.h:40:54: style: Parameter 'user' can be declared as pointer to const [constParameterPointer]
+static inline void set_user_guest(struct ksmbd_user *user)
+                                                     ^
+src/mgmt/user_config.h:44:53: style: Parameter 'user' can be declared as pointer to const [constParameterPointer]
+static inline char *user_passkey(struct ksmbd_user *user)
+                                                    ^
+src/mgmt/user_config.h:49:50: style: Parameter 'user' can be declared as pointer to const [constParameterPointer]
+static inline char *user_name(struct ksmbd_user *user)
+                                                 ^
+src/mgmt/user_config.h:54:56: style: Parameter 'user' can be declared as pointer to const [constParameterPointer]
+static inline unsigned int user_uid(struct ksmbd_user *user)
+                                                       ^
+src/mgmt/user_config.h:59:56: style: Parameter 'user' can be declared as pointer to const [constParameterPointer]
+static inline unsigned int user_gid(struct ksmbd_user *user)
+                                                       ^
+src/mgmt/user_session.h:81:59: style: Parameter 'sess' can be declared as pointer to const [constParameterPointer]
+static inline int test_session_flag(struct ksmbd_session *sess, int bit)
+                                                          ^
+src/mgmt/share_config.c:102:28: error: Uninitialized variable: share->name [uninitvar]
+  if (!strcmp(name, share->name))
+                           ^
+src/mgmt/tree_connect.h:45:66: style: Parameter 'tree_conn' can be declared as pointer to const [constParameterPointer]
+static inline int test_tree_conn_flag(struct ksmbd_tree_connect *tree_conn,
+                                                                 ^
+src/mgmt/tree_connect.c:159:11: error: Uninitialized variable: tc->t_state [uninitvar]
+  if (tc->t_state == TREE_DISCONNECTED) {
+          ^
+src/mgmt/user_config.c:94:45: style: Parameter 'user' can be declared as pointer to const [constParameterPointer]
+int ksmbd_anonymous_user(struct ksmbd_user *user)
+                                            ^
+src/mgmt/user_session.c:325:3: error: There is an unknown macro here somewhere. Configuration is required. If hlist_for_each_entry_safe is a macro then please configure it. [unknownMacro]
+  hlist_for_each_entry_safe(sess, n, &to_destroy, hlist)
+  ^
+src/protocol/common/smb_common.c:489:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+ ^
+src/protocol/smb1/smb1misc.c:44:49: style: Parameter 'hdr' can be declared as pointer to const [constParameterPointer]
+static int smb1_req_struct_size(struct smb_hdr *hdr)
+                                                ^
+src/protocol/smb1/smb1pdu.c:13:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+ ^
+src/protocol/smb2/smb2_create.c:25:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+ ^
+src/protocol/smb2/smb2_dir.c:25:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+ ^
+src/protocol/smb2/smb2_ioctl.c:25:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+ ^
+src/protocol/smb2/smb2_lock.c:25:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+ ^
+src/protocol/smb2/smb2_misc_cmds.c:17:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+ ^
+src/protocol/smb2/smb2_negotiate.c:25:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+ ^
+src/protocol/smb2/smb2_pdu_common.c:25:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+ ^
+src/protocol/smb2/smb2_query_set.c:17:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+ ^
+src/protocol/smb2/smb2_read_write.c:25:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+ ^
+src/protocol/smb2/smb2_session.c:25:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+ ^
+src/protocol/smb2/smb2_tree.c:17:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+ ^
+src/protocol/smb2/smb2fruit.c:593:7: error: There is an unknown macro here somewhere. Configuration is required. If AFP_RESOURCE_STREAM is a macro then please configure it. [unknownMacro]
+      XATTR_NAME_AFP_RESOURCE,
+      ^
+src/protocol/smb2/smb2misc.c:15:44: style: Parameter 'hdr' can be declared as pointer to const [constParameterPointer]
+static int check_smb2_hdr(struct smb2_hdr *hdr)
+                                           ^
+src/transport/transport_ipc.c:299:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0)
+ ^
+src/transport/transport_quic.c:513:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 19, 0)
+ ^
+src/transport/transport_rdma.c:2013:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 5, 0)
+ ^
+src/transport/transport_tcp.c:65:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 8, 0)
+ ^

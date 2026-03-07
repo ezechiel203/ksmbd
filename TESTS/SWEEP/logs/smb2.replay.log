@@ -1,0 +1,155 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772584866
+time: 2026-03-04 00:41:06.623647
+progress: 60
+test: replay-commands
+time: 2026-03-04 00:41:06.625978
+Try Commands with Replay Flags Enabled
+Trying create
+Trying write
+Trying flush
+Trying read
+Trying setinfo
+Trying getinfo
+Trying ioctl
+Trying lock
+time: 2026-03-04 00:41:06.709420
+success: replay-commands
+test: replay-regular
+time: 2026-03-04 00:41:06.709487
+No replay detection for regular create
+time: 2026-03-04 00:41:06.772335
+success: replay-regular
+test: replay-dhv2-oplock1
+time: 2026-03-04 00:41:06.772390
+Replay of DurableHandleReqV2 on Single Channel
+time: 2026-03-04 00:41:06.876510
+success: replay-dhv2-oplock1
+test: replay-dhv2-oplock2
+time: 2026-03-04 00:41:06.876558
+Replay of DurableHandleReqV2 on Single Channel
+transport[0x5616507fffa0] Acking to level II [0x01] in oplock handler
+time: 2026-03-04 00:41:07.010017
+success: replay-dhv2-oplock2
+test: replay-dhv2-oplock3
+time: 2026-03-04 00:41:07.010071
+Replay of DurableHandleReqV2 on Single Channel
+transport[0x5616507fffa0] Acking to level II [0x01] in oplock handler
+time: 2026-03-04 00:41:07.092142
+success: replay-dhv2-oplock3
+test: replay-dhv2-oplock-lease
+time: 2026-03-04 00:41:07.092192
+Replay of DurableHandleReqV2 on Single Channel
+time: 2026-03-04 00:41:07.130806
+success: replay-dhv2-oplock-lease
+test: replay-dhv2-lease1
+time: 2026-03-04 00:41:07.130856
+Replay of DurableHandleReqV2 with Lease on Single Channel
+time: 2026-03-04 00:41:07.182182
+success: replay-dhv2-lease1
+test: replay-dhv2-lease2
+time: 2026-03-04 00:41:07.182244
+Replay of DurableHandleReqV2 with Lease on Single Channel
+time: 2026-03-04 00:41:07.228698
+success: replay-dhv2-lease2
+test: replay-dhv2-lease3
+time: 2026-03-04 00:41:07.228750
+Replay of DurableHandleReqV2 with Lease on Single Channel
+time: 2026-03-04 00:41:07.258196
+success: replay-dhv2-lease3
+test: replay-dhv2-lease-oplock
+time: 2026-03-04 00:41:07.258253
+Replay of DurableHandleReqV2 with Lease on Single Channel
+time: 2026-03-04 00:41:07.330767
+success: replay-dhv2-lease-oplock
+test: dhv2-pending1n-vs-violation-lease-close-sane
+time: 2026-03-04 00:41:07.330818
+Waiting for a potential lease break...
+transport[0x5616507fffa0] Skip acking to 0x3 (RH) in lease handler
+Got 1 lease breaks
+time: 2026-03-04 00:41:07.414520
+failure: dhv2-pending1n-vs-violation-lease-close-sane [
+(../../source4/torture/smb2/replay.c:1569): wrong value for lb->new_lease_state got 0x3 - should be 0x5
+]
+test: dhv2-pending1n-vs-violation-lease-ack-sane
+time: 2026-03-04 00:41:07.414578
+Waiting for a potential lease break...
+transport[0x561650ad9d60] Skip acking to 0x3 (RH) in lease handler
+Got 1 lease breaks
+time: 2026-03-04 00:41:07.489738
+failure: dhv2-pending1n-vs-violation-lease-ack-sane [
+(../../source4/torture/smb2/replay.c:1569): wrong value for lb->new_lease_state got 0x3 - should be 0x5
+]
+test: dhv2-pending1n-vs-violation-lease-close-windows
+time: 2026-03-04 00:41:07.489794
+Waiting for a potential lease break...
+transport[0x5616507fffa0] Skip acking to 0x3 (RH) in lease handler
+Got 1 lease breaks
+time: 2026-03-04 00:41:07.664388
+failure: dhv2-pending1n-vs-violation-lease-close-windows [
+(../../source4/torture/smb2/replay.c:1569): wrong value for lb->new_lease_state got 0x3 - should be 0x5
+]
+test: dhv2-pending1n-vs-violation-lease-ack-windows
+time: 2026-03-04 00:41:07.664445
+Waiting for a potential lease break...
+transport[0x561650ad9d60] Skip acking to 0x3 (RH) in lease handler
+Got 1 lease breaks
+time: 2026-03-04 00:41:07.750041
+failure: dhv2-pending1n-vs-violation-lease-ack-windows [
+(../../source4/torture/smb2/replay.c:1569): wrong value for lb->new_lease_state got 0x3 - should be 0x5
+]
+test: dhv2-pending1n-vs-oplock-sane
+time: 2026-03-04 00:41:07.750107
+Waiting for a potential oplock break...
+transport[0x5616507fffa0] skip acking to level II [0x01] in oplock handler
+Got 1 oplock breaks
+Waiting for async response: req21
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+time: 2026-03-04 00:41:46.698625
+failure: dhv2-pending1n-vs-oplock-sane [
+../../source4/torture/smb2/replay.c:2228: Incorrect status NT_STATUS_OK - should be NT_STATUS_FILE_NOT_AVAILABLE
+]
+test: dhv2-pending1n-vs-oplock-windows
+time: 2026-03-04 00:41:46.698706
+Waiting for a potential oplock break...
+transport[0x561650ad9d60] skip acking to level II [0x01] in oplock handler
+Got 1 oplock breaks
+Waiting for async response: req21
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+time: 2026-03-04 00:42:23.539746
+failure: dhv2-pending1n-vs-oplock-windows [
+../../source4/torture/smb2/replay.c:2228: Incorrect status NT_STATUS_OK - should be NT_STATUS_ACCESS_DENIED
+]
+test: dhv2-pending1n-vs-lease-sane
+time: 2026-03-04 00:42:23.539807
+Waiting for a potential lease break...
+transport[0x5616507fffa0] Skip acking to 0x3 (RH) in lease handler
+Got 1 lease breaks
+Waiting for async response: req21
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+time: 2026-03-04 00:42:29.570189
+failure: dhv2-pending1n-vs-lease-sane [
+../../source4/torture/smb2/replay.c:2228: Incorrect status NT_STATUS_IO_TIMEOUT - should be NT_STATUS_FILE_NOT_AVAILABLE
+]
+test: dhv2-pending1n-vs-lease-windows
+time: 2026-03-04 00:42:29.570263
+Waiting for a potential lease break...
+transport[0x561650ad9d60] Skip acking to 0x3 (RH) in lease handler
+Got 1 lease breaks
+Waiting for async response: req21
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+time: 2026-03-04 00:42:35.627236
+failure: dhv2-pending1n-vs-lease-windows [
+../../source4/torture/smb2/replay.c:2228: Incorrect status NT_STATUS_IO_TIMEOUT - should be NT_STATUS_ACCESS_DENIED
+]
+test: dhv2-pending1l-vs-oplock-sane
+time: 2026-03-04 00:42:35.627300
+Waiting for a potential oplock break...
+transport[0x5616507fffa0] skip acking to level II [0x01] in oplock handler
+Got 1 oplock breaks
+Waiting for async response: req21

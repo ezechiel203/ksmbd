@@ -1,0 +1,98 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772585232
+time: 2026-03-04 00:47:12.619563
+progress: 14
+test: dir
+time: 2026-03-04 00:47:12.620691
+teststreams\stream.txt:Stream One
+(../../source4/torture/smb2/streams.c:214) opening non-existent directory stream
+(../../source4/torture/smb2/streams.c:229) opening basedir  stream
+time: 2026-03-04 00:47:12.697975
+failure: dir [
+../../source4/torture/smb2/streams.c:242: status was NT_STATUS_OK, expected NT_STATUS_NOT_A_DIRECTORY: CHECK_STATUS
+]
+test: io
+time: 2026-03-04 00:47:12.698027
+(../../source4/torture/smb2/streams.c:301) creating a stream on a non-existent file
+(../../source4/torture/smb2/streams.c:321) check that open of base file is allowed
+(../../source4/torture/smb2/streams.c:328) writing to stream
+(../../source4/torture/smb2/streams.c:343) modifying stream
+(../../source4/torture/smb2/streams.c:353) creating a stream2 on a existing file
+(../../source4/torture/smb2/streams.c:360) modifying stream
+(../../source4/torture/smb2/streams.c:409) deleting stream
+(../../source4/torture/smb2/streams.c:422) delete a stream via delete-on-close
+(../../source4/torture/smb2/streams.c:454) deleting file
+time: 2026-03-04 00:47:12.783177
+success: io
+test: sharemodes
+time: 2026-03-04 00:47:12.783231
+(../../source4/torture/smb2/streams.c:570) Testing stream share mode conflicts
+time: 2026-03-04 00:47:12.856176
+success: sharemodes
+test: names
+time: 2026-03-04 00:47:12.856227
+(../../source4/torture/smb2/streams.c:847) testing stream names
+time: 2026-03-04 00:47:12.900333
+success: names
+test: names2
+time: 2026-03-04 00:47:12.900384
+(../../source4/torture/smb2/streams.c:1141) testing stream names
+time: 2026-03-04 00:47:13.056235
+success: names2
+test: names3
+time: 2026-03-04 00:47:13.056301
+(../../source4/torture/smb2/streams.c:1269) testing case insensitive stream names
+time: 2026-03-04 00:47:13.092800
+success: names3
+test: rename
+time: 2026-03-04 00:47:13.092852
+(../../source4/torture/smb2/streams.c:1350) testing stream renames
+time: 2026-03-04 00:47:13.140531
+success: rename
+test: rename2
+time: 2026-03-04 00:47:13.140580
+(../../source4/torture/smb2/streams.c:1475) Checking SMB2 rename of a stream using :<stream>
+(../../source4/torture/smb2/streams.c:1489) Checking SMB2 rename of an overwriting stream using :<stream>
+(../../source4/torture/smb2/streams.c:1519) Checking SMB2 rename of a stream using <base>:<stream>
+(../../source4/torture/smb2/streams.c:1529) Checking SMB2 rename to default stream using :<stream>
+time: 2026-03-04 00:47:13.244175
+success: rename2
+test: create-disposition
+time: 2026-03-04 00:47:13.244227
+(../../source4/torture/smb2/streams.c:1635) Checking create disp: open
+(../../source4/torture/smb2/streams.c:1649) Checking create disp: overwrite
+(../../source4/torture/smb2/streams.c:1663) Checking create disp: overwrite_if
+(../../source4/torture/smb2/streams.c:1681) Checking create disp: supersede
+(../../source4/torture/smb2/streams.c:1701) Checking create disp: overwrite_if on stream
+time: 2026-03-04 00:47:13.263353
+success: create-disposition
+test: attributes1
+time: 2026-03-04 00:47:13.263405
+(../../source4/torture/smb2/streams.c:1779) testing attribute setting on stream
+time: 2026-03-04 00:47:13.300029
+success: attributes1
+test: attributes2
+time: 2026-03-04 00:47:13.300095
+Let's dance!
+time: 2026-03-04 00:47:13.358549
+success: attributes2
+test: delete
+time: 2026-03-04 00:47:13.358601
+(../../source4/torture/smb2/streams.c:679) opening non-existent file stream
+time: 2026-03-04 00:47:13.399786
+failure: delete [
+../../source4/torture/smb2/streams.c:750: status was NT_STATUS_OK, expected NT_STATUS_DELETE_PENDING: CHECK_STATUS
+]
+test: zero-byte
+time: 2026-03-04 00:47:13.399842
+(../../source4/torture/smb2/streams.c:490) Check 0 byte named stream
+time: 2026-03-04 00:47:13.449191
+success: zero-byte
+test: basefile-rename-with-open-stream
+time: 2026-03-04 00:47:13.449244
+Creating file with stream
+Writing to stream
+Renaming base file
+time: 2026-03-04 00:47:13.466310
+success: basefile-rename-with-open-stream

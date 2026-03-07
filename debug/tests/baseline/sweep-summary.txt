@@ -1,0 +1,103 @@
+==========================================================================
+KSMBD smbtorture Sweep Summary - VM2 (port 12445)
+Date: 2026-03-03
+Branch: phase1-security-hardening
+==========================================================================
+
+SUITE                            PASS   FAIL   SKIP   STATUS
+--------------------------------------------------------------------------
+smb2.compound                      20      0      0   PASS
+smb2.compound_async                 6      4      0   FAIL
+smb2.compound_find                  2      1      0   FAIL
+smb2.connect                        1      0      0   PASS
+smb2.create                        16      1      1   FAIL
+smb2.credits                        2      0      0   PASS
+smb2.delete-on-close-perms          8      1      0   FAIL
+smb2.dir                            7      0      0   PASS
+smb2.dirlease                       3     12      0   FAIL
+smb2.dosmode                        0      1      0   FAIL
+smb2.durable-open                  16      9      1   FAIL
+smb2.durable-v2-open               21     12      0   FAIL
+smb2.getinfo                        8      0      0   PASS
+smb2.ioctl                         43     17     15   FAIL
+smb2.lease                         22      8      1   FAIL
+smb2.lock                          22      0      4   PASS
+smb2.maxfid                         0      0      0   NO-RESULT
+smb2.maximum_allowed                2      0      0   PASS
+smb2.mkdir                          1      0      0   PASS
+smb2.mux                            0      0      0   NO-RESULT
+smb2.notify                         1      1      0   FAIL
+smb2.openattr                       1      0      0   PASS
+smb2.oplock                        41      1      0   FAIL
+smb2.read                           4      0      1   PASS
+smb2.rename                        13      0      0   PASS
+smb2.replay                         2     17      0   FAIL
+smb2.rw                             3      1      0   FAIL
+smb2.secleak                        0      1      0   FAIL
+smb2.session                        8     15     45   FAIL
+smb2.setinfo                        1      0      0   PASS
+smb2.streams                       11      3      0   FAIL
+smb2.zero-data-ioctl                0      1      0   FAIL
+--------------------------------------------------------------------------
+TOTAL                             285    106     68
+==========================================================================
+
+Grand total individual tests:  459
+Pass:                          285
+Fail:                          106
+Skip:                          68
+Pass rate (of pass+fail):      72.9%
+
+--------------------------------------------------------------------------
+Suites with 100% pass (0 failures):
+  smb2.compound                  20 passed
+  smb2.connect                   1 passed
+  smb2.credits                   2 passed
+  smb2.dir                       7 passed
+  smb2.getinfo                   8 passed
+  smb2.lock                      22 passed
+  smb2.maximum_allowed           2 passed
+  smb2.mkdir                     1 passed
+  smb2.openattr                  1 passed
+  smb2.read                      4 passed
+  smb2.rename                    13 passed
+  smb2.setinfo                   1 passed
+
+--------------------------------------------------------------------------
+Suites with failures (sorted by fail count desc):
+  smb2.ioctl: 17 failures (of 60 tests)
+  smb2.replay: 17 failures (of 19 tests)
+  smb2.session: 15 failures (of 23 tests)
+  smb2.dirlease: 12 failures (of 15 tests)
+  smb2.durable-v2-open: 12 failures (of 33 tests)
+  smb2.durable-open: 9 failures (of 25 tests)
+  smb2.lease: 8 failures (of 30 tests)
+  smb2.compound_async: 4 failures (of 10 tests)
+  smb2.streams: 3 failures (of 14 tests)
+  smb2.compound_find: 1 failures (of 3 tests)
+  smb2.create: 1 failures (of 17 tests)
+  smb2.delete-on-close-perms: 1 failures (of 9 tests)
+  smb2.dosmode: 1 failures (of 1 tests)
+  smb2.notify: 1 failures (of 2 tests)
+  smb2.oplock: 1 failures (of 42 tests)
+  smb2.rw: 1 failures (of 4 tests)
+  smb2.secleak: 1 failures (of 1 tests)
+  smb2.zero-data-ioctl: 1 failures (of 1 tests)
+
+--------------------------------------------------------------------------
+VM2 Configuration:
+  SSH port:    12022
+  SMB port:    12445
+  Min proto:   SMB2_10
+  Max proto:   SMB3_11
+  Leases:      yes
+  Durables:    yes
+  ACL xattr:   yes
+  Oplocks:     yes
+  Streams:     yes
+
+Test infrastructure:
+  smbtorture:  host
+  Restart between heavy suites: yes
+  Debug logging: all
+==========================================================================

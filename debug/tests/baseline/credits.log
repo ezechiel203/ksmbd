@@ -1,0 +1,15 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772498605
+time: 2026-03-03 00:43:25.765249
+progress: 10
+test: session_setup_credits_granted
+time: 2026-03-03 00:43:25.766115
+time: 2026-03-03 00:43:25.995239
+success: session_setup_credits_granted
+test: single_req_credits_granted
+time: 2026-03-03 00:43:25.995289
+time: 2026-03-03 00:43:26.306378
+success: single_req_credits_granted
+test: skipped_mid
+time: 2026-03-03 00:43:26.306435

@@ -1,0 +1,30 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772586198
+time: 2026-03-04 01:03:18.599294
+progress: 4
+test: Testing composite character (a umlaut)
+time: 2026-03-04 01:03:18.600946
+time: 2026-03-04 01:03:19.110771
+failure: Testing composite character (a umlaut) [
+../../source4/torture/smb2/charset.c:114: status was NT_STATUS_OBJECT_NAME_INVALID, expected NT_STATUS_OK: Failed to create composed name
+]
+test: Testing naked diacritical (umlaut)
+time: 2026-03-04 01:03:19.111137
+time: 2026-03-04 01:03:19.552135
+failure: Testing naked diacritical (umlaut) [
+../../source4/torture/smb2/charset.c:143: status was NT_STATUS_OBJECT_NAME_INVALID, expected NT_STATUS_OK: Failed to create naked diacritical
+]
+test: Testing partial surrogate
+time: 2026-03-04 01:03:19.552191
+Failed to convert UCS2 Name into unix - convert_string_talloc() failure
+time: 2026-03-04 01:03:19.998607
+failure: Testing partial surrogate [
+../../source4/torture/smb2/charset.c:174: status was NT_STATUS_NO_MEMORY, expected NT_STATUS_OK: Failed to create partial surrogate 1
+]
+test: Testing wide-a
+time: 2026-03-04 01:03:19.998652
+time: 2026-03-04 01:03:20.323785
+failure: Testing wide-a [
+../../source4/torture/smb2/charset.c:210: status was NT_STATUS_OBJECT_NAME_INVALID, expected NT_STATUS_OK: Failed to create wide-a
+]

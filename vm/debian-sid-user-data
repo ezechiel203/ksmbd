@@ -1,0 +1,21 @@
+#cloud-config
+hostname: ksmbd-vm-e
+manage_etc_hosts: true
+disable_root: false
+ssh_pwauth: true
+users:
+  - default
+chpasswd:
+  expire: false
+  users:
+    - name: root
+      password: root
+      type: text
+    - name: debian
+      password: debian
+      type: text
+runcmd:
+  - grep -q '^PasswordAuthentication ' /etc/ssh/sshd_config && sed -i 's/^PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config || echo 'PasswordAuthentication yes' >> /etc/ssh/sshd_config
+  - grep -q '^PermitRootLogin ' /etc/ssh/sshd_config && sed -i 's/^PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config || echo 'PermitRootLogin yes' >> /etc/ssh/sshd_config
+  - systemctl enable ssh || true
+  - systemctl restart ssh || true

@@ -1,0 +1,40 @@
+make[2]: Nothing to be done for 'install-exec-am'.
+make[2]: Nothing to be done for 'install-data-am'.
+make[2]: Leaving directory '/mnt/ksmbd/ksmbd-tools/adduser'
+make[1]: Leaving directory '/mnt/ksmbd/ksmbd-tools/adduser'
+Making install in control
+make[1]: Entering directory '/mnt/ksmbd/ksmbd-tools/control'
+make[2]: Entering directory '/mnt/ksmbd/ksmbd-tools/control'
+make[2]: Nothing to be done for 'install-exec-am'.
+make[2]: Nothing to be done for 'install-data-am'.
+make[2]: Leaving directory '/mnt/ksmbd/ksmbd-tools/control'
+make[1]: Leaving directory '/mnt/ksmbd/ksmbd-tools/control'
+Making install in mountd
+make[1]: Entering directory '/mnt/ksmbd/ksmbd-tools/mountd'
+make[2]: Entering directory '/mnt/ksmbd/ksmbd-tools/mountd'
+make[2]: Nothing to be done for 'install-exec-am'.
+make[2]: Nothing to be done for 'install-data-am'.
+make[2]: Leaving directory '/mnt/ksmbd/ksmbd-tools/mountd'
+make[1]: Leaving directory '/mnt/ksmbd/ksmbd-tools/mountd'
+Making install in tools
+make[1]: Entering directory '/mnt/ksmbd/ksmbd-tools/tools'
+make[2]: Entering directory '/mnt/ksmbd/ksmbd-tools/tools'
+ /usr/bin/mkdir -p '/usr/sbin'
+  /bin/sh ../libtool   --mode=install /usr/bin/install -c ksmbdctl '/usr/sbin'
+libtool: install: /usr/bin/install -c ksmbdctl /usr/sbin/ksmbdctl
+make[2]: Nothing to be done for 'install-data-am'.
+make[2]: Leaving directory '/mnt/ksmbd/ksmbd-tools/tools'
+make[1]: Leaving directory '/mnt/ksmbd/ksmbd-tools/tools'
+make[1]: Entering directory '/mnt/ksmbd/ksmbd-tools'
+make[2]: Entering directory '/mnt/ksmbd/ksmbd-tools'
+make[2]: Nothing to be done for 'install-exec-am'.
+ /usr/bin/mkdir -p '/etc/ksmbd'
+ /usr/bin/install -c -m 644 ksmbd.conf.example '/etc/ksmbd'
+ /usr/bin/mkdir -p '/usr/share/man/man5'
+ /usr/bin/install -c -m 644 ksmbd.conf.5 ksmbdpwd.db.5 '/usr/share/man/man5'
+ /usr/bin/mkdir -p '/usr/share/man/man8'
+ /usr/bin/install -c -m 644 ksmbdctl.8 '/usr/share/man/man8'
+ /usr/bin/mkdir -p '/usr/lib/systemd/system'
+ /usr/bin/install -c -m 644 ksmbd.service '/usr/lib/systemd/system'
+make[2]: Leaving directory '/mnt/ksmbd/ksmbd-tools'
+make[1]: Leaving directory '/mnt/ksmbd/ksmbd-tools'

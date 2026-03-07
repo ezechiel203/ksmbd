@@ -1,0 +1,32 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+#
+# ARM64 cross-build + remote deploy wrapper
+#
+# Usage: make -f Makefile.arm64 <target>
+#
+
+ARCH ?= arm64
+ARCH_LABEL := ARM64
+CROSS_COMPILE ?= aarch64-linux-gnu-
+KERNEL_VERSION ?= 6.1.0
+
+ARM64_HOST ?=
+ARM64_REMOTE_TMP ?= /tmp/ksmbd.ko
+REMOTE_HOST ?= $(ARM64_HOST)
+REMOTE_TMP ?= $(ARM64_REMOTE_TMP)
+HOST_VAR_HINT := ARM64_HOST
+TMP_VAR_HINT := ARM64_REMOTE_TMP
+EXPECTED_REMOTE_ARCH_RE := ^(aarch64|arm64)$
+
+# Keep previous ARM64-specific defaults.
+ARCH_EXTRA_CFLAGS += -Wall
+ARCH_EXTRA_CFLAGS += -Wno-attribute-alias
+ARCH_EXTRA_CFLAGS += -Wno-gnu-variable-sized-type-not-at-end
+ARCH_EXTRA_CFLAGS += -Wno-declaration-after-statement
+ARCH_EXTRA_CFLAGS += -mgeneral-regs-only
+ARCH_EXTRA_CFLAGS += -mstrict-align
+ARCH_EXTRA_CFLAGS += -fno-omit-frame-pointer
+ARCH_EXTRA_CFLAGS += -fno-ipa-sra
+ARCH_EXTRA_CFLAGS += -fno-asynchronous-unwind-tables
+
+include Makefile.cross

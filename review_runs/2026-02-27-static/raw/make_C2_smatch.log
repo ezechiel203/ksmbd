@@ -1,0 +1,277 @@
+make -C /lib/modules/6.18.9-arch1-2/build M=/home/ezechiel203/ksmbd ARCH=x86_64 modules
+make[1]: Entering directory '/usr/lib/modules/6.18.9-arch1-2/build'
+make[2]: Entering directory '/home/ezechiel203/ksmbd'
+  CC [M]  src/encoding/unicode.o
+  CHECK   src/encoding/unicode.c
+  CC [M]  src/core/auth.o
+  CHECK   src/core/auth.c
+src/core/auth.c: note: in included file (through /usr/lib/modules/6.18.9-arch1-2/build/include/net/dst.h, /usr/lib/modules/6.18.9-arch1-2/build/include/net/sock.h, ./src/include/core/connection.h):
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+  CC [M]  src/fs/vfs.o
+  CHECK   src/fs/vfs.c
+src/fs/vfs.c: note: in included file (through /usr/lib/modules/6.18.9-arch1-2/build/include/net/dst.h, /usr/lib/modules/6.18.9-arch1-2/build/include/net/sock.h, ./src/include/core/connection.h):
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+  CC [M]  src/fs/vfs_cache.o
+  CHECK   src/fs/vfs_cache.c
+src/fs/vfs_cache.c: note: in included file (through /usr/lib/modules/6.18.9-arch1-2/build/include/net/dst.h, /usr/lib/modules/6.18.9-arch1-2/build/include/net/sock.h, ./src/include/core/connection.h):
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+  CC [M]  src/core/connection.o
+  CHECK   src/core/connection.c
+src/core/connection.c: note: in included file (through /usr/lib/modules/6.18.9-arch1-2/build/include/net/dst.h, /usr/lib/modules/6.18.9-arch1-2/build/include/net/sock.h, ./src/include/core/connection.h):
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+  CC [M]  src/core/crypto_ctx.o
+  CHECK   src/core/crypto_ctx.c
+  CC [M]  src/core/server.o
+  CHECK   src/core/server.c
+src/core/server.c: note: in included file (through /usr/lib/modules/6.18.9-arch1-2/build/include/net/dst.h, /usr/lib/modules/6.18.9-arch1-2/build/include/net/sock.h, ./src/include/core/connection.h):
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+  CC [M]  src/core/misc.o
+  CHECK   src/core/misc.c
+src/core/misc.c: note: in included file (through /usr/lib/modules/6.18.9-arch1-2/build/include/net/dst.h, /usr/lib/modules/6.18.9-arch1-2/build/include/net/sock.h, ./src/include/core/connection.h):
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+  CC [M]  src/fs/oplock.o
+  CHECK   src/fs/oplock.c
+src/fs/oplock.c: note: in included file (through /usr/lib/modules/6.18.9-arch1-2/build/include/net/dst.h, /usr/lib/modules/6.18.9-arch1-2/build/include/net/sock.h, ./src/include/core/connection.h):
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+src/fs/oplock.c:1183 destroy_lease_table() warn: ignoring unreachable code.
+  CC [M]  src/core/ksmbd_work.o
+  CHECK   src/core/ksmbd_work.c
+src/core/ksmbd_work.c: note: in included file (through /usr/lib/modules/6.18.9-arch1-2/build/include/net/dst.h, /usr/lib/modules/6.18.9-arch1-2/build/include/net/sock.h, ./src/include/core/connection.h):
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+  CC [M]  src/fs/smbacl.o
+  CHECK   src/fs/smbacl.c
+  CC [M]  src/encoding/ndr.o
+  CHECK   src/encoding/ndr.c
+  CC [M]  src/core/ksmbd_buffer.o
+  CHECK   src/core/ksmbd_buffer.c
+  CC [M]  src/core/smb2_compress.o
+  CHECK   src/core/smb2_compress.c
+src/core/smb2_compress.c: note: in included file (through /usr/lib/modules/6.18.9-arch1-2/build/include/net/dst.h, /usr/lib/modules/6.18.9-arch1-2/build/include/net/sock.h, ./src/include/core/connection.h):
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+  CC [M]  src/mgmt/ksmbd_ida.o
+  CHECK   src/mgmt/ksmbd_ida.c
+  CC [M]  src/mgmt/user_config.o
+  CHECK   src/mgmt/user_config.c
+  CC [M]  src/mgmt/share_config.o
+  CHECK   src/mgmt/share_config.c
+src/mgmt/share_config.c: note: in included file (through /usr/lib/modules/6.18.9-arch1-2/build/include/net/dst.h, /usr/lib/modules/6.18.9-arch1-2/build/include/net/sock.h, ./src/include/core/connection.h):
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+src/mgmt/share_config.c:101:9: error: static assertion failed: "pointer type mismatch in container_of()"
+src/mgmt/share_config.c:101:9: error: static assertion failed: "pointer type mismatch in container_of()"
+  CC [M]  src/mgmt/tree_connect.o
+  CHECK   src/mgmt/tree_connect.c
+src/mgmt/tree_connect.c: note: in included file (through /usr/lib/modules/6.18.9-arch1-2/build/include/net/dst.h, /usr/lib/modules/6.18.9-arch1-2/build/include/net/sock.h, ./src/include/core/connection.h):
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+  CC [M]  src/mgmt/user_session.o
+  CHECK   src/mgmt/user_session.c
+src/mgmt/user_session.c: note: in included file (through /usr/lib/modules/6.18.9-arch1-2/build/include/net/dst.h, /usr/lib/modules/6.18.9-arch1-2/build/include/net/sock.h, ./src/include/core/connection.h):
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+src/mgmt/user_session.c:193:9: error: static assertion failed: "pointer type mismatch in container_of()"
+src/mgmt/user_session.c:193:9: error: static assertion failed: "pointer type mismatch in container_of()"
+  CC [M]  src/mgmt/ksmbd_witness.o
+  CHECK   src/mgmt/ksmbd_witness.c
+src/mgmt/ksmbd_witness.c: note: in included file (through /usr/lib/modules/6.18.9-arch1-2/build/include/net/dst.h, /usr/lib/modules/6.18.9-arch1-2/build/include/net/sock.h, /usr/lib/modules/6.18.9-arch1-2/build/include/linux/tcp.h, ...):
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+  CC [M]  src/protocol/common/smb_common.o
+  CHECK   src/protocol/common/smb_common.c
+src/protocol/common/smb_common.c: note: in included file (through /usr/lib/modules/6.18.9-arch1-2/build/include/net/dst.h, /usr/lib/modules/6.18.9-arch1-2/build/include/net/sock.h, ./src/include/core/connection.h):
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+  CC [M]  src/transport/transport_tcp.o
+  CHECK   src/transport/transport_tcp.c
+src/transport/transport_tcp.c: note: in included file (through /usr/lib/modules/6.18.9-arch1-2/build/include/net/dst.h, /usr/lib/modules/6.18.9-arch1-2/build/include/net/sock.h, ./src/include/core/connection.h):
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+src/transport/transport_tcp.c:399 ksmbd_tcp_readv() warn: inconsistent indenting
+  CC [M]  src/transport/transport_ipc.o
+  CHECK   src/transport/transport_ipc.c
+src/transport/transport_ipc.c: note: in included file (through /usr/lib/modules/6.18.9-arch1-2/build/include/net/dst.h, /usr/lib/modules/6.18.9-arch1-2/build/include/net/sock.h, ./src/include/core/connection.h):
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+src/transport/transport_ipc.c:1263 handle_witness_iface_list_event() warn: ignoring unreachable code.
+  CC [M]  src/core/ksmbd_debugfs.o
+  CHECK   src/core/ksmbd_debugfs.c
+src/core/ksmbd_debugfs.c: note: in included file (through /usr/lib/modules/6.18.9-arch1-2/build/include/net/dst.h, /usr/lib/modules/6.18.9-arch1-2/build/include/net/sock.h, ./src/include/core/connection.h):
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+  CC [M]  src/core/ksmbd_config.o
+  CHECK   src/core/ksmbd_config.c
+  CC [M]  src/core/ksmbd_feature.o
+  CHECK   src/core/ksmbd_feature.c
+src/core/ksmbd_feature.c: note: in included file (through /usr/lib/modules/6.18.9-arch1-2/build/include/net/dst.h, /usr/lib/modules/6.18.9-arch1-2/build/include/net/sock.h, ./src/include/core/connection.h):
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+  CC [M]  src/protocol/smb2/smb2_pdu_common.o
+  CHECK   src/protocol/smb2/smb2_pdu_common.c
+src/protocol/smb2/smb2_pdu_common.c: note: in included file (through /usr/lib/modules/6.18.9-arch1-2/build/include/net/dst.h, /usr/lib/modules/6.18.9-arch1-2/build/include/net/sock.h, /usr/lib/modules/6.18.9-arch1-2/build/include/linux/tcp.h, ...):
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+  CC [M]  src/protocol/smb2/smb2_negotiate.o
+  CHECK   src/protocol/smb2/smb2_negotiate.c
+src/protocol/smb2/smb2_negotiate.c: note: in included file (through /usr/lib/modules/6.18.9-arch1-2/build/include/net/dst.h, /usr/lib/modules/6.18.9-arch1-2/build/include/net/sock.h, /usr/lib/modules/6.18.9-arch1-2/build/include/linux/tcp.h, ...):
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+  CC [M]  src/protocol/smb2/smb2_session.o
+  CHECK   src/protocol/smb2/smb2_session.c
+src/protocol/smb2/smb2_session.c: note: in included file (through /usr/lib/modules/6.18.9-arch1-2/build/include/net/dst.h, /usr/lib/modules/6.18.9-arch1-2/build/include/net/sock.h, /usr/lib/modules/6.18.9-arch1-2/build/include/linux/tcp.h, ...):
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+src/protocol/smb2/smb2_session.c:601 smb2_sess_setup() warn: inconsistent indenting
+  CC [M]  src/protocol/smb2/smb2_tree.o
+  CHECK   src/protocol/smb2/smb2_tree.c
+src/protocol/smb2/smb2_tree.c: note: in included file (through /usr/lib/modules/6.18.9-arch1-2/build/include/net/dst.h, /usr/lib/modules/6.18.9-arch1-2/build/include/net/sock.h, /usr/lib/modules/6.18.9-arch1-2/build/include/linux/tcp.h, ...):
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+  CC [M]  src/protocol/smb2/smb2_create.o
+  CHECK   src/protocol/smb2/smb2_create.c
+src/protocol/smb2/smb2_create.c: note: in included file (through /usr/lib/modules/6.18.9-arch1-2/build/include/net/dst.h, /usr/lib/modules/6.18.9-arch1-2/build/include/net/sock.h, /usr/lib/modules/6.18.9-arch1-2/build/include/linux/tcp.h, ...):
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+src/protocol/smb2/smb2_create.c:1175 smb2_open() warn: inconsistent indenting
+  CC [M]  src/protocol/smb2/smb2_dir.o
+  CHECK   src/protocol/smb2/smb2_dir.c
+src/protocol/smb2/smb2_dir.c: note: in included file (through /usr/lib/modules/6.18.9-arch1-2/build/include/net/dst.h, /usr/lib/modules/6.18.9-arch1-2/build/include/net/sock.h, /usr/lib/modules/6.18.9-arch1-2/build/include/linux/tcp.h, ...):
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+  CC [M]  src/protocol/smb2/smb2_query_set.o
+  CHECK   src/protocol/smb2/smb2_query_set.c
+src/protocol/smb2/smb2_query_set.c: note: in included file (through /usr/lib/modules/6.18.9-arch1-2/build/include/net/dst.h, /usr/lib/modules/6.18.9-arch1-2/build/include/net/sock.h, /usr/lib/modules/6.18.9-arch1-2/build/include/linux/tcp.h, ...):
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+src/protocol/smb2/smb2_query_set.c:1643 smb2_query_info() warn: inconsistent indenting
+src/protocol/smb2/smb2_query_set.c:1652 smb2_query_info() warn: inconsistent indenting
+  CC [M]  src/protocol/smb2/smb2_read_write.o
+  CHECK   src/protocol/smb2/smb2_read_write.c
+src/protocol/smb2/smb2_read_write.c: note: in included file (through /usr/lib/modules/6.18.9-arch1-2/build/include/net/dst.h, /usr/lib/modules/6.18.9-arch1-2/build/include/net/sock.h, /usr/lib/modules/6.18.9-arch1-2/build/include/linux/tcp.h, ...):
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+  CC [M]  src/protocol/smb2/smb2_lock.o
+  CHECK   src/protocol/smb2/smb2_lock.c
+src/protocol/smb2/smb2_lock.c: note: in included file (through /usr/lib/modules/6.18.9-arch1-2/build/include/net/dst.h, /usr/lib/modules/6.18.9-arch1-2/build/include/net/sock.h, /usr/lib/modules/6.18.9-arch1-2/build/include/linux/tcp.h, ...):
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+src/protocol/smb2/smb2_lock.c:428 smb2_lock() warn: signed overflow undefined. 'flock->fl_start + lock_length < flock->fl_start'
+  CC [M]  src/protocol/smb2/smb2_ioctl.o
+  CHECK   src/protocol/smb2/smb2_ioctl.c
+src/protocol/smb2/smb2_ioctl.c: note: in included file (through /usr/lib/modules/6.18.9-arch1-2/build/include/net/dst.h, /usr/lib/modules/6.18.9-arch1-2/build/include/net/sock.h, /usr/lib/modules/6.18.9-arch1-2/build/include/linux/tcp.h, ...):
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+  CC [M]  src/protocol/smb2/smb2_notify.o
+  CHECK   src/protocol/smb2/smb2_notify.c
+src/protocol/smb2/smb2_notify.c: note: in included file (through /usr/lib/modules/6.18.9-arch1-2/build/include/net/dst.h, /usr/lib/modules/6.18.9-arch1-2/build/include/net/sock.h, ./src/include/core/connection.h):
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+  CC [M]  src/protocol/smb2/smb2_misc_cmds.o
+  CHECK   src/protocol/smb2/smb2_misc_cmds.c
+src/protocol/smb2/smb2_misc_cmds.c: note: in included file (through /usr/lib/modules/6.18.9-arch1-2/build/include/net/dst.h, /usr/lib/modules/6.18.9-arch1-2/build/include/net/sock.h, /usr/lib/modules/6.18.9-arch1-2/build/include/linux/tcp.h, ...):
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+  CC [M]  src/protocol/smb2/smb2ops.o
+  CHECK   src/protocol/smb2/smb2ops.c
+src/protocol/smb2/smb2ops.c: note: in included file (through /usr/lib/modules/6.18.9-arch1-2/build/include/net/dst.h, /usr/lib/modules/6.18.9-arch1-2/build/include/net/sock.h, ./src/include/core/connection.h):
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+  CC [M]  src/protocol/smb2/smb2misc.o
+  CHECK   src/protocol/smb2/smb2misc.c
+src/protocol/smb2/smb2misc.c: note: in included file (through /usr/lib/modules/6.18.9-arch1-2/build/include/net/dst.h, /usr/lib/modules/6.18.9-arch1-2/build/include/net/sock.h, ./src/include/core/connection.h):
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+  ASN.1   src/encoding/ksmbd_spnego_negtokeninit.asn1.[ch]
+  CC [M]  src/encoding/ksmbd_spnego_negtokeninit.asn1.o
+  CHECK   src/encoding/ksmbd_spnego_negtokeninit.asn1.c
+  ASN.1   src/encoding/ksmbd_spnego_negtokentarg.asn1.[ch]
+  CC [M]  src/encoding/ksmbd_spnego_negtokentarg.asn1.o
+  CHECK   src/encoding/ksmbd_spnego_negtokentarg.asn1.c
+  CC [M]  src/encoding/asn1.o
+  CHECK   src/encoding/asn1.c
+src/encoding/asn1.c: note: in included file (through /usr/lib/modules/6.18.9-arch1-2/build/include/net/dst.h, /usr/lib/modules/6.18.9-arch1-2/build/include/net/sock.h, ./src/include/core/connection.h):
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+  CC [M]  src/core/compat.o
+  CHECK   src/core/compat.c
+  CC [M]  src/fs/ksmbd_fsctl.o
+  CHECK   src/fs/ksmbd_fsctl.c
+src/fs/ksmbd_fsctl.c: note: in included file (through /usr/lib/modules/6.18.9-arch1-2/build/include/net/dst.h, /usr/lib/modules/6.18.9-arch1-2/build/include/net/sock.h, /usr/lib/modules/6.18.9-arch1-2/build/include/linux/tcp.h, ...):
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+src/fs/ksmbd_fsctl.c:68:9: error: static assertion failed: "pointer type mismatch in container_of()"
+src/fs/ksmbd_fsctl.c:68:9: error: static assertion failed: "pointer type mismatch in container_of()"
+src/fs/ksmbd_fsctl.c:124:9: error: static assertion failed: "pointer type mismatch in container_of()"
+src/fs/ksmbd_fsctl.c:124:9: error: static assertion failed: "pointer type mismatch in container_of()"
+  CC [M]  src/fs/ksmbd_create_ctx.o
+  CHECK   src/fs/ksmbd_create_ctx.c
+  CC [M]  src/fs/ksmbd_info.o
+  CHECK   src/fs/ksmbd_info.c
+src/fs/ksmbd_info.c: note: in included file (through /usr/lib/modules/6.18.9-arch1-2/build/include/net/dst.h, /usr/lib/modules/6.18.9-arch1-2/build/include/net/sock.h, ./src/include/core/connection.h):
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+src/fs/ksmbd_info.c:70:9: error: static assertion failed: "pointer type mismatch in container_of()"
+src/fs/ksmbd_info.c:70:9: error: static assertion failed: "pointer type mismatch in container_of()"
+src/fs/ksmbd_info.c:132:9: error: static assertion failed: "pointer type mismatch in container_of()"
+src/fs/ksmbd_info.c:132:9: error: static assertion failed: "pointer type mismatch in container_of()"
+  CC [M]  src/fs/ksmbd_dfs.o
+  CHECK   src/fs/ksmbd_dfs.c
+src/fs/ksmbd_dfs.c: note: in included file (through /usr/lib/modules/6.18.9-arch1-2/build/include/net/dst.h, /usr/lib/modules/6.18.9-arch1-2/build/include/net/sock.h, ./src/include/core/connection.h):
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+  CC [M]  src/fs/ksmbd_vss.o
+  CHECK   src/fs/ksmbd_vss.c
+src/fs/ksmbd_vss.c: note: in included file (through /usr/lib/modules/6.18.9-arch1-2/build/include/net/dst.h, /usr/lib/modules/6.18.9-arch1-2/build/include/net/sock.h, ./src/include/core/connection.h):
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+  CC [M]  src/fs/ksmbd_notify.o
+  CHECK   src/fs/ksmbd_notify.c
+src/fs/ksmbd_notify.c: note: in included file (through /usr/lib/modules/6.18.9-arch1-2/build/include/net/dst.h, /usr/lib/modules/6.18.9-arch1-2/build/include/net/sock.h, ./src/include/core/connection.h):
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+  CC [M]  src/fs/ksmbd_reparse.o
+  CHECK   src/fs/ksmbd_reparse.c
+src/fs/ksmbd_reparse.c: note: in included file (through /usr/lib/modules/6.18.9-arch1-2/build/include/net/dst.h, /usr/lib/modules/6.18.9-arch1-2/build/include/net/sock.h, ./src/include/core/connection.h):
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+  CC [M]  src/fs/ksmbd_resilient.o
+  CHECK   src/fs/ksmbd_resilient.c
+  CC [M]  src/fs/ksmbd_quota.o
+  CHECK   src/fs/ksmbd_quota.c
+src/fs/ksmbd_quota.c: note: in included file (through /usr/lib/modules/6.18.9-arch1-2/build/include/net/dst.h, /usr/lib/modules/6.18.9-arch1-2/build/include/net/sock.h, ./src/include/core/connection.h):
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+  CC [M]  src/fs/ksmbd_app_instance.o
+  CHECK   src/fs/ksmbd_app_instance.c
+  CC [M]  src/fs/ksmbd_fsctl_extra.o
+  CHECK   src/fs/ksmbd_fsctl_extra.c
+src/fs/ksmbd_fsctl_extra.c: note: in included file (through /usr/lib/modules/6.18.9-arch1-2/build/include/net/dst.h, /usr/lib/modules/6.18.9-arch1-2/build/include/net/sock.h, ./src/include/core/connection.h):
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+  CC [M]  src/fs/ksmbd_rsvd.o
+  CHECK   src/fs/ksmbd_rsvd.c
+  CC [M]  src/fs/ksmbd_branchcache.o
+  CHECK   src/fs/ksmbd_branchcache.c
+  CC [M]  src/core/ksmbd_hooks.o
+  CHECK   src/core/ksmbd_hooks.c
+  CC [M]  src/transport/transport_rdma.o
+  CHECK   src/transport/transport_rdma.c
+src/transport/transport_rdma.c: note: in included file (through /usr/lib/modules/6.18.9-arch1-2/build/include/net/dst.h, /usr/lib/modules/6.18.9-arch1-2/build/include/net/sock.h, /usr/lib/modules/6.18.9-arch1-2/build/include/linux/tcp.h, ...):
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+/usr/lib/modules/6.18.9-arch1-2/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+  LD [M]  ksmbd.o
+  MODPOST Module.symvers
+  CC [M]  ksmbd.mod.o
+  CC [M]  .module-common.o
+  LD [M]  ksmbd.ko
+  BTF [M] ksmbd.ko
+make[2]: Leaving directory '/home/ezechiel203/ksmbd'
+make[1]: Leaving directory '/usr/lib/modules/6.18.9-arch1-2/build'

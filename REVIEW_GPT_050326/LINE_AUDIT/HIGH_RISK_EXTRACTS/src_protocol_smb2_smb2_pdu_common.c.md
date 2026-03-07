@@ -1,0 +1,209 @@
+# src/protocol/smb2/smb2_pdu_common.c
+
+Risk-tagged lines (LOCK/LIFETIME/WAIT_LOOP/ERROR_PATH/MEM_BOUNDS/PROTO_GATE):
+
+- L00085 [PROTO_GATE|] ` *         STATUS_FILE_NOT_AVAILABLE to the client.`
+- L00104 [LOCK|] `	spin_lock(&fp->f_lock);`
+- L00108 [LOCK|] `		spin_unlock(&fp->f_lock);`
+- L00109 [ERROR_PATH|] `		pr_warn_ratelimited("ChannelSequence stale: req=%u open=%u\n",`
+- L00111 [ERROR_PATH|] `		return -EAGAIN;`
+- L00115 [LOCK|] `	spin_unlock(&fp->f_lock);`
+- L00138 [PROTO_GATE|] `	if (cmd == SMB2_TREE_CONNECT_HE ||`
+- L00139 [PROTO_GATE|] `	    cmd ==  SMB2_CANCEL_HE ||`
+- L00140 [PROTO_GATE|] `	    cmd ==  SMB2_LOGOFF_HE) {`
+- L00147 [ERROR_PATH|] `		return -ENOENT;`
+- L00154 [PROTO_GATE|] `				     SMB2_FLAGS_RELATED_OPERATIONS);`
+- L00160 [ERROR_PATH|] `			 * established, return -EINVAL which maps to`
+- L00161 [PROTO_GATE|] `			 * STATUS_INVALID_PARAMETER.`
+- L00164 [ERROR_PATH|] `				return -EINVAL;`
+- L00177 [ERROR_PATH|] `			pr_err_ratelimited("Invalid tid %d in compound\n",`
+- L00179 [ERROR_PATH|] `			return -ENOENT;`
+- L00186 [ERROR_PATH|] `		pr_err_ratelimited("Invalid tid %d\n", tree_id);`
+- L00187 [ERROR_PATH|] `		return -ENOENT;`
+- L00193 [PROTO_GATE|] `	 * this session with SMB2_SESSION_REQ_FLAG_ENCRYPT_DATA (resulting in`
+- L00197 [PROTO_GATE|] `	 * encryption-required session are rejected with STATUS_ACCESS_DENIED`
+- L00200 [PROTO_GATE|] `	 * This check supplements the global KSMBD_GLOBAL_FLAG_SMB2_ENCRYPTION`
+- L00208 [PROTO_GATE|] `	 * SMB2_SESSION_FLAG_ENCRYPT_DATA in the SESSION_SETUP response).`
+- L00213 [ERROR_PATH|] `		pr_warn_ratelimited("Unencrypted request (cmd=0x%x) on per-session encrypted session, disconnecting\n",`
+- L00215 [PROTO_GATE|] `		rsp_hdr->Status = STATUS_ACCESS_DENIED;`
+- L00218 [ERROR_PATH|] `		return -EACCES;`
+- L00237 [PROTO_GATE|] `	if (err_rsp->hdr.Status != STATUS_STOPPED_ON_SYMLINK) {`
+- L00240 [PROTO_GATE|] `		err_rsp->StructureSize = SMB2_ERROR_STRUCTURE_SIZE2_LE;`
+- L00246 [PROTO_GATE|] `					__SMB2_HEADER_STRUCTURE_SIZE +`
+- L00247 [PROTO_GATE|] `					SMB2_ERROR_STRUCTURE_SIZE2);`
+- L00264 [PROTO_GATE|] `	if (hdr->ProtocolId != SMB2_PROTO_NUMBER)`
+- L00268 [PROTO_GATE|] `	if (hdr->Flags & SMB2_FLAGS_SERVER_TO_REDIR)`
+- L00271 [PROTO_GATE|] `	if (hdr->Command != SMB2_NEGOTIATE)`
+- L00288 [PROTO_GATE|] `	if (hdr->ProtocolId != SMB2_PROTO_NUMBER)`
+- L00292 [PROTO_GATE|] `	if (!(hdr->Flags & SMB2_FLAGS_SERVER_TO_REDIR))`
+- L00349 [PROTO_GATE|] `	rsp_hdr->ProtocolId = SMB2_PROTO_NUMBER;`
+- L00350 [PROTO_GATE|] `	rsp_hdr->StructureSize = SMB2_HEADER_STRUCTURE_SIZE;`
+- L00352 [PROTO_GATE|] `	rsp_hdr->Command = SMB2_NEGOTIATE;`
+- L00353 [PROTO_GATE|] `	rsp_hdr->Flags = (SMB2_FLAGS_SERVER_TO_REDIR);`
+- L00354 [PROTO_GATE|] `	rsp_hdr->NextCommand = 0;`
+- L00363 [ERROR_PATH|] `	WARN_ON(ksmbd_conn_good(conn));`
+- L00384 [PROTO_GATE|] `	rsp->SecurityMode = SMB2_NEGOTIATE_SIGNING_ENABLED_LE;`
+- L00386 [PROTO_GATE|] `		rsp->SecurityMode |= SMB2_NEGOTIATE_SIGNING_REQUIRED_LE;`
+- L00412 [PROTO_GATE|] `	hdr->CreditCharge = req_hdr->CreditCharge;`
+- L00416 [ERROR_PATH|] `		pr_err_ratelimited("Total credits overflow: %d\n", conn->total_credits);`
+- L00417 [ERROR_PATH|] `		return -EINVAL;`
+- L00421 [PROTO_GATE|] `			      le16_to_cpu(req_hdr->CreditCharge), 1);`
+- L00428 [LOCK|] `	spin_lock(&conn->credits_lock);`
+- L00430 [LOCK|] `		spin_unlock(&conn->credits_lock);`
+- L00433 [ERROR_PATH|] `		return -EINVAL;`
+- L00439 [ERROR_PATH|] `			pr_err_ratelimited("Outstanding credits underflow: charge %u, outstanding %u\n",`
+- L00459 [PROTO_GATE|] `	if (hdr->Command == SMB2_NEGOTIATE)`
+- L00472 [LOCK|] `	spin_unlock(&conn->credits_lock);`
+- L00474 [PROTO_GATE|] `	if (!req_hdr->NextCommand) {`
+- L00505 [PROTO_GATE|] `	if (req->Command == SMB2_CREATE) {`
+- L00506 [PROTO_GATE|] `		if (rsp->Status == STATUS_SUCCESS) {`
+- L00517 [PROTO_GATE|] `	} else if (rsp->Status == STATUS_SUCCESS &&`
+- L00529 [PROTO_GATE|] `		case SMB2_CLOSE:`
+- L00537 [PROTO_GATE|] `		case SMB2_FLUSH:`
+- L00545 [PROTO_GATE|] `		case SMB2_READ:`
+- L00553 [PROTO_GATE|] `		case SMB2_WRITE:`
+- L00561 [PROTO_GATE|] `		case SMB2_QUERY_INFO:`
+- L00569 [PROTO_GATE|] `		case SMB2_SET_INFO:`
+- L00577 [PROTO_GATE|] `		case SMB2_LOCK:`
+- L00585 [PROTO_GATE|] `		case SMB2_IOCTL:`
+- L00593 [PROTO_GATE|] `		case SMB2_QUERY_DIRECTORY:`
+- L00601 [PROTO_GATE|] `		case SMB2_CHANGE_NOTIFY:`
+- L00618 [PROTO_GATE|] `	} else if (req->Flags & SMB2_FLAGS_RELATED_OPERATIONS &&`
+- L00619 [PROTO_GATE|] `		   rsp->Status != STATUS_SUCCESS &&`
+- L00621 [PROTO_GATE|] `		   work->compound_err_status == STATUS_SUCCESS) {`
+- L00637 [PROTO_GATE|] `	next_hdr_offset = le32_to_cpu(req->NextCommand);`
+- L00642 [PROTO_GATE|] `	rsp->NextCommand = cpu_to_le32(new_len);`
+- L00655 [PROTO_GATE|] `	if (!(rcv_hdr->Flags & SMB2_FLAGS_RELATED_OPERATIONS)) {`
+- L00659 [PROTO_GATE|] `		work->compound_err_status = STATUS_SUCCESS;`
+- L00662 [PROTO_GATE|] `	rsp_hdr->ProtocolId = SMB2_PROTO_NUMBER;`
+- L00663 [PROTO_GATE|] `	rsp_hdr->StructureSize = SMB2_HEADER_STRUCTURE_SIZE;`
+- L00669 [PROTO_GATE|] `	rsp_hdr->Flags = (SMB2_FLAGS_SERVER_TO_REDIR |`
+- L00670 [PROTO_GATE|] `				SMB2_FLAGS_RELATED_OPERATIONS);`
+- L00671 [PROTO_GATE|] `	rsp_hdr->NextCommand = 0;`
+- L00676 [MEM_BOUNDS|] `	memcpy(rsp_hdr->Signature, rcv_hdr->Signature, 16);`
+- L00691 [PROTO_GATE|] `	if (hdr->ProtocolId != SMB2_PROTO_NUMBER)`
+- L00695 [PROTO_GATE|] `	next_cmd = le32_to_cpu(hdr->NextCommand);`
+- L00698 [PROTO_GATE|] `			__SMB2_HEADER_STRUCTURE_SIZE >`
+- L00700 [ERROR_PATH|] `			pr_err_ratelimited("next command(%u) offset exceeds smb msg size\n",`
+- L00707 [ERROR_PATH|] `			pr_err_ratelimited("next response offset exceeds response buffer size\n");`
+- L00746 [PROTO_GATE|] `	rsp_hdr->ProtocolId = rcv_hdr->ProtocolId;`
+- L00747 [PROTO_GATE|] `	rsp_hdr->StructureSize = SMB2_HEADER_STRUCTURE_SIZE;`
+- L00753 [PROTO_GATE|] `	rsp_hdr->Flags = (SMB2_FLAGS_SERVER_TO_REDIR);`
+- L00754 [PROTO_GATE|] `	rsp_hdr->NextCommand = 0;`
+- L00759 [MEM_BOUNDS|] `	memcpy(rsp_hdr->Signature, rcv_hdr->Signature, 16);`
+- L00778 [PROTO_GATE|] `	if (cmd == SMB2_IOCTL_HE || cmd == SMB2_QUERY_DIRECTORY_HE)`
+- L00781 [PROTO_GATE|] `	if (cmd == SMB2_QUERY_INFO_HE) {`
+- L00786 [ERROR_PATH|] `			return -EINVAL;`
+- L00789 [PROTO_GATE|] `		if ((req->InfoType == SMB2_O_INFO_FILE &&`
+- L00792 [PROTO_GATE|] `		    req->InfoType == SMB2_O_INFO_SECURITY)`
+- L00797 [PROTO_GATE|] `	if (le32_to_cpu(hdr->NextCommand) > 0)`
+- L00800 [MEM_BOUNDS|] `	work->response_buf = kvzalloc(sz, KSMBD_DEFAULT_GFP);`
+- L00802 [ERROR_PATH|] `		return -ENOMEM;`
+- L00822 [PROTO_GATE|] `	 * SMB2_ECHO, SMB2_NEGOTIATE, SMB2_SESSION_SETUP command do not`
+- L00826 [PROTO_GATE|] `	if (cmd == SMB2_ECHO_HE || cmd == SMB2_NEGOTIATE_HE ||`
+- L00827 [PROTO_GATE|] `	    cmd == SMB2_SESSION_SETUP_HE)`
+- L00831 [ERROR_PATH|] `		return -EIO;`
+- L00837 [PROTO_GATE|] `				     SMB2_FLAGS_RELATED_OPERATIONS);`
+- L00844 [ERROR_PATH|] `			 * request failed), return -EINVAL which maps`
+- L00845 [PROTO_GATE|] `			 * to STATUS_INVALID_PARAMETER per MS-SMB2`
+- L00849 [ERROR_PATH|] `				return -EINVAL;`
+- L00867 [ERROR_PATH|] `		return -ENOENT;`
+- L00875 [ERROR_PATH|] `	return -ENOENT;`
+- L00893 [ERROR_PATH|] `		pr_err("failed to get name %ld\n", PTR_ERR(name));`
+- L00903 [ERROR_PATH|] `		pr_err("not allow directory name included leading slash\n");`
+- L00923 [PROTO_GATE|] `	 * STATUS_INSUFFICIENT_RESOURCES.`
+- L00926 [LIFETIME|] `	    atomic_inc_return(&conn->outstanding_async) >= max_async) {`
+- L00927 [LIFETIME|] `		atomic_dec(&conn->outstanding_async);`
+- L00928 [ERROR_PATH|] `		return -ENOSPC;`
+- L00933 [ERROR_PATH|] `		pr_err("Failed to alloc async message id\n");`
+- L00935 [LIFETIME|] `			atomic_dec(&conn->outstanding_async);`
+- L00949 [LOCK|] `		spin_lock(&conn->request_lock);`
+- L00951 [LOCK|] `		spin_unlock(&conn->request_lock);`
+- L00961 [LOCK|] `	spin_lock(&conn->request_lock);`
+- L00963 [LOCK|] `	spin_unlock(&conn->request_lock);`
+- L00974 [LIFETIME|] `			atomic_dec(&conn->outstanding_async);`
+- L00988 [ERROR_PATH|] `		pr_err("smb_allocate_rsp_buf failed!\n");`
+- L00996 [MEM_BOUNDS|] `	memcpy(smb2_get_msg(in_work->response_buf), ksmbd_resp_buf_next(work),`
+- L00997 [PROTO_GATE|] `	       __SMB2_HEADER_STRUCTURE_SIZE);`
+- L01000 [PROTO_GATE|] `	rsp_hdr->Flags |= SMB2_FLAGS_ASYNC_COMMAND;`
+- L01074 [PROTO_GATE|] `	 * sessions are not incorrectly rejected with STATUS_ACCESS_DENIED.`
+- L01076 [PROTO_GATE|] `	 * B.12: SMB2_OPLOCK_BREAK_HE is excluded unconditionally here so`
+- L01079 [PROTO_GATE|] `	 * arrive with SMB2_FLAGS_SIGNED set will be verified through the`
+- L01080 [PROTO_GATE|] `	 * SMB2_FLAGS_SIGNED branch below.`
+- L01082 [PROTO_GATE|] `	if (command == SMB2_NEGOTIATE_HE ||`
+- L01083 [PROTO_GATE|] `	    command == SMB2_CANCEL_HE ||`
+- L01084 [PROTO_GATE|] `	    command == SMB2_OPLOCK_BREAK_HE)`
+- L01100 [PROTO_GATE|] `		if (rcv_hdr->Flags & SMB2_FLAGS_RELATED_OPERATIONS)`
+- L01108 [PROTO_GATE|] `	 * but require it when SMB2_FLAGS_SIGNED is set (binding requests).`
+- L01110 [PROTO_GATE|] `	if (command == SMB2_SESSION_SETUP_HE &&`
+- L01111 [PROTO_GATE|] `	    !(rcv_hdr->Flags & SMB2_FLAGS_SIGNED))`
+- L01114 [PROTO_GATE|] `	if ((rcv_hdr->Flags & SMB2_FLAGS_SIGNED) ||`
+- L01130 [PROTO_GATE|] `	char signature_req[SMB2_SIGNATURE_SIZE];`
+- L01131 [PROTO_GATE|] `	char signature[SMB2_HMACSHA256_SIZE];`
+- L01149 [PROTO_GATE|] `	if (le16_to_cpu(hdr->Command) == SMB2_CANCEL_HE)`
+- L01152 [PROTO_GATE|] `	if (!hdr->NextCommand && !work->next_smb2_rcv_hdr_off)`
+- L01154 [PROTO_GATE|] `	else if (hdr->NextCommand)`
+- L01155 [PROTO_GATE|] `		len = le32_to_cpu(hdr->NextCommand);`
+- L01160 [MEM_BOUNDS|PROTO_GATE|] `	memcpy(signature_req, hdr->Signature, SMB2_SIGNATURE_SIZE);`
+- L01161 [PROTO_GATE|] `	memset(hdr->Signature, 0, SMB2_SIGNATURE_SIZE);`
+- L01163 [PROTO_GATE|] `	iov[0].iov_base = (char *)&hdr->ProtocolId;`
+- L01170 [PROTO_GATE|] `	if (crypto_memneq(signature, signature_req, SMB2_SIGNATURE_SIZE)) {`
+- L01171 [ERROR_PATH|] `		pr_err_ratelimited("bad smb2 signature\n");`
+- L01186 [PROTO_GATE|] `	char signature[SMB2_HMACSHA256_SIZE];`
+- L01191 [PROTO_GATE|] `	hdr->Flags |= SMB2_FLAGS_SIGNED;`
+- L01192 [PROTO_GATE|] `	memset(hdr->Signature, 0, SMB2_SIGNATURE_SIZE);`
+- L01194 [PROTO_GATE|] `	if (hdr->Command == SMB2_READ) {`
+- L01200 [ERROR_PATH|] `			pr_err("invalid iov state for READ signing: idx=%d cnt=%d\n",`
+- L01208 [ERROR_PATH|] `			pr_err("invalid iov index for signing: idx=%d cnt=%d\n",`
+- L01217 [MEM_BOUNDS|PROTO_GATE|] `		memcpy(hdr->Signature, signature, SMB2_SIGNATURE_SIZE);`
+- L01232 [PROTO_GATE|] `	char signature_req[SMB2_SIGNATURE_SIZE];`
+- L01234 [PROTO_GATE|] `	 * Use SMB2_HMACSHA256_SIZE (32) as the signing buffer size`
+- L01237 [PROTO_GATE|] `	 * Only the first SMB2_SIGNATURE_SIZE (16) bytes are compared.`
+- L01239 [PROTO_GATE|] `	char signature[SMB2_HMACSHA256_SIZE];`
+- L01255 [PROTO_GATE|] `	if (le16_to_cpu(hdr->Command) == SMB2_CANCEL_HE)`
+- L01258 [PROTO_GATE|] `	if (!hdr->NextCommand && !work->next_smb2_rcv_hdr_off)`
+- L01260 [PROTO_GATE|] `	else if (hdr->NextCommand)`
+- L01261 [PROTO_GATE|] `		len = le32_to_cpu(hdr->NextCommand);`
+- L01266 [PROTO_GATE|] `	if (le16_to_cpu(hdr->Command) == SMB2_SESSION_SETUP_HE) {`
+- L01277 [ERROR_PATH|] `		pr_err("SMB3 signing key is not generated\n");`
+- L01281 [MEM_BOUNDS|PROTO_GATE|] `	memcpy(signature_req, hdr->Signature, SMB2_SIGNATURE_SIZE);`
+- L01282 [PROTO_GATE|] `	memset(hdr->Signature, 0, SMB2_SIGNATURE_SIZE);`
+- L01283 [PROTO_GATE|] `	iov[0].iov_base = (char *)&hdr->ProtocolId;`
+- L01298 [PROTO_GATE|] `	if (crypto_memneq(signature, signature_req, SMB2_SIGNATURE_SIZE)) {`
+- L01299 [ERROR_PATH|] `		pr_err_ratelimited("bad smb2 signature\n");`
+- L01316 [PROTO_GATE|] `	char signature[SMB2_HMACSHA256_SIZE];`
+- L01325 [PROTO_GATE|] `	    le16_to_cpu(hdr->Command) == SMB2_SESSION_SETUP_HE) {`
+- L01336 [ERROR_PATH|] `		pr_warn_once("SMB3 signing key not available for response\n");`
+- L01340 [PROTO_GATE|] `	hdr->Flags |= SMB2_FLAGS_SIGNED;`
+- L01341 [PROTO_GATE|] `	memset(hdr->Signature, 0, SMB2_SIGNATURE_SIZE);`
+- L01343 [PROTO_GATE|] `	if (hdr->Command == SMB2_READ) {`
+- L01349 [ERROR_PATH|] `			pr_err("invalid iov state for READ signing: idx=%d cnt=%d\n",`
+- L01357 [ERROR_PATH|] `			pr_err("invalid iov index for signing: idx=%d cnt=%d\n",`
+- L01374 [MEM_BOUNDS|PROTO_GATE|] `		memcpy(hdr->Signature, signature, SMB2_SIGNATURE_SIZE);`
+- L01393 [PROTO_GATE|] `	if (le16_to_cpu(req->Command) == SMB2_NEGOTIATE_HE &&`
+- L01398 [PROTO_GATE|] `	if (le16_to_cpu(rsp->Command) == SMB2_SESSION_SETUP_HE && sess) {`
+- L01402 [LOCK|] `			down_write(&conn->session_lock);`
+- L01405 [LOCK|] `				up_write(&conn->session_lock);`
+- L01410 [LOCK|] `			up_write(&conn->session_lock);`
+- L01445 [PROTO_GATE|] `	tr_hdr->ProtocolId = SMB2_TRANSFORM_PROTO_NUM;`
+- L01448 [PROTO_GATE|] `	if (cipher_type == SMB2_ENCRYPTION_AES128_GCM ||`
+- L01449 [PROTO_GATE|] `	    cipher_type == SMB2_ENCRYPTION_AES256_GCM) {`
+- L01464 [MEM_BOUNDS|] `			memcpy(&tr_hdr->Nonce,`
+- L01467 [MEM_BOUNDS|] `			memcpy(&tr_hdr->Nonce[4],`
+- L01476 [ERROR_PATH|] `				pr_warn_ratelimited(`
+- L01485 [MEM_BOUNDS|] `	memcpy(&tr_hdr->SessionId, &hdr->SessionId, 8);`
+- L01498 [MEM_BOUNDS|] `	tr_buf = kzalloc(sizeof(struct smb2_transform_hdr) + 4, KSMBD_DEFAULT_GFP);`
+- L01517 [PROTO_GATE|] `	return trhdr->ProtocolId == SMB2_TRANSFORM_PROTO_NUM;`
+- L01532 [ERROR_PATH|] `		pr_err_ratelimited("Transform message is too small (%u)\n",`
+- L01534 [ERROR_PATH|] `		return -ECONNABORTED;`
+- L01538 [ERROR_PATH|] `		pr_err_ratelimited("Transform message is broken\n");`
+- L01539 [ERROR_PATH|] `		return -ECONNABORTED;`
+- L01549 [ERROR_PATH|] `		pr_err_ratelimited("Transform header has invalid Flags 0x%04x (expected 0x0001)\n",`
+- L01551 [ERROR_PATH|] `		return -ECONNABORTED;`
+- L01557 [PROTO_GATE|] `	 * state is SMB2_SESSION_EXPIRED but the decryption key is still`
+- L01560 [PROTO_GATE|] `	 * STATUS_USER_SESSION_DELETED.  This prevents the client from`
+- L01565 [ERROR_PATH|] `		pr_err_ratelimited("invalid session id(%llx) in transform header\n",`
+- L01567 [ERROR_PATH|] `		return -ECONNABORTED;`
+- L01580 [MEM_BOUNDS|] `	memmove(buf + 4, iov[1].iov_base, buf_data_size);`
+- L01599 [PROTO_GATE|] `	if (le16_to_cpu(rsp->Command) == SMB2_SESSION_SETUP_HE &&`
+- L01601 [PROTO_GATE|] `	    rsp->Status == STATUS_SUCCESS)`

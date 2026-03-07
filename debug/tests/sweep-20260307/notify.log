@@ -1,0 +1,165 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772889859
+time: 2026-03-07 13:24:19.258449
+progress: 23
+test: valid-req
+time: 2026-03-07 13:24:19.258989
+TESTING VALIDITY OF CHANGE NOTIFY REQUEST
+time: 2026-03-07 13:24:19.276700
+failure: valid-req [
+(../../source4/torture/smb2/notify.c:208) Incorrect status NT_STATUS_OK - should be NT_STATUS_NOTIFY_ENUM_DIR
+]
+test: tcon
+time: 2026-03-07 13:24:19.276742
+TESTING SIMPLE CHANGE NOTIFY
+Testing notify mkdir
+Testing notify rmdir
+SIMPLE CHANGE NOTIFY OK
+TESTING WITH SECONDARY TCON
+tid1=1 tid2=2
+Testing notify mkdir
+Testing notify rmdir
+CHANGE NOTIFY WITH TCON OK
+Disconnecting secondary tree
+Testing notify mkdir
+Testing notify rmdir
+CHANGE NOTIFY WITH TDIS OK
+time: 2026-03-07 13:24:19.294119
+success: tcon
+test: dir
+time: 2026-03-07 13:24:19.294191
+TESTING CHANGE NOTIFY ON DIRECTORIES
+Testing notify cancel
+Testing notify mkdir
+Testing notify rmdir
+Testing notify mkdir - rmdir - mkdir - rmdir
+Testing buffered notify on create of 10 files
+Testing notify on unlink for the first file
+and now from the 1st notify
+(3rd notify) this notify will only see the 1st unlink
+Testing if a close() on the dir handle triggers the notify reply
+time: 2026-03-07 13:24:22.532704
+success: dir
+test: mask
+time: 2026-03-07 13:24:22.532747
+TESTING CHANGE NOTIFY COMPLETION FILTERS
+Testing mkdir
+Testing create file
+Testing unlink
+Testing rmdir
+Testing rename file
+Testing rename dir
+Testing set path attribute
+Testing set path write time
+Testing set file create time
+Testing set file access time
+Testing set file change time
+Testing write
+time: 2026-03-07 13:25:40.693154
+success: mask
+test: tdis
+time: 2026-03-07 13:25:40.693197
+TESTING CHANGE NOTIFY+CANCEL FOLLOWED BY TREE-DISCONNECT
+time: 2026-03-07 13:25:40.702597
+success: tdis
+test: tdis1
+time: 2026-03-07 13:25:40.702634
+TESTING CHANGE NOTIFY ASYNC FOLLOWED BY TREE-DISCONNECT
+time: 2026-03-07 13:25:40.710265
+success: tdis1
+test: mask-change
+time: 2026-03-07 13:25:40.710373
+TESTING CHANGE NOTIFY WITH MASK CHANGE
+time: 2026-03-07 13:25:40.738694
+failure: mask-change [
+(../../source4/torture/smb2/notify.c:823) Incorrect status NT_STATUS_SHARING_VIOLATION - should be NT_STATUS_OK
+]
+test: close
+time: 2026-03-07 13:25:40.738741
+TESTING CHANGE NOTIFY FOLLOWED BY ULOGOFF
+time: 2026-03-07 13:25:40.748532
+success: close
+test: logoff
+time: 2026-03-07 13:25:40.748575
+TESTING CHANGE NOTIFY FOLLOWED BY ULOGOFF
+time: 2026-03-07 13:25:40.757394
+success: logoff
+test: session-reconnect
+time: 2026-03-07 13:25:40.757429
+TESTING CHANGE NOTIFY FOLLOWED BY SESSION RECONNECT
+time: 2026-03-07 13:25:40.767275
+success: session-reconnect
+test: invalid-reauth
+time: 2026-03-07 13:25:40.767344
+TESTING CHANGE NOTIFY FOLLOWED BY invalid REAUTH
+time: 2026-03-07 13:25:40.784031
+failure: invalid-reauth [
+(../../source4/torture/smb2/notify.c:1636) Incorrect status NT_STATUS_OK - should be NT_STATUS_LOGON_FAILURE
+]
+test: tree
+time: 2026-03-07 13:25:40.784079
+TESTING NOTIFY FOR DIFFERENT DEPTHS
+time: 2026-03-07 13:25:40.819197
+failure: tree [
+(../../source4/torture/smb2/notify.c:1996) Incorrect status NT_STATUS_OBJECT_NAME_COLLISION - should be NT_STATUS_OK
+]
+test: basedir
+time: 2026-03-07 13:25:40.819240
+TESTING CHANGE NOTIFY BASEDIR EVENTS
+time: 2026-03-07 13:25:41.038915
+success: basedir
+test: double
+time: 2026-03-07 13:25:41.038958
+TESTING CHANGE NOTIFY TWICE ON ONE DIRECTORY
+time: 2026-03-07 13:25:41.060931
+success: double
+test: file
+time: 2026-03-07 13:25:41.060981
+TESTING CHANGE NOTIFY ON FILES
+Testing if notifies on file handles are invalid (should be)
+time: 2026-03-07 13:25:41.072475
+success: file
+test: tcp
+time: 2026-03-07 13:25:41.072524
+TESTING CHANGE NOTIFY FOLLOWED BY TCP DISCONNECT
+time: 2026-03-07 13:25:41.331098
+success: tcp
+test: rec
+time: 2026-03-07 13:25:41.331149
+TESTING CHANGE NOTIFY WITH RECURSION
+time: 2026-03-07 13:25:41.357897
+failure: rec [
+(../../source4/torture/smb2/notify.c:622) Incorrect status NT_STATUS_SHARING_VIOLATION - should be NT_STATUS_OK
+]
+test: overflow
+time: 2026-03-07 13:25:41.357942
+TESTING CHANGE NOTIFY EVENT OVERFLOW
+Testing overflowed buffer notify on create of 100 files
+time: 2026-03-07 13:25:41.635608
+success: overflow
+test: rmdir1
+time: 2026-03-07 13:25:41.635651
+TESTING NOTIFY CANCEL FOR DELETED DIR
+time: 2026-03-07 13:25:41.643513
+success: rmdir1
+test: rmdir2
+time: 2026-03-07 13:25:41.643550
+TESTING NOTIFY CANCEL FOR DELETED DIR
+time: 2026-03-07 13:25:41.654431
+success: rmdir2
+test: rmdir3
+time: 2026-03-07 13:25:41.654473
+TESTING NOTIFY CANCEL FOR DELETED DIR
+time: 2026-03-07 13:25:41.674406
+success: rmdir3
+test: rmdir4
+time: 2026-03-07 13:25:41.674446
+TESTING NOTIFY CANCEL FOR DELETED DIR
+time: 2026-03-07 13:25:41.694853
+success: rmdir4
+test: handle-permissions
+time: 2026-03-07 13:25:41.694890
+TESTING CHANGE NOTIFY ON A HANDLE WITHOUT PERMISSIONS
+time: 2026-03-07 13:25:41.745824
+success: handle-permissions

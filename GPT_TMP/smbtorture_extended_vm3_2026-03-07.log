@@ -1,0 +1,64 @@
+=== smb2.scan ===
+RESULT smb2.scan: INFRA_FAIL(connectivity rc=1)
+smbtorture 4.23.6
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772877608
+time: 2026-03-07 10:00:08.972646
+progress: 4
+test: scan
+time: 2026-03-07 10:00:08.973162
+active opcode    0 gave status NT_STATUS_INVALID_PARAMETER
+active opcode    1 gave status NT_STATUS_INVALID_PARAMETER
+active opcode    2 gave status NT_STATUS_INVALID_PARAMETER
+RESULT smb2.connect: INFRA_FAIL(precheck)
+RESULT smb2.tcon: INFRA_FAIL(precheck)
+RESULT smb2.getinfo: INFRA_FAIL(precheck)
+RESULT smb2.setinfo: INFRA_FAIL(precheck)
+RESULT smb2.read: INFRA_FAIL(precheck)
+RESULT smb2.rw: INFRA_FAIL(precheck)
+RESULT smb2.rename: INFRA_FAIL(precheck)
+RESULT smb2.create: INFRA_FAIL(precheck)
+RESULT smb2.dir: INFRA_FAIL(precheck)
+RESULT smb2.mkdir: INFRA_FAIL(precheck)
+RESULT smb2.dosmode: INFRA_FAIL(precheck)
+RESULT smb2.timestamps: INFRA_FAIL(precheck)
+RESULT smb2.ea: INFRA_FAIL(precheck)
+RESULT smb2.winattr: INFRA_FAIL(precheck)
+RESULT smb2.streams: INFRA_FAIL(precheck)
+RESULT smb2.lock: INFRA_FAIL(precheck)
+RESULT smb2.sharemode: INFRA_FAIL(precheck)
+RESULT smb2.deny: INFRA_FAIL(precheck)
+RESULT smb2.delete-on-close-perms: INFRA_FAIL(precheck)
+RESULT smb2.openattr: INFRA_FAIL(precheck)
+RESULT smb2.maximum_allowed: INFRA_FAIL(precheck)
+RESULT smb2.ioctl: INFRA_FAIL(precheck)
+RESULT smb2.notify: INFRA_FAIL(precheck)
+RESULT smb2.compound: INFRA_FAIL(precheck)
+RESULT smb2.compound_async: INFRA_FAIL(precheck)
+RESULT smb2.compound_find: INFRA_FAIL(precheck)
+RESULT smb2.session: INFRA_FAIL(precheck)
+RESULT smb2.oplock: INFRA_FAIL(precheck)
+RESULT smb2.lease: INFRA_FAIL(precheck)
+RESULT smb2.dirlease: INFRA_FAIL(precheck)
+RESULT smb2.durable-open: INFRA_FAIL(precheck)
+RESULT smb2.durable-v2-open: INFRA_FAIL(precheck)
+RESULT smb2.durable-v2-regressions: INFRA_FAIL(precheck)
+RESULT smb2.replay: INFRA_FAIL(precheck)
+=== smb2.sdread ===
+RESULT smb2.sdread: PASS
+=== smb2.fileid ===
+RESULT smb2.fileid: PASS
+=== smb2.acls ===
+RESULT smb2.acls: INFRA_FAIL(connectivity rc=1)
+smbtorture 4.23.6
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772877612
+time: 2026-03-07 10:00:12.885055
+progress: 14
+test: CREATOR
+time: 2026-03-07 10:00:12.885798
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_DISCONNECTED
+time: 2026-03-07 10:00:12.898430
+failure: CREATOR [
+
+TCP_EXTENDED PASS=2 FAIL=0 SKIP=0 INFRA=36 KNOWNFAIL=0

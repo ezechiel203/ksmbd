@@ -1,0 +1,45 @@
+src/fs/ksmbd_fsctl.c:2703:	cancel_delayed_work_sync(&odx_gc_dwork);
+src/fs/vfs_cache.c:1271:	while (1) {
+src/fs/vfs_cache.c:1466:		remaining_jiffies = wait_event_timeout(dh_wq,
+src/fs/vfs_cache.c:1591:	kthread_stop(server_conf.dh_task);
+src/fs/vfs.c:4239:	wait_event_interruptible(flock->c.flc_wait, !flock->c.flc_blocker);
+src/fs/vfs.c:4241:	wait_event_interruptible(flock->fl_wait, !flock->fl_blocker);
+src/fs/vfs.c:4248:	return wait_event_interruptible_timeout(flock->c.flc_wait,
+src/fs/vfs.c:4251:	return wait_event_interruptible_timeout(flock->fl_wait,
+src/fs/oplock.c:952:	rc = wait_event_interruptible_timeout(opinfo->oplock_q,
+src/fs/oplock.c:1404:		ret = wait_event_interruptible_timeout(opinfo->oplock_brk,
+src/fs/ksmbd_notify.c:2057:	cancel_delayed_work_sync(&watch->batch_work);
+src/mgmt/ksmbd_witness.c:630:		flush_workqueue(witness_notify_wq);
+src/mgmt/ksmbd_witness.c:631:		destroy_workqueue(witness_notify_wq);
+src/transport/transport_rdma.c:407:	wait_event(t->wait_send_pending,
+src/transport/transport_rdma.c:804:	rc = wait_event_interruptible(st->wait_reassembly_queue,
+src/transport/transport_rdma.c:983:		ret = wait_event_interruptible(*waitq,
+src/transport/transport_rdma.c:1366:	wait_event(st->wait_send_pending,
+src/transport/transport_rdma.c:1989:	wait_event_interruptible(st->wait_status,
+src/transport/transport_rdma.c:2110:	wait_event(t->wait_send_pending,
+src/transport/transport_rdma.c:2452:	ret = wait_event_interruptible_timeout(st->wait_status,
+src/transport/transport_rdma.c:2718:		destroy_workqueue(smb_direct_wq);
+src/transport/transport_rdma.c:2743:		destroy_workqueue(smb_direct_wq);
+src/transport/transport_quic.c:2337:		wait_event_interruptible_timeout(qconn->wait,
+src/transport/transport_quic.c:3777:			wait_event_interruptible_timeout(
+src/transport/transport_quic.c:4015:		kthread_stop(quic_listener_kthread);
+src/transport/transport_ipc.c:773:	ret = wait_event_interruptible_timeout(entry->wait,
+src/transport/transport_ipc.c:1455:	cancel_delayed_work_sync(&ipc_timer_work);
+src/transport/transport_ipc.c:1463:	cancel_delayed_work_sync(&ipc_timer_work);
+src/transport/transport_ipc.c:1477:		cancel_delayed_work_sync(&ipc_timer_work);
+src/transport/transport_tcp.c:897:	ret = kthread_stop(kthread);
+src/core/connection.c:315:	if (!wait_event_timeout(conn->req_running_q,
+src/core/connection.c:360:				rc = wait_event_timeout(
+src/core/connection.c:587:			rc = wait_event_interruptible_timeout(conn->req_running_q,
+src/core/connection.c:747:	wait_event(conn->r_count_q, atomic_read(&conn->r_count) == 0);
+src/core/server.c:775:	 * kthread_stop() to hang and making ksmbdctl stop appear to deadlock.
+src/core/ksmbd_work.c:109:		flush_workqueue(ksmbd_wq);
+src/core/ksmbd_work.c:117:	flush_workqueue(ksmbd_wq);
+src/core/ksmbd_work.c:118:	destroy_workqueue(ksmbd_wq);
+src/core/crypto_ctx.c:174:			if (!wait_event_timeout(ctx_list.ctx_wait,
+src/core/crypto_ctx.c:192:			if (!wait_event_timeout(ctx_list.ctx_wait,
+src/protocol/smb2/smb2_lock.c:294:	for (;;) {
+src/protocol/smb1/smb1pdu.c:315:	while (1) {
+src/include/core/compat.h:19: * On older kernels, fall back to cancel_work_sync().
+src/include/core/compat.h:24:	return cancel_work_sync(work);
+src/fs/ksmbd_branchcache.c:91:	cancel_delayed_work_sync(&pccrc_secret_rotation_work);

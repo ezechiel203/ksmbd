@@ -1,0 +1,12 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772586337
+time: 2026-03-04 01:05:37.650837
+progress: 1
+test: no_stream
+time: 2026-03-04 01:05:37.652758
+Expected NT_STATUS_OBJECT_NAME_INVALID, got NT_STATUS_OBJECT_NAME_NOT_FOUND, name: 'test_no_stream::$DATA'
+time: 2026-03-04 01:05:37.722318
+failure: no_stream [
+../../source4/torture/smb2/create.c:3990: Bad create result
+]

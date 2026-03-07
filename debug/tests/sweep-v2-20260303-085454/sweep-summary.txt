@@ -1,0 +1,57 @@
+==========================================================================
+KSMBD smbtorture Sweep Summary - Post-Agent-Merge
+Date: 2026-03-03
+Branch: testability-refactor-query-set-fsctl (commit 05dd7d13)
+VMs: VM6 (16445), VM7 (17445), VM12 (22445), VM13 (23445)
+Method: ksmbd restart between every suite (prevents cascade crashes)
+==========================================================================
+
+SUITE                     PASS  FAIL  SKIP  BASELINE  DELTA
+--------------------------------------------------------------------------
+compound                    17     3     0       20     -3
+compound_async               6     4     0        6      0
+compound_find                2     1     0        2      0
+connect                      1     0     0        1      0
+create                      12     5     1       16     -4
+credits                      5     5     0        2     +3
+delete-on-close-perms        1     8     0        8     -7
+dir                          6     3     0        7     -1
+dirlease                     4    14     0        3     +1
+dosmode                      0     1     0        0      0
+durable-open                13    12     1       16     -3
+durable-v2-open              8    25     0       21    -13
+getinfo                      6     2     0        8     -2
+ioctl                       49    12    14       43     +6
+lease                       23    14     1       22     +1
+lock                        22     0     4       22      0
+notify                       1     1     0        1      0
+oplock                      34     8     0       41     -7
+read                         3     1     1        4     -1
+replay                      10    12     0        2     +8
+rw                           3     1     0        3      0
+secleak                      0     1     0        0      0
+session                     16    42    10        8     +8
+streams                      0    14     0       11    -11
+zero-data-ioctl              0     1     0        0      0
+--------------------------------------------------------------------------
+TOTAL (comparable)         242   190    32      285    -43
+
+Not tested (baseline had): maxfid(0), maximum_allowed(2), mkdir(1),
+  mux(0), openattr(1), rename(13), setinfo(1) = 18 additional PASS
+
+IMPROVEMENTS:  replay(+8), session(+8), ioctl(+6), credits(+3),
+               lease(+1), dirlease(+1) = +27
+
+REGRESSIONS:   durable-v2-open(-13), streams(-11), oplock(-7),
+               delete-on-close-perms(-7), create(-4), compound(-3),
+               durable-open(-3), getinfo(-2), dir(-1), read(-1) = -52
+
+ROOT CAUSES:
+1. vfs_cache.c DOC change: Immediate unlink -> deferred S_DEL_PENDING
+   (breaks cleanup between subtests, causing NAME_COLLISION/DELETE_PENDING)
+2. smb2_create.c: Removed CR3 FILE_OPEN_REQUIRING_OPLOCK handling
+   (breaks oplock tests that depend on this behavior)
+3. smb2_create.c: Removed FILE_COMPLETE_IF_OPLOCKED handling
+4. oplock.c: Parent lease break changes too aggressive
+5. Streams: Still investigating (may be ksmbdctl binary or code issue)
+==========================================================================

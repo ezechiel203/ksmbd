@@ -1,0 +1,883 @@
+# src/protocol/smb1/smb1pdu.c
+
+Risk-tagged lines (LOCK/LIFETIME/WAIT_LOOP/ERROR_PATH/MEM_BOUNDS/PROTO_GATE):
+
+- L00063 [PROTO_GATE|] `	[SMB_COM_CREATE_DIRECTORY] = "SMB_COM_CREATE_DIRECTORY",`
+- L00064 [PROTO_GATE|] `	[SMB_COM_DELETE_DIRECTORY] = "SMB_COM_DELETE_DIRECTORY",`
+- L00065 [PROTO_GATE|] `	[SMB_COM_CLOSE] = "SMB_COM_CLOSE",`
+- L00066 [PROTO_GATE|] `	[SMB_COM_FLUSH] = "SMB_COM_FLUSH",`
+- L00067 [PROTO_GATE|] `	[SMB_COM_DELETE] = "SMB_COM_DELETE",`
+- L00068 [PROTO_GATE|] `	[SMB_COM_RENAME] = "SMB_COM_RENAME",`
+- L00069 [PROTO_GATE|] `	[SMB_COM_QUERY_INFORMATION] = "SMB_COM_QUERY_INFORMATION",`
+- L00070 [PROTO_GATE|] `	[SMB_COM_SETATTR] = "SMB_COM_SETATTR",`
+- L00071 [PROTO_GATE|] `	[SMB_COM_WRITE] = "SMB_COM_WRITE",`
+- L00072 [PROTO_GATE|] `	[SMB_COM_CHECK_DIRECTORY] = "SMB_COM_CHECK_DIRECTORY",`
+- L00073 [PROTO_GATE|] `	[SMB_COM_PROCESS_EXIT] = "SMB_COM_PROCESS_EXIT",`
+- L00074 [PROTO_GATE|] `	[SMB_COM_LOCKING_ANDX] = "SMB_COM_LOCKING_ANDX",`
+- L00075 [PROTO_GATE|] `	[SMB_COM_TRANSACTION] = "SMB_COM_TRANSACTION",`
+- L00076 [PROTO_GATE|] `	[SMB_COM_COPY] = "SMB_COM_COPY",`
+- L00077 [PROTO_GATE|] `	[SMB_COM_ECHO] = "SMB_COM_ECHO",`
+- L00078 [PROTO_GATE|] `	[SMB_COM_OPEN_ANDX] = "SMB_COM_OPEN_ANDX",`
+- L00079 [PROTO_GATE|] `	[SMB_COM_READ_ANDX] = "SMB_COM_READ_ANDX",`
+- L00080 [PROTO_GATE|] `	[SMB_COM_WRITE_ANDX] = "SMB_COM_WRITE_ANDX",`
+- L00081 [PROTO_GATE|] `	[SMB_COM_TRANSACTION2] = "SMB_COM_TRANSACTION2",`
+- L00082 [PROTO_GATE|] `	[SMB_COM_TRANSACTION2_SECONDARY] = "SMB_COM_TRANSACTION2_SECONDARY",`
+- L00083 [PROTO_GATE|] `	[SMB_COM_FIND_CLOSE2] = "SMB_COM_FIND_CLOSE2",`
+- L00084 [PROTO_GATE|] `	[SMB_COM_TREE_DISCONNECT] = "SMB_COM_TREE_DISCONNECT",`
+- L00085 [PROTO_GATE|] `	[SMB_COM_NEGOTIATE] = "SMB_COM_NEGOTIATE",`
+- L00086 [PROTO_GATE|] `	[SMB_COM_SESSION_SETUP_ANDX] = "SMB_COM_SESSION_SETUP_ANDX",`
+- L00087 [PROTO_GATE|] `	[SMB_COM_LOGOFF_ANDX] = "SMB_COM_LOGOFF_ANDX",`
+- L00088 [PROTO_GATE|] `	[SMB_COM_TREE_CONNECT_ANDX] = "SMB_COM_TREE_CONNECT_ANDX",`
+- L00089 [PROTO_GATE|] `	[SMB_COM_QUERY_INFORMATION_DISK] = "SMB_COM_QUERY_INFORMATION_DISK",`
+- L00090 [PROTO_GATE|] `	[SMB_COM_NT_TRANSACT] = "SMB_COM_NT_TRANSACT",`
+- L00091 [PROTO_GATE|] `	[SMB_COM_NT_TRANSACT_SECONDARY] = "SMB_COM_NT_TRANSACT_SECONDARY",`
+- L00092 [PROTO_GATE|] `	[SMB_COM_NT_CREATE_ANDX] = "SMB_COM_NT_CREATE_ANDX",`
+- L00093 [PROTO_GATE|] `	[SMB_COM_NT_CANCEL] = "SMB_COM_NT_CANCEL",`
+- L00094 [PROTO_GATE|] `	[SMB_COM_NT_RENAME] = "SMB_COM_NT_RENAME",`
+- L00222 [MEM_BOUNDS|] `	memcpy(rsp_hdr->Protocol, rcv_hdr->Protocol, 4);`
+- L00258 [PROTO_GATE|] `	if (cmd == SMB_COM_TRANSACTION2) {`
+- L00272 [PROTO_GATE|] `	if (cmd == SMB_COM_TRANSACTION)`
+- L00275 [PROTO_GATE|] `	if (cmd == SMB_COM_ECHO) {`
+- L00289 [MEM_BOUNDS|] `	work->response_buf = kvmalloc(sz, KSMBD_DEFAULT_GFP | __GFP_ZERO);`
+- L00293 [ERROR_PATH|] `		pr_err("Failed to allocate %zu bytes buffer\n", sz);`
+- L00294 [ERROR_PATH|] `		return -ENOMEM;`
+- L00318 [WAIT_LOOP|] `	while (1) {`
+- L00365 [ERROR_PATH|] `		pr_err_ratelimited("SMB1 AndX response buffer too small (need %zu, have %zu)\n",`
+- L00388 [PROTO_GATE|] `	if (cmd == SMB_COM_NEGOTIATE || cmd == SMB_COM_SESSION_SETUP_ANDX ||`
+- L00389 [PROTO_GATE|] `	    cmd == SMB_COM_ECHO)`
+- L00393 [ERROR_PATH|] `		return -EINVAL;`
+- L00397 [ERROR_PATH|] `		return -EINVAL;`
+- L00407 [ERROR_PATH|] `	return -EINVAL;`
+- L00424 [PROTO_GATE|] `	if (cmd == SMB_COM_TREE_CONNECT_ANDX ||`
+- L00425 [PROTO_GATE|] `	    cmd == SMB_COM_NT_CANCEL ||`
+- L00426 [PROTO_GATE|] `	    cmd == SMB_COM_PROCESS_EXIT ||`
+- L00427 [PROTO_GATE|] `	    cmd == SMB_COM_LOGOFF_ANDX) {`
+- L00434 [ERROR_PATH|] `		return -ENOENT;`
+- L00440 [ERROR_PATH|] `		pr_err("Invalid tid %d\n", tree_id);`
+- L00441 [ERROR_PATH|] `		return -EINVAL;`
+- L00501 [ERROR_PATH|] `		pr_err("Invalid tid %d\n", req_hdr->Tid);`
+- L00502 [PROTO_GATE|] `		/* P1.8: MS-SMB §2.2.4.51 requires STATUS_SMB_BAD_TID here */`
+- L00503 [PROTO_GATE|] `		rsp_hdr->Status.CifsError = STATUS_SMB_BAD_TID;`
+- L00504 [ERROR_PATH|] `		return -EINVAL;`
+- L00512 [PROTO_GATE|] `		rsp_hdr->Status.CifsError = STATUS_NETWORK_NAME_DELETED;`
+- L00513 [ERROR_PATH|] `		return -ENOENT;`
+- L00516 [LIFETIME|] `	WARN_ON_ONCE(refcount_dec_and_test(&tcon->refcount));`
+- L00522 [PROTO_GATE|] `		rsp_hdr->Status.CifsError = STATUS_NETWORK_NAME_DELETED;`
+- L00523 [ERROR_PATH|] `		return -ENOENT;`
+- L00540 [MEM_BOUNDS|] `		memcpy(__smb1_unfence(buf), SERVICE_IPC_SHARE, length);`
+- L00548 [MEM_BOUNDS|] `		memcpy(__smb1_unfence(buf), SERVICE_DISK_SHARE, length);`
+- L00582 [PROTO_GATE|] `	if (req_hdr->Command != SMB_COM_TREE_CONNECT_ANDX) {`
+- L00583 [PROTO_GATE|] `		ksmbd_debug(SMB, "SMB_COM_TREE_CONNECT_ANDX is part of ANDX");`
+- L00586 [PROTO_GATE|] `				SMB_COM_TREE_CONNECT_ANDX);`
+- L00594 [ERROR_PATH|] `			goto out_err;`
+- L00609 [LIFETIME|] `				WARN_ON_ONCE(refcount_dec_and_test(&old_tcon->refcount));`
+- L00629 [ERROR_PATH|] `		pr_err("Unable to strdup() treename uid %d\n",`
+- L00631 [PROTO_GATE|] `		status.ret = KSMBD_TREE_CONN_STATUS_ERROR;`
+- L00632 [ERROR_PATH|] `		goto out_err;`
+- L00647 [ERROR_PATH|] `		pr_err("Unable to strdup() devtype uid %d\n",`
+- L00649 [PROTO_GATE|] `		status.ret = KSMBD_TREE_CONN_STATUS_ERROR;`
+- L00650 [ERROR_PATH|] `		goto out_err;`
+- L00654 [PROTO_GATE|] `		status.ret = KSMBD_TREE_CONN_STATUS_ERROR;`
+- L00655 [ERROR_PATH|] `		goto out_err;`
+- L00675 [ERROR_PATH|] `			goto out_err;`
+- L00679 [ERROR_PATH|] `		goto out_err;`
+- L00683 [PROTO_GATE|] `	if (status.ret == KSMBD_TREE_CONN_STATUS_OK)`
+- L00686 [ERROR_PATH|] `		goto out_err;`
+- L00750 [PROTO_GATE|] `	case KSMBD_TREE_CONN_STATUS_NO_SHARE:`
+- L00751 [PROTO_GATE|] `		rsp_hdr->Status.CifsError = STATUS_BAD_NETWORK_PATH;`
+- L00754 [PROTO_GATE|] `	case KSMBD_TREE_CONN_STATUS_NOMEM:`
+- L00755 [PROTO_GATE|] `		rsp_hdr->Status.CifsError = STATUS_NO_MEMORY;`
+- L00757 [PROTO_GATE|] `	case KSMBD_TREE_CONN_STATUS_TOO_MANY_CONNS:`
+- L00758 [PROTO_GATE|] `	case KSMBD_TREE_CONN_STATUS_TOO_MANY_SESSIONS:`
+- L00759 [PROTO_GATE|] `		rsp_hdr->Status.CifsError = STATUS_ACCESS_DENIED;`
+- L00762 [PROTO_GATE|] `		rsp_hdr->Status.CifsError = STATUS_BAD_DEVICE_TYPE;`
+- L00764 [PROTO_GATE|] `	case KSMBD_TREE_CONN_STATUS_ERROR:`
+- L00765 [PROTO_GATE|] `		rsp_hdr->Status.CifsError = STATUS_BAD_NETWORK_NAME;`
+- L00768 [PROTO_GATE|] `		rsp_hdr->Status.CifsError = STATUS_INVALID_PARAMETER;`
+- L00771 [PROTO_GATE|] `		rsp_hdr->Status.CifsError = STATUS_ACCESS_DENIED;`
+- L00776 [ERROR_PATH|] `	return -EINVAL;`
+- L00860 [ERROR_PATH|] `		pr_err("failed to allocate memory\n");`
+- L00861 [PROTO_GATE|] `		rsp_hdr->Status.CifsError = STATUS_NO_MEMORY;`
+- L00878 [ERROR_PATH|] `		goto err_name;`
+- L00882 [MEM_BOUNDS|] `	pattern = kmalloc(pattern_len + 1, KSMBD_DEFAULT_GFP);`
+- L00885 [ERROR_PATH|] `		goto err_name;`
+- L00887 [MEM_BOUNDS|] `	memcpy(pattern, pattern_pos, pattern_len);`
+- L00894 [ERROR_PATH|] `		goto err_pattern;`
+- L00902 [ERROR_PATH|] `		goto err_pattern;`
+- L00915 [PROTO_GATE|] `		rsp_hdr->Status.CifsError = STATUS_INVALID_PARAMETER;`
+- L00917 [PROTO_GATE|] `		rsp_hdr->Status.CifsError = STATUS_NO_MEMORY;`
+- L00919 [PROTO_GATE|] `		rsp_hdr->Status.CifsError = STATUS_OBJECT_NAME_INVALID;`
+- L00946 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_ACCESS_DENIED;`
+- L00947 [ERROR_PATH|] `		return -EACCES;`
+- L00952 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_OBJECT_NAME_INVALID;`
+- L00967 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_OBJECT_NAME_INVALID;`
+- L00970 [ERROR_PATH|] `		goto out;`
+- L00981 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_OBJECT_NAME_COLLISION;`
+- L00983 [ERROR_PATH|] `		goto out;`
+- L00989 [ERROR_PATH|] `		goto out;`
+- L00995 [ERROR_PATH|] `		goto out;`
+- L01005 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_NO_MEMORY;`
+- L01007 [ERROR_PATH|] `		goto out;`
+- L01033 [ERROR_PATH|] `	WARN_ON(ksmbd_conn_good(conn));`
+- L01037 [PROTO_GATE|] `		 * set DialectIndex=0xFFFF with STATUS_SUCCESS (WordCount=1).`
+- L01038 [PROTO_GATE|] `		 * Do NOT return STATUS_INVALID_LOGON_TYPE.`
+- L01042 [PROTO_GATE|] `		neg_rsp->hdr.Status.CifsError = STATUS_SUCCESS;`
+- L01048 [ERROR_PATH|] `		goto err_out;`
+- L01098 [MEM_BOUNDS|] `		memcpy((neg_rsp->u.EncryptionKey), conn->ntlmssp.cryptkey,`
+- L01104 [MEM_BOUNDS|] `		memcpy(__smb1_unfence(domain_ptr), ksmbd_work_group(),`
+- L01158 [ERROR_PATH|] `		pr_err("cannot allocate memory\n");`
+- L01160 [ERROR_PATH|] `		goto out_err;`
+- L01163 [ERROR_PATH|] `	WARN_ON(sess->user);`
+- L01169 [ERROR_PATH|] `		pr_err("user not present in database\n");`
+- L01171 [ERROR_PATH|] `		goto out_err;`
+- L01176 [ERROR_PATH|] `		goto no_password_check;`
+- L01185 [ERROR_PATH|] `			pr_err("ntlm authentication failed for user %s\n",`
+- L01187 [ERROR_PATH|] `			goto out_err;`
+- L01200 [ERROR_PATH|] `			pr_err("cannot allocate memory\n");`
+- L01202 [ERROR_PATH|] `			goto out_err;`
+- L01214 [ERROR_PATH|] `			pr_err("authentication failed for user %s\n",`
+- L01216 [ERROR_PATH|] `			goto out_err;`
+- L01232 [MEM_BOUNDS|] `	memcpy(rsp->NativeOS + offset, str, len);`
+- L01237 [MEM_BOUNDS|] `	memcpy(rsp->NativeOS + offset, str, len);`
+- L01244 [MEM_BOUNDS|] `	memcpy(rsp->NativeOS + offset, str, len);`
+- L01301 [ERROR_PATH|] `			goto out_err;`
+- L01311 [MEM_BOUNDS|] `			neg_blob = kmalloc(sz, KSMBD_DEFAULT_GFP);`
+- L01314 [ERROR_PATH|] `				goto out_err;`
+- L01324 [ERROR_PATH|] `				goto out_err;`
+- L01333 [ERROR_PATH|] `				goto out_err;`
+- L01336 [MEM_BOUNDS|] `			memcpy((char *)rsp->SecurityBlob, spnego_blob,`
+- L01351 [ERROR_PATH|] `				goto out_err;`
+- L01357 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_MORE_PROCESSING_REQUIRED;`
+- L01382 [ERROR_PATH|] `			pr_err("cannot allocate memory\n");`
+- L01384 [ERROR_PATH|] `			goto out_err;`
+- L01395 [ERROR_PATH|] `			goto out_err;`
+- L01400 [ERROR_PATH|] `			goto no_password_check;`
+- L01416 [ERROR_PATH|] `			goto out_err;`
+- L01424 [ERROR_PATH|] `				goto out_err;`
+- L01427 [MEM_BOUNDS|] `			memcpy((char *)rsp->SecurityBlob, spnego_blob,`
+- L01435 [ERROR_PATH|] `		pr_err("Invalid phase %d\n", negblob->MessageType);`
+- L01437 [ERROR_PATH|] `		goto out_err;`
+- L01445 [PROTO_GATE|] `	if (!err && rsp->hdr.Status.CifsError == STATUS_SUCCESS) {`
+- L01454 [MEM_BOUNDS|] `		memcpy(__smb1_unfence(str_base + str_offset), str22, slen);`
+- L01459 [MEM_BOUNDS|] `		memcpy(__smb1_unfence(str_base + str_offset), str22, slen);`
+- L01466 [MEM_BOUNDS|] `		memcpy(__smb1_unfence(str_base + str_offset), str22, slen);`
+- L01515 [ERROR_PATH|] `		pr_err("malformed packet\n");`
+- L01526 [ERROR_PATH|] `			goto out_err;`
+- L01563 [ERROR_PATH|] `			goto out_err;`
+- L01568 [ERROR_PATH|] `			goto out_err;`
+- L01584 [ERROR_PATH|] `		goto out_err;`
+- L01592 [PROTO_GATE|] `	rsp->resp.hdr.Status.CifsError = STATUS_LOGON_FAILURE;`
+- L01634 [ERROR_PATH|] `			return -ENOENT;`
+- L01642 [ERROR_PATH|] `			return -EEXIST;`
+- L01659 [ERROR_PATH|] `			return -ENOENT;`
+- L01673 [ERROR_PATH|] `		return -EINVAL;`
+- L01796 [ERROR_PATH|] `		pr_err("unexpected oplock state 0x%x\n", opinfo->op_state);`
+- L01797 [ERROR_PATH|] `		return -EINVAL;`
+- L01803 [ERROR_PATH|] `			return -EINVAL;`
+- L01811 [ERROR_PATH|] `			return -EINVAL;`
+- L01818 [ERROR_PATH|] `			return -EINVAL;`
+- L01836 [MEM_BOUNDS|] `	lock = kzalloc(sizeof(struct ksmbd_lock), KSMBD_DEFAULT_GFP);`
+- L01891 [ERROR_PATH|] `		pr_err("cannot obtain fid for %d\n", req->Fid);`
+- L01892 [ERROR_PATH|] `		return -EINVAL;`
+- L01896 [ERROR_PATH|] `		pr_err("lock type is oplock release\n");`
+- L01922 [PROTO_GATE|] `		 * STATUS_NOT_SUPPORTED as required by MS-SMB spec.`
+- L01924 [ERROR_PATH|] `		pr_err("lock type: LOCKING_ANDX_CHANGE_LOCKTYPE\n");`
+- L01925 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_NOT_SUPPORTED;`
+- L01927 [ERROR_PATH|] `		return -EOPNOTSUPP;`
+- L01931 [ERROR_PATH|] `		pr_err("lock type: LOCKING_ANDX_CANCEL_LOCK\n");`
+- L01939 [ERROR_PATH|] `			goto out;`
+- L01978 [LOCK|] `		spin_lock(&conn_hash[bkt].lock);`
+- L01981 [LOCK|] `			spin_lock(&conn->llist_lock);`
+- L01995 [LOCK|] `					spin_unlock(&conn->llist_lock);`
+- L01996 [LOCK|] `					spin_unlock(&conn_hash[bkt].lock);`
+- L01997 [ERROR_PATH|] `					goto out_check_cl_unlck_early;`
+- L02000 [LOCK|] `			spin_unlock(&conn->llist_lock);`
+- L02002 [LOCK|] `		spin_unlock(&conn_hash[bkt].lock);`
+- L02008 [PROTO_GATE|] `			rsp->hdr.Status.CifsError = STATUS_RANGE_NOT_LOCKED;`
+- L02009 [ERROR_PATH|] `			goto out;`
+- L02015 [LOCK|] `			spin_lock(&conn->llist_lock);`
+- L02019 [LOCK|] `			spin_unlock(&conn->llist_lock);`
+- L02025 [PROTO_GATE|] `			rsp->hdr.Status.CifsError = STATUS_RANGE_NOT_LOCKED;`
+- L02027 [ERROR_PATH|] `			goto out;`
+- L02035 [ERROR_PATH|] `			goto out;`
+- L02038 [ERROR_PATH|] `			pr_err("received shared request\n");`
+- L02041 [PROTO_GATE|] `					STATUS_ACCESS_DENIED;`
+- L02043 [ERROR_PATH|] `				goto out;`
+- L02052 [ERROR_PATH|] `			pr_err("received exclusive request\n");`
+- L02055 [PROTO_GATE|] `					STATUS_ACCESS_DENIED;`
+- L02057 [ERROR_PATH|] `				goto out;`
+- L02086 [ERROR_PATH|] `			pr_err("Invalid lock range requested\n");`
+- L02087 [PROTO_GATE|] `			rsp->hdr.Status.CifsError = STATUS_INVALID_LOCK_RANGE;`
+- L02089 [ERROR_PATH|] `			goto out;`
+- L02093 [ERROR_PATH|] `			pr_err("Invalid lock range requested\n");`
+- L02094 [PROTO_GATE|] `			rsp->hdr.Status.CifsError = STATUS_INVALID_LOCK_RANGE;`
+- L02096 [ERROR_PATH|] `			goto out;`
+- L02115 [ERROR_PATH|] `			goto out;`
+- L02125 [LOCK|] `		spin_lock(&conn_hash[bkt].lock);`
+- L02128 [LOCK|] `			spin_lock(&conn->llist_lock);`
+- L02143 [LOCK|] `					spin_unlock(&conn->llist_lock);`
+- L02144 [LOCK|] `					spin_unlock(&conn_hash[bkt].lock);`
+- L02145 [ERROR_PATH|] `					goto out_check_cl;`
+- L02152 [ERROR_PATH|] `					pr_err("previous lock conflict with zero byte lock range\n");`
+- L02157 [ERROR_PATH|] `					pr_err("current lock conflict with zero byte lock range\n");`
+- L02164 [ERROR_PATH|] `					pr_err("Not allow lock operation on exclusive lock range\n");`
+- L02184 [LOCK|] `							spin_unlock(&conn->llist_lock);`
+- L02185 [LOCK|] `							spin_unlock(&conn_hash[bkt].lock);`
+- L02188 [WAIT_LOOP|] `							msleep(timeout);`
+- L02191 [PROTO_GATE|] `							STATUS_FILE_LOCK_CONFLICT;`
+- L02194 [PROTO_GATE|] `							STATUS_LOCK_NOT_GRANTED;`
+- L02199 [LOCK|] `						spin_unlock(&conn->llist_lock);`
+- L02200 [LOCK|] `						spin_unlock(&conn_hash[bkt].lock);`
+- L02202 [ERROR_PATH|] `					goto out;`
+- L02205 [LOCK|] `			spin_unlock(&conn->llist_lock);`
+- L02207 [LOCK|] `		spin_unlock(&conn_hash[bkt].lock);`
+- L02215 [ERROR_PATH|] `			goto skip;`
+- L02222 [ERROR_PATH|] `			pr_err("would have to wait for getting lock\n");`
+- L02223 [LOCK|] `			spin_lock(&work->conn->llist_lock);`
+- L02225 [LOCK|] `			spin_unlock(&work->conn->llist_lock);`
+- L02232 [LOCK|] `				spin_lock(&work->conn->llist_lock);`
+- L02234 [LOCK|] `				spin_unlock(&work->conn->llist_lock);`
+- L02235 [ERROR_PATH|] `				goto retry;`
+- L02237 [ERROR_PATH|] `				goto wait;`
+- L02240 [LOCK|] `			spin_lock(&work->conn->llist_lock);`
+- L02243 [LOCK|] `			spin_unlock(&work->conn->llist_lock);`
+- L02245 [ERROR_PATH|] `			pr_err("successful in taking lock\n");`
+- L02247 [PROTO_GATE|] `			rsp->hdr.Status.CifsError = STATUS_LOCK_NOT_GRANTED;`
+- L02248 [ERROR_PATH|] `			goto out;`
+- L02289 [ERROR_PATH|] `			pr_err("rollback unlock fail : %d\n", err);`
+- L02292 [LOCK|] `		spin_lock(&work->conn->llist_lock);`
+- L02296 [LOCK|] `		spin_unlock(&work->conn->llist_lock);`
+- L02304 [ERROR_PATH|] `	pr_err("failed in taking lock\n");`
+- L02341 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;`
+- L02342 [ERROR_PATH|] `		return -EINVAL;`
+- L02345 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;`
+- L02346 [ERROR_PATH|] `		return -EINVAL;`
+- L02352 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;`
+- L02353 [ERROR_PATH|] `		return -EINVAL;`
+- L02358 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;`
+- L02359 [ERROR_PATH|] `		return -EINVAL;`
+- L02369 [ERROR_PATH|] `		pr_err("failed to allocate memory\n");`
+- L02370 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_NO_MEMORY;`
+- L02387 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;`
+- L02389 [ERROR_PATH|] `		return -EINVAL;`
+- L02395 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_NOT_SUPPORTED;`
+- L02407 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_NOT_SUPPORTED;`
+- L02415 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;`
+- L02417 [ERROR_PATH|] `		goto out;`
+- L02428 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;`
+- L02430 [ERROR_PATH|] `		goto out;`
+- L02441 [PROTO_GATE|] `					STATUS_NOT_SUPPORTED;`
+- L02443 [ERROR_PATH|] `				goto out;`
+- L02446 [PROTO_GATE|] `					STATUS_INVALID_PARAMETER;`
+- L02448 [ERROR_PATH|] `				goto out;`
+- L02455 [PROTO_GATE|] `						STATUS_INVALID_PARAMETER;`
+- L02458 [ERROR_PATH|] `					goto out;`
+- L02461 [MEM_BOUNDS|] `				memcpy((char *)rsp +`
+- L02467 [ERROR_PATH|] `			goto resp_out;`
+- L02470 [ERROR_PATH|] `			goto out;`
+- L02485 [PROTO_GATE|] `					STATUS_NOT_SUPPORTED;`
+- L02487 [ERROR_PATH|] `				goto out;`
+- L02490 [PROTO_GATE|] `					STATUS_INVALID_PARAMETER;`
+- L02492 [ERROR_PATH|] `				goto out;`
+- L02499 [PROTO_GATE|] `						STATUS_INVALID_PARAMETER;`
+- L02502 [ERROR_PATH|] `					goto out;`
+- L02505 [MEM_BOUNDS|] `				memcpy((char *)rsp +`
+- L02517 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_NOT_SUPPORTED;`
+- L02518 [ERROR_PATH|] `		goto out;`
+- L02569 [ERROR_PATH|] `		goto out;`
+- L02574 [ERROR_PATH|] `		goto out;`
+- L02602 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_SUCCESS;`
+- L02605 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;`
+- L02610 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_NO_MEMORY;`
+- L02630 [ERROR_PATH|] `		return -EBADF;`
+- L02648 [ERROR_PATH|] `		pr_err("cannot get linux path (%s), err = %d\n", name, err);`
+- L02687 [PROTO_GATE|] `	rsp->hdr.Status.CifsError = STATUS_UNSUCCESSFUL;`
+- L02696 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_NOT_SUPPORTED;`
+- L02697 [ERROR_PATH|] `		return -EINVAL;`
+- L02703 [PROTO_GATE|] `			rsp->hdr.Status.CifsError = STATUS_ACCESS_DENIED;`
+- L02704 [ERROR_PATH|] `			return -EPERM;`
+- L02708 [PROTO_GATE|] `			rsp->hdr.Status.CifsError = STATUS_CANNOT_DELETE;`
+- L02709 [ERROR_PATH|] `			return -EPERM;`
+- L02731 [PROTO_GATE|] `			rsp->hdr.Status.CifsError = STATUS_INVALID_HANDLE;`
+- L02733 [ERROR_PATH|] `			return -EINVAL;`
+- L02741 [MEM_BOUNDS|] `	src = kzalloc(le16_to_cpu(req->NameLength) + 2, KSMBD_DEFAULT_GFP);`
+- L02743 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_NO_MEMORY;`
+- L02745 [ERROR_PATH|] `		return -ENOMEM;`
+- L02749 [MEM_BOUNDS|] `		memcpy(src, req->fileName + 1, le16_to_cpu(req->NameLength));`
+- L02752 [MEM_BOUNDS|] `		memcpy(src, req->fileName, le16_to_cpu(req->NameLength));`
+- L02762 [ERROR_PATH|] `			pr_err("failed to allocate memory\n");`
+- L02763 [PROTO_GATE|] `			rsp->hdr.Status.CifsError = STATUS_NO_MEMORY;`
+- L02765 [PROTO_GATE|] `			rsp->hdr.Status.CifsError = STATUS_OBJECT_NAME_INVALID;`
+- L02776 [PROTO_GATE|] `			rsp->hdr.Status.CifsError = STATUS_NO_MEMORY;`
+- L02777 [ERROR_PATH|] `			return -ENOMEM;`
+- L02788 [PROTO_GATE|] `			rsp->hdr.Status.CifsError = STATUS_OBJECT_NAME_INVALID;`
+- L02790 [ERROR_PATH|] `			return -EINVAL;`
+- L02796 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_OBJECT_NAME_INVALID;`
+- L02803 [ERROR_PATH|] `		goto out1;`
+- L02811 [ERROR_PATH|] `			goto out;`
+- L02818 [ERROR_PATH|] `			goto free_path;`
+- L02824 [ERROR_PATH|] `			pr_err("can not stat %s, err = %d\n", conv_name, err);`
+- L02825 [ERROR_PATH|] `			goto free_path;`
+- L02841 [PROTO_GATE|] `				STATUS_OBJECT_NAME_COLLISION;`
+- L02845 [ERROR_PATH|] `		goto free_path;`
+- L02853 [PROTO_GATE|] `			ntstatus_to_dos(STATUS_NOT_A_DIRECTORY,`
+- L02857 [PROTO_GATE|] `			rsp->hdr.Status.CifsError = STATUS_NOT_A_DIRECTORY;`
+- L02861 [ERROR_PATH|] `		goto free_path;`
+- L02880 [PROTO_GATE|] `					STATUS_INVALID_PARAMETER;`
+- L02883 [PROTO_GATE|] `					STATUS_OBJECT_NAME_COLLISION;`
+- L02885 [ERROR_PATH|] `			goto free_path;`
+- L02888 [ERROR_PATH|] `			goto out;`
+- L02932 [ERROR_PATH|] `				goto free_path;`
+- L02934 [ERROR_PATH|] `				goto out;`
+- L02948 [ERROR_PATH|] `			goto out;`
+- L02954 [ERROR_PATH|] `			goto free_path;`
+- L02958 [PROTO_GATE|] `	if (err == KSMBD_INODE_STATUS_PENDING_DELETE) {`
+- L02960 [ERROR_PATH|] `		goto free_path;`
+- L02973 [ERROR_PATH|] `		goto free_path;`
+- L02979 [LOCK|] `	down_write(&fp->f_ci->m_lock);`
+- L02981 [LOCK|] `	up_write(&fp->f_ci->m_lock);`
+- L02993 [ERROR_PATH|] `			goto free_path;`
+- L02997 [ERROR_PATH|] `			goto free_path;`
+- L03002 [ERROR_PATH|] `			goto free_path;`
+- L03026 [ERROR_PATH|] `		pr_err("cannot get stat information\n");`
+- L03027 [ERROR_PATH|] `		goto free_path;`
+- L03036 [ERROR_PATH|] `				pr_err("failed to expand file, err = %d\n",`
+- L03038 [ERROR_PATH|] `				goto free_path;`
+- L03044 [PROTO_GATE|] `	rsp->hdr.Status.CifsError = STATUS_SUCCESS;`
+- L03146 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_DISK_FULL;`
+- L03149 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_TOO_MANY_OPENED_FILES;`
+- L03152 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_NO_SUCH_USER;`
+- L03155 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_ACCESS_DENIED;`
+- L03158 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_SHARING_VIOLATION;`
+- L03161 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_OBJECT_NAME_NOT_FOUND;`
+- L03164 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_DELETE_PENDING;`
+- L03167 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_NOT_SUPPORTED;`
+- L03170 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_NO_MEMORY;`
+- L03173 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_UNEXPECTED_IO_ERROR;`
+- L03223 [PROTO_GATE|] `	ksmbd_debug(SMB, "SMB_COM_CLOSE called for fid %u\n", req->FileID);`
+- L03229 [ERROR_PATH|] `			goto out;`
+- L03230 [ERROR_PATH|] `		goto IPC_out;`
+- L03256 [PROTO_GATE|] `	rsp->hdr.Status.CifsError = STATUS_SUCCESS;`
+- L03262 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_INVALID_HANDLE;`
+- L03284 [PROTO_GATE|] `			rsp->hdr.Status.CifsError = STATUS_UNEXPECTED_IO_ERROR;`
+- L03286 [ERROR_PATH|] `			return -EINVAL;`
+- L03290 [MEM_BOUNDS|] `		aux_buf = kvmalloc(nbytes, GFP_KERNEL);`
+- L03293 [ERROR_PATH|] `			return -ENOMEM;`
+- L03295 [MEM_BOUNDS|] `		memcpy(aux_buf, rpc_resp->payload, nbytes);`
+- L03303 [PROTO_GATE|] `			rsp->hdr.Status.CifsError = STATUS_UNEXPECTED_IO_ERROR;`
+- L03304 [ERROR_PATH|] `			return -EINVAL;`
+- L03307 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_UNEXPECTED_IO_ERROR;`
+- L03308 [ERROR_PATH|] `		return -EINVAL;`
+- L03311 [PROTO_GATE|] `	rsp->hdr.Status.CifsError = STATUS_SUCCESS;`
+- L03362 [ERROR_PATH|] `		pr_err("failed to get filp for fid %d\n", req->Fid);`
+- L03363 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_FILE_CLOSED;`
+- L03364 [ERROR_PATH|] `		return -ENOENT;`
+- L03382 [PROTO_GATE|] `	 * using an SMB_COM_READ_ANDX request.`
+- L03398 [MEM_BOUNDS|] `	work->aux_payload_buf = kvmalloc(count, KSMBD_DEFAULT_GFP | __GFP_ZERO);`
+- L03401 [ERROR_PATH|] `		goto out;`
+- L03407 [ERROR_PATH|] `		goto out;`
+- L03411 [PROTO_GATE|] `	rsp->hdr.Status.CifsError = STATUS_SUCCESS;`
+- L03443 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_INVALID_HANDLE;`
+- L03467 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_ACCESS_DENIED;`
+- L03468 [ERROR_PATH|] `		return -EACCES;`
+- L03473 [ERROR_PATH|] `		pr_err("failed to get filp for fid %u\n", req->Fid);`
+- L03474 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_FILE_CLOSED;`
+- L03475 [ERROR_PATH|] `		return -ENOENT;`
+- L03498 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_SUCCESS;`
+- L03503 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_DISK_FULL;`
+- L03505 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_INVALID_HANDLE;`
+- L03530 [PROTO_GATE|] `			rsp->hdr.Status.CifsError = STATUS_NOT_SUPPORTED;`
+- L03532 [ERROR_PATH|] `			return -EOPNOTSUPP;`
+- L03535 [PROTO_GATE|] `			rsp->hdr.Status.CifsError = STATUS_INVALID_HANDLE;`
+- L03537 [ERROR_PATH|] `			return -EINVAL;`
+- L03545 [PROTO_GATE|] `	rsp->hdr.Status.CifsError = STATUS_SUCCESS;`
+- L03589 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_ACCESS_DENIED;`
+- L03590 [ERROR_PATH|] `		return -EACCES;`
+- L03601 [ERROR_PATH|] `		pr_err("failed to get filp for fid %u\n", req->Fid);`
+- L03602 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_FILE_CLOSED;`
+- L03603 [ERROR_PATH|] `		return -ENOENT;`
+- L03637 [ERROR_PATH|] `			pr_err("invalid write data offset %u, smb_len %u\n",`
+- L03641 [ERROR_PATH|] `			goto out;`
+- L03653 [ERROR_PATH|] `		goto out;`
+- L03656 [PROTO_GATE|] `	rsp->hdr.Status.CifsError = STATUS_SUCCESS;`
+- L03681 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_DISK_FULL;`
+- L03683 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_INVALID_HANDLE;`
+- L03702 [PROTO_GATE|] `	ksmbd_debug(SMB, "SMB_COM_ECHO called with echo count %u\n",`
+- L03716 [PROTO_GATE|] `	rsp->hdr.Status.CifsError = STATUS_SUCCESS;`
+- L03720 [MEM_BOUNDS|] `	memcpy(rsp->Data, req->Data, data_count);`
+- L03749 [PROTO_GATE|] `	ksmbd_debug(SMB, "SMB_COM_FLUSH called for fid %u\n", req->FileID);`
+- L03754 [ERROR_PATH|] `			goto out;`
+- L03758 [ERROR_PATH|] `			goto out;`
+- L03762 [PROTO_GATE|] `	rsp->hdr.Status.CifsError = STATUS_SUCCESS;`
+- L03769 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_INVALID_HANDLE;`
+- L03906 [ERROR_PATH|] `		pr_err("unknown file type 0x%x\n",`
+- L03973 [ERROR_PATH|] `		return -EOPNOTSUPP;`
+- L03984 [ERROR_PATH|] `			return -EINVAL;`
+- L03993 [ERROR_PATH|] `			return -EINVAL;`
+- L03996 [ERROR_PATH|] `		return -EINVAL;`
+- L04001 [ERROR_PATH|] `		return -ERANGE;`
+- L04143 [PROTO_GATE|] `	rsp->hdr.Status.CifsError = STATUS_SUCCESS;`
+- L04181 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_OBJECT_NAME_INVALID;`
+- L04185 [MEM_BOUNDS|] `	buf = vmalloc(XATTR_SIZE_MAX);`
+- L04187 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_NO_MEMORY;`
+- L04189 [ERROR_PATH|] `		goto out;`
+- L04203 [ERROR_PATH|] `		goto out;`
+- L04209 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;`
+- L04210 [ERROR_PATH|] `		goto out;`
+- L04227 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_UNEXPECTED_IO_ERROR;`
+- L04228 [ERROR_PATH|] `		goto out;`
+- L04231 [PROTO_GATE|] `	rsp->hdr.Status.CifsError = STATUS_SUCCESS;`
+- L04263 [MEM_BOUNDS|] `	nptr = kvmalloc(new_sz, KSMBD_DEFAULT_GFP | __GFP_ZERO);`
+- L04266 [MEM_BOUNDS|] `	memcpy(nptr, ptr, sz);`
+- L04284 [MEM_BOUNDS|] `	buf = kzalloc((CIFS_MF_SYMLINK_LINK_MAXLEN), KSMBD_DEFAULT_GFP);`
+- L04286 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_NO_MEMORY;`
+- L04287 [ERROR_PATH|] `		return -ENOMEM;`
+- L04292 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_INVALID_HANDLE;`
+- L04293 [ERROR_PATH|] `		goto out;`
+- L04310 [PROTO_GATE|] `			rsp->hdr.Status.CifsError = STATUS_NO_MEMORY;`
+- L04312 [ERROR_PATH|] `			goto out;`
+- L04333 [MEM_BOUNDS|] `		name_len = strscpy(ptr, buf, link_len);`
+- L04336 [PROTO_GATE|] `			rsp->hdr.Status.CifsError = STATUS_NO_MEMORY;`
+- L04337 [ERROR_PATH|] `			goto out;`
+- L04385 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_INVALID_HANDLE;`
+- L04386 [ERROR_PATH|] `		goto out;`
+- L04389 [ERROR_PATH|] `		goto done;`
+- L04419 [PROTO_GATE|] `			rsp->hdr.Status.CifsError = STATUS_INVALID_HANDLE;`
+- L04420 [ERROR_PATH|] `			goto out;`
+- L04423 [MEM_BOUNDS|] `		memcpy(ptr, buf, value_len);`
+- L04429 [MEM_BOUNDS|] `			memcpy(temp_fea->name, &name[XATTR_USER_PREFIX_LEN],`
+- L04432 [MEM_BOUNDS|] `			memcpy(temp_fea->name, name, name_len);`
+- L04487 [PROTO_GATE|] `		rsp_hdr->Status.CifsError = STATUS_UNEXPECTED_IO_ERROR;`
+- L04496 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_OBJECT_NAME_INVALID;`
+- L04502 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_NO_MEMORY;`
+- L04503 [ERROR_PATH|] `		return -ENOMEM;`
+- L04508 [PROTO_GATE|] `			rsp_hdr->Status.CifsError = STATUS_ACCESS_DENIED;`
+- L04511 [PROTO_GATE|] `					STATUS_OBJECT_NAME_NOT_FOUND;`
+- L04514 [ERROR_PATH|] `		goto out;`
+- L04518 [PROTO_GATE|] `		rsp_hdr->Status.CifsError = STATUS_ACCESS_DENIED;`
+- L04519 [ERROR_PATH|] `		goto err_out;`
+- L04524 [ERROR_PATH|] `		pr_err("cannot get stat information\n");`
+- L04525 [ERROR_PATH|] `		goto err_out;`
+- L04546 [PROTO_GATE|] `		if (rc == KSMBD_INODE_STATUS_PENDING_DELETE) {`
+- L04548 [ERROR_PATH|] `			goto err_out;`
+- L04591 [PROTO_GATE|] `		if (del_pending == KSMBD_INODE_STATUS_PENDING_DELETE)`
+- L04710 [ERROR_PATH|] `			goto err_out;`
+- L04748 [PROTO_GATE|] `		if (del_pending == KSMBD_INODE_STATUS_PENDING_DELETE)`
+- L04756 [ERROR_PATH|] `			goto err_out;`
+- L04911 [ERROR_PATH|] `			goto err_out;`
+- L04917 [ERROR_PATH|] `			goto err_out;`
+- L04923 [ERROR_PATH|] `			goto err_out;`
+- L04926 [ERROR_PATH|] `		pr_err("query path info not implemnted for %x\n",`
+- L04929 [ERROR_PATH|] `		goto err_out;`
+- L04994 [ERROR_PATH|] `			pr_err("Non compatible unix major info\n");`
+- L04995 [ERROR_PATH|] `			return -EINVAL;`
+- L05000 [ERROR_PATH|] `			pr_err("Non compatible unix minor info\n");`
+- L05001 [ERROR_PATH|] `			return -EINVAL;`
+- L05023 [ERROR_PATH|] `		return -EINVAL;`
+- L05078 [ERROR_PATH|] `		return -ENOENT;`
+- L05082 [ERROR_PATH|] `		return -ENOENT;`
+- L05085 [ERROR_PATH|] `		return -ENOMEM;`
+- L05090 [ERROR_PATH|] `		pr_err("cannot create vfs path\n");`
+- L05096 [ERROR_PATH|] `		pr_err("cannot do stat of path %s\n", share->path);`
+- L05097 [ERROR_PATH|] `		goto err_out;`
+- L05115 [MEM_BOUNDS|] `		memcpy(vbuf + 5, share->name, vlabel_len);`
+- L05193 [ERROR_PATH|] `			pr_err("Insufficient bytes, cannot response()\n");`
+- L05195 [ERROR_PATH|] `			goto err_out;`
+- L05213 [ERROR_PATH|] `			pr_err("Insufficient bytes, cannot response()\n");`
+- L05215 [ERROR_PATH|] `			goto err_out;`
+- L05241 [ERROR_PATH|] `			pr_err("Insufficient bytes, cannot response()\n");`
+- L05243 [ERROR_PATH|] `			goto err_out;`
+- L05273 [ERROR_PATH|] `		goto err_out;`
+- L05381 [PROTO_GATE|] `		pSMB_rsp->hdr.Status.CifsError = STATUS_OBJECT_NAME_INVALID;`
+- L05386 [PROTO_GATE|] `		pSMB_rsp->hdr.Status.CifsError = STATUS_NO_MEMORY;`
+- L05388 [ERROR_PATH|] `		return -ENOMEM;`
+- L05396 [ERROR_PATH|] `			goto out;`
+- L05400 [ERROR_PATH|] `			goto free_path;`
+- L05405 [ERROR_PATH|] `			pr_err("can not stat %s, err = %d\n", name, err);`
+- L05406 [ERROR_PATH|] `			goto free_path;`
+- L05425 [ERROR_PATH|] `			goto free_path;`
+- L05427 [ERROR_PATH|] `			goto out;`
+- L05441 [ERROR_PATH|] `				goto free_path;`
+- L05443 [ERROR_PATH|] `				goto out;`
+- L05449 [ERROR_PATH|] `		goto free_path;`
+- L05458 [ERROR_PATH|] `			goto out;`
+- L05462 [ERROR_PATH|] `			goto prepare_rsp;`
+- L05467 [ERROR_PATH|] `			goto free_path;`
+- L05475 [ERROR_PATH|] `		goto free_path;`
+- L05479 [LOCK|] `	down_write(&fp->f_ci->m_lock);`
+- L05481 [LOCK|] `	up_write(&fp->f_ci->m_lock);`
+- L05492 [ERROR_PATH|] `			goto free_path;`
+- L05505 [ERROR_PATH|] `		goto free_path;`
+- L05529 [ERROR_PATH|] `		pr_err("cannot get stat information\n");`
+- L05530 [ERROR_PATH|] `		goto free_path;`
+- L05533 [PROTO_GATE|] `	pSMB_rsp->hdr.Status.CifsError = STATUS_SUCCESS;`
+- L05561 [PROTO_GATE|] `		pSMB_rsp->hdr.Status.CifsError = STATUS_DISK_FULL;`
+- L05564 [PROTO_GATE|] `		pSMB_rsp->hdr.Status.CifsError = STATUS_NO_SUCH_USER;`
+- L05567 [PROTO_GATE|] `		pSMB_rsp->hdr.Status.CifsError = STATUS_ACCESS_DENIED;`
+- L05570 [PROTO_GATE|] `		pSMB_rsp->hdr.Status.CifsError = STATUS_OBJECT_NAME_NOT_FOUND;`
+- L05573 [PROTO_GATE|] `		pSMB_rsp->hdr.Status.CifsError = STATUS_DELETE_PENDING;`
+- L05576 [PROTO_GATE|] `		pSMB_rsp->hdr.Status.CifsError = STATUS_OBJECT_NAME_COLLISION;`
+- L05579 [PROTO_GATE|] `		pSMB_rsp->hdr.Status.CifsError = STATUS_UNEXPECTED_IO_ERROR;`
+- L05610 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_ACCESS_DENIED;`
+- L05611 [ERROR_PATH|] `		return -EACCES;`
+- L05616 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_OBJECT_NAME_INVALID;`
+- L05623 [ERROR_PATH|] `		goto out;`
+- L05632 [ERROR_PATH|] `		goto out;`
+- L05637 [PROTO_GATE|] `	rsp->hdr.Status.CifsError = STATUS_SUCCESS;`
+- L05660 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_UNEXPECTED_IO_ERROR;`
+- L05684 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_OBJECT_NAME_INVALID;`
+- L05737 [ERROR_PATH|] `		goto done;`
+- L05741 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;`
+- L05747 [PROTO_GATE|] `	rsp->hdr.Status.CifsError = STATUS_SUCCESS;`
+- L05788 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_OBJECT_NAME_INVALID;`
+- L05793 [ERROR_PATH|] `		return -ENOMEM;`
+- L05798 [ERROR_PATH|] `		return -ENOENT;`
+- L05809 [ERROR_PATH|] `		goto out;`
+- L05813 [ERROR_PATH|] `		goto out;`
+- L05815 [PROTO_GATE|] `	rsp->hdr.Status.CifsError = STATUS_SUCCESS;`
+- L05836 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;`
+- L05861 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_OBJECT_NAME_INVALID;`
+- L05874 [ERROR_PATH|] `			goto out;`
+- L05879 [MEM_BOUNDS|] `		attr_name = kmalloc(XATTR_NAME_MAX + 1, KSMBD_DEFAULT_GFP);`
+- L05882 [ERROR_PATH|] `			goto out;`
+- L05885 [MEM_BOUNDS|] `		memcpy(attr_name, XATTR_USER_PREFIX, XATTR_USER_PREFIX_LEN);`
+- L05886 [MEM_BOUNDS|] `		memcpy(&attr_name[XATTR_USER_PREFIX_LEN], ea->name,`
+- L05897 [PROTO_GATE|] `			rsp->hdr.Status.CifsError = STATUS_UNEXPECTED_IO_ERROR;`
+- L05898 [ERROR_PATH|] `			goto out;`
+- L05904 [PROTO_GATE|] `	rsp->hdr.Status.CifsError = STATUS_SUCCESS;`
+- L05949 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_OBJECT_NAME_INVALID;`
+- L05960 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;`
+- L05961 [ERROR_PATH|] `		goto out;`
+- L05964 [PROTO_GATE|] `	rsp->hdr.Status.CifsError = STATUS_SUCCESS;`
+- L06003 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_OBJECT_NAME_INVALID;`
+- L06013 [ERROR_PATH|] `		goto out;`
+- L06020 [PROTO_GATE|] `			rsp->hdr.Status.CifsError = STATUS_ACCESS_DENIED;`
+- L06022 [PROTO_GATE|] `			rsp->hdr.Status.CifsError = STATUS_NOT_SAME_DEVICE;`
+- L06023 [ERROR_PATH|] `		goto out;`
+- L06026 [PROTO_GATE|] `	rsp->hdr.Status.CifsError = STATUS_SUCCESS;`
+- L06064 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_OBJECT_NAME_INVALID;`
+- L06074 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_NO_MEMORY;`
+- L06082 [PROTO_GATE|] `			rsp->hdr.Status.CifsError = STATUS_DISK_FULL;`
+- L06085 [PROTO_GATE|] `				STATUS_OBJECT_NAME_COLLISION;`
+- L06087 [PROTO_GATE|] `			rsp->hdr.Status.CifsError = STATUS_NOT_SAME_DEVICE;`
+- L06089 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_SUCCESS;`
+- L06126 [PROTO_GATE|] `		pSMB_rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;`
+- L06127 [ERROR_PATH|] `		pr_err("invalid total parameter for info_level 0x%x\n",`
+- L06129 [ERROR_PATH|] `		return -EINVAL;`
+- L06167 [PROTO_GATE|] `		pSMB_rsp->hdr.Status.CifsError = STATUS_NOT_IMPLEMENTED;`
+- L06168 [ERROR_PATH|] `		return -EOPNOTSUPP;`
+- L06198 [ERROR_PATH|] `		return -EOPNOTSUPP;`
+- L06226 [ERROR_PATH|] `		return -EOPNOTSUPP;`
+- L06232 [ERROR_PATH|] `		return -ENOMEM;`
+- L06240 [ERROR_PATH|] `		return -ENOSPC;`
+- L06267 [MEM_BOUNDS|] `		memcpy(fsinfo->FileName, conv_name, conv_len);`
+- L06296 [MEM_BOUNDS|] `		memcpy(fesize->FileName, conv_name, conv_len);`
+- L06307 [MEM_BOUNDS|] `		memcpy(fdinfo->FileName, conv_name, conv_len);`
+- L06322 [MEM_BOUNDS|] `		memcpy(ffdinfo->FileName, conv_name, conv_len);`
+- L06335 [MEM_BOUNDS|] `		memcpy(fninfo->FileName, conv_name, conv_len);`
+- L06353 [MEM_BOUNDS|] `		memcpy(fbdinfo->FileName, conv_name, conv_len);`
+- L06370 [MEM_BOUNDS|] `		memcpy(dinfo->FileName, conv_name, conv_len);`
+- L06389 [MEM_BOUNDS|] `		memcpy(fibdinfo->FileName, conv_name, conv_len);`
+- L06407 [MEM_BOUNDS|] `		memcpy(finfo->FileName, conv_name, conv_len + 2);`
+- L06458 [ERROR_PATH|] `		return -EINVAL;`
+- L06465 [MEM_BOUNDS|] `	memcpy(de->name, name, namlen);`
+- L06508 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_NO_MEMORY;`
+- L06509 [ERROR_PATH|] `		return -ENOMEM;`
+- L06517 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_NO_MEMORY;`
+- L06519 [ERROR_PATH|] `		goto err_out;`
+- L06534 [ERROR_PATH|] `		goto err_free_dirpath;`
+- L06539 [ERROR_PATH|] `			goto err_free_kernpath;`
+- L06545 [ERROR_PATH|] `		goto err_free_kernpath;`
+- L06553 [ERROR_PATH|] `		goto err_free_kernpath;`
+- L06556 [LOCK|] `	down_write(&dir_fp->f_ci->m_lock);`
+- L06558 [LOCK|] `	up_write(&dir_fp->f_ci->m_lock);`
+- L06564 [ERROR_PATH|] `		goto err_out;`
+- L06577 [MEM_BOUNDS|] `	d_info.smb1_name = kmalloc(NAME_MAX + 1, KSMBD_DEFAULT_GFP);`
+- L06580 [ERROR_PATH|] `		goto err_out;`
+- L06593 [ERROR_PATH|] `		goto err_out;`
+- L06614 [ERROR_PATH|] `			goto err_out;`
+- L06625 [ERROR_PATH|] `				goto err_out;`
+- L06654 [ERROR_PATH|] `			pr_err("filename length exceeds 255 bytes.\n");`
+- L06662 [MEM_BOUNDS|] `		memcpy(d_info.smb1_name, de->name, de->namelen);`
+- L06694 [ERROR_PATH|] `				goto err_out;`
+- L06701 [ERROR_PATH|] `		goto err_out;`
+- L06758 [PROTO_GATE|] `		rsp_hdr->Status.CifsError = STATUS_INVALID_PARAMETER;`
+- L06760 [PROTO_GATE|] `		rsp_hdr->Status.CifsError = STATUS_ACCESS_DENIED;`
+- L06762 [PROTO_GATE|] `		rsp_hdr->Status.CifsError = STATUS_NO_SUCH_FILE;`
+- L06764 [PROTO_GATE|] `		rsp_hdr->Status.CifsError = STATUS_FILE_CLOSED;`
+- L06766 [PROTO_GATE|] `		rsp_hdr->Status.CifsError = STATUS_NO_MEMORY;`
+- L06768 [PROTO_GATE|] `		rsp_hdr->Status.CifsError = STATUS_INVALID_LEVEL;`
+- L06770 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_UNEXPECTED_IO_ERROR;`
+- L06826 [ERROR_PATH|] `		goto err_out;`
+- L06834 [MEM_BOUNDS|] `	d_info.smb1_name = kmalloc(NAME_MAX + 1, KSMBD_DEFAULT_GFP);`
+- L06837 [ERROR_PATH|] `		goto err_out;`
+- L06850 [ERROR_PATH|] `		goto err_out;`
+- L06863 [ERROR_PATH|] `				goto err_out;`
+- L06897 [ERROR_PATH|] `			pr_err("filename length exceeds 255 bytes.\n");`
+- L06900 [MEM_BOUNDS|] `		memcpy(d_info.smb1_name, de->name, de->namelen);`
+- L06936 [ERROR_PATH|] `			goto err_out;`
+- L06989 [PROTO_GATE|] `		rsp_hdr->Status.CifsError = STATUS_INVALID_PARAMETER;`
+- L06991 [PROTO_GATE|] `		rsp_hdr->Status.CifsError = STATUS_ACCESS_DENIED;`
+- L06993 [PROTO_GATE|] `		rsp_hdr->Status.CifsError = STATUS_NO_SUCH_FILE;`
+- L06995 [PROTO_GATE|] `		rsp_hdr->Status.CifsError = STATUS_FILE_CLOSED;`
+- L06997 [PROTO_GATE|] `		rsp_hdr->Status.CifsError = STATUS_NO_MEMORY;`
+- L06999 [PROTO_GATE|] `		rsp_hdr->Status.CifsError = STATUS_INVALID_LEVEL;`
+- L07001 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_UNEXPECTED_IO_ERROR;`
+- L07042 [ERROR_PATH|] `		pr_err("failed to get filp for fid %u\n", req->Fid);`
+- L07043 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_FILE_CLOSED;`
+- L07044 [ERROR_PATH|] `		return -ENOENT;`
+- L07049 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;`
+- L07055 [ERROR_PATH|] `		goto out;`
+- L07066 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;`
+- L07075 [PROTO_GATE|] `	rsp->hdr.Status.CifsError = STATUS_SUCCESS;`
+- L07122 [ERROR_PATH|] `		pr_err("failed to get filp for fid %u\n", req->Fid);`
+- L07123 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_FILE_CLOSED;`
+- L07124 [ERROR_PATH|] `		return -ENOENT;`
+- L07130 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;`
+- L07137 [PROTO_GATE|] `	rsp->hdr.Status.CifsError = STATUS_SUCCESS;`
+- L07183 [PROTO_GATE|] `		rsp_hdr->Status.CifsError = STATUS_NOT_SUPPORTED;`
+- L07184 [ERROR_PATH|] `		return -EOPNOTSUPP;`
+- L07249 [ERROR_PATH|] `		pr_err("failed to get filp for fid %u\n", req_params->Fid);`
+- L07250 [PROTO_GATE|] `		rsp_hdr->Status.CifsError = STATUS_UNEXPECTED_IO_ERROR;`
+- L07252 [ERROR_PATH|] `		goto err_out;`
+- L07258 [ERROR_PATH|] `		goto err_out;`
+- L07416 [ERROR_PATH|] `			goto err_out;`
+- L07536 [MEM_BOUNDS|] `		memcpy(sinfo->StreamName, default_stream_name, sname_bytes);`
+- L07541 [ERROR_PATH|] `		pr_err("query path info not implemnted for %x\n",`
+- L07543 [PROTO_GATE|] `		rsp_hdr->Status.CifsError = STATUS_NOT_SUPPORTED;`
+- L07545 [ERROR_PATH|] `		goto err_out;`
+- L07570 [ERROR_PATH|] `		return -ENOMEM;`
+- L07574 [ERROR_PATH|] `		return -ENOENT;`
+- L07586 [ERROR_PATH|] `		goto out;`
+- L07590 [ERROR_PATH|] `		goto out;`
+- L07593 [PROTO_GATE|] `	rsp->hdr.Status.CifsError = STATUS_SUCCESS;`
+- L07615 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;`
+- L07642 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;`
+- L07643 [ERROR_PATH|] `		return -EINVAL;`
+- L07648 [PROTO_GATE|] `			rsp->hdr.Status.CifsError = STATUS_ACCESS_DENIED;`
+- L07650 [ERROR_PATH|] `			goto err_out;`
+- L07654 [PROTO_GATE|] `			rsp->hdr.Status.CifsError = STATUS_CANNOT_DELETE;`
+- L07656 [ERROR_PATH|] `			goto err_out;`
+- L07661 [PROTO_GATE|] `			rsp->hdr.Status.CifsError = STATUS_DIRECTORY_NOT_EMPTY;`
+- L07663 [ERROR_PATH|] `			goto err_out;`
+- L07671 [PROTO_GATE|] `	rsp->hdr.Status.CifsError = STATUS_SUCCESS;`
+- L07756 [ERROR_PATH|] `		goto done;`
+- L07760 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;`
+- L07766 [PROTO_GATE|] `	rsp->hdr.Status.CifsError = STATUS_SUCCESS;`
+- L07812 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_ACCESS_DENIED;`
+- L07813 [ERROR_PATH|] `		return -EACCES;`
+- L07818 [ERROR_PATH|] `		pr_err("failed to get filp for fid %u\n", req->Fid);`
+- L07819 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_FILE_CLOSED;`
+- L07820 [ERROR_PATH|] `		return -ENOENT;`
+- L07825 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_OBJECT_NAME_INVALID;`
+- L07844 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_UNEXPECTED_IO_ERROR;`
+- L07845 [ERROR_PATH|] `		goto out;`
+- L07890 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;`
+- L07891 [ERROR_PATH|] `		pr_err("invalid total parameter for info_level 0x%x\n",`
+- L07893 [ERROR_PATH|] `		return -EINVAL;`
+- L07928 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_NOT_IMPLEMENTED;`
+- L07929 [ERROR_PATH|] `		return -EOPNOTSUPP;`
+- L07949 [PROTO_GATE|] `		rsp->Status.CifsError = STATUS_ACCESS_DENIED;`
+- L07950 [ERROR_PATH|] `		return -EACCES;`
+- L07954 [PROTO_GATE|] `		rsp->Status.CifsError = STATUS_NO_MEMORY;`
+- L07955 [ERROR_PATH|] `		return -ENOMEM;`
+- L07967 [PROTO_GATE|] `					STATUS_OBJECT_NAME_COLLISION;`
+- L07969 [PROTO_GATE|] `			rsp->Status.CifsError = STATUS_DATA_ERROR;`
+- L07970 [ERROR_PATH|] `		goto out;`
+- L07998 [PROTO_GATE|] `	rsp->Status.CifsError = STATUS_SUCCESS;`
+- L08026 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_OBJECT_NAME_INVALID;`
+- L08057 [ERROR_PATH|] `		pr_err("Wrong setup count in SMB_TRANS2 - indicates wrong request\n");`
+- L08058 [PROTO_GATE|] `		rsp_hdr->Status.CifsError = STATUS_UNSUCCESSFUL;`
+- L08059 [ERROR_PATH|] `		return -EINVAL;`
+- L08074 [ERROR_PATH|] `		pr_err("TRANS2: invalid offsets/counts P@%u/%u D@%u/%u len=%u\n",`
+- L08076 [PROTO_GATE|] `		rsp_hdr->Status.CifsError = STATUS_INVALID_PARAMETER;`
+- L08077 [ERROR_PATH|] `		return -EINVAL;`
+- L08120 [PROTO_GATE|] `			rsp_hdr->Status.CifsError = STATUS_NOT_SUPPORTED;`
+- L08123 [PROTO_GATE|] `			rsp_hdr->Status.CifsError = STATUS_NO_MEMORY;`
+- L08126 [PROTO_GATE|] `			rsp_hdr->Status.CifsError = STATUS_NO_SUCH_FILE;`
+- L08129 [PROTO_GATE|] `			rsp_hdr->Status.CifsError = STATUS_DELETE_PENDING;`
+- L08133 [PROTO_GATE|] `			rsp_hdr->Status.CifsError = STATUS_ACCESS_DENIED;`
+- L08136 [PROTO_GATE|] `			rsp_hdr->Status.CifsError = STATUS_FILE_CLOSED;`
+- L08139 [PROTO_GATE|] `			rsp_hdr->Status.CifsError = STATUS_INVALID_LEVEL;`
+- L08142 [PROTO_GATE|] `			rsp_hdr->Status.CifsError = STATUS_NOT_IMPLEMENTED;`
+- L08145 [PROTO_GATE|] `			rsp_hdr->Status.CifsError = STATUS_UNEXPECTED_IO_ERROR;`
+- L08174 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_OBJECT_NAME_INVALID;`
+- L08207 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_OBJECT_NAME_INVALID;`
+- L08217 [PROTO_GATE|] `			 * STATUS_OBJECT_NAME_NOT_FOUND`
+- L08218 [PROTO_GATE|] `			 * for that case and STATUS_OBJECT_PATH_NOT_FOUND`
+- L08239 [PROTO_GATE|] `					STATUS_OBJECT_NAME_NOT_FOUND;`
+- L08243 [PROTO_GATE|] `					STATUS_INSUFFICIENT_RESOURCES;`
+- L08247 [PROTO_GATE|] `					STATUS_ACCESS_DENIED;`
+- L08250 [PROTO_GATE|] `				rsp->hdr.Status.CifsError = STATUS_DATA_ERROR;`
+- L08254 [PROTO_GATE|] `					STATUS_OBJECT_PATH_SYNTAX_BAD;`
+- L08265 [ERROR_PATH|] `		goto out;`
+- L08268 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_NOT_A_DIRECTORY;`
+- L08271 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_SUCCESS;`
+- L08289 [PROTO_GATE|] ` * SMB_COM_PROCESS_EXIT requests. Instead, CIFS clients SHOULD perform all`
+- L08298 [PROTO_GATE|] `	rsp->hdr.Status.CifsError = STATUS_SUCCESS;`
+- L08324 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_ACCESS_DENIED;`
+- L08325 [ERROR_PATH|] `		return -EACCES;`
+- L08330 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_OBJECT_NAME_INVALID;`
+- L08349 [PROTO_GATE|] `			rsp->hdr.Status.CifsError = STATUS_DIRECTORY_NOT_EMPTY;`
+- L08352 [PROTO_GATE|] `				STATUS_OBJECT_NAME_NOT_FOUND;`
+- L08354 [PROTO_GATE|] `			rsp->hdr.Status.CifsError = STATUS_DATA_ERROR;`
+- L08357 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_SUCCESS;`
+- L08384 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_ACCESS_DENIED;`
+- L08385 [ERROR_PATH|] `		return -EACCES;`
+- L08390 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_OBJECT_NAME_INVALID;`
+- L08415 [PROTO_GATE|] `			rsp->hdr.Status.CifsError = STATUS_FILE_IS_A_DIRECTORY;`
+- L08417 [PROTO_GATE|] `			rsp->hdr.Status.CifsError = STATUS_SHARING_VIOLATION;`
+- L08419 [PROTO_GATE|] `			rsp->hdr.Status.CifsError = STATUS_ACCESS_DENIED;`
+- L08422 [PROTO_GATE|] `				STATUS_OBJECT_NAME_NOT_FOUND;`
+- L08424 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_SUCCESS;`
+- L08449 [LOCK|] `	spin_lock(&conn->request_lock);`
+- L08461 [LOCK|] `	spin_unlock(&conn->request_lock);`
+- L08463 [PROTO_GATE|] `	/* For SMB_COM_NT_CANCEL command itself send no response */`
+- L08485 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_ACCESS_DENIED;`
+- L08486 [ERROR_PATH|] `		return -EACCES;`
+- L08490 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;`
+- L08491 [ERROR_PATH|] `		return -EINVAL;`
+- L08496 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_OBJECT_NAME_INVALID;`
+- L08511 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_OBJECT_NAME_INVALID;`
+- L08521 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_ACCESS_DENIED;`
+- L08523 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_NOT_SAME_DEVICE;`
+- L08548 [PROTO_GATE|] `		return STATUS_OBJECT_NAME_INVALID;`
+- L08552 [PROTO_GATE|] `		return STATUS_NO_MEMORY;`
+- L08556 [ERROR_PATH|] `		pr_err("look up failed err %d\n", ret);`
+- L08559 [PROTO_GATE|] `			err = STATUS_ACCESS_DENIED;`
+- L08560 [ERROR_PATH|] `			goto out;`
+- L08562 [PROTO_GATE|] `		err = STATUS_OBJECT_NAME_NOT_FOUND;`
+- L08563 [ERROR_PATH|] `		goto out;`
+- L08598 [ERROR_PATH|] `		return -EINVAL;`
+- L08601 [PROTO_GATE|] `	rsp->hdr.Status.CifsError = STATUS_SUCCESS;`
+- L08637 [PROTO_GATE|] `	ksmbd_debug(SMB, "SMB_COM_FIND_CLOSE2 called for fid %u\n",`
+- L08645 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_SUCCESS;`
+- L08647 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_INVALID_HANDLE;`
+- L08686 [ERROR_PATH|] `			return -EEXIST;`
+- L08699 [ERROR_PATH|] `			return -EINVAL;`
+- L08736 [PROTO_GATE|] `	rsp->hdr.Status.CifsError = STATUS_UNSUCCESSFUL;`
+- L08746 [ERROR_PATH|] `		return -EINVAL;`
+- L08757 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_OBJECT_NAME_INVALID;`
+- L08763 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_NO_MEMORY;`
+- L08764 [ERROR_PATH|] `		return -ENOMEM;`
+- L08771 [ERROR_PATH|] `			goto out;`
+- L08777 [ERROR_PATH|] `			goto free_path;`
+- L08790 [ERROR_PATH|] `			goto free_path;`
+- L08793 [ERROR_PATH|] `			goto out;`
+- L08801 [PROTO_GATE|] `			rsp->hdr.Status.CifsError = STATUS_ACCESS_DENIED;`
+- L08803 [ERROR_PATH|] `			goto free_path;`
+- L08817 [ERROR_PATH|] `			goto out;`
+- L08823 [ERROR_PATH|] `			goto free_path;`
+- L08828 [ERROR_PATH|] `			goto free_path;`
+- L08832 [PROTO_GATE|] `	if (err == KSMBD_INODE_STATUS_PENDING_DELETE) {`
+- L08834 [ERROR_PATH|] `		goto free_path;`
+- L08845 [ERROR_PATH|] `		goto free_path;`
+- L08849 [LOCK|] `	down_write(&fp->f_ci->m_lock);`
+- L08851 [LOCK|] `	up_write(&fp->f_ci->m_lock);`
+- L08862 [ERROR_PATH|] `			goto free_path;`
+- L08866 [ERROR_PATH|] `			goto free_path;`
+- L08871 [ERROR_PATH|] `			goto free_path;`
+- L08928 [PROTO_GATE|] `	rsp->hdr.Status.CifsError = STATUS_SUCCESS;`
+- L08963 [PROTO_GATE|] `			rsp->hdr.Status.CifsError = STATUS_DISK_FULL;`
+- L08966 [PROTO_GATE|] `				STATUS_TOO_MANY_OPENED_FILES;`
+- L08968 [PROTO_GATE|] `			rsp->hdr.Status.CifsError = STATUS_DELETE_PENDING;`
+- L08971 [PROTO_GATE|] `				STATUS_OBJECT_NAME_NOT_FOUND;`
+- L08973 [PROTO_GATE|] `			rsp->hdr.Status.CifsError = STATUS_ACCESS_DENIED;`
+- L08975 [PROTO_GATE|] `			rsp->hdr.Status.CifsError = STATUS_UNEXPECTED_IO_ERROR;`
+- L09018 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_OBJECT_NAME_INVALID;`
+- L09025 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_OBJECT_NAME_NOT_FOUND;`
+- L09027 [ERROR_PATH|] `		goto out;`
+- L09033 [ERROR_PATH|] `		goto out;`
+- L09073 [ERROR_PATH|] `		goto out;`
+- L09075 [PROTO_GATE|] `	rsp->hdr.Status.CifsError = STATUS_SUCCESS;`
+- L09082 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;`
+- L09111 [ERROR_PATH|] `		goto out;`
+- L09117 [ERROR_PATH|] `		goto out;`
+- L09124 [ERROR_PATH|] `		goto out;`
+- L09129 [ERROR_PATH|] `		goto out;`
+- L09134 [ERROR_PATH|] `		goto out_fsids;`
+- L09138 [ERROR_PATH|] `		pr_err("cannot do stat of path %s\n", share->path);`
+- L09139 [ERROR_PATH|] `		goto out_path;`
+- L09192 [PROTO_GATE|] `			rsp->hdr.Status.CifsError = STATUS_NOT_SUPPORTED;`
+- L09195 [PROTO_GATE|] `			rsp->hdr.Status.CifsError = STATUS_NO_MEMORY;`
+- L09198 [PROTO_GATE|] `			rsp->hdr.Status.CifsError = STATUS_NO_SUCH_FILE;`
+- L09201 [PROTO_GATE|] `			rsp->hdr.Status.CifsError = STATUS_DELETE_PENDING;`
+- L09205 [PROTO_GATE|] `			rsp->hdr.Status.CifsError = STATUS_ACCESS_DENIED;`
+- L09208 [PROTO_GATE|] `			rsp->hdr.Status.CifsError = STATUS_FILE_CLOSED;`
+- L09211 [PROTO_GATE|] `			rsp->hdr.Status.CifsError = STATUS_INVALID_LEVEL;`
+- L09214 [PROTO_GATE|] `			rsp->hdr.Status.CifsError = STATUS_NOT_IMPLEMENTED;`
+- L09217 [PROTO_GATE|] `			rsp->hdr.Status.CifsError = STATUS_UNEXPECTED_IO_ERROR;`
+- L09244 [PROTO_GATE|] `	if (command == SMB_COM_NEGOTIATE)`
+- L09247 [PROTO_GATE|] `	if (command == SMB_COM_SESSION_SETUP_ANDX && !work->sess)`
+- L09302 [ERROR_PATH|] `		pr_err("QUERY_INFORMATION2: invalid Fid %u\n", req->Fid);`
+- L09303 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_INVALID_HANDLE;`
+- L09304 [ERROR_PATH|] `		return -ENOENT;`
+- L09311 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_UNEXPECTED_IO_ERROR;`
+- L09351 [ERROR_PATH|] `		pr_err("SET_INFORMATION2: invalid Fid %u\n", req->Fid);`
+- L09352 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_INVALID_HANDLE;`
+- L09353 [ERROR_PATH|] `		return -ENOENT;`
+- L09384 [PROTO_GATE|] `			rsp->hdr.Status.CifsError = STATUS_ACCESS_DENIED;`
+- L09408 [MEM_BOUNDS|] `	memcpy(signature_req, rcv_hdr1->Signature.SecuritySignature,`
+- L09460 [MEM_BOUNDS|] `		memcpy(rsp_hdr->Signature.SecuritySignature, signature,`
+- L09492 [PROTO_GATE|] `	rsp->hdr.Status.CifsError = STATUS_SUCCESS;`
+- L09595 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_NETWORK_NAME_DELETED;`
+- L09596 [ERROR_PATH|] `		return -EINVAL;`
+- L09605 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;`
+- L09606 [ERROR_PATH|] `		return -EINVAL;`
+- L09646 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;`
+- L09647 [ERROR_PATH|] `		return -EINVAL;`
+- L09657 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;`
+- L09658 [ERROR_PATH|] `		return -EINVAL;`
+- L09665 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_OBJECT_NAME_INVALID;`
+- L09673 [PROTO_GATE|] `	 * that accepts pre-parsed parameters.  Return STATUS_NOT_SUPPORTED`
+- L09680 [PROTO_GATE|] `	rsp->hdr.Status.CifsError = STATUS_NOT_SUPPORTED;`
+- L09681 [ERROR_PATH|] `	return -EOPNOTSUPP;`
+- L09692 [PROTO_GATE|] ` * For now we log the request and return STATUS_NOT_SUPPORTED.  A future`
+- L09705 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;`
+- L09706 [ERROR_PATH|] `		return -EINVAL;`
+- L09721 [PROTO_GATE|] `	 * Return STATUS_NOT_SUPPORTED so the client can fall back.`
+- L09723 [PROTO_GATE|] `	rsp->hdr.Status.CifsError = STATUS_NOT_SUPPORTED;`
+- L09724 [ERROR_PATH|] `	return -EOPNOTSUPP;`
+- L09739 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;`
+- L09740 [ERROR_PATH|] `		return -EINVAL;`
+- L09752 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_INVALID_HANDLE;`
+- L09753 [ERROR_PATH|] `		return -EBADF;`
+- L09765 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_ACCESS_DENIED;`
+- L09783 [PROTO_GATE|] ` * no longer needs the watch they cancel the MID via SMB_COM_NT_CANCEL.`
+- L09803 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;`
+- L09804 [ERROR_PATH|] `		return -EINVAL;`
+- L09818 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_INVALID_HANDLE;`
+- L09819 [ERROR_PATH|] `		return -EBADF;`
+- L09825 [PROTO_GATE|] `	 * either cancel (via SMB_COM_NT_CANCEL) or reconnect.`
+- L09851 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;`
+- L09852 [ERROR_PATH|] `		return -EINVAL;`
+- L09863 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_INVALID_HANDLE;`
+- L09864 [ERROR_PATH|] `		return -EBADF;`
+- L09868 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;`
+- L09870 [ERROR_PATH|] `		return -EINVAL;`
+- L09878 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_OBJECT_NAME_INVALID;`
+- L09895 [PROTO_GATE|] `			rsp->hdr.Status.CifsError = STATUS_ACCESS_DENIED;`
+- L09897 [PROTO_GATE|] `			rsp->hdr.Status.CifsError = STATUS_OBJECT_NAME_NOT_FOUND;`
+- L09899 [PROTO_GATE|] `			rsp->hdr.Status.CifsError = STATUS_UNEXPECTED_IO_ERROR;`
+- L09930 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;`
+- L09931 [ERROR_PATH|] `		return -EINVAL;`
+- L09944 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_INVALID_HANDLE;`
+- L09945 [ERROR_PATH|] `		return -EBADF;`
+- L09987 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_UNEXPECTED_IO_ERROR;`
+- L09998 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_BUFFER_TOO_SMALL;`
+- L10010 [PROTO_GATE|] ` * STATUS_NOT_SUPPORTED so clients (Windows Explorer, net.exe) can gracefully`
+- L10019 [PROTO_GATE|] `	rsp->hdr.Status.CifsError = STATUS_NOT_SUPPORTED;`
+- L10020 [ERROR_PATH|] `	return -EOPNOTSUPP;`
+- L10029 [PROTO_GATE|] `	rsp->hdr.Status.CifsError = STATUS_NOT_SUPPORTED;`
+- L10030 [ERROR_PATH|] `	return -EOPNOTSUPP;`
+- L10034 [PROTO_GATE|] ` * smb_nt_transact() - handler for SMB_COM_NT_TRANSACT (0xA0)`
+- L10048 [PROTO_GATE|] `	ksmbd_debug(SMB, "SMB_COM_NT_TRANSACT function=0x%x\n", function);`
+- L10051 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_NETWORK_NAME_DELETED;`
+- L10052 [ERROR_PATH|] `		return -EINVAL;`
+- L10075 [PROTO_GATE|] `		rsp->hdr.Status.CifsError = STATUS_NOT_SUPPORTED;`
+- L10076 [ERROR_PATH|] `		return -EOPNOTSUPP;`
+- L10081 [PROTO_GATE|] ` * smb_nt_transact_secondary() - stub for SMB_COM_NT_TRANSACT_SECONDARY (0xA1)`
+- L10085 [PROTO_GATE|] ` * Returns STATUS_NOT_SUPPORTED.`
+- L10093 [PROTO_GATE|] `	ksmbd_debug(SMB, "SMB_COM_NT_TRANSACT_SECONDARY - not implemented\n");`
+- L10094 [PROTO_GATE|] `	rsp->Status.CifsError = STATUS_NOT_SUPPORTED;`
+- L10095 [ERROR_PATH|] `	return -EOPNOTSUPP;`

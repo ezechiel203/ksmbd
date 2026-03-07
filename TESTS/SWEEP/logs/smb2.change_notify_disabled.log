@@ -1,0 +1,8 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772586076
+time: 2026-03-04 01:01:16.712094
+progress: 1
+test: notfiy_disabled
+time: 2026-03-04 01:01:16.713391
+TESTING CHANGE NOTIFY DISABLED

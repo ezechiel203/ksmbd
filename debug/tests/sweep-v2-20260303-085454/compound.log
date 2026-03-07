@@ -1,0 +1,100 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772524567
+time: 2026-03-03 07:56:07.743023
+progress: 20
+test: related1
+time: 2026-03-03 07:56:07.744028
+time: 2026-03-03 07:56:07.751100
+success: related1
+test: related2
+time: 2026-03-03 07:56:07.751158
+time: 2026-03-03 07:56:07.754317
+success: related2
+test: related3
+time: 2026-03-03 07:56:07.754367
+time: 2026-03-03 07:56:07.757351
+success: related3
+test: related4
+time: 2026-03-03 07:56:07.757404
+set a sec desc allowing no write by CREATOR_OWNER
+try open for write
+time: 2026-03-03 07:56:07.761116
+failure: related4 [
+../../source4/torture/smb2/compound.c:596: status was NT_STATUS_OK, expected NT_STATUS_ACCESS_DENIED: smb2_create_recv failed
+]
+test: related5
+time: 2026-03-03 07:56:07.761170
+time: 2026-03-03 07:56:07.764767
+success: related5
+test: related6
+time: 2026-03-03 07:56:07.764820
+try open for read
+time: 2026-03-03 07:56:07.769777
+success: related6
+test: related7
+time: 2026-03-03 07:56:07.769823
+set a sec desc allowing no write by CREATOR_OWNER
+try open for write
+time: 2026-03-03 07:56:07.773817
+failure: related7 [
+../../source4/torture/smb2/compound.c:886: status was NT_STATUS_OK, expected NT_STATUS_ACCESS_DENIED: smb2_create_recv failed
+]
+test: related8
+time: 2026-03-03 07:56:07.773868
+try open for write
+time: 2026-03-03 07:56:07.780303
+success: related8
+test: related9
+time: 2026-03-03 07:56:07.780353
+time: 2026-03-03 07:56:07.785101
+success: related9
+test: unrelated1
+time: 2026-03-03 07:56:07.785156
+time: 2026-03-03 07:56:07.789603
+success: unrelated1
+test: invalid1
+time: 2026-03-03 07:56:07.789654
+time: 2026-03-03 07:56:07.792509
+success: invalid1
+test: invalid2
+time: 2026-03-03 07:56:07.792559
+time: 2026-03-03 07:56:07.795855
+success: invalid2
+test: invalid3
+time: 2026-03-03 07:56:07.795917
+time: 2026-03-03 07:56:07.800561
+success: invalid3
+test: invalid4
+time: 2026-03-03 07:56:07.800620
+time: 2026-03-03 07:56:07.806058
+success: invalid4
+test: interim1
+time: 2026-03-03 07:56:07.806113
+time: 2026-03-03 07:56:07.809865
+success: interim1
+test: interim2
+time: 2026-03-03 07:56:07.809917
+time: 2026-03-03 07:56:07.815630
+success: interim2
+test: interim3
+time: 2026-03-03 07:56:07.815687
+time: 2026-03-03 07:56:07.821695
+success: interim3
+test: compound-break
+time: 2026-03-03 07:56:07.821871
+TEST2: open a file with an batch oplock (share mode: all)
+TEST2: Opening second time with compound
+Acking to level II [0x01] in oplock handler
+time: 2026-03-03 07:56:07.827860
+success: compound-break
+test: compound-padding
+time: 2026-03-03 07:56:07.827930
+time: 2026-03-03 07:56:07.831582
+failure: compound-padding [
+../../source4/torture/smb2/compound.c:1175: Incorrect status NT_STATUS_OBJECT_NAME_NOT_FOUND - should be NT_STATUS_OK
+]
+test: create-write-close
+time: 2026-03-03 07:56:07.831641
+time: 2026-03-03 07:56:07.834857
+success: create-write-close

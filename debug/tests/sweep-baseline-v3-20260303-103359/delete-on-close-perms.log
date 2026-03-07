@@ -1,0 +1,105 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772530552
+time: 2026-03-03 09:35:52.737632
+progress: 9
+test: OVERWRITE_IF
+time: 2026-03-03 09:35:52.739205
+Opening Directory for setting new SD: test_dir
+get the original sd
+Setting permissions on dir to 0x1f01ff
+Creating Directory for testing: test_dir
+get the original sd
+Setting permissions on dir to 0x1e01bf
+Create file with DeleteOnClose on non-existent file (OVERWRITE_IF)
+We expect NT_STATUS_OK
+Testing if the file was deleted when closed
+We expect NT_STATUS_OBJECT_NAME_NOT_FOUND
+time: 2026-03-03 09:35:52.754610
+success: OVERWRITE_IF
+test: OVERWRITE_IF Existing
+time: 2026-03-03 09:35:52.754660
+Opening Directory for setting new SD: test_dir
+get the original sd
+Setting permissions on dir to 0x1f01ff
+Creating Directory for testing: test_dir
+get the original sd
+Setting permissions on dir to 0x1e01bf
+Create file with DeleteOnClose on existing file (OVERWRITE_IF)
+We expect NT_STATUS_ACCESS_DENIED
+time: 2026-03-03 09:35:52.761890
+success: OVERWRITE_IF Existing
+test: CREATE
+time: 2026-03-03 09:35:52.761937
+Opening Directory for setting new SD: test_dir
+get the original sd
+Setting permissions on dir to 0x1f01ff
+Creating Directory for testing: test_dir
+get the original sd
+Setting permissions on dir to 0x1e01bf
+Create file with DeleteOnClose on non-existent file (CREATE) 
+We expect NT_STATUS_OK
+Testing if the file was deleted when closed
+We expect NT_STATUS_OBJECT_NAME_NOT_FOUND
+time: 2026-03-03 09:35:52.769752
+success: CREATE
+test: CREATE Existing
+time: 2026-03-03 09:35:52.769800
+Opening Directory for setting new SD: test_dir
+get the original sd
+Setting permissions on dir to 0x1f01ff
+Creating Directory for testing: test_dir
+get the original sd
+Setting permissions on dir to 0x1e01bf
+Create file with DeleteOnClose on non-existent file (CREATE) 
+We expect NT_STATUS_OBJECT_NAME_COLLISION
+time: 2026-03-03 09:35:52.776225
+success: CREATE Existing
+test: CREATE_IF
+time: 2026-03-03 09:35:52.776277
+Opening Directory for setting new SD: test_dir
+get the original sd
+Setting permissions on dir to 0x1f01ff
+Creating Directory for testing: test_dir
+get the original sd
+Setting permissions on dir to 0x1e01bf
+Create file with DeleteOnClose on non-existent file (OPEN_IF)
+We expect NT_STATUS_OK
+Testing if the file was deleted when closed
+We expect NT_STATUS_OBJECT_NAME_NOT_FOUND
+time: 2026-03-03 09:35:52.784344
+success: CREATE_IF
+test: CREATE_IF Existing
+time: 2026-03-03 09:35:52.784389
+Opening Directory for setting new SD: test_dir
+get the original sd
+Setting permissions on dir to 0x1f01ff
+Creating Directory for testing: test_dir
+get the original sd
+Setting permissions on dir to 0x1e01bf
+Create file with DeleteOnClose on existing file (OPEN_IF)
+We expect NT_STATUS_ACCESS_DENIED
+time: 2026-03-03 09:35:52.790406
+success: CREATE_IF Existing
+test: FIND_and_set_DOC
+time: 2026-03-03 09:35:52.790452
+Opening Directory for setting new SD: test_dir
+get the original sd
+Setting permissions on dir to 0x1f01ff
+FIND and delete directory
+We expect NT_STATUS_OK
+time: 2026-03-03 09:35:52.797729
+success: FIND_and_set_DOC
+test: READONLY
+time: 2026-03-03 09:35:52.797781
+Opening Directory for setting new SD: test_dir
+get the original sd
+Setting permissions on dir to 0x1f01ff
+time: 2026-03-03 09:35:52.806594
+failure: READONLY [
+../../source4/torture/smb2/delete-on-close.c:603: status was NT_STATUS_OK, expected NT_STATUS_CANNOT_DELETE: Unexpected status for CREATE of new file.
+]
+test: BUG14427
+time: 2026-03-03 09:35:52.806660
+time: 2026-03-03 09:35:52.810382
+success: BUG14427

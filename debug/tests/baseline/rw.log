@@ -1,0 +1,29 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772500520
+time: 2026-03-03 01:15:20.628305
+progress: 4
+test: rw1
+time: 2026-03-03 01:15:20.632321
+Checking data integrity over 10 ops
+0time: 2026-03-03 01:15:23.331198
+success: rw1
+test: rw2
+time: 2026-03-03 01:15:23.331393
+Checking data integrity over 10 ops
+0time: 2026-03-03 01:15:26.590408
+success: rw2
+test: invalid
+time: 2026-03-03 01:15:26.590567
+time: 2026-03-03 01:15:28.184501
+failure: invalid [
+../../source4/torture/smb2/read_write.c:334: status was NT_STATUS_OK, expected NT_STATUS_DISK_FULL: Incorrect status
+]
+test: append
+time: 2026-03-03 01:15:28.184562
+Create file with 1 byte
+Open file with SEC_FILE_APPEND_DATA|SEC_STD_SYNCHRONIZE
+Write one byte at offset 0 and verify written data was not appended but written at requested offset
+Open file in write-data only mode and check if we can append
+time: 2026-03-03 01:15:30.058333
+success: append

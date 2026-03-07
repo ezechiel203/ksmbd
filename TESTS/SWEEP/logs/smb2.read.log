@@ -1,0 +1,28 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772584853
+time: 2026-03-04 00:40:53.362568
+progress: 5
+test: eof
+time: 2026-03-04 00:40:53.363118
+time: 2026-03-04 00:40:53.403040
+success: eof
+test: position
+time: 2026-03-04 00:40:53.403100
+time: 2026-03-04 00:40:53.480165
+success: position
+test: dir
+time: 2026-03-04 00:40:53.480229
+time: 2026-03-04 00:40:53.533281
+success: dir
+test: access
+time: 2026-03-04 00:40:53.533335
+time: 2026-03-04 00:40:53.709573
+success: access
+test: bug14607
+time: 2026-03-04 00:40:53.709624
+FSCTL_SMBTORTURE_GLOBAL_READ_RESPONSE_BODY_PADDING8: NT_STATUS_INVALID_DEVICE_REQUEST
+time: 2026-03-04 00:40:53.731779
+skip: bug14607 [
+../../source4/torture/smb2/read.c:394: server doesn't support FSCTL_SMBTORTURE_GLOBAL_READ_RESPONSE_BODY_PADDING8
+]

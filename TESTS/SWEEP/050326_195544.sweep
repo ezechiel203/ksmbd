@@ -1,0 +1,10 @@
+=== SMB2 Full Sweep with Debug ===
+Date: jeu. 05 mars 2026 19:55:53 CET
+SSH=13022  SMB=13445
+Git: ab2648d8 fix: V7 audit — null session crypto, IOCTL BUFFER_OVERFLOW, signing fallback log
+
+Restarting ksmbd (debug enabled)...
+[ksmbd.control/9644]: INFO: Terminated mountd
+[ksmbd.control/9644]: INFO: Killed ksmbd
+[ksmbd.mountd/9669]: INFO: Started manager
+  smb2.compound ... 

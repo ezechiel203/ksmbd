@@ -1,0 +1,275 @@
+src/include/core/auth.h:92:2: error: failed to evaluate #if condition, undefined function-like macro invocation: IS_ENABLED( ... ) [syntaxError]
+#if IS_ENABLED(CONFIG_KUNIT)
+ ^
+src/core/auth.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/include/core/compat.h:21:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 13, 0)
+ ^
+src/include/fs/smbacl.h:15:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 17, 0)
+ ^
+src/core/connection.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/core/crypto_ctx.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/core/ksmbd_buffer.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/core/ksmbd_config.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/core/ksmbd_debugfs.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/core/ksmbd_feature.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/core/ksmbd_hooks.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/core/ksmbd_work.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/include/protocol/smb_common.h:11:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 12, 0)
+ ^
+src/core/misc.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/core/server.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/core/smb2_compress.c:32:2: error: failed to evaluate #if condition, undefined function-like macro invocation: IS_ENABLED( ... ) [syntaxError]
+#if IS_ENABLED(CONFIG_KUNIT)
+ ^
+src/core/smb2_compress.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/encoding/asn1.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/encoding/ndr.c:11:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 12, 0)
+ ^
+src/encoding/ndr.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/encoding/unicode.c:12:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 12, 0)
+ ^
+src/encoding/unicode.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/fs/ksmbd_app_instance.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/fs/ksmbd_branchcache.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/fs/ksmbd_create_ctx.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/include/fs/ksmbd_fsctl.h:105:2: error: failed to evaluate #if condition, undefined function-like macro invocation: IS_ENABLED( ... ) [syntaxError]
+#if IS_ENABLED(CONFIG_KUNIT)
+ ^
+src/fs/ksmbd_dfs.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/fs/ksmbd_fsctl.c:26:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 13, 0)
+ ^
+src/fs/ksmbd_fsctl.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/fs/ksmbd_fsctl_extra.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/fs/ksmbd_info.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/fs/ksmbd_notify.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/fs/ksmbd_quota.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/fs/ksmbd_reparse.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/fs/ksmbd_resilient.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/fs/ksmbd_rsvd.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/fs/ksmbd_snapshot.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/fs/ksmbd_vss.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/fs/oplock.c:8:2: error: failed to evaluate #if condition, undefined function-like macro invocation: IS_ENABLED( ... ) [syntaxError]
+#if IS_ENABLED(CONFIG_KUNIT)
+ ^
+src/fs/oplock.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/fs/smbacl.c:16:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 17, 0)
+ ^
+src/fs/smbacl.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/fs/vfs.c:12:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+ ^
+src/fs/vfs.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/fs/vfs_cache.c:9:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+ ^
+src/fs/vfs_cache.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/mgmt/ksmbd_ida.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/mgmt/ksmbd_witness.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/mgmt/share_config.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/mgmt/tree_connect.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/mgmt/user_config.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/mgmt/user_session.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/protocol/common/netmisc.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/protocol/common/smb_common.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/protocol/smb1/smb1misc.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/protocol/smb1/smb1ops.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/protocol/smb1/smb1pdu.c:15:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+ ^
+src/protocol/smb1/smb1pdu.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/protocol/smb2/smb2_create.c:19:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+ ^
+src/protocol/smb2/smb2_create.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/protocol/smb2/smb2_dir.c:19:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+ ^
+src/protocol/smb2/smb2_dir.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/protocol/smb2/smb2_ioctl.c:19:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+ ^
+src/protocol/smb2/smb2_ioctl.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/protocol/smb2/smb2_lock.c:19:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+ ^
+src/protocol/smb2/smb2_lock.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/protocol/smb2/smb2_misc_cmds.c:19:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+ ^
+src/protocol/smb2/smb2_misc_cmds.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/protocol/smb2/smb2_negotiate.c:21:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+ ^
+src/protocol/smb2/smb2_negotiate.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/protocol/smb2/smb2_notify.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/protocol/smb2/smb2_pdu_common.c:19:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+ ^
+src/protocol/smb2/smb2_pdu_common.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/protocol/smb2/smb2_ph.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/protocol/smb2/smb2_query_set.c:19:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+ ^
+src/protocol/smb2/smb2_query_set.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/protocol/smb2/smb2_read_write.c:19:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+ ^
+src/protocol/smb2/smb2_read_write.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/protocol/smb2/smb2_session.c:22:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+ ^
+src/protocol/smb2/smb2_session.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/protocol/smb2/smb2_tree.c:19:2: error: failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... ) [syntaxError]
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+ ^
+src/protocol/smb2/smb2_tree.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/protocol/smb2/smb2fruit.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/protocol/smb2/smb2misc.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/protocol/smb2/smb2ops.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/tools/memory_usage_validator.c:0:0: information: Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches. [normalCheckLevelMaxBranches]
+
+^
+src/transport/transport_ipc.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/transport/transport_quic.c:83:2: error: failed to evaluate #if condition, undefined function-like macro invocation: IS_ENABLED( ... ) [syntaxError]
+#if IS_ENABLED(CONFIG_TLS)
+ ^
+src/transport/transport_quic.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/transport/transport_rdma.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+src/transport/transport_tcp.c:0:0: information: This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details. [noValidConfiguration]
+
+^
+nofile:0:0: information: Active checkers: There was critical errors (use --checkers-report=<filename> to see details) [checkersReport]
+

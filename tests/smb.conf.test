@@ -1,0 +1,24 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+#
+# Test configuration for ksmbd integration tests
+# This file is used by run_integration.sh to set up a test environment.
+#
+
+[global]
+	workgroup = TESTGROUP
+	server string = ksmbd test server
+	netbios name = KSMBDTEST
+
+[test_share]
+	path = /tmp/ksmbd_test_share
+	read only = no
+	browseable = yes
+	guest ok = yes
+	force user = nobody
+
+[ro_share]
+	path = /tmp/ksmbd_test_ro_share
+	read only = yes
+	browseable = yes
+	guest ok = no
+	force user = nobody

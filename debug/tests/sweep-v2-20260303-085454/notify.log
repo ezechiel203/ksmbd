@@ -1,0 +1,40 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772527382
+time: 2026-03-03 08:43:02.199685
+progress: 23
+test: valid-req
+time: 2026-03-03 08:43:02.200461
+TESTING VALIDITY OF CHANGE NOTIFY REQUEST
+time: 2026-03-03 08:43:02.211736
+failure: valid-req [
+(../../source4/torture/smb2/notify.c:163) wrong value for n.out.num_changes  0x4 should be 0x3
+]
+test: tcon
+time: 2026-03-03 08:43:02.211789
+TESTING SIMPLE CHANGE NOTIFY
+Testing notify mkdir
+Testing notify rmdir
+SIMPLE CHANGE NOTIFY OK
+TESTING WITH SECONDARY TCON
+tid1=1 tid2=2
+Testing notify mkdir
+Testing notify rmdir
+CHANGE NOTIFY WITH TCON OK
+Disconnecting secondary tree
+Testing notify mkdir
+Testing notify rmdir
+CHANGE NOTIFY WITH TDIS OK
+time: 2026-03-03 08:43:02.223119
+success: tcon
+test: dir
+time: 2026-03-03 08:43:02.223170
+TESTING CHANGE NOTIFY ON DIRECTORIES
+Testing notify cancel
+Testing notify mkdir
+Testing notify rmdir
+Testing notify mkdir - rmdir - mkdir - rmdir
+Testing buffered notify on create of 10 files
+Testing notify on unlink for the first file
+and now from the 1st notify
+(3rd notify) this notify will only see the 1st unlink

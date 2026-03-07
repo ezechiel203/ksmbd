@@ -1,0 +1,270 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772523638
+time: 2026-03-03 07:40:38.615251
+progress: 42
+test: exclusive1
+time: 2026-03-03 07:40:38.616255
+time: 2026-03-03 07:40:38.624677
+failure: exclusive1 [
+../../source4/torture/smb2/oplock.c:322: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: Error creating directory
+]
+test: exclusive2
+time: 2026-03-03 07:40:38.624734
+time: 2026-03-03 07:40:38.629809
+failure: exclusive2 [
+../../source4/torture/smb2/oplock.c:389: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: Error creating directory
+]
+test: exclusive3
+time: 2026-03-03 07:40:38.629862
+time: 2026-03-03 07:40:38.634695
+failure: exclusive3 [
+../../source4/torture/smb2/oplock.c:467: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: Error creating directory
+]
+test: exclusive4
+time: 2026-03-03 07:40:38.634750
+time: 2026-03-03 07:40:38.640734
+failure: exclusive4 [
+../../source4/torture/smb2/oplock.c:536: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: Error creating directory
+]
+test: exclusive5
+time: 2026-03-03 07:40:38.640800
+time: 2026-03-03 07:40:38.645137
+failure: exclusive5 [
+../../source4/torture/smb2/oplock.c:605: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: Error creating directory
+]
+test: exclusive6
+time: 2026-03-03 07:40:38.645193
+time: 2026-03-03 07:40:38.648798
+failure: exclusive6 [
+../../source4/torture/smb2/oplock.c:686: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: Error creating directory
+]
+test: exclusive9
+time: 2026-03-03 07:40:38.648845
+time: 2026-03-03 07:40:38.652808
+failure: exclusive9 [
+../../source4/torture/smb2/oplock.c:804: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: Error creating directory
+]
+test: batch1
+time: 2026-03-03 07:40:38.652868
+time: 2026-03-03 07:40:38.658705
+failure: batch1 [
+../../source4/torture/smb2/oplock.c:874: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: Error creating directory
+]
+test: batch2
+time: 2026-03-03 07:40:38.658756
+time: 2026-03-03 07:40:38.664321
+failure: batch2 [
+../../source4/torture/smb2/oplock.c:960: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: Error creating directory
+]
+test: batch3
+time: 2026-03-03 07:40:38.664369
+time: 2026-03-03 07:40:38.668799
+failure: batch3 [
+../../source4/torture/smb2/oplock.c:1040: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: Error creating directory
+]
+test: batch4
+time: 2026-03-03 07:40:38.668847
+time: 2026-03-03 07:40:38.673482
+failure: batch4 [
+../../source4/torture/smb2/oplock.c:1105: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: Error creating directory
+]
+test: batch5
+time: 2026-03-03 07:40:38.673533
+time: 2026-03-03 07:40:38.681203
+failure: batch5 [
+../../source4/torture/smb2/oplock.c:1169: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: Error creating directory
+]
+test: batch6
+time: 2026-03-03 07:40:38.681252
+time: 2026-03-03 07:40:38.687057
+failure: batch6 [
+../../source4/torture/smb2/oplock.c:1234: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: Error creating directory
+]
+test: batch7
+time: 2026-03-03 07:40:38.687115
+time: 2026-03-03 07:40:38.692333
+failure: batch7 [
+../../source4/torture/smb2/oplock.c:1322: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: Error creating directory
+]
+test: batch8
+time: 2026-03-03 07:40:38.692391
+time: 2026-03-03 07:40:38.696794
+failure: batch8 [
+../../source4/torture/smb2/oplock.c:1394: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: Error creating directory
+]
+test: batch9
+time: 2026-03-03 07:40:38.696850
+time: 2026-03-03 07:40:38.701765
+failure: batch9 [
+../../source4/torture/smb2/oplock.c:1464: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: Error creating directory
+]
+test: batch9a
+time: 2026-03-03 07:40:38.701825
+time: 2026-03-03 07:40:38.706636
+failure: batch9a [
+../../source4/torture/smb2/oplock.c:1577: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: Error creating directory
+]
+test: batch10
+time: 2026-03-03 07:40:38.706690
+time: 2026-03-03 07:40:38.710857
+failure: batch10 [
+../../source4/torture/smb2/oplock.c:1703: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: Error creating directory
+]
+test: batch11
+time: 2026-03-03 07:40:38.710923
+time: 2026-03-03 07:40:38.714720
+failure: batch11 [
+../../source4/torture/smb2/oplock.c:1802: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: Error creating directory
+]
+test: batch12
+time: 2026-03-03 07:40:38.714780
+time: 2026-03-03 07:40:38.719128
+failure: batch12 [
+../../source4/torture/smb2/oplock.c:1882: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: Error creating directory
+]
+test: batch13
+time: 2026-03-03 07:40:38.719188
+time: 2026-03-03 07:40:38.726310
+failure: batch13 [
+../../source4/torture/smb2/oplock.c:1962: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: Error creating directory
+]
+test: batch14
+time: 2026-03-03 07:40:38.726362
+time: 2026-03-03 07:40:38.730930
+failure: batch14 [
+../../source4/torture/smb2/oplock.c:2044: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: Error creating directory
+]
+test: batch15
+time: 2026-03-03 07:40:38.730990
+time: 2026-03-03 07:40:38.735781
+failure: batch15 [
+../../source4/torture/smb2/oplock.c:2124: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: Error creating directory
+]
+test: batch16
+time: 2026-03-03 07:40:38.735826
+time: 2026-03-03 07:40:38.741366
+failure: batch16 [
+../../source4/torture/smb2/oplock.c:2195: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: Error creating directory
+]
+test: batch19
+time: 2026-03-03 07:40:38.741421
+time: 2026-03-03 07:40:38.743561
+failure: batch19 [
+../../source4/torture/smb2/oplock.c:2305: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: Error creating directory
+]
+test: batch20
+time: 2026-03-03 07:40:38.743620
+time: 2026-03-03 07:40:38.748053
+failure: batch20 [
+../../source4/torture/smb2/oplock.c:2387: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: Error creating directory
+]
+test: batch21
+time: 2026-03-03 07:40:38.748107
+time: 2026-03-03 07:40:38.750171
+failure: batch21 [
+../../source4/torture/smb2/oplock.c:2517: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: Error creating directory
+]
+test: batch22a
+time: 2026-03-03 07:40:38.750220
+time: 2026-03-03 07:40:38.751832
+failure: batch22a [
+../../source4/torture/smb2/oplock.c:2579: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: Error creating directory
+]
+test: batch22b
+time: 2026-03-03 07:40:38.751887
+time: 2026-03-03 07:40:38.755723
+failure: batch22b [
+../../source4/torture/smb2/oplock.c:2661: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: Error creating directory
+]
+test: batch23
+time: 2026-03-03 07:40:38.755785
+time: 2026-03-03 07:40:38.759459
+failure: batch23 [
+../../source4/torture/smb2/oplock.c:2751: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: Error creating directory
+]
+test: batch24
+time: 2026-03-03 07:40:38.759512
+time: 2026-03-03 07:40:38.762775
+failure: batch24 [
+../../source4/torture/smb2/oplock.c:2844: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: Error creating directory
+]
+test: batch25
+time: 2026-03-03 07:40:38.762827
+time: 2026-03-03 07:40:38.764484
+failure: batch25 [
+../../source4/torture/smb2/oplock.c:2925: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: Error creating directory
+]
+test: batch26
+time: 2026-03-03 07:40:38.764542
+time: 2026-03-03 07:40:38.765923
+failure: batch26 [
+../../source4/torture/smb2/oplock.c:2984: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: Error creating directory
+]
+test: stream1
+time: 2026-03-03 07:40:38.765967
+time: 2026-03-03 07:40:38.768816
+failure: stream1 [
+../../source4/torture/smb2/oplock.c:3090: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: Error creating directory
+]
+test: doc
+time: 2026-03-03 07:40:38.768863
+time: 2026-03-03 07:40:38.777213
+failure: doc [
+../../source4/torture/smb2/oplock.c:3237: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: Error creating directory
+]
+test: brl1
+time: 2026-03-03 07:40:38.777264
+time: 2026-03-03 07:40:38.779815
+failure: brl1 [
+../../source4/torture/smb2/oplock.c:3316: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: Error creating directory
+]
+test: brl2
+time: 2026-03-03 07:40:38.779869
+time: 2026-03-03 07:40:38.781247
+failure: brl2 [
+../../source4/torture/smb2/oplock.c:3441: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: Error creating directory
+]
+test: brl3
+time: 2026-03-03 07:40:38.781293
+time: 2026-03-03 07:40:38.782563
+failure: brl3 [
+../../source4/torture/smb2/oplock.c:3544: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: Error creating directory
+]
+test: levelii500
+time: 2026-03-03 07:40:38.782609
+time: 2026-03-03 07:40:38.783869
+failure: levelii500 [
+../../source4/torture/smb2/oplock.c:3666: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: Error creating directory
+]
+test: levelii501
+time: 2026-03-03 07:40:38.783911
+time: 2026-03-03 07:40:38.788165
+failure: levelii501 [
+../../source4/torture/smb2/oplock.c:3803: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: Error creating directory
+]
+test: levelii502
+time: 2026-03-03 07:40:38.788248
+time: 2026-03-03 07:40:38.791016
+failure: levelii502 [
+../../source4/torture/smb2/oplock.c:4002: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: Error creating directory
+]
+test: statopen1
+time: 2026-03-03 07:40:38.791071
+Acking to level II [0x01] in oplock handler
+Acking to level II [0x01] in oplock handler
+Acking to level II [0x01] in oplock handler
+Acking to level II [0x01] in oplock handler
+Acking to level II [0x01] in oplock handler
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+Acking to level II [0x01] in oplock handler
+		Specific bits: 0x0
+WARNING!: (../../source4/torture/smb2/oplock.c:4114): wrong value for break_info.count got 0x0 - should be 0x1
+
+time: 2026-03-03 07:40:40.801304
+failure: statopen1 [
+test 8: access_mask: READ_CONTROL_ACCESS , expect_stat_open: no
+]

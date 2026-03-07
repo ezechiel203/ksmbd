@@ -1,0 +1,39 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772585261
+time: 2026-03-04 00:47:41.696946
+test: winattr
+time: 2026-03-04 00:47:41.698628
+[0] setattr = [0x80] got attr 0x80
+[1] setattr = [0x20] got attr 0x20
+[2] setattr = [0x1] got attr 0x1
+[3] setattr = [0x2] got attr 0x2
+[4] setattr = [0x4] got attr 0x4
+[5] setattr = [0x21] got attr 0x21
+[6] setattr = [0x22] got attr 0x22
+[7] setattr = [0x24] got attr 0x24
+[8] setattr = [0x23] got attr 0x23
+[9] setattr = [0x25] got attr 0x25
+[10] setattr = [0x26] got attr 0x26
+[11] setattr = [0x3] got attr 0x3
+[12] setattr = [0x5] got attr 0x5
+[13] setattr = [0x7] got attr 0x7
+[14] setattr = [0x2] got attr 0x2
+[15] setattr = [0x4] got attr 0x4
+[1] setatt = [0x20] got attr 0x30
+[2] setatt = [0x1] got attr 0x11
+[3] setatt = [0x2] got attr 0x12
+[4] setatt = [0x4] got attr 0x14
+[5] setatt = [0x21] got attr 0x31
+[6] setatt = [0x22] got attr 0x32
+[7] setatt = [0x24] got attr 0x34
+[8] setatt = [0x23] got attr 0x33
+[9] setatt = [0x25] got attr 0x35
+[10] setatt = [0x26] got attr 0x36
+[11] setatt = [0x3] got attr 0x13
+[12] setatt = [0x5] got attr 0x15
+[13] setatt = [0x7] got attr 0x17
+[14] setatt = [0x2] got attr 0x12
+[15] setatt = [0x4] got attr 0x14
+time: 2026-03-04 00:47:42.042445
+success: winattr

@@ -1,0 +1,65 @@
+# Shared cross-agent coordination log
+# Agent Claude should append updates here.
+# Agent GPT reads this file before major actions to avoid collisions.
+
+2026-02-28T14:00:38+01:00 | agent=gpt
+- Active ownership: VM0..VM2 runtime/debug lane.
+- VM3/VM4 intentionally stopped per user instruction.
+- Code areas touched: `src/core/connection.c`, `src/transport/transport_tcp.c`.
+- Current state: SMB authenticated read/write passes on VM0..VM2; no dmesg critical regressions in latest cycle.
+
+2026-02-28T14:12:20+01:00 | agent=gpt
+- Ran extended regression loops on VM0..VM2 (reconnect cycles, protocol/protection matrix, repeated lifecycle stop/start).
+- Stability state remains good: no kernel BUG/KFENCE/UAF/framing regressions detected.
+- Remaining functional gap under investigation: authenticated `smbclient -L` browse output is empty despite direct share access working.
+
+2026-02-28T14:15:08+01:00 | agent=gpt
+- Probed userspace SRVSVC share-enumeration logic in `ksmbd-tools/mountd/rpc_srvsvc.c`; rebuilt and deployed `ksmbdctl` to VM0..VM2 for test.
+- Current status unchanged for browse output (`smbclient -L` empty), but transport/session and RW data path remain stable.
+
+2026-02-28T14:21:12+01:00 | agent=gpt
+- Deep-dive on SRVSVC browse path completed with debug tracing and client-side decode capture.
+- Evidence now shows server enumerates two shares with status=0, but Samba client decode drops array for browse output.
+- Reverted one unsuccessful experimental NDR-array tweak to keep baseline stable.
+
+2026-02-28T14:28:51+01:00 | agent=gpt
+- Continued SRVSVC work with IDL-guided serialization experiments; reverted unstable variants.
+- VM0..VM2 remain in stable baseline: browse output still empty, direct share path and RW tests pass.
+
+2026-02-28T14:32:21+01:00 | agent=gpt
+- Fixed authenticated browse enumeration on VM0..VM2 via manual SRVSVC NetShareEnumAll level-1 ctr1 serialization in `ksmbd-tools/mountd/rpc_srvsvc.c`.
+- `smbclient -L` now lists `test` and `ipc$` on all three VMs; direct share path remains healthy.
+
+2026-02-28T14:33:12+01:00 | agent=gpt
+- Post-fix mixed stress passed on VM0..VM2 with zero failures and clean kernel logs.
+
+2026-02-28T14:52:42+01:00 | agent=gpt
+- Switched module build/test lane to optional-feature-enabled builds (SMBDIRECT/QUIC/FRUIT active).
+- Added RDMA dependency preloads in VM guest helper scripts to support SMBDIRECT-enabled module load.
+- SMB1 optional build path currently broken in tree (`CONFIG_SMB_INSECURE_SERVER=y` compile errors in smb1pdu), so active runtime validation continues with all other optional features enabled.
+
+2026-02-28T15:03:42+01:00 | agent=gpt
+- Updated state: SMB1 optional build path fixed (full optional-feature build compiles with `CONFIG_SMB_INSECURE_SERVER=y`).
+- Then executed endurance validation on VM0..VM2 with all optional features built in; zero failures and clean kernel logs.
+
+2026-02-28T15:59:24+01:00 | agent=gpt
+- Added QUIC hostfwd capabilities and a userspace QUIC-proxy emulator bridge for VM0..VM2.
+- Verified QUIC transport path behavior through proxy lifecycle tests (works when proxy up, resets when proxy down).
+- Ensured VM3/VM4 remain stopped; active lane unchanged on VM0..VM2.
+
+2026-02-28T16:02:46+01:00 | agent=gpt
+- Authored full RFC-compliant QUIC testing blueprint in `vm/QUIC_FULL_COMPLIANCE_PLAN.md` for next implementation phase.
+
+2026-02-28T16:11:43+01:00 | agent=gpt
+- Implemented Phase-1 real QUIC proxy scaffolding and VM0..VM2 deployment (`aioquic`-based daemon + cert bootstrap + probe client + usage docs).
+
+2026-02-28T16:15:30+01:00 | agent=gpt
+- Continued QUIC real-proxy hardening with CA/client-cert flows and cert-aware probe options.
+- Remaining gap: strict no-client-cert rejection is not yet enforced by current aioquic test profile; needs deeper mTLS policy handling.
+
+2026-02-28T16:26:09+01:00 | agent=gpt
+- Added kernel QUIC peer-credential enforcement (`transport_quic.c`), rejecting non-root unix-socket peers.
+- Verified rejection behavior on VM0..VM2 via non-root injection tests.
+
+2026-02-28T16:37:31+01:00 | agent=gpt
+- Expanded QUIC validation with kernel TLS_VERIFIED flag enforcement and automated compatibility matrix (`vm/quic-compat-matrix.sh`), currently passing on VM0..VM2.

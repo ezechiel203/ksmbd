@@ -1,0 +1,115 @@
+# src/core/connection.c
+
+Risk-tagged lines (LOCK/LIFETIME/WAIT_LOOP/ERROR_PATH/MEM_BOUNDS/PROTO_GATE):
+
+- L00038 [LIFETIME|] `atomic_t conn_hash_count = ATOMIC_INIT(0);`
+- L00051 [LIFETIME|] `	atomic_set(&conn_hash_count, 0);`
+- L00064 [LOCK|] `	spin_lock(&conn_hash[bkt].lock);`
+- L00066 [LIFETIME|] `	atomic_inc(&conn_hash_count);`
+- L00067 [LOCK|] `	spin_unlock(&conn_hash[bkt].lock);`
+- L00079 [LOCK|] `	spin_lock(&conn_hash[bkt].lock);`
+- L00082 [LIFETIME|] `		atomic_dec(&conn_hash_count);`
+- L00084 [LOCK|] `	spin_unlock(&conn_hash[bkt].lock);`
+- L00098 [LIFETIME|] `	return atomic_read(&conn_hash_count) == 0;`
+- L00143 [LIFETIME|] `	if (!refcount_dec_and_test(&conn->refcnt))`
+- L00159 [MEM_BOUNDS|] `	conn = kzalloc(sizeof(struct ksmbd_conn), KSMBD_DEFAULT_GFP);`
+- L00178 [LIFETIME|] `	atomic_set(&conn->req_running, 0);`
+- L00179 [LIFETIME|] `	atomic_set(&conn->r_count, 0);`
+- L00180 [LIFETIME|] `	atomic_set(&conn->outstanding_async, 0);`
+- L00181 [LIFETIME|] `	refcount_set(&conn->refcnt, 1);`
+- L00210 [LOCK|] `		spin_lock(&conn_hash[i].lock);`
+- L00213 [PROTO_GATE|] `				    SMB2_CLIENT_GUID_SIZE)) {`
+- L00214 [LOCK|] `				spin_unlock(&conn_hash[i].lock);`
+- L00218 [LOCK|] `		spin_unlock(&conn_hash[i].lock);`
+- L00230 [PROTO_GATE|] `	if (hdr->ProtocolId == SMB2_PROTO_NUMBER) {`
+- L00231 [PROTO_GATE|] `		if (conn->ops->get_cmd_val(work) != SMB2_CANCEL_HE)`
+- L00234 [PROTO_GATE|] `		if (conn->ops->get_cmd_val(work) != SMB_COM_NT_CANCEL)`
+- L00238 [PROTO_GATE|] `	if (conn->ops->get_cmd_val(work) != SMB2_CANCEL_HE)`
+- L00242 [LIFETIME|] `	atomic_inc(&conn->req_running);`
+- L00244 [LOCK|] `		spin_lock(&conn->request_lock);`
+- L00246 [LOCK|] `		spin_unlock(&conn->request_lock);`
+- L00254 [LIFETIME|] `	atomic_dec(&conn->req_running);`
+- L00258 [LOCK|] `	spin_lock(&conn->request_lock);`
+- L00261 [LOCK|] `		spin_unlock(&conn->request_lock);`
+- L00265 [LOCK|] `	spin_unlock(&conn->request_lock);`
+- L00274 [LOCK|] `	mutex_lock(&conn->srv_mutex);`
+- L00279 [LOCK|] `	mutex_unlock(&conn->srv_mutex);`
+- L00288 [LOCK|] `		spin_lock(&conn_hash[i].lock);`
+- L00290 [LIFETIME|] `			rcu_read_lock();`
+- L00294 [LIFETIME|] `			rcu_read_unlock();`
+- L00296 [LOCK|] `		spin_unlock(&conn_hash[i].lock);`
+- L00302 [WAIT_LOOP|] `	if (!wait_event_timeout(conn->req_running_q,`
+- L00303 [LIFETIME|] `				atomic_read(&conn->req_running) < 2,`
+- L00305 [ERROR_PATH|] `		pr_err_ratelimited("Timeout waiting for idle conn (req_running=%d, status=%d)\n",`
+- L00306 [LIFETIME|] `				   atomic_read(&conn->req_running),`
+- L00325 [ERROR_PATH|] `		pr_err_ratelimited("wait_idle_sess_id: timed out after %d retries for session %llu\n",`
+- L00327 [ERROR_PATH|] `		return -EIO;`
+- L00331 [LOCK|] `		spin_lock(&conn_hash[i].lock);`
+- L00336 [LIFETIME|] `			rcu_read_lock();`
+- L00339 [LIFETIME|] `			rcu_read_unlock();`
+- L00344 [LIFETIME|] `			if (atomic_read(&conn->req_running) >=`
+- L00346 [LOCK|] `				spin_unlock(&conn_hash[i].lock);`
+- L00347 [WAIT_LOOP|] `				rc = wait_event_timeout(`
+- L00349 [LIFETIME|] `					atomic_read(`
+- L00360 [ERROR_PATH|] `				goto retry_idle;`
+- L00363 [LOCK|] `		spin_unlock(&conn_hash[i].lock);`
+- L00376 [ERROR_PATH|] `		pr_err("NULL response header\n");`
+- L00377 [ERROR_PATH|] `		return -EINVAL;`
+- L00424 [ERROR_PATH|] `		return -EINVAL;`
+- L00450 [ERROR_PATH|] `		pr_err("Failed to send message: %d\n", sent);`
+- L00455 [ERROR_PATH|] `		pr_warn_ratelimited("Short write: sent %d of %zu bytes\n",`
+- L00469 [ERROR_PATH|] `			pr_err("Failed to sendfile: %d\n", sent);`
+- L00516 [LIFETIME|] `	if (atomic_read(&conn->stats.open_files_count) > 0)`
+- L00535 [PROTO_GATE|] `#define SMB2_MIN_SUPPORTED_HEADER_SIZE (sizeof(struct smb2_hdr) + 4)`
+- L00557 [ERROR_PATH|] `		goto out;`
+- L00570 [LIFETIME|] `		if (atomic_read(&conn->req_running) + 1 > max_req) {`
+- L00571 [WAIT_LOOP|] `			rc = wait_event_interruptible_timeout(conn->req_running_q,`
+- L00572 [LIFETIME|] `							      atomic_read(&conn->req_running) < max_req ||`
+- L00579 [ERROR_PATH|] `			goto recheck;`
+- L00600 [ERROR_PATH|] `				pr_err_ratelimited("PDU length(%u) excceed maximum allowed pdu size(%u) on connection(%d)\n",`
+- L00603 [ERROR_PATH|] `				pr_err_ratelimited("Invalid RFC1002 hdr bytes: %02x %02x %02x %02x\n",`
+- L00620 [MEM_BOUNDS|] `		if (check_add_overflow(pdu_size, 5u, (unsigned int *)&size))`
+- L00622 [MEM_BOUNDS|] `		conn->request_buf = kvmalloc(size, KSMBD_DEFAULT_GFP);`
+- L00626 [MEM_BOUNDS|] `		memcpy(conn->request_buf, hdr_buf, sizeof(hdr_buf));`
+- L00634 [ERROR_PATH|] `			pr_err("sock_read failed: %d\n", size);`
+- L00639 [ERROR_PATH|] `				pr_err("PDU error. Read: %d, Expected: %d\n",`
+- L00649 [PROTO_GATE|] `				if (sess_req->hdr.ProtocolId == SMB2_PROTO_NUMBER &&`
+- L00651 [PROTO_GATE|] `				    SMB2_SESSION_SETUP_HE) {`
+- L00661 [MEM_BOUNDS|] `						if (check_add_overflow(expected_pdu, 5u,`
+- L00665 [MEM_BOUNDS|] `						new_buf = kvmalloc(size, KSMBD_DEFAULT_GFP);`
+- L00669 [MEM_BOUNDS|] `						memcpy(new_buf, conn->request_buf,`
+- L00678 [ERROR_PATH|] `							pr_err("SESSION_SETUP extension read failed: %d expected %u\n",`
+- L00684 [ERROR_PATH|] `						pr_warn_ratelimited(`
+- L00702 [LIFETIME|] `					    pdu_size, atomic_read(&conn->req_running));`
+- L00708 [PROTO_GATE|] `		if (((struct smb2_hdr *)smb2_get_msg(conn->request_buf))->ProtocolId ==`
+- L00709 [PROTO_GATE|] `		    SMB2_PROTO_NUMBER) {`
+- L00710 [PROTO_GATE|] `			if (pdu_size < SMB2_MIN_SUPPORTED_HEADER_SIZE)`
+- L00715 [ERROR_PATH|] `			pr_err("No connection request callback\n");`
+- L00720 [ERROR_PATH|] `			pr_err("Cannot handle request\n");`
+- L00728 [LIFETIME|] `	ksmbd_debug(CONN, "Wait for all pending requests(%d)\n", atomic_read(&conn->r_count));`
+- L00729 [LIFETIME|WAIT_LOOP|] `	wait_event(conn->r_count_q, atomic_read(&conn->r_count) == 0);`
+- L00749 [LIFETIME|] `	atomic_inc(&conn->r_count);`
+- L00765 [LIFETIME|] `	if (!atomic_dec_return(&conn->r_count) &&`
+- L00775 [LOCK|] `	mutex_lock(&init_lock);`
+- L00778 [ERROR_PATH|] `		pr_err("Failed to init TCP subsystem: %d\n", ret);`
+- L00779 [ERROR_PATH|] `		goto out;`
+- L00784 [ERROR_PATH|] `		pr_warn("RDMA subsystem unavailable (%d), continuing without RDMA\n",`
+- L00792 [ERROR_PATH|] `		pr_warn("QUIC subsystem unavailable (%d), continuing without QUIC\n",`
+- L00797 [LOCK|] `	mutex_unlock(&init_lock);`
+- L00801 [LOCK|] `	mutex_unlock(&init_lock);`
+- L00817 [LOCK|] `		spin_lock(&conn_hash[i].lock);`
+- L00830 [LIFETIME|] `				if (!refcount_inc_not_zero(&conn->refcnt))`
+- L00832 [LOCK|] `				spin_unlock(&conn_hash[i].lock);`
+- L00835 [ERROR_PATH|] `				goto again;`
+- L00838 [LOCK|] `		spin_unlock(&conn_hash[i].lock);`
+- L00852 [LOCK|] `				spin_lock(&conn_hash[i].lock);`
+- L00856 [LOCK|] `				spin_unlock(&conn_hash[i].lock);`
+- L00863 [LOCK|] `				spin_lock(&conn_hash[i].lock);`
+- L00866 [LIFETIME|] `					if (!refcount_inc_not_zero(&conn->refcnt))`
+- L00868 [LOCK|] `					spin_unlock(&conn_hash[i].lock);`
+- L00870 [ERROR_PATH|] `					goto restart;`
+- L00872 [LOCK|] `				spin_unlock(&conn_hash[i].lock);`
+- L00876 [WAIT_LOOP|] `		msleep(100);`
+- L00877 [ERROR_PATH|] `		goto again;`
+- L00883 [LOCK|] `	mutex_lock(&init_lock);`
+- L00889 [LOCK|] `	mutex_unlock(&init_lock);`

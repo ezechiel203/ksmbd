@@ -1,0 +1,269 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772889793
+time: 2026-03-07 13:23:13.251222
+progress: 26
+test: valid-request
+time: 2026-03-07 13:23:13.251669
+Test request with 0 locks.
+Test >63-bit lock requests.
+Test basic lock stacking.
+Test flags field permutations.
+Test return error when 2 locks are requested
+time: 2026-03-07 13:23:13.283390
+success: valid-request
+test: rw-none
+time: 2026-03-07 13:23:13.283436
+time: 2026-03-07 13:23:13.290034
+skip: rw-none [
+../../source4/torture/smb2/lock.c:493: RW-NONE tests the behavior of a NONE-type lock, which is the same as a SHARED lock but is granted due to a bug in W2K8.  If target is not W2K8 we skip this test.
+]
+test: rw-shared
+time: 2026-03-07 13:23:13.290076
+time: 2026-03-07 13:23:13.302105
+success: rw-shared
+test: rw-exclusive
+time: 2026-03-07 13:23:13.302145
+time: 2026-03-07 13:23:13.316421
+success: rw-exclusive
+test: auto-unlock
+time: 2026-03-07 13:23:13.316459
+time: 2026-03-07 13:23:13.334303
+success: auto-unlock
+test: lock
+time: 2026-03-07 13:23:13.334344
+Trying 0/0 lock
+Trying 0/1 lock
+Trying 0xEEFFFFF lock
+Trying 0xEF00000 lock
+Trying (2^63 - 1)/1
+Trying 2^63/1
+Trying max/0 lock
+Trying max/1 lock
+Trying max/2 lock
+Trying wrong handle unlock
+time: 2026-03-07 13:23:13.363464
+success: lock
+test: async
+time: 2026-03-07 13:23:13.363507
+  Acquire first lock
+  Second lock should pend on first
+  Unlock first lock
+  Second lock should now succeed
+time: 2026-03-07 13:23:13.375581
+success: async
+test: cancel
+time: 2026-03-07 13:23:13.375620
+Testing basic cancel
+  Acquire first lock
+  Second lock should pend on first
+  Cancel the second lock
+  Unlock first lock
+Testing cancel by unlock
+  Acquire first lock
+  Second lock should pend on first
+  Attempt to unlock pending second lock
+  Now cancel the second lock
+  Unlock first lock
+Testing cancel by close
+  Acquire first lock
+  Second lock should pend on first
+  Close the second lock handle
+  Check pending lock reply
+  Unlock first lock
+time: 2026-03-07 13:23:13.393360
+success: cancel
+test: cancel-tdis
+time: 2026-03-07 13:23:13.393402
+Testing cancel by tree disconnect
+  Acquire first lock
+  Second lock should pend on first
+  Disconnect the tree
+  Check pending lock reply
+  Attempt to unlock first lock
+time: 2026-03-07 13:23:13.405879
+success: cancel-tdis
+test: cancel-logoff
+time: 2026-03-07 13:23:13.405918
+Testing cancel by ulogoff
+  Acquire first lock
+  Second lock should pend on first
+  Logoff user
+  Check pending lock reply
+  Attempt to unlock first lock
+time: 2026-03-07 13:23:13.417780
+success: cancel-logoff
+test: errorcode
+time: 2026-03-07 13:23:13.417819
+Testing LOCK_NOT_GRANTED vs. FILE_LOCK_CONFLICT
+time: 2026-03-07 13:23:13.437760
+success: errorcode
+test: zerobytelength
+time: 2026-03-07 13:23:13.437804
+Testing zero length byte range locks:
+  ... {10, 0} + {10, 0} = NT_STATUS_OK
+  ... {10, 0} + {9, 1} = NT_STATUS_OK
+  ... {10, 0} + {10, 1} = NT_STATUS_OK
+  ... {10, 0} + {11, 1} = NT_STATUS_OK
+  ... {10, 0} + {9, 2} = NT_STATUS_LOCK_NOT_GRANTED
+  ... {10, 0} + {10, 2} = NT_STATUS_OK
+  ... {10, 0} + {9, 3} = NT_STATUS_LOCK_NOT_GRANTED
+  ... {10, 0} + {10, 0} = NT_STATUS_OK
+  ... {9, 1} + {10, 0} = NT_STATUS_OK
+  ... {10, 1} + {10, 0} = NT_STATUS_OK
+  ... {11, 1} + {10, 0} = NT_STATUS_OK
+  ... {9, 2} + {10, 0} = NT_STATUS_LOCK_NOT_GRANTED
+  ... {10, 2} + {10, 0} = NT_STATUS_OK
+  ... {9, 3} + {10, 0} = NT_STATUS_LOCK_NOT_GRANTED
+  ... {0, 0} + {0, 0} = NT_STATUS_OK
+  ... {10, 0} + {10, 0} = NT_STATUS_OK
+  ... {10, 0} + {9, 1} = NT_STATUS_OK
+  ... {10, 0} + {10, 1} = NT_STATUS_OK
+  ... {10, 0} + {11, 1} = NT_STATUS_OK
+  ... {10, 0} + {9, 2} = NT_STATUS_LOCK_NOT_GRANTED
+  ... {10, 0} + {10, 2} = NT_STATUS_OK
+  ... {10, 0} + {9, 3} = NT_STATUS_LOCK_NOT_GRANTED
+  ... {10, 0} + {10, 0} = NT_STATUS_OK
+  ... {9, 1} + {10, 0} = NT_STATUS_OK
+  ... {10, 1} + {10, 0} = NT_STATUS_OK
+  ... {11, 1} + {10, 0} = NT_STATUS_OK
+  ... {9, 2} + {10, 0} = NT_STATUS_LOCK_NOT_GRANTED
+  ... {10, 2} + {10, 0} = NT_STATUS_OK
+  ... {9, 3} + {10, 0} = NT_STATUS_LOCK_NOT_GRANTED
+  ... {0, 0} + {0, 0} = NT_STATUS_OK
+time: 2026-03-07 13:23:13.481136
+success: zerobytelength
+test: zerobyteread
+time: 2026-03-07 13:23:13.481192
+Testing zero byte read on lock range:
+  taking exclusive lock.
+  reading 0 bytes.
+Testing zero byte read on zero byte lock range:
+  taking exclusive 0-byte lock.
+  reading 0 bytes before the lock.
+  reading 0 bytes on the lock.
+  reading 0 bytes after the lock.
+time: 2026-03-07 13:23:13.494692
+success: zerobyteread
+test: unlock
+time: 2026-03-07 13:23:13.494731
+Testing unlock exclusive with shared
+  taking exclusive lock.
+  try to unlock the exclusive with a shared unlock call.
+  try shared lock on h2, to test the unlock.
+  unlock the exclusive lock
+Testing unlock shared with exclusive
+  taking shared lock.
+  try to unlock the shared with an exclusive unlock call.
+  try exclusive lock on h2, to test the unlock.
+  unlock the exclusive lock
+Test unlocking stacked 0-byte locks
+Test unlocking stacked exclusive/shared locks
+time: 2026-03-07 13:23:13.516352
+success: unlock
+test: multiple-unlock
+time: 2026-03-07 13:23:13.516393
+Testing multiple unlocks:
+  unlock 2 locks, first one not locked. Expect no locks unlocked. 
+  unlock 2 locks, second one not locked. Expect first lock unlocked.
+  request 2 locks, second one will contend. Expect both to fail.
+  request unlock and lock, second one will error. Expect the unlock to succeed.
+  request unlock and lock.  Unlock will succeed, but lock will fail.
+  request lock and unlock.  Both will fail.
+time: 2026-03-07 13:23:13.533157
+success: multiple-unlock
+test: stacking
+time: 2026-03-07 13:23:13.533196
+Testing lock stacking:
+  stacking a shared on top of a sharedlock succeeds.
+  stacking a shared on top of an exclusive lock succeeds.
+  stacking a shared on top of an exclusive lock with different handles fails.
+  stacking an exclusive on top of a shared lock fails.
+  two exclusive locks do not stack.
+time: 2026-03-07 13:23:13.547615
+success: stacking
+test: contend
+time: 2026-03-07 13:23:13.547654
+Testing lock contention:
+  shared should contend on exclusive on different handle.
+time: 2026-03-07 13:23:13.558459
+success: contend
+test: context
+time: 2026-03-07 13:23:13.558506
+Testing locker context:
+  pid shouldn't affect locker context
+time: 2026-03-07 13:23:13.570125
+success: context
+test: range
+time: 2026-03-07 13:23:13.570166
+Testing locks spread across the 64-bit offset range
+  establishing 10 locks
+  testing 10 locks
+  removing 10 locks
+time: 2026-03-07 13:23:13.594628
+success: range
+test: overlap
+time: 2026-03-07 13:23:13.594670
+Testing overlapping locks:
+the same session/handle cannot set overlapping exclusive locks
+the same session/handle can set overlapping shared locks
+a different session cannot set overlapping exclusive locks
+a different session can set overlapping shared locks
+a different handle cannot set overlapping exclusive locks
+a different handle can set overlapping shared locks
+the same handle cannot coalesce read locks
+the server doesn't have the NT byte range lock bug
+time: 2026-03-07 13:23:13.617000
+success: overlap
+test: truncate
+time: 2026-03-07 13:23:13.617046
+Testing truncation of locked file:
+  overwrite disposition is allowed on a locked file.
+  supersede disposition is allowed on a locked file.
+time: 2026-03-07 13:23:13.629819
+success: truncate
+test: replay_broken_windows
+time: 2026-03-07 13:23:13.629858
+Testing Open File:
+Testing Lock Replay detection [ignored]:
+
+SMB3 Server implements LockSequence as SMB 2.1.0 LEGACY BROKEN Windows!!!
+
+Testing SMB 2.1.0 LockSequence for ResilientHandles
+Testing Set Resiliency:
+Testing Lock (ignored) Replay detection (Bucket No: 0 (invalid)) [ignored]:
+Testing Lock Replay detection (Bucket No: 1):
+Testing Lock Replay detection (Bucket No: 2):
+Testing Lock Replay detection (Bucket No: 65 (invalid)) [ignored]:
+Testing Lock Replay detection (Bucket No: 64):
+time: 2026-03-07 13:23:13.647865
+success: replay_broken_windows
+test: replay_smb3_specification_durable
+time: 2026-03-07 13:23:13.647907
+replay_smb3_specification_durable: Testing Open File:
+Testing SMB 3 LockSequence for all Handles
+Testing Lock (ignored) Replay detection (Bucket No: 0 (invalid)) [ignored]:
+Testing Lock Replay detection (Bucket No: 1):
+Testing Lock Replay detection (Bucket No: 2):
+Testing Lock Replay detection (Bucket No: 65 (invalid)) [ignored]:
+Testing Lock Replay detection (Bucket No: 64):
+time: 2026-03-07 13:23:13.662680
+success: replay_smb3_specification_durable
+test: replay_smb3_specification_multi
+time: 2026-03-07 13:23:13.662724
+time: 2026-03-07 13:23:13.672688
+skip: replay_smb3_specification_multi [
+../../source4/torture/smb2/lock.c:3398: MULTI_CHANNEL is 			required for Lock Replay tests on without durable handles
+]
+test: ctdb-delrec-deadlock
+time: 2026-03-07 13:23:13.672739
+time: 2026-03-07 13:23:13.679901
+skip: ctdb-delrec-deadlock [
+../../source4/torture/smb2/lock.c:3425: Test must be run on a ctdb cluster
+]
+test: open-brlock-deadlock
+time: 2026-03-07 13:23:13.679945
+time: 2026-03-07 13:23:13.693849
+skip: open-brlock-deadlock [
+../../source4/torture/smb2/lock.c:3682: Test skipped, pass '--option=torture:open_brlock_deadlock_timemout=SEC' to run
+]

@@ -1,0 +1,3 @@
+# Ignore all result files (generated per-run)
+*
+!.gitignore

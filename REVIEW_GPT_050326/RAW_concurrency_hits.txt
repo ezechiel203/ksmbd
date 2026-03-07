@@ -1,0 +1,484 @@
+src/transport/transport_tcp.c:33:static atomic_t active_num_conn;
+src/transport/transport_tcp.c:332:		    atomic_inc_return(&active_num_conn) > server_conf.max_connections) {
+src/transport/transport_tcp.c:334:					    atomic_read(&active_num_conn));
+src/transport/transport_tcp.c:335:			atomic_dec(&active_num_conn);
+src/transport/transport_tcp.c:347:				atomic_dec(&active_num_conn);
+src/transport/transport_tcp.c:639:		atomic_dec(&active_num_conn);
+src/core/misc.c:339:	/* Avoid underflow on mount points or pseudo-filesystems */
+src/core/misc.c:566:	/* XXX */
+src/fs/ksmbd_fsctl.c:9: *   RCU-protected hash table.  Built-in handlers are registered at module
+src/fs/ksmbd_fsctl.c:94: * Removes the handler under spinlock and waits for an RCU grace period.
+src/fs/ksmbd_fsctl.c:115: * Performs an RCU-protected hash lookup, takes a module reference on the
+src/fs/ksmbd_fsctl.c:967:			 * F2: Use RCU read lock when iterating IPv6 addresses.
+src/fs/ksmbd_fsctl.c:969:			 * freed via RCU when an IPv6 address is removed concurrently
+src/fs/ksmbd_fsctl.c:970:			 * (e.g., by a netlink message on another CPU).  The RCU lock
+src/fs/ksmbd_fsctl.c:1310:	/* Validate offset+length doesn't overflow */
+src/fs/ksmbd_fsctl.c:1805:			 * Gracefully allow clients probing pipe
+src/fs/ksmbd_fsctl.c:2541:	/* Guard against signed overflow in token_off + xfer_off */
+src/fs/ksmbd_fsctl.c:2542:	if (check_add_overflow(token_off, xfer_off, &src_off)) {
+src/include/transport/transport_rdma.h:110:	atomic_t	lifetime_granted;   /* cumulative grants */
+src/include/transport/transport_rdma.h:111:	atomic_t	lifetime_reclaimed; /* cumulative reclaims */
+src/include/transport/transport_rdma.h:131:	atomic_set(&pool->lifetime_granted, 0);
+src/include/transport/transport_rdma.h:132:	atomic_set(&pool->lifetime_reclaimed, 0);
+src/include/transport/transport_rdma.h:160:		atomic_add(count, &pool->lifetime_granted);
+src/include/transport/transport_rdma.h:189:		atomic_add(count, &pool->lifetime_reclaimed);
+src/include/transport/transport_rdma.h:209:	atomic_add(reclaimed, &pool->lifetime_reclaimed);
+src/include/transport/transport_rdma.h:256:	lg = atomic_read(&pool->lifetime_granted);
+src/include/transport/transport_rdma.h:257:	lr = atomic_read(&pool->lifetime_reclaimed);
+src/core/auth.c:19:#include <linux/overflow.h>
+src/core/auth.c:428:	if (check_add_overflow(CIFS_CRYPTO_KEY_SIZE, blen, &len)) {
+src/core/auth.c:703:	/* TODO : use domain name that imported from configuration file */
+src/core/auth.c:1685:		if (check_add_overflow(total_entries, nr_entries[i],
+src/core/auth.c:1693:	if (check_add_overflow(total_entries, 2, &total_entries)) {
+src/transport/transport_rdma.c:78:static atomic_t smbd_active_conn;
+src/transport/transport_rdma.c:144:	atomic_t		send_credits;
+src/transport/transport_rdma.c:149:	atomic_t		rw_credits;
+src/transport/transport_rdma.c:160:	atomic_t		send_pending;
+src/transport/transport_rdma.c:185:	atomic_t		recv_posted;
+src/transport/transport_rdma.c:186:	atomic_t		total_credits_granted;
+src/transport/transport_rdma.c:187:	atomic_t		total_credits_reclaimed;
+src/transport/transport_rdma.c:289:				 atomic_read(&t->send_pending) == 0 ||
+src/transport/transport_rdma.c:294:				   caller, atomic_read(&t->send_pending), t->status);
+src/transport/transport_rdma.c:298:	if (atomic_read(&t->send_pending) == 0)
+src/transport/transport_rdma.c:446:	atomic_set(&t->send_pending, 0);
+src/transport/transport_rdma.c:450:	atomic_set(&t->recv_posted, 0);
+src/transport/transport_rdma.c:451:	atomic_set(&t->total_credits_granted, 0);
+src/transport/transport_rdma.c:452:	atomic_set(&t->total_credits_reclaimed, 0);
+src/transport/transport_rdma.c:464:	 * J.5: IPv6 address enumeration RCU locking note.
+src/transport/transport_rdma.c:471:	 * The IPv6 addr_list iteration that DOES need an RCU lock is in
+src/transport/transport_rdma.c:474:	 * uses the non-RCU list_for_each_entry() instead of
+src/transport/transport_rdma.c:475:	 * list_for_each_entry_rcu(), which is a potential use-after-free
+src/transport/transport_rdma.c:476:	 * race.  The fix is in that file (owned by Track F/IOCTL), not here.
+src/transport/transport_rdma.c:546:	if (atomic_read(&t->send_pending))
+src/transport/transport_rdma.c:702:	posted = atomic_read(&t->recv_posted);
+src/transport/transport_rdma.c:703:	granted = atomic_read(&t->total_credits_granted);
+src/transport/transport_rdma.c:704:	reclaimed = atomic_read(&t->total_credits_reclaimed);
+src/transport/transport_rdma.c:725:			"ksmbd: RDMA recv_posted underflow: %d\n", posted);
+src/transport/transport_rdma.c:758:	posted = atomic_read(&t->recv_posted);
+src/transport/transport_rdma.c:777:	posted = atomic_xchg(&t->recv_posted, 0);
+src/transport/transport_rdma.c:783:	leaked = atomic_read(&t->total_credits_granted) -
+src/transport/transport_rdma.c:784:		 atomic_read(&t->total_credits_reclaimed);
+src/transport/transport_rdma.c:789:			atomic_read(&t->total_credits_granted),
+src/transport/transport_rdma.c:790:			atomic_read(&t->total_credits_reclaimed),
+src/transport/transport_rdma.c:803:	atomic_dec(&t->recv_posted);
+src/transport/transport_rdma.c:804:	atomic_inc(&t->total_credits_reclaimed);
+src/transport/transport_rdma.c:920:		atomic_add(le16_to_cpu(data_transfer->credits_granted),
+src/transport/transport_rdma.c:927:		if (atomic_read(&t->send_credits) > 0)
+src/transport/transport_rdma.c:984:	atomic_inc(&t->recv_posted);
+src/transport/transport_rdma.c:985:	atomic_inc(&t->total_credits_granted);
+src/transport/transport_rdma.c:1222:	if (atomic_dec_and_test(&t->send_pending))
+src/transport/transport_rdma.c:1255:	atomic_inc(&t->send_pending);
+src/transport/transport_rdma.c:1259:		if (atomic_dec_and_test(&t->send_pending))
+src/transport/transport_rdma.c:1307:		atomic_add(send_ctx->wr_cnt, &t->send_credits);
+src/transport/transport_rdma.c:1318:			    wait_queue_head_t *waitq, atomic_t *total_credits,
+src/transport/transport_rdma.c:1324:		if (atomic_sub_return(needed, total_credits) >= 0)
+src/transport/transport_rdma.c:1327:		atomic_add(needed, total_credits);
+src/transport/transport_rdma.c:1329:						       atomic_read(total_credits) >= needed ||
+src/transport/transport_rdma.c:1337:					   needed, atomic_read(total_credits));
+src/transport/transport_rdma.c:1351:	    (send_ctx->wr_cnt >= 16 || atomic_read(&t->send_credits) <= 1)) {
+src/transport/transport_rdma.c:1536:		atomic_inc(&t->send_credits);
+src/transport/transport_rdma.c:1576:	atomic_inc(&t->send_credits);
+src/transport/transport_rdma.c:1597:	//FIXME: skip RFC1002 header..
+src/transport/transport_rdma.c:1933:	atomic_add(credits_needed, &t->rw_credits);
+src/transport/transport_rdma.c:1972:		atomic_dec(&smbd_active_conn);
+src/transport/transport_rdma.c:2252:	atomic_set(&t->send_credits, 0);
+src/transport/transport_rdma.c:2253:	atomic_set(&t->rw_credits, t->max_rw_credits);
+src/transport/transport_rdma.c:2555:	    atomic_inc_return(&smbd_active_conn) > server_conf.max_connections) {
+src/transport/transport_rdma.c:2556:		atomic_dec(&smbd_active_conn);
+src/transport/transport_rdma.c:2565:			atomic_dec(&smbd_active_conn);
+src/transport/transport_rdma.c:2586:		atomic_dec(&smbd_active_conn);
+src/core/server.c:49: * deliberately avoid atomic_t / locking overhead here.
+src/core/server.c:427:	 * handler thread.  Accessing them would be use-after-free.
+src/core/server.c:631:	refcount_inc(&conn->refcnt);
+src/fs/ksmbd_notify.c:60:static atomic_t notify_watch_count = ATOMIC_INIT(0);
+src/fs/ksmbd_notify.c:297:		atomic_dec(&work->conn->outstanding_async);
+src/fs/ksmbd_notify.c:446:		atomic_dec(&work->conn->outstanding_async);
+src/fs/ksmbd_notify.c:658:		atomic_dec(&notify_watch_count);
+src/fs/ksmbd_notify.c:660:			atomic_dec(&work->conn->notify_watch_count);
+src/fs/ksmbd_notify.c:683:	atomic_dec(&notify_watch_count);
+src/fs/ksmbd_notify.c:685:		atomic_dec(&watch->conn->notify_watch_count);
+src/fs/ksmbd_notify.c:889:	if (atomic_inc_return(&notify_watch_count) >
+src/fs/ksmbd_notify.c:891:		atomic_dec(&notify_watch_count);
+src/fs/ksmbd_notify.c:896:	    atomic_inc_return(&work->conn->notify_watch_count) >
+src/fs/ksmbd_notify.c:898:		atomic_dec(&work->conn->notify_watch_count);
+src/fs/ksmbd_notify.c:899:		atomic_dec(&notify_watch_count);
+src/fs/ksmbd_notify.c:906:			atomic_dec(&work->conn->notify_watch_count);
+src/fs/ksmbd_notify.c:907:		atomic_dec(&notify_watch_count);
+src/fs/ksmbd_notify.c:1078:		atomic_dec(&notify_watch_count);
+src/fs/ksmbd_notify.c:1080:			atomic_dec(&work->conn->notify_watch_count);
+src/fs/ksmbd_notify.c:1084:			atomic_dec(&work->conn->outstanding_async);
+src/fs/ksmbd_notify.c:1197:		atomic_dec(&work->conn->outstanding_async);
+src/fs/ksmbd_notify.c:1255:	 * never enqueued, so dequeuing would underflow req_running.
+src/fs/ksmbd_notify.c:1261:		atomic_dec(&work->conn->outstanding_async);
+src/fs/ksmbd_notify.c:1327:		atomic_dec(&notify_watch_count);
+src/fs/ksmbd_notify.c:1329:			atomic_dec(&work->conn->notify_watch_count);
+src/fs/ksmbd_notify.c:1379:	 * never enqueued, so dequeuing would underflow req_running.
+src/fs/ksmbd_notify.c:1385:		atomic_dec(&work->conn->outstanding_async);
+src/fs/ksmbd_notify.c:1487:		 * caller (module unload), preventing use-after-free
+src/transport/transport_quic.c:333:static atomic_t			 quic_active_conns;
+src/transport/transport_quic.c:1047:	/* Validate hs_data_len to prevent overflow */
+src/transport/transport_quic.c:1440: * Also handles PADDING (0x00) and PING (0x01) frames gracefully.
+src/transport/transport_quic.c:1914: * Return: 0 on success, -ENOMEM if the buffer would overflow.
+src/transport/transport_quic.c:2169: * Called by stop_sessions() during graceful server teardown.
+src/transport/transport_quic.c:2211:		atomic_dec(&quic_active_conns);
+src/transport/transport_quic.c:2356:	atomic_inc(&quic_active_conns);
+src/transport/transport_quic.c:2585:	    atomic_read(&quic_active_conns) >= (int)server_conf.max_connections) {
+src/transport/transport_quic.c:3116:	atomic_set(&quic_active_conns, 0);
+src/core/connection.c:10:#include <linux/overflow.h>
+src/core/connection.c:38:atomic_t conn_hash_count = ATOMIC_INIT(0);
+src/core/connection.c:51:	atomic_set(&conn_hash_count, 0);
+src/core/connection.c:66:	atomic_inc(&conn_hash_count);
+src/core/connection.c:82:		atomic_dec(&conn_hash_count);
+src/core/connection.c:91: * Uses a global atomic counter to avoid TOCTOU races that could occur
+src/core/connection.c:98:	return atomic_read(&conn_hash_count) == 0;
+src/core/connection.c:143:	if (!refcount_dec_and_test(&conn->refcnt))
+src/core/connection.c:178:	atomic_set(&conn->req_running, 0);
+src/core/connection.c:179:	atomic_set(&conn->r_count, 0);
+src/core/connection.c:180:	atomic_set(&conn->outstanding_async, 0);
+src/core/connection.c:181:	refcount_set(&conn->refcnt, 1);
+src/core/connection.c:242:	atomic_inc(&conn->req_running);
+src/core/connection.c:254:	atomic_dec(&conn->req_running);
+src/core/connection.c:303:				atomic_read(&conn->req_running) < 2,
+src/core/connection.c:306:				   atomic_read(&conn->req_running),
+src/core/connection.c:344:			if (atomic_read(&conn->req_running) >=
+src/core/connection.c:349:					atomic_read(
+src/core/connection.c:516:	if (atomic_read(&conn->stats.open_files_count) > 0)
+src/core/connection.c:570:		if (atomic_read(&conn->req_running) + 1 > max_req) {
+src/core/connection.c:572:							      atomic_read(&conn->req_running) < max_req ||
+src/core/connection.c:620:		if (check_add_overflow(pdu_size, 5u, (unsigned int *)&size))
+src/core/connection.c:661:						if (check_add_overflow(expected_pdu, 5u,
+src/core/connection.c:693:			 * Trace parsed protocol signature after payload read to
+src/core/connection.c:702:					    pdu_size, atomic_read(&conn->req_running));
+src/core/connection.c:728:	ksmbd_debug(CONN, "Wait for all pending requests(%d)\n", atomic_read(&conn->r_count));
+src/core/connection.c:729:	wait_event(conn->r_count_q, atomic_read(&conn->r_count) == 0);
+src/core/connection.c:749:	atomic_inc(&conn->r_count);
+src/core/connection.c:759:	 * races with the handler's own exit path and causes double-free
+src/core/connection.c:760:	 * or use-after-free of the transport.
+src/core/connection.c:765:	if (!atomic_dec_return(&conn->r_count) &&
+src/core/connection.c:826:				 * The connection can concurrently race to its
+src/core/connection.c:830:				if (!refcount_inc_not_zero(&conn->refcnt))
+src/core/connection.c:866:					if (!refcount_inc_not_zero(&conn->refcnt))
+src/fs/ksmbd_reparse.c:277:	 * symlink creation to close the TOCTOU race window where an
+src/fs/ksmbd_reparse.c:338:		/* Something raced and created an entry - bail out */
+src/fs/ksmbd_reparse.c:421:	 * file creation to close the TOCTOU race window where an
+src/fs/ksmbd_reparse.c:482:		/* Something raced and created an entry - bail out */
+src/fs/ksmbd_reparse.c:542:			"reparse symlink: substitute name overflows buf\n");
+src/fs/ksmbd_reparse.c:603:			"reparse junction: sub name overflows buf\n");
+src/include/protocol/smb2pdu.h:112:/* BB FIXME - analyze following length BB */
+src/transport/transport_ipc.c:333:	if (check_add_overflow(sz, sizeof(struct ksmbd_ipc_msg), &msg_sz))
+src/transport/transport_ipc.c:408:	if (check_mul_overflow(req->deadtime, SMB_ECHO_INTERVAL,
+src/transport/transport_ipc.c:591:		if (check_add_overflow(msg_sz, resp->payload_sz, &msg_sz))
+src/transport/transport_ipc.c:601:		if (check_add_overflow(resp->session_key_len,
+src/transport/transport_ipc.c:604:		if (check_add_overflow(msg_sz, payload_sz, &msg_sz))
+src/transport/transport_ipc.c:618:		if (check_add_overflow(msg_sz, resp->payload_sz, &msg_sz))
+src/transport/transport_ipc.c:630:			if (check_mul_overflow(resp->ngroups,
+src/transport/transport_ipc.c:634:			if (check_add_overflow(msg_sz, groups_sz, &msg_sz))
+src/transport/transport_ipc.c:944:	lockdep_assert_not_held(&sess->rpc_lock);
+src/transport/transport_ipc.c:972:	lockdep_assert_not_held(&sess->rpc_lock);
+src/transport/transport_ipc.c:1003:	lockdep_assert_not_held(&sess->rpc_lock);
+src/fs/ksmbd_notify.c.bak:49:static atomic_t notify_watch_count = ATOMIC_INIT(0);
+src/fs/ksmbd_notify.c.bak:265:		atomic_dec(&work->conn->outstanding_async);
+src/fs/ksmbd_notify.c.bak:407:		atomic_dec(&work->conn->outstanding_async);
+src/fs/ksmbd_notify.c.bak:476:		atomic_dec(&work->conn->outstanding_async);
+src/fs/ksmbd_notify.c.bak:626:		atomic_dec(&notify_watch_count);
+src/fs/ksmbd_notify.c.bak:628:			atomic_dec(&work->conn->notify_watch_count);
+src/fs/ksmbd_notify.c.bak:651:	atomic_dec(&notify_watch_count);
+src/fs/ksmbd_notify.c.bak:653:		atomic_dec(&watch->conn->notify_watch_count);
+src/fs/ksmbd_notify.c.bak:816:	if (atomic_inc_return(&notify_watch_count) >
+src/fs/ksmbd_notify.c.bak:818:		atomic_dec(&notify_watch_count);
+src/fs/ksmbd_notify.c.bak:823:	    atomic_inc_return(&work->conn->notify_watch_count) >
+src/fs/ksmbd_notify.c.bak:825:		atomic_dec(&work->conn->notify_watch_count);
+src/fs/ksmbd_notify.c.bak:826:		atomic_dec(&notify_watch_count);
+src/fs/ksmbd_notify.c.bak:833:			atomic_dec(&work->conn->notify_watch_count);
+src/fs/ksmbd_notify.c.bak:834:		atomic_dec(&notify_watch_count);
+src/fs/ksmbd_notify.c.bak:988:		atomic_dec(&notify_watch_count);
+src/fs/ksmbd_notify.c.bak:990:			atomic_dec(&work->conn->notify_watch_count);
+src/fs/ksmbd_notify.c.bak:994:			atomic_dec(&work->conn->outstanding_async);
+src/fs/ksmbd_notify.c.bak:1099:		atomic_dec(&work->conn->outstanding_async);
+src/fs/ksmbd_notify.c.bak:1156:		atomic_dec(&work->conn->outstanding_async);
+src/fs/ksmbd_notify.c.bak:1222:		atomic_dec(&notify_watch_count);
+src/fs/ksmbd_notify.c.bak:1224:			atomic_dec(&work->conn->notify_watch_count);
+src/fs/ksmbd_notify.c.bak:1258:		 * caller (module unload), preventing use-after-free
+src/include/protocol/smb1pdu.h:143: * Return: 0 on valid, -EINVAL if any region overflows.
+src/include/protocol/smb1pdu.h:159:	/* Integer overflow guards: check individual values first */
+src/fs/vfs.c:24:#include <linux/overflow.h>
+src/fs/vfs.c:68: * escaped the share boundary via a symlink race (TOCTOU).
+src/fs/vfs.c:2622:	if (check_mul_overflow(sizeof(struct xattr_acl_entry),
+src/fs/vfs.c:2624:	    check_add_overflow(sizeof(struct xattr_smb_acl), alloc_size, &alloc_size))
+src/fs/vfs.c:2858:		pr_err("invalid NTSD offset: underflow detected\n");
+src/fs/ksmbd_info.c:8: *   Provides an RCU-protected hash table for dispatching SMB2 QUERY_INFO
+src/fs/ksmbd_info.c:96: * Removes the handler under spinlock and waits for an RCU grace period
+src/fs/ksmbd_info.c:119: * Performs an RCU-protected hash lookup, takes a module reference on the
+src/fs/ksmbd_info.c:756:		/* Nothing found in parent (race?) -- fall back */
+src/fs/ksmbd_create_ctx.c:8: *   Provides an RCU-protected linked list for SMB2 Create Context
+src/fs/ksmbd_create_ctx.c:33: * Adds the handler to the RCU-protected list under spinlock.
+src/fs/ksmbd_create_ctx.c:49: * Removes the handler under spinlock and waits for an RCU grace period.
+src/fs/ksmbd_create_ctx.c:64: * Performs an RCU-protected list lookup and takes a module reference
+src/fs/vfs_cache.c:50:static atomic_long_t fd_limit;
+src/fs/vfs_cache.c:60:	atomic_long_set(&fd_limit, limit);
+src/fs/vfs_cache.c:65:	long v = atomic_long_dec_return(&fd_limit);
+src/fs/vfs_cache.c:69:	atomic_long_inc(&fd_limit);
+src/fs/vfs_cache.c:75:	atomic_long_inc(&fd_limit);
+src/fs/vfs_cache.c:100:			if (atomic_inc_not_zero(&ci->m_count))
+src/fs/vfs_cache.c:251:	atomic_set(&ci->m_count, 1);
+src/fs/vfs_cache.c:252:	atomic_set(&ci->op_count, 0);
+src/fs/vfs_cache.c:253:	atomic_set(&ci->sop_count, 0);
+src/fs/vfs_cache.c:309:	if (atomic_dec_and_test(&ci->m_count))
+src/fs/vfs_cache.c:402:	if (!atomic_dec_and_test(&ci->m_count)) {
+src/fs/vfs_cache.c:575:	if (!refcount_inc_not_zero(&fp->refcount))
+src/fs/vfs_cache.c:599:	atomic_dec(&work->conn->stats.open_files_count);
+src/fs/vfs_cache.c:646:			if (!refcount_dec_and_test(&fp->refcount))
+src/fs/vfs_cache.c:659:	 * hold the final refcount and f_state is FP_CLOSED, preventing
+src/fs/vfs_cache.c:672:	if (!refcount_dec_and_test(&fp->refcount))
+src/fs/vfs_cache.c:748:	if (!refcount_dec_and_test(&fp->refcount))
+src/fs/vfs_cache.c:944:	refcount_set(&fp->refcount, 1);
+src/fs/vfs_cache.c:967:	atomic_inc(&work->conn->stats.open_files_count);
+src/fs/vfs_cache.c:1005:		    !refcount_dec_and_test(&fp->refcount)) {
+src/fs/vfs_cache.c:1124:				if (!refcount_inc_not_zero(&fp->refcount))
+src/fs/vfs_cache.c:1127:				if (refcount_read(&fp->refcount) != 2) {
+src/fs/vfs_cache.c:1133:					refcount_dec(&fp->refcount);
+src/fs/vfs_cache.c:1154:				if (!refcount_dec_and_test(&fp->refcount))
+src/fs/vfs_cache.c:1295:	atomic_sub(num, &work->conn->stats.open_files_count);
+src/fs/vfs_cache.c:1304:	atomic_sub(num, &work->conn->stats.open_files_count);
+src/fs/vfs_cache.c:1403:		refcount_inc(&op->conn->refcnt);
+src/include/protocol/smbstatus.h:440:#define STATUS_VIRTUAL_CIRCUIT_CLOSED cpu_to_le32(0xC00000D6)
+src/fs/smbacl.c:11:#include <linux/overflow.h>
+src/fs/smbacl.c:200: * Return:	size of the ACE in bytes, or 0 on overflow
+src/fs/smbacl.c:206:	if (check_add_overflow(1u + 1u + 2u + 4u + 1u + 1u + 6u,
+src/fs/smbacl.c:302: *   - Bounds checking rejects RIDs that would overflow uid_t after
+src/fs/smbacl.c:458: *   - Rejects if the resulting UID would overflow uid_t
+src/fs/smbacl.c:508:	/* Bounds check: reject if RID + offset would overflow uid_t */
+src/fs/smbacl.c:510:		pr_err("SID RID %u + domain offset %u would overflow uid_t\n",
+src/fs/smbacl.c:1025:		    check_add_overflow((unsigned int)*size,
+src/fs/smbacl.c:1030:			pr_err_ratelimited("ACL buffer overflow in posix ACE\n");
+src/fs/smbacl.c:1047:			    check_add_overflow((unsigned int)*size,
+src/fs/smbacl.c:1052:				pr_err_ratelimited("ACL buffer overflow in posix dir ACE\n");
+src/fs/smbacl.c:1110:		    check_add_overflow((unsigned int)*size,
+src/fs/smbacl.c:1115:			pr_err_ratelimited("ACL buffer overflow in default ACE\n");
+src/fs/smbacl.c:1167:			if (check_add_overflow((unsigned int)size,
+src/fs/smbacl.c:1171:				pr_err_ratelimited("ACL buffer overflow copying NT ACEs\n");
+src/fs/smbacl.c:1250:	    check_add_overflow((unsigned int)ace_size, 4u,
+src/fs/smbacl.c:1252:	    check_add_overflow((unsigned int)size, new_off,
+src/fs/smbacl.c:1255:		pr_err_ratelimited("ACL buffer overflow: owner ACE\n");
+src/fs/smbacl.c:1271:	    check_add_overflow((unsigned int)ace_size, 4u,
+src/fs/smbacl.c:1273:	    check_add_overflow((unsigned int)size, new_off,
+src/fs/smbacl.c:1276:		pr_err_ratelimited("ACL buffer overflow: group ACE\n");
+src/fs/smbacl.c:1298:		    check_add_overflow((unsigned int)size,
+src/fs/smbacl.c:1302:			pr_err_ratelimited("ACL buffer overflow: creator owner\n");
+src/fs/smbacl.c:1313:		    check_add_overflow((unsigned int)size,
+src/fs/smbacl.c:1317:			pr_err_ratelimited("ACL buffer overflow: creator group\n");
+src/fs/smbacl.c:1330:	    check_add_overflow((unsigned int)size,
+src/fs/smbacl.c:1333:		pr_err_ratelimited("ACL buffer overflow: everyone ACE\n");
+src/fs/smbacl.c:1392:	 * before computing pointers.  Use check_add_overflow() to
+src/fs/smbacl.c:1403:		    (check_add_overflow(osidoff,
+src/fs/smbacl.c:1410:		    (check_add_overflow(gsidoff,
+src/fs/smbacl.c:1417:		    (check_add_overflow(dacloffset,
+src/fs/smbacl.c:1615:		if (check_add_overflow(offset, sid_size, &new_off) ||
+src/fs/smbacl.c:1617:			pr_err_ratelimited("SD buffer overflow: owner SID\n");
+src/fs/smbacl.c:1631:		if (check_add_overflow(offset, sid_size, &new_off) ||
+src/fs/smbacl.c:1633:			pr_err_ratelimited("SD buffer overflow: group SID\n");
+src/fs/smbacl.c:1666:				    !check_add_overflow(offset, pp_sacl_size,
+src/fs/smbacl.c:1685:		if (check_add_overflow(offset,
+src/fs/smbacl.c:1689:			pr_err_ratelimited("SD buffer overflow: SACL hdr\n");
+src/fs/smbacl.c:1721:		if (check_add_overflow(offset,
+src/fs/smbacl.c:1725:			pr_err_ratelimited("SD buffer overflow: DACL hdr\n");
+src/fs/smbacl.c:1848:	    check_add_overflow(dacloffset, sizeof(struct smb_acl), &dacl_struct_end) ||
+src/fs/smbacl.c:1928:				pr_err_ratelimited("inherit ACL overflow\n");
+src/fs/smbacl.c:1950:				pr_err_ratelimited("inherit ACL overflow\n");
+src/fs/smbacl.c:2121:	    check_add_overflow(dacl_offset, sizeof(struct smb_acl), &dacl_struct_end) ||
+src/encoding/asn1.c:60:		/* Check for overflow before shifting left by 7 */
+src/encoding/asn1.c:212:	/* Validate ntlm_blob_len early to prevent integer overflow in
+src/fs/oplock.c:66:	refcount_set(&opinfo->refcount, 1);
+src/fs/oplock.c:67:	atomic_set(&opinfo->breaking_cnt, 0);
+src/fs/oplock.c:69:	 * Use refcount_inc_not_zero() to guard against a race where the
+src/fs/oplock.c:71:	 * reached 0.  An unconditional refcount_inc() on a freed object
+src/fs/oplock.c:72:	 * would saturate the refcount and corrupt connection state.
+src/fs/oplock.c:74:	if (!refcount_inc_not_zero(&opinfo->conn->refcnt)) {
+src/fs/oplock.c:166:	if (opinfo && !refcount_inc_not_zero(&opinfo->refcount))
+src/fs/oplock.c:182:		    !refcount_inc_not_zero(&opinfo->refcount))
+src/fs/oplock.c:186:				refcount_dec(&opinfo->refcount);
+src/fs/oplock.c:201:	if (!refcount_dec_and_test(&opinfo->refcount))
+src/fs/oplock.c:231:		return atomic_read(&fp->f_ci->sop_count);
+src/fs/oplock.c:233:		return atomic_read(&fp->f_ci->op_count);
+src/fs/oplock.c:239:		return atomic_inc(&fp->f_ci->sop_count);
+src/fs/oplock.c:241:		return atomic_inc(&fp->f_ci->op_count);
+src/fs/oplock.c:247:		return atomic_dec(&fp->f_ci->sop_count);
+src/fs/oplock.c:249:		return atomic_dec(&fp->f_ci->op_count);
+src/fs/oplock.c:517:			atomic_set(&opinfo->breaking_cnt, 0);
+src/fs/oplock.c:681:			if (atomic_read(&opinfo->breaking_cnt))
+src/fs/oplock.c:685:			if ((atomic_read(&ci->op_count) +
+src/fs/oplock.c:686:			     atomic_read(&ci->sop_count)) == 1) {
+src/fs/oplock.c:696:			} else if ((atomic_read(&ci->op_count) +
+src/fs/oplock.c:697:				    atomic_read(&ci->sop_count)) > 1) {
+src/fs/oplock.c:1159:	if (atomic_read(&opinfo->breaking_cnt)) {
+src/fs/oplock.c:1169:					 atomic_read(&opinfo->breaking_cnt) == 0,
+src/fs/oplock.c:1172:			atomic_set(&opinfo->breaking_cnt, 0);
+src/fs/oplock.c:1191:		atomic_inc(&brk_opinfo->breaking_cnt);
+src/fs/oplock.c:1194:			atomic_dec(&brk_opinfo->breaking_cnt);
+src/fs/oplock.c:1253:			atomic_dec(&brk_opinfo->breaking_cnt);
+src/fs/oplock.c:1347:		if (!refcount_inc_not_zero(&opinfo->refcount))
+src/fs/oplock.c:1466:			if (!refcount_inc_not_zero(&opinfo->refcount))
+src/fs/oplock.c:1539:		if (!refcount_inc_not_zero(&opinfo->refcount))
+src/fs/oplock.c:1620:		if (!refcount_inc_not_zero(&opinfo->refcount))
+src/fs/oplock.c:1691:		if (!refcount_inc_not_zero(&opinfo->refcount))
+src/fs/oplock.c:1779:			if (atomic_read(&m_opinfo->breaking_cnt))
+src/fs/oplock.c:1920:	 * refcount_t underflow ("decrement hit 0; leaking memory")
+src/fs/oplock.c:1982:	 * the lock before sending break notifications to avoid deadlock.
+src/fs/oplock.c:1983:	 * Each collected entry holds a reference from refcount_inc_not_zero.
+src/fs/oplock.c:1991:		if (!refcount_inc_not_zero(&brk_op->refcount))
+src/fs/oplock.c:2022:			    atomic_read(&brk_op->breaking_cnt))
+src/fs/oplock.c:2052:		    atomic_read(&brk_op->breaking_cnt))
+src/fs/oplock.c:2135:		if (!refcount_inc_not_zero(&brk_op->refcount))
+src/fs/oplock.c:2646:		if (!refcount_inc_not_zero(&opinfo->refcount))
+src/protocol/smb2/smb2_create.c:189:	    check_add_overflow(dacl_offset, sizeof(struct smb_acl),
+src/protocol/smb2/smb2_create.c:891: * TODO: write state to /tmp/ksmbd_ph/<guid> using filp_open + kernel_write.
+src/protocol/smb2/smb2_create.c:895:	/* TODO: persistent handle state — save to /tmp/ksmbd_ph/<guid> */
+src/protocol/smb2/smb2_create.c:906: * TODO: read state from /tmp/ksmbd_ph/<guid> using kern_path + kernel_read.
+src/protocol/smb2/smb2_create.c:912:	/* TODO: persistent handle restore — read from /tmp/ksmbd_ph/<guid> */
+src/protocol/smb2/smb2_create.c:924: * TODO: delete /tmp/ksmbd_ph/<guid> using kern_path + vfs_unlink.
+src/protocol/smb2/smb2_create.c:928:	/* TODO: persistent handle delete — remove /tmp/ksmbd_ph/<guid> */
+src/protocol/smb2/smb2_create.c:2434:		    (atomic_read(&fp->f_ci->op_count) > 0 ||
+src/protocol/smb2/smb2_create.c:2435:		     atomic_read(&fp->f_ci->sop_count) > 0)) {
+src/encoding/unicode.c:214:	 * not to overflow the destination buffer when we get close to the
+src/encoding/unicode.c:216:	 * for overflow however.
+src/encoding/unicode.c:298:		 * units to prevent destination buffer overflow.
+src/encoding/unicode.c:457:		 * FIXME: We can not handle remapping backslash (UNI_SLASH)
+src/fs/ksmbd_branchcache.c:18:#include <linux/overflow.h>
+src/fs/ksmbd_branchcache.c:45: * TODO: Implement periodic secret rotation (e.g. via a timer or
+src/fs/ksmbd_branchcache.c:545:		if (check_mul_overflow((size_t)num_segments,
+src/encoding/ndr.c:34:	if (check_add_overflow((size_t)n->offset, sz, &needed) ||
+src/encoding/ndr.c:35:	    check_add_overflow(needed, (size_t)1024, &new_sz))
+src/fs/ksmbd_app_instance.c:98:	 * performs its own idr_find() under ft->lock and gracefully
+src/protocol/smb2/smb2_session.c:871:			/* TODO: need one more negotiation */
+src/fs/ksmbd_quota.c:20:#include <linux/overflow.h>
+src/fs/ksmbd_quota.c:363:		if (check_add_overflow(start_sid_off, start_sid_len,
+src/protocol/smb2/smb2_misc_cmds.c:444:	if (!atomic_read(&opinfo->breaking_cnt)) {
+src/protocol/smb2/smb2_misc_cmds.c:547:	atomic_dec(&opinfo->breaking_cnt);
+src/protocol/smb2/smb2_read_write.c:120:		atomic_dec(&work->conn->outstanding_async);
+src/protocol/smb2/smb2_read_write.c:475:	 * overflow the maximum addressable file offset.  A read at
+src/protocol/smb2/smb2_read_write.c:854:	/* Reject writes where offset + length would overflow MAX_LFS_FILESIZE */
+src/protocol/smb2/smb2_read_write.c:1028:			pr_err_ratelimited("write data overflow: off=%u len=%zu buf=%u\n",
+src/protocol/smb2/smb2_negotiate.c:19:#include <linux/overflow.h>
+src/protocol/smb2/smb2_negotiate.c:342:	if (check_mul_overflow((size_t)cph_cnt, sizeof(__le16), &cphs_size)) {
+src/protocol/smb2/smb2_negotiate.c:343:		pr_err_ratelimited("Cipher count overflow(%d)\n", cph_cnt);
+src/protocol/smb2/smb2_negotiate.c:433:	if (check_mul_overflow((size_t)algo_cnt, sizeof(__le16), &algos_size)) {
+src/protocol/smb2/smb2_negotiate.c:434:		pr_err("Compression algorithm count overflow(%d)\n", algo_cnt);
+src/protocol/smb2/smb2_negotiate.c:493:	if (check_mul_overflow((int)sign_algo_cnt, (int)sizeof(__le16), &sign_alos_size))
+src/protocol/smb2/smb2_negotiate.c:564:	if (check_mul_overflow((int)xform_cnt, (int)sizeof(__le16), &xforms_size))
+src/protocol/smb2/smb2_pdu_common.c:416:		pr_err_ratelimited("Total credits overflow: %d\n", conn->total_credits);
+src/protocol/smb2/smb2_pdu_common.c:438:		pr_err_ratelimited("Outstanding credits underflow: charge %u, outstanding %u\n",
+src/protocol/smb2/smb2_pdu_common.c:450:	 * TODO: Need to adjuct CreditRequest value according to
+src/protocol/smb2/smb2_pdu_common.c:852:		 * avoid refcount leaks.
+src/protocol/smb2/smb2_pdu_common.c:920:	    atomic_inc_return(&conn->outstanding_async) >= max_async) {
+src/protocol/smb2/smb2_pdu_common.c:921:		atomic_dec(&conn->outstanding_async);
+src/protocol/smb2/smb2_pdu_common.c:929:			atomic_dec(&conn->outstanding_async);
+src/protocol/smb2/smb2_pdu_common.c:968:			atomic_dec(&conn->outstanding_async);
+src/protocol/smb2/smb2_notify.c:314:	 * To prevent the use-after-free, we move the dequeue
+src/protocol/smb1/smb1pdu.c:516:	WARN_ON_ONCE(refcount_dec_and_test(&tcon->refcount));
+src/protocol/smb1/smb1pdu.c:609:				WARN_ON_ONCE(refcount_dec_and_test(&old_tcon->refcount));
+src/protocol/smb1/smb1pdu.c:4092:		/* BB add check to make sure ACL does not overflow SMB */
+src/protocol/smb1/smb1pdu.c:10010: * STATUS_NOT_SUPPORTED so clients (Windows Explorer, net.exe) can gracefully
+src/include/core/auth.h:50:/* TODO: callers must be updated to pass the output buffer size as max_blob_sz */
+src/protocol/smb1/smb1misc.c:27: * TODO: properly check client authetication and tree authentication
+src/protocol/smb1/smb1misc.c:42:	/* TODO : check for oplock break */
+src/protocol/smb2/smb2_query_set.c:16:#include <linux/overflow.h>
+src/protocol/smb2/smb2_query_set.c:137:	lockdep_assert_not_held(&sess->rpc_lock);
+src/protocol/smb2/smb2_query_set.c:527:	/* Clamp to PATH_MAX bytes to prevent response buffer overflow */
+src/protocol/smb2/smb2_query_set.c:1728:		 * TODO : The current implementation is based on
+src/protocol/smb2/smb2_query_set.c:2695:	 * TODO : It's working fine only when store dos attributes
+src/protocol/smb2/smb2_query_set.c:2721:		if (check_add_overflow(alloc_sz, (u64)511, &alloc_rounded)) {
+src/protocol/smb2/smb2_query_set.c:3218:	 * TODO : need to implement consideration for
+src/protocol/smb2/smb2_query_set.c:3482:		/* Guard against underflow in compound requests */
+src/protocol/smb2/smb2misc.c:551:			pr_err_ratelimited("Outstanding credit overflow, total %u outstanding %u\n",
+src/include/core/nterr.h:251:#define NT_STATUS_VIRTUAL_CIRCUIT_CLOSED (0xC0000000 | 0x00d6)
+src/core/smb2_compress.c:29:#include <linux/overflow.h>
+src/core/smb2_compress.c:1677:	if (check_add_overflow(
+src/core/smb2_compress.c:1680:		pr_err("Compression offset overflow: sizeof(hdr) + %u\n",
+src/include/core/ksmbd_hooks.h:89: * @owner:    Module that owns this handler (for refcounting)
+src/include/core/ksmbd_hooks.h:158: * The hook list is protected by RCU; readers (hook dispatch) do not
+src/include/core/ksmbd_hooks.h:170: * Removes the handler from the hook chain and waits for an RCU grace
+src/include/core/connection.h:17:#include <linux/refcount.h>
+src/include/core/connection.h:43:	atomic_t			open_files_count;
+src/include/core/connection.h:74:	atomic_t			req_running;
+src/include/core/connection.h:76:	atomic_t			r_count;
+src/include/core/connection.h:129:	refcount_t			refcnt;
+src/include/core/connection.h:133:	atomic_t			notify_watch_count;
+src/include/core/connection.h:136:	atomic_t			outstanding_async;
+src/include/core/connection.h:200:extern atomic_t conn_hash_count;
+src/core/ksmbd_hooks.c:9: *   operations.  Hook lists are RCU-protected so that the dispatch
+src/core/ksmbd_hooks.c:62: * was enabled.  Waits for an RCU grace period to ensure no readers
+src/core/ksmbd_hooks.c:84:	/* Wait for any in-flight RCU readers to finish */
+src/core/ksmbd_hooks.c:94: * priority (ascending: lower value = called first).  RCU is used to
+src/core/ksmbd_hooks.c:147: * Removes the handler from the RCU-protected list and waits for an
+src/core/ksmbd_hooks.c:148: * RCU grace period before returning, so the caller can safely free
+src/core/ksmbd_hooks.c:173:	/* Ensure no in-flight RCU readers reference this handler */
+src/core/ksmbd_hooks.c:183: * Walks the priority-sorted hook chain under RCU read-side protection.
+src/protocol/common/netmisc.c:263:	ERRDOS, 240, NT_STATUS_VIRTUAL_CIRCUIT_CLOSED}, {
+src/mgmt/user_session.h:10:#include <linux/refcount.h>
+src/mgmt/user_session.h:78:	refcount_t			refcnt;
+src/mgmt/ksmbd_witness.c:38:static atomic_t witness_reg_count = ATOMIC_INIT(0);
+src/mgmt/ksmbd_witness.c:149: * cannot accidentally dereference a stale, unrefcounted pointer.
+src/mgmt/ksmbd_witness.c:213:	if (atomic_inc_return(&witness_reg_count) > KSMBD_MAX_WITNESS_REGISTRATIONS) {
+src/mgmt/ksmbd_witness.c:214:		atomic_dec(&witness_reg_count);
+src/mgmt/ksmbd_witness.c:220:		atomic_dec(&witness_reg_count);
+src/mgmt/ksmbd_witness.c:227:		atomic_dec(&witness_reg_count);
+src/mgmt/ksmbd_witness.c:247:			 * EEXIST means a concurrent add raced with us.
+src/mgmt/ksmbd_witness.c:253:				atomic_dec(&witness_reg_count);
+src/mgmt/ksmbd_witness.c:262:				atomic_dec(&witness_reg_count);
+src/mgmt/ksmbd_witness.c:333:	atomic_dec(&witness_reg_count);
+src/mgmt/ksmbd_witness.c:386:		atomic_dec(&witness_reg_count);
+src/mgmt/tree_connect.c:83:	 * closes a TOCTOU race where a concurrent session logoff could find
+src/mgmt/tree_connect.c:85:	 * pointer, causing a use-after-free.
+src/mgmt/tree_connect.c:88:	refcount_set(&tree_conn->refcount, 2);
+src/mgmt/tree_connect.c:110:	if (refcount_dec_and_test(&tcon->refcount)) {
+src/mgmt/tree_connect.c:141:		else if (!refcount_inc_not_zero(&tcon->refcount))
+src/mgmt/share_config.c:59: * kill_share_rcu() - RCU callback to free a share config
+src/mgmt/share_config.c:62: * Called after an RCU grace period to safely free a share
+src/mgmt/share_config.c:90:	if (!refcount_inc_not_zero(&share->refcount))
+src/mgmt/share_config.c:212:	refcount_set(&share->refcount, 1);
+src/mgmt/share_config.c:322: * Uses RCU for lock-free read-side lookup of share configs.
+src/mgmt/share_config.c:325: * Return: share config with incremented refcount, or NULL
+src/mgmt/tree_connect.h:10:#include <linux/refcount.h>
+src/mgmt/tree_connect.h:36:	refcount_t			refcount;
+src/mgmt/share_config.h:12:#include <linux/refcount.h>
+src/mgmt/share_config.h:28:	refcount_t		refcount;
+src/mgmt/share_config.h:72:	if (!refcount_dec_and_test(&share->refcount))
+src/mgmt/user_session.c:158:	lockdep_assert_held(&sess->rpc_lock);
+src/mgmt/user_session.c:193:	lockdep_assert(rcu_read_lock_held());
+src/mgmt/user_session.c:232:			if (refcount_read(&sess->refcnt) <= 1 &&
+src/mgmt/user_session.c:309:				if (refcount_dec_and_test(&sess->refcnt))
+src/mgmt/user_session.c:336:			if (refcount_dec_and_test(&sess->refcnt))
+src/mgmt/user_session.c:388: * Uses RCU for lock-free read-side lookup of sessions in the
+src/mgmt/user_session.c:392: * Return: session with incremented refcount, or NULL
+src/mgmt/user_session.c:401:		if (!refcount_inc_not_zero(&sess->refcnt))
+src/mgmt/user_session.c:434:	refcount_inc(&sess->refcnt);
+src/mgmt/user_session.c:442:	if (refcount_read(&sess->refcnt) <= 0) {
+src/mgmt/user_session.c:446:	if (refcount_dec_and_test(&sess->refcnt))
+src/mgmt/user_session.c:483:	if (prev_sess && !refcount_inc_not_zero(&prev_sess->refcnt))
+src/mgmt/user_session.c:571:	lockdep_assert_held(&conn->session_lock);
+src/mgmt/user_session.c:651:	refcount_set(&sess->refcnt, 2);
+src/core/ksmbd_debugfs.c:92:				atomic_read(&conn->req_running);
+src/protocol/smb2/smb2_lock.c:989:	if (atomic_read(&fp->f_ci->op_count) > 1)
+src/include/fs/vfs_cache.h:14:#include <linux/refcount.h>
+src/include/fs/vfs_cache.h:55:	atomic_t			m_count;
+src/include/fs/vfs_cache.h:56:	atomic_t			op_count;
+src/include/fs/vfs_cache.h:58:	atomic_t			sop_count;
+src/include/fs/vfs_cache.h:94:	refcount_t			refcount;
+src/include/fs/oplock.h:10:#include <linux/refcount.h>
+src/include/fs/oplock.h:87:	atomic_t		breaking_cnt;
+src/include/fs/oplock.h:88:	refcount_t		refcount;
+src/protocol/common/smb_common.c:583: * TODO: Though this function conforms the restriction of 8.3 Filename spec,
+src/include/fs/ksmbd_info.h:8: *   Provides an RCU-protected hash table for SMB2 QUERY_INFO and SET_INFO
+src/include/fs/ksmbd_info.h:43: * @rcu:        RCU callback head for safe removal
+src/include/fs/ksmbd_info.h:46: * (info_type, info_class, op) into an RCU-protected hash table.
+src/include/fs/ksmbd_info.h:68: * Adds the handler to the RCU-protected dispatch table.
+src/include/fs/ksmbd_info.h:79: * Removes the handler and waits for an RCU grace period so that
+src/include/fs/ksmbd_fsctl.h:26: * @rcu:	RCU callback head for safe removal
+src/include/fs/ksmbd_fsctl.h:28: * Each registered handler is hashed by ctl_code into an RCU-protected
+src/include/fs/ksmbd_fsctl.h:52: * Adds the handler to the RCU-protected dispatch table.
+src/include/fs/ksmbd_fsctl.h:62: * Removes the handler and waits for an RCU grace period so that
+src/include/fs/ksmbd_create_ctx.h:32: * @rcu:	RCU callback for safe removal
+src/include/fs/ksmbd_create_ctx.h:34: * Each registered handler is stored in an RCU-protected linked list
+src/include/fs/ksmbd_create_ctx.h:60: * Adds the handler to the RCU-protected dispatch list.
+src/include/fs/ksmbd_create_ctx.h:70: * Removes the handler and waits for an RCU grace period so that
+src/include/fs/ksmbd_create_ctx.h:80: * Performs an RCU-protected list lookup and takes a module reference

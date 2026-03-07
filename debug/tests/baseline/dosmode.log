@@ -1,0 +1,11 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772499194
+time: 2026-03-03 00:53:14.701023
+test: dosmode
+time: 2026-03-03 00:53:14.702844
+Checking dosmode with "hide files" and "hide dot files"
+time: 2026-03-03 00:53:15.350101
+failure: dosmode [
+../../source4/torture/smb2/dosmode.c:121: finfo2.all_info2.out.attrib & FILE_ATTRIBUTE_HIDDEN was 0 (0x0), expected 2 (0x2): FILE_ATTRIBUTE_HIDDEN is not set
+]

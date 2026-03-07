@@ -1,0 +1,2105 @@
+Log of Meson test suite run on 2026-03-07T02:57:22.113661
+
+Inherited environment: ARCHFLAGS='-arch x86_64' CODEX_CI=1 CODEX_MANAGED_BY_NPM=1 CODEX_THREAD_ID=019cc597-efd9-70d3-acb4-966c0cedece5 COLORTERM='' DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus DEBUGINFOD_URLS='https://debuginfod.archlinux.org ' EDITOR=vim GH_PAGER=cat GIT_PAGER=cat HOME=/home/ezechiel203 LANG=fr_FR.UTF-8 LC_ALL=C.UTF-8 LC_CTYPE=C.UTF-8 LESS=-R LOGNAME=ezechiel203 LSCOLORS=Gxfxcxdxbxegedabagacad LS_COLORS='rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=00:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.7z=01;31:*.ace=01;31:*.alz=01;31:*.apk=01;31:*.arc=01;31:*.arj=01;31:*.bz=01;31:*.bz2=01;31:*.cab=01;31:*.cpio=01;31:*.crate=01;31:*.deb=01;31:*.drpm=01;31:*.dwm=01;31:*.dz=01;31:*.ear=01;31:*.egg=01;31:*.esd=01;31:*.gz=01;31:*.jar=01;31:*.lha=01;31:*.lrz=01;31:*.lz=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.lzo=01;31:*.pyz=01;31:*.rar=01;31:*.rpm=01;31:*.rz=01;31:*.sar=01;31:*.swm=01;31:*.t7z=01;31:*.tar=01;31:*.taz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tgz=01;31:*.tlz=01;31:*.txz=01;31:*.tz=01;31:*.tzo=01;31:*.tzst=01;31:*.udeb=01;31:*.war=01;31:*.whl=01;31:*.wim=01;31:*.xz=01;31:*.z=01;31:*.zip=01;31:*.zoo=01;31:*.zst=01;31:*.avif=01;35:*.jpg=01;35:*.jpeg=01;35:*.jxl=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:*~=00;90:*#=00;90:*.bak=00;90:*.crdownload=00;90:*.dpkg-dist=00;90:*.dpkg-new=00;90:*.dpkg-old=00;90:*.dpkg-tmp=00;90:*.old=00;90:*.orig=00;90:*.part=00;90:*.rej=00;90:*.rpmnew=00;90:*.rpmorig=00;90:*.rpmsave=00;90:*.swp=00;90:*.tmp=00;90:*.ucf-dist=00;90:*.ucf-new=00;90:*.ucf-old=00;90:' MAIL=/var/spool/mail/ezechiel203 MOTD_SHOWN=pam NO_COLOR=1 OLDPWD=/home/ezechiel203/ksmbd P9K_SSH=1 P9K_TTY=old PAGER=less PATH=/home/ezechiel203/.codex/tmp/arg0/codex-arg03maros:/usr/lib/node_modules/@openai/codex/node_modules/@openai/codex-linux-x64/vendor/x86_64-unknown-linux-musl/path:/home/ezechiel203/bin:/home/ezechiel203/.local/bin:/usr/local/bin:/opt:/home/ezechiel203/bin:/home/ezechiel203/.local/bin:/usr/local/bin:/opt:/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl PWD=/home/ezechiel203/ksmbd/ksmbd-tools SHELL=/usr/bin/zsh SHLVL=2 SSH_CLIENT='212.114.22.162 61123 2403' SSH_CONNECTION='212.114.22.162 61123 95.217.38.213 2403' SSH_TTY=/dev/pts/33 TERM=xterm-256color USER=ezechiel203 XDG_RUNTIME_DIR=/run/user/1000 XDG_SESSION_CLASS=user XDG_SESSION_ID=43 XDG_SESSION_TYPE=tty ZELLIJ=0 ZELLIJ_PANE_ID=8 ZELLIJ_SESSION_NAME=undulating-crab ZSH=/home/ezechiel203/.oh-my-zsh _=/usr/bin/meson _P9K_SSH_TTY='' _P9K_TTY=/dev/pts/29 
+
+==================================== 1/25 ====================================
+test:         ksmbd-tools:host-acl
+start time:   01:57:22
+duration:     0.18s
+result:       exit status 0
+command:      MSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 MALLOC_PERTURB_=103 MESON_TEST_ITERATION=1 ASAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1 UBSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 /home/ezechiel203/ksmbd/ksmbd-tools/build-codex/tests/test_host_acl
+----------------------------------- stdout -----------------------------------
+=== Host ACL Tests ===
+
+-- Exact IPv4 matching --
+  PASS: match_host_cidr("192.168.1.1", "192.168.1.1") == 1
+  PASS: match_host_cidr("192.168.1.1", "192.168.1.2") == 0
+
+-- CIDR /24 subnet --
+  PASS: match_host_cidr("192.168.1.0/24", "192.168.1.100") == 1
+  PASS: match_host_cidr("192.168.1.0/24", "192.168.2.1") == 0
+
+-- CIDR /32 (single host) --
+  PASS: match_host_cidr("10.0.0.1/32", "10.0.0.1") == 1
+  PASS: match_host_cidr("10.0.0.1/32", "10.0.0.2") == 0
+
+-- CIDR /0 (match all) --
+  PASS: match_host_cidr("0.0.0.0/0", "1.2.3.4") == 1
+
+-- Hostname matching --
+  PASS: match_host_cidr("server1", "server1") == 1
+  PASS: match_host_cidr("server1", "server2") == 0
+
+-- IPv6 CIDR matching --
+  PASS: match_host_cidr("fd00::/16", "fd00::1") == 1
+  PASS: match_host_cidr("fd00::/16", "fe80::1") == 0
+
+-- Invalid CIDR fallback --
+  PASS: match_host_cidr("invalid/24", "invalid/24") == 1
+
+12/12 tests passed
+==============================================================================
+
+==================================== 2/25 ====================================
+test:         ksmbd-tools:config-parser
+start time:   01:57:22
+duration:     0.16s
+result:       exit status 0
+command:      MSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 MESON_TEST_ITERATION=1 ASAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1 MALLOC_PERTURB_=255 UBSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 /home/ezechiel203/ksmbd/ksmbd-tools/build-codex/tests/test_config_parser
+----------------------------------- stdout -----------------------------------
+=== Config Parser Tests ===
+
+--- Boolean Parsing ---
+  TEST: test_bool_yes_values ... PASS
+  TEST: test_bool_no_values ... PASS
+
+--- Config Option Parsing ---
+  TEST: test_config_opt_values ... PASS
+
+--- Memparse ---
+  TEST: test_memparse_units ... PASS
+
+--- Long Parsing ---
+  TEST: test_get_long ... PASS
+  TEST: test_get_long_base ... PASS
+
+--- Default Values ---
+  TEST: test_default_values ... PASS
+
+--- Encryption Flags ---
+  TEST: test_encryption_mandatory ... PASS
+  TEST: test_encryption_disabled ... PASS
+  TEST: test_encryption_enabled ... PASS
+
+--- Multichannel ---
+  TEST: test_multichannel_enabled ... PASS
+  TEST: test_multichannel_disabled ... PASS
+
+--- Durable Handle ---
+  TEST: test_durable_handle_enabled ... PASS
+  TEST: test_durable_handle_disabled ... PASS
+
+--- Fruit Extensions ---
+  TEST: test_fruit_extensions_disabled ... PASS
+  TEST: test_fruit_zero_file_id_disabled ... PASS
+  TEST: test_fruit_nfs_aces_enabled ... PASS
+  TEST: test_fruit_copyfile_enabled ... PASS
+
+--- Max Connections Range ---
+  TEST: test_max_connections_clamped ... PASS
+  TEST: test_max_connections_zero_clamped ... PASS
+  TEST: test_max_connections_valid ... PASS
+
+--- Max Worker Threads Range ---
+  TEST: test_max_worker_threads_clamped_high ... PASS
+  TEST: test_max_worker_threads_clamped_low ... PASS
+  TEST: test_max_worker_threads_valid ... PASS
+
+--- Protocol Version Parsing ---
+  TEST: test_protocol_min_version ... PASS
+  TEST: test_protocol_max_version ... PASS
+  TEST: test_protocol_both_versions ... PASS
+
+--- TCP Port ---
+  TEST: test_tcp_port_custom ... PASS
+
+--- Deadtime ---
+  TEST: test_deadtime ... PASS
+
+--- SMB2 Leases ---
+  TEST: test_smb2_leases_enabled ... PASS
+  TEST: test_smb2_leases_disabled ... PASS
+
+--- Server Signing ---
+  TEST: test_server_signing_mandatory ... PASS
+
+--- Combined Flags ---
+  TEST: test_multiple_flags ... PASS
+
+=== Results: 33/33 tests passed ===
+==============================================================================
+
+==================================== 3/25 ====================================
+test:         ksmbd-tools:share-config-payload
+start time:   01:57:22
+duration:     0.10s
+result:       exit status 0
+command:      MSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 MESON_TEST_ITERATION=1 ASAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1 MALLOC_PERTURB_=48 UBSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 /home/ezechiel203/ksmbd/ksmbd-tools/build-codex/tests/test_share_config_payload
+----------------------------------- stdout -----------------------------------
+=== Share Config Payload Tests ===
+
+  TEST: test_payload_size_no_veto_no_root ... PASS
+  TEST: test_payload_size_with_root_and_veto ... PASS
+  TEST: test_payload_size_pipe_share_zero ... PASS
+  TEST: test_payload_size_invalid_path ... PASS
+  TEST: test_serialize_no_veto ... PASS
+  TEST: test_serialize_with_veto_and_root ... PASS
+  TEST: test_serialize_insufficient_payload ... PASS
+  TEST: test_serialize_pipe_share ... PASS
+
+=== Results: 8/8 tests passed ===
+==============================================================================
+
+==================================== 4/25 ====================================
+test:         ksmbd-tools:ipc-request-validation
+start time:   01:57:22
+duration:     0.04s
+result:       exit status 0
+command:      MSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 MALLOC_PERTURB_=196 MESON_TEST_ITERATION=1 ASAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1 UBSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 /home/ezechiel203/ksmbd/ksmbd-tools/build-codex/tests/test_ipc_request_validation
+----------------------------------- stdout -----------------------------------
+=== IPC Request Validation Tests ===
+
+  TEST: test_login_rejects_unterminated_account ... [ksmbd.tools/3370705]: ERROR: Invalid login request: account is not NUL-terminated
+PASS
+  TEST: test_login_ext_rejects_unterminated_account ... [ksmbd.tools/3370705]: ERROR: Invalid login ext request: account is not NUL-terminated
+PASS
+  TEST: test_logout_rejects_unterminated_account ... [ksmbd.tools/3370705]: ERROR: Invalid logout request: account is not NUL-terminated
+PASS
+  TEST: test_tree_connect_rejects_unterminated_strings ... [ksmbd.tools/3370705]: ERROR: treecon: malformed request with unterminated string
+PASS
+
+=== Results: 4/4 tests passed ===
+==============================================================================
+
+==================================== 5/25 ====================================
+test:         ksmbd-tools:md4-kat
+start time:   01:57:22
+duration:     0.02s
+result:       exit status 0
+command:      MSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 MESON_TEST_ITERATION=1 ASAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1 MALLOC_PERTURB_=12 UBSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 /home/ezechiel203/ksmbd/ksmbd-tools/build-codex/tests/test_md4_kat
+----------------------------------- stdout -----------------------------------
+=== MD4 Known-Answer Tests (RFC 1320) ===
+
+--- RFC 1320 Test Vectors ---
+  TEST: test_md4_empty ... PASS
+  TEST: test_md4_a ... PASS
+  TEST: test_md4_abc ... PASS
+  TEST: test_md4_message_digest ... PASS
+  TEST: test_md4_alphabet ... PASS
+
+--- Incremental Update ---
+  TEST: test_md4_incremental ... PASS
+
+=== Results: 6/6 tests passed ===
+==============================================================================
+
+==================================== 6/25 ====================================
+test:         ksmbd-tools:rpc-ndr
+start time:   01:57:22
+duration:     0.26s
+result:       exit status 0
+command:      MSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 MESON_TEST_ITERATION=1 ASAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1 MALLOC_PERTURB_=89 UBSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 /home/ezechiel203/ksmbd/ksmbd-tools/build-codex/tests/test_rpc_ndr
+----------------------------------- stdout -----------------------------------
+=== RPC NDR Primitive Tests ===
+
+--- Integer Round-trip ---
+  TEST: test_ndr_int8_roundtrip ... PASS
+  TEST: test_ndr_int16_roundtrip ... PASS
+  TEST: test_ndr_int32_roundtrip ... PASS
+  TEST: test_ndr_int64_roundtrip ... PASS
+
+--- Bytes Round-trip ---
+  TEST: test_ndr_bytes_roundtrip ... PASS
+
+--- Alignment ---
+  TEST: test_ndr_auto_align_offset_align4 ... PASS
+  TEST: test_ndr_auto_align_offset_align2 ... PASS
+  TEST: test_ndr_auto_align_offset_align8 ... PASS
+
+--- String & Offset ---
+  TEST: test_ndr_write_string ... PASS
+  TEST: test_ndr_write_string_empty ... PASS
+  TEST: test_ndr_offset_advances ... PASS
+  TEST: test_ndr_zero_values ... PASS
+
+=== Results: 12/12 tests passed ===
+==============================================================================
+
+==================================== 7/25 ====================================
+test:         ksmbd-tools:rpc-services
+start time:   01:57:22
+duration:     0.25s
+result:       exit status 0
+command:      MSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 MESON_TEST_ITERATION=1 ASAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1 UBSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 MALLOC_PERTURB_=128 /home/ezechiel203/ksmbd/ksmbd-tools/build-codex/tests/test_rpc_services
+----------------------------------- stdout -----------------------------------
+=== RPC Service Lifecycle Tests ===
+
+--- Init/Destroy ---
+  TEST: test_rpc_init_destroy ... PASS
+  TEST: test_usm_init_destroy ... PASS
+  TEST: test_shm_init_destroy ... PASS
+  TEST: test_sm_init_destroy ... PASS
+
+--- User Management ---
+  TEST: test_usm_add_lookup_user ... PASS
+  TEST: test_usm_lookup_nonexistent ... PASS
+
+--- Share Management ---
+  TEST: test_shm_share_name_hash_consistency ... PASS
+
+=== Results: 7/7 tests passed ===
+==============================================================================
+
+==================================== 8/25 ====================================
+test:         ksmbd-tools:user-management
+start time:   01:57:22
+duration:     0.25s
+result:       exit status 0
+command:      MSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 MESON_TEST_ITERATION=1 MALLOC_PERTURB_=46 ASAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1 UBSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 /home/ezechiel203/ksmbd/ksmbd-tools/build-codex/tests/test_user_management
+----------------------------------- stdout -----------------------------------
+=== User Management Tests ===
+
+--- Add & Lookup ---
+  TEST: test_usm_add_and_lookup ... PASS
+  TEST: test_usm_lookup_nonexistent ... PASS
+  TEST: test_usm_lookup_null ... PASS
+
+--- Remove ---
+  TEST: test_usm_remove_user ... PASS
+  TEST: test_usm_remove_all_users ... PASS
+
+--- Duplicate & Empty ---
+  TEST: test_usm_add_duplicate ... PASS
+  TEST: test_usm_empty_name ... PASS
+
+--- Update Password ---
+  TEST: test_usm_update_password ... PASS
+  TEST: test_usm_update_password_invalid_b64 ... PASS
+
+--- Iteration ---
+  TEST: test_usm_iter_users_count ... PASS
+
+--- Guest Account ---
+  TEST: test_usm_add_guest_account ... PASS
+
+--- Null Safety ---
+  TEST: test_put_user_null ... PASS
+
+--- User Name Validation ---
+  TEST: test_usm_user_name_valid ... PASS
+  TEST: test_usm_user_name_empty ... PASS
+  TEST: test_usm_user_name_with_colon ... PASS
+  TEST: test_usm_user_name_control_char ... PASS
+  TEST: test_usm_user_name_utf8 ... PASS
+  TEST: test_usm_user_name_too_long ... PASS
+
+--- Ref Counting ---
+  TEST: test_get_ksmbd_user_refcount ... PASS
+
+--- User Flag Operations ---
+  TEST: test_user_flag_operations ... PASS
+
+--- Login Request ---
+  TEST: test_usm_handle_login_request_valid_user ... PASS
+  TEST: test_usm_handle_login_request_null_session ... PASS
+  TEST: test_usm_handle_login_request_bad_user ... PASS
+  TEST: test_usm_handle_login_request_map_to_guest ... PASS
+  TEST: test_usm_handle_login_request_invalid_account ... [ksmbd.tools/3370716]: ERROR: Invalid login request: account is not NUL-terminated
+PASS
+
+--- Login Request Ext ---
+  TEST: test_usm_handle_login_request_ext_valid ... PASS
+  TEST: test_usm_handle_login_request_ext_empty_account ... PASS
+  TEST: test_usm_handle_login_request_ext_invalid_account ... [ksmbd.tools/3370716]: ERROR: Invalid login ext request: account is not NUL-terminated
+PASS
+
+--- Logout Request ---
+  TEST: test_usm_handle_logout_request_valid ... PASS
+  TEST: test_usm_handle_logout_request_bad_password ... PASS
+  TEST: test_usm_handle_logout_request_nonexistent ... PASS
+  TEST: test_usm_handle_logout_request_invalid_account ... [ksmbd.tools/3370716]: ERROR: Invalid logout request: account is not NUL-terminated
+PASS
+  TEST: test_usm_handle_logout_delay_session ... PASS
+
+--- Lifecycle ---
+  TEST: test_usm_init_destroy_cycle ... PASS
+
+=== Results: 34/34 tests passed ===
+==============================================================================
+
+==================================== 9/25 ====================================
+test:         ksmbd-tools:share-admin
+start time:   01:57:22
+duration:     0.24s
+result:       exit status 0
+command:      MSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 MESON_TEST_ITERATION=1 ASAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1 MALLOC_PERTURB_=151 UBSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 /home/ezechiel203/ksmbd/ksmbd-tools/build-codex/tests/test_share_admin
+----------------------------------- stdout -----------------------------------
+=== Share Administration Tests ===
+
+--- Low-level Add & Lookup ---
+  TEST: test_add_share_and_lookup ... PASS
+  TEST: test_lookup_nonexistent ... PASS
+
+--- Case Insensitive ---
+  TEST: test_share_name_case_insensitive ... PASS
+  TEST: test_share_hash_consistency ... PASS
+
+--- Config Payload ---
+  TEST: test_share_config_payload_size ... PASS
+  TEST: test_payload_size_null_share ... PASS
+  TEST: test_payload_size_no_path ... PASS
+
+--- Connection ---
+  TEST: test_open_close_connection ... PASS
+  TEST: test_share_max_connections_limit ... PASS
+  TEST: test_close_connection_null ... PASS
+
+--- Share Name Validation ---
+  TEST: test_share_name_valid ... PASS
+  TEST: test_share_name_empty ... PASS
+  TEST: test_share_name_with_brackets ... PASS
+  TEST: test_share_name_with_control_char ... PASS
+  TEST: test_share_name_utf8 ... PASS
+
+--- Share Name Equality ---
+  TEST: test_share_name_equal_same ... PASS
+  TEST: test_share_name_equal_different_case ... PASS
+  TEST: test_share_name_equal_different ... PASS
+
+--- Share Config Match ---
+  TEST: test_share_config_match ... PASS
+  TEST: test_share_config_no_match ... PASS
+  TEST: test_share_config_broken ... PASS
+
+--- Duplicate Handling ---
+  TEST: test_duplicate_share_add ... PASS
+
+--- Share Config Options (flags) ---
+  TEST: test_share_with_comment ... PASS
+  TEST: test_share_read_only ... PASS
+  TEST: test_share_writeable ... PASS
+  TEST: test_share_guest_ok ... PASS
+  TEST: test_share_browseable ... PASS
+  TEST: test_share_oplocks ... PASS
+  TEST: test_share_store_dos_attributes ... PASS
+  TEST: test_share_hide_dot_files ... PASS
+  TEST: test_share_create_mask ... PASS
+  TEST: test_share_force_create_mode ... PASS
+  TEST: test_share_veto_files ... PASS
+  TEST: test_share_inherit_owner ... PASS
+  TEST: test_share_follow_symlinks ... PASS
+  TEST: test_share_crossmnt ... PASS
+  TEST: test_share_streams ... PASS
+  TEST: test_share_acl_xattr ... PASS
+  TEST: test_share_fruit_time_machine ... PASS
+  TEST: test_share_fruit_finder_info ... PASS
+  TEST: test_share_continuous_availability ... PASS
+  TEST: test_share_vfs_objects_streams_acl ... PASS
+  TEST: test_share_write_ok_flag ... PASS
+  TEST: test_share_read_only_overrides_writable ... PASS
+
+--- Share Flag Helpers ---
+  TEST: test_share_flag_set_clear_test ... PASS
+
+--- Remove All & Iterate ---
+  TEST: test_remove_all_shares ... PASS
+  TEST: test_iter_shares ... PASS
+
+--- command_add_share ---
+  TEST: test_command_add_share_basic ... [ksmbdctl(share)/3370718]: INFO: Wrote `/tmp/ksmbd-share-test-4D1XL3'
+[ksmbdctl(share)/3370718]: INFO: Added share `newshare'
+PASS
+  TEST: test_command_add_share_duplicate ... [ksmbdctl(share)/3370718]: ERROR: Share `existing' already exists
+PASS
+  TEST: test_command_add_share_with_comment ... [ksmbdctl(share)/3370718]: INFO: Wrote `/tmp/ksmbd-share-test-ZO1XL3'
+[ksmbdctl(share)/3370718]: INFO: Added share `commented'
+PASS
+  TEST: test_command_add_share_with_veto_files ... [ksmbdctl(share)/3370718]: INFO: Wrote `/tmp/ksmbd-share-test-YA4XL3'
+[ksmbdctl(share)/3370718]: INFO: Added share `vetoed'
+PASS
+  TEST: test_command_add_share_with_boolean_options ... [ksmbdctl(share)/3370718]: INFO: Wrote `/tmp/ksmbd-share-test-ZI4XL3'
+[ksmbdctl(share)/3370718]: INFO: Added share `boolshare'
+PASS
+  TEST: test_command_add_share_with_masks ... [ksmbdctl(share)/3370718]: INFO: Wrote `/tmp/ksmbd-share-test-4V5XL3'
+[ksmbdctl(share)/3370718]: INFO: Added share `maskshare'
+PASS
+  TEST: test_command_add_share_with_valid_users ... [ksmbdctl(share)/3370718]: INFO: Wrote `/tmp/ksmbd-share-test-EP4XL3'
+[ksmbdctl(share)/3370718]: INFO: Added share `validusershare'
+PASS
+  TEST: test_command_add_share_fruit_options ... [ksmbdctl(share)/3370718]: INFO: Wrote `/tmp/ksmbd-share-test-PCSWL3'
+[ksmbdctl(share)/3370718]: INFO: Added share `fruitshare'
+PASS
+  TEST: test_command_add_share_writes_file ... [ksmbdctl(share)/3370718]: INFO: Wrote `/tmp/ksmbd-share-test-IEUWL3'
+[ksmbdctl(share)/3370718]: INFO: Added share `ioshare'
+PASS
+  TEST: test_command_add_multiple_shares ... [ksmbdctl(share)/3370718]: INFO: Wrote `/tmp/ksmbd-share-test-9LUWL3'
+[ksmbdctl(share)/3370718]: INFO: Added share `multi1'
+[ksmbdctl(share)/3370718]: INFO: Wrote `/tmp/ksmbd-share-test-9LUWL3'
+[ksmbdctl(share)/3370718]: INFO: Added share `multi2'
+PASS
+
+--- command_update_share ---
+  TEST: test_command_update_share_basic ... [ksmbdctl(share)/3370718]: INFO: Wrote `/tmp/ksmbd-share-test-C8TWL3'
+[ksmbdctl(share)/3370718]: INFO: Updated share `myshare'
+PASS
+  TEST: test_command_update_share_nonexistent ... [ksmbdctl(share)/3370718]: ERROR: Share `nonexistent' does not exist
+PASS
+  TEST: test_command_update_share_change_comment ... [ksmbdctl(share)/3370718]: INFO: Wrote `/tmp/ksmbd-share-test-FUTWL3'
+[ksmbdctl(share)/3370718]: INFO: Updated share `updshare'
+PASS
+  TEST: test_command_update_share_toggle_readonly ... [ksmbdctl(share)/3370718]: INFO: Wrote `/tmp/ksmbd-share-test-THTWL3'
+[ksmbdctl(share)/3370718]: INFO: Updated share `toggleshare'
+PASS
+
+--- command_delete_share ---
+  TEST: test_command_delete_share_basic ... [ksmbdctl(share)/3370718]: INFO: Wrote `/tmp/ksmbd-share-test-L9WWL3'
+[ksmbdctl(share)/3370718]: INFO: Deleted share `delshare'
+PASS
+  TEST: test_command_delete_share_nonexistent ... [ksmbdctl(share)/3370718]: ERROR: Share `nonexistent' does not exist
+PASS
+  TEST: test_command_delete_share_global_resets ... [ksmbdctl(share)/3370718]: INFO: Wrote `/tmp/ksmbd-share-test-UVWWL3'
+[ksmbdctl(share)/3370718]: INFO: Updated share `global'
+PASS
+
+=== Results: 64/64 tests passed ===
+==============================================================================
+
+=================================== 10/25 ====================================
+test:         ksmbd-tools:user-admin
+start time:   01:57:22
+duration:     0.23s
+result:       exit status 0
+command:      MSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 MESON_TEST_ITERATION=1 MALLOC_PERTURB_=124 ASAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1 UBSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 /home/ezechiel203/ksmbd/ksmbd-tools/build-codex/tests/test_user_admin
+----------------------------------- stdout -----------------------------------
+=== User Administration Tests ===
+
+--- Parse Password DB ---
+  TEST: test_parse_pwddb_single_user ... PASS
+  TEST: test_parse_pwddb_multiple_users ... PASS
+  TEST: test_parse_pwddb_empty_file ... PASS
+  TEST: test_parse_pwddb_with_blank_lines ... PASS
+  TEST: test_parse_pwddb_whitespace_handling ... PASS
+
+--- User Lifecycle ---
+  TEST: test_user_add_and_remove ... PASS
+  TEST: test_user_password_update ... PASS
+  TEST: test_duplicate_user_add ... PASS
+
+--- User Name Validation ---
+  TEST: test_user_name_valid ... PASS
+  TEST: test_user_name_empty ... PASS
+  TEST: test_user_name_with_colon ... PASS
+  TEST: test_user_name_with_control_char ... PASS
+  TEST: test_user_name_utf8 ... PASS
+  TEST: test_user_name_space_allowed ... PASS
+  TEST: test_user_name_tab_allowed ... PASS
+
+--- User Lookup Edge Cases ---
+  TEST: test_lookup_user_null ... PASS
+  TEST: test_lookup_user_nonexistent ... PASS
+
+--- User Flag Operations ---
+  TEST: test_user_flag_set_test_clear ... PASS
+
+--- Guest Account ---
+  TEST: test_add_guest_account ... PASS
+
+--- Iterate & Remove All ---
+  TEST: test_iter_users ... PASS
+  TEST: test_remove_all_users ... PASS
+
+--- Reference Counting ---
+  TEST: test_user_ref_counting ... PASS
+
+--- command_add_user ---
+  TEST: test_command_add_user_with_password ... [ksmbdctl(user)/3370723]: INFO: Wrote `/tmp/ksmbd-user-test-ZQ9WL3'
+[ksmbdctl(user)/3370723]: INFO: Added user `newuser'
+PASS
+  TEST: test_command_add_user_duplicate ... [ksmbdctl(user)/3370723]: ERROR: User `existinguser' already exists
+PASS
+  TEST: test_command_add_user_empty_password ... [ksmbdctl(user)/3370723]: INFO: Password is empty
+[ksmbdctl(user)/3370723]: INFO: Wrote `/tmp/ksmbd-user-test-LMCXL3'
+[ksmbdctl(user)/3370723]: INFO: Added user `emptypassuser'
+PASS
+  TEST: test_command_add_user_password_hash_is_base64 ... [ksmbdctl(user)/3370723]: INFO: Wrote `/tmp/ksmbd-user-test-8TEXL3'
+[ksmbdctl(user)/3370723]: INFO: Added user `hashuser'
+PASS
+  TEST: test_command_add_user_unicode_password ... [ksmbdctl(user)/3370723]: INFO: Wrote `/tmp/ksmbd-user-test-A0DXL3'
+[ksmbdctl(user)/3370723]: INFO: Added user `unicodeuser'
+PASS
+  TEST: test_command_add_user_single_char_password ... [ksmbdctl(user)/3370723]: INFO: Wrote `/tmp/ksmbd-user-test-DJFXL3'
+[ksmbdctl(user)/3370723]: INFO: Added user `shortpwduser'
+PASS
+  TEST: test_command_add_multiple_users ... [ksmbdctl(user)/3370723]: INFO: Wrote `/tmp/ksmbd-user-test-F52VL3'
+[ksmbdctl(user)/3370723]: INFO: Added user `user1'
+[ksmbdctl(user)/3370723]: INFO: Wrote `/tmp/ksmbd-user-test-F52VL3'
+[ksmbdctl(user)/3370723]: INFO: Added user `user2'
+PASS
+
+--- command_update_user ---
+  TEST: test_command_update_user_basic ... [ksmbdctl(user)/3370723]: INFO: Wrote `/tmp/ksmbd-user-test-I04VL3'
+[ksmbdctl(user)/3370723]: INFO: Updated user `updateuser'
+PASS
+  TEST: test_command_update_user_nonexistent ... [ksmbdctl(user)/3370723]: ERROR: User `ghostuser' does not exist
+PASS
+  TEST: test_command_update_user_preserves_others ... [ksmbdctl(user)/3370723]: INFO: Wrote `/tmp/ksmbd-user-test-LU6VL3'
+[ksmbdctl(user)/3370723]: INFO: Updated user `alice'
+PASS
+
+--- command_delete_user ---
+  TEST: test_command_delete_user_basic ... [ksmbdctl(user)/3370723]: INFO: Wrote `/tmp/ksmbd-user-test-QI8VL3'
+[ksmbdctl(user)/3370723]: INFO: Deleted user `deleteuser'
+PASS
+  TEST: test_command_delete_user_nonexistent ... [ksmbdctl(user)/3370723]: ERROR: User `ghostuser' does not exist
+PASS
+  TEST: test_command_delete_user_preserves_others ... [ksmbdctl(user)/3370723]: INFO: Wrote `/tmp/ksmbd-user-test-L58VL3'
+[ksmbdctl(user)/3370723]: INFO: Deleted user `alice'
+PASS
+  TEST: test_command_delete_user_required_by_share ... [ksmbdctl(user)/3370723]: ERROR: Share `myshare' requires user `shareuser'
+PASS
+  TEST: test_command_delete_user_required_by_global_guest ... [ksmbdctl(user)/3370723]: ERROR: Server requires user `globalguest'
+PASS
+
+--- Password File Format ---
+  TEST: test_pwddb_file_format ... [ksmbdctl(user)/3370723]: INFO: Wrote `/tmp/ksmbd-user-test-QIEWL3'
+[ksmbdctl(user)/3370723]: INFO: Added user `fmtuser'
+PASS
+  TEST: test_guest_users_excluded_from_listing ... [ksmbdctl(user)/3370723]: INFO: Wrote `/tmp/ksmbd-user-test-7LDWL3'
+[ksmbdctl(user)/3370723]: INFO: Added user `anotheruser'
+PASS
+
+=== Results: 39/39 tests passed ===
+==============================================================================
+
+=================================== 11/25 ====================================
+test:         ksmbd-tools:control
+start time:   01:57:22
+duration:     0.23s
+result:       exit status 0
+command:      MSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 MESON_TEST_ITERATION=1 MALLOC_PERTURB_=162 ASAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1 UBSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 /home/ezechiel203/ksmbd/ksmbd-tools/build-codex/tests/test_control
+----------------------------------- stdout -----------------------------------
+=== Control Utility Tests (comprehensive) ===
+
+--- signing_to_str() ---
+  TEST: test_signing_disabled ... PASS
+  TEST: test_signing_enabled ... PASS
+  TEST: test_signing_auto ... PASS
+  TEST: test_signing_mandatory ... PASS
+  TEST: test_signing_unknown_positive ... PASS
+  TEST: test_signing_unknown_negative ... PASS
+  TEST: test_signing_unknown_large ... PASS
+  TEST: test_signing_all_values_distinct ... PASS
+
+--- read_sysfs_string() basic ---
+  TEST: test_read_sysfs_success ... PASS
+  TEST: test_read_sysfs_nonexistent ... PASS
+  TEST: test_read_sysfs_empty_file ... PASS
+  TEST: test_read_sysfs_no_trailing_newline ... PASS
+  TEST: test_read_sysfs_only_newline ... PASS
+  TEST: test_read_sysfs_multiple_lines ... PASS
+  TEST: test_read_sysfs_truncation ... PASS
+  TEST: test_read_sysfs_exact_fit ... PASS
+
+--- read_sysfs_string() edge cases ---
+  TEST: test_read_sysfs_binary_content ... PASS
+  TEST: test_read_sysfs_whitespace_content ... PASS
+  TEST: test_read_sysfs_single_char ... PASS
+  TEST: test_read_sysfs_single_char_newline ... PASS
+  TEST: test_read_sysfs_long_content ... PASS
+  TEST: test_read_sysfs_min_buffer ... PASS
+  TEST: test_read_sysfs_numeric_content ... PASS
+
+--- feature_flags table ---
+  TEST: test_feature_flags_table_count ... PASS
+  TEST: test_feature_flags_are_power_of_two ... PASS
+  TEST: test_feature_flags_no_overlap ... PASS
+
+--- config_opt constants ---
+  TEST: test_config_opt_values ... PASS
+
+--- control_features() ---
+  TEST: test_control_features_minimal_config ... === ksmbd Feature Status ===
+  SMB2 Leases         disabled
+  SMB2 Encryption     disabled
+  SMB3 Multichannel   disabled
+  Durable Handle      disabled
+  Fruit Extensions    enabled
+  Fruit Zero FileID   enabled
+  Fruit NFS ACEs      disabled
+  Fruit Copyfile      disabled
+  Signing:            auto
+  Min Protocol:       (default)
+  Max Protocol:       (default)
+  Max Worker Threads: 4
+PASS
+  TEST: test_control_features_all_flags_enabled ... === ksmbd Feature Status ===
+  SMB2 Leases         enabled
+  SMB2 Encryption     disabled
+  SMB3 Multichannel   disabled
+  Durable Handle      disabled
+  Fruit Extensions    enabled
+  Fruit Zero FileID   enabled
+  Fruit NFS ACEs      disabled
+  Fruit Copyfile      disabled
+  Signing:            mandatory
+  Min Protocol:       SMB2_10
+  Max Protocol:       SMB3_11
+  Max Worker Threads: 4
+PASS
+  TEST: test_control_features_signing_disabled ... === ksmbd Feature Status ===
+  SMB2 Leases         enabled
+  SMB2 Encryption     disabled
+  SMB3 Multichannel   disabled
+  Durable Handle      disabled
+  Fruit Extensions    enabled
+  Fruit Zero FileID   enabled
+  Fruit NFS ACEs      disabled
+  Fruit Copyfile      disabled
+  Signing:            disabled
+  Min Protocol:       SMB2_10
+  Max Protocol:       SMB3_11
+  Max Worker Threads: 4
+PASS
+  TEST: test_control_features_missing_config ... [ksmbd.tools/3370724]: INFO: No user database
+[ksmbd.tools/3370724]: INFO: No configuration file
+=== ksmbd Feature Status ===
+  SMB2 Leases         enabled
+  SMB2 Encryption     disabled
+  SMB3 Multichannel   disabled
+  Durable Handle      disabled
+  Fruit Extensions    enabled
+  Fruit Zero FileID   enabled
+  Fruit NFS ACEs      disabled
+  Fruit Copyfile      disabled
+  Signing:            auto
+  Min Protocol:       SMB2_10
+  Max Protocol:       SMB3_11
+  Max Worker Threads: 4
+PASS
+  TEST: test_control_features_with_share ... === ksmbd Feature Status ===
+  SMB2 Leases         enabled
+  SMB2 Encryption     disabled
+  SMB3 Multichannel   disabled
+  Durable Handle      disabled
+  Fruit Extensions    enabled
+  Fruit Zero FileID   enabled
+  Fruit NFS ACEs      disabled
+  Fruit Copyfile      disabled
+  Signing:            auto
+  Min Protocol:       SMB2_10
+  Max Protocol:       SMB3_11
+  Max Worker Threads: 4
+PASS
+  TEST: test_control_features_output_format ... PASS
+
+--- control_limits() ---
+  TEST: test_control_limits_minimal_config ... === ksmbd Server Limits ===
+
+  Transport Limits:
+    TCP Port:                   445
+    TCP Recv Timeout:           7 s (0=default:7)
+    TCP Send Timeout:           5 s (0=default:5)
+    QUIC Recv Timeout:          7 s (0=default:7)
+    QUIC Send Timeout:          5 s (0=default:5)
+    SMBD Max IO Size:           8388608
+
+  Connection Limits:
+    Max Connections:            256
+    Max IP Connections:         32
+    Deadtime:                   0 s
+
+  Protocol Limits:
+    SMB2 Max Read:              65536
+    SMB2 Max Write:             65536
+    SMB2 Max Trans:             65536
+    SMB2 Max Credits:           8192
+    Max Buffer Size:            65536
+    Max Lock Count:             64
+    SMB1 Max MPX:               10
+
+  Session Limits:
+    Max Sessions:               1024
+    Session Timeout:            10 s (0=default:10)
+    Durable Handle Timeout:     300000 ms (0=default:300000)
+    Max Open Files:             10000
+
+  Credit/Request Limits:
+    Max Inflight Requests:      8192
+    Max Async Credits:          512
+    IPC Timeout:                10 s
+
+  (Values of 0 mean 'not configured'; kernel uses built-in defaults)
+PASS
+  TEST: test_control_limits_with_values ... === ksmbd Server Limits ===
+
+  Transport Limits:
+    TCP Port:                   445
+    TCP Recv Timeout:           7 s (0=default:7)
+    TCP Send Timeout:           5 s (0=default:5)
+    QUIC Recv Timeout:          7 s (0=default:7)
+    QUIC Send Timeout:          5 s (0=default:5)
+    SMBD Max IO Size:           8388608
+
+  Connection Limits:
+    Max Connections:            2048
+    Max IP Connections:         32
+    Deadtime:                   300 s
+
+  Protocol Limits:
+    SMB2 Max Read:              131072
+    SMB2 Max Write:             131072
+    SMB2 Max Trans:             131072
+    SMB2 Max Credits:           16384
+    Max Buffer Size:            65536
+    Max Lock Count:             64
+    SMB1 Max MPX:               10
+
+  Session Limits:
+    Max Sessions:               1024
+    Session Timeout:            10 s (0=default:10)
+    Durable Handle Timeout:     300000 ms (0=default:300000)
+    Max Open Files:             10000
+
+  Credit/Request Limits:
+    Max Inflight Requests:      8192
+    Max Async Credits:          512
+    IPC Timeout:                10 s
+
+  (Values of 0 mean 'not configured'; kernel uses built-in defaults)
+PASS
+  TEST: test_control_limits_missing_config ... [ksmbd.tools/3370724]: INFO: No user database
+[ksmbd.tools/3370724]: INFO: No configuration file
+=== ksmbd Server Limits ===
+
+  Transport Limits:
+    TCP Port:                   445
+    TCP Recv Timeout:           7 s (0=default:7)
+    TCP Send Timeout:           5 s (0=default:5)
+    QUIC Recv Timeout:          7 s (0=default:7)
+    QUIC Send Timeout:          5 s (0=default:5)
+    SMBD Max IO Size:           8388608
+
+  Connection Limits:
+    Max Connections:            256
+    Max IP Connections:         32
+    Deadtime:                   300 s
+
+  Protocol Limits:
+    SMB2 Max Read:              131072
+    SMB2 Max Write:             131072
+    SMB2 Max Trans:             131072
+    SMB2 Max Credits:           16384
+    Max Buffer Size:            65536
+    Max Lock Count:             64
+    SMB1 Max MPX:               10
+
+  Session Limits:
+    Max Sessions:               1024
+    Session Timeout:            10 s (0=default:10)
+    Durable Handle Timeout:     300000 ms (0=default:300000)
+    Max Open Files:             10000
+
+  Credit/Request Limits:
+    Max Inflight Requests:      8192
+    Max Async Credits:          512
+    IPC Timeout:                10 s
+
+  (Values of 0 mean 'not configured'; kernel uses built-in defaults)
+PASS
+  TEST: test_control_limits_output_format ... PASS
+  TEST: test_control_limits_with_shares_and_all_values ... === ksmbd Server Limits ===
+
+  Transport Limits:
+    TCP Port:                   445
+    TCP Recv Timeout:           7 s (0=default:7)
+    TCP Send Timeout:           5 s (0=default:5)
+    QUIC Recv Timeout:          7 s (0=default:7)
+    QUIC Send Timeout:          5 s (0=default:5)
+    SMBD Max IO Size:           8388608
+
+  Connection Limits:
+    Max Connections:            512
+    Max IP Connections:         32
+    Deadtime:                   600 s
+
+  Protocol Limits:
+    SMB2 Max Read:              262144
+    SMB2 Max Write:             262144
+    SMB2 Max Trans:             262144
+    SMB2 Max Credits:           4096
+    Max Buffer Size:            65536
+    Max Lock Count:             64
+    SMB1 Max MPX:               10
+
+  Session Limits:
+    Max Sessions:               1024
+    Session Timeout:            10 s (0=default:10)
+    Durable Handle Timeout:     300000 ms (0=default:300000)
+    Max Open Files:             10000
+
+  Credit/Request Limits:
+    Max Inflight Requests:      8192
+    Max Async Credits:          512
+    IPC Timeout:                10 s
+
+  (Values of 0 mean 'not configured'; kernel uses built-in defaults)
+PASS
+
+--- global_conf integration ---
+  TEST: test_global_conf_defaults_after_load ... PASS
+  TEST: test_global_conf_signing_mandatory ... PASS
+  TEST: test_global_conf_protocol_strings ... PASS
+  TEST: test_global_conf_null_protocols ... === ksmbd Feature Status ===
+  SMB2 Leases         enabled
+  SMB2 Encryption     disabled
+  SMB3 Multichannel   disabled
+  Durable Handle      disabled
+  Fruit Extensions    enabled
+  Fruit Zero FileID   enabled
+  Fruit NFS ACEs      disabled
+  Fruit Copyfile      disabled
+  Signing:            auto
+  Min Protocol:       SMB2_10
+  Max Protocol:       SMB3_11
+  Max Worker Threads: 4
+PASS
+  TEST: test_global_conf_tcp_port ... PASS
+
+--- control_show_version() ---
+  TEST: test_control_show_version_no_module ... [ksmbd.tools/3370724]: ERROR: Can't output ksmbd version
+PASS
+
+--- control_debug() ---
+  TEST: test_control_debug_no_module ... [ksmbd.tools/3370724]: ERROR: Can't toggle ksmbd debug component
+PASS
+
+=== Results: 45/45 tests passed ===
+==============================================================================
+
+=================================== 12/25 ====================================
+test:         ksmbd-tools:ipc-compat-kernel
+start time:   01:57:22
+duration:     1.97s
+result:       exit status 0
+command:      KSMBD_TOOLS_SOURCE_ROOT=/home/ezechiel203/ksmbd/ksmbd-tools MSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 MESON_TEST_ITERATION=1 MALLOC_PERTURB_=19 ASAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1 UBSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 /usr/bin/sh /home/ezechiel203/ksmbd/ksmbd-tools/build-codex/../tests/test_ipc_compat.sh
+----------------------------------- stdout -----------------------------------
+PASS: ksmbd-tools IPC ABI matches kernel for common messages
+PASS: EVENT_MAX is identical (tools=25, kernel=25)
+==============================================================================
+
+=================================== 13/25 ====================================
+test:         ksmbd-tools:integration-cli
+start time:   01:57:22
+duration:     3.55s
+result:       exit status 0
+command:      MSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 MESON_TEST_ITERATION=1 BUILDDIR=/home/ezechiel203/ksmbd/ksmbd-tools/build-codex ASAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1 KSMBDCTL=/home/ezechiel203/ksmbd/ksmbd-tools/build-codex/tools/ksmbdctl MALLOC_PERTURB_=155 UBSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 /usr/bin/sh /home/ezechiel203/ksmbd/ksmbd-tools/build-codex/../tests/test_integration.sh
+----------------------------------- stdout -----------------------------------
+=== ksmbd-tools Integration Tests ===
+
+--- ksmbdctl binary ---
+  PASS: ksmbdctl binary exists
+  PASS: ksmbdctl --help shows usage
+  PASS: ksmbdctl --version shows version
+
+--- ksmbdctl subcommand help ---
+  PASS: ksmbdctl user shows usage
+  PASS: ksmbdctl share shows usage
+  PASS: ksmbdctl debug shows usage
+  PASS: ksmbdctl config shows usage
+
+--- ksmbdctl status/features ---
+  PASS: ksmbdctl status reports module state
+  PASS: ksmbdctl features output is sane
+
+--- ksmbdctl version ---
+  PASS: ksmbdctl version shows tools version
+
+--- ksmbdctl config subcommands ---
+  PASS: ksmbdctl config validate
+  PASS: ksmbdctl config show has global
+  PASS: ksmbdctl config show global
+
+--- ksmbdctl user subcommands ---
+  PASS: ksmbdctl user add testuser
+  PASS: user entry exists in pwddb (ksmbdctl)
+  PASS: ksmbdctl user list shows user
+  PASS: ksmbdctl user update testuser
+  PASS: ksmbdctl user set adds missing user
+  PASS: ksmbdctl user set updates existing user
+  PASS: ksmbdctl user set changed password hash
+  PASS: ksmbdctl user delete testuser
+  PASS: ksmbdctl user delete upsertuser
+  PASS: user removed from pwddb (ksmbdctl)
+
+--- ksmbdctl share subcommands ---
+  PASS: ksmbdctl share add newshare
+  PASS: newshare section exists in config (ksmbdctl)
+  PASS: ksmbdctl share list shows newshare
+  PASS: ksmbdctl share show newshare
+  PASS: ksmbdctl share update newshare
+  PASS: newshare path updated (ksmbdctl)
+  PASS: ksmbdctl share set adds missing share
+  PASS: ksmbdctl share set updates existing share
+  PASS: ksmbdctl share set changed share option
+  PASS: ksmbdctl share delete newshare
+  PASS: ksmbdctl share delete upshare
+  PASS: newshare removed from config (ksmbdctl)
+
+--- ksmbdctl error handling ---
+  PASS: ksmbdctl user add rejects missing name
+  PASS: ksmbdctl share add rejects missing name
+  PASS: ksmbdctl rejects unknown command
+  PASS: legacy entrypoint ksmbd.adduser is rejected
+  PASS: legacy entrypoint prints migration hint
+
+--- Share add with multiple options ---
+  PASS: share add with multiple -o options
+  PASS: multishare section exists
+  PASS: multishare has read only = yes
+  PASS: multishare has browseable = no
+  PASS: share show multishare has path
+  PASS: share show multishare has read only
+
+--- Share update preserves existing options ---
+  PASS: share update adds guest ok
+  PASS: share update preserved path
+
+--- User delete then re-add lifecycle ---
+  PASS: user add lcuser
+  PASS: user delete lcuser
+  PASS: lcuser removed after delete
+  PASS: user re-add lcuser after delete
+  PASS: lcuser exists after re-add
+
+--- Share list shows all shares ---
+  PASS: share list includes listshare1
+  PASS: share list includes listshare2
+  PASS: share list includes testshare
+
+--- Config validation ---
+  PASS: valid config passes validation
+  PASS: malformed config reports issue
+
+--- Multiple concurrent share operations ---
+  PASS: 5 concurrent shares all present
+  PASS: 5 concurrent shares all removed
+
+--- Share add with guest ok option ---
+  PASS: share add guestshare with guest ok
+  PASS: guestshare config shows guest ok
+
+--- User list with multiple users ---
+  PASS: user list includes multiuser1
+  PASS: user list includes multiuser2
+  PASS: user list includes multiuser3
+
+--- Share with vfs objects option ---
+  PASS: share add with vfs objects
+  PASS: vfsshare has vfs objects
+
+--- Duplicate share add is idempotent ---
+  PASS: first share add dupshare
+  PASS: share set updates dupshare
+
+--- Delete nonexistent share ---
+  PASS: delete nonexistent share fails
+
+--- Delete nonexistent user ---
+  PASS: delete nonexistent user fails
+
+=== Results ===
+Passed: 71
+Failed: 0
+Total:  71
+==============================================================================
+
+=================================== 14/25 ====================================
+test:         ksmbd-tools:ipc-handlers
+start time:   01:57:25
+duration:     11.74s
+result:       exit status 0
+command:      MSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 MALLOC_PERTURB_=0 MESON_TEST_ITERATION=1 BUILDDIR=/home/ezechiel203/ksmbd/ksmbd-tools/build-codex ASAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1 UBSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 /usr/bin/sh /home/ezechiel203/ksmbd/ksmbd-tools/build-codex/../tests/run_ipc_handlers.sh
+----------------------------------- stdout -----------------------------------
+=== IPC Handler Tests ===
+
+--- Login ---
+  TEST: test_login_valid_user ... PASS
+  TEST: test_login_unknown_user ... PASS
+
+--- Session ---
+  TEST: test_session_capacity ... PASS
+
+--- Tree Connect ---
+  TEST: test_tree_connect_lifecycle ... PASS
+
+--- Share Config ---
+  TEST: test_share_config_payload_size ... PASS
+  TEST: test_shm_open_close_connection ... PASS
+  TEST: test_share_lookup_nonexistent ... PASS
+
+--- Multiple Sessions ---
+  TEST: test_multiple_sessions ... PASS
+
+=== Results: 8/8 tests passed ===
+==============================================================================
+
+=================================== 15/25 ====================================
+test:         ksmbd-tools:rpc-srvsvc
+start time:   01:57:37
+duration:     0.79s
+result:       exit status 0
+command:      MSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 MESON_TEST_ITERATION=1 ASAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1 MALLOC_PERTURB_=156 UBSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 /home/ezechiel203/ksmbd/ksmbd-tools/build-codex/tests/test_rpc_srvsvc
+----------------------------------- stdout -----------------------------------
+=== SRVSVC RPC Service Tests ===
+
+--- BIND ---
+  TEST: test_srvsvc_bind ... PASS
+
+--- NetShareEnumAll ---
+  TEST: test_srvsvc_share_enum_no_shares ... PASS
+  TEST: test_srvsvc_share_enum_with_shares ... PASS
+  TEST: test_srvsvc_share_enum_level0 ... PASS
+
+--- Pipe Management ---
+  TEST: test_srvsvc_pipe_open_close ... [ksmbd.tools/3371110]: ERROR: RPC: unknown pipe ID: 999
+PASS
+  TEST: test_srvsvc_open_duplicate_handle ... [ksmbd.tools/3371110]: ERROR: RPC: pipe ID collision: 500
+PASS
+
+--- NetShareEnumAll (expanded) ---
+  TEST: test_srvsvc_share_enum_all_level0_with_ipc ... PASS
+  TEST: test_srvsvc_share_enum_all_level1_with_ipc ... PASS
+
+--- NetShareGetInfo ---
+  TEST: test_srvsvc_share_get_info_level0 ... PASS
+  TEST: test_srvsvc_share_get_info_level1 ... PASS
+  TEST: test_srvsvc_share_get_info_nonexistent ... PASS
+
+--- Restricted Context ---
+  TEST: test_srvsvc_restricted_context ... PASS
+
+--- ALTER_CONTEXT ---
+  TEST: test_srvsvc_alter_context ... PASS
+
+--- Many Shares ---
+  TEST: test_srvsvc_many_shares_enum ... PASS
+
+--- Level 0 Coverage ---
+  TEST: test_srvsvc_share_enum_level0_no_shares ... PASS
+  TEST: test_srvsvc_many_shares_level0 ... PASS
+  TEST: test_srvsvc_enum_response_ndr_level0 ... PASS
+
+--- Unsupported Levels ---
+  TEST: test_srvsvc_share_enum_unsupported_level ... [ksmbd.tools/3371110]: ERROR: Unsupported share info level (write): 2
+PASS
+  TEST: test_srvsvc_share_get_info_unsupported_level ... [ksmbd.tools/3371110]: ERROR: Unsupported share info level (write): 502
+[ksmbd.tools/3371110]: ERROR: Unsupported share info level (read): 502
+PASS
+  TEST: test_srvsvc_share_get_info_nonexistent_level0 ... PASS
+
+--- Share Comments ---
+  TEST: test_srvsvc_share_with_comment ... PASS
+  TEST: test_srvsvc_share_get_info_with_comment ... PASS
+  TEST: test_srvsvc_share_null_comment_enum ... PASS
+
+--- Share Types ---
+  TEST: test_srvsvc_share_get_info_disk_share_level0 ... PASS
+  TEST: test_srvsvc_share_get_info_disk_share_level1 ... PASS
+  TEST: test_srvsvc_mixed_share_types_enum ... PASS
+  TEST: test_srvsvc_share_get_info_ipc_type ... PASS
+
+--- Restricted Context (expanded) ---
+  TEST: test_srvsvc_restricted_context_enum_all ... PASS
+  TEST: test_srvsvc_restricted_context_get_info_level0 ... PASS
+  TEST: test_srvsvc_restricted_context_get_info_level1 ... PASS
+  TEST: test_srvsvc_restricted_context_unsupported_level ... [ksmbd.tools/3371110]: ERROR: Unsupported share info level (write): 2
+[ksmbd.tools/3371110]: ERROR: Unsupported share info level (read): 2
+PASS
+
+--- Response Validation ---
+  TEST: test_srvsvc_response_header_fields ... PASS
+  TEST: test_srvsvc_enum_response_ndr_level ... PASS
+
+--- Sequential Operations ---
+  TEST: test_srvsvc_sequential_operations ... PASS
+
+--- Size Limits ---
+  TEST: test_srvsvc_share_enum_small_maxsize ... PASS
+  TEST: test_srvsvc_20_shares_enum ... PASS
+
+=== Results: 36/36 tests passed ===
+==============================================================================
+
+=================================== 16/25 ====================================
+test:         ksmbd-tools:tools-utils
+start time:   01:57:37
+duration:     0.50s
+result:       exit status 0
+command:      MSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 MALLOC_PERTURB_=187 MESON_TEST_ITERATION=1 ASAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1 UBSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 /home/ezechiel203/ksmbd/ksmbd-tools/build-codex/tests/test_tools_utils
+----------------------------------- stdout -----------------------------------
+=== Tools Utility Tests ===
+
+--- Base64 ---
+  TEST: test_base64_roundtrip ... PASS
+  TEST: test_base64_empty ... PASS
+  TEST: test_base64_known_values ... PASS
+  TEST: test_base64_binary_data ... PASS
+  TEST: test_base64_large_data ... PASS
+
+--- Charset Conversion ---
+  TEST: test_gconvert_utf8_to_utf16le ... PASS
+  TEST: test_gconvert_utf16le_to_utf8 ... PASS
+  TEST: test_gconvert_invalid_codeset ... [ksmbd.tools/3371121]: ERROR: Unknown target codeset: 5
+PASS
+  TEST: test_gconvert_invalid_from_codeset ... [ksmbd.tools/3371121]: ERROR: Unknown source codeset: 5
+PASS
+  TEST: test_gconvert_utf8_to_utf16be ... PASS
+  TEST: test_gconvert_utf16be_to_utf8 ... PASS
+  TEST: test_gconvert_empty_string ... PASS
+
+--- GPtrArray Utilities ---
+  TEST: test_gptrarray_to_strv ... PASS
+  TEST: test_gptrarray_to_strv_already_null_terminated ... PASS
+  TEST: test_gptrarray_to_str ... PASS
+  TEST: test_gptrarray_to_str_single ... PASS
+  TEST: test_gptrarray_printf ... PASS
+
+--- Log Level ---
+  TEST: test_set_log_level ... PASS
+  TEST: test_set_log_level_debug_sticky ... PASS
+  TEST: test_set_log_level_to_error ... PASS
+
+--- Logger Init ---
+  TEST: test_pr_logger_init_syslog ... {"ts":1772848657.865,"level":"info","msg":"test json message"}
+PASS
+  TEST: test_pr_logger_init_json ... {"ts":1772848657.865,"level":"error","msg":"json error msg"}
+{"ts":1772848657.865,"level":"info","msg":"json info msg"}
+{"ts":1772848657.865,"level":"debug","msg":"json debug msg"}
+PASS
+
+--- Hex Dump ---
+  TEST: test_pr_hex_dump_no_crash ... PASS
+
+--- Charset Names ---
+  TEST: test_charset_names ... PASS
+  TEST: test_charset_sentinel ... PASS
+
+--- Tool Name ---
+  TEST: test_get_tool_name_default ... PASS
+  TEST: test_get_tool_name_ksmbdctl ... PASS
+  TEST: test_get_tool_name_addshare ... PASS
+  TEST: test_get_tool_name_adduser ... PASS
+  TEST: test_get_tool_name_control ... PASS
+
+--- set_conf_contents ---
+  TEST: test_set_conf_contents_valid ... {"ts":1772848657.865,"level":"info","msg":"Wrote `/tmp/ksmbd-test/set_conf_test'"}
+PASS
+  TEST: test_set_conf_contents_invalid_path ... {"ts":1772848657.865,"level":"error","msg":"Failed to create file “/nonexistent/dir/file.1WSLL3”: No such file or directory"}
+PASS
+  TEST: test_set_conf_contents_overwrite ... {"ts":1772848657.865,"level":"info","msg":"Wrote `/tmp/ksmbd-test/overwrite_test'"}
+{"ts":1772848657.865,"level":"info","msg":"Wrote `/tmp/ksmbd-test/overwrite_test'"}
+PASS
+  TEST: test_set_conf_contents_empty ... {"ts":1772848657.865,"level":"info","msg":"Wrote `/tmp/ksmbd-test/empty_test'"}
+PASS
+
+--- set_tool_main ---
+  TEST: test_set_tool_main_valid ... PASS
+  TEST: test_set_tool_main_invalid ... PASS
+
+--- show_version ---
+  TEST: test_show_version_returns_zero ... {"ts":1772848657.865,"level":"info","msg":"ksmbd-tools version : 3.5.6"}
+PASS
+
+--- remove_config ---
+  TEST: test_remove_config_no_crash ... PASS
+  TEST: test_remove_config_addshare_mode ... PASS
+
+=== Results: 39/39 tests passed ===
+==============================================================================
+
+=================================== 17/25 ====================================
+test:         ksmbd-tools:config-parser-extended
+start time:   01:57:37
+duration:     0.49s
+result:       exit status 0
+command:      MSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 MESON_TEST_ITERATION=1 MALLOC_PERTURB_=239 ASAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1 UBSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 /home/ezechiel203/ksmbd/ksmbd-tools/build-codex/tests/test_config_parser_extended
+----------------------------------- stdout -----------------------------------
+=== Extended Config Parser Tests ===
+
+--- cp_ltrim ---
+  TEST: test_ltrim_spaces ... PASS
+  TEST: test_ltrim_tabs ... PASS
+  TEST: test_ltrim_mixed ... PASS
+  TEST: test_ltrim_no_whitespace ... PASS
+  TEST: test_ltrim_empty ... PASS
+  TEST: test_ltrim_all_whitespace ... PASS
+
+--- cp_rtrim ---
+  TEST: test_rtrim_spaces ... PASS
+  TEST: test_rtrim_tabs ... PASS
+  TEST: test_rtrim_no_trailing ... PASS
+  TEST: test_rtrim_single_char ... PASS
+  TEST: test_rtrim_all_spaces ... PASS
+
+--- cp_key_cmp ---
+  TEST: test_key_cmp_exact_match ... PASS
+  TEST: test_key_cmp_case_insensitive ... PASS
+  TEST: test_key_cmp_different_keys ... PASS
+
+--- cp_get_group_kv_string ---
+  TEST: test_get_group_kv_string ... PASS
+  TEST: test_get_group_kv_string_empty ... PASS
+
+--- cp_get_group_kv_list ---
+  TEST: test_get_group_kv_list_comma ... PASS
+  TEST: test_get_group_kv_list_space ... PASS
+  TEST: test_get_group_kv_list_tab ... PASS
+  TEST: test_get_group_kv_list_single ... PASS
+
+--- cp_get_group_kv_long_base ---
+  TEST: test_get_long_base_invalid ... PASS
+  TEST: test_get_long_hex ... PASS
+
+--- cp_group_kv_steal ---
+  TEST: test_cp_group_kv_steal_found ... PASS
+  TEST: test_cp_group_kv_steal_not_found ... PASS
+
+--- Parser lifecycle ---
+  TEST: test_parser_init_destroy_cycle ... PASS
+
+--- cp_parse_pwddb ---
+  TEST: test_parse_pwddb_single_user ... PASS
+  TEST: test_parse_pwddb_multiple_users ... PASS
+  TEST: test_parse_pwddb_empty_file ... PASS
+  TEST: test_parse_pwddb_malformed_entry ... [ksmbd.tools/3371123]: ERROR: Invalid pwddb entry `badentry_no_colon'
+PASS
+  TEST: test_parse_pwddb_nonexistent_file ... [ksmbd.tools/3371123]: INFO: No user database
+PASS
+
+--- cp_parse_smbconf ---
+  TEST: test_parse_smbconf_with_share ... PASS
+  TEST: test_parse_smbconf_comment_lines ... PASS
+  TEST: test_parse_smbconf_nonexistent ... [ksmbd.tools/3371123]: INFO: No configuration file
+PASS
+
+--- cp_parse_external_smbconf_group ---
+  TEST: test_parse_external_smbconf_group_valid ... PASS
+  TEST: test_parse_external_smbconf_group_invalid_option ... [ksmbd.tools/3371123]: INFO: Ignored option `bogus option = something'
+PASS
+
+--- Inline Helpers ---
+  TEST: test_smbconf_eol ... PASS
+  TEST: test_pwddb_eol ... PASS
+  TEST: test_printable ... PASS
+
+--- cp_memparse Extended ---
+  TEST: test_memparse_overflow ... [ksmbd.tools/3371123]: ERROR: Value overflow in memparse
+PASS
+  TEST: test_memparse_invalid ... PASS
+  TEST: test_memparse_terabytes ... PASS
+  TEST: test_memparse_petabytes ... PASS
+  TEST: test_memparse_exabytes ... PASS
+  TEST: test_memparse_hex_input ... PASS
+  TEST: test_memparse_zero_value ... PASS
+
+--- cp_group_kv_list_free ---
+  TEST: test_group_kv_list_free_no_crash ... PASS
+
+--- cp_parse_subauth ---
+  TEST: test_parse_subauth_valid ... PASS
+  TEST: test_parse_subauth_non_mountd ... PASS
+
+--- cp_parse_lock ---
+  TEST: test_parse_lock_orphaned_pid ... PASS
+  TEST: test_parse_lock_non_ksmbd_process ... PASS
+
+--- Global config: restrict anonymous ---
+  TEST: test_restrict_anon_type1 ... PASS
+  TEST: test_restrict_anon_type2 ... PASS
+  TEST: test_restrict_anon_invalid ... PASS
+
+--- Global config: map to guest ---
+  TEST: test_map_to_guest_bad_user ... PASS
+  TEST: test_map_to_guest_never ... PASS
+
+--- Global config: bind interfaces ---
+  TEST: test_bind_interfaces_only ... PASS
+
+--- Global config: root directory ---
+  TEST: test_root_directory ... PASS
+
+--- Global config: kerberos ---
+  TEST: test_kerberos_config ... PASS
+
+--- Global config: ipc timeout ---
+  TEST: test_ipc_timeout_valid ... PASS
+  TEST: test_ipc_timeout_overflow ... PASS
+
+--- Global config: max open files ---
+  TEST: test_max_open_files_valid ... PASS
+  TEST: test_max_open_files_zero ... PASS
+
+--- Global config: smb2 max r/w/t ---
+  TEST: test_smb2_max_rw_trans ... PASS
+
+--- Global config: sessions cap ---
+  TEST: test_sessions_cap_clamped ... PASS
+
+--- Global config: tcp port overflow ---
+  TEST: test_tcp_port_overflow ... PASS
+
+--- Global config: share_fake_fscaps ---
+  TEST: test_share_fake_fscaps ... PASS
+
+--- Global config: optional limits ---
+  TEST: test_optional_server_limits ... PASS
+
+--- Global config: max ip connections ---
+  TEST: test_max_ip_connections_clamped ... PASS
+
+--- Global config: fruit model ---
+  TEST: test_fruit_model_custom ... PASS
+
+=== Results: 69/69 tests passed ===
+==============================================================================
+
+=================================== 18/25 ====================================
+test:         ksmbd-tools:rpc-samr
+start time:   01:57:37
+duration:     0.48s
+result:       exit status 0
+command:      MSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 MESON_TEST_ITERATION=1 ASAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1 MALLOC_PERTURB_=218 UBSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 /home/ezechiel203/ksmbd/ksmbd-tools/build-codex/tests/test_rpc_samr
+----------------------------------- stdout -----------------------------------
+=== SAMR RPC Service Tests (Comprehensive) ===
+
+--- Full user lifecycle (all opcodes) ---
+  TEST: test_samr_full_user_lifecycle ... PASS
+
+--- BIND ---
+  TEST: test_samr_bind ... PASS
+  TEST: test_samr_bind_ack_fields ... PASS
+
+--- SamrConnect5 (opnum 64) ---
+  TEST: test_samr_connect5 ... PASS
+  TEST: test_samr_connect5_handle_returned ... PASS
+
+--- SamrEnumDomains (opnum 6) ---
+  TEST: test_samr_enum_domains ... PASS
+  TEST: test_samr_enum_domains_bad_handle ... PASS
+
+--- SamrLookupDomain (opnum 5) ---
+  TEST: test_samr_lookup_domain_builtin ... PASS
+  TEST: test_samr_lookup_domain_hostname ... PASS
+  TEST: test_samr_lookup_domain_bad_handle ... PASS
+
+--- SamrOpenDomain (opnum 7) ---
+  TEST: test_samr_open_domain_success ... PASS
+  TEST: test_samr_open_domain_bad_handle ... PASS
+
+--- SamrClose (opnum 1) ---
+  TEST: test_samr_close_handle ... PASS
+  TEST: test_samr_close_bad_handle ... PASS
+  TEST: test_samr_close_with_refcount ... PASS
+
+--- Unsupported opnum ---
+  TEST: test_samr_unsupported_opnum ... [ksmbd.tools/3371124]: ERROR: SAMR: unsupported INVOKE method 255
+PASS
+
+--- SamrLookupNames (opnum 17) error paths ---
+  TEST: test_samr_lookup_names_nonexistent ... PASS
+  TEST: test_samr_lookup_names_bad_handle ... PASS
+
+--- SamrOpenUser (opnum 34) error paths ---
+  TEST: test_samr_open_user_wrong_rid ... PASS
+  TEST: test_samr_open_user_no_lookup ... PASS
+  TEST: test_samr_open_user_bad_handle ... PASS
+
+--- QueryUserInfo/QuerySecurity/GetGroups bad handles ---
+  TEST: test_samr_query_user_info_bad_handle ... PASS
+  TEST: test_samr_query_security_bad_handle ... PASS
+  TEST: test_samr_query_security_no_user ... PASS
+  TEST: test_samr_get_groups_for_user_bad_handle ... PASS
+  TEST: test_samr_get_alias_membership_bad_handle ... PASS
+
+--- SamrGetAliasMembership (opnum 16) success ---
+  TEST: test_samr_get_alias_membership_success ... PASS
+
+--- Lifecycle flows ---
+  TEST: test_samr_connect_enum_close ... PASS
+  TEST: test_samr_connect_lookup_close ... PASS
+  TEST: test_samr_multiple_connects ... PASS
+  TEST: test_samr_init_destroy_cycle ... PASS
+
+=== Results: 31/31 tests passed ===
+==============================================================================
+
+=================================== 19/25 ====================================
+test:         ksmbd-tools:rpc-wkssvc
+start time:   01:57:38
+duration:     0.06s
+result:       exit status 0
+command:      MSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 MESON_TEST_ITERATION=1 ASAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1 MALLOC_PERTURB_=161 UBSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 /home/ezechiel203/ksmbd/ksmbd-tools/build-codex/tests/test_rpc_wkssvc
+----------------------------------- stdout -----------------------------------
+=== WKSSVC RPC Service Tests ===
+
+--- BIND ---
+  TEST: test_wkssvc_bind ... PASS
+  TEST: test_wkssvc_bind_ack_fields ... PASS
+
+--- NetWkstaGetInfo ---
+  TEST: test_wkssvc_netwksta_getinfo ... PASS
+
+--- Error Cases ---
+  TEST: test_wkssvc_pipe_close_unknown ... [ksmbd.tools/3371131]: ERROR: RPC: unknown pipe ID: 99999
+PASS
+
+--- NetWkstaGetInfo (expanded) ---
+  TEST: test_wkssvc_netwksta_getinfo_level100_fields ... PASS
+  TEST: test_wkssvc_netwksta_getinfo_invalid_level ... [ksmbd.tools/3371131]: ERROR: Unsupported wksta info level (write): 999
+[ksmbd.tools/3371131]: ERROR: Unsupported wksta info level (read): 999
+PASS
+  TEST: test_wkssvc_server_name_in_response ... PASS
+  TEST: test_wkssvc_domain_name_in_response ... PASS
+
+--- Restricted Context ---
+  TEST: test_wkssvc_restricted_context ... PASS
+  TEST: test_wkssvc_restricted_context_invalid_level ... [ksmbd.tools/3371131]: ERROR: Unsupported wksta info level (write): 42
+[ksmbd.tools/3371131]: ERROR: Unsupported wksta info level (read): 42
+PASS
+
+--- NULL/Edge Inputs ---
+  TEST: test_wkssvc_null_server_name ... PASS
+  TEST: test_wkssvc_empty_workgroup ... PASS
+  TEST: test_wkssvc_long_server_name ... PASS
+
+--- Response Validation ---
+  TEST: test_wkssvc_version_fields ... PASS
+  TEST: test_wkssvc_ref_pointers ... PASS
+  TEST: test_wkssvc_response_header_fields ... PASS
+  TEST: test_wkssvc_response_size ... PASS
+
+--- Pipe Lifecycle ---
+  TEST: test_wkssvc_pipe_lifecycle ... [ksmbd.tools/3371131]: ERROR: RPC: unknown pipe ID: 777
+PASS
+
+--- Sequential Operations ---
+  TEST: test_wkssvc_sequential_requests ... [ksmbd.tools/3371131]: ERROR: Unsupported wksta info level (write): 101
+[ksmbd.tools/3371131]: ERROR: Unsupported wksta info level (read): 101
+PASS
+
+--- Custom Configuration ---
+  TEST: test_wkssvc_custom_workgroup ... PASS
+
+--- ALTER_CONTEXT ---
+  TEST: test_wkssvc_alter_context ... PASS
+
+--- Multiple Unsupported Levels ---
+  TEST: test_wkssvc_various_unsupported_levels ... [ksmbd.tools/3371131]: ERROR: Unsupported wksta info level (write): 0
+[ksmbd.tools/3371131]: ERROR: Unsupported wksta info level (read): 0
+[ksmbd.tools/3371131]: ERROR: Unsupported wksta info level (write): 1
+[ksmbd.tools/3371131]: ERROR: Unsupported wksta info level (read): 1
+[ksmbd.tools/3371131]: ERROR: Unsupported wksta info level (write): 101
+[ksmbd.tools/3371131]: ERROR: Unsupported wksta info level (read): 101
+[ksmbd.tools/3371131]: ERROR: Unsupported wksta info level (write): 102
+[ksmbd.tools/3371131]: ERROR: Unsupported wksta info level (read): 102
+[ksmbd.tools/3371131]: ERROR: Unsupported wksta info level (write): 200
+[ksmbd.tools/3371131]: ERROR: Unsupported wksta info level (read): 200
+[ksmbd.tools/3371131]: ERROR: Unsupported wksta info level (write): 502
+[ksmbd.tools/3371131]: ERROR: Unsupported wksta info level (read): 502
+[ksmbd.tools/3371131]: ERROR: Unsupported wksta info level (write): 1000
+[ksmbd.tools/3371131]: ERROR: Unsupported wksta info level (read): 1000
+PASS
+
+=== Results: 22/22 tests passed ===
+==============================================================================
+
+=================================== 20/25 ====================================
+test:         ksmbd-tools:rpc-lsarpc
+start time:   01:57:37
+duration:     0.49s
+result:       exit status 0
+command:      MSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 MESON_TEST_ITERATION=1 ASAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1 MALLOC_PERTURB_=104 UBSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 /home/ezechiel203/ksmbd/ksmbd-tools/build-codex/tests/test_rpc_lsarpc
+----------------------------------- stdout -----------------------------------
+=== LSARPC RPC Service Tests ===
+
+--- BIND ---
+  TEST: test_lsarpc_bind ... PASS
+  TEST: test_lsarpc_bind_ack_fields ... PASS
+  TEST: test_lsarpc_dssetup_bind ... PASS
+
+--- LsarOpenPolicy2 ---
+  TEST: test_lsarpc_open_policy2 ... PASS
+  TEST: test_lsarpc_open_policy2_handle_nonzero ... PASS
+  TEST: test_lsarpc_open_policy2_response_handle_size ... PASS
+
+--- LsarQueryInfoPolicy ---
+  TEST: test_lsarpc_query_info_level5 ... PASS
+  TEST: test_lsarpc_query_info_invalid_level ... PASS
+  TEST: test_lsarpc_query_info_invalid_handle ... PASS
+  TEST: test_lsarpc_query_info_response_contains_level ... PASS
+
+--- LsarClose ---
+  TEST: test_lsarpc_close ... PASS
+  TEST: test_lsarpc_close_invalid_handle ... PASS
+  TEST: test_lsarpc_double_close ... PASS
+  TEST: test_lsarpc_query_after_close ... PASS
+  TEST: test_lsarpc_close_response_zeroed ... PASS
+  TEST: test_lsarpc_close_with_dssetup_bind ... PASS
+
+--- LsarLookupSid2 ---
+  TEST: test_lsarpc_lookup_sid2_single ... PASS
+  TEST: test_lsarpc_lookup_sid2_invalid_handle ... PASS
+  TEST: test_lsarpc_lookup_sid2_unknown_rid ... PASS
+  TEST: test_lsarpc_lookup_sid2_wellknown ... PASS
+  TEST: test_lsarpc_lookup_sid2_multiple ... PASS
+
+--- LsarLookupNames3 ---
+  TEST: test_lsarpc_lookup_names3_known_user ... PASS
+  TEST: test_lsarpc_lookup_names3_unknown_user ... PASS
+  TEST: test_lsarpc_lookup_names3_no_domain_prefix ... PASS
+  TEST: test_lsarpc_lookup_names3_invalid_handle ... PASS
+  TEST: test_lsarpc_lookup_names3_multiple ... PASS
+
+--- DsRoleGetPrimaryDomainInfo ---
+  TEST: test_dsrole_get_primary_domain_info_level1 ... PASS
+  TEST: test_dsrole_get_primary_domain_info_invalid_level ... PASS
+
+--- Unsupported opnum ---
+  TEST: test_lsarpc_unsupported_opnum ... [ksmbd.tools/3371125]: ERROR: LSARPC: unsupported INVOKE method 99, alloc_hint : 0
+PASS
+
+--- Multiple handles ---
+  TEST: test_lsarpc_multiple_opens_separate_pipes ... PASS
+
+--- Init/Destroy lifecycle ---
+  TEST: test_lsarpc_init_destroy ... PASS
+  TEST: test_lsarpc_init_destroy_with_handles ... PASS
+
+=== Results: 32/32 tests passed ===
+==============================================================================
+
+=================================== 21/25 ====================================
+test:         ksmbd-tools:share-management
+start time:   01:57:38
+duration:     0.06s
+result:       exit status 0
+command:      MSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 MESON_TEST_ITERATION=1 ASAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1 MALLOC_PERTURB_=33 UBSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 /home/ezechiel203/ksmbd/ksmbd-tools/build-codex/tests/test_share_management
+----------------------------------- stdout -----------------------------------
+=== Share Management Tests ===
+
+--- shm_share_config ---
+  TEST: test_share_config_valid_key ... PASS
+  TEST: test_share_config_invalid_key ... PASS
+  TEST: test_share_config_case_insensitive ... PASS
+  TEST: test_share_config_all_keys ... PASS
+  TEST: test_share_config_broken_admin_users ... PASS
+
+--- shm_share_name ---
+  TEST: test_share_name_valid ... PASS
+  TEST: test_share_name_empty ... PASS
+  TEST: test_share_name_with_brackets ... PASS
+  TEST: test_share_name_utf8 ... PASS
+  TEST: test_share_name_too_long ... PASS
+  TEST: test_share_name_control_chars ... PASS
+
+--- Share lookup & refcount ---
+  TEST: test_share_lookup_and_refcount ... PASS
+  TEST: test_share_lookup_nonexistent ... PASS
+  TEST: test_share_lookup_case_insensitive ... PASS
+
+--- Share iteration ---
+  TEST: test_share_iteration ... PASS
+
+--- Connection tracking ---
+  TEST: test_connection_tracking ... PASS
+  TEST: test_connection_tracking_unlimited ... PASS
+
+--- Share flags ---
+  TEST: test_share_flags_guest_ok ... PASS
+  TEST: test_share_flags_read_only ... PASS
+  TEST: test_share_flags_writeable ... PASS
+  TEST: test_share_flags_browseable ... PASS
+  TEST: test_share_flags_streams_and_acl ... PASS
+  TEST: test_share_store_dos_attrs_disabled ... PASS
+  TEST: test_share_oplocks_disabled ... PASS
+  TEST: test_share_crossmnt_enabled ... PASS
+  TEST: test_share_flag_operations ... PASS
+
+--- Share masks & modes ---
+  TEST: test_share_masks ... PASS
+  TEST: test_share_force_modes ... PASS
+
+--- Hosts map ---
+  TEST: test_hosts_allow_map ... PASS
+  TEST: test_hosts_deny_map ... PASS
+  TEST: test_hosts_map_invalid_index ... [ksmbd.tools/3371132]: ERROR: Invalid hosts map index: 2
+PASS
+  TEST: test_hosts_map_no_map ... PASS
+  TEST: test_hosts_allow_ipv6_cidr ... PASS
+  TEST: test_hosts_allow_multiple ... PASS
+
+--- Users map ---
+  TEST: test_users_map_invalid_index ... [ksmbd.tools/3371132]: ERROR: Invalid users map index: 5
+PASS
+  TEST: test_users_map_no_map ... PASS
+
+--- Share name hash/equal ---
+  TEST: test_share_name_hash_equal ... PASS
+
+--- Null safety ---
+  TEST: test_close_connection_null ... PASS
+  TEST: test_put_share_null ... PASS
+  TEST: test_payload_size_null_share ... PASS
+  TEST: test_handle_config_request_null_share ... PASS
+
+--- Special shares ---
+  TEST: test_share_veto_files ... PASS
+  TEST: test_share_vfs_objects ... PASS
+  TEST: test_share_writable_variant ... PASS
+  TEST: test_share_fruit_options ... PASS
+  TEST: test_ipc_pipe_share ... PASS
+
+--- Remove all shares ---
+  TEST: test_remove_all_shares ... PASS
+
+--- All options ---
+  TEST: test_share_all_options ... PASS
+
+=== Results: 48/48 tests passed ===
+==============================================================================
+
+=================================== 22/25 ====================================
+test:         ksmbd-tools:smbacl
+start time:   01:57:38
+duration:     0.03s
+result:       exit status 0
+command:      MSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 MALLOC_PERTURB_=6 MESON_TEST_ITERATION=1 ASAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1 UBSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 /home/ezechiel203/ksmbd/ksmbd-tools/build-codex/tests/test_smbacl
+----------------------------------- stdout -----------------------------------
+=== SMB ACL Tests ===
+
+--- smb_copy_sid ---
+  TEST: test_copy_sid_basic ... PASS
+  TEST: test_copy_sid_max_subauth ... PASS
+  TEST: test_copy_sid_overflow_guard ... PASS
+
+--- smb_compare_sids ---
+  TEST: test_compare_sids_equal ... PASS
+  TEST: test_compare_sids_null_left ... PASS
+  TEST: test_compare_sids_null_right ... PASS
+  TEST: test_compare_sids_revision_greater ... PASS
+  TEST: test_compare_sids_revision_less ... PASS
+  TEST: test_compare_sids_authority_diff ... PASS
+  TEST: test_compare_sids_subauth_diff ... PASS
+  TEST: test_compare_sids_different_count ... PASS
+
+--- smb_write_sid / smb_read_sid ---
+  TEST: test_write_read_sid_roundtrip ... PASS
+  TEST: test_read_sid_zero_subauth ... PASS
+  TEST: test_read_sid_max_subauth_exceeded ... PASS
+  TEST: test_write_sid_overflow ... [ksmbd.tools/3371133]: ERROR: DCE RPC: fixed payload buffer overflow
+PASS
+
+--- smb_init_domain_sid ---
+  TEST: test_init_domain_sid ... PASS
+
+--- build_sec_desc ---
+  TEST: test_build_sec_desc ... PASS
+
+--- set_domain_name ---
+  TEST: test_set_domain_name_unix_users ... PASS
+  TEST: test_set_domain_name_unix_groups ... PASS
+
+=== Results: 19/19 tests passed ===
+==============================================================================
+
+=================================== 23/25 ====================================
+test:         ksmbd-tools:rpc-pipe
+start time:   01:57:38
+duration:     0.02s
+result:       exit status 0
+command:      MSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 MESON_TEST_ITERATION=1 ASAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1 MALLOC_PERTURB_=36 UBSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 /home/ezechiel203/ksmbd/ksmbd-tools/build-codex/tests/test_rpc_pipe
+----------------------------------- stdout -----------------------------------
+=== RPC Pipe Tests (Full Coverage) ===
+
+--- rpc_open / rpc_close ---
+  TEST: test_rpc_open_close_lifecycle ... PASS
+  TEST: test_rpc_open_collision ... [ksmbd.tools/3371137]: ERROR: RPC: pipe ID collision: 2001
+PASS
+  TEST: test_rpc_close_nonexistent ... [ksmbd.tools/3371137]: ERROR: RPC: unknown pipe ID: 99999
+PASS
+  TEST: test_rpc_open_multiple_pipes ... PASS
+  TEST: test_rpc_destroy_clears_pipes ... [ksmbd.tools/3371137]: ERROR: RPC: unknown pipe ID: 2200
+PASS
+
+--- rpc_restricted_context ---
+  TEST: test_rpc_restricted_context_disabled ... PASS
+  TEST: test_rpc_restricted_context_enabled_with_flag ... PASS
+  TEST: test_rpc_restricted_context_enabled_no_flag ... PASS
+
+--- rpc_write / rpc_read errors ---
+  TEST: test_rpc_write_no_pipe ... PASS
+  TEST: test_rpc_read_no_pipe ... [ksmbd.tools/3371137]: ERROR: RPC: no pipe or pipe has no associated DCE [77778]
+PASS
+  TEST: test_rpc_write_return_ready_bypass ... PASS
+  TEST: test_rpc_write_unsupported_ptype ... PASS
+
+--- rpc_ioctl_request ---
+  TEST: test_rpc_ioctl_payload_too_small ... PASS
+
+--- dcerpc_write_headers ---
+  TEST: test_dcerpc_write_headers ... PASS
+  TEST: test_dcerpc_write_headers_emore_data ... PASS
+  TEST: test_dcerpc_write_headers_resp_fields ... PASS
+
+--- rpc_init / rpc_destroy ---
+  TEST: test_rpc_init_destroy_idempotent ... PASS
+
+--- Full BIND round-trips ---
+  TEST: test_rpc_srvsvc_bind_roundtrip ... PASS
+  TEST: test_rpc_wkssvc_bind_roundtrip ... PASS
+  TEST: test_rpc_samr_bind_roundtrip ... PASS
+  TEST: test_rpc_lsarpc_bind_roundtrip ... PASS
+
+--- BIND NACK ---
+  TEST: test_rpc_bind_nack_unsupported_syntax ... [ksmbd.tools/3371137]: ERROR: Unsupported transfer syntax
+PASS
+
+--- ALTCONT ---
+  TEST: test_rpc_altcont_bind ... PASS
+
+--- dssetup detection ---
+  TEST: test_rpc_bind_dssetup_detection ... PASS
+
+--- assoc_group_id preservation ---
+  TEST: test_rpc_bind_assoc_group_preserved ... PASS
+
+--- negotiate_ack syntax ---
+  TEST: test_rpc_bind_negotiate_ack_syntax ... PASS
+
+--- zero contexts ---
+  TEST: test_rpc_bind_zero_contexts ... [ksmbd.tools/3371137]: ERROR: Unsupported transfer syntax
+PASS
+
+--- dcerpc_set_ext_payload ---
+  TEST: test_dcerpc_set_ext_payload ... PASS
+
+--- rpc_pipe_reset ---
+  TEST: test_rpc_pipe_reset_with_entries ... PASS
+  TEST: test_rpc_pipe_reset_via_destroy ... PASS
+
+--- NDR union int ---
+  TEST: test_ndr_write_union_int16_roundtrip ... PASS
+  TEST: test_ndr_write_union_int32_roundtrip ... PASS
+  TEST: test_ndr_read_union_int32_roundtrip ... PASS
+  TEST: test_ndr_read_union_int32_mismatch ... [ksmbd.tools/3371137]: ERROR: NDR: union representation mismatch 286331153
+PASS
+
+--- NDR vstring ---
+  TEST: test_ndr_write_vstring ... PASS
+  TEST: test_ndr_write_vstring_null ... PASS
+  TEST: test_ndr_write_vstring_ascii ... PASS
+  TEST: test_ndr_write_lsa_string ... PASS
+  TEST: test_ndr_write_lsa_string_null ... PASS
+  TEST: test_ndr_read_vstring_roundtrip ... PASS
+  TEST: test_ndr_read_vstring_empty ... PASS
+  TEST: test_ndr_read_vstring_truncated ... PASS
+  TEST: test_ndr_read_vstring_actual_exceeds_max ... PASS
+
+--- NDR vstring ptr ---
+  TEST: test_ndr_read_vstring_ptr ... PASS
+  TEST: test_ndr_read_uniq_vstring_ptr_with_ref ... PASS
+  TEST: test_ndr_read_uniq_vstring_ptr_null_ref ... PASS
+
+--- NDR ptr / uniq_ptr ---
+  TEST: test_ndr_read_ptr ... PASS
+  TEST: test_ndr_read_uniq_ptr ... PASS
+  TEST: test_ndr_read_uniq_ptr_null ... PASS
+
+--- NDR free helpers ---
+  TEST: test_ndr_free_vstring_ptr ... PASS
+  TEST: test_ndr_free_uniq_vstring_ptr ... PASS
+
+--- NDR overflow ---
+  TEST: test_ndr_read_int16_overflow ... PASS
+  TEST: test_ndr_read_int32_overflow ... PASS
+  TEST: test_ndr_read_int64_overflow ... PASS
+  TEST: test_ndr_read_bytes_overflow ... PASS
+
+--- NDR null value ptr ---
+  TEST: test_ndr_read_int32_null_value ... PASS
+  TEST: test_ndr_read_int16_null_value ... PASS
+
+--- NDR big-endian ---
+  TEST: test_ndr_big_endian_int16 ... PASS
+  TEST: test_ndr_big_endian_int32 ... PASS
+
+--- fixed payload overflow ---
+  TEST: test_ndr_write_fixed_payload_overflow ... [ksmbd.tools/3371137]: ERROR: DCE RPC: fixed payload buffer overflow
+PASS
+
+--- dynamic realloc ---
+  TEST: test_ndr_write_dynamic_realloc ... PASS
+
+--- ndr_write_string NULL ---
+  TEST: test_ndr_write_string_null ... PASS
+
+--- auto_align edge cases ---
+  TEST: test_auto_align_already_aligned ... PASS
+  TEST: test_auto_align_no_flag ... PASS
+
+--- rpc_read unsupported ptype ---
+  TEST: test_rpc_read_unsupported_ptype ... PASS
+
+--- rpc_read after open (no write) ---
+  TEST: test_rpc_read_after_open_no_write ... [ksmbd.tools/3371137]: ERROR: SRVSVC: unsupported RETURN method 0
+PASS
+
+--- ndr_write_array_of_structs empty ---
+  TEST: test_ndr_write_array_of_structs_empty ... PASS
+
+=== Results: 67/67 tests passed ===
+==============================================================================
+
+=================================== 24/25 ====================================
+test:         ksmbd-tools:worker-ipc
+start time:   01:57:38
+duration:     0.20s
+result:       exit status 0
+command:      MSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 MESON_TEST_ITERATION=1 ASAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1 MALLOC_PERTURB_=248 UBSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 /home/ezechiel203/ksmbd/ksmbd-tools/build-codex/tests/test_worker_ipc
+----------------------------------- stdout -----------------------------------
+=== Worker / IPC Comprehensive Tests ===
+
+--- ipc_msg_alloc: basic ---
+  TEST: test_ipc_msg_alloc_basic ... PASS
+  TEST: test_ipc_msg_alloc_zero_size ... PASS
+  TEST: test_ipc_msg_alloc_one_byte ... PASS
+
+--- ipc_msg_alloc: maximum boundary ---
+  TEST: test_ipc_msg_alloc_max_size ... PASS
+  TEST: test_ipc_msg_alloc_max_minus_one ... PASS
+  TEST: test_ipc_msg_alloc_max_plus_one ... [ksmbd.tools/3371134]: ERROR: IPC message is too large: 4097
+PASS
+  TEST: test_ipc_msg_alloc_exact_max_message_size ... [ksmbd.tools/3371134]: ERROR: IPC message is too large: 4105
+PASS
+
+--- ipc_msg_alloc: overflow protection ---
+  TEST: test_ipc_msg_alloc_size_max_overflow ... [ksmbd.tools/3371134]: ERROR: IPC message size overflow: 18446744073709551615
+PASS
+  TEST: test_ipc_msg_alloc_size_max_minus_header ... [ksmbd.tools/3371134]: ERROR: IPC message size overflow: 18446744073709551607
+PASS
+  TEST: test_ipc_msg_alloc_size_max_minus_header_minus_one ... [ksmbd.tools/3371134]: ERROR: IPC message is too large: 18446744073709551615
+PASS
+  TEST: test_ipc_msg_alloc_half_size_max ... [ksmbd.tools/3371134]: ERROR: IPC message is too large: 9223372036854775816
+PASS
+  TEST: test_ipc_msg_alloc_large_but_no_overflow ... [ksmbd.tools/3371134]: ERROR: IPC message is too large: 8201
+PASS
+
+--- ipc_msg_alloc: typical structure sizes ---
+  TEST: test_ipc_msg_alloc_login_request_size ... PASS
+  TEST: test_ipc_msg_alloc_login_response_size ... PASS
+  TEST: test_ipc_msg_alloc_heartbeat_size ... PASS
+  TEST: test_ipc_msg_alloc_tree_connect_request_size ... PASS
+  TEST: test_ipc_msg_alloc_tree_connect_response_size ... PASS
+  TEST: test_ipc_msg_alloc_share_config_request_size ... PASS
+  TEST: test_ipc_msg_alloc_share_config_response_size ... PASS
+  TEST: test_ipc_msg_alloc_rpc_command_size ... PASS
+  TEST: test_ipc_msg_alloc_logout_request_size ... PASS
+  TEST: test_ipc_msg_alloc_tree_disconnect_request_size ... PASS
+  TEST: test_ipc_msg_alloc_spnego_authen_request_size ... PASS
+  TEST: test_ipc_msg_alloc_spnego_authen_response_size ... PASS
+  TEST: test_ipc_msg_alloc_startup_request_size ... PASS
+  TEST: test_ipc_msg_alloc_login_response_ext_size ... PASS
+
+--- ipc_msg_free ---
+  TEST: test_ipc_msg_free_null ... PASS
+  TEST: test_ipc_msg_free_valid ... PASS
+
+--- ipc_msg_alloc: zero-initialization ---
+  TEST: test_ipc_msg_alloc_zeroed ... PASS
+
+--- KSMBD_IPC_MSG_PAYLOAD: layout and access ---
+  TEST: test_ipc_msg_payload_roundtrip ... PASS
+  TEST: test_ipc_msg_payload_type_field ... PASS
+  TEST: test_ipc_msg_payload_offset ... PASS
+  TEST: test_ipc_msg_payload_struct_embedding ... PASS
+  TEST: test_ipc_msg_payload_login_request_embedding ... PASS
+  TEST: test_ipc_msg_payload_login_response_embedding ... PASS
+  TEST: test_ipc_msg_payload_tree_connect_request_embedding ... PASS
+  TEST: test_ipc_msg_payload_tree_disconnect_request_embedding ... PASS
+  TEST: test_ipc_msg_payload_logout_request_embedding ... PASS
+  TEST: test_ipc_msg_payload_rpc_command_embedding ... PASS
+
+--- Message type constants ---
+  TEST: test_event_type_constants ... PASS
+  TEST: test_event_max_constant ... PASS
+  TEST: test_event_type_all_request_response_pairs ... PASS
+
+--- IPC constants ---
+  TEST: test_ipc_max_message_size_constant ... PASS
+  TEST: test_ipc_so_rcvbuf_size_constant ... PASS
+  TEST: test_genl_constants ... PASS
+  TEST: test_req_max_sizes ... PASS
+
+--- User and tree connect status constants ---
+  TEST: test_user_flag_constants ... PASS
+  TEST: test_tree_conn_status_constants ... PASS
+
+--- RPC method and status constants ---
+  TEST: test_rpc_method_flag_constants ... PASS
+  TEST: test_rpc_status_constants ... PASS
+
+--- Structure size sanity ---
+  TEST: test_ipc_msg_struct_size ... PASS
+  TEST: test_heartbeat_struct_size ... PASS
+  TEST: test_login_request_struct_size ... PASS
+  TEST: test_login_response_struct_size ... PASS
+  TEST: test_tree_connect_request_struct_size ... PASS
+  TEST: test_tree_disconnect_request_struct_size ... PASS
+  TEST: test_logout_request_struct_size ... PASS
+  TEST: test_rpc_command_struct_layout ... PASS
+
+--- wp_init / wp_destroy: lifecycle ---
+  TEST: test_wp_lifecycle ... PASS
+  TEST: test_wp_init_default_thread_count ... PASS
+  TEST: test_wp_init_one_thread ... PASS
+  TEST: test_wp_init_max_threads ... PASS
+  TEST: test_wp_init_over_max_threads ... PASS
+  TEST: test_wp_init_very_large_thread_count ... PASS
+  TEST: test_wp_init_negative_thread_count ... PASS
+  TEST: test_wp_init_int_min_thread_count ... PASS
+  TEST: test_wp_init_two_threads ... PASS
+  TEST: test_wp_init_thirty_two_threads ... PASS
+
+--- wp_destroy: idempotency ---
+  TEST: test_wp_destroy_idempotent ... PASS
+  TEST: test_wp_destroy_without_init ... PASS
+  TEST: test_wp_destroy_triple ... PASS
+
+--- wp_init: idempotency ---
+  TEST: test_wp_init_idempotent ... PASS
+  TEST: test_wp_init_reinit_after_destroy ... PASS
+
+--- wp_ipc_msg_push ---
+  TEST: test_wp_ipc_msg_push_basic ... PASS
+  TEST: test_wp_ipc_msg_push_unknown_type ... [ksmbd.tools/3371134]: ERROR: Unknown IPC message type: 9999
+PASS
+
+--- Alloc/free stress ---
+  TEST: test_ipc_msg_alloc_free_cycle ... PASS
+  TEST: test_ipc_msg_alloc_multiple_outstanding ... PASS
+
+--- Payload isolation ---
+  TEST: test_ipc_msg_payload_isolation ... PASS
+
+--- Share config response layout ---
+  TEST: test_share_config_response_veto_list_macro ... PASS
+  TEST: test_share_config_response_no_veto_list ... PASS
+
+--- Global / share / tree connect flag constants ---
+  TEST: test_global_flag_constants ... PASS
+  TEST: test_share_flag_constants ... PASS
+  TEST: test_tree_connect_flag_constants ... PASS
+
+--- Config option constants ---
+  TEST: test_config_opt_constants ... PASS
+
+--- Health status constants ---
+  TEST: test_health_status_constants ... PASS
+
+--- Startup config interfaces macro ---
+  TEST: test_startup_config_interfaces_macro ... PASS
+
+--- Alloc/free reuse ---
+  TEST: test_ipc_msg_alloc_reuse ... PASS
+
+--- wp_init/destroy rapid cycling ---
+  TEST: test_wp_rapid_init_destroy_cycle ... PASS
+
+=== Results: 88/88 tests passed ===
+==============================================================================
+
+=================================== 25/25 ====================================
+test:         ksmbd-tools:session-tree
+start time:   01:57:37
+duration:     1.13s
+result:       exit status 0
+command:      MSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 MESON_TEST_ITERATION=1 ASAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1 UBSAN_OPTIONS=halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1 MALLOC_PERTURB_=82 /home/ezechiel203/ksmbd/ksmbd-tools/build-codex/tests/test_session_tree
+----------------------------------- stdout -----------------------------------
+=== Session & Tree Connection Tests ===
+
+--- Session Capacity ---
+  TEST: test_session_capacity_available ... PASS
+  TEST: test_session_capacity_exhausted ... PASS
+  TEST: test_session_capacity_exactly_one ... PASS
+  TEST: test_session_capacity_existing_session ... PASS
+  TEST: test_session_capacity_existing_does_not_decrement ... PASS
+  TEST: test_session_capacity_decrements_for_new ... PASS
+  TEST: test_session_capacity_boundary_at_one ... PASS
+
+--- Tree Connect/Disconnect ---
+  TEST: test_tree_connect_disconnect_basic ... PASS
+  TEST: test_multiple_trees_same_session ... PASS
+  TEST: test_tree_connect_same_session_reuses_session ... PASS
+  TEST: test_tree_connect_large_session_id ... PASS
+  TEST: test_tree_connect_zero_session_id ... PASS
+  TEST: test_tree_connect_large_tree_conn_id ... PASS
+
+--- Tree Disconnect Edge Cases ---
+  TEST: test_tree_disconnect_nonexistent_tree ... PASS
+  TEST: test_tree_disconnect_nonexistent_session ... PASS
+  TEST: test_tree_disconnect_twice_same_tree ... PASS
+  TEST: test_tree_disconnect_middle_tree ... PASS
+  TEST: test_tree_disconnect_all_in_forward_order ... PASS
+
+--- Multiple Sessions ---
+  TEST: test_multiple_sessions_different_users ... PASS
+  TEST: test_multiple_sessions_same_user ... PASS
+
+--- Capacity Reclaim ---
+  TEST: test_session_capacity_reclaim ... PASS
+  TEST: test_session_capacity_no_reclaim_with_remaining_trees ... PASS
+  TEST: test_session_capacity_reclaim_then_new_session ... PASS
+
+--- Tree Conn Flags ---
+  TEST: test_tree_conn_flags ... PASS
+  TEST: test_tree_conn_flags_all ... PASS
+  TEST: test_tree_conn_flags_idempotent_set ... PASS
+  TEST: test_tree_conn_flags_zero ... PASS
+
+--- TCM Wrapper ---
+  TEST: test_tcm_handle_tree_disconnect ... PASS
+  TEST: test_tcm_handle_tree_disconnect_nonexistent ... PASS
+
+--- TCM Full Tree Connect ---
+  TEST: test_tcm_handle_tree_connect_basic ... PASS
+  TEST: test_tcm_handle_tree_connect_no_share ... [ksmbd.tools/3371111]: ERROR: treecon: Unknown net share: nonexistent_share_xyz
+PASS
+  TEST: test_tcm_handle_tree_connect_no_user ... [ksmbd.tools/3371111]: ERROR: treecon: User `nonexistent_user_xyz' not found
+PASS
+  TEST: test_tcm_handle_tree_connect_bad_password_map_never ... PASS
+  TEST: test_tcm_handle_tree_connect_guest_denied ... PASS
+  TEST: test_tcm_handle_tree_connect_guest_ok_share ... PASS
+  TEST: test_tcm_handle_tree_connect_unterminated_share ... [ksmbd.tools/3371111]: ERROR: treecon: malformed request with unterminated string
+PASS
+  TEST: test_tcm_handle_tree_connect_unterminated_account ... [ksmbd.tools/3371111]: ERROR: treecon: malformed request with unterminated string
+PASS
+  TEST: test_tcm_handle_tree_connect_unterminated_peer_addr ... [ksmbd.tools/3371111]: ERROR: treecon: malformed request with unterminated string
+PASS
+  TEST: test_tcm_handle_tree_connect_sessions_exhausted ... PASS
+  TEST: test_tcm_handle_tree_connect_restrict_anon_guest ... PASS
+  TEST: test_tcm_handle_tree_connect_multiple_to_same_share ... PASS
+
+--- Session Refcounting ---
+  TEST: test_session_refcount_single_tree ... PASS
+  TEST: test_session_multiple_trees_refcount ... PASS
+
+--- Stress ---
+  TEST: test_many_sessions ... PASS
+  TEST: test_interleaved_connect_disconnect ... PASS
+  TEST: test_session_reuse_after_destroy ... PASS
+
+--- Concurrency ---
+  TEST: test_concurrent_sessions ... PASS
+  TEST: test_concurrent_tree_adds_same_session ... PASS
+
+--- Init/Destroy Cycle (runs last) ---
+  TEST: test_sm_init_destroy_cycle ... PASS
+  TEST: test_sm_destroy_without_init ... PASS
+  TEST: test_sm_init_double ... PASS
+
+=== Results: 51/51 tests passed ===
+==============================================================================
+
+
+Ok:                25  
+Fail:              0   

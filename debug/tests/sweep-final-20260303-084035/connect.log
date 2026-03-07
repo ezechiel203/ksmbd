@@ -1,0 +1,52 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772523635
+time: 2026-03-03 07:40:35.209064
+test: connect
+time: 2026-03-03 07:40:35.210232
+all_info for '\test9.dat'
+	create_time:    Tue Mar  3 08:40:35 2026 CET
+	access_time:    Tue Mar  3 08:40:35 2026 CET
+	write_time:     Tue Mar  3 08:40:35 2026 CET
+	change_time:    Tue Mar  3 08:40:35 2026 CET
+	attrib:         0x20
+	unknown1:       0x0
+	alloc_size:     69632
+	size:           65536
+	nlink:          1
+	delete_pending: 0
+	directory:      0
+	file_id:        419558
+	ea_size:        0
+	access_mask:    0x001f01ff
+	position:       0x10000
+	mode:           0x2
+	short name:     'TEST9~KO.DAT'
+	stream 0:
+		size       65536
+		alloc size 69632
+		name       ::$DATA
+all_info for '\test9.dat'
+	create_time:    Tue Mar  3 08:40:35 2026 CET
+	access_time:    Tue Mar  3 08:40:35 2026 CET
+	write_time:     Tue Mar  3 08:40:35 2026 CET
+	change_time:    Tue Mar  3 08:40:35 2026 CET
+	attrib:         0x20
+	unknown1:       0x0
+	alloc_size:     69632
+	size:           65536
+	nlink:          1
+	delete_pending: 0
+	directory:      0
+	file_id:        419558
+	ea_size:        0
+	access_mask:    0x001f01ff
+	position:       0x10000
+	mode:           0x2
+	short name:     'TEST9~KO.DAT'
+	stream 0:
+		size       65536
+		alloc size 69632
+		name       ::$DATA
+time: 2026-03-03 07:40:35.241167
+success: connect

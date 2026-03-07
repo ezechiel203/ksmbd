@@ -1,0 +1,488 @@
+smbtorture 4.23.6
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772856562
+time: 2026-03-07 04:09:22.434649
+progress: 42
+test: exclusive1
+time: 2026-03-07 04:09:22.435765
+EXCLUSIVE1: open a file with an exclusive oplock (share mode: none)
+a 2nd open should not cause a break
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+unlink it - should also be no break
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+time: 2026-03-07 04:09:25.108226
+success: exclusive1
+test: exclusive2
+time: 2026-03-07 04:09:25.108276
+EXCLUSIVE2: open a file with an exclusive oplock (share mode: all)
+a 2nd open should cause a break to level 2
+Acking to level II [0x01] in oplock handler
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+try to unlink it - should cause a break
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+close both handles
+time: 2026-03-07 04:09:27.766968
+success: exclusive2
+test: exclusive3
+time: 2026-03-07 04:09:27.767022
+EXCLUSIVE3: open a file with an exclusive oplock (share mode: none)
+setpathinfo EOF should trigger a break to none
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+time: 2026-03-07 04:09:29.393579
+success: exclusive3
+test: exclusive4
+time: 2026-03-07 04:09:29.393621
+EXCLUSIVE4: open with exclusive oplock
+second open with attributes only shouldn't cause oplock break
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+time: 2026-03-07 04:09:31.256507
+success: exclusive4
+test: exclusive5
+time: 2026-03-07 04:09:31.256550
+EXCLUSIVE5: open with exclusive oplock
+second open with attributes only and NTCREATEX_DISP_OVERWRITE_IF disposition causes oplock break
+Acking to level II [0x01] in oplock handler
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+time: 2026-03-07 04:09:32.935003
+success: exclusive5
+test: exclusive6
+time: 2026-03-07 04:09:32.935047
+EXCLUSIVE6: open a file with an exclusive oplock (share mode: none)
+rename with the parent directory handle open for DELETE should not generate a break but get a sharing violation
+trying rename while parent handle open for delete.
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+rename with the parent directory handle open without DELETE should succeed without a break
+trying rename while parent handle open without delete
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+time: 2026-03-07 04:09:35.648902
+success: exclusive6
+test: exclusive9
+time: 2026-03-07 04:09:35.648951
+Acking to none [0x00] in oplock handler
+Acking to level II [0x01] in oplock handler
+Acking to none [0x00] in oplock handler
+Acking to level II [0x01] in oplock handler
+time: 2026-03-07 04:09:36.639721
+success: exclusive9
+test: batch1
+time: 2026-03-07 04:09:36.639771
+BATCH1: open with batch oplock
+unlink should generate a break
+Acking to level II [0x01] in oplock handler
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+2nd unlink should not generate a break
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+writing should generate a self break to none
+Break from level II to none in oplock handler
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+time: 2026-03-07 04:09:40.365776
+success: batch1
+test: batch2
+time: 2026-03-07 04:09:40.365830
+BATCH2: open with batch oplock
+unlink should generate a break, which we ack as break to none
+Acking to none in oplock handler
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+2nd unlink should not generate a break
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+writing should not generate a break
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+time: 2026-03-07 04:09:44.109544
+success: batch2
+test: batch3
+time: 2026-03-07 04:09:44.109607
+BATCH3: if we close on break then the unlink can succeed
+time: 2026-03-07 04:10:20.325217
+failure: batch3 [
+../../source4/torture/smb2/oplock.c:1078: status was NT_STATUS_SHARING_VIOLATION, expected NT_STATUS_OK: Incorrect status
+]
+test: batch4
+time: 2026-03-07 04:10:20.325264
+BATCH4: a self read should not cause a break
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+time: 2026-03-07 04:10:21.957501
+success: batch4
+test: batch5
+time: 2026-03-07 04:10:21.957567
+BATCH5: a 2nd open should give a break
+Acking to level II [0x01] in oplock handler
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+time: 2026-03-07 04:10:23.595194
+success: batch5
+test: batch6
+time: 2026-03-07 04:10:23.595254
+BATCH6: a 2nd open should give a break to level II if the first open allowed shared read
+Acking to level II [0x01] in oplock handler
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+write should trigger a break to none on both
+Break from level II to none in oplock handler
+Break from level II to none in oplock handler
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+time: 2026-03-07 04:10:27.263046
+success: batch6
+test: batch7
+time: 2026-03-07 04:10:27.263091
+BATCH7: a 2nd open should get an oplock when we close instead of ack
+time: 2026-03-07 04:11:05.383263
+failure: batch7 [
+../../source4/torture/smb2/oplock.c:1366: status was NT_STATUS_SHARING_VIOLATION, expected NT_STATUS_OK: Incorrect status
+]
+test: batch8
+time: 2026-03-07 04:11:05.383309
+BATCH8: open with batch oplock
+second open with attributes only shouldn't cause oplock break
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+time: 2026-03-07 04:11:07.116216
+success: batch8
+test: batch9
+time: 2026-03-07 04:11:07.116262
+BATCH9: open with attributes only can create file
+Subsequent normal open should break oplock on attribute only open to level II
+Acking to level II [0x01] in oplock handler
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+third oplocked open should grant level2 without break
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+write should trigger a break to none on both
+Break from level II to none in oplock handler
+Break from level II to none in oplock handler
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+time: 2026-03-07 04:11:12.005376
+success: batch9
+test: batch9a
+time: 2026-03-07 04:11:12.005442
+BATCH9: open with attributes only can create file
+Subsequent attributes open should not break
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+Subsequent normal open should break oplock on attribute only open to level II
+Acking to level II [0x01] in oplock handler
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+third oplocked open should grant level2 without break
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+write should trigger a break to none on both
+Break from level II to none in oplock handler
+Break from level II to none in oplock handler
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+time: 2026-03-07 04:11:17.960443
+success: batch9a
+test: batch10
+time: 2026-03-07 04:11:17.960487
+BATCH10: Open with oplock after a non-oplock open should grant level2
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+write should trigger a break to none
+Break from level II to none in oplock handler
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+time: 2026-03-07 04:11:21.721801
+success: batch10
+test: batch11
+time: 2026-03-07 04:11:21.721861
+BATCH11: Test if setpathinfo set EOF breaks oplocks.
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+Breaking to level II [0x01] in oplock handler
+Breaking to none [0x00] in oplock handler
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+time: 2026-03-07 04:11:25.388578
+success: batch11
+test: batch12
+time: 2026-03-07 04:11:25.388642
+BATCH12: Test if setpathinfo allocation size breaks oplocks.
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+Breaking to level II [0x01] in oplock handler
+Breaking to none [0x00] in oplock handler
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+time: 2026-03-07 04:11:29.206660
+success: batch12
+test: batch13
+time: 2026-03-07 04:11:29.206708
+BATCH13: open with batch oplock
+second open with attributes only and NTCREATEX_DISP_OVERWRITE disposition causes oplock break
+Acking to level II [0x01] in oplock handler
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+time: 2026-03-07 04:11:31.082042
+success: batch13
+test: batch14
+time: 2026-03-07 04:11:31.082087
+BATCH14: open with batch oplock
+second open with attributes only and NTCREATEX_DISP_SUPERSEDE disposition causes oplock break
+Acking to level II [0x01] in oplock handler
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+time: 2026-03-07 04:11:32.721036
+success: batch14
+test: batch15
+time: 2026-03-07 04:11:32.721100
+BATCH15: Test if qpathinfo all info breaks a batch oplock (should not).
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+time: 2026-03-07 04:11:35.353811
+success: batch15
+test: batch16
+time: 2026-03-07 04:11:35.353899
+BATCH16: open with batch oplock
+second open with attributes only and NTCREATEX_DISP_OVERWRITE_IF disposition causes oplock break
+Acking to level II [0x01] in oplock handler
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+time: 2026-03-07 04:11:37.141545
+success: batch16
+test: batch19
+time: 2026-03-07 04:11:37.141590
+BATCH19: open a file with an batch oplock (share mode: none)
+setfileinfo rename info should not trigger a break but should cause a sharing violation
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+time: 2026-03-07 04:11:38.507163
+success: batch19
+test: batch20
+time: 2026-03-07 04:11:38.507206
+BATCH20: open a file with an batch oplock (share mode: all)
+setfileinfo rename info should not trigger a break but should cause a sharing violation
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+open the file a second time requesting batch (share mode: all)
+Acking to level II [0x01] in oplock handler
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+setfileinfo rename info should not trigger a break but should cause a sharing violation
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+time: 2026-03-07 04:11:42.157369
+success: batch20
+test: batch21
+time: 2026-03-07 04:11:42.157437
+BATCH21: open with batch oplock
+writing should not generate a break
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+time: 2026-03-07 04:11:43.655491
+success: batch21
+test: batch22a
+time: 2026-03-07 04:11:43.655559
+BATCH22: open with batch oplock
+a 2nd open should succeed after the oplock break timeout
+Let oplock break timeout
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+waited 36 seconds for oplock timeout
+time: 2026-03-07 04:12:20.401334
+success: batch22a
+test: batch22b
+time: 2026-03-07 04:12:20.401396
+BATCH22: open with batch oplock
+a 2nd open should succeed after the oplock break timeout
+transport[transport1] uses tcp port: 41632
+WARNING!: ../../source4/torture/smb2/block.c:377: status was NT_STATUS_USER_SESSION_DELETED, expected NT_STATUS_OK: FSCTL_SMBTORTURE_FORCE_UNACKED_TIMEOUT failed
+
+On a Samba server 'smbd:FSCTL_SMBTORTURE = yes' is needed!
+
+Otherwise you may need to use iptables like this:
+--option='torture:use_iptables=yes'
+And maybe something like this in addition:
+--option='torture:iptables_command=sudo /sbin/iptables'
+
+
+time: 2026-03-07 04:12:20.717085
+failure: batch22b [
+../../source4/torture/smb2/oplock.c:2706: Expression `block_ok' failed: test_block_smb2_transport
+]
+test: batch23
+time: 2026-03-07 04:12:20.717144
+BATCH23: an open and ask for a batch oplock
+a 2nd open without level2 oplock support should generate a break to level2
+Acking to level II [0x01] in oplock handler
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+a 3rd open with level2 oplock support should not generate a break
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+time: 2026-03-07 04:12:23.554566
+success: batch23
+test: batch24
+time: 2026-03-07 04:12:23.555772
+BATCH24: a open without level support and ask for a batch oplock
+a 2nd open with level2 oplock support should generate a break
+Acking to level II [0x01] in oplock handler
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+time: 2026-03-07 04:12:28.136516
+success: batch24
+test: batch25
+time: 2026-03-07 04:12:28.138483
+BATCH25: open a file with an batch oplock (share mode: none)
+time: 2026-03-07 04:12:28.463377
+success: batch25
+test: batch26
+time: 2026-03-07 04:12:28.463424
+Open the base file with batch oplock
+Got batch oplock on base file
+Opening stream file with batch oplock..
+Got batch oplock on stream file
+Open base file again with batch oplock
+Acking to level II [0x01] in oplock handler
+time: 2026-03-07 04:12:29.045048
+success: batch26
+test: stream1
+time: 2026-03-07 04:12:29.045097
+0: Opening stream: oplock_test\test_stream1.txt:Stream One:$DATA with 9
+1: Opening stream: oplock_test\test_stream1.txt::$DATA with 9
+2: Opening stream: oplock_test\test_stream1.txt:Stream One:$DATA with 8
+3: Opening stream: oplock_test\test_stream1.txt::$DATA with 8
+Opening base file: oplock_test\test_stream1.txt with 9
+4: Opening stream: oplock_test\test_stream1.txt:Stream One:$DATA with 9
+Opening base file: oplock_test\test_stream1.txt with 9
+5: Opening stream: oplock_test\test_stream1.txt::$DATA with 9
+Acking to level II [0x01] in oplock handler
+Opening base file: oplock_test\test_stream1.txt with 9
+6: Opening stream: oplock_test\test_stream1.txt:Stream One:$DATA with 8
+Opening base file: oplock_test\test_stream1.txt with 9
+7: Opening stream: oplock_test\test_stream1.txt::$DATA with 8
+Acking to level II [0x01] in oplock handler
+Opening stream: oplock_test\test_stream1.txt:Stream One:$DATA with 8
+Opening base file: oplock_test\test_stream1.txt with 9
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+Opening stream again: oplock_test\test_stream1.txt with 9
+Acking to level II [0x01] in oplock handler
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+time: 2026-03-07 04:12:32.281836
+success: stream1
+test: doc
+time: 2026-03-07 04:12:32.281882
+open a file with a batch oplock
+Set delete on close
+2nd open should not break and get DELETE_PENDING
+time: 2026-03-07 04:12:32.883854
+success: doc
+test: brl1
+time: 2026-03-07 04:12:32.883903
+open with batch oplock
+a 2nd open should give a break
+Breaking to level II [0x01] in oplock handler
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+a self BRL acquisition should break to none
+Breaking to none [0x00] in oplock handler
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+time: 2026-03-07 04:12:36.637414
+success: brl1
+test: brl2
+time: 2026-03-07 04:12:36.637461
+open with batch oplock
+a self BRL acquisition should not break to none
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+time: 2026-03-07 04:12:38.275553
+success: brl2
+test: brl3
+time: 2026-03-07 04:12:38.275598
+open with batch oplock
+a 2nd open should give a break
+Breaking to level II [0x01] in oplock handler
+a self BRL acquisition should break to none
+Breaking to none [0x00] in oplock handler
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+time: 2026-03-07 04:12:40.891703
+success: brl3
+test: levelii500
+time: 2026-03-07 04:12:40.891747
+LEVELII500: acknowledging a break from II to none should return an error
+write should trigger a break to none and when we reply, an oplock break failure
+Acking to none [0x00] in oplock handler
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+time: 2026-03-07 04:12:45.529541
+success: levelii500
+test: levelii501
+time: 2026-03-07 04:12:45.529588
+LEVELII501: Test double break sequence
+Got break to level II [0x01] in oplock handler, postponing break response for 500msec
+open1 done: NT_STATUS_INVALID_NETWORK_RESPONSE
+break done: NT_STATUS_OK
+Got break to none [0x00] in oplock handler, postponing break response for 500msec
+open2 done: NT_STATUS_OK
+break done: NT_STATUS_INVALID_OPLOCK_PROTOCOL
+time: 2026-03-07 04:12:47.943523
+success: levelii501
+test: levelii502
+time: 2026-03-07 04:12:47.943602
+LEVELII502: Open a stale LEVEL2 oplock with OVERWRITEtime: 2026-03-07 04:12:49.279924
+success: levelii502
+test: statopen1
+time: 2026-03-07 04:12:49.279990
+Acking to level II [0x01] in oplock handler
+Acking to level II [0x01] in oplock handler
+Acking to level II [0x01] in oplock handler
+Acking to level II [0x01] in oplock handler
+Acking to level II [0x01] in oplock handler
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+Acking to level II [0x01] in oplock handler
+		Specific bits: 0x0
+WARNING!: (../../source4/torture/smb2/oplock.c:4114): wrong value for break_info.count got 0x0 - should be 0x1
+
+time: 2026-03-07 04:12:52.372487
+failure: statopen1 [
+test 8: access_mask: READ_CONTROL_ACCESS , expect_stat_open: no
+]

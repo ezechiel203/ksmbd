@@ -1,0 +1,13 @@
+test/ksmbd_test_ida.c:164: * If it ever gets 0xFFFE, it frees that and tries 0xFFFF instead.
+test/ksmbd_test_pdu_common.c:191: * test_dos_mode_regular_file_default - regular file gets ATTR_ARCHIVE
+test/ksmbd_test_pdu_common.c:216: * test_dos_mode_fifo_gets_reparse - FIFO gets ATTR_REPARSE
+src/core/misc.c:378:				sprintf(out_next, "%s/", name);
+src/include/fs/smbacl.h:152:	struct smb_sid sid; /* ie UUID of user or group who gets these perms */
+ksmbd-tools/mountd/ipc.c:197:			strcpy(config_payload + sz, p);
+ksmbd-tools/tools/management/share.c:1088:		sprintf(config_payload,
+ksmbd-tools/tools/management/share.c:1093:		sprintf(config_payload, "%s", share->path);
+ksmbd-tools/tools/tools.c:233:		xi += sprintf(xline + xi, "%02X ", 0xff & c);
+ksmbd-tools/tools/tools.c:235:			si += sprintf(sline + si, "%c", c);
+ksmbd-tools/tools/tools.c:237:			si += sprintf(sline + si, ".");
+ksmbd-tools/tools/management/spnego_krb5.c:286:	strcpy(auth_out->user_name, client_name);
+ksmbd-tools/include/smbacl.h:71:	struct smb_sid sid; /* ie UUID of user or group who gets these perms */

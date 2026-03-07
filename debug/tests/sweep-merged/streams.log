@@ -1,0 +1,88 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772505880
+time: 2026-03-03 02:44:40.867433
+progress: 14
+test: dir
+time: 2026-03-03 02:44:40.868420
+teststreams\stream.txt:Stream One
+(../../source4/torture/smb2/streams.c:214) opening non-existent directory stream
+(../../source4/torture/smb2/streams.c:229) opening basedir  stream
+(../../source4/torture/smb2/streams.c:245) opening basedir ::$DATA stream
+(../../source4/torture/smb2/streams.c:261) list the streams on the basedir
+time: 2026-03-03 02:44:40.876308
+success: dir
+test: io
+time: 2026-03-03 02:44:40.876351
+time: 2026-03-03 02:44:40.882210
+failure: io [
+../../source4/torture/smb2/streams.c:298: status was NT_STATUS_DELETE_PENDING, expected NT_STATUS_OK: CHECK_STATUS
+]
+test: sharemodes
+time: 2026-03-03 02:44:40.882263
+(../../source4/torture/smb2/streams.c:570) Testing stream share mode conflicts
+time: 2026-03-03 02:44:40.890755
+success: sharemodes
+test: names
+time: 2026-03-03 02:44:40.890815
+time: 2026-03-03 02:44:40.894870
+failure: names [
+../../source4/torture/smb2/streams.c:845: status was NT_STATUS_DELETE_PENDING, expected NT_STATUS_OK: CHECK_STATUS
+]
+test: names2
+time: 2026-03-03 02:44:40.894933
+(../../source4/torture/smb2/streams.c:1141) testing stream names
+time: 2026-03-03 02:44:40.936586
+success: names2
+test: names3
+time: 2026-03-03 02:44:40.936644
+time: 2026-03-03 02:44:40.943374
+failure: names3 [
+../../source4/torture/smb2/streams.c:1227: status was NT_STATUS_DELETE_PENDING, expected NT_STATUS_OK: CHECK_STATUS
+]
+test: rename
+time: 2026-03-03 02:44:40.943441
+(../../source4/torture/smb2/streams.c:1350) testing stream renames
+time: 2026-03-03 02:44:40.951719
+success: rename
+test: rename2
+time: 2026-03-03 02:44:40.951775
+(../../source4/torture/smb2/streams.c:1475) Checking SMB2 rename of a stream using :<stream>
+(../../source4/torture/smb2/streams.c:1489) Checking SMB2 rename of an overwriting stream using :<stream>
+(../../source4/torture/smb2/streams.c:1519) Checking SMB2 rename of a stream using <base>:<stream>
+(../../source4/torture/smb2/streams.c:1529) Checking SMB2 rename to default stream using :<stream>
+time: 2026-03-03 02:44:40.962800
+success: rename2
+test: create-disposition
+time: 2026-03-03 02:44:40.962846
+time: 2026-03-03 02:44:40.966409
+failure: create-disposition [
+../../source4/torture/smb2/streams.c:1604: status was NT_STATUS_DELETE_PENDING, expected NT_STATUS_OK: CHECK_STATUS
+]
+test: attributes1
+time: 2026-03-03 02:44:40.966457
+(../../source4/torture/smb2/streams.c:1779) testing attribute setting on stream
+time: 2026-03-03 02:44:40.976839
+success: attributes1
+test: attributes2
+time: 2026-03-03 02:44:40.977071
+Let's dance!
+time: 2026-03-03 02:44:40.996618
+success: attributes2
+test: delete
+time: 2026-03-03 02:44:40.996672
+(../../source4/torture/smb2/streams.c:679) opening non-existent file stream
+time: 2026-03-03 02:44:41.004859
+success: delete
+test: zero-byte
+time: 2026-03-03 02:44:41.005130
+(../../source4/torture/smb2/streams.c:490) Check 0 byte named stream
+time: 2026-03-03 02:44:41.012724
+success: zero-byte
+test: basefile-rename-with-open-stream
+time: 2026-03-03 02:44:41.012782
+Creating file with stream
+Writing to stream
+Renaming base file
+time: 2026-03-03 02:44:41.021840
+success: basefile-rename-with-open-stream

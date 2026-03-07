@@ -1,0 +1,6 @@
+make: Entering directory '/usr/lib/modules/6.18.13-arch1-1/build'
+make[1] : on entre dans le répertoire « /home/ezechiel203/ksmbd »
+  CLEAN   Module.symvers
+find: ‘./.tmp_3711931’: Aucun fichier ou dossier de ce nom
+make[1] : on quitte le répertoire « /home/ezechiel203/ksmbd »
+make: Leaving directory '/usr/lib/modules/6.18.13-arch1-1/build'

@@ -1,0 +1,6 @@
+make -C /lib/modules/6.17.0-14-generic/build M=/home/ezechiel203/ksmbd clean
+make[1]: Entering directory '/usr/src/linux-headers-6.17.0-14-generic'
+make[2]: Entering directory '/home/ezechiel203/ksmbd'
+  CLEAN   Module.symvers
+make[2]: Leaving directory '/home/ezechiel203/ksmbd'
+make[1]: Leaving directory '/usr/src/linux-headers-6.17.0-14-generic'

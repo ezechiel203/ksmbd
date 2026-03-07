@@ -1,0 +1,17 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772505897
+time: 2026-03-03 02:44:58.001441
+progress: 3
+test: compound_find_related
+time: 2026-03-03 02:44:58.002975
+time: 2026-03-03 02:44:58.010296
+success: compound_find_related
+test: compound_find_unrelated
+time: 2026-03-03 02:44:58.010422
+time: 2026-03-03 02:44:58.015133
+success: compound_find_unrelated
+test: compound_find_close
+time: 2026-03-03 02:44:58.015188
+time: 2026-03-03 02:45:12.162134
+success: compound_find_close

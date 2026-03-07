@@ -1,0 +1,50 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772500721
+time: 2026-03-03 01:18:41.263427
+test: setinfo
+time: 2026-03-03 01:18:41.264311
+all_info for '\fnum_test_21.txt'
+	create_time:    Sat Nov 28 02:18:40 2026 CET
+	access_time:    Sun Aug 30 03:18:40 2026 CEST
+	write_time:     Mon Jun  1 03:18:40 2026 CEST
+	change_time:    Thu Apr  2 03:18:40 2026 CEST
+	attrib:         0x80
+	unknown1:       0x0
+	alloc_size:     8192
+	size:           7
+	nlink:          1
+	delete_pending: 0
+	directory:      0
+	file_id:        418132
+	ea_size:        0
+	access_mask:    0x001f01ff
+	position:       0x7
+	mode:           0x0
+	short name:     'FNUM_~-J.TXT'
+	EA[0] flags=0 len=6 'EAONE'
+	EA[1] flags=0 len=8 'SECONDEA'
+	stream 0:
+		size       7
+		alloc size 8192
+		name       ::$DATA
+Test basic_information level
+a zero time means don't change
+change the attribute
+zero attrib means don't change
+can't change a file to a directory
+restore attribute
+Test disposition_information level
+Test allocation_information level
+Test end_of_file_info level
+Test position_information level
+Test mode_information level
+Test sec_desc level
+add a new ACE to the DACL
+remove it again
+Check zero length EA's behavior
+num_eas=1
+num_eas=1
+num_eas=1
+time: 2026-03-03 01:18:46.817967
+success: setinfo

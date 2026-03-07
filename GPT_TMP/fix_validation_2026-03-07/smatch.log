@@ -1,0 +1,14 @@
+make: Entering directory '/usr/lib/modules/6.18.13-arch1-1/build'
+make[1] : on entre dans le répertoire « /home/ezechiel203/ksmbd »
+  CC [M]  src/fs/vfs_cache.o
+  CHECK   src/fs/vfs_cache.c
+src/fs/vfs_cache.c: note: in included file (through /usr/lib/modules/6.18.13-arch1-1/build/include/net/dst.h, /usr/lib/modules/6.18.13-arch1-1/build/include/net/sock.h, ./src/include/core/connection.h):
+/usr/lib/modules/6.18.13-arch1-1/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+/usr/lib/modules/6.18.13-arch1-1/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+  CC [M]  src/transport/transport_tcp.o
+  CHECK   src/transport/transport_tcp.c
+src/transport/transport_tcp.c: note: in included file (through /usr/lib/modules/6.18.13-arch1-1/build/include/net/dst.h, /usr/lib/modules/6.18.13-arch1-1/build/include/net/sock.h, ./src/include/core/connection.h):
+/usr/lib/modules/6.18.13-arch1-1/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+/usr/lib/modules/6.18.13-arch1-1/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+make[1] : on quitte le répertoire « /home/ezechiel203/ksmbd »
+make: Leaving directory '/usr/lib/modules/6.18.13-arch1-1/build'

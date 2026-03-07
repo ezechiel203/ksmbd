@@ -1,0 +1,11 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772585220
+time: 2026-03-04 00:47:00.630108
+progress: 1
+test: bug15397
+time: 2026-03-04 00:47:00.631845
+time: 2026-03-04 00:47:00.698643
+failure: bug15397 [
+../../source4/torture/smb2/session.c:6338: security_mode was 1 (0x1), expected 3 (0x3): Signing not required
+]

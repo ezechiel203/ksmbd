@@ -1,0 +1,103 @@
+<html>
+<head>
+<title>ksmbd - scan-build results</title>
+<link type="text/css" rel="stylesheet" href="scanview.css"/>
+<script src="sorttable.js"></script>
+<script language='javascript' type="text/javascript">
+function SetDisplay(RowClass, DisplayVal)
+{
+  var Rows = document.getElementsByTagName("tr");
+  for ( var i = 0 ; i < Rows.length; ++i ) {
+    if (Rows[i].className == RowClass) {
+      Rows[i].style.display = DisplayVal;
+    }
+  }
+}
+
+function CopyCheckedStateToCheckButtons(SummaryCheckButton) {
+  var Inputs = document.getElementsByTagName("input");
+  for ( var i = 0 ; i < Inputs.length; ++i ) {
+    if (Inputs[i].type == "checkbox") {
+      if(Inputs[i] != SummaryCheckButton) {
+        Inputs[i].checked = SummaryCheckButton.checked;
+        Inputs[i].onclick();
+      }
+    }
+  }
+}
+
+function returnObjById( id ) {
+    if (document.getElementById)
+        var returnVar = document.getElementById(id);
+    else if (document.all)
+        var returnVar = document.all[id];
+    else if (document.layers)
+        var returnVar = document.layers[id];
+    return returnVar;
+}
+
+var NumUnchecked = 0;
+
+function ToggleDisplay(CheckButton, ClassName) {
+  if (CheckButton.checked) {
+    SetDisplay(ClassName, "");
+    if (--NumUnchecked == 0) {
+      returnObjById("AllBugsCheck").checked = true;
+    }
+  }
+  else {
+    SetDisplay(ClassName, "none");
+    NumUnchecked++;
+    returnObjById("AllBugsCheck").checked = false;
+  }
+}
+</script>
+<!-- SUMMARYENDHEAD -->
+</head>
+<body>
+<h1>ksmbd - scan-build results</h1>
+
+<table>
+<tr><th>User:</th><td>ezechiel203@srv2</td></tr>
+<tr><th>Working Directory:</th><td>/home/ezechiel203/ksmbd</td></tr>
+<tr><th>Command Line:</th><td>clang -c -o /tmp/server-scan.o -nostdinc -I/usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include -I/usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/generated -I/usr/lib/modules/6.18.13-arch1-1/build/include -I/usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/uapi -I/usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/generated/uapi -I/usr/lib/modules/6.18.13-arch1-1/build/include/uapi -I/usr/lib/modules/6.18.13-arch1-1/build/include/generated/uapi -include /usr/lib/modules/6.18.13-arch1-1/build/include/linux/compiler-version.h -include /usr/lib/modules/6.18.13-arch1-1/build/include/linux/kconfig.h -include /usr/lib/modules/6.18.13-arch1-1/build/include/linux/compiler_types.h -D__KERNEL__ -std=gnu11 -m64 -mcmodel=kernel -O2 -Wall -Wextra -I./src -I./src/include/core -I./src/include/fs -I./src/include/protocol -I./src/include/transport -I./src/include/encoding -I./src/encoding -DCONFIG_KSMBD_FRUIT -DCONFIG_SMB_INSECURE_SERVER -DMODULE '-DKBUILD_BASENAME="server"' '-DKBUILD_MODNAME="ksmbd"' -D__KBUILD_MODNAME=kmod_ksmbd src/core/server.c</td></tr>
+<tr><th>Clang Version:</th><td>clang version 21.1.8
+</td></tr>
+<tr><th>Date:</th><td>Sat Mar  7 01:10:51 2026</td></tr>
+</table>
+<h2>Bug Summary</h2><table>
+<thead><tr><td>Bug Type</td><td>Quantity</td><td class="sorttable_nosort">Display?</td></tr></thead>
+<tr style="font-weight:bold"><td class="SUMM_DESC">All Bugs</td><td class="Q">1</td><td><center><input type="checkbox" id="AllBugsCheck" onClick="CopyCheckedStateToCheckButtons(this);" checked/></center></td></tr>
+<tr><th>Logic error</th><th colspan=2></th></tr>
+<tr><td class="SUMM_DESC">Uninitialized argument value</td><td class="Q">1</td><td><center><input type="checkbox" onClick="ToggleDisplay(this,'bt_logic_error_uninitialized_argument_value');" checked/></center></td></tr>
+</table>
+
+<h2>Filter Results by File</h2>
+<input
+  type="text"
+  id="file_input"
+  onkeyup="searchFiles()"
+  placeholder="Enter a path or filename"
+  title="Enter a path or filename">
+
+<h2>Reports</h2>
+
+<table id="reports_table" class="sortable" style="table-layout:automatic">
+<thead><tr>
+  <td>Bug Group</td>
+  <td class="sorttable_sorted">Bug Type<span id="sorttable_sortfwdind">&nbsp;&#x25BE;</span></td>
+  <td>File</td>
+  <td>Function/Method</td>
+  <td class="Q">Line</td>
+  <td class="Q">Path Length</td>
+  <td class="sorttable_nosort"></td>
+  <!-- REPORTBUGCOL -->
+</tr></thead>
+<tbody>
+<tr class="bt_logic_error_uninitialized_argument_value"><td class="DESC">Logic error</td><td class="DESC">Uninitialized argument value</td><td>server.c</td><td class="DESC">stats_show</td><td class="Q">864</td><td class="Q">10</td><td><a href="report-6c0d84.html#EndPath">View Report</a></td>
+<!-- REPORTBUG id="report-6c0d84.html" -->
+</tr>
+</tbody>
+</table>
+
+</body></html>

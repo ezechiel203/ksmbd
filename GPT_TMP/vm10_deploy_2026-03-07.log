@@ -1,0 +1,9 @@
+Deploying ksmbd to: VM10
+
+==> Deploying to VM10 (SSH 20022)...
+[ksmbd.control/536]: ERROR: Can't kill ksmbd
+[ksmbd.adduser/572]: ERROR: User `testuser' already exists
+[ksmbd.mountd/573]: INFO: Started manager
+  OK: VM10 ksmbd running on port 445
+
+Done. 1 VMs targeted, 0 failed.

@@ -1,0 +1,81 @@
+smbtorture sweep -- mer. 04 mars 2026 02:00:50 CET
+Port: 13445 | Timeout: 60s per suite
+========================================
+SUITE                                          PASS  FAIL  SKIP NOTE
+----------------------------------------
+smb2.compound_async                               3     7     0 
+smb2.acls                                         0     1     0 
+smb2.acls_non_canonical                           0     1     0 
+smb2.aio_delay                                    -     -     - SKIPPED
+smb2.async_dosmode                                1     0     0 
+smb2.bench                                        -     -     - SKIPPED
+smb2.compound_find                                2     0     0 TIMEOUT
+smb2.connect                                      1     0     0 
+smb2.create                                      17     0     1 
+smb2.create_no_streams                            0     1     0 
+smb2.change_notify_disabled                       0     0     0 TIMEOUT
+smb2.charset                                      0     4     0 
+smb2.check-sharemode                              1     0     0 
+smb2.compound                                    20     0     0 
+smb2.compound_async                               4     6     0 
+smb2.credits                                      2     0     0 TIMEOUT
+smb2.delete-on-close-perms                        8     1     0 
+smb2.deny                                         2     0     0 
+smb2.compound_find                                2     0     0 TIMEOUT
+smb2.connect                                      1     0     0 
+smb2.create                                      16     1     1 
+smb2.create_no_streams                            0     1     0 
+smb2.credits                                      4     4     0 TIMEOUT
+smb2.delete-on-close-perms                        8     1     0 
+smb2.deny                                         2     0     0 
+smb2.dir                                          2     4     0 
+smb2.dirlease                                     3    12     0 TIMEOUT
+smb2.dosmode                                      0     1     0 
+smb2.durable-open                                13    12     1 
+smb2.durable-open-disconnect                      1     0     0 
+smb2.durable-v2-delay                             2     0     0 
+smb2.dir                                          5     5     0 TIMEOUT
+smb2.durable-v2-open                              8    25     0 
+smb2.durable-v2-regressions                       0     0     1 
+smb2.ea                                           0     1     0 
+smb2.fileid                                       4     0     0 
+smb2.getinfo                                      8     0     0 
+smb2.hold-oplock                                  -     -     - SKIPPED
+smb2.hold-sharemode                               -     -     - SKIPPED
+smb2.dirlease                                     3    14     0 TIMEOUT
+smb2.dosmode                                      0     1     0 
+smb2.durable-open                                13    12     1 
+smb2.durable-open-disconnect                      1     0     0 
+smb2.durable-v2-delay                             2     0     0 
+smb2.ioctl                                       40    20    15 
+smb2.ioctl-on-stream                              1     0     0 
+smb2.kernel-oplocks                               3     4     1 
+smb2.durable-v2-open                              7    25     0 TIMEOUT
+smb2.durable-v2-regressions                       0     0     1 
+smb2.ea                                           0     1     0 
+smb2.lease                                        8    10     0 TIMEOUT
+smb2.lock                                        22     0     4 
+smb2.fileid                                       3     0     0 TIMEOUT
+smb2.getinfo                                      8     0     0 
+smb2.hold-oplock                                  -     -     - SKIPPED
+smb2.hold-sharemode                               -     -     - SKIPPED
+smb2.maxfid                                       0     0     0 TIMEOUT
+smb2.maximum_allowed                              1     1     0 
+smb2.mkdir                                        0     1     0 
+smb2.multichannel                                 -     -     - SKIPPED
+smb2.ioctl                                       40    20    15 
+smb2.name-mangling                                0     2     0 
+smb2.ioctl-on-stream                              1     0     0 
+smb2.kernel-oplocks                               3     4     1 
+smb2.notify                                       1     2     0 TIMEOUT
+smb2.lease                                        4     6     0 TIMEOUT
+smb2.notify-inotify                               0     0     0 TIMEOUT
+smb2.lock                                         4     0     1 TIMEOUT
+smb2.openattr                                     0     0     0 TIMEOUT
+smb2.maxfid                                       0     0     0 TIMEOUT
+smb2.maximum_allowed                              0     0     0 TIMEOUT
+smb2.mkdir                                        0     0     0 TIMEOUT
+smb2.multichannel                                 -     -     - SKIPPED
+smb2.name-mangling                                0     0     0 TIMEOUT
+smb2.notify                                       0     0     0 TIMEOUT
+smb2.notify-inotify                               0     0     0 TIMEOUT

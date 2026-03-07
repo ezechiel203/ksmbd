@@ -1,0 +1,106 @@
+# src/fs/vfs_cache.c
+
+Risk-tagged lines (LOCK/LIFETIME/WAIT_LOOP/ERROR_PATH/MEM_BOUNDS/PROTO_GATE):
+
+- L00050 [LIFETIME|] `static atomic_long_t fd_limit;`
+- L00060 [LIFETIME|] `	atomic_long_set(&fd_limit, limit);`
+- L00065 [LIFETIME|] `	long v = atomic_long_dec_return(&fd_limit);`
+- L00069 [LIFETIME|] `	atomic_long_inc(&fd_limit);`
+- L00075 [LIFETIME|] `	atomic_long_inc(&fd_limit);`
+- L00100 [LIFETIME|] `			if (atomic_inc_not_zero(&ci->m_count))`
+- L00129 [PROTO_GATE|] `	int ret = KSMBD_INODE_STATUS_UNKNOWN;`
+- L00139 [LOCK|] `	down_read(&ci->m_lock);`
+- L00141 [PROTO_GATE|] `		ret = KSMBD_INODE_STATUS_PENDING_DELETE;`
+- L00143 [PROTO_GATE|] `		ret = KSMBD_INODE_STATUS_OK;`
+- L00155 [LOCK|] `	down_read(&ci->m_lock);`
+- L00158 [PROTO_GATE|] `	 * opens with STATUS_DELETE_PENDING.  S_DEL_ON_CLS is a per-handle`
+- L00175 [LOCK|] `	down_write(&ci->m_lock);`
+- L00181 [LOCK|] `	up_write(&ci->m_lock);`
+- L00190 [LOCK|] `	down_write(&ci->m_lock);`
+- L00192 [LOCK|] `	up_write(&ci->m_lock);`
+- L00199 [LOCK|] `	down_write(&ci->m_lock);`
+- L00201 [LOCK|] `	up_write(&ci->m_lock);`
+- L00210 [LOCK|] `	down_write(&ci->m_lock);`
+- L00215 [LOCK|] `	up_write(&ci->m_lock);`
+- L00251 [LIFETIME|] `	atomic_set(&ci->m_count, 1);`
+- L00252 [LIFETIME|] `	atomic_set(&ci->op_count, 0);`
+- L00253 [LIFETIME|] `	atomic_set(&ci->sop_count, 0);`
+- L00278 [MEM_BOUNDS|] `	ci = kmalloc(sizeof(struct ksmbd_inode), KSMBD_DEFAULT_GFP);`
+- L00284 [ERROR_PATH|] `		pr_err("inode initialized failed\n");`
+- L00309 [LIFETIME|] `	if (atomic_dec_and_test(&ci->m_count))`
+- L00326 [MEM_BOUNDS|] `	inode_hashtable = vmalloc(size);`
+- L00328 [ERROR_PATH|] `		return -ENOMEM;`
+- L00357 [LOCK|] `		down_write(&ci->m_lock);`
+- L00362 [LOCK|] `		up_write(&ci->m_lock);`
+- L00374 [ERROR_PATH|] `				pr_err("remove xattr failed : %s\n",`
+- L00402 [LIFETIME|] `	if (!atomic_dec_and_test(&ci->m_count)) {`
+- L00413 [LOCK|] `			down_write(&ci->m_lock);`
+- L00418 [LOCK|] `			up_write(&ci->m_lock);`
+- L00450 [LOCK|] `					down_write(&ci->m_lock);`
+- L00452 [LOCK|] `					up_write(&ci->m_lock);`
+- L00459 [LOCK|] `		down_write(&ci->m_lock);`
+- L00464 [LOCK|] `		up_write(&ci->m_lock);`
+- L00509 [LOCK|] `	down_write(&fp->f_ci->m_lock);`
+- L00511 [LOCK|] `	up_write(&fp->f_ci->m_lock);`
+- L00554 [LOCK|] `		spin_lock(&fp->conn->llist_lock);`
+- L00556 [LOCK|] `		spin_unlock(&fp->conn->llist_lock);`
+- L00575 [LIFETIME|] `	if (!refcount_inc_not_zero(&fp->refcount))`
+- L00599 [LIFETIME|] `	atomic_dec(&work->conn->stats.open_files_count);`
+- L00606 [LOCK|] `	spin_lock(&fp->f_lock);`
+- L00617 [PROTO_GATE|] `		if (hdr->Command == SMB2_CHANGE_NOTIFY ||`
+- L00625 [LOCK|] `	spin_unlock(&fp->f_lock);`
+- L00646 [LIFETIME|] `			if (!refcount_dec_and_test(&fp->refcount))`
+- L00653 [ERROR_PATH|] `		return -EINVAL;`
+- L00656 [PROTO_GATE|] `	 * Notify cleanup sends STATUS_NOTIFY_CLEANUP responses over`
+- L00672 [LIFETIME|] `	if (!refcount_dec_and_test(&fp->refcount))`
+- L00748 [LIFETIME|] `	if (!refcount_dec_and_test(&fp->refcount))`
+- L00763 [PROTO_GATE|] `			    SMB2_CREATE_GUID_SIZE)) {`
+- L00780 [MEM_BOUNDS|] `	pathname = kmalloc(PATH_MAX, KSMBD_DEFAULT_GFP);`
+- L00817 [LOCK|] `	down_read(&ci->m_lock);`
+- L00892 [ERROR_PATH|] `		return -EMFILE;`
+- L00934 [ERROR_PATH|] `		pr_err("Failed to allocate memory\n");`
+- L00944 [LIFETIME|] `	refcount_set(&fp->refcount, 1);`
+- L00958 [ERROR_PATH|] `		goto err_out;`
+- L00964 [ERROR_PATH|] `		goto err_out;`
+- L00967 [LIFETIME|] `	atomic_inc(&work->conn->stats.open_files_count);`
+- L00996 [WAIT_LOOP|] `	while (1) {`
+- L01005 [LIFETIME|] `		    !refcount_dec_and_test(&fp->refcount)) {`
+- L01022 [LOCK|] `		down_write(&fp->f_ci->m_lock);`
+- L01024 [LOCK|] `		up_write(&fp->f_ci->m_lock);`
+- L01051 [PROTO_GATE|] `		 opinfo->o_lease->state & SMB2_LEASE_HANDLE_CACHING_LE)`
+- L01054 [PROTO_GATE|] `	else if (fp->is_durable && opinfo->level == SMB2_OPLOCK_LEVEL_BATCH)`
+- L01099 [WAIT_LOOP|] `		remaining_jiffies = wait_event_timeout(dh_wq,`
+- L01124 [LIFETIME|] `				if (!refcount_inc_not_zero(&fp->refcount))`
+- L01127 [LIFETIME|] `				if (refcount_read(&fp->refcount) != 2) {`
+- L01133 [LIFETIME|] `					refcount_dec(&fp->refcount);`
+- L01149 [LOCK|] `					down_write(&fp->f_ci->m_lock);`
+- L01151 [LOCK|] `					up_write(&fp->f_ci->m_lock);`
+- L01154 [LIFETIME|] `				if (!refcount_dec_and_test(&fp->refcount))`
+- L01163 [ERROR_PATH|] `				goto rescan;`
+- L01193 [LOCK|] `	mutex_lock(&durable_scavenger_lock);`
+- L01195 [LOCK|] `		mutex_unlock(&durable_scavenger_lock);`
+- L01204 [ERROR_PATH|] `		pr_err("cannot start conn thread, err : %ld\n",`
+- L01206 [LOCK|] `	mutex_unlock(&durable_scavenger_lock);`
+- L01214 [LOCK|] `	mutex_lock(&durable_scavenger_lock);`
+- L01216 [LOCK|] `		mutex_unlock(&durable_scavenger_lock);`
+- L01223 [LOCK|] `	mutex_unlock(&durable_scavenger_lock);`
+- L01254 [LOCK|] `	down_write(&ci->m_lock);`
+- L01262 [LOCK|] `	up_write(&ci->m_lock);`
+- L01295 [LIFETIME|] `	atomic_sub(num, &work->conn->stats.open_files_count);`
+- L01304 [LIFETIME|] `	atomic_sub(num, &work->conn->stats.open_files_count);`
+- L01353 [MEM_BOUNDS|] `	pathname = kmalloc(PATH_MAX, KSMBD_DEFAULT_GFP);`
+- L01355 [ERROR_PATH|] `		return -EACCES;`
+- L01360 [ERROR_PATH|] `		return -EACCES;`
+- L01379 [ERROR_PATH|] `		pr_err("Invalid durable fd [%p:%p]\n", fp->conn, fp->tcon);`
+- L01380 [ERROR_PATH|] `		return -EBADF;`
+- L01384 [ERROR_PATH|] `		pr_err("Still in use durable fd: %llu\n", fp->volatile_id);`
+- L01385 [ERROR_PATH|] `		return -EBADF;`
+- L01398 [LOCK|] `	down_write(&ci->m_lock);`
+- L01403 [LIFETIME|] `		refcount_inc(&op->conn->refcnt);`
+- L01405 [LOCK|] `	up_write(&ci->m_lock);`
+- L01412 [ERROR_PATH|] `		return -EBADF;`
+- L01419 [MEM_BOUNDS|] `	ft->idr = kzalloc(sizeof(struct idr), KSMBD_DEFAULT_GFP);`
+- L01421 [ERROR_PATH|] `		return -ENOMEM;`
+- L01446 [ERROR_PATH|] `		goto out;`
+- L01453 [ERROR_PATH|] `	pr_err("failed to allocate file cache\n");`
+- L01454 [ERROR_PATH|] `	return -ENOMEM;`

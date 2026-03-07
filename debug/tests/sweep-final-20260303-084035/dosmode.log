@@ -1,0 +1,11 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772523674
+time: 2026-03-03 07:41:14.312175
+test: dosmode
+time: 2026-03-03 07:41:14.312978
+Checking dosmode with "hide files" and "hide dot files"
+time: 2026-03-03 07:41:14.321609
+failure: dosmode [
+../../source4/torture/smb2/dosmode.c:100: status was NT_STATUS_OK, expected NT_STATUS_ACCESS_DENIED: smb2_create failed
+]

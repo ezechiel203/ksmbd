@@ -1,0 +1,12 @@
+src/transport/transport_rdma.c,6,32,130,8,7
+src/core/connection.c,5,32,27,11,7
+src/fs/oplock.c,4,17,96,205,23
+src/fs/vfs.c,4,17,191,4,19
+src/transport/transport_quic.c,3,18,81,0,49
+src/core/crypto_ctx.c,2,9,4,0,3
+src/fs/vfs_cache.c,2,39,21,9,5
+src/protocol/smb1/smb1pdu.c,2,36,386,397,56
+src/include/transport/transport_quic.h,1,0,0,0,0
+src/protocol/smb2/smb2_lock.c,1,35,46,45,2
+src/transport/transport_ipc.c,1,17,55,0,26
+src/transport/transport_tcp.c,1,11,22,0,4

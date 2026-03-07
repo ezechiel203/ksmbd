@@ -1,0 +1,90 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+#
+# Benchmark helper targets for scripts in ./benchmarks
+#
+
+SCRIPT_DIR := benchmarks
+RUN_BENCHMARKS := $(SCRIPT_DIR)/run_benchmarks.sh
+LATENCY_PROFILE := $(SCRIPT_DIR)/latency_profile.sh
+SCALABILITY_TEST := $(SCRIPT_DIR)/scalability_test.sh
+COMPARE_SERVERS := $(SCRIPT_DIR)/compare_servers.sh
+
+MOUNT ?=
+KSMBD_MOUNT ?=
+SAMBA_MOUNT ?=
+NFS_MOUNT ?=
+
+OUTPUT ?=
+SIZE ?=
+ITERATIONS ?= 1
+QUICK ?= 0
+MAX_CLIENTS ?= 256
+FILE_SIZE ?=
+RUNTIME ?= 30
+
+all: help
+
+run:
+	@test -x "$(RUN_BENCHMARKS)" || { echo "ERROR: $(RUN_BENCHMARKS) not found or not executable"; exit 1; }
+	@test -n "$(MOUNT)" || { echo "ERROR: set MOUNT=/path/to/mount"; exit 1; }
+	@set -- --mount "$(MOUNT)" --iterations "$(ITERATIONS)"; \
+		if [ -n "$(SIZE)" ]; then set -- "$$@" --size "$(SIZE)"; fi; \
+		if [ -n "$(OUTPUT)" ]; then set -- "$$@" --output "$(OUTPUT)"; fi; \
+		if [ "$(QUICK)" != "0" ]; then set -- "$$@" --quick; fi; \
+		"$(RUN_BENCHMARKS)" "$$@"
+
+profile:
+	@test -x "$(LATENCY_PROFILE)" || { echo "ERROR: $(LATENCY_PROFILE) not found or not executable"; exit 1; }
+	@test -n "$(MOUNT)" || { echo "ERROR: set MOUNT=/path/to/mount"; exit 1; }
+	@set -- --mount "$(MOUNT)"; \
+		if [ -n "$(OUTPUT)" ]; then set -- "$$@" --output-dir "$(OUTPUT)"; fi; \
+		sudo "$(LATENCY_PROFILE)" "$$@"
+
+scalability:
+	@test -x "$(SCALABILITY_TEST)" || { echo "ERROR: $(SCALABILITY_TEST) not found or not executable"; exit 1; }
+	@test -n "$(MOUNT)" || { echo "ERROR: set MOUNT=/path/to/mount"; exit 1; }
+	@set -- --mount "$(MOUNT)" --max-clients "$(MAX_CLIENTS)" --runtime "$(RUNTIME)"; \
+		if [ -n "$(FILE_SIZE)" ]; then set -- "$$@" --file-size "$(FILE_SIZE)"; fi; \
+		if [ -n "$(OUTPUT)" ]; then set -- "$$@" --output "$(OUTPUT)"; fi; \
+		"$(SCALABILITY_TEST)" "$$@"
+
+compare:
+	@test -x "$(COMPARE_SERVERS)" || { echo "ERROR: $(COMPARE_SERVERS) not found or not executable"; exit 1; }
+	@test -n "$(KSMBD_MOUNT)" || { echo "ERROR: set KSMBD_MOUNT=/path/to/ksmbd/mount"; exit 1; }
+	@if [ -z "$(SAMBA_MOUNT)" ] && [ -z "$(NFS_MOUNT)" ]; then \
+		echo "ERROR: set at least one of SAMBA_MOUNT or NFS_MOUNT"; \
+		exit 1; \
+	fi
+	@set -- --ksmbd "$(KSMBD_MOUNT)"; \
+		if [ -n "$(SAMBA_MOUNT)" ]; then set -- "$$@" --samba "$(SAMBA_MOUNT)"; fi; \
+		if [ -n "$(NFS_MOUNT)" ]; then set -- "$$@" --nfs "$(NFS_MOUNT)"; fi; \
+		if [ -n "$(SIZE)" ]; then set -- "$$@" --size "$(SIZE)"; fi; \
+		if [ -n "$(OUTPUT)" ]; then set -- "$$@" --output "$(OUTPUT)"; fi; \
+		if [ "$(QUICK)" != "0" ]; then set -- "$$@" --quick; fi; \
+		"$(COMPARE_SERVERS)" "$$@"
+
+clean:
+	rm -f perf.data* perf*.map perf*.log
+	rm -rf profile_* results_*.json scalability_*.json
+
+install-deps:
+	sudo apt-get update
+	sudo apt-get install -y fio jq sysstat linux-tools-common linux-tools-generic
+
+help:
+	@echo "KSMBD benchmark helper targets"
+	@echo ""
+	@echo "  run          Run fio benchmark suite (requires MOUNT=...)"
+	@echo "  profile      Run latency profiling (requires MOUNT=..., uses sudo)"
+	@echo "  scalability  Run scalability benchmark (requires MOUNT=...)"
+	@echo "  compare      Compare ksmbd vs samba/nfs benchmark results"
+	@echo "  clean        Remove common benchmark output artifacts"
+	@echo "  install-deps Install benchmark dependencies on Debian/Ubuntu"
+	@echo ""
+	@echo "Variables:"
+	@echo "  MOUNT=/mnt/ksmbd_test"
+	@echo "  KSMBD_MOUNT=/mnt/ksmbd  SAMBA_MOUNT=/mnt/samba  NFS_MOUNT=/mnt/nfs"
+	@echo "  OUTPUT=<file or dir> SIZE=<size> ITERATIONS=<n> QUICK=1"
+	@echo "  MAX_CLIENTS=<n> FILE_SIZE=<size> RUNTIME=<seconds>"
+
+.PHONY: all run profile scalability compare clean install-deps help

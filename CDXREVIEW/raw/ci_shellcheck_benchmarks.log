@@ -1,0 +1,12 @@
+
+In benchmarks/latency_profile.sh line 258:
+    local operation_name="$1"
+          ^------------^ SC2034 (warning): operation_name appears unused. Verify use (or export if used externally).
+
+
+In benchmarks/scalability_test.sh line 454:
+        local pcbw_colored="$pcbw"
+              ^----------^ SC2034 (warning): pcbw_colored appears unused. Verify use (or export if used externally).
+
+For more information:
+  https://www.shellcheck.net/wiki/SC2034 -- operation_name appears unused. Ve...

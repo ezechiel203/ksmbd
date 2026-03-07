@@ -1,0 +1,1516 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+# syzkaller system call description grammar for fuzzing the ksmbd SMB2 server
+# over a TCP socket (coverage-guided kernel fuzzing of the SMB2 state machine).
+#
+# References:
+#   MS-SMB2 §2.2.x  - SMB2 Protocol Data Unit specifications
+#   MS-NLMP         - NT LAN Manager Authentication Protocol
+#   src/include/protocol/smb2pdu.h
+#   test/fuzz/smb2_create_fuzz.c, smb2_lock_fuzz.c, negotiate_context_fuzz.c
+#
+# Usage:
+#   1. Install syzkaller and build its executor.
+#   2. Point the "target" at a VM running ksmbd on port 445 (or a custom port).
+#   3. syzkaller fuzzes the sequence of calls below, tracking kernel coverage
+#      via kcov to find paths that crash or corrupt state.
+#
+# Resources flow through the state machine:
+#   smb2_sock  →  smb2_session_id  →  smb2_tree_id  →  smb2_file_id
+#
+# Each call wraps a NetBIOS session service header (4 bytes) prepended to
+# the raw SMB2 PDU.  The "syz_smb2_send" pseudo-syscall is a thin wrapper
+# around sendmsg() that prepends the NB length automatically so that
+# individual descriptions need only describe the SMB2 payload.
+#
+# Dialect constants (little-endian u16):
+#   0x0202  SMB 2.0.2
+#   0x0210  SMB 2.1
+#   0x0300  SMB 3.0
+#   0x0302  SMB 3.0.2
+#   0x0311  SMB 3.1.1
+#   0x02FF  wildcard (SMB 2.*)
+#
+# SMB2 command codes (little-endian u16):
+#   0x0000  NEGOTIATE
+#   0x0001  SESSION_SETUP
+#   0x0002  LOGOFF
+#   0x0003  TREE_CONNECT
+#   0x0004  TREE_DISCONNECT
+#   0x0005  CREATE
+#   0x0006  CLOSE
+#   0x0007  FLUSH
+#   0x0008  READ
+#   0x0009  WRITE
+#   0x000A  LOCK
+#   0x000B  IOCTL
+#   0x000C  CANCEL
+#   0x000D  ECHO
+#   0x000E  QUERY_DIRECTORY
+#   0x000F  CHANGE_NOTIFY
+#   0x0010  QUERY_INFO
+#   0x0011  SET_INFO
+#   0x0012  OPLOCK_BREAK
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# Resource declarations
+# ─────────────────────────────────────────────────────────────────────────────
+
+# TCP socket to the ksmbd server
+resource smb2_sock[fd_tcp]
+
+# Session ID returned in SESSION_SETUP response (64-bit opaque)
+resource smb2_session_id[int64]
+
+# Tree ID returned in TREE_CONNECT response (32-bit opaque)
+resource smb2_tree_id[int32]
+
+# File ID is a pair (PersistentFileId || VolatileFileId), each 64-bit.
+# We model the volatile half as the primary resource for dependency tracking.
+resource smb2_volatile_file_id[int64]
+resource smb2_persistent_file_id[int64]
+
+# MessageId counter (monotonically increasing per connection)
+resource smb2_message_id[int64]
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Helper type aliases
+# ─────────────────────────────────────────────────────────────────────────────
+
+# NetBIOS Session Service header: byte 0 = 0x00 (SESSION_MESSAGE), bytes 1-3 = big-endian length
+type nb_hdr array[int8, 4]
+
+# SMB2 fixed 64-byte header
+type smb2_hdr {
+    ProtocolId      const[0xFE534D42, int32]    # 0xFE 'S' 'M' 'B'
+    StructureSize   const[64, int16]
+    CreditCharge    int16[0:16]
+    Status          int32                        # fuzzable (channel seq in low 16 bits)
+    Command         int16                        # set per-PDU
+    CreditRequest   int16[1:128]
+    Flags           flags[smb2_hdr_flags, int32]
+    NextCommand     int32                        # 0 for non-compound
+    MessageId       smb2_message_id
+    ProcessId       int32
+    TreeId          smb2_tree_id
+    SessionId       smb2_session_id
+    Signature       array[int8, 16]
+}
+
+smb2_hdr_flags = 0x00000000, 0x00000004, 0x00000008, 0x20000000
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 1. Socket setup: connect to ksmbd
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Open a TCP socket
+socket$smb2(domain const[AF_INET, int32], typ const[SOCK_STREAM, int32], proto const[0, int32]) smb2_sock
+
+# Connect to ksmbd on 127.0.0.1:445 (for VM testing use the forwarded port)
+connect$smb2(fd smb2_sock, addr ptr[in, sockaddr_smb2_server], addrlen len[addr])
+
+sockaddr_smb2_server {
+    sa_family   const[AF_INET, int16]
+    port        const[0xBD01, int16]    # port 445 in network byte order
+    addr        const[0x0100007F, int32]  # 127.0.0.1
+    pad         array[const[0, int8], 8]
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 2. SMB2 NEGOTIATE request (MS-SMB2 §2.2.3)
+#
+#    Establishes the SMB dialect and advertises capabilities.
+#    For SMB 3.1.1 we append negotiate contexts (PREAUTH, ENCRYPT, COMPRESS,
+#    SIGNING) after the dialect array.
+# ─────────────────────────────────────────────────────────────────────────────
+
+sendmsg$smb2_negotiate(fd smb2_sock, msg ptr[in, smb2_negotiate_msg], flags const[0, int32])
+
+smb2_negotiate_msg {
+    nb          smb2_nb_hdr_negotiate
+    hdr         smb2_hdr_negotiate
+    body        smb2_negotiate_req_body
+    neg_ctxts   smb2_neg_ctx_chain
+}
+
+smb2_nb_hdr_negotiate {
+    type    const[0x00, int8]
+    len_hi  int8
+    len_mid int8
+    len_lo  int8
+}
+
+smb2_hdr_negotiate {
+    ProtocolId      const[0xFE534D42, int32]
+    StructureSize   const[64, int16]
+    CreditCharge    const[0, int16]
+    Status          const[0, int32]
+    Command         const[0x0000, int16]     # NEGOTIATE
+    CreditRequest   int16[1:10]
+    Flags           const[0, int32]
+    NextCommand     const[0, int32]
+    MessageId       const[0, int64]
+    ProcessId       const[0, int32]
+    TreeId          const[0, int32]
+    SessionId       const[0, int64]
+    Signature       array[const[0, int8], 16]
+}
+
+smb2_negotiate_req_body {
+    StructureSize           const[36, int16]
+    DialectCount            int16[1:6]
+    SecurityMode            flags[smb2_security_mode_flags, int16]
+    Reserved                const[0, int16]
+    Capabilities            flags[smb2_global_cap_flags, int32]
+    ClientGUID              array[int8, 16]
+    NegotiateContextOffset  int32           # offset to first negotiate context
+    NegotiateContextCount   int16[0:6]
+    Reserved2               const[0, int16]
+    Dialects                smb2_dialect_array
+}
+
+smb2_security_mode_flags = 0x0001, 0x0002, 0x0003
+smb2_global_cap_flags    = 0x00000001, 0x00000002, 0x00000004, 0x00000008,
+                           0x00000010, 0x00000020, 0x00000040, 0x00000080
+
+smb2_dialect_array [
+    single_311      array[const[0x0311, int16], 1]
+    single_302      array[const[0x0302, int16], 1]
+    single_300      array[const[0x0300, int16], 1]
+    single_210      array[const[0x0210, int16], 1]
+    single_202      array[const[0x0202, int16], 1]
+    multi_modern    array[smb2_dialect_value, 4]
+    wildcard        array[const[0x02FF, int16], 1]
+]
+
+smb2_dialect_value = 0x0202, 0x0210, 0x0300, 0x0302, 0x0311
+
+# Negotiate context chain (SMB 3.1.1)
+smb2_neg_ctx_chain {
+    preauth     smb2_neg_ctx_preauth
+    _pad1       array[const[0, int8], 0:7]   # 8-byte alignment pad
+    encrypt     smb2_neg_ctx_encrypt
+    _pad2       array[const[0, int8], 0:7]
+    compress    smb2_neg_ctx_compress
+    _pad3       array[const[0, int8], 0:7]
+    signing     smb2_neg_ctx_signing
+}
+
+# Preauth Integrity Capabilities (ContextType=0x0001)
+smb2_neg_ctx_preauth {
+    ContextType         const[0x0001, int16]
+    DataLength          const[38, int16]    # 2+2+32 = 36 + 2 byte hash count
+    Reserved            const[0, int32]
+    HashAlgorithmCount  const[1, int16]
+    SaltLength          const[32, int16]
+    HashAlgorithm       const[0x0001, int16]    # SHA-512
+    Salt                array[int8, 32]
+}
+
+# Encryption Capabilities (ContextType=0x0002)
+smb2_neg_ctx_encrypt {
+    ContextType     const[0x0002, int16]
+    DataLength      const[6, int16]         # 2 (count) + 2*2 (2 ciphers)
+    Reserved        const[0, int32]
+    CipherCount     int16[1:4]
+    Ciphers         smb2_cipher_list
+}
+
+smb2_cipher_list [
+    aes128ccm   array[const[0x0001, int16], 1]
+    aes128gcm   array[const[0x0002, int16], 1]
+    aes256ccm   array[const[0x0003, int16], 1]
+    aes256gcm   array[const[0x0004, int16], 1]
+    two_ciphers array[smb2_cipher_value, 2]
+]
+
+smb2_cipher_value = 0x0001, 0x0002, 0x0003, 0x0004
+
+# Compression Capabilities (ContextType=0x0003)
+smb2_neg_ctx_compress {
+    ContextType                 const[0x0003, int16]
+    DataLength                  const[10, int16]    # 2+2+4+2*1
+    Reserved                    const[0, int32]
+    CompressionAlgorithmCount   int16[0:4]
+    Padding                     const[0, int16]
+    Flags                       flags[smb2_compress_flags, int32]
+    CompressionAlgorithms       smb2_compress_alg_list
+}
+
+smb2_compress_flags = 0x00000000, 0x00000001  # none / chaining
+
+smb2_compress_alg_list [
+    none        array[const[0x0000, int16], 1]
+    lznt1       array[const[0x0001, int16], 1]
+    lz77        array[const[0x0002, int16], 1]
+    lz77huff    array[const[0x0003, int16], 1]
+    multi       array[smb2_compress_alg_value, 3]
+]
+
+smb2_compress_alg_value = 0x0000, 0x0001, 0x0002, 0x0003, 0x0004
+
+# Signing Capabilities (ContextType=0x0008)
+smb2_neg_ctx_signing {
+    ContextType             const[0x0008, int16]
+    DataLength              const[4, int16]     # 2 (count) + 2 (one algorithm)
+    Reserved                const[0, int32]
+    SigningAlgorithmCount   int16[1:3]
+    SigningAlgorithms       smb2_signing_alg_list
+}
+
+smb2_signing_alg_list [
+    hmac_sha256 array[const[0x0000, int16], 1]
+    aes_cmac    array[const[0x0001, int16], 1]
+    aes_gmac    array[const[0x0002, int16], 1]
+    multi       array[smb2_signing_alg_value, 2]
+]
+
+smb2_signing_alg_value = 0x0000, 0x0001, 0x0002
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 3. SMB2 SESSION_SETUP — Phase 1: NTLMSSP_NEGOTIATE (MS-SMB2 §2.2.5)
+# ─────────────────────────────────────────────────────────────────────────────
+
+sendmsg$smb2_session_setup_negotiate(fd smb2_sock,
+    msg ptr[in, smb2_session_setup_neg_msg], flags const[0, int32])
+
+smb2_session_setup_neg_msg {
+    nb      smb2_nb_sess_hdr
+    hdr     smb2_hdr_session_cmd
+    body    smb2_sess_setup_req_body
+    spnego  smb2_ntlmssp_neg_blob
+}
+
+smb2_nb_sess_hdr {
+    type    const[0x00, int8]
+    len_hi  int8
+    len_mid int8
+    len_lo  int8
+}
+
+smb2_hdr_session_cmd {
+    ProtocolId      const[0xFE534D42, int32]
+    StructureSize   const[64, int16]
+    CreditCharge    const[1, int16]
+    Status          const[0, int32]
+    Command         const[0x0001, int16]     # SESSION_SETUP
+    CreditRequest   int16[1:32]
+    Flags           const[0, int32]
+    NextCommand     const[0, int32]
+    MessageId       smb2_message_id
+    ProcessId       const[0, int32]
+    TreeId          const[0, int32]
+    SessionId       const[0, int64]          # 0 for first setup round
+    Signature       array[const[0, int8], 16]
+}
+
+smb2_sess_setup_req_body {
+    StructureSize           const[25, int16]
+    Flags                   flags[smb2_sess_req_flags, int8]
+    SecurityMode            flags[smb2_security_mode_flags, int8]
+    Capabilities            flags[smb2_global_cap_flags, int32]
+    Channel                 const[0, int32]
+    SecurityBufferOffset    const[88, int16]    # 64 (hdr) + 25 - 1 = 88
+    SecurityBufferLength    bytesize[smb2_ntlmssp_neg_blob, int16]
+    PreviousSessionId       int64
+}
+
+smb2_sess_req_flags = 0x00, 0x01, 0x04
+
+# Simplified NTLMSSP NEGOTIATE blob (SPNEGO wrapping omitted for brevity;
+# syzkaller can also mutate the raw bytes of the blob)
+smb2_ntlmssp_neg_blob {
+    Signature       const[0x4E544C4D53535000, int64]  # "NTLMSSP\0"
+    MessageType     const[0x00000001, int32]           # NTLMSSP_NEGOTIATE
+    NegotiateFlags  flags[ntlmssp_neg_flags, int32]
+    DomainNameLen   const[0, int16]
+    DomainNameMaxLen const[0, int16]
+    DomainNameOffset const[0, int32]
+    WorkstationLen  const[0, int16]
+    WorkstationMaxLen const[0, int16]
+    WorkstationOffset const[0, int32]
+    # Optional: Version struct (8 bytes) + MIC (16 bytes) omitted
+}
+
+ntlmssp_neg_flags = 0x00000001, 0x00000002, 0x00000004, 0x00000008,
+                   0x00000010, 0x00000020, 0x00000200, 0x00000400,
+                   0x00008000, 0x00020000, 0x00080000, 0x20000000
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 3b. SMB2 SESSION_SETUP — Phase 2: NTLMSSP_AUTH (MS-SMB2 §2.2.5)
+# ─────────────────────────────────────────────────────────────────────────────
+
+sendmsg$smb2_session_setup_auth(fd smb2_sock,
+    msg ptr[in, smb2_session_setup_auth_msg], flags const[0, int32])
+
+smb2_session_setup_auth_msg {
+    nb      smb2_nb_sess_hdr
+    hdr     smb2_hdr_session_auth
+    body    smb2_sess_setup_auth_body
+    spnego  smb2_ntlmssp_auth_blob
+}
+
+smb2_hdr_session_auth {
+    ProtocolId      const[0xFE534D42, int32]
+    StructureSize   const[64, int16]
+    CreditCharge    const[1, int16]
+    Status          const[0, int32]
+    Command         const[0x0001, int16]    # SESSION_SETUP
+    CreditRequest   int16[1:32]
+    Flags           const[0, int32]
+    NextCommand     const[0, int32]
+    MessageId       smb2_message_id
+    ProcessId       const[0, int32]
+    TreeId          const[0, int32]
+    SessionId       smb2_session_id         # from phase-1 response
+    Signature       array[const[0, int8], 16]
+}
+
+smb2_sess_setup_auth_body {
+    StructureSize           const[25, int16]
+    Flags                   const[0, int8]
+    SecurityMode            flags[smb2_security_mode_flags, int8]
+    Capabilities            flags[smb2_global_cap_flags, int32]
+    Channel                 const[0, int32]
+    SecurityBufferOffset    const[88, int16]
+    SecurityBufferLength    bytesize[smb2_ntlmssp_auth_blob, int16]
+    PreviousSessionId       const[0, int64]
+}
+
+smb2_ntlmssp_auth_blob {
+    Signature               const[0x4E544C4D53535000, int64]  # "NTLMSSP\0"
+    MessageType             const[0x00000003, int32]           # NTLMSSP_AUTH
+    LmChallengeResponseLen  int16[0:24]
+    LmChallengeResponseMax  int16[0:24]
+    LmChallengeResponseOff  int32
+    NtChallengeResponseLen  int16[0:24]
+    NtChallengeResponseMax  int16[0:24]
+    NtChallengeResponseOff  int32
+    DomainNameLen           int16[0:128]
+    DomainNameMax           int16[0:128]
+    DomainNameOff           int32
+    UserNameLen             int16[0:128]
+    UserNameMax             int16[0:128]
+    UserNameOff             int32
+    WorkstationLen          int16[0:128]
+    WorkstationMax          int16[0:128]
+    WorkstationOff          int32
+    EncryptedRandomSessKeyLen int16[0:16]
+    EncryptedRandomSessKeyMax int16[0:16]
+    EncryptedRandomSessKeyOff int32
+    NegotiateFlags          flags[ntlmssp_neg_flags, int32]
+    # Payload area (variable — username "testuser", domain "", workstation "")
+    Payload                 array[int8, 0:256]
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 4. SMB2 TREE_CONNECT (MS-SMB2 §2.2.9)
+# ─────────────────────────────────────────────────────────────────────────────
+
+sendmsg$smb2_tree_connect(fd smb2_sock,
+    msg ptr[in, smb2_tree_connect_msg], flags const[0, int32])
+
+smb2_tree_connect_msg {
+    nb      smb2_nb_tree_hdr
+    hdr     smb2_hdr_with_session
+    body    smb2_tree_connect_req_body
+    path    smb2_unc_path
+}
+
+smb2_nb_tree_hdr {
+    type    const[0x00, int8]
+    len_hi  int8
+    len_mid int8
+    len_lo  int8
+}
+
+smb2_hdr_with_session {
+    ProtocolId      const[0xFE534D42, int32]
+    StructureSize   const[64, int16]
+    CreditCharge    const[1, int16]
+    Status          const[0, int32]
+    Command         int16                   # set by each message
+    CreditRequest   int16[1:32]
+    Flags           flags[smb2_hdr_flags, int32]
+    NextCommand     const[0, int32]
+    MessageId       smb2_message_id
+    ProcessId       const[0, int32]
+    TreeId          smb2_tree_id
+    SessionId       smb2_session_id
+    Signature       array[const[0, int8], 16]
+}
+
+smb2_tree_connect_req_body {
+    StructureSize   const[9, int16]
+    Flags           flags[smb2_tree_connect_flags, int16]
+    PathOffset      int16                   # offset from header start to path
+    PathLength      bytesize[smb2_unc_path, int16]
+}
+
+smb2_tree_connect_flags = 0x0000, 0x0001, 0x0002, 0x0004
+
+# UNC path in UTF-16LE: "\\server\share"
+smb2_unc_path [
+    test_share      smb2_unc_test
+    ipc_share       smb2_unc_ipc
+    random_share    array[int16, 4:40]
+]
+
+smb2_unc_test {
+    buf array[const[0x0074, int16], 1]  # "t" in UTF-16LE — placeholder
+}
+
+smb2_unc_ipc {
+    buf array[const[0x0049, int16], 1]  # "I" in UTF-16LE — placeholder
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 5. SMB2 CREATE (MS-SMB2 §2.2.13)
+#
+#    Opens or creates a file/directory with optional create contexts.
+# ─────────────────────────────────────────────────────────────────────────────
+
+sendmsg$smb2_create(fd smb2_sock,
+    msg ptr[in, smb2_create_msg], flags const[0, int32])
+
+smb2_create_msg {
+    nb      smb2_nb_generic
+    hdr     smb2_hdr_create
+    body    smb2_create_req_body
+    name    smb2_filename_utf16
+    ctxts   smb2_create_ctx_chain
+}
+
+smb2_nb_generic {
+    type    const[0x00, int8]
+    len_hi  int8
+    len_mid int8
+    len_lo  int8
+}
+
+smb2_hdr_create {
+    ProtocolId      const[0xFE534D42, int32]
+    StructureSize   const[64, int16]
+    CreditCharge    int16[1:8]
+    Status          int32
+    Command         const[0x0005, int16]    # CREATE
+    CreditRequest   int16[1:64]
+    Flags           flags[smb2_hdr_flags, int32]
+    NextCommand     int32
+    MessageId       smb2_message_id
+    ProcessId       int32
+    TreeId          smb2_tree_id
+    SessionId       smb2_session_id
+    Signature       array[const[0, int8], 16]
+}
+
+smb2_create_req_body {
+    StructureSize           const[57, int16]
+    SecurityFlags           const[0, int8]
+    RequestedOplockLevel    flags[smb2_oplock_level, int8]
+    ImpersonationLevel      flags[smb2_impersonation_level, int32]
+    SmbCreateFlags          int64
+    Reserved                const[0, int64]
+    DesiredAccess           flags[smb2_desired_access, int32]
+    FileAttributes          flags[smb2_file_attributes, int32]
+    ShareAccess             flags[smb2_share_access, int32]
+    CreateDisposition       flags[smb2_create_disposition, int32]
+    CreateOptions           flags[smb2_create_options, int32]
+    NameOffset              int16           # offset into buffer
+    NameLength              int16[0:512]    # even for UTF-16LE
+    CreateContextsOffset    int32
+    CreateContextsLength    int32
+}
+
+smb2_oplock_level       = 0x00, 0x01, 0x08, 0x09, 0xFF
+smb2_impersonation_level = 0x00000000, 0x00000001, 0x00000002, 0x00000003
+smb2_desired_access     = 0x00000001, 0x00000002, 0x00000004, 0x00000008,
+                          0x00000010, 0x00000020, 0x00000040, 0x00000080,
+                          0x00000100, 0x00010000, 0x00020000, 0x00040000,
+                          0x00080000, 0x00100000, 0x02000000, 0x10000000,
+                          0x20000000, 0x40000000, 0x80000000, 0x001F01FF
+smb2_file_attributes    = 0x00000001, 0x00000002, 0x00000004, 0x00000010,
+                          0x00000020, 0x00000040, 0x00000080, 0x00000100,
+                          0x00000200, 0x00000400, 0x00000800, 0x00001000,
+                          0x00002000, 0x00004000, 0x00008000, 0x00020000
+smb2_share_access       = 0x00000000, 0x00000001, 0x00000002, 0x00000004, 0x00000007
+smb2_create_disposition = 0x00000000, 0x00000001, 0x00000002, 0x00000003, 0x00000004, 0x00000005
+smb2_create_options     = 0x00000000, 0x00000001, 0x00000002, 0x00000004, 0x00000008,
+                          0x00000010, 0x00000020, 0x00000040, 0x00000080,
+                          0x00000100, 0x00000200, 0x00000400, 0x00001000,
+                          0x00004000, 0x00200000, 0x01000000
+
+smb2_filename_utf16 {
+    chars   array[int16, 0:255]
+}
+
+# Create context chain: various well-known create contexts
+smb2_create_ctx_chain [
+    dh2q_only   smb2_ctx_dh2q
+    rqls_only   smb2_ctx_rqls
+    mxac_only   smb2_ctx_mxac
+    qfid_only   smb2_ctx_qfid
+    dhnq_only   smb2_ctx_dhnq
+    combined    smb2_ctx_combined
+    random      array[int8, 0:512]
+]
+
+# DH2Q — Durable Handle Request V2 (MS-SMB2 §2.2.13.2.11)
+smb2_ctx_dh2q {
+    Next        const[0, int32]
+    NameOffset  const[16, int16]    # sizeof(create_context header)
+    NameLength  const[4, int16]
+    Reserved    const[0, int16]
+    DataOffset  const[24, int16]    # 16 + 4 name + 4 pad
+    DataLength  const[32, int32]    # timeout(4)+flags(4)+reserved(8)+guid(16)
+    Name        array[const[0x44, int8], 4]   # "DH2Q"
+    Pad         array[const[0, int8], 4]
+    Timeout     int32[0:300000]
+    Flags       flags[smb2_dh2q_flags, int32]
+    Reserved2   array[const[0, int8], 8]
+    CreateGuid  array[int8, 16]
+}
+
+smb2_dh2q_flags = 0x00000000, 0x00000002  # 0x2 = SMB2_DHANDLE_FLAG_PERSISTENT
+
+# RqLs — Request Lease (MS-SMB2 §2.2.13.2.8)
+smb2_ctx_rqls {
+    Next        const[0, int32]
+    NameOffset  const[16, int16]
+    NameLength  const[4, int16]
+    Reserved    const[0, int16]
+    DataOffset  const[24, int16]
+    DataLength  const[32, int32]    # lease_context v1 = 32 bytes
+    Name        array[const[0x52, int8], 4]  # "RqLs"
+    Pad         array[const[0, int8], 4]
+    LeaseKey    array[int8, 16]
+    LeaseState  flags[smb2_lease_state, int32]
+    LeaseFlags  flags[smb2_lease_flags, int32]
+    LeaseDuration int64
+}
+
+smb2_lease_state = 0x00000000, 0x00000001, 0x00000002, 0x00000004,
+                   0x00000003, 0x00000005, 0x00000007
+smb2_lease_flags = 0x00000000, 0x00000002, 0x00000004
+
+# MxAc — Query Maximal Access (MS-SMB2 §2.2.13.2.5)
+smb2_ctx_mxac {
+    Next        const[0, int32]
+    NameOffset  const[16, int16]
+    NameLength  const[4, int16]
+    Reserved    const[0, int16]
+    DataOffset  const[24, int16]
+    DataLength  const[8, int32]
+    Name        array[const[0x4D, int8], 4]  # "MxAc"
+    Pad         array[const[0, int8], 4]
+    Timestamp   int64
+}
+
+# QFid — Query On Disk ID (MS-SMB2 §2.2.13.2.6)
+smb2_ctx_qfid {
+    Next        const[0, int32]
+    NameOffset  const[16, int16]
+    NameLength  const[4, int16]
+    Reserved    const[0, int16]
+    DataOffset  const[0, int16]
+    DataLength  const[0, int32]
+    Name        array[const[0x51, int8], 4]  # "QFid"
+    Pad         array[const[0, int8], 4]
+}
+
+# DHnQ — Durable Handle Request V1 (MS-SMB2 §2.2.13.2.3)
+smb2_ctx_dhnq {
+    Next        const[0, int32]
+    NameOffset  const[16, int16]
+    NameLength  const[4, int16]
+    Reserved    const[0, int16]
+    DataOffset  const[24, int16]
+    DataLength  const[16, int32]
+    Name        array[const[0x44, int8], 4]  # "DHnQ"
+    Pad         array[const[0, int8], 4]
+    Reserved2   array[const[0, int8], 16]
+}
+
+# Combined chain: MxAc → QFid (chain with Next pointer)
+smb2_ctx_combined {
+    mxac_next   const[32, int32]    # advance to QFid (aligned)
+    mxac_namoff const[16, int16]
+    mxac_namlen const[4, int16]
+    mxac_res    const[0, int16]
+    mxac_datoff const[24, int16]
+    mxac_datlen const[8, int32]
+    mxac_name   array[const[0x4D, int8], 4]  # "MxAc"
+    mxac_pad    array[const[0, int8], 4]
+    mxac_ts     int64
+    qfid_next   const[0, int32]
+    qfid_namoff const[16, int16]
+    qfid_namlen const[4, int16]
+    qfid_res    const[0, int16]
+    qfid_datoff const[0, int16]
+    qfid_datlen const[0, int32]
+    qfid_name   array[const[0x51, int8], 4]  # "QFid"
+    qfid_pad    array[const[0, int8], 4]
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 6. SMB2 READ (MS-SMB2 §2.2.19)
+# ─────────────────────────────────────────────────────────────────────────────
+
+sendmsg$smb2_read(fd smb2_sock, msg ptr[in, smb2_read_msg], flags const[0, int32])
+
+smb2_read_msg {
+    nb      smb2_nb_generic
+    hdr     smb2_hdr_read
+    body    smb2_read_req_body
+}
+
+smb2_hdr_read {
+    ProtocolId      const[0xFE534D42, int32]
+    StructureSize   const[64, int16]
+    CreditCharge    int16[1:8]
+    Status          int32
+    Command         const[0x0008, int16]    # READ
+    CreditRequest   int16[1:64]
+    Flags           flags[smb2_hdr_flags, int32]
+    NextCommand     int32
+    MessageId       smb2_message_id
+    ProcessId       int32
+    TreeId          smb2_tree_id
+    SessionId       smb2_session_id
+    Signature       array[const[0, int8], 16]
+}
+
+smb2_read_req_body {
+    StructureSize           const[49, int16]
+    Padding                 int8[0:7]
+    Flags                   flags[smb2_read_flags, int8]
+    Length                  int32[0:4194304]    # up to 4MB
+    Offset                  int64
+    PersistentFileId        smb2_persistent_file_id
+    VolatileFileId          smb2_volatile_file_id
+    MinimumCount            int32
+    Channel                 int32
+    RemainingBytes          int32
+    ReadChannelInfoOffset   int16
+    ReadChannelInfoLength   int16
+}
+
+smb2_read_flags = 0x00, 0x01, 0x02, 0x04
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 7. SMB2 WRITE (MS-SMB2 §2.2.21)
+# ─────────────────────────────────────────────────────────────────────────────
+
+sendmsg$smb2_write(fd smb2_sock, msg ptr[in, smb2_write_msg], flags const[0, int32])
+
+smb2_write_msg {
+    nb      smb2_nb_generic
+    hdr     smb2_hdr_write
+    body    smb2_write_req_body
+    data    smb2_write_data
+}
+
+smb2_hdr_write {
+    ProtocolId      const[0xFE534D42, int32]
+    StructureSize   const[64, int16]
+    CreditCharge    int16[1:8]
+    Status          int32
+    Command         const[0x0009, int16]    # WRITE
+    CreditRequest   int16[1:64]
+    Flags           flags[smb2_hdr_flags, int32]
+    NextCommand     int32
+    MessageId       smb2_message_id
+    ProcessId       int32
+    TreeId          smb2_tree_id
+    SessionId       smb2_session_id
+    Signature       array[const[0, int8], 16]
+}
+
+smb2_write_req_body {
+    StructureSize               const[49, int16]
+    DataOffset                  int16           # offset to data in message
+    Length                      bytesize[smb2_write_data, int32]
+    Offset                      int64           # 0xFFFFFFFFFFFFFFFF = append
+    PersistentFileId            smb2_persistent_file_id
+    VolatileFileId              smb2_volatile_file_id
+    Channel                     int32
+    RemainingBytes              int32
+    WriteChannelInfoOffset      int16
+    WriteChannelInfoLength      int16
+    Flags                       flags[smb2_write_flags, int32]
+}
+
+smb2_write_flags = 0x00000000, 0x00000001, 0x00000002, 0x00000004
+
+smb2_write_data {
+    bytes   array[int8, 0:65536]
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 8. SMB2 CLOSE (MS-SMB2 §2.2.15)
+# ─────────────────────────────────────────────────────────────────────────────
+
+sendmsg$smb2_close(fd smb2_sock, msg ptr[in, smb2_close_msg], flags const[0, int32])
+
+smb2_close_msg {
+    nb      smb2_nb_generic
+    hdr     smb2_hdr_close
+    body    smb2_close_req_body
+}
+
+smb2_hdr_close {
+    ProtocolId      const[0xFE534D42, int32]
+    StructureSize   const[64, int16]
+    CreditCharge    const[1, int16]
+    Status          int32
+    Command         const[0x0006, int16]    # CLOSE
+    CreditRequest   int16[1:32]
+    Flags           flags[smb2_hdr_flags, int32]
+    NextCommand     int32
+    MessageId       smb2_message_id
+    ProcessId       int32
+    TreeId          smb2_tree_id
+    SessionId       smb2_session_id
+    Signature       array[const[0, int8], 16]
+}
+
+smb2_close_req_body {
+    StructureSize       const[24, int16]
+    Flags               flags[smb2_close_flags, int16]
+    Reserved            const[0, int32]
+    PersistentFileId    smb2_persistent_file_id
+    VolatileFileId      smb2_volatile_file_id
+}
+
+smb2_close_flags = 0x0000, 0x0001  # 0x0001 = POSTQUERY_ATTRIB
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 9. SMB2 LOCK (MS-SMB2 §2.2.26)
+#
+#    Lock elements exercise byte-range locking.
+# ─────────────────────────────────────────────────────────────────────────────
+
+sendmsg$smb2_lock(fd smb2_sock, msg ptr[in, smb2_lock_msg], flags const[0, int32])
+
+smb2_lock_msg {
+    nb          smb2_nb_generic
+    hdr         smb2_hdr_lock
+    body        smb2_lock_req_body
+    lock_elems  smb2_lock_element_array
+}
+
+smb2_hdr_lock {
+    ProtocolId      const[0xFE534D42, int32]
+    StructureSize   const[64, int16]
+    CreditCharge    const[1, int16]
+    Status          int32
+    Command         const[0x000A, int16]    # LOCK
+    CreditRequest   int16[1:32]
+    Flags           flags[smb2_hdr_flags, int32]
+    NextCommand     int32
+    MessageId       smb2_message_id
+    ProcessId       int32
+    TreeId          smb2_tree_id
+    SessionId       smb2_session_id
+    Signature       array[const[0, int8], 16]
+}
+
+smb2_lock_req_body {
+    StructureSize       const[48, int16]
+    LockCount           int16[1:64]
+    LockSequenceNumber  int32[0:0xFFFFFFFF]     # bits 0-3 = index, 4-7 = sequence
+    PersistentFileId    smb2_persistent_file_id
+    VolatileFileId      smb2_volatile_file_id
+}
+
+smb2_lock_element_array [
+    one     array[smb2_lock_element, 1]
+    two     array[smb2_lock_element, 2]
+    eight   array[smb2_lock_element, 8]
+    many    array[smb2_lock_element, 1:64]
+]
+
+smb2_lock_element {
+    Offset      smb2_lock_offset
+    Length      smb2_lock_length
+    Flags       flags[smb2_lock_flags, int32]
+    Reserved    const[0, int32]
+}
+
+smb2_lock_offset [
+    zero        const[0, int64]
+    small       int64[0:4096]
+    large       int64[0:0xFFFFFFFF]
+    max_minus   const[0xFFFFFFFFFFFFFF00, int64]
+    max         const[0xFFFFFFFFFFFFFFFF, int64]
+]
+
+smb2_lock_length [
+    zero    const[0, int64]
+    one     const[1, int64]
+    small   int64[1:4096]
+    large   int64[1:0xFFFFFFFF]
+    max     const[0xFFFFFFFFFFFFFFFF, int64]
+]
+
+smb2_lock_flags = 0x00000001, 0x00000002, 0x00000004, 0x00000010,
+                  0x00000011, 0x00000012
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 10. SMB2 IOCTL (MS-SMB2 §2.2.31)
+#
+#     Covers several important FSCTLs: VALIDATE_NEGOTIATE_INFO,
+#     PIPE_TRANSCEIVE, COPYCHUNK, QUERY_NETWORK_INTERFACE_INFO, etc.
+# ─────────────────────────────────────────────────────────────────────────────
+
+sendmsg$smb2_ioctl(fd smb2_sock, msg ptr[in, smb2_ioctl_msg], flags const[0, int32])
+
+smb2_ioctl_msg {
+    nb      smb2_nb_generic
+    hdr     smb2_hdr_ioctl
+    body    smb2_ioctl_req_body
+    inbuf   smb2_ioctl_input
+}
+
+smb2_hdr_ioctl {
+    ProtocolId      const[0xFE534D42, int32]
+    StructureSize   const[64, int16]
+    CreditCharge    int16[1:8]
+    Status          int32
+    Command         const[0x000B, int16]    # IOCTL
+    CreditRequest   int16[1:64]
+    Flags           flags[smb2_hdr_flags, int32]
+    NextCommand     int32
+    MessageId       smb2_message_id
+    ProcessId       int32
+    TreeId          smb2_tree_id
+    SessionId       smb2_session_id
+    Signature       array[const[0, int8], 16]
+}
+
+smb2_ioctl_req_body {
+    StructureSize           const[57, int16]
+    Reserved                const[0, int16]
+    CtlCode                 flags[smb2_ioctl_ctlcode, int32]
+    PersistentFileId        smb2_persistent_file_id
+    VolatileFileId          smb2_volatile_file_id
+    InputOffset             int32
+    InputCount              bytesize[smb2_ioctl_input, int32]
+    MaxInputResponse        int32
+    OutputOffset            const[0, int32]
+    OutputCount             const[0, int32]
+    MaxOutputResponse       int32[0:65536]
+    Flags                   const[0x00000001, int32]    # SMB2_0_IOCTL_IS_FSCTL
+    Reserved2               const[0, int32]
+}
+
+# Key FSCTL codes used by ksmbd
+smb2_ioctl_ctlcode = 0x00140204,   # FSCTL_VALIDATE_NEGOTIATE_INFO
+                     0x0011C017,   # FSCTL_PIPE_TRANSCEIVE
+                     0x0011400C,   # FSCTL_PIPE_PEEK
+                     0x00110018,   # FSCTL_PIPE_WAIT
+                     0x001401D4,   # FSCTL_LMR_REQUEST_RESILIENCY
+                     0x001440F2,   # FSCTL_COPYCHUNK
+                     0x001480F2,   # FSCTL_COPYCHUNK_WRITE
+                     0x001400FC,   # FSCTL_QUERY_NETWORK_INTERFACE_INFO
+                     0x00144064,   # FSCTL_SRV_ENUMERATE_SNAPSHOTS
+                     0x00090000,   # FSCTL_REQUEST_OPLOCK_LEVEL_1
+                     0x00090004,   # FSCTL_REQUEST_OPLOCK_LEVEL_2
+                     0x00090008,   # FSCTL_REQUEST_BATCH_OPLOCK
+                     0x000900C4,   # FSCTL_SET_SPARSE
+                     0x000980C8,   # FSCTL_SET_ZERO_DATA
+                     0x000940CF,   # FSCTL_QUERY_ALLOCATED_RANGES
+                     0x000900A4,   # FSCTL_SET_REPARSE_POINT
+                     0x000900A8,   # FSCTL_GET_REPARSE_POINT
+                     0x00090098,   # FSCTL_SET_OBJECT_ID
+                     0x0009009C,   # FSCTL_GET_OBJECT_ID
+                     0x00098344,   # FSCTL_DUPLICATE_EXTENTS_TO_FILE
+                     0x00140078,   # FSCTL_REQUEST_RESUME_KEY
+                     0x00060194,   # FSCTL_DFS_GET_REFERRALS
+                     0x0009C040,   # FSCTL_SET_COMPRESSION
+                     0x0009003C,   # FSCTL_GET_COMPRESSION
+                     0x0009027C,   # FSCTL_GET_INTEGRITY_INFORMATION
+                     0x009013C0    # FSCTL_QUERY_ON_DISK_VOLUME_INFO
+
+smb2_ioctl_input [
+    validate_neg    smb2_ioctl_validate_neg
+    copychunk       smb2_ioctl_copychunk
+    resiliency      smb2_ioctl_resiliency
+    pipe_write      array[int8, 0:512]
+    random          array[int8, 0:4096]
+]
+
+# FSCTL_VALIDATE_NEGOTIATE_INFO input (MS-SMB2 §2.2.31.4)
+smb2_ioctl_validate_neg {
+    Capabilities    flags[smb2_global_cap_flags, int32]
+    ClientGuid      array[int8, 16]
+    SecurityMode    flags[smb2_security_mode_flags, int16]
+    DialectCount    int16[1:6]
+    Dialects        array[smb2_dialect_value, 1:6]
+}
+
+# FSCTL_COPYCHUNK / FSCTL_COPYCHUNK_WRITE (MS-SMB2 §2.2.31.1)
+smb2_ioctl_copychunk {
+    SourceKey       array[int8, 24]
+    ChunkCount      int32[0:256]
+    Reserved        const[0, int32]
+    Chunks          array[smb2_copychunk_element, 1:16]
+}
+
+smb2_copychunk_element {
+    SourceOffset    int64
+    TargetOffset    int64
+    Length          int32[0:1048576]
+    Reserved        const[0, int32]
+}
+
+# FSCTL_LMR_REQUEST_RESILIENCY (MS-SMB2 §2.2.31.3)
+smb2_ioctl_resiliency {
+    Timeout     int32[0:300000]
+    Reserved    const[0, int32]
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 11. SMB2 QUERY_DIRECTORY (MS-SMB2 §2.2.33)
+# ─────────────────────────────────────────────────────────────────────────────
+
+sendmsg$smb2_query_directory(fd smb2_sock,
+    msg ptr[in, smb2_query_dir_msg], flags const[0, int32])
+
+smb2_query_dir_msg {
+    nb      smb2_nb_generic
+    hdr     smb2_hdr_qdir
+    body    smb2_query_dir_req_body
+    pattern smb2_search_pattern
+}
+
+smb2_hdr_qdir {
+    ProtocolId      const[0xFE534D42, int32]
+    StructureSize   const[64, int16]
+    CreditCharge    const[1, int16]
+    Status          int32
+    Command         const[0x000E, int16]    # QUERY_DIRECTORY
+    CreditRequest   int16[1:32]
+    Flags           flags[smb2_hdr_flags, int32]
+    NextCommand     int32
+    MessageId       smb2_message_id
+    ProcessId       int32
+    TreeId          smb2_tree_id
+    SessionId       smb2_session_id
+    Signature       array[const[0, int8], 16]
+}
+
+smb2_query_dir_req_body {
+    StructureSize       const[33, int16]
+    FileInformationClass flags[smb2_file_info_class, int8]
+    Flags               flags[smb2_qdir_flags, int8]
+    FileIndex           int32
+    PersistentFileId    smb2_persistent_file_id
+    VolatileFileId      smb2_volatile_file_id
+    FileNameOffset      int16
+    FileNameLength      bytesize[smb2_search_pattern, int16]
+    OutputBufferLength  int32[0:65536]
+}
+
+smb2_file_info_class = 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x08,
+                       0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
+                       0x22, 0x25, 0x26, 0x30, 0x36
+
+smb2_qdir_flags = 0x00, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40
+
+smb2_search_pattern [
+    wildcard    array[const[0x002A, int16], 1]  # "*" in UTF-16LE
+    specific    array[int16, 1:255]
+]
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 12. SMB2 CHANGE_NOTIFY (MS-SMB2 §2.2.35)
+# ─────────────────────────────────────────────────────────────────────────────
+
+sendmsg$smb2_change_notify(fd smb2_sock,
+    msg ptr[in, smb2_change_notify_msg], flags const[0, int32])
+
+smb2_change_notify_msg {
+    nb      smb2_nb_generic
+    hdr     smb2_hdr_notify
+    body    smb2_change_notify_req_body
+}
+
+smb2_hdr_notify {
+    ProtocolId      const[0xFE534D42, int32]
+    StructureSize   const[64, int16]
+    CreditCharge    const[1, int16]
+    Status          int32
+    Command         const[0x000F, int16]    # CHANGE_NOTIFY
+    CreditRequest   int16[1:32]
+    Flags           flags[smb2_hdr_flags, int32]
+    NextCommand     int32
+    MessageId       smb2_message_id
+    ProcessId       int32
+    TreeId          smb2_tree_id
+    SessionId       smb2_session_id
+    Signature       array[const[0, int8], 16]
+}
+
+smb2_change_notify_req_body {
+    StructureSize       const[32, int16]
+    Flags               flags[smb2_notify_flags, int16]
+    OutputBufferLength  int32[0:65536]
+    PersistentFileId    smb2_persistent_file_id
+    VolatileFileId      smb2_volatile_file_id
+    CompletionFilter    flags[smb2_notify_filter, int32]
+    Reserved            const[0, int32]
+}
+
+smb2_notify_flags  = 0x0000, 0x0001    # 0x0001 = WATCH_TREE
+smb2_notify_filter = 0x00000001, 0x00000002, 0x00000004, 0x00000008,
+                     0x00000010, 0x00000020, 0x00000040, 0x00000080,
+                     0x00000100, 0x00000200, 0x00000FFF
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 13. SMB2 QUERY_INFO (MS-SMB2 §2.2.37)
+# ─────────────────────────────────────────────────────────────────────────────
+
+sendmsg$smb2_query_info(fd smb2_sock,
+    msg ptr[in, smb2_query_info_msg], flags const[0, int32])
+
+smb2_query_info_msg {
+    nb      smb2_nb_generic
+    hdr     smb2_hdr_qinfo
+    body    smb2_query_info_req_body
+    inbuf   array[int8, 0:64]
+}
+
+smb2_hdr_qinfo {
+    ProtocolId      const[0xFE534D42, int32]
+    StructureSize   const[64, int16]
+    CreditCharge    const[1, int16]
+    Status          int32
+    Command         const[0x0010, int16]    # QUERY_INFO
+    CreditRequest   int16[1:32]
+    Flags           flags[smb2_hdr_flags, int32]
+    NextCommand     int32
+    MessageId       smb2_message_id
+    ProcessId       int32
+    TreeId          smb2_tree_id
+    SessionId       smb2_session_id
+    Signature       array[const[0, int8], 16]
+}
+
+smb2_query_info_req_body {
+    StructureSize           const[41, int16]
+    InfoType                flags[smb2_info_type, int8]
+    FileInfoClass           int8
+    OutputBufferLength      int32[0:65536]
+    InputBufferOffset       int16
+    Reserved                const[0, int16]
+    InputBufferLength       bytesize[smb2_query_info_msg_inbuf, int32]
+    AdditionalInformation   flags[smb2_additional_info, int32]
+    Flags                   int32
+    PersistentFileId        smb2_persistent_file_id
+    VolatileFileId          smb2_volatile_file_id
+}
+
+smb2_info_type       = 0x01, 0x02, 0x03, 0x04   # FILE, FS, SECURITY, QUOTA
+smb2_additional_info = 0x00000000, 0x00000001, 0x00000002, 0x00000004,
+                       0x00000008, 0x00000010
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 14. SMB2 SET_INFO (MS-SMB2 §2.2.39)
+# ─────────────────────────────────────────────────────────────────────────────
+
+sendmsg$smb2_set_info(fd smb2_sock,
+    msg ptr[in, smb2_set_info_msg], flags const[0, int32])
+
+smb2_set_info_msg {
+    nb      smb2_nb_generic
+    hdr     smb2_hdr_setinfo
+    body    smb2_set_info_req_body
+    inbuf   array[int8, 0:512]
+}
+
+smb2_hdr_setinfo {
+    ProtocolId      const[0xFE534D42, int32]
+    StructureSize   const[64, int16]
+    CreditCharge    const[1, int16]
+    Status          int32
+    Command         const[0x0011, int16]    # SET_INFO
+    CreditRequest   int16[1:32]
+    Flags           flags[smb2_hdr_flags, int32]
+    NextCommand     int32
+    MessageId       smb2_message_id
+    ProcessId       int32
+    TreeId          smb2_tree_id
+    SessionId       smb2_session_id
+    Signature       array[const[0, int8], 16]
+}
+
+smb2_set_info_req_body {
+    StructureSize           const[33, int16]
+    InfoType                flags[smb2_info_type, int8]
+    FileInfoClass           int8
+    BufferLength            bytesize[smb2_set_info_msg_inbuf, int32]
+    BufferOffset            int16
+    Reserved                const[0, int16]
+    AdditionalInformation   flags[smb2_additional_info, int32]
+    PersistentFileId        smb2_persistent_file_id
+    VolatileFileId          smb2_volatile_file_id
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 15. SMB2 CANCEL (MS-SMB2 §2.2.29)
+#
+#     Cancels a pending async request identified by AsyncId or MessageId.
+#     Note: CANCEL itself MUST NOT be signed (MS-SMB2 §3.2.4.24).
+# ─────────────────────────────────────────────────────────────────────────────
+
+sendmsg$smb2_cancel(fd smb2_sock, msg ptr[in, smb2_cancel_msg], flags const[0, int32])
+
+smb2_cancel_msg {
+    nb      smb2_nb_generic
+    hdr     smb2_hdr_cancel
+    body    smb2_cancel_req_body
+}
+
+smb2_hdr_cancel {
+    ProtocolId      const[0xFE534D42, int32]
+    StructureSize   const[64, int16]
+    CreditCharge    const[0, int16]
+    Status          const[0, int32]
+    Command         const[0x000C, int16]    # CANCEL
+    CreditRequest   const[0, int16]
+    Flags           flags[smb2_cancel_flags, int32]
+    NextCommand     const[0, int32]
+    MessageId       smb2_message_id         # MessageId to cancel (sync)
+    ProcessId       int32
+    TreeId          smb2_tree_id
+    SessionId       smb2_session_id
+    Signature       array[const[0, int8], 16]
+}
+
+smb2_cancel_req_body {
+    StructureSize   const[4, int16]
+    Reserved        const[0, int16]
+}
+
+smb2_cancel_flags = 0x00000000, 0x00000002  # 0x2 = SMB2_FLAGS_ASYNC_COMMAND
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 16. SMB2 ECHO (MS-SMB2 §2.2.28)
+# ─────────────────────────────────────────────────────────────────────────────
+
+sendmsg$smb2_echo(fd smb2_sock, msg ptr[in, smb2_echo_msg], flags const[0, int32])
+
+smb2_echo_msg {
+    nb      smb2_nb_generic
+    hdr     smb2_hdr_echo
+    body    smb2_echo_req_body
+}
+
+smb2_hdr_echo {
+    ProtocolId      const[0xFE534D42, int32]
+    StructureSize   const[64, int16]
+    CreditCharge    const[1, int16]
+    Status          const[0, int32]
+    Command         const[0x000D, int16]    # ECHO
+    CreditRequest   int16[1:10]
+    Flags           const[0, int32]
+    NextCommand     const[0, int32]
+    MessageId       smb2_message_id
+    ProcessId       const[0, int32]
+    TreeId          const[0, int32]
+    SessionId       smb2_session_id
+    Signature       array[const[0, int8], 16]
+}
+
+smb2_echo_req_body {
+    StructureSize   const[4, int16]
+    Reserved        const[0, int16]
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 17. SMB2 LOGOFF (MS-SMB2 §2.2.7)
+# ─────────────────────────────────────────────────────────────────────────────
+
+sendmsg$smb2_logoff(fd smb2_sock, msg ptr[in, smb2_logoff_msg], flags const[0, int32])
+
+smb2_logoff_msg {
+    nb      smb2_nb_generic
+    hdr     smb2_hdr_logoff
+    body    smb2_logoff_req_body
+}
+
+smb2_hdr_logoff {
+    ProtocolId      const[0xFE534D42, int32]
+    StructureSize   const[64, int16]
+    CreditCharge    const[1, int16]
+    Status          const[0, int32]
+    Command         const[0x0002, int16]    # LOGOFF
+    CreditRequest   int16[1:10]
+    Flags           const[0, int32]
+    NextCommand     const[0, int32]
+    MessageId       smb2_message_id
+    ProcessId       const[0, int32]
+    TreeId          const[0, int32]
+    SessionId       smb2_session_id
+    Signature       array[const[0, int8], 16]
+}
+
+smb2_logoff_req_body {
+    StructureSize   const[4, int16]
+    Reserved        const[0, int16]
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 18. SMB2 TREE_DISCONNECT (MS-SMB2 §2.2.11)
+# ─────────────────────────────────────────────────────────────────────────────
+
+sendmsg$smb2_tree_disconnect(fd smb2_sock,
+    msg ptr[in, smb2_tree_disconnect_msg], flags const[0, int32])
+
+smb2_tree_disconnect_msg {
+    nb      smb2_nb_generic
+    hdr     smb2_hdr_tree_disc
+    body    smb2_tree_disc_req_body
+}
+
+smb2_hdr_tree_disc {
+    ProtocolId      const[0xFE534D42, int32]
+    StructureSize   const[64, int16]
+    CreditCharge    const[1, int16]
+    Status          const[0, int32]
+    Command         const[0x0004, int16]    # TREE_DISCONNECT
+    CreditRequest   int16[1:10]
+    Flags           const[0, int32]
+    NextCommand     const[0, int32]
+    MessageId       smb2_message_id
+    ProcessId       const[0, int32]
+    TreeId          smb2_tree_id
+    SessionId       smb2_session_id
+    Signature       array[const[0, int8], 16]
+}
+
+smb2_tree_disc_req_body {
+    StructureSize   const[4, int16]
+    Reserved        const[0, int16]
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 19. SMB2 OPLOCK_BREAK acknowledgment (MS-SMB2 §2.2.24.1 / §2.2.24.2)
+#
+#     Client sends this in response to a server oplock break notification.
+#     StructureSize=24 for oplock break, StructureSize=36 for lease break.
+# ─────────────────────────────────────────────────────────────────────────────
+
+sendmsg$smb2_oplock_break_ack(fd smb2_sock,
+    msg ptr[in, smb2_oplock_break_msg], flags const[0, int32])
+
+smb2_oplock_break_msg [
+    oplock  smb2_oplock_break_oplock
+    lease   smb2_oplock_break_lease
+]
+
+smb2_oplock_break_oplock {
+    nb              smb2_nb_generic
+    hdr             smb2_hdr_oplock
+    StructureSize   const[24, int16]
+    OplockLevel     flags[smb2_oplock_break_level, int8]
+    Reserved        const[0, int8]
+    Reserved2       const[0, int32]
+    PersistentFileId smb2_persistent_file_id
+    VolatileFileId  smb2_volatile_file_id
+}
+
+smb2_oplock_break_lease {
+    nb              smb2_nb_generic
+    hdr             smb2_hdr_oplock
+    StructureSize   const[36, int16]
+    Reserved        const[0, int16]
+    Reserved2       const[0, int32]
+    LeaseKey        array[int8, 16]
+    CurrentLeaseState flags[smb2_lease_state, int32]
+    NewLeaseState   flags[smb2_lease_state, int32]
+    BreakReason     const[0, int32]
+    AccessMaskHint  const[0, int32]
+    ShareMaskHint   const[0, int32]
+}
+
+smb2_hdr_oplock {
+    ProtocolId      const[0xFE534D42, int32]
+    StructureSize   const[64, int16]
+    CreditCharge    const[1, int16]
+    Status          const[0, int32]
+    Command         const[0x0012, int16]    # OPLOCK_BREAK
+    CreditRequest   int16[1:10]
+    Flags           const[0, int32]
+    NextCommand     const[0, int32]
+    MessageId       smb2_message_id
+    ProcessId       const[0, int32]
+    TreeId          const[0, int32]
+    SessionId       smb2_session_id
+    Signature       array[const[0, int8], 16]
+}
+
+smb2_oplock_break_level = 0x00, 0x01    # NONE or LEVEL_II
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 20. SMB3 Transform Header (encrypted message wrapper, MS-SMB2 §2.2.41)
+#
+#     Wraps any SMB2 PDU for encrypted transport when the session uses
+#     SMB3 encryption (AES-CCM or AES-GCM).
+# ─────────────────────────────────────────────────────────────────────────────
+
+sendmsg$smb2_transform(fd smb2_sock,
+    msg ptr[in, smb2_transform_msg], flags const[0, int32])
+
+smb2_transform_msg {
+    nb          smb2_nb_generic
+    hdr         smb2_transform_hdr_body
+    encrypted   smb2_encrypted_payload
+}
+
+smb2_transform_hdr_body {
+    ProtocolId              const[0xFD534D42, int32]  # 0xFD 'S' 'M' 'B'
+    Signature               array[int8, 16]
+    Nonce                   array[int8, 16]
+    OriginalMessageSize     int32[64:65536]
+    Reserved1               const[0, int16]
+    Flags                   const[0x0001, int16]    # SMB2_TRANSFORM_FLAG_ENCRYPTED
+    SessionId               smb2_session_id
+}
+
+smb2_encrypted_payload {
+    ciphertext  array[int8, 64:65536]
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 20b. SMB2 Compression Transform Header (MS-SMB2 §2.2.42)
+#
+#      Wraps a compressed SMB2 PDU.  ProtocolId = 0xFC534D42.
+# ─────────────────────────────────────────────────────────────────────────────
+
+sendmsg$smb2_compress(fd smb2_sock,
+    msg ptr[in, smb2_compress_msg], flags const[0, int32])
+
+smb2_compress_msg {
+    nb      smb2_nb_generic
+    hdr     smb2_compress_hdr_body
+    payload array[int8, 0:65536]
+}
+
+smb2_compress_hdr_body {
+    ProtocolId                      const[0xFC534D42, int32]  # 0xFC 'S' 'M' 'B'
+    OriginalCompressedSegmentSize   int32[64:65536]
+    CompressionAlgorithm            flags[smb2_compress_alg_value, int16]
+    Flags                           flags[smb2_compress_hdr_flags, int16]
+    Offset                          int32
+}
+
+smb2_compress_hdr_flags = 0x0000, 0x0001  # none / chained
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Compound request: NEGOTIATE → SESSION_SETUP in a single TCP segment
+#
+#   The NextCommand field of the first PDU's header points to the byte offset
+#   of the second PDU within the compound message.  Both PDUs are preceded by
+#   a single NetBIOS header covering the total length.
+# ─────────────────────────────────────────────────────────────────────────────
+
+sendmsg$smb2_compound_neg_sess(fd smb2_sock,
+    msg ptr[in, smb2_compound_neg_sess_msg], flags const[0, int32])
+
+smb2_compound_neg_sess_msg {
+    nb          smb2_nb_generic
+    neg_hdr     smb2_hdr_negotiate_compound
+    neg_body    smb2_negotiate_req_body
+    sess_hdr    smb2_hdr_session_compound
+    sess_body   smb2_sess_setup_req_body
+    sess_spnego smb2_ntlmssp_neg_blob
+}
+
+smb2_hdr_negotiate_compound {
+    ProtocolId      const[0xFE534D42, int32]
+    StructureSize   const[64, int16]
+    CreditCharge    const[0, int16]
+    Status          const[0, int32]
+    Command         const[0x0000, int16]
+    CreditRequest   int16[1:10]
+    Flags           const[0, int32]
+    NextCommand     int32[0:65536]          # offset to next compound PDU
+    MessageId       const[0, int64]
+    ProcessId       const[0, int32]
+    TreeId          const[0, int32]
+    SessionId       const[0, int64]
+    Signature       array[const[0, int8], 16]
+}
+
+smb2_hdr_session_compound {
+    ProtocolId      const[0xFE534D42, int32]
+    StructureSize   const[64, int16]
+    CreditCharge    const[1, int16]
+    Status          const[0, int32]
+    Command         const[0x0001, int16]
+    CreditRequest   int16[1:32]
+    Flags           const[0x00000004, int32]    # SMB2_FLAGS_RELATED_OPERATIONS
+    NextCommand     const[0, int32]
+    MessageId       smb2_message_id
+    ProcessId       const[0, int32]
+    TreeId          const[0xFFFFFFFF, int32]    # placeholder (related compound)
+    SessionId       const[0xFFFFFFFFFFFFFFFF, int64]  # placeholder
+    Signature       array[const[0, int8], 16]
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SMB2 FLUSH (MS-SMB2 §2.2.17) — trivial but tests access checks
+# ─────────────────────────────────────────────────────────────────────────────
+
+sendmsg$smb2_flush(fd smb2_sock, msg ptr[in, smb2_flush_msg], flags const[0, int32])
+
+smb2_flush_msg {
+    nb      smb2_nb_generic
+    hdr     smb2_hdr_flush
+    body    smb2_flush_req_body
+}
+
+smb2_hdr_flush {
+    ProtocolId      const[0xFE534D42, int32]
+    StructureSize   const[64, int16]
+    CreditCharge    const[1, int16]
+    Status          int32
+    Command         const[0x0007, int16]    # FLUSH
+    CreditRequest   int16[1:10]
+    Flags           flags[smb2_hdr_flags, int32]
+    NextCommand     int32
+    MessageId       smb2_message_id
+    ProcessId       int32
+    TreeId          smb2_tree_id
+    SessionId       smb2_session_id
+    Signature       array[const[0, int8], 16]
+}
+
+smb2_flush_req_body {
+    StructureSize       const[24, int16]
+    Reserved1           const[0, int16]
+    Reserved2           const[0, int32]
+    PersistentFileId    smb2_persistent_file_id
+    VolatileFileId      smb2_volatile_file_id
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# recvmsg: receive server responses (needed by syzkaller to track state)
+# ─────────────────────────────────────────────────────────────────────────────
+
+recvmsg$smb2(fd smb2_sock, msg ptr[out, recv_msg], flags const[0, int32])
+
+recv_msg {
+    hdr     ptr[out, array[int8, 68]]    # NetBIOS(4) + SMB2_HDR(64)
+    iov_len len[hdr, intptr]
+    control const[0, intptr]
+    ctllen  const[0, intptr]
+    msgflags const[0, int32]
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# close: tear down the TCP connection
+# ─────────────────────────────────────────────────────────────────────────────
+
+close$smb2(fd smb2_sock)

@@ -1,0 +1,11 @@
+make: Entering directory '/usr/lib/modules/6.18.13-arch1-1/build'
+make[1] : on entre dans le répertoire « /home/ezechiel203/ksmbd/test »
+  CC [M]  ksmbd_test_connection.o
+ksmbd_test_connection.c: Dans la fonction « test_conn_refcount_inc_not_zero_on_zero »:
+ksmbd_test_connection.c:321:9: attention: la valeur retournée par « refcount_dec_and_test » est ignorée alors qu'elle est déclarée avec l'attribut « warn_unused_result » [-Wunused-result]
+  321 |         refcount_dec_and_test(&conn->refcnt);
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  CC [M]  ksmbd_test_notify.o
+  CC [M]  ksmbd_test_tcp_shutdown.o
+make[1] : on quitte le répertoire « /home/ezechiel203/ksmbd/test »
+make: Leaving directory '/usr/lib/modules/6.18.13-arch1-1/build'

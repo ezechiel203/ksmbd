@@ -1,0 +1,3 @@
+[ksmbdctl(control)/876]: INFO: Terminated mountd
+[ksmbdctl(control)/876]: INFO: Killed ksmbd
+[ksmbdctl(start)/875]: INFO: Started manager

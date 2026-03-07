@@ -1,0 +1,95 @@
+=== SMB2 Sweep: ven. 06 mars 2026 03:43:24 CET ===
+SSH=13022  SMB=13445
+Output: /tmp/sweep-20260306-034324
+
+Restarting ksmbd...
+[ksmbd.control/1817]: INFO: Terminated mountd
+[ksmbd.control/1817]: INFO: Killed ksmbd
+[ksmbd.mountd/1894]: INFO: Started manager
+  smb2.compound ... P=20 F=0 S=0 E=0
+  smb2.compound_async ... P=6 F=4 S=0 E=0
+  smb2.compound_find ... TIMEOUT (120s)
+P=2 F=0 S=0 E=0
+  smb2.connect ... P=1 F=0 S=0 E=0
+  smb2.create ... [ksmbd.control/2621]: INFO: Terminated mountd
+[ksmbd.control/2621]: INFO: Killed ksmbd
+[ksmbd.mountd/2655]: INFO: Started manager
+P=16 F=1 S=1 E=0
+  smb2.credits ... [ksmbd.control/2842]: INFO: Terminated mountd
+[ksmbd.control/2842]: INFO: Killed ksmbd
+[ksmbd.mountd/2876]: INFO: Started manager
+P=3 F=7 S=0 E=0
+  smb2.delete-on-close-perms ... [ksmbd.control/3022]: INFO: Terminated mountd
+[ksmbd.control/3022]: INFO: Killed ksmbd
+[ksmbd.mountd/3056]: INFO: Started manager
+P=8 F=1 S=0 E=0
+  smb2.dir ... [ksmbd.control/3203]: INFO: Terminated mountd
+[ksmbd.control/3203]: INFO: Killed ksmbd
+[ksmbd.mountd/3237]: INFO: Started manager
+P=7 F=2 S=0 E=0
+  smb2.dirlease ... [ksmbd.control/3458]: INFO: Terminated mountd
+[ksmbd.control/3458]: INFO: Killed ksmbd
+[ksmbd.mountd/3493]: INFO: Started manager
+P=3 F=15 S=0 E=0
+  smb2.dosmode ... P=0 F=1 S=0 E=0
+  smb2.durable-open ... [ksmbd.control/3832]: INFO: Terminated mountd
+[ksmbd.control/3832]: INFO: Killed ksmbd
+P=21 F=4 S=1 E=0
+  smb2.durable-v2-open ... [ksmbd.control/852]: ERROR: Can't kill ksmbd
+[ksmbd.mountd/992]: INFO: Started manager
+P=0 F=0 S=0 E=0
+  smb2.getinfo ... [ksmbd.control/1148]: INFO: Terminated mountd
+[ksmbd.control/1148]: INFO: Killed ksmbd
+[ksmbd.mountd/1189]: INFO: Started manager
+P=6 F=2 S=0 E=0
+  smb2.ioctl ... [ksmbd.control/1609]: INFO: Terminated mountd
+[ksmbd.control/1609]: INFO: Killed ksmbd
+[ksmbd.mountd/1658]: INFO: Started manager
+P=41 F=19 S=15 E=0
+  smb2.lease ... [ksmbd.control/2142]: ERROR: Invalid lock entry `1904'
+[ksmbd.control/2142]: INFO: Killed ksmbd
+[ksmbd.mountd/2186]: INFO: Started manager
+TIMEOUT (180s)
+P=22 F=10 S=1 E=0
+  smb2.lock ... [ksmbd.control/2406]: INFO: Terminated mountd
+[ksmbd.control/2406]: INFO: Killed ksmbd
+[ksmbd.mountd/2440]: INFO: Started manager
+P=22 F=0 S=4 E=0
+  smb2.maxfid ... P=1 F=0 S=0 E=0
+  smb2.maximum_allowed ... P=1 F=1 S=0 E=0
+  smb2.mkdir ... P=0 F=1 S=0 E=0
+  smb2.mux ... P=0 F=0 S=0 E=0
+  smb2.notify ... [ksmbd.control/2804]: INFO: Terminated mountd
+[ksmbd.control/2804]: INFO: Killed ksmbd
+[ksmbd.mountd/2847]: INFO: Started manager
+TIMEOUT (180s)
+P=5 F=7 S=0 E=0
+  smb2.openattr ... P=0 F=0 S=0 E=0
+  smb2.oplock ... [ksmbd.control/830]: ERROR: Can't kill ksmbd
+[ksmbd.mountd/971]: INFO: Started manager
+[ksmbd.mountd/1007]: INFO: Started manager
+P=0 F=0 S=0 E=0
+  smb2.read ... TIMEOUT (120s)
+P=0 F=1 S=0 E=0
+  smb2.rename ... P=0 F=0 S=0 E=0
+  smb2.replay ... [ksmbd.control/832]: ERROR: Can't kill ksmbd
+[ksmbd.mountd/964]: INFO: Started manager
+P=0 F=0 S=0 E=0
+  smb2.rw ... P=4 F=0 S=0 E=0
+  smb2.secleak ... P=0 F=1 S=0 E=0
+  smb2.session ... [ksmbd.control/1833]: ERROR: Invalid lock entry `975'
+[ksmbd.control/1833]: INFO: Killed ksmbd
+[ksmbd.mountd/1879]: INFO: Started manager
+P=17 F=44 S=10 E=0
+  smb2.setinfo ... TIMEOUT (120s)
+P=0 F=0 S=0 E=0
+  smb2.streams ... [ksmbd.control/829]: ERROR: Can't kill ksmbd
+[ksmbd.mountd/959]: INFO: Started manager
+P=0 F=0 S=0 E=0
+  smb2.zero-data-ioctl ... P=0 F=1 S=0 E=0
+
+=== TOTALS ===
+PASS=206  FAIL=122  SKIP=32  ERROR=0
+Total tests: 360
+
+Results saved to: /tmp/sweep-20260306-034324

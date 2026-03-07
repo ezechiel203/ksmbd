@@ -1,0 +1,309 @@
+auth.c:0:0: information: Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches. [normalCheckLevelMaxBranches]
+
+^
+connection.c:0:0: information: Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches. [normalCheckLevelMaxBranches]
+
+^
+ksmbd.mod.c:23:50: error: syntax error [syntaxError]
+static const struct modversion_info ____versions[]
+                                                 ^
+ksmbd_app_instance.c:90:7: error: Uninitialized variables: prev_fp.filp, prev_fp.persistent_id, prev_fp.volatile_id, prev_fp.f_lock, prev_fp.f_ci, prev_fp.f_parent_ci, prev_fp.conn, prev_fp.tcon, prev_fp.refcount, prev_fp.daccess, prev_fp.saccess, prev_fp.coption, prev_fp.cdoption, prev_fp.create_time, prev_fp.itime, prev_fp.is_nt_open, prev_fp.attrib_only, prev_fp.has_app_instance_id, prev_fp.app_instance_version, prev_fp.stream, prev_fp.node, prev_fp.blocked_works, prev_fp.lock_list, prev_fp.durable_timeout, prev_fp.durable_scavenger_timeout, prev_fp.readdir_data, prev_fp.f_state, prev_fp.reserve_lease_break, prev_fp.is_durable, prev_fp.is_persistent, prev_fp.is_resilient, prev_fp.resilient_timeout, prev_fp.is_scavenger_claimed, prev_fp.is_posix_ctxt, prev_fp.lock_seq_lock [uninitvar]
+  if (prev_fp == fp)
+      ^
+ksmbd_app_instance.c:90:7: error: Uninitialized variables: prev_fp.filp, prev_fp.persistent_id, prev_fp.volatile_id, prev_fp.f_lock, prev_fp.f_ci, prev_fp.f_parent_ci, prev_fp.conn, prev_fp.tcon, prev_fp.refcount, prev_fp.daccess, prev_fp.saccess, prev_fp.coption, prev_fp.cdoption, prev_fp.create_time, prev_fp.itime, prev_fp.is_nt_open, prev_fp.attrib_only, prev_fp.has_app_instance_id, prev_fp.app_instance_version, prev_fp.stream, prev_fp.node, prev_fp.blocked_works, prev_fp.lock_list, prev_fp.durable_timeout, prev_fp.durable_scavenger_timeout, prev_fp.pid, prev_fp.cflock_cnt, prev_fp.llock_fstart, prev_fp.dirent_offset, prev_fp.filename, prev_fp.readdir_data, prev_fp.f_state, prev_fp.reserve_lease_break, prev_fp.is_durable, prev_fp.is_persistent, prev_fp.is_resilient, prev_fp.resilient_timeout, prev_fp.is_scavenger_claimed, prev_fp.is_posix_ctxt, prev_fp.lock_seq_lock [uninitvar]
+  if (prev_fp == fp)
+      ^
+ksmbd_create_ctx.c:77:10: error: Uninitialized variable: h->tag_len [uninitvar]
+  if (h->tag_len == tag_len &&
+         ^
+ksmbd_fsctl.c:0:0: information: Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches. [normalCheckLevelMaxBranches]
+
+^
+ksmbd_fsctl.c:54:12: error: Uninitialized variable: cur->ctl_code [uninitvar]
+  if (cur->ctl_code == h->ctl_code) {
+           ^
+ksmbd_fsctl.c:110:10: error: Uninitialized variable: h->ctl_code [uninitvar]
+  if (h->ctl_code != ctl_code)
+         ^
+ksmbd_fsctl_extra.c:0:0: information: Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches. [normalCheckLevelMaxBranches]
+
+^
+ksmbd_hooks.c:122:12: error: Uninitialized variable: pos->priority [uninitvar]
+  if (pos->priority > handler->priority) {
+           ^
+ksmbd_info.c:76:12: error: Uninitialized variable: cur->info_type [uninitvar]
+  if (cur->info_type == h->info_type &&
+           ^
+ksmbd_info.c:138:10: error: Uninitialized variable: h->info_type [uninitvar]
+  if (h->info_type != info_type ||
+         ^
+ksmbd_notify.c:0:0: information: Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches. [normalCheckLevelMaxBranches]
+
+^
+ksmbd_notify.c:506:28: error: Uninitialized variable: work->request_buf [uninitvar]
+  hdr = smb2_get_msg(work->request_buf);
+                           ^
+ksmbd_quota.c:0:0: information: Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches. [normalCheckLevelMaxBranches]
+
+^
+ksmbd_reparse.c:0:0: information: Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches. [normalCheckLevelMaxBranches]
+
+^
+ksmbd_vss.c:0:0: information: Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches. [normalCheckLevelMaxBranches]
+
+^
+ksmbd_vss.c:69:20: error: Uninitialized variable: cur->name [uninitvar]
+  if (!strcmp(cur->name, be->name)) {
+                   ^
+ksmbd_vss.c:117:12: error: Uninitialized variable: be->resolve_path [uninitvar]
+  if (!be->resolve_path)
+           ^
+ksmbd_work.c:54:29: error: Uninitialized variable: ar->buf [uninitvar]
+  ksmbd_buffer_pool_put(ar->buf);
+                            ^
+memory_usage_validator.c:0:0: information: Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches. [normalCheckLevelMaxBranches]
+
+^
+misc.c:0:0: information: Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches. [normalCheckLevelMaxBranches]
+
+^
+ndr.c:0:0: information: Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches. [normalCheckLevelMaxBranches]
+
+^
+oplock.c:0:0: information: Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches. [normalCheckLevelMaxBranches]
+
+^
+oplock.c:609:16: error: Uninitialized variable: opinfo->is_lease [uninitvar]
+  if (!opinfo->is_lease || !opinfo->conn)
+               ^
+oplock.c:1175:19: warning: Uninitialized variables: opinfo.conn, opinfo.sess, opinfo.work, opinfo.o_fp, opinfo.level, opinfo.op_state, opinfo.pending_break, opinfo.fid, opinfo.breaking_cnt, opinfo.refcount, opinfo.Tid, opinfo.is_lease, opinfo.open_trunc, opinfo.o_lease, opinfo.op_entry, opinfo.lease_entry, opinfo.oplock_q, opinfo.oplock_brk [uninitvar]
+   lease_del_list(opinfo);
+                  ^
+oplock.c:1167:12: note: Assuming condition is false
+  if (conn && memcmp(lb->client_guid, conn->ClientGUID,
+           ^
+oplock.c:1175:19: note: Uninitialized variables: opinfo.conn, opinfo.sess, opinfo.work, opinfo.o_fp, opinfo.level, opinfo.op_state, opinfo.pending_break, opinfo.fid, opinfo.breaking_cnt, opinfo.refcount, opinfo.Tid, opinfo.is_lease, opinfo.open_trunc, opinfo.o_lease, opinfo.op_entry, opinfo.lease_entry, opinfo.oplock_q, opinfo.oplock_brk
+   lease_del_list(opinfo);
+                  ^
+oplock.c:1258:28: error: Uninitialized variables: lb.lease_list, lb.l_entry, lb.lb_lock, lb.rcu_head [uninitvar]
+   opinfo->o_lease->l_lb = lb;
+                           ^
+oplock.c:1316:15: error: Uninitialized variable: opinfo->conn [uninitvar]
+  if (opinfo->conn == NULL || !opinfo->is_lease)
+              ^
+oplock.c:1572:15: error: Uninitialized variable: brk_op->conn [uninitvar]
+  if (brk_op->conn == NULL)
+              ^
+oplock.c:1175:19: warning: Uninitialized variables: opinfo.conn, opinfo.sess, opinfo.work, opinfo.o_fp, opinfo.level, opinfo.op_state, opinfo.pending_break, opinfo.fid, opinfo.breaking_cnt, opinfo.refcount, opinfo.Tid, opinfo.is_lease, opinfo.is_smb2, opinfo.open_trunc, opinfo.o_lease, opinfo.op_entry, opinfo.lease_entry, opinfo.oplock_q, opinfo.oplock_brk [uninitvar]
+   lease_del_list(opinfo);
+                  ^
+oplock.c:1167:12: note: Assuming condition is false
+  if (conn && memcmp(lb->client_guid, conn->ClientGUID,
+           ^
+oplock.c:1175:19: note: Uninitialized variables: opinfo.conn, opinfo.sess, opinfo.work, opinfo.o_fp, opinfo.level, opinfo.op_state, opinfo.pending_break, opinfo.fid, opinfo.breaking_cnt, opinfo.refcount, opinfo.Tid, opinfo.is_lease, opinfo.is_smb2, opinfo.open_trunc, opinfo.o_lease, opinfo.op_entry, opinfo.lease_entry, opinfo.oplock_q, opinfo.oplock_brk
+   lease_del_list(opinfo);
+                  ^
+server.c:802:1: error: There is an unknown macro here somewhere. Configuration is required. If module_init is a macro then please configure it. [unknownMacro]
+module_init(ksmbd_server_init)
+^
+smb1misc.c:0:0: information: Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches. [normalCheckLevelMaxBranches]
+
+^
+smb1pdu.c:0:0: information: Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches. [normalCheckLevelMaxBranches]
+
+^
+smb1pdu.c:2750:34: warning: Either the condition 'fp' is redundant or there is possible null pointer dereference: fp. [nullPointerRedundantCheck]
+ rsp->CreationTime = cpu_to_le64(fp->create_time);
+                                 ^
+smb1pdu.c:2771:7: note: Assuming that condition 'fp' is not redundant
+  if (fp) {
+      ^
+smb1pdu.c:2750:34: note: Null pointer dereference
+ rsp->CreationTime = cpu_to_le64(fp->create_time);
+                                 ^
+smb1pdu.c:3650:2: warning: Either the condition 'local_acl' is redundant or there is possible null pointer dereference: local_acl. [nullPointerRedundantCheck]
+ local_acl->a_version = cpu_to_le32(POSIX_ACL_XATTR_VERSION);
+ ^
+smb1pdu.c:3645:23: note: Assuming that condition 'local_acl' is not redundant
+ if ((buflen != 0) && local_acl && size > buflen)
+                      ^
+smb1pdu.c:3650:2: note: Null pointer dereference
+ local_acl->a_version = cpu_to_le32(POSIX_ACL_XATTR_VERSION);
+ ^
+smb1pdu.c:8558:41: warning: Either the condition '!tree_conn' is redundant or there is possible null pointer dereference: work->tcon. [nullPointerRedundantCheck]
+ struct ksmbd_share_config *share = work->tcon->share_conf;
+                                        ^
+smb1pdu.c:8574:6: note: Assuming that condition '!tree_conn' is not redundant
+ if (!tree_conn) {
+     ^
+smb1pdu.c:8573:18: note: Assignment to 'tree_conn=work->tcon'
+ tree_conn = work->tcon;
+                 ^
+smb1pdu.c:8558:41: note: Null pointer dereference
+ struct ksmbd_share_config *share = work->tcon->share_conf;
+                                        ^
+smb1pdu.c:3649:27: warning: Either the condition 'local_acl' is redundant or there is pointer arithmetic with NULL pointer. [nullPointerArithmeticRedundantCheck]
+ ace = (void *)(local_acl + 1);
+                          ^
+smb1pdu.c:3645:23: note: Assuming that condition 'local_acl' is not redundant
+ if ((buflen != 0) && local_acl && size > buflen)
+                      ^
+smb1pdu.c:3649:27: note: Null pointer addition
+ ace = (void *)(local_acl + 1);
+                          ^
+smb1pdu.c:3701:57: warning: Either the condition '!pACL' is redundant or there is pointer arithmetic with NULL pointer. [nullPointerArithmeticRedundantCheck]
+ struct posix_acl_xattr_entry *ace = (void *)(local_acl + 1);
+                                                        ^
+smb1pdu.c:3705:23: note: Assuming that condition '!pACL' is not redundant
+ if ((buflen == 0) || !pACL || !cifs_acl)
+                      ^
+smb1pdu.c:3700:43: note: local_acl is assigned '(void*)pACL' here.
+ struct posix_acl_xattr_header *local_acl = (void *)pACL;
+                                          ^
+smb1pdu.c:3701:57: note: Null pointer addition
+ struct posix_acl_xattr_entry *ace = (void *)(local_acl + 1);
+                                                        ^
+smb1pdu.c:7933:42: error: Uninitialized variable: new_work->request_buf [uninitvar]
+  work_hdr = (struct smb_hdr *)new_work->request_buf;
+                                         ^
+smb1pdu.c:7934:7: error: Uninitialized variable: work_hdr [uninitvar]
+  if (work_hdr->Mid == hdr->Mid) {
+      ^
+smb1pdu.c:7933:14: note: Assignment 'work_hdr=(struct smb_hdr*)new_work->request_buf', assigned value is <Uninit>
+  work_hdr = (struct smb_hdr *)new_work->request_buf;
+             ^
+smb1pdu.c:7934:7: note: Uninitialized variable: work_hdr
+  if (work_hdr->Mid == hdr->Mid) {
+      ^
+smb2_create.c:0:0: information: Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches. [normalCheckLevelMaxBranches]
+
+^
+smb2_dir.c:0:0: information: Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches. [normalCheckLevelMaxBranches]
+
+^
+smb2_ioctl.c:0:0: information: Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches. [normalCheckLevelMaxBranches]
+
+^
+smb2_lock.c:93:30: error: Uninitialized variable: iter->request_buf [uninitvar]
+   chdr = smb2_get_msg(iter->request_buf);
+                             ^
+smb2_negotiate.c:0:0: information: Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches. [normalCheckLevelMaxBranches]
+
+^
+smb2_pdu_common.c:0:0: information: Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches. [normalCheckLevelMaxBranches]
+
+^
+smb2_pdu_common.c:1166:9: warning: Identical condition and return expression 'rc', return value is always 0 [identicalConditionAfterEarlyExit]
+ return rc;
+        ^
+smb2_pdu_common.c:1160:6: note: If condition 'rc' is true, the function will return/exit
+ if (rc)
+     ^
+smb2_pdu_common.c:1166:9: note: Returning identical expression 'rc'
+ return rc;
+        ^
+smb2_query_set.c:0:0: information: Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches. [normalCheckLevelMaxBranches]
+
+^
+smb2_read_write.c:0:0: information: Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches. [normalCheckLevelMaxBranches]
+
+^
+smb2_session.c:0:0: information: Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches. [normalCheckLevelMaxBranches]
+
+^
+smb2fruit.c:0:0: information: Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches. [normalCheckLevelMaxBranches]
+
+^
+smb2misc.c:0:0: information: Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches. [normalCheckLevelMaxBranches]
+
+^
+smb2ops.c:0:0: information: Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches. [normalCheckLevelMaxBranches]
+
+^
+smb_common.c:0:0: information: Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches. [normalCheckLevelMaxBranches]
+
+^
+smbacl.c:0:0: information: Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches. [normalCheckLevelMaxBranches]
+
+^
+smbacl.c:1084:37: warning: Either the condition '!pntsd' is redundant or there is pointer arithmetic with NULL pointer. [nullPointerArithmeticRedundantCheck]
+ char *end_of_acl = ((char *)pntsd) + acl_len;
+                                    ^
+smbacl.c:1088:6: note: Assuming that condition '!pntsd' is not redundant
+ if (!pntsd)
+     ^
+smbacl.c:1084:37: note: Null pointer addition
+ char *end_of_acl = ((char *)pntsd) + acl_len;
+                                    ^
+transport_ipc.c:0:0: information: Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches. [normalCheckLevelMaxBranches]
+
+^
+transport_ipc.c:299:24: error: Uninitialized variable: entry->handle [uninitvar]
+  if (handle != entry->handle)
+                       ^
+transport_rdma.c:0:0: information: Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches. [normalCheckLevelMaxBranches]
+
+^
+transport_rdma.c:2262:16: error: Uninitialized variable: smb_dev->ib_dev [uninitvar]
+  if (smb_dev->ib_dev == ib_dev) {
+               ^
+transport_rdma.c:2345:28: warning: Uninitialized variable: smb_dev->ib_dev [uninitvar]
+  for (i = 0; i < smb_dev->ib_dev->phys_port_cnt; i++) {
+                           ^
+transport_tcp.c:0:0: information: Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches. [normalCheckLevelMaxBranches]
+
+^
+unicode.c:0:0: information: Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches. [normalCheckLevelMaxBranches]
+
+^
+vfs.c:0:0: information: Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches. [normalCheckLevelMaxBranches]
+
+^
+vfs_cache.c:0:0: information: Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches. [normalCheckLevelMaxBranches]
+
+^
+vfs_cache.c:485:35: error: Uninitialized variable: cancel_work->request_buf [uninitvar]
+  hdr = smb2_get_msg(cancel_work->request_buf);
+                                  ^
+vfs_cache.c:682:23: error: Uninitialized variables: lfp.persistent_id, lfp.volatile_id, lfp.f_lock, lfp.f_ci, lfp.f_parent_ci, lfp.conn, lfp.tcon, lfp.refcount, lfp.daccess, lfp.saccess, lfp.coption, lfp.cdoption, lfp.create_time, lfp.itime, lfp.is_nt_open, lfp.attrib_only, lfp.has_app_instance_id, lfp.app_instance_version, lfp.stream, lfp.node, lfp.blocked_works, lfp.lock_list, lfp.durable_timeout, lfp.durable_scavenger_timeout, lfp.readdir_data, lfp.f_state, lfp.reserve_lease_break, lfp.is_durable, lfp.is_persistent, lfp.is_resilient, lfp.resilient_timeout, lfp.is_scavenger_claimed, lfp.is_posix_ctxt, lfp.lock_seq_lock [uninitvar]
+   lfp = ksmbd_fp_get(lfp);
+                      ^
+vfs_cache.c:1056:11: error: Uninitialized variable: op->conn [uninitvar]
+  if (op->conn != conn)
+          ^
+vfs_cache.c:1182:11: error: Uninitialized variable: op->conn [uninitvar]
+  if (op->conn)
+          ^
+vfs_cache.c:682:23: error: Uninitialized variables: lfp.persistent_id, lfp.volatile_id, lfp.f_lock, lfp.f_ci, lfp.f_parent_ci, lfp.conn, lfp.tcon, lfp.refcount, lfp.daccess, lfp.saccess, lfp.coption, lfp.cdoption, lfp.create_time, lfp.itime, lfp.is_nt_open, lfp.attrib_only, lfp.has_app_instance_id, lfp.app_instance_version, lfp.stream, lfp.node, lfp.blocked_works, lfp.lock_list, lfp.durable_timeout, lfp.durable_scavenger_timeout, lfp.pid, lfp.cflock_cnt, lfp.llock_fstart, lfp.dirent_offset, lfp.filename, lfp.readdir_data, lfp.f_state, lfp.reserve_lease_break, lfp.is_durable, lfp.is_persistent, lfp.is_resilient, lfp.resilient_timeout, lfp.is_scavenger_claimed, lfp.is_posix_ctxt, lfp.lock_seq_lock [uninitvar]
+   lfp = ksmbd_fp_get(lfp);
+                      ^
+mgmt/share_config.c:102:28: error: Uninitialized variable: share->name [uninitvar]
+  if (!strcmp(name, share->name))
+                           ^
+mgmt/tree_connect.c:159:11: error: Uninitialized variable: tc->t_state [uninitvar]
+  if (tc->t_state == TREE_DISCONNECTED) {
+          ^
+mgmt/user_session.c:0:0: information: Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches. [normalCheckLevelMaxBranches]
+
+^
+mgmt/user_session.c:71:29: error: Uninitialized variables: entry.id, entry.method [uninitvar]
+  __session_rpc_close(sess, entry);
+                            ^
+mgmt/user_session.c:190:19: error: Uninitialized variable: sess->id [uninitvar]
+  if (id == sess->id) {
+                  ^
+mgmt/user_session.c:213:17: error: Uninitialized variable: sess->state [uninitvar]
+  state = sess->state;
+                ^
+mgmt/user_session.c:210:18: note: Assuming condition is false
+  if (nr_expired >= ARRAY_SIZE(expired))
+                 ^
+mgmt/user_session.c:213:17: note: Uninitialized variable: sess->state
+  state = sess->state;
+                ^
+mgmt/user_session.c:275:31: error: Uninitialized variables: sess.id, sess.dialect, sess.user, sess.sequence_number, sess.flags, sess.sign, sess.enc, sess.is_anonymous, sess.state, sess.state_lock, sess.Preauth_HashValue, sess.hlist, sess.ksmbd_chann_list, sess.tree_conns, sess.tree_conn_ida, sess.rpc_handle_list, sess.file_table, sess.last_active, sess.tree_conns_lock, sess.gcm_nonce_counter, sess.refcnt, sess.rpc_lock, sess.rcu_head [uninitvar]
+   if (!ksmbd_chann_del(conn, sess) &&
+                              ^
+mgmt/user_session.c:310:15: error: Uninitialized variable: chann->conn [uninitvar]
+   if (chann->conn != conn)
+              ^

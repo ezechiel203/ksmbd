@@ -1,0 +1,58 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772587193
+time: 2026-03-04 01:19:53.182262
+progress: 8
+test: kernel_oplocks1
+time: 2026-03-04 01:19:53.183012
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+time: 2026-03-04 01:19:54.608143
+success: kernel_oplocks1
+test: kernel_oplocks2
+time: 2026-03-04 01:19:54.608191
+time: 2026-03-04 01:19:54.774285
+failure: kernel_oplocks2 [
+../../source4/torture/smb2/oplock.c:4594: status was NT_STATUS_SHARING_VIOLATION, expected NT_STATUS_OK: Error opening the file
+]
+test: kernel_oplocks3
+time: 2026-03-04 01:19:54.774341
+Acking to level II [0x01] in oplock handler
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+time: 2026-03-04 01:19:56.096551
+success: kernel_oplocks3
+test: kernel_oplocks4
+time: 2026-03-04 01:19:56.096599
+time: 2026-03-04 01:19:56.478048
+failure: kernel_oplocks4 [
+../../source4/torture/smb2/oplock.c:4756: status was NT_STATUS_SHARING_VIOLATION, expected NT_STATUS_OK: Error opening the file
+]
+test: kernel_oplocks5
+time: 2026-03-04 01:19:56.478112
+Acking to level II [0x01] in oplock handler
+time: 2026-03-04 01:19:56.930259
+failure: kernel_oplocks5 [
+../../source4/torture/smb2/oplock.c:4848: Expression `create.out.oplock_level == 0x00' failed: Oplock level is not SMB2_OPLOCK_LEVEL_NONE
+]
+test: kernel_oplocks6
+time: 2026-03-04 01:19:56.930310
+Acking to level II [0x01] in oplock handler
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+time: 2026-03-04 01:19:58.533726
+success: kernel_oplocks6
+test: kernel_oplocks7
+time: 2026-03-04 01:19:58.533779
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+time: 2026-03-04 01:20:00.228370
+failure: kernel_oplocks7 [
+(../../source4/torture/smb2/oplock.c:5049): wrong value for oplock got 0x1
+]
+test: kernel_oplocks8
+time: 2026-03-04 01:20:00.228484
+time: 2026-03-04 01:20:00.511582
+skip: kernel_oplocks8 [
+../../source4/torture/smb2/oplock.c:5295: Need localdir for test
+]

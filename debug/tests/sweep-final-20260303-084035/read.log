@@ -1,0 +1,30 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772523656
+time: 2026-03-03 07:40:56.977755
+progress: 5
+test: eof
+time: 2026-03-03 07:40:56.978177
+time: 2026-03-03 07:40:56.983671
+success: eof
+test: position
+time: 2026-03-03 07:40:56.983724
+time: 2026-03-03 07:40:56.985688
+failure: position [
+../../source4/torture/smb2/read.c:151: status was NT_STATUS_DELETE_PENDING, expected NT_STATUS_OK: Incorrect status
+]
+test: dir
+time: 2026-03-03 07:40:56.985740
+time: 2026-03-03 07:40:56.987807
+success: dir
+test: access
+time: 2026-03-03 07:40:56.987854
+time: 2026-03-03 07:40:57.000169
+success: access
+test: bug14607
+time: 2026-03-03 07:40:57.000216
+FSCTL_SMBTORTURE_GLOBAL_READ_RESPONSE_BODY_PADDING8: NT_STATUS_INVALID_DEVICE_REQUEST
+time: 2026-03-03 07:40:57.003515
+skip: bug14607 [
+../../source4/torture/smb2/read.c:394: server doesn't support FSCTL_SMBTORTURE_GLOBAL_READ_RESPONSE_BODY_PADDING8
+]

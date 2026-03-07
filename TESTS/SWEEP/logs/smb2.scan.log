@@ -1,0 +1,1431 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772584993
+time: 2026-03-04 00:43:13.218809
+progress: 4
+test: scan
+time: 2026-03-04 00:43:13.219256
+time: 2026-03-04 00:43:48.859714
+success: scan
+test: getinfo
+time: 2026-03-04 00:43:48.859776
+file level 0x01:04 4 is 40 bytes - NT_STATUS_OK
+dir  level 0x01:04 4 is 40 bytes - NT_STATUS_OK
+file level 0x01:05 5 is 24 bytes - NT_STATUS_OK
+dir  level 0x01:05 5 is 24 bytes - NT_STATUS_OK
+file level 0x01:06 6 is 8 bytes - NT_STATUS_OK
+dir  level 0x01:06 6 is 8 bytes - NT_STATUS_OK
+file level 0x01:07 7 is 4 bytes - NT_STATUS_OK
+dir  level 0x01:07 7 is 4 bytes - NT_STATUS_OK
+file level 0x01:08 8 is 4 bytes - NT_STATUS_OK
+dir  level 0x01:08 8 is 4 bytes - NT_STATUS_OK
+file level 0x01:09 9 is 38 bytes - NT_STATUS_OK
+dir  level 0x01:09 9 is 38 bytes - NT_STATUS_OK
+file level 0x01:0e 14 is 8 bytes - NT_STATUS_OK
+dir  level 0x01:0e 14 is 8 bytes - NT_STATUS_OK
+file level 0x01:0f 15 is 48 bytes - NT_STATUS_OK
+dir  level 0x01:0f 15 is 48 bytes - NT_STATUS_OK
+file level 0x01:10 16 is 4 bytes - NT_STATUS_OK
+dir  level 0x01:10 16 is 4 bytes - NT_STATUS_OK
+file level 0x01:11 17 is 4 bytes - NT_STATUS_OK
+dir  level 0x01:11 17 is 4 bytes - NT_STATUS_OK
+file level 0x01:12 18 is 134 bytes - NT_STATUS_OK
+dir  level 0x01:12 18 is 134 bytes - NT_STATUS_OK
+file level 0x01:15 21 is 28 bytes - NT_STATUS_OK
+dir  level 0x01:15 21 is 28 bytes - NT_STATUS_OK
+file level 0x01:16 22 is 94 bytes - NT_STATUS_OK
+dir  level 0x01:16 22 is 56 bytes - NT_STATUS_OK
+file level 0x01:17 23 is 8 bytes - NT_STATUS_OK
+dir  level 0x01:17 23 is 8 bytes - NT_STATUS_OK
+file level 0x01:18 24 is 40 bytes - NT_STATUS_OK
+dir  level 0x01:18 24 is 40 bytes - NT_STATUS_OK
+file level 0x01:19 25 is 16 bytes - NT_STATUS_OK
+dir  level 0x01:19 25 is 16 bytes - NT_STATUS_OK
+file level 0x01:1a 26 is 24 bytes - NT_STATUS_OK
+dir  level 0x01:1a 26 is 24 bytes - NT_STATUS_OK
+file level 0x01:1c 28 is 16 bytes - NT_STATUS_OK
+dir  level 0x01:1c 28 is 16 bytes - NT_STATUS_OK
+file level 0x01:1d 29 is 64 bytes - NT_STATUS_OK
+dir  level 0x01:1d 29 is 64 bytes - NT_STATUS_OK
+file level 0x01:21 33 is 12 bytes - NT_STATUS_OK
+dir  level 0x01:21 33 is 12 bytes - NT_STATUS_OK
+file level 0x01:22 34 is 56 bytes - NT_STATUS_OK
+dir  level 0x01:22 34 is 56 bytes - NT_STATUS_OK
+file level 0x01:23 35 is 8 bytes - NT_STATUS_OK
+dir  level 0x01:23 35 is 8 bytes - NT_STATUS_OK
+file level 0x01:2e 46 is 64 bytes - NT_STATUS_OK
+dir  level 0x01:2e 46 is 64 bytes - NT_STATUS_OK
+file level 0x01:2f 47 is 8 bytes - NT_STATUS_OK
+dir  level 0x01:2f 47 is 8 bytes - NT_STATUS_OK
+file level 0x01:30 48 is 36 bytes - NT_STATUS_OK
+dir  level 0x01:30 48 is 36 bytes - NT_STATUS_OK
+file level 0x01:31 49 is 68 bytes - NT_STATUS_OK
+dir  level 0x01:31 49 is 68 bytes - NT_STATUS_OK
+file level 0x01:33 51 is 4 bytes - NT_STATUS_OK
+dir  level 0x01:33 51 is 4 bytes - NT_STATUS_OK
+file level 0x01:36 54 is 12 bytes - NT_STATUS_OK
+dir  level 0x01:36 54 is 12 bytes - NT_STATUS_OK
+file level 0x01:37 55 is 116 bytes - NT_STATUS_OK
+dir  level 0x01:37 55 is 116 bytes - NT_STATUS_OK
+file level 0x01:3a 58 is 16 bytes - NT_STATUS_OK
+dir  level 0x01:3a 58 is 16 bytes - NT_STATUS_OK
+file level 0x01:3b 59 is 24 bytes - NT_STATUS_OK
+dir  level 0x01:3b 59 is 24 bytes - NT_STATUS_OK
+file level 0x01:46 70 is 64 bytes - NT_STATUS_OK
+dir  level 0x01:46 70 is 64 bytes - NT_STATUS_OK
+file level 0x01:47 71 is 88 bytes - NT_STATUS_OK
+dir  level 0x01:47 71 is 88 bytes - NT_STATUS_OK
+file level 0x01:64 100 is 112 bytes - NT_STATUS_OK
+dir  level 0x01:64 100 is 112 bytes - NT_STATUS_OK
+file level 0x02:01 1 is 26 bytes - NT_STATUS_OK
+dir  level 0x02:01 1 is 26 bytes - NT_STATUS_OK
+file level 0x02:03 3 is 24 bytes - NT_STATUS_OK
+dir  level 0x02:03 3 is 24 bytes - NT_STATUS_OK
+file level 0x02:04 4 is 8 bytes - NT_STATUS_OK
+dir  level 0x02:04 4 is 8 bytes - NT_STATUS_OK
+file level 0x02:05 5 is 20 bytes - NT_STATUS_OK
+dir  level 0x02:05 5 is 20 bytes - NT_STATUS_OK
+file level 0x02:06 6 is 48 bytes - NT_STATUS_OK
+dir  level 0x02:06 6 is 48 bytes - NT_STATUS_OK
+file level 0x02:07 7 is 32 bytes - NT_STATUS_OK
+dir  level 0x02:07 7 is 32 bytes - NT_STATUS_OK
+file level 0x02:08 8 is 64 bytes - NT_STATUS_OK
+dir  level 0x02:08 8 is 64 bytes - NT_STATUS_OK
+file level 0x02:09 9 is 4 bytes - NT_STATUS_OK
+dir  level 0x02:09 9 is 4 bytes - NT_STATUS_OK
+file level 0x02:0b 11 is 28 bytes - NT_STATUS_OK
+dir  level 0x02:0b 11 is 28 bytes - NT_STATUS_OK
+file level 0x02:64 100 is 56 bytes - NT_STATUS_OK
+dir  level 0x02:64 100 is 56 bytes - NT_STATUS_OK
+file level 0x03:00 0 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:00 0 is 20 bytes - NT_STATUS_OK
+file level 0x03:01 1 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:01 1 is 20 bytes - NT_STATUS_OK
+file level 0x03:02 2 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:02 2 is 20 bytes - NT_STATUS_OK
+file level 0x03:03 3 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:03 3 is 20 bytes - NT_STATUS_OK
+file level 0x03:04 4 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:04 4 is 20 bytes - NT_STATUS_OK
+file level 0x03:05 5 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:05 5 is 20 bytes - NT_STATUS_OK
+file level 0x03:06 6 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:06 6 is 20 bytes - NT_STATUS_OK
+file level 0x03:07 7 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:07 7 is 20 bytes - NT_STATUS_OK
+file level 0x03:08 8 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:08 8 is 20 bytes - NT_STATUS_OK
+file level 0x03:09 9 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:09 9 is 20 bytes - NT_STATUS_OK
+file level 0x03:0a 10 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:0a 10 is 20 bytes - NT_STATUS_OK
+file level 0x03:0b 11 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:0b 11 is 20 bytes - NT_STATUS_OK
+file level 0x03:0c 12 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:0c 12 is 20 bytes - NT_STATUS_OK
+file level 0x03:0d 13 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:0d 13 is 20 bytes - NT_STATUS_OK
+file level 0x03:0e 14 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:0e 14 is 20 bytes - NT_STATUS_OK
+file level 0x03:0f 15 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:0f 15 is 20 bytes - NT_STATUS_OK
+file level 0x03:10 16 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:10 16 is 20 bytes - NT_STATUS_OK
+file level 0x03:11 17 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:11 17 is 20 bytes - NT_STATUS_OK
+file level 0x03:12 18 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:12 18 is 20 bytes - NT_STATUS_OK
+file level 0x03:13 19 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:13 19 is 20 bytes - NT_STATUS_OK
+file level 0x03:14 20 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:14 20 is 20 bytes - NT_STATUS_OK
+file level 0x03:15 21 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:15 21 is 20 bytes - NT_STATUS_OK
+file level 0x03:16 22 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:16 22 is 20 bytes - NT_STATUS_OK
+file level 0x03:17 23 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:17 23 is 20 bytes - NT_STATUS_OK
+file level 0x03:18 24 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:18 24 is 20 bytes - NT_STATUS_OK
+file level 0x03:19 25 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:19 25 is 20 bytes - NT_STATUS_OK
+file level 0x03:1a 26 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:1a 26 is 20 bytes - NT_STATUS_OK
+file level 0x03:1b 27 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:1b 27 is 20 bytes - NT_STATUS_OK
+file level 0x03:1c 28 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:1c 28 is 20 bytes - NT_STATUS_OK
+file level 0x03:1d 29 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:1d 29 is 20 bytes - NT_STATUS_OK
+file level 0x03:1e 30 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:1e 30 is 20 bytes - NT_STATUS_OK
+file level 0x03:1f 31 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:1f 31 is 20 bytes - NT_STATUS_OK
+file level 0x03:20 32 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:20 32 is 20 bytes - NT_STATUS_OK
+file level 0x03:21 33 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:21 33 is 20 bytes - NT_STATUS_OK
+file level 0x03:22 34 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:22 34 is 20 bytes - NT_STATUS_OK
+file level 0x03:23 35 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:23 35 is 20 bytes - NT_STATUS_OK
+file level 0x03:24 36 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:24 36 is 20 bytes - NT_STATUS_OK
+file level 0x03:25 37 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:25 37 is 20 bytes - NT_STATUS_OK
+file level 0x03:26 38 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:26 38 is 20 bytes - NT_STATUS_OK
+file level 0x03:27 39 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:27 39 is 20 bytes - NT_STATUS_OK
+file level 0x03:28 40 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:28 40 is 20 bytes - NT_STATUS_OK
+file level 0x03:29 41 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:29 41 is 20 bytes - NT_STATUS_OK
+file level 0x03:2a 42 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:2a 42 is 20 bytes - NT_STATUS_OK
+file level 0x03:2b 43 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:2b 43 is 20 bytes - NT_STATUS_OK
+file level 0x03:2c 44 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:2c 44 is 20 bytes - NT_STATUS_OK
+file level 0x03:2d 45 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:2d 45 is 20 bytes - NT_STATUS_OK
+file level 0x03:2e 46 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:2e 46 is 20 bytes - NT_STATUS_OK
+file level 0x03:2f 47 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:2f 47 is 20 bytes - NT_STATUS_OK
+file level 0x03:30 48 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:30 48 is 20 bytes - NT_STATUS_OK
+file level 0x03:31 49 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:31 49 is 20 bytes - NT_STATUS_OK
+file level 0x03:32 50 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:32 50 is 20 bytes - NT_STATUS_OK
+file level 0x03:33 51 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:33 51 is 20 bytes - NT_STATUS_OK
+file level 0x03:34 52 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:34 52 is 20 bytes - NT_STATUS_OK
+file level 0x03:35 53 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:35 53 is 20 bytes - NT_STATUS_OK
+file level 0x03:36 54 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:36 54 is 20 bytes - NT_STATUS_OK
+file level 0x03:37 55 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:37 55 is 20 bytes - NT_STATUS_OK
+file level 0x03:38 56 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:38 56 is 20 bytes - NT_STATUS_OK
+file level 0x03:39 57 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:39 57 is 20 bytes - NT_STATUS_OK
+file level 0x03:3a 58 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:3a 58 is 20 bytes - NT_STATUS_OK
+file level 0x03:3b 59 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:3b 59 is 20 bytes - NT_STATUS_OK
+file level 0x03:3c 60 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:3c 60 is 20 bytes - NT_STATUS_OK
+file level 0x03:3d 61 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:3d 61 is 20 bytes - NT_STATUS_OK
+file level 0x03:3e 62 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:3e 62 is 20 bytes - NT_STATUS_OK
+file level 0x03:3f 63 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:3f 63 is 20 bytes - NT_STATUS_OK
+file level 0x03:40 64 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:40 64 is 20 bytes - NT_STATUS_OK
+file level 0x03:41 65 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:41 65 is 20 bytes - NT_STATUS_OK
+file level 0x03:42 66 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:42 66 is 20 bytes - NT_STATUS_OK
+file level 0x03:43 67 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:43 67 is 20 bytes - NT_STATUS_OK
+file level 0x03:44 68 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:44 68 is 20 bytes - NT_STATUS_OK
+file level 0x03:45 69 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:45 69 is 20 bytes - NT_STATUS_OK
+file level 0x03:46 70 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:46 70 is 20 bytes - NT_STATUS_OK
+file level 0x03:47 71 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:47 71 is 20 bytes - NT_STATUS_OK
+file level 0x03:48 72 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:48 72 is 20 bytes - NT_STATUS_OK
+file level 0x03:49 73 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:49 73 is 20 bytes - NT_STATUS_OK
+file level 0x03:4a 74 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:4a 74 is 20 bytes - NT_STATUS_OK
+file level 0x03:4b 75 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:4b 75 is 20 bytes - NT_STATUS_OK
+file level 0x03:4c 76 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:4c 76 is 20 bytes - NT_STATUS_OK
+file level 0x03:4d 77 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:4d 77 is 20 bytes - NT_STATUS_OK
+file level 0x03:4e 78 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:4e 78 is 20 bytes - NT_STATUS_OK
+file level 0x03:4f 79 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:4f 79 is 20 bytes - NT_STATUS_OK
+file level 0x03:50 80 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:50 80 is 20 bytes - NT_STATUS_OK
+file level 0x03:51 81 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:51 81 is 20 bytes - NT_STATUS_OK
+file level 0x03:52 82 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:52 82 is 20 bytes - NT_STATUS_OK
+file level 0x03:53 83 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:53 83 is 20 bytes - NT_STATUS_OK
+file level 0x03:54 84 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:54 84 is 20 bytes - NT_STATUS_OK
+file level 0x03:55 85 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:55 85 is 20 bytes - NT_STATUS_OK
+file level 0x03:56 86 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:56 86 is 20 bytes - NT_STATUS_OK
+file level 0x03:57 87 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:57 87 is 20 bytes - NT_STATUS_OK
+file level 0x03:58 88 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:58 88 is 20 bytes - NT_STATUS_OK
+file level 0x03:59 89 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:59 89 is 20 bytes - NT_STATUS_OK
+file level 0x03:5a 90 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:5a 90 is 20 bytes - NT_STATUS_OK
+file level 0x03:5b 91 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:5b 91 is 20 bytes - NT_STATUS_OK
+file level 0x03:5c 92 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:5c 92 is 20 bytes - NT_STATUS_OK
+file level 0x03:5d 93 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:5d 93 is 20 bytes - NT_STATUS_OK
+file level 0x03:5e 94 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:5e 94 is 20 bytes - NT_STATUS_OK
+file level 0x03:5f 95 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:5f 95 is 20 bytes - NT_STATUS_OK
+file level 0x03:60 96 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:60 96 is 20 bytes - NT_STATUS_OK
+file level 0x03:61 97 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:61 97 is 20 bytes - NT_STATUS_OK
+file level 0x03:62 98 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:62 98 is 20 bytes - NT_STATUS_OK
+file level 0x03:63 99 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:63 99 is 20 bytes - NT_STATUS_OK
+file level 0x03:64 100 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:64 100 is 20 bytes - NT_STATUS_OK
+file level 0x03:65 101 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:65 101 is 20 bytes - NT_STATUS_OK
+file level 0x03:66 102 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:66 102 is 20 bytes - NT_STATUS_OK
+file level 0x03:67 103 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:67 103 is 20 bytes - NT_STATUS_OK
+file level 0x03:68 104 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:68 104 is 20 bytes - NT_STATUS_OK
+file level 0x03:69 105 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:69 105 is 20 bytes - NT_STATUS_OK
+file level 0x03:6a 106 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:6a 106 is 20 bytes - NT_STATUS_OK
+file level 0x03:6b 107 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:6b 107 is 20 bytes - NT_STATUS_OK
+file level 0x03:6c 108 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:6c 108 is 20 bytes - NT_STATUS_OK
+file level 0x03:6d 109 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:6d 109 is 20 bytes - NT_STATUS_OK
+file level 0x03:6e 110 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:6e 110 is 20 bytes - NT_STATUS_OK
+file level 0x03:6f 111 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:6f 111 is 20 bytes - NT_STATUS_OK
+file level 0x03:70 112 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:70 112 is 20 bytes - NT_STATUS_OK
+file level 0x03:71 113 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:71 113 is 20 bytes - NT_STATUS_OK
+file level 0x03:72 114 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:72 114 is 20 bytes - NT_STATUS_OK
+file level 0x03:73 115 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:73 115 is 20 bytes - NT_STATUS_OK
+file level 0x03:74 116 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:74 116 is 20 bytes - NT_STATUS_OK
+file level 0x03:75 117 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:75 117 is 20 bytes - NT_STATUS_OK
+file level 0x03:76 118 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:76 118 is 20 bytes - NT_STATUS_OK
+file level 0x03:77 119 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:77 119 is 20 bytes - NT_STATUS_OK
+file level 0x03:78 120 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:78 120 is 20 bytes - NT_STATUS_OK
+file level 0x03:79 121 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:79 121 is 20 bytes - NT_STATUS_OK
+file level 0x03:7a 122 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:7a 122 is 20 bytes - NT_STATUS_OK
+file level 0x03:7b 123 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:7b 123 is 20 bytes - NT_STATUS_OK
+file level 0x03:7c 124 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:7c 124 is 20 bytes - NT_STATUS_OK
+file level 0x03:7d 125 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:7d 125 is 20 bytes - NT_STATUS_OK
+file level 0x03:7e 126 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:7e 126 is 20 bytes - NT_STATUS_OK
+file level 0x03:7f 127 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:7f 127 is 20 bytes - NT_STATUS_OK
+file level 0x03:80 128 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:80 128 is 20 bytes - NT_STATUS_OK
+file level 0x03:81 129 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:81 129 is 20 bytes - NT_STATUS_OK
+file level 0x03:82 130 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:82 130 is 20 bytes - NT_STATUS_OK
+file level 0x03:83 131 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:83 131 is 20 bytes - NT_STATUS_OK
+file level 0x03:84 132 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:84 132 is 20 bytes - NT_STATUS_OK
+file level 0x03:85 133 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:85 133 is 20 bytes - NT_STATUS_OK
+file level 0x03:86 134 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:86 134 is 20 bytes - NT_STATUS_OK
+file level 0x03:87 135 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:87 135 is 20 bytes - NT_STATUS_OK
+file level 0x03:88 136 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:88 136 is 20 bytes - NT_STATUS_OK
+file level 0x03:89 137 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:89 137 is 20 bytes - NT_STATUS_OK
+file level 0x03:8a 138 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:8a 138 is 20 bytes - NT_STATUS_OK
+file level 0x03:8b 139 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:8b 139 is 20 bytes - NT_STATUS_OK
+file level 0x03:8c 140 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:8c 140 is 20 bytes - NT_STATUS_OK
+file level 0x03:8d 141 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:8d 141 is 20 bytes - NT_STATUS_OK
+file level 0x03:8e 142 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:8e 142 is 20 bytes - NT_STATUS_OK
+file level 0x03:8f 143 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:8f 143 is 20 bytes - NT_STATUS_OK
+file level 0x03:90 144 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:90 144 is 20 bytes - NT_STATUS_OK
+file level 0x03:91 145 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:91 145 is 20 bytes - NT_STATUS_OK
+file level 0x03:92 146 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:92 146 is 20 bytes - NT_STATUS_OK
+file level 0x03:93 147 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:93 147 is 20 bytes - NT_STATUS_OK
+file level 0x03:94 148 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:94 148 is 20 bytes - NT_STATUS_OK
+file level 0x03:95 149 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:95 149 is 20 bytes - NT_STATUS_OK
+file level 0x03:96 150 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:96 150 is 20 bytes - NT_STATUS_OK
+file level 0x03:97 151 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:97 151 is 20 bytes - NT_STATUS_OK
+file level 0x03:98 152 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:98 152 is 20 bytes - NT_STATUS_OK
+file level 0x03:99 153 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:99 153 is 20 bytes - NT_STATUS_OK
+file level 0x03:9a 154 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:9a 154 is 20 bytes - NT_STATUS_OK
+file level 0x03:9b 155 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:9b 155 is 20 bytes - NT_STATUS_OK
+file level 0x03:9c 156 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:9c 156 is 20 bytes - NT_STATUS_OK
+file level 0x03:9d 157 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:9d 157 is 20 bytes - NT_STATUS_OK
+file level 0x03:9e 158 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:9e 158 is 20 bytes - NT_STATUS_OK
+file level 0x03:9f 159 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:9f 159 is 20 bytes - NT_STATUS_OK
+file level 0x03:a0 160 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:a0 160 is 20 bytes - NT_STATUS_OK
+file level 0x03:a1 161 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:a1 161 is 20 bytes - NT_STATUS_OK
+file level 0x03:a2 162 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:a2 162 is 20 bytes - NT_STATUS_OK
+file level 0x03:a3 163 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:a3 163 is 20 bytes - NT_STATUS_OK
+file level 0x03:a4 164 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:a4 164 is 20 bytes - NT_STATUS_OK
+file level 0x03:a5 165 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:a5 165 is 20 bytes - NT_STATUS_OK
+file level 0x03:a6 166 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:a6 166 is 20 bytes - NT_STATUS_OK
+file level 0x03:a7 167 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:a7 167 is 20 bytes - NT_STATUS_OK
+file level 0x03:a8 168 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:a8 168 is 20 bytes - NT_STATUS_OK
+file level 0x03:a9 169 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:a9 169 is 20 bytes - NT_STATUS_OK
+file level 0x03:aa 170 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:aa 170 is 20 bytes - NT_STATUS_OK
+file level 0x03:ab 171 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:ab 171 is 20 bytes - NT_STATUS_OK
+file level 0x03:ac 172 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:ac 172 is 20 bytes - NT_STATUS_OK
+file level 0x03:ad 173 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:ad 173 is 20 bytes - NT_STATUS_OK
+file level 0x03:ae 174 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:ae 174 is 20 bytes - NT_STATUS_OK
+file level 0x03:af 175 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:af 175 is 20 bytes - NT_STATUS_OK
+file level 0x03:b0 176 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:b0 176 is 20 bytes - NT_STATUS_OK
+file level 0x03:b1 177 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:b1 177 is 20 bytes - NT_STATUS_OK
+file level 0x03:b2 178 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:b2 178 is 20 bytes - NT_STATUS_OK
+file level 0x03:b3 179 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:b3 179 is 20 bytes - NT_STATUS_OK
+file level 0x03:b4 180 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:b4 180 is 20 bytes - NT_STATUS_OK
+file level 0x03:b5 181 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:b5 181 is 20 bytes - NT_STATUS_OK
+file level 0x03:b6 182 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:b6 182 is 20 bytes - NT_STATUS_OK
+file level 0x03:b7 183 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:b7 183 is 20 bytes - NT_STATUS_OK
+file level 0x03:b8 184 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:b8 184 is 20 bytes - NT_STATUS_OK
+file level 0x03:b9 185 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:b9 185 is 20 bytes - NT_STATUS_OK
+file level 0x03:ba 186 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:ba 186 is 20 bytes - NT_STATUS_OK
+file level 0x03:bb 187 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:bb 187 is 20 bytes - NT_STATUS_OK
+file level 0x03:bc 188 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:bc 188 is 20 bytes - NT_STATUS_OK
+file level 0x03:bd 189 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:bd 189 is 20 bytes - NT_STATUS_OK
+file level 0x03:be 190 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:be 190 is 20 bytes - NT_STATUS_OK
+file level 0x03:bf 191 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:bf 191 is 20 bytes - NT_STATUS_OK
+file level 0x03:c0 192 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:c0 192 is 20 bytes - NT_STATUS_OK
+file level 0x03:c1 193 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:c1 193 is 20 bytes - NT_STATUS_OK
+file level 0x03:c2 194 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:c2 194 is 20 bytes - NT_STATUS_OK
+file level 0x03:c3 195 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:c3 195 is 20 bytes - NT_STATUS_OK
+file level 0x03:c4 196 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:c4 196 is 20 bytes - NT_STATUS_OK
+file level 0x03:c5 197 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:c5 197 is 20 bytes - NT_STATUS_OK
+file level 0x03:c6 198 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:c6 198 is 20 bytes - NT_STATUS_OK
+file level 0x03:c7 199 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:c7 199 is 20 bytes - NT_STATUS_OK
+file level 0x03:c8 200 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:c8 200 is 20 bytes - NT_STATUS_OK
+file level 0x03:c9 201 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:c9 201 is 20 bytes - NT_STATUS_OK
+file level 0x03:ca 202 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:ca 202 is 20 bytes - NT_STATUS_OK
+file level 0x03:cb 203 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:cb 203 is 20 bytes - NT_STATUS_OK
+file level 0x03:cc 204 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:cc 204 is 20 bytes - NT_STATUS_OK
+file level 0x03:cd 205 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:cd 205 is 20 bytes - NT_STATUS_OK
+file level 0x03:ce 206 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:ce 206 is 20 bytes - NT_STATUS_OK
+file level 0x03:cf 207 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:cf 207 is 20 bytes - NT_STATUS_OK
+file level 0x03:d0 208 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:d0 208 is 20 bytes - NT_STATUS_OK
+file level 0x03:d1 209 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:d1 209 is 20 bytes - NT_STATUS_OK
+file level 0x03:d2 210 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:d2 210 is 20 bytes - NT_STATUS_OK
+file level 0x03:d3 211 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:d3 211 is 20 bytes - NT_STATUS_OK
+file level 0x03:d4 212 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:d4 212 is 20 bytes - NT_STATUS_OK
+file level 0x03:d5 213 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:d5 213 is 20 bytes - NT_STATUS_OK
+file level 0x03:d6 214 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:d6 214 is 20 bytes - NT_STATUS_OK
+file level 0x03:d7 215 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:d7 215 is 20 bytes - NT_STATUS_OK
+file level 0x03:d8 216 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:d8 216 is 20 bytes - NT_STATUS_OK
+file level 0x03:d9 217 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:d9 217 is 20 bytes - NT_STATUS_OK
+file level 0x03:da 218 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:da 218 is 20 bytes - NT_STATUS_OK
+file level 0x03:db 219 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:db 219 is 20 bytes - NT_STATUS_OK
+file level 0x03:dc 220 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:dc 220 is 20 bytes - NT_STATUS_OK
+file level 0x03:dd 221 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:dd 221 is 20 bytes - NT_STATUS_OK
+file level 0x03:de 222 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:de 222 is 20 bytes - NT_STATUS_OK
+file level 0x03:df 223 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:df 223 is 20 bytes - NT_STATUS_OK
+file level 0x03:e0 224 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:e0 224 is 20 bytes - NT_STATUS_OK
+file level 0x03:e1 225 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:e1 225 is 20 bytes - NT_STATUS_OK
+file level 0x03:e2 226 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:e2 226 is 20 bytes - NT_STATUS_OK
+file level 0x03:e3 227 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:e3 227 is 20 bytes - NT_STATUS_OK
+file level 0x03:e4 228 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:e4 228 is 20 bytes - NT_STATUS_OK
+file level 0x03:e5 229 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:e5 229 is 20 bytes - NT_STATUS_OK
+file level 0x03:e6 230 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:e6 230 is 20 bytes - NT_STATUS_OK
+file level 0x03:e7 231 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:e7 231 is 20 bytes - NT_STATUS_OK
+file level 0x03:e8 232 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:e8 232 is 20 bytes - NT_STATUS_OK
+file level 0x03:e9 233 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:e9 233 is 20 bytes - NT_STATUS_OK
+file level 0x03:ea 234 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:ea 234 is 20 bytes - NT_STATUS_OK
+file level 0x03:eb 235 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:eb 235 is 20 bytes - NT_STATUS_OK
+file level 0x03:ec 236 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:ec 236 is 20 bytes - NT_STATUS_OK
+file level 0x03:ed 237 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:ed 237 is 20 bytes - NT_STATUS_OK
+file level 0x03:ee 238 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:ee 238 is 20 bytes - NT_STATUS_OK
+file level 0x03:ef 239 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:ef 239 is 20 bytes - NT_STATUS_OK
+file level 0x03:f0 240 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:f0 240 is 20 bytes - NT_STATUS_OK
+file level 0x03:f1 241 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:f1 241 is 20 bytes - NT_STATUS_OK
+file level 0x03:f2 242 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:f2 242 is 20 bytes - NT_STATUS_OK
+file level 0x03:f3 243 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:f3 243 is 20 bytes - NT_STATUS_OK
+file level 0x03:f4 244 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:f4 244 is 20 bytes - NT_STATUS_OK
+file level 0x03:f5 245 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:f5 245 is 20 bytes - NT_STATUS_OK
+file level 0x03:f6 246 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:f6 246 is 20 bytes - NT_STATUS_OK
+file level 0x03:f7 247 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:f7 247 is 20 bytes - NT_STATUS_OK
+file level 0x03:f8 248 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:f8 248 is 20 bytes - NT_STATUS_OK
+file level 0x03:f9 249 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:f9 249 is 20 bytes - NT_STATUS_OK
+file level 0x03:fa 250 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:fa 250 is 20 bytes - NT_STATUS_OK
+file level 0x03:fb 251 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:fb 251 is 20 bytes - NT_STATUS_OK
+file level 0x03:fc 252 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:fc 252 is 20 bytes - NT_STATUS_OK
+file level 0x03:fd 253 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:fd 253 is 20 bytes - NT_STATUS_OK
+file level 0x03:fe 254 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:fe 254 is 20 bytes - NT_STATUS_OK
+file level 0x03:ff 255 is 20 bytes - NT_STATUS_OK
+dir  level 0x03:ff 255 is 20 bytes - NT_STATUS_OK
+file level 0x04:00 0 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:00 0 is 0 bytes - NT_STATUS_OK
+file level 0x04:01 1 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:01 1 is 0 bytes - NT_STATUS_OK
+file level 0x04:02 2 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:02 2 is 0 bytes - NT_STATUS_OK
+file level 0x04:03 3 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:03 3 is 0 bytes - NT_STATUS_OK
+file level 0x04:04 4 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:04 4 is 0 bytes - NT_STATUS_OK
+file level 0x04:05 5 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:05 5 is 0 bytes - NT_STATUS_OK
+file level 0x04:06 6 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:06 6 is 0 bytes - NT_STATUS_OK
+file level 0x04:07 7 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:07 7 is 0 bytes - NT_STATUS_OK
+file level 0x04:08 8 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:08 8 is 0 bytes - NT_STATUS_OK
+file level 0x04:09 9 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:09 9 is 0 bytes - NT_STATUS_OK
+file level 0x04:0a 10 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:0a 10 is 0 bytes - NT_STATUS_OK
+file level 0x04:0b 11 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:0b 11 is 0 bytes - NT_STATUS_OK
+file level 0x04:0c 12 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:0c 12 is 0 bytes - NT_STATUS_OK
+file level 0x04:0d 13 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:0d 13 is 0 bytes - NT_STATUS_OK
+file level 0x04:0e 14 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:0e 14 is 0 bytes - NT_STATUS_OK
+file level 0x04:0f 15 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:0f 15 is 0 bytes - NT_STATUS_OK
+file level 0x04:10 16 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:10 16 is 0 bytes - NT_STATUS_OK
+file level 0x04:11 17 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:11 17 is 0 bytes - NT_STATUS_OK
+file level 0x04:12 18 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:12 18 is 0 bytes - NT_STATUS_OK
+file level 0x04:13 19 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:13 19 is 0 bytes - NT_STATUS_OK
+file level 0x04:14 20 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:14 20 is 0 bytes - NT_STATUS_OK
+file level 0x04:15 21 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:15 21 is 0 bytes - NT_STATUS_OK
+file level 0x04:16 22 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:16 22 is 0 bytes - NT_STATUS_OK
+file level 0x04:17 23 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:17 23 is 0 bytes - NT_STATUS_OK
+file level 0x04:18 24 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:18 24 is 0 bytes - NT_STATUS_OK
+file level 0x04:19 25 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:19 25 is 0 bytes - NT_STATUS_OK
+file level 0x04:1a 26 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:1a 26 is 0 bytes - NT_STATUS_OK
+file level 0x04:1b 27 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:1b 27 is 0 bytes - NT_STATUS_OK
+file level 0x04:1c 28 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:1c 28 is 0 bytes - NT_STATUS_OK
+file level 0x04:1d 29 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:1d 29 is 0 bytes - NT_STATUS_OK
+file level 0x04:1e 30 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:1e 30 is 0 bytes - NT_STATUS_OK
+file level 0x04:1f 31 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:1f 31 is 0 bytes - NT_STATUS_OK
+file level 0x04:20 32 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:20 32 is 0 bytes - NT_STATUS_OK
+file level 0x04:21 33 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:21 33 is 0 bytes - NT_STATUS_OK
+file level 0x04:22 34 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:22 34 is 0 bytes - NT_STATUS_OK
+file level 0x04:23 35 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:23 35 is 0 bytes - NT_STATUS_OK
+file level 0x04:24 36 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:24 36 is 0 bytes - NT_STATUS_OK
+file level 0x04:25 37 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:25 37 is 0 bytes - NT_STATUS_OK
+file level 0x04:26 38 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:26 38 is 0 bytes - NT_STATUS_OK
+file level 0x04:27 39 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:27 39 is 0 bytes - NT_STATUS_OK
+file level 0x04:28 40 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:28 40 is 0 bytes - NT_STATUS_OK
+file level 0x04:29 41 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:29 41 is 0 bytes - NT_STATUS_OK
+file level 0x04:2a 42 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:2a 42 is 0 bytes - NT_STATUS_OK
+file level 0x04:2b 43 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:2b 43 is 0 bytes - NT_STATUS_OK
+file level 0x04:2c 44 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:2c 44 is 0 bytes - NT_STATUS_OK
+file level 0x04:2d 45 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:2d 45 is 0 bytes - NT_STATUS_OK
+file level 0x04:2e 46 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:2e 46 is 0 bytes - NT_STATUS_OK
+file level 0x04:2f 47 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:2f 47 is 0 bytes - NT_STATUS_OK
+file level 0x04:30 48 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:30 48 is 0 bytes - NT_STATUS_OK
+file level 0x04:31 49 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:31 49 is 0 bytes - NT_STATUS_OK
+file level 0x04:32 50 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:32 50 is 0 bytes - NT_STATUS_OK
+file level 0x04:33 51 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:33 51 is 0 bytes - NT_STATUS_OK
+file level 0x04:34 52 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:34 52 is 0 bytes - NT_STATUS_OK
+file level 0x04:35 53 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:35 53 is 0 bytes - NT_STATUS_OK
+file level 0x04:36 54 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:36 54 is 0 bytes - NT_STATUS_OK
+file level 0x04:37 55 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:37 55 is 0 bytes - NT_STATUS_OK
+file level 0x04:38 56 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:38 56 is 0 bytes - NT_STATUS_OK
+file level 0x04:39 57 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:39 57 is 0 bytes - NT_STATUS_OK
+file level 0x04:3a 58 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:3a 58 is 0 bytes - NT_STATUS_OK
+file level 0x04:3b 59 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:3b 59 is 0 bytes - NT_STATUS_OK
+file level 0x04:3c 60 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:3c 60 is 0 bytes - NT_STATUS_OK
+file level 0x04:3d 61 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:3d 61 is 0 bytes - NT_STATUS_OK
+file level 0x04:3e 62 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:3e 62 is 0 bytes - NT_STATUS_OK
+file level 0x04:3f 63 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:3f 63 is 0 bytes - NT_STATUS_OK
+file level 0x04:40 64 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:40 64 is 0 bytes - NT_STATUS_OK
+file level 0x04:41 65 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:41 65 is 0 bytes - NT_STATUS_OK
+file level 0x04:42 66 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:42 66 is 0 bytes - NT_STATUS_OK
+file level 0x04:43 67 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:43 67 is 0 bytes - NT_STATUS_OK
+file level 0x04:44 68 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:44 68 is 0 bytes - NT_STATUS_OK
+file level 0x04:45 69 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:45 69 is 0 bytes - NT_STATUS_OK
+file level 0x04:46 70 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:46 70 is 0 bytes - NT_STATUS_OK
+file level 0x04:47 71 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:47 71 is 0 bytes - NT_STATUS_OK
+file level 0x04:48 72 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:48 72 is 0 bytes - NT_STATUS_OK
+file level 0x04:49 73 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:49 73 is 0 bytes - NT_STATUS_OK
+file level 0x04:4a 74 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:4a 74 is 0 bytes - NT_STATUS_OK
+file level 0x04:4b 75 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:4b 75 is 0 bytes - NT_STATUS_OK
+file level 0x04:4c 76 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:4c 76 is 0 bytes - NT_STATUS_OK
+file level 0x04:4d 77 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:4d 77 is 0 bytes - NT_STATUS_OK
+file level 0x04:4e 78 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:4e 78 is 0 bytes - NT_STATUS_OK
+file level 0x04:4f 79 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:4f 79 is 0 bytes - NT_STATUS_OK
+file level 0x04:50 80 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:50 80 is 0 bytes - NT_STATUS_OK
+file level 0x04:51 81 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:51 81 is 0 bytes - NT_STATUS_OK
+file level 0x04:52 82 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:52 82 is 0 bytes - NT_STATUS_OK
+file level 0x04:53 83 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:53 83 is 0 bytes - NT_STATUS_OK
+file level 0x04:54 84 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:54 84 is 0 bytes - NT_STATUS_OK
+file level 0x04:55 85 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:55 85 is 0 bytes - NT_STATUS_OK
+file level 0x04:56 86 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:56 86 is 0 bytes - NT_STATUS_OK
+file level 0x04:57 87 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:57 87 is 0 bytes - NT_STATUS_OK
+file level 0x04:58 88 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:58 88 is 0 bytes - NT_STATUS_OK
+file level 0x04:59 89 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:59 89 is 0 bytes - NT_STATUS_OK
+file level 0x04:5a 90 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:5a 90 is 0 bytes - NT_STATUS_OK
+file level 0x04:5b 91 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:5b 91 is 0 bytes - NT_STATUS_OK
+file level 0x04:5c 92 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:5c 92 is 0 bytes - NT_STATUS_OK
+file level 0x04:5d 93 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:5d 93 is 0 bytes - NT_STATUS_OK
+file level 0x04:5e 94 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:5e 94 is 0 bytes - NT_STATUS_OK
+file level 0x04:5f 95 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:5f 95 is 0 bytes - NT_STATUS_OK
+file level 0x04:60 96 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:60 96 is 0 bytes - NT_STATUS_OK
+file level 0x04:61 97 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:61 97 is 0 bytes - NT_STATUS_OK
+file level 0x04:62 98 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:62 98 is 0 bytes - NT_STATUS_OK
+file level 0x04:63 99 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:63 99 is 0 bytes - NT_STATUS_OK
+file level 0x04:64 100 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:64 100 is 0 bytes - NT_STATUS_OK
+file level 0x04:65 101 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:65 101 is 0 bytes - NT_STATUS_OK
+file level 0x04:66 102 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:66 102 is 0 bytes - NT_STATUS_OK
+file level 0x04:67 103 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:67 103 is 0 bytes - NT_STATUS_OK
+file level 0x04:68 104 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:68 104 is 0 bytes - NT_STATUS_OK
+file level 0x04:69 105 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:69 105 is 0 bytes - NT_STATUS_OK
+file level 0x04:6a 106 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:6a 106 is 0 bytes - NT_STATUS_OK
+file level 0x04:6b 107 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:6b 107 is 0 bytes - NT_STATUS_OK
+file level 0x04:6c 108 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:6c 108 is 0 bytes - NT_STATUS_OK
+file level 0x04:6d 109 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:6d 109 is 0 bytes - NT_STATUS_OK
+file level 0x04:6e 110 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:6e 110 is 0 bytes - NT_STATUS_OK
+file level 0x04:6f 111 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:6f 111 is 0 bytes - NT_STATUS_OK
+file level 0x04:70 112 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:70 112 is 0 bytes - NT_STATUS_OK
+file level 0x04:71 113 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:71 113 is 0 bytes - NT_STATUS_OK
+file level 0x04:72 114 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:72 114 is 0 bytes - NT_STATUS_OK
+file level 0x04:73 115 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:73 115 is 0 bytes - NT_STATUS_OK
+file level 0x04:74 116 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:74 116 is 0 bytes - NT_STATUS_OK
+file level 0x04:75 117 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:75 117 is 0 bytes - NT_STATUS_OK
+file level 0x04:76 118 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:76 118 is 0 bytes - NT_STATUS_OK
+file level 0x04:77 119 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:77 119 is 0 bytes - NT_STATUS_OK
+file level 0x04:78 120 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:78 120 is 0 bytes - NT_STATUS_OK
+file level 0x04:79 121 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:79 121 is 0 bytes - NT_STATUS_OK
+file level 0x04:7a 122 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:7a 122 is 0 bytes - NT_STATUS_OK
+file level 0x04:7b 123 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:7b 123 is 0 bytes - NT_STATUS_OK
+file level 0x04:7c 124 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:7c 124 is 0 bytes - NT_STATUS_OK
+file level 0x04:7d 125 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:7d 125 is 0 bytes - NT_STATUS_OK
+file level 0x04:7e 126 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:7e 126 is 0 bytes - NT_STATUS_OK
+file level 0x04:7f 127 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:7f 127 is 0 bytes - NT_STATUS_OK
+file level 0x04:80 128 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:80 128 is 0 bytes - NT_STATUS_OK
+file level 0x04:81 129 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:81 129 is 0 bytes - NT_STATUS_OK
+file level 0x04:82 130 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:82 130 is 0 bytes - NT_STATUS_OK
+file level 0x04:83 131 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:83 131 is 0 bytes - NT_STATUS_OK
+file level 0x04:84 132 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:84 132 is 0 bytes - NT_STATUS_OK
+file level 0x04:85 133 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:85 133 is 0 bytes - NT_STATUS_OK
+file level 0x04:86 134 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:86 134 is 0 bytes - NT_STATUS_OK
+file level 0x04:87 135 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:87 135 is 0 bytes - NT_STATUS_OK
+file level 0x04:88 136 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:88 136 is 0 bytes - NT_STATUS_OK
+file level 0x04:89 137 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:89 137 is 0 bytes - NT_STATUS_OK
+file level 0x04:8a 138 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:8a 138 is 0 bytes - NT_STATUS_OK
+file level 0x04:8b 139 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:8b 139 is 0 bytes - NT_STATUS_OK
+file level 0x04:8c 140 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:8c 140 is 0 bytes - NT_STATUS_OK
+file level 0x04:8d 141 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:8d 141 is 0 bytes - NT_STATUS_OK
+file level 0x04:8e 142 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:8e 142 is 0 bytes - NT_STATUS_OK
+file level 0x04:8f 143 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:8f 143 is 0 bytes - NT_STATUS_OK
+file level 0x04:90 144 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:90 144 is 0 bytes - NT_STATUS_OK
+file level 0x04:91 145 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:91 145 is 0 bytes - NT_STATUS_OK
+file level 0x04:92 146 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:92 146 is 0 bytes - NT_STATUS_OK
+file level 0x04:93 147 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:93 147 is 0 bytes - NT_STATUS_OK
+file level 0x04:94 148 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:94 148 is 0 bytes - NT_STATUS_OK
+file level 0x04:95 149 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:95 149 is 0 bytes - NT_STATUS_OK
+file level 0x04:96 150 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:96 150 is 0 bytes - NT_STATUS_OK
+file level 0x04:97 151 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:97 151 is 0 bytes - NT_STATUS_OK
+file level 0x04:98 152 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:98 152 is 0 bytes - NT_STATUS_OK
+file level 0x04:99 153 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:99 153 is 0 bytes - NT_STATUS_OK
+file level 0x04:9a 154 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:9a 154 is 0 bytes - NT_STATUS_OK
+file level 0x04:9b 155 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:9b 155 is 0 bytes - NT_STATUS_OK
+file level 0x04:9c 156 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:9c 156 is 0 bytes - NT_STATUS_OK
+file level 0x04:9d 157 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:9d 157 is 0 bytes - NT_STATUS_OK
+file level 0x04:9e 158 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:9e 158 is 0 bytes - NT_STATUS_OK
+file level 0x04:9f 159 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:9f 159 is 0 bytes - NT_STATUS_OK
+file level 0x04:a0 160 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:a0 160 is 0 bytes - NT_STATUS_OK
+file level 0x04:a1 161 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:a1 161 is 0 bytes - NT_STATUS_OK
+file level 0x04:a2 162 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:a2 162 is 0 bytes - NT_STATUS_OK
+file level 0x04:a3 163 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:a3 163 is 0 bytes - NT_STATUS_OK
+file level 0x04:a4 164 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:a4 164 is 0 bytes - NT_STATUS_OK
+file level 0x04:a5 165 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:a5 165 is 0 bytes - NT_STATUS_OK
+file level 0x04:a6 166 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:a6 166 is 0 bytes - NT_STATUS_OK
+file level 0x04:a7 167 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:a7 167 is 0 bytes - NT_STATUS_OK
+file level 0x04:a8 168 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:a8 168 is 0 bytes - NT_STATUS_OK
+file level 0x04:a9 169 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:a9 169 is 0 bytes - NT_STATUS_OK
+file level 0x04:aa 170 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:aa 170 is 0 bytes - NT_STATUS_OK
+file level 0x04:ab 171 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:ab 171 is 0 bytes - NT_STATUS_OK
+file level 0x04:ac 172 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:ac 172 is 0 bytes - NT_STATUS_OK
+file level 0x04:ad 173 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:ad 173 is 0 bytes - NT_STATUS_OK
+file level 0x04:ae 174 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:ae 174 is 0 bytes - NT_STATUS_OK
+file level 0x04:af 175 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:af 175 is 0 bytes - NT_STATUS_OK
+file level 0x04:b0 176 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:b0 176 is 0 bytes - NT_STATUS_OK
+file level 0x04:b1 177 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:b1 177 is 0 bytes - NT_STATUS_OK
+file level 0x04:b2 178 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:b2 178 is 0 bytes - NT_STATUS_OK
+file level 0x04:b3 179 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:b3 179 is 0 bytes - NT_STATUS_OK
+file level 0x04:b4 180 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:b4 180 is 0 bytes - NT_STATUS_OK
+file level 0x04:b5 181 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:b5 181 is 0 bytes - NT_STATUS_OK
+file level 0x04:b6 182 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:b6 182 is 0 bytes - NT_STATUS_OK
+file level 0x04:b7 183 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:b7 183 is 0 bytes - NT_STATUS_OK
+file level 0x04:b8 184 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:b8 184 is 0 bytes - NT_STATUS_OK
+file level 0x04:b9 185 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:b9 185 is 0 bytes - NT_STATUS_OK
+file level 0x04:ba 186 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:ba 186 is 0 bytes - NT_STATUS_OK
+file level 0x04:bb 187 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:bb 187 is 0 bytes - NT_STATUS_OK
+file level 0x04:bc 188 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:bc 188 is 0 bytes - NT_STATUS_OK
+file level 0x04:bd 189 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:bd 189 is 0 bytes - NT_STATUS_OK
+file level 0x04:be 190 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:be 190 is 0 bytes - NT_STATUS_OK
+file level 0x04:bf 191 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:bf 191 is 0 bytes - NT_STATUS_OK
+file level 0x04:c0 192 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:c0 192 is 0 bytes - NT_STATUS_OK
+file level 0x04:c1 193 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:c1 193 is 0 bytes - NT_STATUS_OK
+file level 0x04:c2 194 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:c2 194 is 0 bytes - NT_STATUS_OK
+file level 0x04:c3 195 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:c3 195 is 0 bytes - NT_STATUS_OK
+file level 0x04:c4 196 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:c4 196 is 0 bytes - NT_STATUS_OK
+file level 0x04:c5 197 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:c5 197 is 0 bytes - NT_STATUS_OK
+file level 0x04:c6 198 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:c6 198 is 0 bytes - NT_STATUS_OK
+file level 0x04:c7 199 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:c7 199 is 0 bytes - NT_STATUS_OK
+file level 0x04:c8 200 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:c8 200 is 0 bytes - NT_STATUS_OK
+file level 0x04:c9 201 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:c9 201 is 0 bytes - NT_STATUS_OK
+file level 0x04:ca 202 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:ca 202 is 0 bytes - NT_STATUS_OK
+file level 0x04:cb 203 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:cb 203 is 0 bytes - NT_STATUS_OK
+file level 0x04:cc 204 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:cc 204 is 0 bytes - NT_STATUS_OK
+file level 0x04:cd 205 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:cd 205 is 0 bytes - NT_STATUS_OK
+file level 0x04:ce 206 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:ce 206 is 0 bytes - NT_STATUS_OK
+file level 0x04:cf 207 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:cf 207 is 0 bytes - NT_STATUS_OK
+file level 0x04:d0 208 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:d0 208 is 0 bytes - NT_STATUS_OK
+file level 0x04:d1 209 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:d1 209 is 0 bytes - NT_STATUS_OK
+file level 0x04:d2 210 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:d2 210 is 0 bytes - NT_STATUS_OK
+file level 0x04:d3 211 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:d3 211 is 0 bytes - NT_STATUS_OK
+file level 0x04:d4 212 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:d4 212 is 0 bytes - NT_STATUS_OK
+file level 0x04:d5 213 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:d5 213 is 0 bytes - NT_STATUS_OK
+file level 0x04:d6 214 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:d6 214 is 0 bytes - NT_STATUS_OK
+file level 0x04:d7 215 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:d7 215 is 0 bytes - NT_STATUS_OK
+file level 0x04:d8 216 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:d8 216 is 0 bytes - NT_STATUS_OK
+file level 0x04:d9 217 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:d9 217 is 0 bytes - NT_STATUS_OK
+file level 0x04:da 218 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:da 218 is 0 bytes - NT_STATUS_OK
+file level 0x04:db 219 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:db 219 is 0 bytes - NT_STATUS_OK
+file level 0x04:dc 220 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:dc 220 is 0 bytes - NT_STATUS_OK
+file level 0x04:dd 221 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:dd 221 is 0 bytes - NT_STATUS_OK
+file level 0x04:de 222 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:de 222 is 0 bytes - NT_STATUS_OK
+file level 0x04:df 223 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:df 223 is 0 bytes - NT_STATUS_OK
+file level 0x04:e0 224 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:e0 224 is 0 bytes - NT_STATUS_OK
+file level 0x04:e1 225 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:e1 225 is 0 bytes - NT_STATUS_OK
+file level 0x04:e2 226 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:e2 226 is 0 bytes - NT_STATUS_OK
+file level 0x04:e3 227 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:e3 227 is 0 bytes - NT_STATUS_OK
+file level 0x04:e4 228 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:e4 228 is 0 bytes - NT_STATUS_OK
+file level 0x04:e5 229 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:e5 229 is 0 bytes - NT_STATUS_OK
+file level 0x04:e6 230 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:e6 230 is 0 bytes - NT_STATUS_OK
+file level 0x04:e7 231 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:e7 231 is 0 bytes - NT_STATUS_OK
+file level 0x04:e8 232 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:e8 232 is 0 bytes - NT_STATUS_OK
+file level 0x04:e9 233 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:e9 233 is 0 bytes - NT_STATUS_OK
+file level 0x04:ea 234 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:ea 234 is 0 bytes - NT_STATUS_OK
+file level 0x04:eb 235 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:eb 235 is 0 bytes - NT_STATUS_OK
+file level 0x04:ec 236 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:ec 236 is 0 bytes - NT_STATUS_OK
+file level 0x04:ed 237 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:ed 237 is 0 bytes - NT_STATUS_OK
+file level 0x04:ee 238 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:ee 238 is 0 bytes - NT_STATUS_OK
+file level 0x04:ef 239 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:ef 239 is 0 bytes - NT_STATUS_OK
+file level 0x04:f0 240 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:f0 240 is 0 bytes - NT_STATUS_OK
+file level 0x04:f1 241 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:f1 241 is 0 bytes - NT_STATUS_OK
+file level 0x04:f2 242 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:f2 242 is 0 bytes - NT_STATUS_OK
+file level 0x04:f3 243 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:f3 243 is 0 bytes - NT_STATUS_OK
+file level 0x04:f4 244 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:f4 244 is 0 bytes - NT_STATUS_OK
+file level 0x04:f5 245 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:f5 245 is 0 bytes - NT_STATUS_OK
+file level 0x04:f6 246 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:f6 246 is 0 bytes - NT_STATUS_OK
+file level 0x04:f7 247 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:f7 247 is 0 bytes - NT_STATUS_OK
+file level 0x04:f8 248 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:f8 248 is 0 bytes - NT_STATUS_OK
+file level 0x04:f9 249 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:f9 249 is 0 bytes - NT_STATUS_OK
+file level 0x04:fa 250 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:fa 250 is 0 bytes - NT_STATUS_OK
+file level 0x04:fb 251 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:fb 251 is 0 bytes - NT_STATUS_OK
+file level 0x04:fc 252 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:fc 252 is 0 bytes - NT_STATUS_OK
+file level 0x04:fd 253 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:fd 253 is 0 bytes - NT_STATUS_OK
+file level 0x04:fe 254 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:fe 254 is 0 bytes - NT_STATUS_OK
+file level 0x04:ff 255 is 0 bytes - NT_STATUS_OK
+dir  level 0x04:ff 255 is 0 bytes - NT_STATUS_OK
+time: 2026-03-04 00:43:49.369222
+success: getinfo
+test: setinfo
+time: 2026-03-04 00:43:49.369550
+file level 0x0401 - NT_STATUS_OK
+file level 0x0a01 - NT_STATUS_INVALID_PARAMETER
+file level 0x0b01 - NT_STATUS_INVALID_PARAMETER
+file level 0x0d01 - NT_STATUS_OK
+file level 0x0e01 - NT_STATUS_OK
+file level 0x0f01 - NT_STATUS_OK
+file level 0x1001 - NT_STATUS_OK
+file level 0x1301 - NT_STATUS_OK
+file level 0x1401 - NT_STATUS_OK
+file level 0x1701 - NT_STATUS_OK
+file level 0x1901 - NT_STATUS_OK
+file level 0x1b01 - NT_STATUS_OK
+file level 0x1d01 - NT_STATUS_OK
+file level 0x1f01 - NT_STATUS_OK
+file level 0x2401 - NT_STATUS_OK
+file level 0x2701 - NT_STATUS_INVALID_PARAMETER
+file level 0x2801 - NT_STATUS_OK
+file level 0x2c01 - NT_STATUS_OK
+file level 0x2d01 - NT_STATUS_OK
+file level 0x3801 - NT_STATUS_INVALID_PARAMETER
+file level 0x3901 - NT_STATUS_INVALID_PARAMETER
+file level 0x4001 - NT_STATUS_OK
+file level 0x4101 - NT_STATUS_INVALID_PARAMETER
+file level 0x4201 - NT_STATUS_INVALID_PARAMETER
+file level 0x0202 - NT_STATUS_OK
+file level 0x0602 - NT_STATUS_OK
+file level 0x0802 - NT_STATUS_OK
+file level 0x0003 - NT_STATUS_OK
+file level 0x0103 - NT_STATUS_OK
+file level 0x0203 - NT_STATUS_OK
+file level 0x0303 - NT_STATUS_OK
+file level 0x0403 - NT_STATUS_OK
+file level 0x0503 - NT_STATUS_OK
+file level 0x0603 - NT_STATUS_OK
+file level 0x0703 - NT_STATUS_OK
+file level 0x0803 - NT_STATUS_OK
+file level 0x0903 - NT_STATUS_OK
+file level 0x0a03 - NT_STATUS_OK
+file level 0x0b03 - NT_STATUS_OK
+file level 0x0c03 - NT_STATUS_OK
+file level 0x0d03 - NT_STATUS_OK
+file level 0x0e03 - NT_STATUS_OK
+file level 0x0f03 - NT_STATUS_OK
+file level 0x1003 - NT_STATUS_OK
+file level 0x1103 - NT_STATUS_OK
+file level 0x1203 - NT_STATUS_OK
+file level 0x1303 - NT_STATUS_OK
+file level 0x1403 - NT_STATUS_OK
+file level 0x1503 - NT_STATUS_OK
+file level 0x1603 - NT_STATUS_OK
+file level 0x1703 - NT_STATUS_OK
+file level 0x1803 - NT_STATUS_OK
+file level 0x1903 - NT_STATUS_OK
+file level 0x1a03 - NT_STATUS_OK
+file level 0x1b03 - NT_STATUS_OK
+file level 0x1c03 - NT_STATUS_OK
+file level 0x1d03 - NT_STATUS_OK
+file level 0x1e03 - NT_STATUS_OK
+file level 0x1f03 - NT_STATUS_OK
+file level 0x2003 - NT_STATUS_OK
+file level 0x2103 - NT_STATUS_OK
+file level 0x2203 - NT_STATUS_OK
+file level 0x2303 - NT_STATUS_OK
+file level 0x2403 - NT_STATUS_OK
+file level 0x2503 - NT_STATUS_OK
+file level 0x2603 - NT_STATUS_OK
+file level 0x2703 - NT_STATUS_OK
+file level 0x2803 - NT_STATUS_OK
+file level 0x2903 - NT_STATUS_OK
+file level 0x2a03 - NT_STATUS_OK
+file level 0x2b03 - NT_STATUS_OK
+file level 0x2c03 - NT_STATUS_OK
+file level 0x2d03 - NT_STATUS_OK
+file level 0x2e03 - NT_STATUS_OK
+file level 0x2f03 - NT_STATUS_OK
+file level 0x3003 - NT_STATUS_OK
+file level 0x3103 - NT_STATUS_OK
+file level 0x3203 - NT_STATUS_OK
+file level 0x3303 - NT_STATUS_OK
+file level 0x3403 - NT_STATUS_OK
+file level 0x3503 - NT_STATUS_OK
+file level 0x3603 - NT_STATUS_OK
+file level 0x3703 - NT_STATUS_OK
+file level 0x3803 - NT_STATUS_OK
+file level 0x3903 - NT_STATUS_OK
+file level 0x3a03 - NT_STATUS_OK
+file level 0x3b03 - NT_STATUS_OK
+file level 0x3c03 - NT_STATUS_OK
+file level 0x3d03 - NT_STATUS_OK
+file level 0x3e03 - NT_STATUS_OK
+file level 0x3f03 - NT_STATUS_OK
+file level 0x4003 - NT_STATUS_OK
+file level 0x4103 - NT_STATUS_OK
+file level 0x4203 - NT_STATUS_OK
+file level 0x4303 - NT_STATUS_OK
+file level 0x4403 - NT_STATUS_OK
+file level 0x4503 - NT_STATUS_OK
+file level 0x4603 - NT_STATUS_OK
+file level 0x4703 - NT_STATUS_OK
+file level 0x4803 - NT_STATUS_OK
+file level 0x4903 - NT_STATUS_OK
+file level 0x4a03 - NT_STATUS_OK
+file level 0x4b03 - NT_STATUS_OK
+file level 0x4c03 - NT_STATUS_OK
+file level 0x4d03 - NT_STATUS_OK
+file level 0x4e03 - NT_STATUS_OK
+file level 0x4f03 - NT_STATUS_OK
+file level 0x5003 - NT_STATUS_OK
+file level 0x5103 - NT_STATUS_OK
+file level 0x5203 - NT_STATUS_OK
+file level 0x5303 - NT_STATUS_OK
+file level 0x5403 - NT_STATUS_OK
+file level 0x5503 - NT_STATUS_OK
+file level 0x5603 - NT_STATUS_OK
+file level 0x5703 - NT_STATUS_OK
+file level 0x5803 - NT_STATUS_OK
+file level 0x5903 - NT_STATUS_OK
+file level 0x5a03 - NT_STATUS_OK
+file level 0x5b03 - NT_STATUS_OK
+file level 0x5c03 - NT_STATUS_OK
+file level 0x5d03 - NT_STATUS_OK
+file level 0x5e03 - NT_STATUS_OK
+file level 0x5f03 - NT_STATUS_OK
+file level 0x6003 - NT_STATUS_OK
+file level 0x6103 - NT_STATUS_OK
+file level 0x6203 - NT_STATUS_OK
+file level 0x6303 - NT_STATUS_OK
+file level 0x6403 - NT_STATUS_OK
+file level 0x6503 - NT_STATUS_OK
+file level 0x6603 - NT_STATUS_OK
+file level 0x6703 - NT_STATUS_OK
+file level 0x6803 - NT_STATUS_OK
+file level 0x6903 - NT_STATUS_OK
+file level 0x6a03 - NT_STATUS_OK
+file level 0x6b03 - NT_STATUS_OK
+file level 0x6c03 - NT_STATUS_OK
+file level 0x6d03 - NT_STATUS_OK
+file level 0x6e03 - NT_STATUS_OK
+file level 0x6f03 - NT_STATUS_OK
+file level 0x7003 - NT_STATUS_OK
+file level 0x7103 - NT_STATUS_OK
+file level 0x7203 - NT_STATUS_OK
+file level 0x7303 - NT_STATUS_OK
+file level 0x7403 - NT_STATUS_OK
+file level 0x7503 - NT_STATUS_OK
+file level 0x7603 - NT_STATUS_OK
+file level 0x7703 - NT_STATUS_OK
+file level 0x7803 - NT_STATUS_OK
+file level 0x7903 - NT_STATUS_OK
+file level 0x7a03 - NT_STATUS_OK
+file level 0x7b03 - NT_STATUS_OK
+file level 0x7c03 - NT_STATUS_OK
+file level 0x7d03 - NT_STATUS_OK
+file level 0x7e03 - NT_STATUS_OK
+file level 0x7f03 - NT_STATUS_OK
+file level 0x8003 - NT_STATUS_OK
+file level 0x8103 - NT_STATUS_OK
+file level 0x8203 - NT_STATUS_OK
+file level 0x8303 - NT_STATUS_OK
+file level 0x8403 - NT_STATUS_OK
+file level 0x8503 - NT_STATUS_OK
+file level 0x8603 - NT_STATUS_OK
+file level 0x8703 - NT_STATUS_OK
+file level 0x8803 - NT_STATUS_OK
+file level 0x8903 - NT_STATUS_OK
+file level 0x8a03 - NT_STATUS_OK
+file level 0x8b03 - NT_STATUS_OK
+file level 0x8c03 - NT_STATUS_OK
+file level 0x8d03 - NT_STATUS_OK
+file level 0x8e03 - NT_STATUS_OK
+file level 0x8f03 - NT_STATUS_OK
+file level 0x9003 - NT_STATUS_OK
+file level 0x9103 - NT_STATUS_OK
+file level 0x9203 - NT_STATUS_OK
+file level 0x9303 - NT_STATUS_OK
+file level 0x9403 - NT_STATUS_OK
+file level 0x9503 - NT_STATUS_OK
+file level 0x9603 - NT_STATUS_OK
+file level 0x9703 - NT_STATUS_OK
+file level 0x9803 - NT_STATUS_OK
+file level 0x9903 - NT_STATUS_OK
+file level 0x9a03 - NT_STATUS_OK
+file level 0x9b03 - NT_STATUS_OK
+file level 0x9c03 - NT_STATUS_OK
+file level 0x9d03 - NT_STATUS_OK
+file level 0x9e03 - NT_STATUS_OK
+file level 0x9f03 - NT_STATUS_OK
+file level 0xa003 - NT_STATUS_OK
+file level 0xa103 - NT_STATUS_OK
+file level 0xa203 - NT_STATUS_OK
+file level 0xa303 - NT_STATUS_OK
+file level 0xa403 - NT_STATUS_OK
+file level 0xa503 - NT_STATUS_OK
+file level 0xa603 - NT_STATUS_OK
+file level 0xa703 - NT_STATUS_OK
+file level 0xa803 - NT_STATUS_OK
+file level 0xa903 - NT_STATUS_OK
+file level 0xaa03 - NT_STATUS_OK
+file level 0xab03 - NT_STATUS_OK
+file level 0xac03 - NT_STATUS_OK
+file level 0xad03 - NT_STATUS_OK
+file level 0xae03 - NT_STATUS_OK
+file level 0xaf03 - NT_STATUS_OK
+file level 0xb003 - NT_STATUS_OK
+file level 0xb103 - NT_STATUS_OK
+file level 0xb203 - NT_STATUS_OK
+file level 0xb303 - NT_STATUS_OK
+file level 0xb403 - NT_STATUS_OK
+file level 0xb503 - NT_STATUS_OK
+file level 0xb603 - NT_STATUS_OK
+file level 0xb703 - NT_STATUS_OK
+file level 0xb803 - NT_STATUS_OK
+file level 0xb903 - NT_STATUS_OK
+file level 0xba03 - NT_STATUS_OK
+file level 0xbb03 - NT_STATUS_OK
+file level 0xbc03 - NT_STATUS_OK
+file level 0xbd03 - NT_STATUS_OK
+file level 0xbe03 - NT_STATUS_OK
+file level 0xbf03 - NT_STATUS_OK
+file level 0xc003 - NT_STATUS_OK
+file level 0xc103 - NT_STATUS_OK
+file level 0xc203 - NT_STATUS_OK
+file level 0xc303 - NT_STATUS_OK
+file level 0xc403 - NT_STATUS_OK
+file level 0xc503 - NT_STATUS_OK
+file level 0xc603 - NT_STATUS_OK
+file level 0xc703 - NT_STATUS_OK
+file level 0xc803 - NT_STATUS_OK
+file level 0xc903 - NT_STATUS_OK
+file level 0xca03 - NT_STATUS_OK
+file level 0xcb03 - NT_STATUS_OK
+file level 0xcc03 - NT_STATUS_OK
+file level 0xcd03 - NT_STATUS_OK
+file level 0xce03 - NT_STATUS_OK
+file level 0xcf03 - NT_STATUS_OK
+file level 0xd003 - NT_STATUS_OK
+file level 0xd103 - NT_STATUS_OK
+file level 0xd203 - NT_STATUS_OK
+file level 0xd303 - NT_STATUS_OK
+file level 0xd403 - NT_STATUS_OK
+file level 0xd503 - NT_STATUS_OK
+file level 0xd603 - NT_STATUS_OK
+file level 0xd703 - NT_STATUS_OK
+file level 0xd803 - NT_STATUS_OK
+file level 0xd903 - NT_STATUS_OK
+file level 0xda03 - NT_STATUS_OK
+file level 0xdb03 - NT_STATUS_OK
+file level 0xdc03 - NT_STATUS_OK
+file level 0xdd03 - NT_STATUS_OK
+file level 0xde03 - NT_STATUS_OK
+file level 0xdf03 - NT_STATUS_OK
+file level 0xe003 - NT_STATUS_OK
+file level 0xe103 - NT_STATUS_OK
+file level 0xe203 - NT_STATUS_OK
+file level 0xe303 - NT_STATUS_OK
+file level 0xe403 - NT_STATUS_OK
+file level 0xe503 - NT_STATUS_OK
+file level 0xe603 - NT_STATUS_OK
+file level 0xe703 - NT_STATUS_OK
+file level 0xe803 - NT_STATUS_OK
+file level 0xe903 - NT_STATUS_OK
+file level 0xea03 - NT_STATUS_OK
+file level 0xeb03 - NT_STATUS_OK
+file level 0xec03 - NT_STATUS_OK
+file level 0xed03 - NT_STATUS_OK
+file level 0xee03 - NT_STATUS_OK
+file level 0xef03 - NT_STATUS_OK
+file level 0xf003 - NT_STATUS_OK
+file level 0xf103 - NT_STATUS_OK
+file level 0xf203 - NT_STATUS_OK
+file level 0xf303 - NT_STATUS_OK
+file level 0xf403 - NT_STATUS_OK
+file level 0xf503 - NT_STATUS_OK
+file level 0xf603 - NT_STATUS_OK
+file level 0xf703 - NT_STATUS_OK
+file level 0xf803 - NT_STATUS_OK
+file level 0xf903 - NT_STATUS_OK
+file level 0xfa03 - NT_STATUS_OK
+file level 0xfb03 - NT_STATUS_OK
+file level 0xfc03 - NT_STATUS_OK
+file level 0xfd03 - NT_STATUS_OK
+file level 0xfe03 - NT_STATUS_OK
+file level 0xff03 - NT_STATUS_OK
+file level 0x2004 - NT_STATUS_OK
+time: 2026-03-04 00:43:49.570950
+success: setinfo
+test: find
+time: 2026-03-04 00:43:49.571031
+find level 0x0001 is 7052 bytes - NT_STATUS_OK
+find level 0x0002 is 7280 bytes - NT_STATUS_OK
+find level 0x0003 is 8794 bytes - NT_STATUS_OK
+find level 0x000c is 3864 bytes - NT_STATUS_OK
+find level 0x0025 is 9492 bytes - NT_STATUS_OK
+find level 0x0026 is 8028 bytes - NT_STATUS_OK
+find level 0x0032 is 9492 bytes - NT_STATUS_OK
+find level 0x003c is 8516 bytes - NT_STATUS_OK
+find level 0x003f is 10022 bytes - NT_STATUS_OK
+find level 0x004e is 8028 bytes - NT_STATUS_OK
+find level 0x004f is 9534 bytes - NT_STATUS_OK
+find level 0x0050 is 9004 bytes - NT_STATUS_OK
+find level 0x0051 is 10510 bytes - NT_STATUS_OK
+find level 0x0064 is 11444 bytes - NT_STATUS_OK
+time: 2026-03-04 00:43:49.742475
+success: find

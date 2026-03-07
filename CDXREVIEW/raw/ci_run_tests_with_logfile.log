@@ -1,0 +1,18 @@
+[0;34m[INFO][0m Setting up test environment...
+[0;34m[INFO][0m Cleaning existing results directory...
+[0;34m[INFO][0m Test environment ready
+[0;34m[INFO][0m Results directory: /home/ezechiel203/ksmbd/test_results
+[0;34m[INFO][0m Log file: /tmp/ksmbd_run_tests.log
+[0;36m[1mApple SMB Extensions Test Framework[0m
+[0;36m===================================[0m
+[0;34m[INFO][0m Started at Mon Feb 23 22:48:32 CET 2026
+[0;34m[INFO][0m Test type: all
+[0;34m[INFO][0m Validating test environment...
+[0;32m[SUCCESS][0m Environment validation passed
+[0;36m[1mBuilding Test Modules[0m
+[0;36m=====================[0m
+[0;34m[INFO][0m Starting build at Mon Feb 23 22:48:32 CET 2026
+=== Testing Apple SMB Code Fixes ===
+1. Checking header files...
+   ✗ Missing smb2aapl.h
+[0;31m[ERROR][0m Build failed

@@ -1,0 +1,18 @@
+[ 2235.477778] ksmbd: durable reconnect v2: client GUID mismatch
+[ 2235.487730] ksmbd: durable reconnect v2: client GUID mismatch
+[ 2235.590084] ksmbd: inherit ACL overflow
+[ 2235.620567] ksmbd: inherit ACL overflow
+[ 2235.677248] ksmbd: inherit ACL overflow
+[ 2235.690155] ksmbd: inherit ACL overflow
+[ 2235.710319] ksmbd: inherit ACL overflow
+[ 2235.733568] ksmbd: inherit ACL overflow
+[ 2235.757247] ksmbd: inherit ACL overflow
+[ 2235.775998] ksmbd: inherit ACL overflow
+[ 2239.791372] ksmbd: inherit ACL overflow
+[ 2243.807086] ksmbd: inherit ACL overflow
+[ 2247.824123] ksmbd: inherit ACL overflow
+[ 2251.839628] ksmbd: inherit ACL overflow
+[ 2255.854337] ksmbd: inherit ACL overflow
+[ 2259.871826] ksmbd: inherit ACL overflow
+[ 2263.886597] ksmbd: inherit ACL overflow
+[ 2267.903991] ksmbd: inherit ACL overflow

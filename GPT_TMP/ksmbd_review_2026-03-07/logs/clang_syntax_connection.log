@@ -1,0 +1,309 @@
+In file included from src/core/connection.c:9:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/mutex.h:14:
+/usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/current.h:22:6: error: call to undeclared function 'IS_ENABLED'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+   22 |         if (IS_ENABLED(CONFIG_USE_X86_SEG_SUPPORT))
+      |             ^
+/usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/current.h:22:17: error: use of undeclared identifier 'CONFIG_USE_X86_SEG_SUPPORT'
+   22 |         if (IS_ENABLED(CONFIG_USE_X86_SEG_SUPPORT))
+      |                        ^~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from src/core/connection.c:9:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/mutex.h:17:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/lockdep.h:14:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/smp.h:13:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/cpumask.h:11:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/kernel.h:23:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/bitops.h:67:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/bitops.h:424:
+/usr/lib/modules/6.18.13-arch1-1/build/include/asm-generic/bitops/instrumented-non-atomic.h:66:6: error: call to undeclared function 'IS_ENABLED'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+   66 |         if (IS_ENABLED(CONFIG_KCSAN_ASSUME_PLAIN_WRITES_ATOMIC)) {
+      |             ^
+/usr/lib/modules/6.18.13-arch1-1/build/include/asm-generic/bitops/instrumented-non-atomic.h:66:17: error: use of undeclared identifier 'CONFIG_KCSAN_ASSUME_PLAIN_WRITES_ATOMIC'
+   66 |         if (IS_ENABLED(CONFIG_KCSAN_ASSUME_PLAIN_WRITES_ATOMIC)) {
+      |                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from src/core/connection.c:9:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/mutex.h:17:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/lockdep.h:14:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/smp.h:13:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/cpumask.h:12:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/bitmap.h:13:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/string.h:65:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/string.h:5:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/string_64.h:6:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/jump_label.h:257:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/atomic.h:7:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/atomic.h:174:
+/usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/atomic64_64.h:13:53: error: unknown type name 'atomic64_t'; did you mean 'atomic_t'?
+   13 | static __always_inline s64 arch_atomic64_read(const atomic64_t *v)
+      |                                                     ^~~~~~~~~~
+      |                                                     atomic_t
+/usr/lib/modules/6.18.13-arch1-1/build/include/linux/types.h:183:3: note: 'atomic_t' declared here
+  183 | } atomic_t;
+      |   ^
+In file included from src/core/connection.c:9:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/mutex.h:17:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/lockdep.h:14:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/smp.h:13:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/cpumask.h:12:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/bitmap.h:13:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/string.h:65:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/string.h:5:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/string_64.h:6:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/jump_label.h:257:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/atomic.h:7:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/atomic.h:174:
+/usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/atomic64_64.h:18:47: error: unknown type name 'atomic64_t'; did you mean 'atomic_t'?
+   18 | static __always_inline void arch_atomic64_set(atomic64_t *v, s64 i)
+      |                                               ^~~~~~~~~~
+      |                                               atomic_t
+/usr/lib/modules/6.18.13-arch1-1/build/include/linux/types.h:183:3: note: 'atomic_t' declared here
+  183 | } atomic_t;
+      |   ^
+In file included from src/core/connection.c:9:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/mutex.h:17:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/lockdep.h:14:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/smp.h:13:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/cpumask.h:12:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/bitmap.h:13:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/string.h:65:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/string.h:5:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/string_64.h:6:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/jump_label.h:257:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/atomic.h:7:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/atomic.h:174:
+/usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/atomic64_64.h:23:54: error: unknown type name 'atomic64_t'; did you mean 'atomic_t'?
+   23 | static __always_inline void arch_atomic64_add(s64 i, atomic64_t *v)
+      |                                                      ^~~~~~~~~~
+      |                                                      atomic_t
+/usr/lib/modules/6.18.13-arch1-1/build/include/linux/types.h:183:3: note: 'atomic_t' declared here
+  183 | } atomic_t;
+      |   ^
+In file included from src/core/connection.c:9:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/mutex.h:17:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/lockdep.h:14:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/smp.h:13:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/cpumask.h:12:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/bitmap.h:13:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/string.h:65:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/string.h:5:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/string_64.h:6:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/jump_label.h:257:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/atomic.h:7:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/atomic.h:174:
+/usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/atomic64_64.h:30:54: error: unknown type name 'atomic64_t'; did you mean 'atomic_t'?
+   30 | static __always_inline void arch_atomic64_sub(s64 i, atomic64_t *v)
+      |                                                      ^~~~~~~~~~
+      |                                                      atomic_t
+/usr/lib/modules/6.18.13-arch1-1/build/include/linux/types.h:183:3: note: 'atomic_t' declared here
+  183 | } atomic_t;
+      |   ^
+In file included from src/core/connection.c:9:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/mutex.h:17:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/lockdep.h:14:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/smp.h:13:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/cpumask.h:12:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/bitmap.h:13:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/string.h:65:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/string.h:5:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/string_64.h:6:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/jump_label.h:257:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/atomic.h:7:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/atomic.h:174:
+/usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/atomic64_64.h:37:63: error: unknown type name 'atomic64_t'; did you mean 'atomic_t'?
+   37 | static __always_inline bool arch_atomic64_sub_and_test(s64 i, atomic64_t *v)
+      |                                                               ^~~~~~~~~~
+      |                                                               atomic_t
+/usr/lib/modules/6.18.13-arch1-1/build/include/linux/types.h:183:3: note: 'atomic_t' declared here
+  183 | } atomic_t;
+      |   ^
+In file included from src/core/connection.c:9:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/mutex.h:17:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/lockdep.h:14:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/smp.h:13:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/cpumask.h:12:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/bitmap.h:13:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/string.h:65:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/string.h:5:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/string_64.h:6:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/jump_label.h:257:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/atomic.h:7:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/atomic.h:174:
+/usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/atomic64_64.h:43:47: error: unknown type name 'atomic64_t'; did you mean 'atomic_t'?
+   43 | static __always_inline void arch_atomic64_inc(atomic64_t *v)
+      |                                               ^~~~~~~~~~
+      |                                               atomic_t
+/usr/lib/modules/6.18.13-arch1-1/build/include/linux/types.h:183:3: note: 'atomic_t' declared here
+  183 | } atomic_t;
+      |   ^
+In file included from src/core/connection.c:9:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/mutex.h:17:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/lockdep.h:14:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/smp.h:13:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/cpumask.h:12:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/bitmap.h:13:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/string.h:65:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/string.h:5:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/string_64.h:6:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/jump_label.h:257:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/atomic.h:7:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/atomic.h:174:
+/usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/atomic64_64.h:51:47: error: unknown type name 'atomic64_t'; did you mean 'atomic_t'?
+   51 | static __always_inline void arch_atomic64_dec(atomic64_t *v)
+      |                                               ^~~~~~~~~~
+      |                                               atomic_t
+/usr/lib/modules/6.18.13-arch1-1/build/include/linux/types.h:183:3: note: 'atomic_t' declared here
+  183 | } atomic_t;
+      |   ^
+In file included from src/core/connection.c:9:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/mutex.h:17:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/lockdep.h:14:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/smp.h:13:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/cpumask.h:12:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/bitmap.h:13:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/string.h:65:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/string.h:5:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/string_64.h:6:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/jump_label.h:257:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/atomic.h:7:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/atomic.h:174:
+/usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/atomic64_64.h:59:56: error: unknown type name 'atomic64_t'; did you mean 'atomic_t'?
+   59 | static __always_inline bool arch_atomic64_dec_and_test(atomic64_t *v)
+      |                                                        ^~~~~~~~~~
+      |                                                        atomic_t
+/usr/lib/modules/6.18.13-arch1-1/build/include/linux/types.h:183:3: note: 'atomic_t' declared here
+  183 | } atomic_t;
+      |   ^
+In file included from src/core/connection.c:9:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/mutex.h:17:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/lockdep.h:14:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/smp.h:13:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/cpumask.h:12:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/bitmap.h:13:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/string.h:65:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/string.h:5:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/string_64.h:6:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/jump_label.h:257:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/atomic.h:7:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/atomic.h:174:
+/usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/atomic64_64.h:65:56: error: unknown type name 'atomic64_t'; did you mean 'atomic_t'?
+   65 | static __always_inline bool arch_atomic64_inc_and_test(atomic64_t *v)
+      |                                                        ^~~~~~~~~~
+      |                                                        atomic_t
+/usr/lib/modules/6.18.13-arch1-1/build/include/linux/types.h:183:3: note: 'atomic_t' declared here
+  183 | } atomic_t;
+      |   ^
+In file included from src/core/connection.c:9:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/mutex.h:17:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/lockdep.h:14:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/smp.h:13:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/cpumask.h:12:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/bitmap.h:13:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/string.h:65:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/string.h:5:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/string_64.h:6:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/jump_label.h:257:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/atomic.h:7:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/atomic.h:174:
+/usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/atomic64_64.h:71:63: error: unknown type name 'atomic64_t'; did you mean 'atomic_t'?
+   71 | static __always_inline bool arch_atomic64_add_negative(s64 i, atomic64_t *v)
+      |                                                               ^~~~~~~~~~
+      |                                                               atomic_t
+/usr/lib/modules/6.18.13-arch1-1/build/include/linux/types.h:183:3: note: 'atomic_t' declared here
+  183 | } atomic_t;
+      |   ^
+In file included from src/core/connection.c:9:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/mutex.h:17:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/lockdep.h:14:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/smp.h:13:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/cpumask.h:12:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/bitmap.h:13:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/string.h:65:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/string.h:5:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/string_64.h:6:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/jump_label.h:257:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/atomic.h:7:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/atomic.h:174:
+/usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/atomic64_64.h:77:60: error: unknown type name 'atomic64_t'; did you mean 'atomic_t'?
+   77 | static __always_inline s64 arch_atomic64_add_return(s64 i, atomic64_t *v)
+      |                                                            ^~~~~~~~~~
+      |                                                            atomic_t
+/usr/lib/modules/6.18.13-arch1-1/build/include/linux/types.h:183:3: note: 'atomic_t' declared here
+  183 | } atomic_t;
+      |   ^
+In file included from src/core/connection.c:9:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/mutex.h:17:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/lockdep.h:14:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/smp.h:13:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/cpumask.h:12:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/bitmap.h:13:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/string.h:65:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/string.h:5:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/string_64.h:6:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/jump_label.h:257:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/atomic.h:7:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/atomic.h:174:
+/usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/atomic64_64.h:85:59: error: unknown type name 'atomic64_t'; did you mean 'atomic_t'?
+   85 | static __always_inline s64 arch_atomic64_fetch_add(s64 i, atomic64_t *v)
+      |                                                           ^~~~~~~~~~
+      |                                                           atomic_t
+/usr/lib/modules/6.18.13-arch1-1/build/include/linux/types.h:183:3: note: 'atomic_t' declared here
+  183 | } atomic_t;
+      |   ^
+In file included from src/core/connection.c:9:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/mutex.h:17:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/lockdep.h:14:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/smp.h:13:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/cpumask.h:12:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/bitmap.h:13:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/string.h:65:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/string.h:5:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/string_64.h:6:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/jump_label.h:257:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/atomic.h:7:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/atomic.h:174:
+/usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/atomic64_64.h:93:50: error: unknown type name 'atomic64_t'; did you mean 'atomic_t'?
+   93 | static __always_inline s64 arch_atomic64_cmpxchg(atomic64_t *v, s64 old, s64 new)
+      |                                                  ^~~~~~~~~~
+      |                                                  atomic_t
+/usr/lib/modules/6.18.13-arch1-1/build/include/linux/types.h:183:3: note: 'atomic_t' declared here
+  183 | } atomic_t;
+      |   ^
+In file included from src/core/connection.c:9:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/mutex.h:17:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/lockdep.h:14:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/smp.h:13:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/cpumask.h:12:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/bitmap.h:13:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/string.h:65:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/string.h:5:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/string_64.h:6:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/jump_label.h:257:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/atomic.h:7:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/atomic.h:174:
+/usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/atomic64_64.h:99:55: error: unknown type name 'atomic64_t'; did you mean 'atomic_t'?
+   99 | static __always_inline bool arch_atomic64_try_cmpxchg(atomic64_t *v, s64 *old, s64 new)
+      |                                                       ^~~~~~~~~~
+      |                                                       atomic_t
+/usr/lib/modules/6.18.13-arch1-1/build/include/linux/types.h:183:3: note: 'atomic_t' declared here
+  183 | } atomic_t;
+      |   ^
+In file included from src/core/connection.c:9:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/mutex.h:17:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/lockdep.h:14:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/smp.h:13:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/cpumask.h:12:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/bitmap.h:13:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/string.h:65:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/string.h:5:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/string_64.h:6:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/jump_label.h:257:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/include/linux/atomic.h:7:
+In file included from /usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/atomic.h:174:
+/usr/lib/modules/6.18.13-arch1-1/build/arch/x86/include/asm/atomic64_64.h:105:47: error: unknown type name 'atomic64_t'; did you mean 'atomic_t'?
+  105 | static __always_inline s64 arch_atomic64_xchg(atomic64_t *v, s64 new)
+      |                                               ^~~~~~~~~~
+      |                                               atomic_t
+/usr/lib/modules/6.18.13-arch1-1/build/include/linux/types.h:183:3: note: 'atomic_t' declared here
+  183 | } atomic_t;
+      |   ^
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+20 errors generated.

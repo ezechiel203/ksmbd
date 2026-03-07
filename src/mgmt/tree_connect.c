@@ -1,0 +1,189 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+/*
+ *   Copyright (C) 2018 Samsung Electronics Co., Ltd.
+ */
+
+#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+
+#include <linux/list.h>
+#include <linux/slab.h>
+#include <linux/xarray.h>
+
+#include "transport_ipc.h"
+#include "connection.h"
+
+#include "tree_connect.h"
+#include "user_config.h"
+#include "share_config.h"
+#include "user_session.h"
+
+struct ksmbd_tree_conn_status
+ksmbd_tree_conn_connect(struct ksmbd_work *work, const char *share_name)
+{
+	struct ksmbd_tree_conn_status status = {-ENOENT, NULL};
+	struct ksmbd_tree_connect_response *resp = NULL;
+	struct ksmbd_share_config *sc;
+	struct ksmbd_tree_connect *tree_conn = NULL;
+	struct sockaddr *peer_addr;
+	struct ksmbd_conn *conn = work->conn;
+	struct ksmbd_session *sess = work->sess;
+	int ret;
+
+	sc = ksmbd_share_config_get(work, share_name);
+	if (!sc)
+		return status;
+
+	tree_conn = kzalloc(sizeof(struct ksmbd_tree_connect),
+			    KSMBD_DEFAULT_GFP);
+	if (!tree_conn) {
+		status.ret = -ENOMEM;
+		goto out_error;
+	}
+
+	tree_conn->id = ksmbd_acquire_tree_conn_id(sess);
+	if (tree_conn->id < 0) {
+		status.ret = -EINVAL;
+		goto out_error;
+	}
+
+	peer_addr = KSMBD_TCP_PEER_SOCKADDR(conn);
+	resp = ksmbd_ipc_tree_connect_request(sess,
+					      sc,
+					      tree_conn,
+					      peer_addr);
+	if (!resp) {
+		status.ret = -EINVAL;
+		goto out_error;
+	}
+
+	status.ret = resp->status;
+	if (status.ret != KSMBD_TREE_CONN_STATUS_OK)
+		goto out_error;
+
+	tree_conn->flags = resp->connection_flags;
+	if (test_tree_conn_flag(tree_conn, KSMBD_TREE_CONN_FLAG_UPDATE)) {
+		struct ksmbd_share_config *new_sc;
+
+		ksmbd_share_config_del(sc);
+		new_sc = ksmbd_share_config_get(work, share_name);
+		if (!new_sc) {
+			pr_err("Failed to update stale share config\n");
+			status.ret = -ESTALE;
+			goto out_error;
+		}
+		ksmbd_share_config_put(sc);
+		sc = new_sc;
+	}
+
+	tree_conn->user = sess->user;
+	tree_conn->share_conf = sc;
+	status.tree_conn = tree_conn;
+
+	/*
+	 * Set state to TREE_CONNECTED and take two references (one for the
+	 * xarray, one for the caller) before storing in the xarray.  This
+	 * closes a TOCTOU race where a concurrent session logoff could find
+	 * and free a TREE_NEW entry while the caller still holds a raw
+	 * pointer, causing a use-after-free.
+	 */
+	tree_conn->t_state = TREE_CONNECTED;
+	refcount_set(&tree_conn->refcount, 2);
+
+	ret = xa_err(xa_store(&sess->tree_conns, tree_conn->id, tree_conn,
+			      KSMBD_DEFAULT_GFP));
+	if (ret) {
+		status.ret = -ENOMEM;
+		goto out_error;
+	}
+	kvfree(resp);
+	return status;
+
+out_error:
+	if (tree_conn)
+		ksmbd_release_tree_conn_id(sess, tree_conn->id);
+	ksmbd_share_config_put(sc);
+	kfree(tree_conn);
+	kvfree(resp);
+	return status;
+}
+
+void ksmbd_tree_connect_put(struct ksmbd_tree_connect *tcon)
+{
+	if (refcount_dec_and_test(&tcon->refcount)) {
+		ksmbd_share_config_put(tcon->share_conf);
+		kfree(tcon);
+	}
+}
+
+int ksmbd_tree_conn_disconnect(struct ksmbd_session *sess,
+			       struct ksmbd_tree_connect *tree_conn)
+{
+	int ret;
+
+	write_lock(&sess->tree_conns_lock);
+	xa_erase(&sess->tree_conns, tree_conn->id);
+	write_unlock(&sess->tree_conns_lock);
+
+	ret = ksmbd_ipc_tree_disconnect_request(sess->id, tree_conn->id);
+	ksmbd_release_tree_conn_id(sess, tree_conn->id);
+	ksmbd_tree_connect_put(tree_conn);
+	return ret;
+}
+
+struct ksmbd_tree_connect *ksmbd_tree_conn_lookup(struct ksmbd_session *sess,
+						  unsigned int id)
+{
+	struct ksmbd_tree_connect *tcon;
+
+	read_lock(&sess->tree_conns_lock);
+	tcon = xa_load(&sess->tree_conns, id);
+	if (tcon) {
+		if (tcon->t_state != TREE_CONNECTED)
+			tcon = NULL;
+		else if (!refcount_inc_not_zero(&tcon->refcount))
+			tcon = NULL;
+	}
+	read_unlock(&sess->tree_conns_lock);
+
+	return tcon;
+}
+
+int ksmbd_tree_conn_session_logoff(struct ksmbd_session *sess)
+{
+	int ret = 0;
+	struct ksmbd_tree_connect *tc, *tmp;
+	unsigned long id;
+	LIST_HEAD(free_list);
+
+	if (!sess)
+		return -EINVAL;
+
+	/*
+	 * Collect all tree connections under lock and erase them from
+	 * the xarray, then process disconnections after releasing the
+	 * lock. This avoids dropping/reacquiring the lock during
+	 * iteration which is racy.
+	 */
+	write_lock(&sess->tree_conns_lock);
+	lockdep_assert_held_write(&sess->tree_conns_lock);
+	xa_for_each(&sess->tree_conns, id, tc) {
+		if (tc->t_state == TREE_DISCONNECTED) {
+			ret = -ENOENT;
+			continue;
+		}
+		tc->t_state = TREE_DISCONNECTED;
+		xa_erase(&sess->tree_conns, tc->id);
+		list_add(&tc->list, &free_list);
+	}
+	write_unlock(&sess->tree_conns_lock);
+
+	list_for_each_entry_safe(tc, tmp, &free_list, list) {
+		list_del(&tc->list);
+		ret |= ksmbd_ipc_tree_disconnect_request(sess->id, tc->id);
+		ksmbd_release_tree_conn_id(sess, tc->id);
+		ksmbd_tree_connect_put(tc);
+	}
+
+	xa_destroy(&sess->tree_conns);
+	return ret;
+}

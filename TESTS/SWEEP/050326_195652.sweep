@@ -1,0 +1,1052 @@
+=== SMB2 Full Sweep with Debug ===
+Date: jeu. 05 mars 2026 19:56:56 CET
+Git: ab2648d8 fix: V7 audit — null session crypto, IOCTL BUFFER_OVERFLOW, signing fallback log
+
+[ksmbd.control/9876]: INFO: Terminated mountd
+[ksmbd.control/9876]: INFO: Killed ksmbd
+[ksmbd.mountd/9900]: INFO: Started manager
+  smb2.compound...                    
+--- smb2.compound ---
+P=20  F=0   S=0   E=0
+smbtorture 4.23.6
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772737023
+time: 2026-03-05 18:57:03.756397
+progress: 20
+test: related1
+time: 2026-03-05 18:57:03.757639
+time: 2026-03-05 18:57:04.023082
+success: related1
+test: related2
+time: 2026-03-05 18:57:04.023147
+time: 2026-03-05 18:57:04.284167
+success: related2
+test: related3
+time: 2026-03-05 18:57:04.284329
+time: 2026-03-05 18:57:04.517425
+success: related3
+test: related4
+time: 2026-03-05 18:57:04.517646
+set a sec desc allowing no write by CREATOR_OWNER
+try open for write
+time: 2026-03-05 18:57:04.823986
+success: related4
+test: related5
+time: 2026-03-05 18:57:04.824320
+time: 2026-03-05 18:57:05.005447
+success: related5
+test: related6
+time: 2026-03-05 18:57:05.005515
+try open for read
+time: 2026-03-05 18:57:05.364002
+success: related6
+test: related7
+time: 2026-03-05 18:57:05.364068
+set a sec desc allowing no write by CREATOR_OWNER
+try open for write
+time: 2026-03-05 18:57:05.642070
+success: related7
+test: related8
+time: 2026-03-05 18:57:05.642119
+try open for write
+time: 2026-03-05 18:57:05.903737
+success: related8
+test: related9
+time: 2026-03-05 18:57:05.903791
+time: 2026-03-05 18:57:06.160515
+success: related9
+test: unrelated1
+time: 2026-03-05 18:57:06.160562
+time: 2026-03-05 18:57:06.430914
+success: unrelated1
+test: invalid1
+time: 2026-03-05 18:57:06.431076
+time: 2026-03-05 18:57:06.695318
+success: invalid1
+test: invalid2
+time: 2026-03-05 18:57:06.695370
+time: 2026-03-05 18:57:06.971762
+success: invalid2
+test: invalid3
+time: 2026-03-05 18:57:06.971808
+time: 2026-03-05 18:57:07.259844
+success: invalid3
+test: invalid4
+time: 2026-03-05 18:57:07.259914
+time: 2026-03-05 18:57:07.526449
+success: invalid4
+test: interim1
+time: 2026-03-05 18:57:07.526607
+time: 2026-03-05 18:57:07.914389
+success: interim1
+test: interim2
+time: 2026-03-05 18:57:07.914438
+time: 2026-03-05 18:57:08.288264
+success: interim2
+test: interim3
+time: 2026-03-05 18:57:08.288314
+time: 2026-03-05 18:57:08.688795
+success: interim3
+test: compound-break
+time: 2026-03-05 18:57:08.688940
+TEST2: open a file with an batch oplock (share mode: all)
+TEST2: Opening second time with compound
+Acking to level II [0x01] in oplock handler
+time: 2026-03-05 18:57:09.023310
+success: compound-break
+test: compound-padding
+time: 2026-03-05 18:57:09.023388
+time: 2026-03-05 18:57:09.714037
+success: compound-padding
+test: create-write-close
+time: 2026-03-05 18:57:09.714082
+time: 2026-03-05 18:57:10.011347
+success: create-write-close
+  smb2.compound_async...              P=7   F=3   S=0   E=0
+
+--- smb2.compound_async ---
+smbtorture 4.23.6
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772737030
+time: 2026-03-05 18:57:10.560591
+progress: 10
+test: flush_close
+time: 2026-03-05 18:57:10.561890
+time: 2026-03-05 18:57:12.975671
+success: flush_close
+test: flush_flush
+time: 2026-03-05 18:57:12.975722
+time: 2026-03-05 18:57:15.418709
+success: flush_flush
+test: write_write
+time: 2026-03-05 18:57:15.418755
+time: 2026-03-05 18:57:15.713855
+failure: write_write [
+(../../source4/torture/smb2/compound.c:2549) Incorrect value req[1]->cancel.can_cancel=0 - should be 1
+]
+test: read_read
+time: 2026-03-05 18:57:15.713909
+time: 2026-03-05 18:57:16.022745
+failure: read_read [
+(../../source4/torture/smb2/compound.c:2653) Incorrect value req[1]->cancel.can_cancel=0 - should be 1
+]
+test: create_lease_break_async
+time: 2026-03-05 18:57:16.022794
+Waiting for a potential lease break...
+transport[0x55b09ba879f0] Skip acking to 0x3 (RH) in lease handler
+Got 1 lease breaks
+time: 2026-03-05 18:57:16.476394
+success: create_lease_break_async
+test: getinfo_middle
+time: 2026-03-05 18:57:16.476445
+Waiting for a potential lease break...
+transport[0x55b09ba879f0] Skip acking to 0x3 (RH) in lease handler
+Got 1 lease breaks
+time: 2026-03-05 18:57:16.921118
+failure: getinfo_middle [
+../../source4/torture/smb2/compound.c:2890: status was NT_STATUS_FILE_CLOSED, expected NT_STATUS_OK: smb2_getinfo_recv failed
+]
+test: rename_same_srcdst_non_compound_no_async
+time: 2026-03-05 18:57:16.921190
+Waiting for a potential lease break...
+transport[0x55b09ba879f0] Skip acking to 0x1 (R) in lease handler
+Got 1 lease breaks
+time: 2026-03-05 18:57:18.542418
+success: rename_same_srcdst_non_compound_no_async
+test: rename_non_compound_no_async
+time: 2026-03-05 18:57:18.542474
+Waiting for a potential lease break...
+transport[0x55b09ba879f0] Skip acking to 0x1 (R) in lease handler
+Got 1 lease breaks
+time: 2026-03-05 18:57:20.108625
+success: rename_non_compound_no_async
+test: rename_last
+time: 2026-03-05 18:57:20.108702
+Waiting for a potential lease break...
+transport[0x55b09ba879f0] Skip acking to 0x1 (R) in lease handler
+Got 1 lease breaks
+time: 2026-03-05 18:57:21.670745
+success: rename_last
+test: rename_middle
+time: 2026-03-05 18:57:21.670810
+Waiting for a potential lease break...
+transport[0x55b09ba879f0] Skip acking to 0x1 (R) in lease handler
+Got 1 lease breaks
+time: 2026-03-05 18:57:23.240311
+success: rename_middle
+  smb2.compound_find...               P=2   F=0   S=0   E=0
+
+--- smb2.compound_find ---
+smbtorture 4.23.6
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772737043
+time: 2026-03-05 18:57:23.762728
+progress: 3
+test: compound_find_related
+time: 2026-03-05 18:57:23.764201
+time: 2026-03-05 18:57:24.186896
+success: compound_find_related
+test: compound_find_unrelated
+time: 2026-03-05 18:57:24.186949
+time: 2026-03-05 18:57:24.662402
+success: compound_find_unrelated
+test: compound_find_close
+time: 2026-03-05 18:57:24.662453
+TIMEOUT (120s)
+  smb2.connect...                     P=1   F=0   S=0   E=0
+
+--- smb2.connect ---
+smbtorture 4.23.6
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772737164
+time: 2026-03-05 18:59:24.308035
+test: connect
+time: 2026-03-05 18:59:24.309900
+all_info for '\test9.dat'
+	create_time:    Thu Mar  5 18:59:24 2026 UTC
+	access_time:    Thu Mar  5 18:59:24 2026 UTC
+	write_time:     Thu Mar  5 18:59:24 2026 UTC
+	change_time:    Thu Mar  5 18:59:24 2026 UTC
+	attrib:         0x20
+	unknown1:       0x0
+	alloc_size:     69632
+	size:           65536
+	nlink:          1
+	delete_pending: 0
+	directory:      0
+	file_id:        414614
+	ea_size:        0
+	access_mask:    0x001f01ff
+	position:       0x10000
+	mode:           0x2
+	short name:     'TEST9~1.DAT'
+	stream 0:
+		size       65536
+		alloc size 69632
+		name       ::$DATA
+all_info for '\test9.dat'
+	create_time:    Thu Mar  5 18:59:24 2026 UTC
+	access_time:    Thu Mar  5 18:59:24 2026 UTC
+	write_time:     Thu Mar  5 18:59:24 2026 UTC
+	change_time:    Thu Mar  5 18:59:24 2026 UTC
+	attrib:         0x20
+	unknown1:       0x0
+	alloc_size:     69632
+	size:           65536
+	nlink:          1
+	delete_pending: 0
+	directory:      0
+	file_id:        414614
+	ea_size:        0
+	access_mask:    0x001f01ff
+	position:       0x10000
+	mode:           0x2
+	short name:     'TEST9~1.DAT'
+	stream 0:
+		size       65536
+		alloc size 69632
+		name       ::$DATA
+time: 2026-03-05 18:59:24.646461
+success: connect
+  smb2.create...                      [ksmbd.control/10519]: INFO: Terminated mountd
+[ksmbd.control/10519]: INFO: Killed ksmbd
+[ksmbd.mountd/10543]: INFO: Started manager
+
+--- smb2.create ---
+P=13  F=4   S=1   E=0
+smbtorture 4.23.6
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772737166
+time: 2026-03-05 18:59:26.786962
+progress: 18
+test: gentest
+time: 2026-03-05 18:59:26.787488
+time: 2026-03-05 18:59:29.201934
+failure: gentest [
+(../../source4/torture/smb2/create.c:253) Incorrect value for access_mask 0x0de0fe00 - should be 0x0df0fe00
+]
+test: blob
+time: 2026-03-05 18:59:29.201983
+Testing alloc size
+Testing durable open
+Testing query maximal access
+Testing timewarp
+Testing query_on_disk
+Testing unknown tag
+Testing bad tag length 0
+Testing bad tag length 1
+Testing bad tag length 2
+Testing bad tag length 3
+Testing tag length 4
+Testing tag length 5
+Testing tag length 6
+Testing tag length 7
+Testing tag length 8
+Testing tag length 16
+Testing tag length 17
+Testing tag length 34
+time: 2026-03-05 18:59:30.096424
+success: blob
+test: open
+time: 2026-03-05 18:59:30.096478
+Checking SMB2 Open
+time: 2026-03-05 18:59:32.925580
+success: open
+test: brlocked
+time: 2026-03-05 18:59:32.925628
+Testing SMB2 open with a byte range locked file
+time: 2026-03-05 18:59:33.521052
+success: brlocked
+test: multi
+time: 2026-03-05 18:59:33.521119
+Testing SMB2 Open with multiple connections
+waiting for replies
+File 0 returned status NT_STATUS_OBJECT_NAME_COLLISION
+File 1 returned status NT_STATUS_OK
+File 2 returned status NT_STATUS_OBJECT_NAME_COLLISION
+time: 2026-03-05 18:59:34.166094
+success: multi
+test: delete
+time: 2026-03-05 18:59:34.166206
+Checking SMB2_OPEN for delete on a readonly file.
+time: 2026-03-05 18:59:34.766629
+success: delete
+test: leading-slash
+time: 2026-03-05 18:59:34.766720
+Trying to create a directory with leading slash on path
+time: 2026-03-05 18:59:34.954971
+success: leading-slash
+test: impersonation
+time: 2026-03-05 18:59:34.955025
+Testing SMB2 open with an invalid impersonation level.
+time: 2026-03-05 18:59:35.402050
+success: impersonation
+test: aclfile
+time: 2026-03-05 18:59:35.402116
+Testing nttrans create with sec_desc on files
+basic create
+adding a new ACE
+creating a file with an initial ACL
+creating with attributes
+creating with attributes and ACL
+creating with attributes, ACL and owner
+time: 2026-03-05 18:59:36.132644
+success: aclfile
+test: acldir
+time: 2026-03-05 18:59:36.132736
+Testing nttrans create with sec_desc on directories
+basic create
+adding a new ACE
+creating a file with an initial ACL
+creating with attributes
+creating with attributes and ACL
+creating with attributes, ACL and owner
+time: 2026-03-05 18:59:36.936775
+success: acldir
+test: nulldacl
+time: 2026-03-05 18:59:36.936834
+TESTING SEC_DESC WITH A NULL DACL
+creating a file with a empty sd
+get the original sd
+set NULL DACL
+get the sd
+try open for read control
+try open for write
+try open for read
+try open for generic write
+try open for generic read
+set DACL with 0 aces
+get the sd
+try open for read control
+try open for write => access_denied
+time: 2026-03-05 18:59:37.674052
+failure: nulldacl [
+(../../source4/torture/smb2/create.c:1451) Incorrect status NT_STATUS_OBJECT_NAME_NOT_FOUND - should be NT_STATUS_ACCESS_DENIED
+]
+test: mkdir-dup
+time: 2026-03-05 18:59:37.674110
+Testing SMB2 Create Directory with multiple connections
+waiting for replies
+time: 2026-03-05 18:59:38.153795
+failure: mkdir-dup [
+../../source4/torture/smb2/create.c:1624: File 0 returned status NT_STATUS_OBJECT_NAME_COLLISION
+]
+test: mkdir-visible
+time: 2026-03-05 18:59:38.155060
+Testing SMB2 Create Directory is visible with multiple connections
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-05 18:59:42.371031
+failure: mkdir-visible [
+../../source4/torture/smb2/create.c:1956: Expression `ret' failed: torture_smb2_connection
+]
+test: dir-alloc-size
+time: 2026-03-05 18:59:42.389974
+Checking initial allocation size on directories
+Got directory alloc size: 8192
+time: 2026-03-05 18:59:42.945756
+success: dir-alloc-size
+test: dosattr_tmp_dir
+time: 2026-03-05 18:59:42.945830
+time: 2026-03-05 18:59:43.327170
+success: dosattr_tmp_dir
+test: quota-fake-file
+time: 2026-03-05 18:59:43.327903
+time: 2026-03-05 18:59:43.484996
+success: quota-fake-file
+test: path-length
+time: 2026-03-05 18:59:43.486418
+time: 2026-03-05 18:59:43.593238
+skip: path-length [
+Interactive Test: Skipping... (enable with --interactive)
+]
+test: bench-path-contention-shared
+time: 2026-03-05 18:59:43.594857
+Opening 4 connections
+Opened 4 connections with qdepth=1 => 4 loops
+Running for 10 seconds
+1.00 second: open[num/s=26,avslat=0.021200,minlat=0.000000,maxlat=0.023605] close[num/s=25,avslat=0.017607,minlat=0.000000,maxlat=0.018730]     2.00 second: open[num/s=25,avslat=0.021469,minlat=0.000000,maxlat=0.027876] close[num/s=26,avslat=0.018181,minlat=0.000000,maxlat=0.022482]     3.00 second: open[num/s=24,avslat=0.022959,minlat=0.000000,maxlat=0.042541] close[num/s=24,avslat=0.018452,minlat=0.000000,maxlat=0.024578]     4.00 second: open[num/s=24,avslat=0.022949,minlat=0.000000,maxlat=0.025494] close[num/s=23,avslat=0.019380,minlat=0.000000,maxlat=0.023493]     5.01 second: open[num/s=23,avslat=0.022724,minlat=0.000000,maxlat=0.025904] close[num/s=24,avslat=0.019530,minlat=0.000000,maxlat=0.024016]     6.01 second: open[num/s=24,avslat=0.023161,minlat=0.000000,maxlat=0.027125] close[num/s=24,avslat=0.019217,minlat=0.000000,maxlat=0.020925]     7.01 second: open[num/s=23,avslat=0.023265,minlat=0.000000,maxlat=0.026967] close[num/s=23,avslat=0.019676,minlat=0.000000,maxlat=0.023912]     8.01 second: open[num/s=23,avslat=0.023697,minlat=0.000000,maxlat=0.026471] close[num/s=23,avslat=0.020075,minlat=0.000000,maxlat=0.024824]     9.01 second: open[num/s=23,avslat=0.024398,minlat=0.000000,maxlat=0.042480] close[num/s=22,avslat=0.019945,minlat=0.000000,maxlat=0.032792]     10.01 second: open[num/s=23,avslat=0.022893,minlat=0.000000,maxlat=0.042541] close[num/s=23,avslat=0.019179,minlat=0.000000,maxlat=0.032792]
+10.01 seconds
+time: 2026-03-05 18:59:54.243448
+success: bench-path-contention-shared
+  smb2.credits...                     [ksmbd.control/10644]: INFO: Terminated mountd
+[ksmbd.control/10644]: INFO: Killed ksmbd
+[ksmbd.mountd/10676]: INFO: Started manager
+
+--- smb2.credits ---
+P=2   F=0   S=0   E=0
+smbtorture 4.23.6
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772737201
+time: 2026-03-05 19:00:01.894236
+progress: 10
+test: session_setup_credits_granted
+time: 2026-03-05 19:00:01.896446
+time: 2026-03-05 19:00:02.145982
+success: session_setup_credits_granted
+test: single_req_credits_granted
+time: 2026-03-05 19:00:02.146037
+time: 2026-03-05 19:00:02.472570
+success: single_req_credits_granted
+test: skipped_mid
+time: 2026-03-05 19:00:02.472619
+TIMEOUT (120s)
+  smb2.delete-on-close-perms...       [ksmbd.control/10798]: INFO: Terminated mountd
+[ksmbd.control/10798]: INFO: Killed ksmbd
+[ksmbd.mountd/10822]: INFO: Started manager
+
+--- smb2.delete-on-close-perms ---
+P=8   F=1   S=0   E=0
+smbtorture 4.23.6
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772737329
+time: 2026-03-05 19:02:09.277045
+progress: 9
+test: OVERWRITE_IF
+time: 2026-03-05 19:02:09.279200
+Opening Directory for setting new SD: test_dir
+get the original sd
+Setting permissions on dir to 0x1f01ff
+Creating Directory for testing: test_dir
+get the original sd
+Setting permissions on dir to 0x1e01bf
+Create file with DeleteOnClose on non-existent file (OVERWRITE_IF)
+We expect NT_STATUS_OK
+Testing if the file was deleted when closed
+We expect NT_STATUS_OBJECT_NAME_NOT_FOUND
+time: 2026-03-05 19:02:09.891211
+success: OVERWRITE_IF
+test: OVERWRITE_IF Existing
+time: 2026-03-05 19:02:09.891295
+Opening Directory for setting new SD: test_dir
+get the original sd
+Setting permissions on dir to 0x1f01ff
+Creating Directory for testing: test_dir
+get the original sd
+Setting permissions on dir to 0x1e01bf
+Create file with DeleteOnClose on existing file (OVERWRITE_IF)
+We expect NT_STATUS_ACCESS_DENIED
+time: 2026-03-05 19:02:10.584820
+success: OVERWRITE_IF Existing
+test: CREATE
+time: 2026-03-05 19:02:10.584865
+Opening Directory for setting new SD: test_dir
+get the original sd
+Setting permissions on dir to 0x1f01ff
+Creating Directory for testing: test_dir
+get the original sd
+Setting permissions on dir to 0x1e01bf
+Create file with DeleteOnClose on non-existent file (CREATE) 
+We expect NT_STATUS_OK
+Testing if the file was deleted when closed
+We expect NT_STATUS_OBJECT_NAME_NOT_FOUND
+time: 2026-03-05 19:02:11.372598
+success: CREATE
+test: CREATE Existing
+time: 2026-03-05 19:02:11.372688
+Opening Directory for setting new SD: test_dir
+get the original sd
+Setting permissions on dir to 0x1f01ff
+Creating Directory for testing: test_dir
+get the original sd
+Setting permissions on dir to 0x1e01bf
+Create file with DeleteOnClose on non-existent file (CREATE) 
+We expect NT_STATUS_OBJECT_NAME_COLLISION
+time: 2026-03-05 19:02:12.018019
+success: CREATE Existing
+test: CREATE_IF
+time: 2026-03-05 19:02:12.018071
+Opening Directory for setting new SD: test_dir
+get the original sd
+Setting permissions on dir to 0x1f01ff
+Creating Directory for testing: test_dir
+get the original sd
+Setting permissions on dir to 0x1e01bf
+Create file with DeleteOnClose on non-existent file (OPEN_IF)
+We expect NT_STATUS_OK
+Testing if the file was deleted when closed
+We expect NT_STATUS_OBJECT_NAME_NOT_FOUND
+time: 2026-03-05 19:02:12.624184
+success: CREATE_IF
+test: CREATE_IF Existing
+time: 2026-03-05 19:02:12.624248
+Opening Directory for setting new SD: test_dir
+get the original sd
+Setting permissions on dir to 0x1f01ff
+Creating Directory for testing: test_dir
+get the original sd
+Setting permissions on dir to 0x1e01bf
+Create file with DeleteOnClose on existing file (OPEN_IF)
+We expect NT_STATUS_ACCESS_DENIED
+time: 2026-03-05 19:02:13.153979
+success: CREATE_IF Existing
+test: FIND_and_set_DOC
+time: 2026-03-05 19:02:13.154045
+Opening Directory for setting new SD: test_dir
+get the original sd
+Setting permissions on dir to 0x1f01ff
+FIND and delete directory
+We expect NT_STATUS_OK
+time: 2026-03-05 19:02:13.687826
+success: FIND_and_set_DOC
+test: READONLY
+time: 2026-03-05 19:02:13.687875
+Opening Directory for setting new SD: test_dir
+get the original sd
+Setting permissions on dir to 0x1f01ff
+time: 2026-03-05 19:02:14.447891
+failure: READONLY [
+../../source4/torture/smb2/delete-on-close.c:603: status was NT_STATUS_OK, expected NT_STATUS_CANNOT_DELETE: Unexpected status for CREATE of new file.
+]
+test: BUG14427
+time: 2026-03-05 19:02:14.447960
+time: 2026-03-05 19:02:14.726493
+success: BUG14427
+  smb2.dir...                         [ksmbd.control/10937]: INFO: Terminated mountd
+[ksmbd.control/10937]: INFO: Killed ksmbd
+[ksmbd.mountd/10969]: INFO: Started manager
+
+--- smb2.dir ---
+P=6   F=0   S=0   E=0
+smbtorture 4.23.6
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772737342
+time: 2026-03-05 19:02:22.395825
+progress: 9
+test: find
+time: 2026-03-05 19:02:22.397116
+time: 2026-03-05 19:02:34.635752
+success: find
+test: fixed
+time: 2026-03-05 19:02:34.635799
+time: 2026-03-05 19:02:44.346481
+success: fixed
+test: one
+time: 2026-03-05 19:02:44.346527
+Testing SMB2_FIND_DIRECTORY_INFO 1
+Testing SMB2_FIND_FULL_DIRECTORY_INFO 2
+Testing SMB2_FIND_NAME_INFO 12
+Testing SMB2_FIND_BOTH_DIRECTORY_INFO 3
+Testing SMB2_FIND_ID_FULL_DIRECTORY_INFO 38
+Testing SMB2_FIND_ID_BOTH_DIRECTORY_INFO 37
+time: 2026-03-05 19:02:44.957374
+success: one
+test: many
+time: 2026-03-05 19:02:44.957440
+Testing with 700 files
+Continue SMB2_FIND_BOTH_DIRECTORY_INFO via SINGLE
+Continue SMB2_FIND_BOTH_DIRECTORY_INFO via INDEX
+Continue SMB2_FIND_BOTH_DIRECTORY_INFO via RESTART
+Continue SMB2_FIND_BOTH_DIRECTORY_INFO via REOPEN
+Continue SMB2_FIND_DIRECTORY_INFO via SINGLE
+Continue SMB2_FIND_DIRECTORY_INFO via INDEX
+Continue SMB2_FIND_DIRECTORY_INFO via RESTART
+Continue SMB2_FIND_DIRECTORY_INFO via REOPEN
+Continue SMB2_FIND_FULL_DIRECTORY_INFO via SINGLE
+Continue SMB2_FIND_FULL_DIRECTORY_INFO via INDEX
+Continue SMB2_FIND_FULL_DIRECTORY_INFO via RESTART
+Continue SMB2_FIND_FULL_DIRECTORY_INFO via REOPEN
+Continue SMB2_FIND_ID_FULL_DIRECTORY_INFO via SINGLE
+Continue SMB2_FIND_ID_FULL_DIRECTORY_INFO via INDEX
+Continue SMB2_FIND_ID_FULL_DIRECTORY_INFO via RESTART
+Continue SMB2_FIND_ID_FULL_DIRECTORY_INFO via REOPEN
+Continue SMB2_FIND_ID_BOTH_DIRECTORY_INFO via SINGLE
+Continue SMB2_FIND_ID_BOTH_DIRECTORY_INFO via INDEX
+Continue SMB2_FIND_ID_BOTH_DIRECTORY_INFO via RESTART
+Continue SMB2_FIND_ID_BOTH_DIRECTORY_INFO via REOPEN
+time: 2026-03-05 19:04:30.546965
+success: many
+test: modify
+time: 2026-03-05 19:04:30.547195
+Creating 700 files
+pulling the first two files
+Changing attributes and deleting
+time: 2026-03-05 19:05:51.392869
+success: modify
+test: sorted
+time: 2026-03-05 19:05:51.392917
+Testing if directories always come back sorted
+non-alphabetical order at entry 0 'ojaaaaaa' 'mdaaaaaa'
+Server does not produce sorted directory listings(not an error)
+time: 2026-03-05 19:07:10.203543
+success: sorted
+test: file-index
+time: 2026-03-05 19:07:10.204201
+Testing the behavior of file_index flag
+Next expected file: smb2_dir\file66.txt but the server returned file17.txt
+Not an error. Resuming using a file index is an optional feature of the protocol.
+TIMEOUT (300s)
+  smb2.dirlease...                    [ksmbd.control/11156]: INFO: Terminated mountd
+[ksmbd.control/11156]: INFO: Killed ksmbd
+[ksmbd.mountd/11189]: INFO: Started manager
+
+--- smb2.dirlease ---
+P=3   F=13  S=0   E=0
+smbtorture 4.23.6
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772737649
+time: 2026-03-05 19:07:29.857113
+progress: 18
+test: v2_request_parent
+time: 2026-03-05 19:07:29.859252
+time: 2026-03-05 19:07:30.121093
+success: v2_request_parent
+test: v2_request
+time: 2026-03-05 19:07:30.121139
+transport[0x55d52057d9f0] acking to 0x1 (R) in lease handler
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+transport[0x55d52057d9f0] Skip acking to 0x1 (R) in lease handler
+Got 1 lease breaks
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+transport[0x55d52057d9f0] acking to 0x0 () in lease handler
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+WARNING!: (../../source4/torture/smb2/lease.c:1751): wrong value for (&io)->out.lease_response_v2.lease_epoch got 0x26 - should be 0x25
+
+time: 2026-03-05 19:07:36.359889
+failure: v2_request [
+../../source4/torture/smb2/lease.c:1938: Expression `ret == (1)' failed: Rearm dirlease failed
+]
+test: oplocks
+time: 2026-03-05 19:07:36.359938
+time: 2026-03-05 19:07:37.064640
+success: oplocks
+test: leases
+time: 2026-03-05 19:07:37.065243
+time: 2026-03-05 19:07:37.621063
+success: leases
+test: seteof
+time: 2026-03-05 19:07:37.621220
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+transport[0x55d52057d9f0] acking to 0x0 () in lease handler
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+WARNING!: (../../source4/torture/smb2/lease.c:1751): wrong value for (&io)->out.lease_response_v2.lease_epoch got 0x4 - should be 0x3
+
+WARNING!: ../../source4/torture/smb2/lease.c:6103: Expression `ret == (1)' failed: Rearm dirlease failed
+
+transport[0x55d52057d9f0] acking to 0x3 (RH) in lease handler
+time: 2026-03-05 19:07:41.539345
+failure: seteof [
+../../source4/torture/smb2/lease.c:6256: Expression `ret' failed: seteof test failed
+]
+test: setdos
+time: 2026-03-05 19:07:41.539393
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+transport[0x55d52057d9f0] acking to 0x0 () in lease handler
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+WARNING!: (../../source4/torture/smb2/lease.c:1751): wrong value for (&io)->out.lease_response_v2.lease_epoch got 0x4 - should be 0x3
+
+WARNING!: ../../source4/torture/smb2/lease.c:6103: Expression `ret == (1)' failed: Rearm dirlease failed
+
+transport[0x55d52057d9f0] acking to 0x3 (RH) in lease handler
+time: 2026-03-05 19:07:45.450745
+failure: setdos [
+../../source4/torture/smb2/lease.c:6312: Expression `ret' failed: setdos test failed
+]
+test: setbtime
+time: 2026-03-05 19:07:45.450814
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+transport[0x55d52057d9f0] acking to 0x0 () in lease handler
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+WARNING!: (../../source4/torture/smb2/lease.c:1751): wrong value for (&io)->out.lease_response_v2.lease_epoch got 0x4 - should be 0x3
+
+WARNING!: ../../source4/torture/smb2/lease.c:6103: Expression `ret == (1)' failed: Rearm dirlease failed
+
+transport[0x55d52057d9f0] acking to 0x3 (RH) in lease handler
+time: 2026-03-05 19:07:49.419942
+failure: setbtime [
+../../source4/torture/smb2/lease.c:6364: Expression `ret' failed: setbtime test failed
+]
+test: setmtime
+time: 2026-03-05 19:07:49.419991
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+transport[0x55d52057d9f0] acking to 0x0 () in lease handler
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+WARNING!: (../../source4/torture/smb2/lease.c:1751): wrong value for (&io)->out.lease_response_v2.lease_epoch got 0x4 - should be 0x3
+
+WARNING!: ../../source4/torture/smb2/lease.c:6103: Expression `ret == (1)' failed: Rearm dirlease failed
+
+transport[0x55d52057d9f0] acking to 0x3 (RH) in lease handler
+time: 2026-03-05 19:07:53.447528
+failure: setmtime [
+../../source4/torture/smb2/lease.c:6416: Expression `ret' failed: setmtime test failed
+]
+test: setctime
+time: 2026-03-05 19:07:53.447580
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+transport[0x55d52057d9f0] acking to 0x0 () in lease handler
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+WARNING!: (../../source4/torture/smb2/lease.c:1751): wrong value for (&io)->out.lease_response_v2.lease_epoch got 0x4 - should be 0x3
+
+WARNING!: ../../source4/torture/smb2/lease.c:6103: Expression `ret == (1)' failed: Rearm dirlease failed
+
+transport[0x55d52057d9f0] acking to 0x3 (RH) in lease handler
+time: 2026-03-05 19:07:57.321731
+failure: setctime [
+../../source4/torture/smb2/lease.c:6468: Expression `ret' failed: setctime test failed
+]
+test: setatime
+time: 2026-03-05 19:07:57.321783
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+transport[0x55d52057d9f0] acking to 0x0 () in lease handler
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+WARNING!: (../../source4/torture/smb2/lease.c:1751): wrong value for (&io)->out.lease_response_v2.lease_epoch got 0x4 - should be 0x3
+
+WARNING!: ../../source4/torture/smb2/lease.c:6103: Expression `ret == (1)' failed: Rearm dirlease failed
+
+transport[0x55d52057d9f0] acking to 0x3 (RH) in lease handler
+time: 2026-03-05 19:08:01.117203
+failure: setatime [
+../../source4/torture/smb2/lease.c:6520: Expression `ret' failed: setctime test failed
+]
+test: rename
+time: 2026-03-05 19:08:01.117251
+
+Rename subtest: samedir-correct-parent-leaskey
+==================================
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+
+Rename subtest: samedir-wrong-parent-leaskey
+==================================
+transport[0x55d520847480] acking to 0x0 () in lease handler
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+WARNING!: ../../source4/torture/smb2/lease.c:6745: status was NT_STATUS_UNSUCCESSFUL, expected NT_STATUS_OK: smb2_lease_break_ack failed
+
+time: 2026-03-05 19:08:05.256642
+failure: rename [
+../../source4/torture/smb2/lease.c:6778: Expression `ret' failed: samedir-wrong-parent-leaskey failed
+]
+test: rename_dst_parent
+time: 2026-03-05 19:08:05.256968
+transport[0x55d520847480] acking to 0x0 () in lease handler
+time: 2026-03-05 19:08:06.018718
+failure: rename_dst_parent [
+../../source4/torture/smb2/lease.c:6845: status was NT_STATUS_OK, expected NT_STATUS_SHARING_VIOLATION: smb2_setinfo_file
+]
+test: overwrite
+time: 2026-03-05 19:08:06.018762
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+transport[0x55d520847480] Skip acking to 0x0 () in lease handler
+Got 1 lease breaks
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+WARNING!: (../../source4/torture/smb2/lease.c:7002): wrong value for lease_break_info.count got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:7002): wrong value for (&lease_break_info.lease_break)->current_lease.lease_state got 0x0 - should be 0x3
+
+WARNING!: (../../source4/torture/smb2/lease.c:7002): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[0] got 0x0 - should be 0xe0ddf00d
+
+WARNING!: (../../source4/torture/smb2/lease.c:7002): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[1] got 0x0 - should be 0x1f220ff2
+
+WARNING!: (../../source4/torture/smb2/lease.c:7002): wrong value for (&lease_break_info.lease_break)->break_flags got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:7002): wrong value for lease_break_info.lease_break.new_epoch got 0x0 - should be 0x3
+
+WARNING!: (../../source4/torture/smb2/lease.c:7002): wrong value for (uintptr_t)lease_break_info.lease_transport got 0x0 - should be 0x20847480
+
+time: 2026-03-05 19:08:08.860683
+failure: overwrite [
+../../source4/torture/smb2/lease.c:7012: status was NT_STATUS_UNSUCCESSFUL, expected NT_STATUS_OK: smb2_lease_break_ack failed
+]
+test: hardlink
+time: 2026-03-05 19:08:08.860731
+
+Hardlink subtest: samedir-correct-parent-leaskey
+==================================
+transport[0x55d520847480] acking to 0x0 () in lease handler
+WARNING!: ../../source4/torture/smb2/lease.c:7214: status was NT_STATUS_INVALID_PARAMETER, expected NT_STATUS_OK: smb2_setinfo_file failed
+
+time: 2026-03-05 19:08:09.570083
+failure: hardlink [
+../../source4/torture/smb2/lease.c:7280: Expression `ret' failed: samedir-correct-parent-leaskey failed
+]
+test: unlink_same_set_and_close
+time: 2026-03-05 19:08:09.570139
+First open test directory with RH-dirlease
+Second open test directory with RH-dirlease
+First open test file
+transport[0x55d520847480] acking to 0x0 () in lease handler
+Second open test file
+transport[0x55d520847480] acking to 0x0 () in lease handler
+Sets delete on close on open 2
+Closing first handle that has not set delete-on-close, this should not trigger a break
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Closing second and last handle will remove the file, trigger a break on first directory with different parent lease key
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+WARNING!: (../../source4/torture/smb2/lease.c:7381): wrong value for lease_break_info.count got 0x2 - should be 0x0
+
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+time: 2026-03-05 19:08:13.156354
+failure: unlink_same_set_and_close [
+(../../source4/torture/smb2/lease.c:7390): wrong value for lease_break_info.count got 0x2 - should be 0x1
+]
+test: unlink_different_set_and_close
+time: 2026-03-05 19:08:13.156400
+First open test directory with RH-dirlease
+Second open test directory with RH-dirlease
+First open test file
+transport[0x55d520847480] Skip acking to 0x0 () in lease handler
+Second open test file
+transport[0x55d520847480] Skip acking to 0x0 () in lease handler
+Client 1 sets delete on close
+Closing first handle that has set delete-on-close, will not delete the file and not trigger a break
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Closing second and last handle will remove the file, and trigger a break as the parent lease keys don't match
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+WARNING!: (../../source4/torture/smb2/lease.c:7508): wrong value for lease_break_info.count got 0x2 - should be 0x0
+
+WARNING!: (../../source4/torture/smb2/lease.c:7532): wrong value for lease_break_info.count got 0x2 - should be 0x1
+
+time: 2026-03-05 19:09:29.000743
+failure: unlink_different_set_and_close [
+../../source4/torture/smb2/lease.c:7540: status was NT_STATUS_UNSUCCESSFUL, expected NT_STATUS_OK: smb2_lease_break_ack failed
+]
+test: unlink_same_initial_and_close
+time: 2026-03-05 19:09:29.000815
+TIMEOUT (120s)
+  smb2.dosmode...                     P=0   F=1   S=0   E=0
+
+--- smb2.dosmode ---
+smbtorture 4.23.6
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772737777
+time: 2026-03-05 19:09:37.341040
+test: dosmode
+time: 2026-03-05 19:09:37.344395
+Checking dosmode with "hide files" and "hide dot files"
+time: 2026-03-05 19:09:37.997735
+failure: dosmode [
+../../source4/torture/smb2/dosmode.c:121: finfo2.all_info2.out.attrib & FILE_ATTRIBUTE_HIDDEN was 0 (0x0), expected 2 (0x2): FILE_ATTRIBUTE_HIDDEN is not set
+]
+  smb2.durable-open...                [ksmbd.control/11509]: INFO: Terminated mountd
+[ksmbd.control/11509]: INFO: Killed ksmbd
+[ksmbd.mountd/11564]: INFO: Started manager
+
+--- smb2.durable-open ---
+P=22  F=3   S=1   E=0
+smbtorture 4.23.6
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772737778
+time: 2026-03-05 19:09:38.575206
+progress: 26
+test: open-oplock
+time: 2026-03-05 19:09:38.576223
+time: 2026-03-05 19:09:42.432444
+success: open-oplock
+test: open-lease
+time: 2026-03-05 19:09:42.432498
+time: 2026-03-05 19:09:47.332266
+success: open-lease
+test: reopen1
+time: 2026-03-05 19:09:47.332332
+time: 2026-03-05 19:09:47.584801
+success: reopen1
+test: reopen1a
+time: 2026-03-05 19:09:47.584957
+time: 2026-03-05 19:09:48.103983
+success: reopen1a
+test: reopen1a-lease
+time: 2026-03-05 19:09:48.104032
+time: 2026-03-05 19:09:48.674957
+success: reopen1a-lease
+test: reopen2
+time: 2026-03-05 19:09:48.675025
+time: 2026-03-05 19:09:49.319195
+success: reopen2
+test: reopen2-lease
+time: 2026-03-05 19:09:49.319242
+time: 2026-03-05 19:09:49.982711
+success: reopen2-lease
+test: reopen2-lease-v2
+time: 2026-03-05 19:09:49.982778
+time: 2026-03-05 19:09:50.609245
+success: reopen2-lease-v2
+test: reopen2a
+time: 2026-03-05 19:09:50.609308
+time: 2026-03-05 19:09:50.974000
+success: reopen2a
+test: reopen3
+time: 2026-03-05 19:09:50.974068
+time: 2026-03-05 19:09:51.311768
+success: reopen3
+test: reopen4
+time: 2026-03-05 19:09:51.311838
+time: 2026-03-05 19:09:51.611699
+success: reopen4
+test: reopen5
+time: 2026-03-05 19:09:51.611763
+time: 2026-03-05 19:09:55.125642
+success: reopen5
+test: reopen6
+time: 2026-03-05 19:09:55.125793
+Fallback to anonymous for 'torture:user2name'=NULL 'torture:user2domain'='WORKGROUP' 'torture:user2password'='REDACTED'time: 2026-03-05 19:09:55.242824
+skip: reopen6 [
+../../source4/torture/smb2/durable_open.c:1723: valid user2 credentials are required
+]
+test: delete_on_close1
+time: 2026-03-05 19:09:55.242878
+time: 2026-03-05 19:09:55.655410
+failure: delete_on_close1 [
+../../source4/torture/smb2/durable_open.c:1852: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: ../../source4/torture/smb2/durable_open.c:1852
+]
+test: delete_on_close2
+time: 2026-03-05 19:09:55.655461
+time: 2026-03-05 19:09:56.312472
+success: delete_on_close2
+test: file-position
+time: 2026-03-05 19:09:56.312521
+position: 0
+position: 4096
+position: 4096
+time: 2026-03-05 19:09:56.824314
+success: file-position
+test: oplock
+time: 2026-03-05 19:09:56.824358
+time: 2026-03-05 19:09:57.384387
+success: oplock
+test: lease
+time: 2026-03-05 19:09:57.384433
+time: 2026-03-05 19:09:57.961100
+success: lease
+test: lock-oplock
+time: 2026-03-05 19:09:57.961154
+time: 2026-03-05 19:09:58.421265
+success: lock-oplock
+test: lock-lease
+time: 2026-03-05 19:09:58.421318
+time: 2026-03-05 19:09:58.832726
+success: lock-lease
+test: lock-noW-lease
+time: 2026-03-05 19:09:58.832785
+time: 2026-03-05 19:09:59.291264
+failure: lock-noW-lease [
+../../source4/torture/smb2/durable_open.c:2550: status was NT_STATUS_OK, expected NT_STATUS_OBJECT_NAME_NOT_FOUND: ../../source4/torture/smb2/durable_open.c:2550
+]
+test: open2-lease
+time: 2026-03-05 19:09:59.291319
+time: 2026-03-05 19:09:59.866535
+success: open2-lease
+test: open2-oplock
+time: 2026-03-05 19:09:59.866581
+time: 2026-03-05 19:10:00.367310
+success: open2-oplock
+test: alloc-size
+time: 2026-03-05 19:10:00.367355
+time: 2026-03-05 19:10:00.812810
+failure: alloc-size [
+../../source4/torture/smb2/durable_open.c:2851: (&io)->out.alloc_size was 8192 (0x2000), expected 4096 (0x1000): ../../source4/torture/smb2/durable_open.c:2851
+]
+test: read-only
+time: 2026-03-05 19:10:00.812877
+time: 2026-03-05 19:10:01.209253
+success: read-only
+test: stat-open
+time: 2026-03-05 19:10:01.209297
+time: 2026-03-05 19:10:01.468001
+success: stat-open
+  smb2.durable-v2-open...             [ksmbd.mountd/11717]: INFO: Started manager
+
+--- smb2.durable-v2-open ---
+P=0   F=2   S=0   E=0
+smbtorture 4.23.6
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772737891
+time: 2026-03-05 19:11:31.820756
+progress: 33
+test: create-blob
+time: 2026-03-05 19:11:31.821833
+time: 2026-03-05 19:12:31.894041
+failure: create-blob [
+../../source4/torture/smb2/durable_v2_open.c:134: status was NT_STATUS_IO_TIMEOUT, expected NT_STATUS_OK: ../../source4/torture/smb2/durable_v2_open.c:134
+]
+test: open-oplock
+time: 2026-03-05 19:12:31.894092
+time: 2026-03-05 19:13:31.969942
+failure: open-oplock [
+../../source4/torture/smb2/durable_v2_open.c:288: status was NT_STATUS_IO_TIMEOUT, expected NT_STATUS_OK: ../../source4/torture/smb2/durable_v2_open.c:288
+]
+test: open-lease
+time: 2026-03-05 19:13:31.974900
+TIMEOUT (180s)
+  smb2.getinfo...                     

@@ -1,0 +1,32 @@
+[ksmbdctl(control)/3929]: INFO: Terminated mountd
+[ksmbdctl(control)/3929]: INFO: Killed ksmbd
+[ksmbdctl(start)/3985]: INFO: Started manager
+connect: PASS=0 FAIL=0 SKIP=0 (SMOKE_FAILED)
+[ksmbdctl(control)/4010]: INFO: Terminated mountd
+[ksmbdctl(control)/4010]: INFO: Killed ksmbd
+[ksmbdctl(start)/4066]: INFO: Started manager
+session: PASS=0 FAIL=0 SKIP=0 (SMOKE_FAILED)
+[ksmbdctl(control)/4091]: INFO: Terminated mountd
+[ksmbdctl(control)/4091]: INFO: Killed ksmbd
+[ksmbdctl(start)/4147]: INFO: Started manager
+oplock: PASS=0 FAIL=0 SKIP=0 (SMOKE_FAILED)
+[ksmbdctl(control)/4172]: INFO: Terminated mountd
+[ksmbdctl(control)/4172]: INFO: Killed ksmbd
+[ksmbdctl(start)/4228]: INFO: Started manager
+durable-open: PASS=0 FAIL=0 SKIP=0 (SMOKE_FAILED)
+[ksmbdctl(control)/4253]: INFO: Terminated mountd
+[ksmbdctl(control)/4253]: INFO: Killed ksmbd
+[ksmbdctl(start)/4309]: INFO: Started manager
+durable-v2-open: PASS=0 FAIL=0 SKIP=0 (SMOKE_FAILED)
+[ksmbdctl(control)/4350]: INFO: Terminated mountd
+[ksmbdctl(control)/4350]: INFO: Killed ksmbd
+[ksmbdctl(start)/4408]: INFO: Started manager
+replay: PASS=0 FAIL=0 SKIP=0 (SMOKE_FAILED)
+[ksmbdctl(control)/4433]: INFO: Terminated mountd
+[ksmbdctl(control)/4433]: INFO: Killed ksmbd
+[ksmbdctl(start)/4500]: INFO: Started manager
+dirlease: PASS=0 FAIL=0 SKIP=0 (SMOKE_FAILED)
+[ksmbdctl(control)/4527]: INFO: Terminated mountd
+[ksmbdctl(control)/4527]: INFO: Killed ksmbd
+[ksmbdctl(start)/4583]: INFO: Started manager
+notify: PASS=0 FAIL=0 SKIP=0 (SMOKE_FAILED)

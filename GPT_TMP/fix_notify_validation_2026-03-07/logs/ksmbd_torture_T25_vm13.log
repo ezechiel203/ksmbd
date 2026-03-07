@@ -1,0 +1,46 @@
+  [INFO] Discovered 806 tests from 68 category files
+  [INFO] Checking VM custom reachability (127.0.0.1:23022)...
+  [INFO] VM custom is reachable (SSH + SMB)
+  [INFO] Testing SMB connectivity to //127.0.0.1/test:23445...
+  [INFO] SMB connectivity verified
+  [INFO] Filtered to 14 tests
+
+  ================================================================
+  ksmbd-torture -- Integration Test Suite
+  ================================================================
+  VM: custom (127.0.0.1:23445)
+  Tests: 14
+
+  === T25 ===
+  PASS   T25.01     FSCTL_SRV_ENUMERATE_SNAPSHOTS                      (2179ms)
+  PASS   T25.02     FSCTL_IS_PATHNAME_VALID - server accepts valid pat (1245ms)
+  PASS   T25.03     FSCTL_IS_VOLUME_DIRTY - returns NOT_SUPPORTED or c (4870ms)
+  PASS   T25.04     FSCTL_LOCK_VOLUME - returns NOT_SUPPORTED on ksmbd (3864ms)
+  PASS   T25.05     FSCTL_UNLOCK_VOLUME - returns NOT_SUPPORTED on ksm (1521ms)
+  PASS   T25.06     FSCTL_CREATE_OR_GET_OBJECT_ID                      (4568ms)
+  PASS   T25.07     FSCTL_GET_OBJECT_ID                                (1646ms)
+  PASS   T25.08     FSCTL_SET_OBJECT_ID - returns NOT_SUPPORTED (read- (1410ms)
+  PASS   T25.09     FSCTL_DELETE_OBJECT_ID - returns NOT_SUPPORTED     (818ms)
+  PASS   T25.10     FSCTL_SRV_READ_HASH (BranchCache) - returns NOT_SU (1426ms)
+  PASS   T25.11     FSCTL_OFFLOAD_READ - ODX offload read              (2082ms)
+  PASS   T25.12     FSCTL_OFFLOAD_WRITE - ODX offload write            (4445ms)
+  PASS   T25.13     FSCTL_MARK_HANDLE - returns NOT_SUPPORTED or succe (1096ms)
+  PASS   T25.14     FSCTL_QUERY_ON_DISK_VOLUME_INFO returns NOT_SUPPOR (1454ms)
+
+  --- T25 --- pass=14 fail=0 (38629ms) health=OK
+
+  ================================================================
+  RESULTS
+  ================================================================
+
+  CATEGORY     PASS   FAIL   SKIP  CRASH   TIME(ms)   HEALTH
+  --------     ----   ----   ----  -----   --------   ------
+  T25            14      0      0      0      38629       OK
+
+  TOTAL          14      0      0      0      38933
+
+  Duration: 38.933s
+
+  ALL TESTS PASSED
+
+  [INFO] JSON results written to: GPT_TMP/fix_notify_validation_2026-03-07/logs/ksmbd_torture_T25_vm13.json

@@ -1,0 +1,124 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772586050
+time: 2026-03-04 01:00:50.272700
+progress: 14
+test: CREATOR
+time: 2026-03-04 01:00:50.275167
+time: 2026-03-04 01:00:51.176110
+error: CREATOR [
+Unable to mkdir when setting up smb2-testsd - NT_STATUS_OBJECT_NAME_COLLISION
+]
+test: GENERIC
+time: 2026-03-04 01:00:51.176170
+time: 2026-03-04 01:00:51.523710
+error: GENERIC [
+Unable to mkdir when setting up smb2-testsd - NT_STATUS_OBJECT_NAME_COLLISION
+]
+test: OWNER
+time: 2026-03-04 01:00:51.523798
+time: 2026-03-04 01:00:51.711564
+error: OWNER [
+Unable to mkdir when setting up smb2-testsd - NT_STATUS_OBJECT_NAME_COLLISION
+]
+test: INHERITANCE
+time: 2026-03-04 01:00:51.711621
+time: 2026-03-04 01:00:53.294412
+error: INHERITANCE [
+Unable to mkdir when setting up smb2-testsd - NT_STATUS_OBJECT_NAME_COLLISION
+]
+test: INHERITFLAGS
+time: 2026-03-04 01:00:53.294468
+i=0:
+i=1:AUTO_INHERITED, 
+i=2:AUTO_INHERIT_REQ, 
+i=3:AUTO_INHERITED, AUTO_INHERIT_REQ,   ... parent is AUTO INHERITED
+i=4:PROTECTED, 
+i=5:AUTO_INHERITED, PROTECTED, 
+i=6:AUTO_INHERIT_REQ, PROTECTED, 
+i=7:AUTO_INHERITED, AUTO_INHERIT_REQ, PROTECTED,   ... parent is AUTO INHERITED
+i=8:INHERITED,   ... parent ACE is INHERITED
+i=9:AUTO_INHERITED, INHERITED,   ... parent ACE is INHERITED
+i=10:AUTO_INHERIT_REQ, INHERITED,   ... parent ACE is INHERITED
+i=11:AUTO_INHERITED, AUTO_INHERIT_REQ, INHERITED,   ... parent is AUTO INHERITED  ... parent ACE is INHERITED
+i=12:PROTECTED, INHERITED,   ... parent ACE is INHERITED
+i=13:AUTO_INHERITED, PROTECTED, INHERITED,   ... parent ACE is INHERITED
+i=14:AUTO_INHERIT_REQ, PROTECTED, INHERITED,   ... parent ACE is INHERITED
+time: 2026-03-04 01:00:55.957553
+error: INHERITFLAGS [
+Unable to mkdir when setting up smb2-testsd - NT_STATUS_OBJECT_NAME_COLLISION
+]
+test: SDFLAGSVSCHOWN
+time: 2026-03-04 01:00:55.957612
+i=0:
+i=1:AUTO_INHERITED, 
+i=2:AUTO_INHERIT_REQ, 
+i=3:AUTO_INHERITED, AUTO_INHERIT_REQ,   ... parent is AUTO INHERITED
+i=4:PROTECTED, 
+i=5:AUTO_INHERITED, PROTECTED, 
+i=6:AUTO_INHERIT_REQ, PROTECTED, 
+i=7:AUTO_INHERITED, AUTO_INHERIT_REQ, PROTECTED,   ... parent is AUTO INHERITED
+i=8:INHERITED,   ... parent ACE is INHERITED
+i=9:AUTO_INHERITED, INHERITED,   ... parent ACE is INHERITED
+i=10:AUTO_INHERIT_REQ, INHERITED,   ... parent ACE is INHERITED
+i=11:AUTO_INHERITED, AUTO_INHERIT_REQ, INHERITED,   ... parent is AUTO INHERITED  ... parent ACE is INHERITED
+i=12:PROTECTED, INHERITED,   ... parent ACE is INHERITED
+i=13:AUTO_INHERITED, PROTECTED, INHERITED,   ... parent ACE is INHERITED
+i=14:AUTO_INHERIT_REQ, PROTECTED, INHERITED,   ... parent ACE is INHERITED
+time: 2026-03-04 01:00:56.332959
+error: SDFLAGSVSCHOWN [
+Unable to mkdir when setting up smb2-testsd - NT_STATUS_OBJECT_NAME_COLLISION
+]
+test: DYNAMIC
+time: 2026-03-04 01:00:56.333012
+TESTING DYNAMIC ACL INHERITANCE
+time: 2026-03-04 01:01:00.102445
+error: DYNAMIC [
+Unable to mkdir when setting up smb2-testsd - NT_STATUS_OBJECT_NAME_COLLISION
+]
+test: ACCESSBASED
+time: 2026-03-04 01:01:00.102506
+Bad SMB2 (sign_algo_id=2) signature for message
+[0000] 30 5A 96 BB 45 0B 59 DF   DD AD 3E 16 2C 52 77 FA   0Z..E.Y. ..>.,Rw.
+[0000] 57 81 53 1C 86 9D B3 6B   6E F4 0B 0E EF 27 5A 0F   W.S....k n....'Z.
+Failed to connect to SMB2 share \\127.0.0.1\hideunread - NT_STATUS_ACCESS_DENIED
+time: 2026-03-04 01:01:00.216840
+failure: ACCESSBASED [
+(../../source4/torture/smb2/acls.c:2188) Unable to connect to share 'hideunread'
+]
+test: OWNER-RIGHTS
+time: 2026-03-04 01:01:00.216894
+time: 2026-03-04 01:01:00.851919
+error: OWNER-RIGHTS [
+Unable to mkdir when setting up smb2-testsd - NT_STATUS_OBJECT_NAME_COLLISION
+]
+test: OWNER-RIGHTS-DENY
+time: 2026-03-04 01:01:00.851980
+time: 2026-03-04 01:01:01.455774
+error: OWNER-RIGHTS-DENY [
+Unable to mkdir when setting up smb2-testsd - NT_STATUS_OBJECT_NAME_COLLISION
+]
+test: OWNER-RIGHTS-DENY1
+time: 2026-03-04 01:01:01.455843
+time: 2026-03-04 01:01:01.984033
+error: OWNER-RIGHTS-DENY1 [
+Unable to mkdir when setting up smb2-testsd - NT_STATUS_OBJECT_NAME_COLLISION
+]
+test: DENY1
+time: 2026-03-04 01:01:01.984093
+time: 2026-03-04 01:01:03.555142
+error: DENY1 [
+Unable to mkdir when setting up smb2-testsd - NT_STATUS_OBJECT_NAME_COLLISION
+]
+test: MXAC-NOT-GRANTED
+time: 2026-03-04 01:01:03.555206
+time: 2026-03-04 01:01:05.864179
+error: MXAC-NOT-GRANTED [
+Unable to mkdir when setting up smb2-testsd - NT_STATUS_OBJECT_NAME_COLLISION
+]
+test: OVERWRITE_READ_ONLY_FILE
+time: 2026-03-04 01:01:05.864236
+time: 2026-03-04 01:01:07.676836
+error: OVERWRITE_READ_ONLY_FILE [
+Unable to mkdir when setting up smb2-testsd - NT_STATUS_OBJECT_NAME_COLLISION
+]

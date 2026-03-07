@@ -1,0 +1,142 @@
+smbtorture 4.23.5
+Using seed 1772883245
+time: 2026-03-07 11:34:05.447022
+progress: 23
+test: valid-req
+time: 2026-03-07 11:34:05.447660
+time: 2026-03-07 11:34:05.457895
+failure: valid-req [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: tcon
+time: 2026-03-07 11:34:05.458015
+time: 2026-03-07 11:34:05.459773
+failure: tcon [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: dir
+time: 2026-03-07 11:34:05.459913
+time: 2026-03-07 11:34:05.462371
+failure: dir [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: mask
+time: 2026-03-07 11:34:05.462454
+time: 2026-03-07 11:34:05.464608
+failure: mask [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: tdis
+time: 2026-03-07 11:34:05.464706
+time: 2026-03-07 11:34:05.467222
+failure: tdis [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: tdis1
+time: 2026-03-07 11:34:05.467839
+time: 2026-03-07 11:34:05.469692
+failure: tdis1 [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: mask-change
+time: 2026-03-07 11:34:05.469901
+time: 2026-03-07 11:34:05.472882
+failure: mask-change [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: close
+time: 2026-03-07 11:34:05.472968
+time: 2026-03-07 11:34:05.474479
+failure: close [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: logoff
+time: 2026-03-07 11:34:05.474889
+time: 2026-03-07 11:34:05.480093
+failure: logoff [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: session-reconnect
+time: 2026-03-07 11:34:05.480840
+time: 2026-03-07 11:34:05.482884
+failure: session-reconnect [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: invalid-reauth
+time: 2026-03-07 11:34:05.482917
+time: 2026-03-07 11:34:05.484424
+failure: invalid-reauth [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: tree
+time: 2026-03-07 11:34:05.484870
+time: 2026-03-07 11:34:05.486440
+failure: tree [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: basedir
+time: 2026-03-07 11:34:05.486593
+time: 2026-03-07 11:34:05.489636
+failure: basedir [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: double
+time: 2026-03-07 11:34:05.489672
+time: 2026-03-07 11:34:05.492668
+failure: double [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: file
+time: 2026-03-07 11:34:05.492744
+time: 2026-03-07 11:34:05.495529
+failure: file [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: tcp
+time: 2026-03-07 11:34:05.495807
+time: 2026-03-07 11:34:05.498776
+failure: tcp [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: rec
+time: 2026-03-07 11:34:05.499100
+time: 2026-03-07 11:34:05.501964
+failure: rec [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: overflow
+time: 2026-03-07 11:34:05.502256
+time: 2026-03-07 11:34:05.505235
+failure: overflow [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: rmdir1
+time: 2026-03-07 11:34:05.505388
+time: 2026-03-07 11:34:05.508519
+failure: rmdir1 [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: rmdir2
+time: 2026-03-07 11:34:05.508806
+time: 2026-03-07 11:34:05.511794
+failure: rmdir2 [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: rmdir3
+time: 2026-03-07 11:34:05.512009
+time: 2026-03-07 11:34:05.515018
+failure: rmdir3 [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: rmdir4
+time: 2026-03-07 11:34:05.515291
+time: 2026-03-07 11:34:05.518416
+failure: rmdir4 [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: handle-permissions
+time: 2026-03-07 11:34:05.518524
+time: 2026-03-07 11:34:05.520634
+failure: handle-permissions [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]

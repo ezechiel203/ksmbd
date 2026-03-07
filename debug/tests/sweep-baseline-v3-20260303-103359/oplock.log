@@ -1,0 +1,299 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772530763
+time: 2026-03-03 09:39:23.944910
+progress: 42
+test: exclusive1
+time: 2026-03-03 09:39:23.945869
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:23.950867
+failure: exclusive1 [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: exclusive2
+time: 2026-03-03 09:39:23.950914
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:23.952378
+failure: exclusive2 [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: exclusive3
+time: 2026-03-03 09:39:23.952420
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:23.953775
+failure: exclusive3 [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: exclusive4
+time: 2026-03-03 09:39:23.953815
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:23.955221
+failure: exclusive4 [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: exclusive5
+time: 2026-03-03 09:39:23.955262
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:23.957101
+failure: exclusive5 [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: exclusive6
+time: 2026-03-03 09:39:23.957144
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:23.960269
+failure: exclusive6 [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: exclusive9
+time: 2026-03-03 09:39:23.960316
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:23.962568
+failure: exclusive9 [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: batch1
+time: 2026-03-03 09:39:23.962611
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:23.965152
+failure: batch1 [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: batch2
+time: 2026-03-03 09:39:23.965199
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:23.967505
+failure: batch2 [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: batch3
+time: 2026-03-03 09:39:23.967548
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:23.969837
+failure: batch3 [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: batch4
+time: 2026-03-03 09:39:23.969879
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:23.971710
+failure: batch4 [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: batch5
+time: 2026-03-03 09:39:23.971784
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:23.973538
+failure: batch5 [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: batch6
+time: 2026-03-03 09:39:23.973583
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:23.975366
+failure: batch6 [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: batch7
+time: 2026-03-03 09:39:23.975409
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:23.977709
+failure: batch7 [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: batch8
+time: 2026-03-03 09:39:23.977804
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:23.981734
+failure: batch8 [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: batch9
+time: 2026-03-03 09:39:23.981846
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:23.985368
+failure: batch9 [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: batch9a
+time: 2026-03-03 09:39:23.985435
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:23.989320
+failure: batch9a [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: batch10
+time: 2026-03-03 09:39:23.989366
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:23.993624
+failure: batch10 [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: batch11
+time: 2026-03-03 09:39:23.993670
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:23.997162
+failure: batch11 [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: batch12
+time: 2026-03-03 09:39:23.997207
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:24.000692
+failure: batch12 [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: batch13
+time: 2026-03-03 09:39:24.000789
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:24.004373
+failure: batch13 [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: batch14
+time: 2026-03-03 09:39:24.004879
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:24.008591
+failure: batch14 [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: batch15
+time: 2026-03-03 09:39:24.008639
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:24.012495
+failure: batch15 [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: batch16
+time: 2026-03-03 09:39:24.012543
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:24.016623
+failure: batch16 [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: batch19
+time: 2026-03-03 09:39:24.016670
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:24.018602
+failure: batch19 [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: batch20
+time: 2026-03-03 09:39:24.018643
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:24.020997
+failure: batch20 [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: batch21
+time: 2026-03-03 09:39:24.021041
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:24.022984
+failure: batch21 [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: batch22a
+time: 2026-03-03 09:39:24.023026
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:24.024497
+failure: batch22a [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: batch22b
+time: 2026-03-03 09:39:24.024539
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:24.026866
+failure: batch22b [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: batch23
+time: 2026-03-03 09:39:24.026912
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:24.029079
+failure: batch23 [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: batch24
+time: 2026-03-03 09:39:24.029131
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:24.031517
+failure: batch24 [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: batch25
+time: 2026-03-03 09:39:24.031562
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:24.033509
+failure: batch25 [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: batch26
+time: 2026-03-03 09:39:24.033556
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:24.036031
+failure: batch26 [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: stream1
+time: 2026-03-03 09:39:24.036078
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:24.037984
+failure: stream1 [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: doc
+time: 2026-03-03 09:39:24.038025
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:24.040593
+failure: doc [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: brl1
+time: 2026-03-03 09:39:24.040638
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:24.042359
+failure: brl1 [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: brl2
+time: 2026-03-03 09:39:24.042402
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:24.045121
+failure: brl2 [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: brl3
+time: 2026-03-03 09:39:24.045169
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:24.047287
+failure: brl3 [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: levelii500
+time: 2026-03-03 09:39:24.047331
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:24.049133
+failure: levelii500 [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: levelii501
+time: 2026-03-03 09:39:24.049175
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:24.051511
+failure: levelii501 [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: levelii502
+time: 2026-03-03 09:39:24.051558
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:24.053632
+failure: levelii502 [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: statopen1
+time: 2026-03-03 09:39:24.053677
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:24.055230
+failure: statopen1 [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]

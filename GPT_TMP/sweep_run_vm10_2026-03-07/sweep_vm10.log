@@ -1,0 +1,44 @@
+=== SMB2 Sweep: Sat Mar  7 12:26:52 CET 2026 ===
+SSH=20022  SMB=20445
+Output: /tmp/sweep-20260307-122652
+Reset mode: full guest factory reset before every suite
+
+Restarting ksmbd...
+  smb2.compound ... P=0 F=0 S=0 E=0
+  smb2.compound_async ... P=0 F=0 S=0 E=0
+  smb2.compound_find ... P=0 F=0 S=0 E=0
+  smb2.connect ... P=0 F=0 S=0 E=0
+  smb2.create ... P=0 F=0 S=0 E=0
+  smb2.credits ... P=0 F=0 S=0 E=0
+  smb2.delete-on-close-perms ... P=0 F=0 S=0 E=0
+  smb2.dir ... P=0 F=0 S=0 E=0
+  smb2.dirlease ... P=0 F=0 S=0 E=0
+  smb2.dosmode ... P=0 F=0 S=0 E=0
+  smb2.durable-open ... P=0 F=0 S=0 E=0
+  smb2.durable-v2-open ... P=0 F=0 S=0 E=0
+  smb2.getinfo ... P=0 F=0 S=0 E=0
+  smb2.ioctl ... P=0 F=0 S=0 E=0
+  smb2.lease ... P=0 F=0 S=0 E=0
+  smb2.lock ... P=0 F=0 S=0 E=0
+  smb2.maxfid ... P=0 F=0 S=0 E=0
+  smb2.maximum_allowed ... P=0 F=0 S=0 E=0
+  smb2.mkdir ... P=0 F=0 S=0 E=0
+  smb2.mux ... P=0 F=0 S=0 E=0
+  smb2.notify ... P=0 F=0 S=0 E=0
+  smb2.openattr ... P=0 F=0 S=0 E=0
+  smb2.oplock ... P=0 F=0 S=0 E=0
+  smb2.read ... P=0 F=0 S=0 E=0
+  smb2.rename ... P=0 F=0 S=0 E=0
+  smb2.replay ... P=0 F=0 S=0 E=0
+  smb2.rw ... P=0 F=0 S=0 E=0
+  smb2.secleak ... P=0 F=0 S=0 E=0
+  smb2.session ... P=0 F=0 S=0 E=0
+  smb2.setinfo ... P=0 F=0 S=0 E=0
+  smb2.streams ... P=0 F=0 S=0 E=0
+  smb2.zero-data-ioctl ... P=0 F=0 S=0 E=0
+
+=== TOTALS ===
+PASS=0  FAIL=0  SKIP=0  ERROR=0
+Total tests: 0
+
+Results saved to: /tmp/sweep-20260307-122652

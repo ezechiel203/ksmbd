@@ -1,0 +1,19 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772587070
+time: 2026-03-04 01:17:50.193334
+progress: 4
+test: fileid
+time: 2026-03-04 01:17:50.193918
+time: 2026-03-04 01:17:51.553616
+success: fileid
+test: fileid-dir
+time: 2026-03-04 01:17:51.553669
+time: 2026-03-04 01:17:53.026721
+success: fileid-dir
+test: unique
+time: 2026-03-04 01:17:53.026775
+time: 2026-03-04 01:18:10.909504
+success: unique
+test: unique-dir
+time: 2026-03-04 01:18:10.909563

@@ -1,0 +1,27 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772541012
+time: 2026-03-03 12:30:12.394355
+progress: 4
+test: rw1
+time: 2026-03-03 12:30:12.395244
+Checking data integrity over 10 ops
+0time: 2026-03-03 12:30:12.461598
+success: rw1
+test: rw2
+time: 2026-03-03 12:30:12.461766
+Checking data integrity over 10 ops
+0time: 2026-03-03 12:30:12.511809
+success: rw2
+test: invalid
+time: 2026-03-03 12:30:12.511943
+time: 2026-03-03 12:30:12.549141
+success: invalid
+test: append
+time: 2026-03-03 12:30:12.549206
+Create file with 1 byte
+Open file with SEC_FILE_APPEND_DATA|SEC_STD_SYNCHRONIZE
+Write one byte at offset 0 and verify written data was not appended but written at requested offset
+Open file in write-data only mode and check if we can append
+time: 2026-03-03 12:30:12.559458
+success: append

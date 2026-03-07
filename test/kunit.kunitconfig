@@ -1,0 +1,70 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+#
+# KUnit configuration for ksmbd KUnit tests.
+#
+# This file is consumed by kunit.py when invoked as:
+#
+#   ./tools/testing/kunit/kunit.py run \
+#       --kunitconfig=fs/ksmbd/test/kunit.kunitconfig \
+#       --arch=um
+#
+# The kunit.py tool builds a UML (User Mode Linux) kernel containing only
+# the symbols enabled here, then runs the KUnit test suites inside it.
+# No hardware or root privileges are required.
+#
+# Minimum kernel version: 6.1 (required for CONFIG_KSMBD_KUNIT_TEST symbol).
+# Recommended version: 6.6+ (MD4 removed from crypto in 6.6; ksmbd ships its
+# own fallback ksmbd_md4.c unconditionally, so MD4 tests still pass).
+
+# ---- KUnit framework ----
+CONFIG_KUNIT=y
+
+# ---- ksmbd and all optional features ----
+# SMB_SERVER depends on INET, MULTIUSER, FILE_LOCKING (all satisfied by UML).
+CONFIG_SMB_SERVER=y
+CONFIG_SMB_INSECURE_SERVER=y
+# SMB_SERVER_SMBDIRECT requires InfiniBand; skip in UML CI.
+# CONFIG_SMB_SERVER_SMBDIRECT is not set
+CONFIG_SMB_SERVER_QUIC=y
+CONFIG_KSMBD_FRUIT=y
+
+# ---- ksmbd KUnit test suite ----
+CONFIG_KSMBD_KUNIT_TEST=y
+
+# ---- Crypto algorithms used by ksmbd ----
+# Selected automatically by SMB_SERVER but listed here explicitly so that
+# kunit.py merges them cleanly with the rest of the UML defconfig.
+CONFIG_CRYPTO=y
+CONFIG_CRYPTO_MD4=y
+CONFIG_CRYPTO_MD5=y
+CONFIG_CRYPTO_HMAC=y
+CONFIG_CRYPTO_ECB=y
+CONFIG_CRYPTO_LIB_DES=y
+CONFIG_CRYPTO_DES=y
+CONFIG_CRYPTO_AES=y
+CONFIG_CRYPTO_CCM=y
+CONFIG_CRYPTO_GCM=y
+CONFIG_CRYPTO_SHA256=y
+CONFIG_CRYPTO_SHA512=y
+CONFIG_CRYPTO_CMAC=y
+CONFIG_CRYPTO_LZ4=y
+
+# ---- ASN.1 / OID support (selected by SMB_SERVER) ----
+CONFIG_ASN1=y
+CONFIG_OID_REGISTRY=y
+
+# ---- NLS (National Language Support) ----
+CONFIG_NLS=y
+CONFIG_NLS_UTF8=y
+
+# ---- Networking (required by SMB_SERVER and SMB_SERVER_QUIC) ----
+CONFIG_NET=y
+CONFIG_INET=y
+CONFIG_NETWORK_FILESYSTEMS=y
+
+# ---- VFS requirements ----
+CONFIG_MULTIUSER=y
+CONFIG_FILE_LOCKING=y
+
+# ---- CRC32 (selected by SMB_SERVER) ----
+CONFIG_CRC32=y

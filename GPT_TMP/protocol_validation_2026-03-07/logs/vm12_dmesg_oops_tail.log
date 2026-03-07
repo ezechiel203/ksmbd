@@ -1,0 +1,120 @@
+[246226.436729] ksmbd: Not permitted to read : 0x2
+[246226.447402] ksmbd: Not permitted to write : 0x1
+[246226.449500] ksmbd: Not permitted to read : 0x2
+[246226.457256] ksmbd: Not permitted to write : 0x1
+[246226.459462] ksmbd: Not permitted to read : 0x2
+[246226.467856] ksmbd: Not permitted to write : 0x1
+[246226.470013] ksmbd: Not permitted to read : 0x2
+[246226.477245] ksmbd: Not permitted to write : 0x1
+[246226.479336] ksmbd: Not permitted to read : 0x2
+[246226.483021] ksmbd: Not permitted to write : 0x1
+[246226.485109] ksmbd: Not permitted to read : 0x2
+[246226.527989] ksmbd: Not permitted to write : 0x1
+[246226.533372] ksmbd: Not permitted to write : 0x1
+[246226.539393] ksmbd: Not permitted to write : 0x1
+[246226.547407] ksmbd: Not permitted to write : 0x1
+[246226.551044] ksmbd: Not permitted to write : 0x1
+[246226.561187] ksmbd: Not permitted to read : 0x2
+[246226.566599] ksmbd: Not permitted to read : 0x2
+[246226.575492] ksmbd: Not permitted to read : 0x2
+[246226.583334] ksmbd: Not permitted to read : 0x2
+[246226.587274] ksmbd: Not permitted to read : 0x2
+[246226.597388] ksmbd: Not permitted to write : 0x1
+[246226.599456] ksmbd: Not permitted to read : 0x2
+[246226.605193] ksmbd: Not permitted to write : 0x1
+[246226.607208] ksmbd: Not permitted to read : 0x2
+[246226.613086] ksmbd: Not permitted to write : 0x1
+[246226.615215] ksmbd: Not permitted to read : 0x2
+[246226.623059] ksmbd: Not permitted to write : 0x1
+[246226.624989] ksmbd: Not permitted to read : 0x2
+[246226.628385] ksmbd: Not permitted to write : 0x1
+[246226.630774] ksmbd: Not permitted to read : 0x2
+[246226.668968] ksmbd: Not permitted to write : 0x1
+[246226.676264] ksmbd: Not permitted to write : 0x1
+[246226.682407] ksmbd: Not permitted to write : 0x1
+[246226.691759] ksmbd: Not permitted to write : 0x1
+[246226.696168] ksmbd: Not permitted to write : 0x1
+[246226.710880] ksmbd: Not permitted to read : 0x2
+[246226.718938] ksmbd: Not permitted to read : 0x2
+[246226.728308] ksmbd: Not permitted to read : 0x2
+[246227.120462] ksmbd: Not permitted to read : 0x2
+[246227.128159] ksmbd: Not permitted to read : 0x2
+[246227.155127] ksmbd: Not permitted to write : 0x1
+[246227.157512] ksmbd: Not permitted to read : 0x2
+[246227.171504] ksmbd: Not permitted to write : 0x1
+[246227.173779] ksmbd: Not permitted to read : 0x2
+[246227.186438] ksmbd: Not permitted to write : 0x1
+[246227.192303] ksmbd: Not permitted to read : 0x2
+[246227.212379] ksmbd: Not permitted to write : 0x1
+[246227.215065] ksmbd: Not permitted to read : 0x2
+[246227.221620] ksmbd: Not permitted to write : 0x1
+[246227.225581] ksmbd: Not permitted to read : 0x2
+[246229.239990] ksmbd: not allow rw access by exclusive lock from other opens
+[246229.261595] ksmbd: not allow rw access by exclusive lock from other opens
+[246230.377128] ksmbd: not allow rw access by exclusive lock from other opens
+[246230.380110] ksmbd: unable to write due to lock
+[246230.399955] ksmbd: not allow rw access by exclusive lock from other opens
+[246230.401837] ksmbd: unable to write due to lock
+[246233.945364] BUG: kernel NULL pointer dereference, address: 0000000000000050
+[246233.946859] #PF: supervisor read access in kernel mode
+[246233.947912] #PF: error_code(0x0000) - not-present page
+[246233.948971] PGD 0 P4D 0 
+[246233.949923] Oops: Oops: 0000 [#1] SMP PTI
+[246233.950975] CPU: 1 UID: 0 PID: 4164 Comm: kworker/1:2 Tainted: G           OE       6.18.13-arch1-1 #1 PREEMPT(full)  37d84e5c59d38b1e3c61214631c6e0356ae9b977
+[246233.954693] Tainted: [O]=OOT_MODULE, [E]=UNSIGNED_MODULE
+[246233.955854] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Arch Linux 1.17.0-2-2 04/01/2014
+[246233.958947] Workqueue: ksmbd-io handle_ksmbd_work [ksmbd]
+[246233.960625] RIP: 0010:mutex_is_locked+0xe/0x30
+[246233.962554] Code: 47 0c 00 00 00 00 c3 cc cc cc cc 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 f3 0f 1e fa 0f 1f 44 00 00 48 85 ff 74 11 <48> 8b 07 48 a9 f8 ff ff ff 0f 95 c0 c3 cc cc cc cc 31 c0 c3 cc cc
+[246233.968654] RSP: 0018:ffffd31c44a6fc28 EFLAGS: 00010206
+[246233.969762] RAX: 0000000000000000 RBX: ffff8b8b9072cc40 RCX: 0000000000000001
+[246233.976002] RDX: 0000000004248160 RSI: ffff8b8b8461f400 RDI: 0000000000000050
+[246233.978228] RBP: ffff8b8b9072cc40 R08: ffff8b8b88bbd948 R09: ffff8b8b917ee1c0
+[246233.979825] R10: ffffd31c44a6fca0 R11: ffffd31c44a6fc98 R12: ffff8b8b8461f400
+[246233.981737] R13: ffff8b8b9072cc00 R14: 0000000000000000 R15: 000000010ea8a652
+[246233.983720] FS:  0000000000000000(0000) GS:ffff8b8c4ddee000(0000) knlGS:0000000000000000
+[246233.991546] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[246233.993849] CR2: 0000000000000050 CR3: 00000000116c0002 CR4: 0000000000372ef0
+[246233.996811] Call Trace:
+[246233.998479]  <TASK>
+[246233.998957]  fsnotify_detach_mark+0x1f/0xb0
+[246234.004596]  fsnotify_destroy_mark+0x48/0x70
+[246234.006637]  ksmbd_notify_cleanup_file+0x11b/0x2d0 [ksmbd be086af04a557cb8a122d15447587ad942003fd8]
+[246234.009548]  ksmbd_close_fd+0xd5/0x110 [ksmbd be086af04a557cb8a122d15447587ad942003fd8]
+[246234.012745]  smb2_close+0x1c3/0x400 [ksmbd be086af04a557cb8a122d15447587ad942003fd8]
+[246234.016617]  ? xas_load+0xd/0xd0
+[246234.021225]  ? xa_load+0x76/0xb0
+[246234.021961]  ? xas_load+0xd/0xd0
+[246234.022738]  ? xa_load+0x76/0xb0
+[246234.024505]  ? _raw_spin_unlock+0xe/0x30
+[246234.026461]  ? ksmbd_smb2_check_message+0x747/0x7d0 [ksmbd be086af04a557cb8a122d15447587ad942003fd8]
+[246234.028617]  ? ksmbd_tree_conn_lookup+0x47/0x80 [ksmbd be086af04a557cb8a122d15447587ad942003fd8]
+[246234.030553]  handle_ksmbd_work+0x46c/0x9b0 [ksmbd be086af04a557cb8a122d15447587ad942003fd8]
+[246234.032407]  process_one_work+0x193/0x350
+[246234.036493]  worker_thread+0x2d7/0x410
+[246234.037360]  ? __pfx_worker_thread+0x10/0x10
+[246234.038264]  kthread+0xfc/0x240
+[246234.038960]  ? __pfx_kthread+0x10/0x10
+[246234.039857]  ? __pfx_kthread+0x10/0x10
+[246234.041707]  ret_from_fork+0x1c2/0x1f0
+[246234.042749]  ? __pfx_kthread+0x10/0x10
+[246234.043748]  ret_from_fork_asm+0x1a/0x30
+[246234.046126]  </TASK>
+[246234.046607] Modules linked in: ccm cmac ksmbd(OE) lz4 tcp_diag inet_diag rdma_ucm rdma_cm iw_cm ib_cm ib_umad ib_uverbs ib_core hkdf crypto_user nls_utf8 md4 lz4_compress libdes intel_rapl_msr intel_rapl_common intel_uncore_frequency_common intel_pmc_core pmt_telemetry pmt_discovery pmt_class intel_pmc_ssram_telemetry intel_vsec kvm_intel kvm irqbypass polyval_clmulni ghash_clmulni_intel aesni_intel ppdev rapl joydev mousedev parport_pc pcspkr psmouse i2c_piix4 parport i2c_smbus mac_hid cfg80211 rfkill nfnetlink vsock_loopback vmw_vsock_virtio_transport_common vmw_vsock_vmci_transport vsock vmw_vmci qemu_fw_cfg sr_mod cdrom ata_generic pata_acpi bochs ata_piix intel_agp floppy intel_gtt serio_raw 9p 9pnet_virtio 9pnet netfs virtio_net net_failover failover
+[246234.046675] Unloaded tainted modules: ksmbd(OE):19 [last unloaded: ksmbd(OE)]
+[246234.070929] CR2: 0000000000000050
+[246234.071755] ---[ end trace 0000000000000000 ]---
+[246234.072796] RIP: 0010:mutex_is_locked+0xe/0x30
+[246234.077205] Code: 47 0c 00 00 00 00 c3 cc cc cc cc 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 f3 0f 1e fa 0f 1f 44 00 00 48 85 ff 74 11 <48> 8b 07 48 a9 f8 ff ff ff 0f 95 c0 c3 cc cc cc cc 31 c0 c3 cc cc
+[246234.085205] RSP: 0018:ffffd31c44a6fc28 EFLAGS: 00010206
+[246234.086906] RAX: 0000000000000000 RBX: ffff8b8b9072cc40 RCX: 0000000000000001
+[246234.090351] RDX: 0000000004248160 RSI: ffff8b8b8461f400 RDI: 0000000000000050
+[246234.091884] RBP: ffff8b8b9072cc40 R08: ffff8b8b88bbd948 R09: ffff8b8b917ee1c0
+[246234.093479] R10: ffffd31c44a6fca0 R11: ffffd31c44a6fc98 R12: ffff8b8b8461f400
+[246234.094994] R13: ffff8b8b9072cc00 R14: 0000000000000000 R15: 000000010ea8a652
+[246234.096967] FS:  0000000000000000(0000) GS:ffff8b8c4ddee000(0000) knlGS:0000000000000000
+[246234.100686] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[246234.102928] CR2: 0000000000000050 CR3: 00000000116c0002 CR4: 0000000000372ef0
+[246234.106236] note: kworker/1:2[4164] exited with irqs disabled
+[246410.774216] ksmbd: Not permitted to write : 0x1
+[246410.838149] ksmbd: Outstanding credits underflow: charge 1, outstanding 0

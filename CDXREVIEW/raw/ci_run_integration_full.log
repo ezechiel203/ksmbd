@@ -1,0 +1,6 @@
+[0;32m[INFO][0m  ksmbd Integration Test Runner
+[0;32m[INFO][0m  ==============================
+[0;32m[INFO][0m  Checking prerequisites...
+[0;31m[ERROR][0m This script must be run as root
+[0;32m[INFO][0m  Cleaning up...
+[0;32m[INFO][0m  Cleanup complete.

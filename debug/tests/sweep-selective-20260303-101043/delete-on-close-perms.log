@@ -1,0 +1,109 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772529421
+time: 2026-03-03 09:17:01.620132
+progress: 9
+test: OVERWRITE_IF
+time: 2026-03-03 09:17:01.621954
+Opening Directory for setting new SD: test_dir
+Creating Directory for testing: test_dir
+WARNING!: (../../source4/torture/smb2/delete-on-close.c:151) Incorrect status NT_STATUS_OBJECT_NAME_NOT_FOUND - should be NT_STATUS_OK
+
+Create file with DeleteOnClose on non-existent file (OVERWRITE_IF)
+We expect NT_STATUS_OK
+WARNING!: (../../source4/torture/smb2/delete-on-close.c:73) Incorrect status NT_STATUS_OBJECT_NAME_NOT_FOUND - should be NT_STATUS_OK
+
+time: 2026-03-03 09:17:01.629482
+failure: OVERWRITE_IF [
+(../../source4/torture/smb2/delete-on-close.c:230) Incorrect status NT_STATUS_ACCESS_DENIED - should be NT_STATUS_OK
+]
+test: OVERWRITE_IF Existing
+time: 2026-03-03 09:17:01.629529
+Opening Directory for setting new SD: test_dir
+Creating Directory for testing: test_dir
+WARNING!: (../../source4/torture/smb2/delete-on-close.c:151) Incorrect status NT_STATUS_OBJECT_NAME_NOT_FOUND - should be NT_STATUS_OK
+
+Create file with DeleteOnClose on existing file (OVERWRITE_IF)
+We expect NT_STATUS_ACCESS_DENIED
+time: 2026-03-03 09:17:01.634491
+failure: OVERWRITE_IF Existing [
+(../../source4/torture/smb2/delete-on-close.c:73) Incorrect status NT_STATUS_OBJECT_NAME_NOT_FOUND - should be NT_STATUS_OK
+]
+test: CREATE
+time: 2026-03-03 09:17:01.634543
+Opening Directory for setting new SD: test_dir
+Creating Directory for testing: test_dir
+WARNING!: (../../source4/torture/smb2/delete-on-close.c:151) Incorrect status NT_STATUS_OBJECT_NAME_NOT_FOUND - should be NT_STATUS_OK
+
+Create file with DeleteOnClose on non-existent file (CREATE) 
+We expect NT_STATUS_OK
+WARNING!: (../../source4/torture/smb2/delete-on-close.c:73) Incorrect status NT_STATUS_OBJECT_NAME_NOT_FOUND - should be NT_STATUS_OK
+
+time: 2026-03-03 09:17:01.638092
+failure: CREATE [
+(../../source4/torture/smb2/delete-on-close.c:337) Incorrect status NT_STATUS_OBJECT_NAME_COLLISION - should be NT_STATUS_OK
+]
+test: CREATE Existing
+time: 2026-03-03 09:17:01.638136
+Opening Directory for setting new SD: test_dir
+Creating Directory for testing: test_dir
+WARNING!: (../../source4/torture/smb2/delete-on-close.c:151) Incorrect status NT_STATUS_OBJECT_NAME_NOT_FOUND - should be NT_STATUS_OK
+
+Create file with DeleteOnClose on non-existent file (CREATE) 
+We expect NT_STATUS_OBJECT_NAME_COLLISION
+WARNING!: (../../source4/torture/smb2/delete-on-close.c:73) Incorrect status NT_STATUS_OBJECT_NAME_NOT_FOUND - should be NT_STATUS_OK
+
+time: 2026-03-03 09:17:01.642136
+failure: CREATE Existing [
+(../../source4/torture/smb2/delete-on-close.c:390) Incorrect status NT_STATUS_OBJECT_NAME_COLLISION - should be NT_STATUS_OK
+]
+test: CREATE_IF
+time: 2026-03-03 09:17:01.642186
+Opening Directory for setting new SD: test_dir
+Creating Directory for testing: test_dir
+WARNING!: (../../source4/torture/smb2/delete-on-close.c:151) Incorrect status NT_STATUS_OBJECT_NAME_NOT_FOUND - should be NT_STATUS_OK
+
+Create file with DeleteOnClose on non-existent file (OPEN_IF)
+We expect NT_STATUS_OK
+WARNING!: (../../source4/torture/smb2/delete-on-close.c:73) Incorrect status NT_STATUS_OBJECT_NAME_NOT_FOUND - should be NT_STATUS_OK
+
+time: 2026-03-03 09:17:01.646206
+failure: CREATE_IF [
+(../../source4/torture/smb2/delete-on-close.c:444) Incorrect status NT_STATUS_ACCESS_DENIED - should be NT_STATUS_OK
+]
+test: CREATE_IF Existing
+time: 2026-03-03 09:17:01.646249
+Opening Directory for setting new SD: test_dir
+Creating Directory for testing: test_dir
+WARNING!: (../../source4/torture/smb2/delete-on-close.c:151) Incorrect status NT_STATUS_OBJECT_NAME_NOT_FOUND - should be NT_STATUS_OK
+
+Create file with DeleteOnClose on existing file (OPEN_IF)
+We expect NT_STATUS_ACCESS_DENIED
+time: 2026-03-03 09:17:01.650861
+failure: CREATE_IF Existing [
+(../../source4/torture/smb2/delete-on-close.c:73) Incorrect status NT_STATUS_OBJECT_NAME_NOT_FOUND - should be NT_STATUS_OK
+]
+test: FIND_and_set_DOC
+time: 2026-03-03 09:17:01.650936
+Opening Directory for setting new SD: test_dir
+FIND and delete directory
+We expect NT_STATUS_OK
+WARNING!: (../../source4/torture/smb2/delete-on-close.c:151) Incorrect status NT_STATUS_OBJECT_NAME_NOT_FOUND - should be NT_STATUS_OK
+
+time: 2026-03-03 09:17:01.655009
+failure: FIND_and_set_DOC [
+(../../source4/torture/smb2/delete-on-close.c:538) Incorrect status NT_STATUS_OBJECT_NAME_NOT_FOUND - should be NT_STATUS_OK
+]
+test: READONLY
+time: 2026-03-03 09:17:01.655063
+Opening Directory for setting new SD: test_dir
+WARNING!: (../../source4/torture/smb2/delete-on-close.c:151) Incorrect status NT_STATUS_OBJECT_NAME_NOT_FOUND - should be NT_STATUS_OK
+
+time: 2026-03-03 09:17:01.659550
+failure: READONLY [
+../../source4/torture/smb2/delete-on-close.c:589: status was NT_STATUS_OBJECT_NAME_NOT_FOUND, expected NT_STATUS_OK: CREATE directory failed
+]
+test: BUG14427
+time: 2026-03-03 09:17:01.659602
+time: 2026-03-03 09:17:01.663809
+success: BUG14427

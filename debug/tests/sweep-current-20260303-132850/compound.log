@@ -1,0 +1,94 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772541001
+time: 2026-03-03 12:30:01.367777
+progress: 20
+test: related1
+time: 2026-03-03 12:30:01.372818
+time: 2026-03-03 12:30:01.392624
+success: related1
+test: related2
+time: 2026-03-03 12:30:01.392682
+time: 2026-03-03 12:30:01.404331
+success: related2
+test: related3
+time: 2026-03-03 12:30:01.404382
+time: 2026-03-03 12:30:01.409294
+success: related3
+test: related4
+time: 2026-03-03 12:30:01.409348
+set a sec desc allowing no write by CREATOR_OWNER
+try open for write
+time: 2026-03-03 12:30:01.418072
+success: related4
+test: related5
+time: 2026-03-03 12:30:01.418129
+time: 2026-03-03 12:30:01.427851
+success: related5
+test: related6
+time: 2026-03-03 12:30:01.427909
+try open for read
+time: 2026-03-03 12:30:01.438356
+success: related6
+test: related7
+time: 2026-03-03 12:30:01.438409
+set a sec desc allowing no write by CREATOR_OWNER
+try open for write
+time: 2026-03-03 12:30:01.455410
+success: related7
+test: related8
+time: 2026-03-03 12:30:01.455463
+try open for write
+time: 2026-03-03 12:30:01.463834
+success: related8
+test: related9
+time: 2026-03-03 12:30:01.463893
+time: 2026-03-03 12:30:01.474095
+success: related9
+test: unrelated1
+time: 2026-03-03 12:30:01.474152
+time: 2026-03-03 12:30:01.482603
+success: unrelated1
+test: invalid1
+time: 2026-03-03 12:30:01.482672
+time: 2026-03-03 12:30:01.492731
+success: invalid1
+test: invalid2
+time: 2026-03-03 12:30:01.492785
+time: 2026-03-03 12:30:01.496594
+success: invalid2
+test: invalid3
+time: 2026-03-03 12:30:01.496652
+time: 2026-03-03 12:30:01.501109
+success: invalid3
+test: invalid4
+time: 2026-03-03 12:30:01.501164
+time: 2026-03-03 12:30:01.506414
+success: invalid4
+test: interim1
+time: 2026-03-03 12:30:01.506463
+time: 2026-03-03 12:30:01.515964
+success: interim1
+test: interim2
+time: 2026-03-03 12:30:01.516019
+time: 2026-03-03 12:30:01.534130
+success: interim2
+test: interim3
+time: 2026-03-03 12:30:01.534185
+time: 2026-03-03 12:30:01.570113
+success: interim3
+test: compound-break
+time: 2026-03-03 12:30:01.570170
+TEST2: open a file with an batch oplock (share mode: all)
+TEST2: Opening second time with compound
+Acking to level II [0x01] in oplock handler
+time: 2026-03-03 12:30:01.577508
+success: compound-break
+test: compound-padding
+time: 2026-03-03 12:30:01.577561
+time: 2026-03-03 12:30:01.604431
+success: compound-padding
+test: create-write-close
+time: 2026-03-03 12:30:01.604489
+time: 2026-03-03 12:30:01.623975
+success: create-write-close

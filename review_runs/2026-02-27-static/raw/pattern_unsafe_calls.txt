@@ -1,0 +1,226 @@
+src/transport/transport_tcp.c:105:		memcpy(&conn->inet6_addr, &client_sk->sk->sk_v6_daddr, 16);
+src/transport/transport_tcp.c:166:	memcpy(new, iov, sizeof(*iov) * nr_segs);
+src/transport/transport_rdma.c:798:			memcpy(buf + data_read, (char *)data_transfer + data_offset + offset,
+src/transport/transport_quic.c:125:	memcpy(new, iov, sizeof(*iov) * nr_segs);
+src/transport/transport_quic.c:367:		memcpy(&conn->inet_addr,
+src/transport/transport_quic.c:507:	memcpy(addr.sun_path + 1, KSMBD_QUIC_SOCK_NAME,
+src/transport/transport_ipc.c:388:		memcpy(entry->response, payload, sz);
+src/transport/transport_ipc.c:529:		WARN_ON(1);
+src/transport/transport_ipc.c:767:	memcpy(req->spnego_blob, spnego_blob, blob_len);
+src/transport/transport_ipc.c:954:	memcpy(req->payload, payload, payload_sz);
+src/transport/transport_ipc.c:1013:	memcpy(req->payload, payload, payload_sz);
+src/transport/transport_ipc.c:1041:	memcpy(req->payload, payload, payload_sz);
+src/transport/transport_ipc.c:1138:	memcpy(msg->payload, &resp, sizeof(resp));
+src/transport/transport_ipc.c:1177:	memcpy(msg->payload, &resp, sizeof(resp));
+src/fs/vfs.c:679:	memcpy(buf, &stream_buf[*pos], count);
+src/fs/vfs.c:915:			memcpy(wbuf, stream_buf, v_len);
+src/fs/vfs.c:920:	memcpy(&stream_buf[*pos], buf, count);
+src/fs/vfs.c:1305:	memcpy(buf, link, len);
+src/fs/vfs.c:1349:	memcpy(name, dir_path, dir_pathlen);
+src/fs/vfs.c:1351:	memcpy(name + dir_pathlen + 1, de_name, de_name_len);
+src/fs/vfs.c:2109:	memcpy(buf, resolved, len + 1);
+src/fs/vfs.c:2603:	memcpy(acl.desc, "posix_acl", 9);
+src/fs/vfs.c:3189:		memcpy((char *)buf->private, name, buf->used);
+src/fs/smbacl.c:889:			memcpy((char *)pndace + size, ntace,
+src/fs/smbacl.c:1609:			memcpy(owner_sid, powner_sid, powner_sid_size);
+src/fs/smbacl.c:1616:			memcpy(group_sid, pgroup_sid, pgroup_sid_size);
+src/fs/smbacl.c:1628:			memcpy(pace, aces_base, nt_size);
+src/fs/smbacl.c:1978:	memcpy(&server_conf.domain_sid, &domain, sizeof(struct smb_sid));
+src/fs/oplock.c:109:	memcpy(lease->lease_key, lctx->lease_key, SMB2_LEASE_KEY_SIZE);
+src/fs/oplock.c:115:	memcpy(lease->parent_lease_key, lctx->parent_lease_key, SMB2_LEASE_KEY_SIZE);
+src/fs/oplock.c:508:		memcpy(lease->lease_key, lctx->lease_key, SMB2_LEASE_KEY_SIZE);
+src/fs/oplock.c:537:		memcpy(lease->lease_key, lctx->lease_key, SMB2_LEASE_KEY_SIZE);
+src/fs/oplock.c:564:		memcpy(lease->lease_key, lctx->lease_key, SMB2_LEASE_KEY_SIZE);
+src/fs/oplock.c:989:	memcpy(rsp->LeaseKey, br_info->lease_key, SMB2_LEASE_KEY_SIZE);
+src/fs/oplock.c:1037:	memcpy(br_info->lease_key, lease->lease_key, SMB2_LEASE_KEY_SIZE);
+src/fs/oplock.c:1253:	memcpy(lease2->lease_key, lease1->lease_key,
+src/fs/oplock.c:1281:	memcpy(lb->client_guid, opinfo->conn->ClientGUID,
+src/fs/oplock.c:1708:		memcpy(buf->lcontext.LeaseKey, lease->lease_key,
+src/fs/oplock.c:1714:			memcpy(buf->lcontext.ParentLeaseKey, lease->parent_lease_key,
+src/fs/oplock.c:1730:		memcpy(buf->lcontext.LeaseKey, lease->lease_key, SMB2_LEASE_KEY_SIZE);
+src/fs/oplock.c:1774:		memcpy(lreq->lease_key, lc->lcontext.LeaseKey, SMB2_LEASE_KEY_SIZE);
+src/fs/oplock.c:1780:			memcpy(lreq->parent_lease_key, lc->lcontext.ParentLeaseKey,
+src/fs/oplock.c:1790:		memcpy(lreq->lease_key, lc->lcontext.LeaseKey, SMB2_LEASE_KEY_SIZE);
+src/fs/ksmbd_fsctl.c:162:	memcpy(object_id, &ino, sizeof(ino));
+src/fs/ksmbd_fsctl.c:163:	memcpy(object_id + sizeof(ino), &gen, sizeof(gen));
+src/fs/ksmbd_fsctl.c:164:	memcpy(object_id + sizeof(ino) + sizeof(gen), &dev, sizeof(dev));
+src/fs/ksmbd_fsctl.c:194:	memcpy(object_id, xattr_buf, 16);
+src/fs/ksmbd_fsctl.c:282:	memcpy(obj_rsp->ObjectId, object_id, sizeof(obj_rsp->ObjectId));
+src/fs/ksmbd_fsctl.c:283:	memcpy(obj_rsp->BirthObjectId, object_id,
+src/fs/ksmbd_fsctl.c:518:	memcpy(&compression_state, in_buf, sizeof(compression_state));
+src/fs/ksmbd_fsctl.c:915:				memcpy(ipv6_addr, ifa->addr.s6_addr, 16);
+src/fs/ksmbd_fsctl.c:1587:		memcpy((char *)rsp->Buffer, rpc_resp->payload, nbytes);
+src/fs/ksmbd_fsctl.c:1900:	memcpy(&val, nonce, sizeof(val));
+src/fs/ksmbd_fsctl.c:1912:	memcpy(entry->nonce, token->nonce, 16);
+src/fs/ksmbd_vss.c:212:		memcpy(entry->gmt_token, dirname,
+src/fs/ksmbd_dfs.c:339:	memcpy(entry_ptr + path_off, dfs_path_utf16, dfs_path_len);
+src/fs/ksmbd_dfs.c:340:	memcpy(entry_ptr + alt_path_off, dfs_path_utf16, dfs_path_len);
+src/fs/ksmbd_dfs.c:341:	memcpy(entry_ptr + node_off, target_utf16, target_len);
+src/fs/ksmbd_branchcache.c:350:	memcpy(hashes, xattr_buf + sizeof(struct pccrc_cache_header),
+src/fs/ksmbd_branchcache.c:399:	memcpy((u8 *)cache_hdr + sizeof(struct pccrc_cache_header),
+src/fs/ksmbd_branchcache.c:571:		memcpy(seg[i].SegmentHashOfData, hash, PCCRC_V1_HASH_SIZE);
+src/fs/ksmbd_branchcache.c:579:		memcpy(seg[i].SegmentSecret, secret, PCCRC_V1_HASH_SIZE);
+src/fs/ksmbd_reparse.c:717:		memcpy(&rsp->Buffer[0], opaque_buf, opaque_len);
+src/fs/ksmbd_reparse.c:760:		memcpy(link_copy, link, link_len);
+src/fs/ksmbd_reparse.c:824:		memcpy(symdata->path_buffer, ucs2_buf, ucs2_bytes);
+src/fs/ksmbd_reparse.c:826:		memcpy(symdata->path_buffer + ucs2_bytes,
+src/fs/ksmbd_app_instance.c:164:	memcpy(fp->app_instance_id, data + APP_INSTANCE_ID_GUID_OFFSET,
+src/fs/ksmbd_quota.c:170:	memcpy(qi->Sid, sid, sid_len);
+src/protocol/smb2/smb2fruit.c:71:	memcpy(state->client_build, &client_info->build_number,
+src/protocol/smb2/smb2fruit.c:239:	memcpy(state->client_build, &client_info->build_number,
+src/protocol/smb2/smb2fruit.c:390:	memcpy(buf, &val, 4);
+src/protocol/smb2/smb2fruit.c:393:	memcpy(buf + 4, &val, 4);
+src/protocol/smb2/smb2fruit.c:398:	memcpy(buf + 12, &val, 4);
+src/protocol/smb2/smb2fruit.c:482:		memcpy(buf, &val, 4);
+src/protocol/smb2/smb2fruit.c:485:		memcpy(buf + 4, &val, 4);
+src/protocol/smb2/smb2fruit.c:488:		memcpy(buf + 12, &val, 4);
+src/fs/ksmbd_info.c:534:	memcpy(entry_info->FileName, utf16_name, name_bytes);
+src/protocol/smb2/smb2_session.c:188:	memcpy(rsp->Buffer, spnego_blob, spnego_blob_len);
+src/protocol/smb2/smb2_session.c:276:		memcpy(rsp->Buffer, spnego_blob, spnego_blob_len);
+src/protocol/smb2/smb2_read_write.c:108:		memcpy(aux_payload_buf, rpc_resp->payload, rpc_resp->payload_sz);
+src/protocol/smb2/smb2_query_set.c:289:		memcpy(ptr, buf, value_len);
+src/protocol/smb2/smb2_query_set.c:297:			memcpy(eainfo->name, &name[XATTR_USER_PREFIX_LEN],
+src/protocol/smb2/smb2_query_set.c:300:			memcpy(eainfo->name, name, name_len);
+src/protocol/smb2/smb2_query_set.c:848:		memcpy(&reparse_tag, reparse_buf, sizeof(reparse_tag));
+src/protocol/smb2/smb2_query_set.c:891:		memcpy(&reparse_tag, reparse_buf, sizeof(reparse_tag));
+src/protocol/smb2/smb2_query_set.c:963:	memcpy(object_id, &ino, sizeof(ino));
+src/protocol/smb2/smb2_query_set.c:964:	memcpy(object_id + sizeof(ino), &gen, sizeof(gen));
+src/protocol/smb2/smb2_query_set.c:965:	memcpy(object_id + sizeof(ino) + sizeof(gen), &dev, sizeof(dev));
+src/protocol/smb2/smb2_query_set.c:989:		memcpy(object_id, xattr_buf, 16);
+src/protocol/smb2/smb2_query_set.c:1398:		memcpy(info->extended_info.version_string, "1.1.0", strlen("1.1.0"));
+src/protocol/smb2/smb2_query_set.c:2395:	memcpy(legacy->FileName, file_info->FileName, name_len);
+src/protocol/smb2/smb2_misc_cmds.c:492:	memcpy(rsp->LeaseKey, req->LeaseKey, 16);
+src/protocol/smb2/smb2_dir.c:313:		memcpy(ffdinfo->FileName, conv_name, conv_len);
+src/protocol/smb2/smb2_dir.c:331:		memcpy(fbdinfo->FileName, conv_name, conv_len);
+src/protocol/smb2/smb2_dir.c:343:		memcpy(fdinfo->FileName, conv_name, conv_len);
+src/protocol/smb2/smb2_dir.c:353:		memcpy(fninfo->FileName, conv_name, conv_len);
+src/protocol/smb2/smb2_dir.c:386:		memcpy(dinfo->FileName, conv_name, conv_len);
+src/protocol/smb2/smb2_dir.c:420:		memcpy(fibdinfo->FileName, conv_name, conv_len);
+src/protocol/smb2/smb2_dir.c:438:		memcpy(&extdinfo->FileId[0], &ino, sizeof(ino));
+src/protocol/smb2/smb2_dir.c:442:		memcpy(extdinfo->FileName, conv_name, conv_len);
+src/protocol/smb2/smb2_dir.c:460:		memcpy(&extdbinfo->FileId[0], &ino, sizeof(ino));
+src/protocol/smb2/smb2_dir.c:466:		memcpy(extdbinfo->FileName, conv_name, conv_len);
+src/protocol/smb2/smb2_dir.c:486:		memcpy(extd64info->FileName, conv_name, conv_len);
+src/protocol/smb2/smb2_dir.c:508:		memcpy(extd64binfo->FileName, conv_name, conv_len);
+src/protocol/smb2/smb2_dir.c:527:		memcpy(&allexdinfo->FileId128[0], &ino, sizeof(ino));
+src/protocol/smb2/smb2_dir.c:531:		memcpy(allexdinfo->FileName, conv_name, conv_len);
+src/protocol/smb2/smb2_dir.c:550:		memcpy(&allexdbinfo->FileId128[0], &ino, sizeof(ino));
+src/protocol/smb2/smb2_dir.c:556:		memcpy(allexdbinfo->FileName, conv_name, conv_len);
+src/protocol/smb2/smb2_dir.c:616:		memcpy(posix_info->name, conv_name, conv_len);
+src/protocol/smb2/smb2_dir.c:779:		memcpy(ffdinfo->FileName, d_info->name, d_info->name_len);
+src/protocol/smb2/smb2_dir.c:790:		memcpy(fbdinfo->FileName, d_info->name, d_info->name_len);
+src/protocol/smb2/smb2_dir.c:801:		memcpy(fdinfo->FileName, d_info->name, d_info->name_len);
+src/protocol/smb2/smb2_dir.c:812:		memcpy(fninfo->FileName, d_info->name, d_info->name_len);
+src/protocol/smb2/smb2_dir.c:823:		memcpy(dinfo->FileName, d_info->name, d_info->name_len);
+src/protocol/smb2/smb2_dir.c:835:		memcpy(fibdinfo->FileName, d_info->name, d_info->name_len);
+src/protocol/smb2/smb2_dir.c:846:		memcpy(extdinfo->FileName, d_info->name, d_info->name_len);
+src/protocol/smb2/smb2_dir.c:857:		memcpy(extdbinfo->FileName, d_info->name, d_info->name_len);
+src/protocol/smb2/smb2_dir.c:868:		memcpy(extd64info->FileName, d_info->name, d_info->name_len);
+src/protocol/smb2/smb2_dir.c:879:		memcpy(extd64binfo->FileName, d_info->name, d_info->name_len);
+src/protocol/smb2/smb2_dir.c:890:		memcpy(allexdinfo->FileName, d_info->name, d_info->name_len);
+src/protocol/smb2/smb2_dir.c:902:		memcpy(allexdbinfo->FileName, d_info->name, d_info->name_len);
+src/protocol/smb2/smb2_dir.c:913:		memcpy(posix_info->name, d_info->name, d_info->name_len);
+src/protocol/smb2/smb2_pdu_common.c:275:	WARN_ON(ksmbd_conn_good(conn));
+src/protocol/smb2/smb2_pdu_common.c:442:	memcpy(rsp_hdr->Signature, rcv_hdr->Signature, 16);
+src/protocol/smb2/smb2_pdu_common.c:521:	memcpy(rsp_hdr->Signature, rcv_hdr->Signature, 16);
+src/protocol/smb2/smb2_pdu_common.c:719:	memcpy(smb2_get_msg(in_work->response_buf), ksmbd_resp_buf_next(work),
+src/protocol/smb2/smb2_pdu_common.c:821:	memcpy(signature_req, hdr->Signature, SMB2_SIGNATURE_SIZE);
+src/protocol/smb2/smb2_pdu_common.c:864:		memcpy(hdr->Signature, signature, SMB2_SIGNATURE_SIZE);
+src/protocol/smb2/smb2_pdu_common.c:911:	memcpy(signature_req, hdr->Signature, SMB2_SIGNATURE_SIZE);
+src/protocol/smb2/smb2_pdu_common.c:984:		memcpy(hdr->Signature, signature, SMB2_SIGNATURE_SIZE);
+src/protocol/smb2/smb2_pdu_common.c:1070:			memcpy(&tr_hdr->Nonce,
+src/protocol/smb2/smb2_pdu_common.c:1073:			memcpy(&tr_hdr->Nonce[4],
+src/protocol/smb2/smb2_pdu_common.c:1091:	memcpy(&tr_hdr->SessionId, &hdr->SessionId, 8);
+src/encoding/ndr.c:97:	memcpy(ndr_get_field(n), value, sz);
+src/encoding/ndr.c:115:	memcpy(ndr_get_field(n), value, sz);
+src/encoding/ndr.c:144:		memcpy(value, ndr_get_field(n), len);
+src/encoding/ndr.c:168:		memcpy(value, ndr_get_field(n), sz);
+src/protocol/smb2/smb2_ioctl.c:324:				memcpy(ipv6_addr, ifa->addr.s6_addr, 16);
+src/protocol/smb2/smb2_create.c:258:		memcpy(attr_name, XATTR_USER_PREFIX, XATTR_USER_PREFIX_LEN);
+src/protocol/smb2/smb2_create.c:259:		memcpy(&attr_name[XATTR_USER_PREFIX_LEN], eabuf->name,
+src/protocol/smb2/smb2_create.c:916:	memcpy(file_id_le, (char *)req + name_off, name_len);
+src/protocol/smb2/smb2_create.c:1880:					memcpy(client_info, context_data, copy_len);
+src/protocol/smb2/smb2_create.c:1927:	memcpy(fp->client_guid, conn->ClientGUID, SMB2_CLIENT_GUID_SIZE);
+src/protocol/smb2/smb2_create.c:1938:			memcpy(fp->create_guid, dh_info.CreateGuid,
+src/protocol/smb2/smb2_negotiate.c:751:		memcpy(conn->ClientGUID, req->ClientGUID,
+src/protocol/smb1/smb1pdu.c:196:	memcpy(rsp_hdr->Protocol, rcv_hdr->Protocol, 4);
+src/protocol/smb1/smb1pdu.c:488:		memcpy(buf, SERVICE_IPC_SHARE, length);
+src/protocol/smb1/smb1pdu.c:496:		memcpy(buf, SERVICE_DISK_SHARE, length);
+src/protocol/smb1/smb1pdu.c:816:	memcpy(pattern, pattern_pos, pattern_len);
+src/protocol/smb1/smb1pdu.c:958:	WARN_ON(ksmbd_conn_good(conn));
+src/protocol/smb1/smb1pdu.c:1004:		memcpy((neg_rsp->u.EncryptionKey), conn->ntlmssp.cryptkey,
+src/protocol/smb1/smb1pdu.c:1059:	WARN_ON(sess->user);
+src/protocol/smb1/smb1pdu.c:1128:	memcpy(rsp->NativeOS + offset, str, len);
+src/protocol/smb1/smb1pdu.c:1133:	memcpy(rsp->NativeOS + offset, str, len);
+src/protocol/smb1/smb1pdu.c:1138:	memcpy(rsp->NativeOS + offset, str, len);
+src/protocol/smb1/smb1pdu.c:1229:			memcpy((char *)rsp->SecurityBlob, spnego_blob,
+src/protocol/smb1/smb1pdu.c:1309:			memcpy((char *)rsp->SecurityBlob, spnego_blob,
+src/protocol/smb1/smb1pdu.c:2246:				memcpy((char *)rsp +
+src/protocol/smb1/smb1pdu.c:2290:				memcpy((char *)rsp +
+src/protocol/smb1/smb1pdu.c:2534:		memcpy(src, req->fileName + 1, le16_to_cpu(req->NameLength));
+src/protocol/smb1/smb1pdu.c:2537:		memcpy(src, req->fileName, le16_to_cpu(req->NameLength));
+src/protocol/smb1/smb1pdu.c:3078:		memcpy(aux_buf, rpc_resp->payload, nbytes);
+src/protocol/smb1/smb1pdu.c:3502:	memcpy(rsp->Data, req->Data, data_count);
+src/protocol/smb1/smb1pdu.c:4047:	memcpy(nptr, ptr, sz);
+src/protocol/smb1/smb1pdu.c:4204:		memcpy(ptr, buf, value_len);
+src/protocol/smb1/smb1pdu.c:4210:			memcpy(temp_fea->name, &name[XATTR_USER_PREFIX_LEN],
+src/protocol/smb1/smb1pdu.c:4213:			memcpy(temp_fea->name, name, name_len);
+src/protocol/smb1/smb1pdu.c:5635:		memcpy(attr_name, XATTR_USER_PREFIX, XATTR_USER_PREFIX_LEN);
+src/protocol/smb1/smb1pdu.c:5636:		memcpy(&attr_name[XATTR_USER_PREFIX_LEN], ea->name,
+src/protocol/smb1/smb1pdu.c:6016:		memcpy(fsinfo->FileName, conv_name, conv_len);
+src/protocol/smb1/smb1pdu.c:6045:		memcpy(fesize->FileName, conv_name, conv_len);
+src/protocol/smb1/smb1pdu.c:6056:		memcpy(fdinfo->FileName, conv_name, conv_len);
+src/protocol/smb1/smb1pdu.c:6071:		memcpy(ffdinfo->FileName, conv_name, conv_len);
+src/protocol/smb1/smb1pdu.c:6084:		memcpy(fninfo->FileName, conv_name, conv_len);
+src/protocol/smb1/smb1pdu.c:6102:		memcpy(fbdinfo->FileName, conv_name, conv_len);
+src/protocol/smb1/smb1pdu.c:6119:		memcpy(dinfo->FileName, conv_name, conv_len);
+src/protocol/smb1/smb1pdu.c:6138:		memcpy(fibdinfo->FileName, conv_name, conv_len);
+src/protocol/smb1/smb1pdu.c:6156:		memcpy(finfo->FileName, conv_name, conv_len + 2);
+src/protocol/smb1/smb1pdu.c:6214:	memcpy(de->name, name, namlen);
+src/protocol/smb1/smb1pdu.c:6411:		memcpy(d_info.smb1_name, de->name, de->namelen);
+src/protocol/smb1/smb1pdu.c:6649:		memcpy(d_info.smb1_name, de->name, de->namelen);
+src/protocol/smb1/smb1pdu.c:8919:	memcpy(signature_req, rcv_hdr1->Signature.SecuritySignature,
+src/protocol/smb1/smb1pdu.c:8971:		memcpy(rsp_hdr->Signature.SecuritySignature, signature,
+src/mgmt/user_config.c:51:		memcpy(user->passkey, resp->hash, resp->hash_sz);
+src/protocol/common/smb_common.c:600:	memcpy(out, base, baselen + 1);
+src/protocol/common/smb_common.c:613:		memcpy(out + baselen + 4, extension, 4);
+src/protocol/common/smb_common.c:841:	WARN_ON(work->saved_cred);
+src/protocol/common/smb_common.c:859:	WARN_ON(!work->saved_cred);
+src/mgmt/user_session.c:248:	memcpy(sess->ClientGUID, conn->ClientGUID, SMB2_CLIENT_GUID_SIZE);
+src/mgmt/user_session.c:419:		WARN_ON(1);
+src/mgmt/user_session.c:434:	memcpy(sess->Preauth_HashValue, conn->preauth_info->Preauth_HashValue,
+src/core/smb2_compress.c:402:		memcpy(decompressed_buf + 4, uncompressed_part, offset);
+src/core/smb2_compress.c:572:	memcpy(comp_transform_buf + 4 +
+src/core/smb2_compress.c:577:	memcpy(comp_transform_buf + 4 +
+src/core/connection.c:570:		memcpy(conn->request_buf, hdr_buf, sizeof(hdr_buf));
+src/core/misc.c:200:	memcpy(nt_pathname + prefix, &ab_pathname[share_path_len],
+src/core/misc.c:313:	memcpy(new_name, share->path, path_len);
+src/core/misc.c:319:	memcpy(new_name + path_len + no_slash, name, name_len);
+src/core/misc.c:378:				sprintf(out_next, "%s/", name);
+src/core/misc.c:415:	memcpy(new_name, share->path, path_len);
+src/core/misc.c:421:	memcpy(new_name + path_len + no_slash, norm_name, name_len);
+src/core/ksmbd_work.c:46:	WARN_ON(work->saved_cred != NULL);
+src/core/auth.c:58:	memcpy(buf, NEGOTIATE_GSS_HEADER, AUTH_GSS_LENGTH);
+src/core/auth.c:334:	memcpy(p21, user_passkey(sess->user), CIFS_NTHASH_SIZE);
+src/core/auth.c:343:	memcpy(sess->sess_key + CIFS_SMB1_SESSKEY_SIZE, key,
+src/core/auth.c:415:	memcpy(construct, cryptkey, CIFS_CRYPTO_KEY_SIZE);
+src/core/auth.c:416:	memcpy(construct + CIFS_CRYPTO_KEY_SIZE, &ntlmv2->blob_signature, blen);
+src/core/auth.c:478:	memcpy(p21, user_passkey(sess->user), CIFS_NTHASH_SIZE);
+src/core/auth.c:712:	memcpy(chgblob->Signature, NTLMSSP_SIGNATURE, 8);
+src/core/auth.c:765:	memcpy(chgblob->Challenge, conn->ntlmssp.cryptkey,
+src/core/auth.c:772:	memcpy(target_name, name, uni_len);
+src/core/auth.c:781:		memcpy(tinfo->Content, name, uni_len);
+src/core/auth.c:855:	memcpy(sess->sess_key, resp->payload, resp->session_key_len);
+src/core/auth.c:856:	memcpy(out_blob, resp->payload + resp->session_key_len,
+src/core/auth.c:1057:	memcpy(nonce, &hdr->MessageId, sizeof(hdr->MessageId));
+src/core/auth.c:1105:			memcpy(aad_buf + offset, iov[i].iov_base,
+src/core/auth.c:1136:	memcpy(sig, tag, SMB2_SIGNATURE_SIZE);
+src/core/auth.c:1235:	memcpy(key, hashptr, key_size);
+src/core/auth.c:1266:		memcpy(chann->smb3signingkey, key, SMB3_SIGN_KEY_SIZE);
+src/core/auth.c:1475:	memcpy(key, ses_enc_key, SMB3_ENC_DEC_KEY_SIZE);
+src/core/auth.c:1632:		memcpy(sign, &tr_hdr->Signature, SMB2_SIGNATURE_SIZE);
+src/core/auth.c:1652:		memcpy(iv, (char *)tr_hdr->Nonce, SMB3_AES_GCM_NONCE);
+src/core/auth.c:1655:		memcpy(iv + 1, (char *)tr_hdr->Nonce, SMB3_AES_CCM_NONCE);
+src/core/auth.c:1670:		memcpy(&tr_hdr->Signature, sign, SMB2_SIGNATURE_SIZE);
+src/encoding/asn1.c:211:	memcpy(buf + ofs, NTLMSSP_OID_STR, NTLMSSP_OID_LEN);
+src/encoding/asn1.c:216:	memcpy(buf + ofs, ntlm_blob, ntlm_blob_len);

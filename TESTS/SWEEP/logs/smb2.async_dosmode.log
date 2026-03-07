@@ -1,0 +1,8 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772586073
+time: 2026-03-04 01:01:13.873114
+test: async_dosmode
+time: 2026-03-04 01:01:13.874679
+time: 2026-03-04 01:01:14.405032
+success: async_dosmode

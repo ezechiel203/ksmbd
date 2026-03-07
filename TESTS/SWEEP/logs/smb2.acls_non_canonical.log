@@ -1,0 +1,12 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772586069
+time: 2026-03-04 01:01:09.941470
+progress: 1
+test: flags
+time: 2026-03-04 01:01:09.945375
+get the original sd
+time: 2026-03-04 01:01:11.583755
+failure: flags [
+../../source4/torture/smb2/acls.c:3428: Expression `sd_orig->type & ( 0x0400 )' failed: Missing SEC_DESC_DACL_AUTO_INHERITED
+]

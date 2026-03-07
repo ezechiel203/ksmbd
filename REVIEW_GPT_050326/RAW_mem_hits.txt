@@ -1,0 +1,520 @@
+src/mgmt/tree_connect.c:34:	tree_conn = kzalloc(sizeof(struct ksmbd_tree_connect),
+src/mgmt/user_session.c:110:	entry = kzalloc(sizeof(struct ksmbd_session_rpc), KSMBD_DEFAULT_GFP);
+src/mgmt/user_session.c:266:	memcpy(sess->ClientGUID, conn->ClientGUID, SMB2_CLIENT_GUID_SIZE);
+src/mgmt/user_session.c:458:	sess = kmalloc(sizeof(struct preauth_session), KSMBD_DEFAULT_GFP);
+src/mgmt/user_session.c:463:	memcpy(sess->Preauth_HashValue, conn->preauth_info->Preauth_HashValue,
+src/mgmt/user_session.c:635:	sess = kzalloc(sizeof(struct ksmbd_session), KSMBD_DEFAULT_GFP);
+src/mgmt/share_config.c:123:		p = kzalloc(sizeof(struct ksmbd_veto_pattern), KSMBD_DEFAULT_GFP);
+src/mgmt/share_config.c:207:	share = kzalloc(sizeof(struct ksmbd_share_config), KSMBD_DEFAULT_GFP);
+src/mgmt/user_config.c:40:	user = kmalloc(sizeof(struct ksmbd_user), KSMBD_DEFAULT_GFP);
+src/mgmt/user_config.c:49:	user->passkey = kmalloc(resp->hash_sz, KSMBD_DEFAULT_GFP);
+src/mgmt/user_config.c:51:		memcpy(user->passkey, resp->hash, resp->hash_sz);
+src/mgmt/ksmbd_witness.c:93:	res = kzalloc(sizeof(*res), KSMBD_DEFAULT_GFP);
+src/mgmt/ksmbd_witness.c:101:	strscpy(res->name, name, KSMBD_WITNESS_NAME_MAX);
+src/mgmt/ksmbd_witness.c:218:	reg = kzalloc(sizeof(*reg), KSMBD_DEFAULT_GFP);
+src/mgmt/ksmbd_witness.c:234:	strscpy(reg->client_name, client_name, KSMBD_WITNESS_NAME_MAX);
+src/mgmt/ksmbd_witness.c:235:	strscpy(reg->resource_name, resource_name, KSMBD_WITNESS_NAME_MAX);
+src/mgmt/ksmbd_witness.c:459:	reg_ids = kvzalloc(capacity * sizeof(*reg_ids), KSMBD_DEFAULT_GFP);
+src/mgmt/ksmbd_witness.c:549:		snprintf(addr_str, sizeof(addr_str), "%pI4",
+src/mgmt/ksmbd_witness.c:556:		nw = kzalloc(sizeof(*nw), GFP_ATOMIC);
+src/mgmt/ksmbd_witness.c:560:		strscpy(nw->resource_name, addr_str,
+src/fs/ksmbd_notify.c.bak:565:				chg = kzalloc(sizeof(*chg),
+src/fs/ksmbd_notify.c.bak:830:	watch = kzalloc(sizeof(*watch), KSMBD_DEFAULT_GFP);
+src/fs/ksmbd_info.c:600:			memcpy(entry->FileName, tmp_utf16, name_bytes);
+src/fs/ksmbd_info.c:709:		memcpy(entry_info->FileName, utf16_name, name_bytes);
+src/fs/ksmbd_info.c:829:		memcpy(entry_info->FileName, utf16_name, name_bytes);
+src/fs/ksmbd_info.c:1680:		memcpy(&lx_uid, xattr_val, sizeof(u32));
+src/fs/ksmbd_info.c:1694:		memcpy(&lx_gid, xattr_val, sizeof(u32));
+src/fs/ksmbd_info.c:1708:		memcpy(&lx_mode, xattr_val, sizeof(u32));
+src/fs/ksmbd_fsctl.c:171:	memcpy(object_id, &ino, sizeof(ino));
+src/fs/ksmbd_fsctl.c:172:	memcpy(object_id + sizeof(ino), &gen, sizeof(gen));
+src/fs/ksmbd_fsctl.c:173:	memcpy(object_id + sizeof(ino) + sizeof(gen), &dev, sizeof(dev));
+src/fs/ksmbd_fsctl.c:203:	memcpy(object_id, xattr_buf, 16);
+src/fs/ksmbd_fsctl.c:291:	memcpy(obj_rsp->ObjectId, object_id, sizeof(obj_rsp->ObjectId));
+src/fs/ksmbd_fsctl.c:292:	memcpy(obj_rsp->BirthObjectId, object_id,
+src/fs/ksmbd_fsctl.c:527:	memcpy(&compression_state, in_buf, sizeof(compression_state));
+src/fs/ksmbd_fsctl.c:978:				memcpy(ipv6_addr, ifa->addr.s6_addr, 16);
+src/fs/ksmbd_fsctl.c:1753:	memcpy(neg_rsp->Guid, server_conf.server_guid, SMB2_CLIENT_GUID_SIZE);
+src/fs/ksmbd_fsctl.c:1827:		memcpy((char *)rsp->Buffer, rpc_resp->payload, nbytes);
+src/fs/ksmbd_fsctl.c:2236:	entry = kmalloc(sizeof(*entry), GFP_KERNEL);
+src/fs/ksmbd_fsctl.c:2240:	memcpy(entry->nonce, token->nonce, 16);
+src/fs/ksmbd_fsctl.c:2542:	if (check_add_overflow(token_off, xfer_off, &src_off)) {
+src/fs/ksmbd_notify.c:596:					chg = kzalloc(sizeof(*chg),
+src/fs/ksmbd_notify.c:903:	watch = kzalloc(sizeof(*watch), KSMBD_DEFAULT_GFP);
+src/fs/ksmbd_vss.c:222:		memcpy(entry->gmt_token, dirname,
+src/fs/ksmbd_vss.c:260:	snprintf(entry->gmt_token, KSMBD_VSS_GMT_TOKEN_LEN,
+src/fs/ksmbd_vss.c:433:			snprintf(resolved, len,
+src/fs/ksmbd_vss.c:515:			snprintf(resolved, len,
+src/fs/ksmbd_dfs.c:361:	memcpy(entry_ptr + path_off, dfs_path_utf16, dfs_path_len);
+src/fs/ksmbd_dfs.c:362:	memcpy(entry_ptr + alt_path_off, dfs_path_utf16, dfs_path_len);
+src/fs/ksmbd_dfs.c:363:	memcpy(entry_ptr + node_off, target_utf16, target_len);
+src/fs/ksmbd_reparse.c:156:		memmove(path, path + 4, len - 4 + 1);
+src/fs/ksmbd_reparse.c:880:		memcpy(&rsp->Buffer[0], opaque_buf, opaque_len);
+src/fs/ksmbd_reparse.c:917:		link_copy = kzalloc(link_len + 1, KSMBD_DEFAULT_GFP);
+src/fs/ksmbd_reparse.c:923:		memcpy(link_copy, link, link_len);
+src/fs/ksmbd_reparse.c:931:		ucs2_buf = kzalloc((link_len + 1) * 2,
+src/fs/ksmbd_reparse.c:987:		memcpy(symdata->path_buffer, ucs2_buf, ucs2_bytes);
+src/fs/ksmbd_reparse.c:989:		memcpy(symdata->path_buffer + ucs2_bytes,
+src/encoding/asn1.c:84:	*oid = kmalloc(vlen * sizeof(unsigned long), KSMBD_DEFAULT_GFP);
+src/encoding/asn1.c:230:	buf = kmalloc(total_len, KSMBD_DEFAULT_GFP);
+src/encoding/asn1.c:251:	memcpy(buf + ofs, NTLMSSP_OID_STR, NTLMSSP_OID_LEN);
+src/encoding/asn1.c:259:	memcpy(buf + ofs, ntlm_blob, ntlm_blob_len);
+src/encoding/asn1.c:280:	buf = kmalloc(total_len, KSMBD_DEFAULT_GFP);
+src/fs/vfs.c:658:			stream_buf = kvzalloc(AFP_AFPINFO_SIZE,
+src/fs/vfs.c:689:	memcpy(buf, &stream_buf[*pos], count);
+src/fs/vfs.c:919:		wbuf = kvzalloc(size, KSMBD_DEFAULT_GFP);
+src/fs/vfs.c:926:			memcpy(wbuf, stream_buf, v_len);
+src/fs/vfs.c:931:	memcpy(&stream_buf[*pos], buf, count);
+src/fs/vfs.c:1322:	memcpy(buf, link, len);
+src/fs/vfs.c:1362:	name = kmalloc(file_pathlen + 1, KSMBD_DEFAULT_GFP);
+src/fs/vfs.c:1366:	memcpy(name, dir_path, dir_pathlen);
+src/fs/vfs.c:1368:	memcpy(name + dir_pathlen + 1, de_name, de_name_len);
+src/fs/vfs.c:2172:	path_buf = kmalloc(PATH_MAX, KSMBD_DEFAULT_GFP);
+src/fs/vfs.c:2196:	memcpy(buf, resolved, len + 1);
+src/fs/vfs.c:2289:	vlist = kvzalloc(size, KSMBD_DEFAULT_GFP);
+src/fs/vfs.c:2361:	buf = kmalloc(xattr_len + 1, KSMBD_DEFAULT_GFP);
+src/fs/vfs.c:2622:	if (check_mul_overflow(sizeof(struct xattr_acl_entry),
+src/fs/vfs.c:2624:	    check_add_overflow(sizeof(struct xattr_smb_acl), alloc_size, &alloc_size))
+src/fs/vfs.c:2627:	smb_acl = kzalloc(alloc_size, KSMBD_DEFAULT_GFP);
+src/fs/vfs.c:2702:	memcpy(acl.desc, "posix_acl", 9);
+src/fs/vfs.c:3012:		zbuf = kzalloc(PAGE_SIZE, GFP_KERNEL);
+src/fs/vfs.c:3360:		memcpy((char *)buf->private, name, buf->used);
+src/fs/vfs.c:3910:			bounce = kvmalloc(len, GFP_KERNEL);
+src/encoding/unicode.c:354:		dst = kmalloc(len, KSMBD_DEFAULT_GFP);
+src/encoding/unicode.c:366:		dst = kmalloc(len, KSMBD_DEFAULT_GFP);
+src/encoding/unicode.c:369:		strscpy(dst, src, len);
+src/fs/vfs_cache.c:278:	ci = kmalloc(sizeof(struct ksmbd_inode), KSMBD_DEFAULT_GFP);
+src/fs/vfs_cache.c:326:	inode_hashtable = vmalloc(size);
+src/fs/vfs_cache.c:780:	pathname = kmalloc(PATH_MAX, KSMBD_DEFAULT_GFP);
+src/fs/vfs_cache.c:1353:	pathname = kmalloc(PATH_MAX, KSMBD_DEFAULT_GFP);
+src/fs/vfs_cache.c:1419:	ft->idr = kzalloc(sizeof(struct idr), KSMBD_DEFAULT_GFP);
+src/encoding/ndr.c:34:	if (check_add_overflow((size_t)n->offset, sz, &needed) ||
+src/encoding/ndr.c:35:	    check_add_overflow(needed, (size_t)1024, &new_sz))
+src/encoding/ndr.c:103:	memcpy(ndr_get_field(n), value, sz);
+src/encoding/ndr.c:121:	memcpy(ndr_get_field(n), value, raw_len);
+src/encoding/ndr.c:152:		memcpy(value, ndr_get_field(n), len);
+src/encoding/ndr.c:179:		memcpy(value, ndr_get_field(n), sz);
+src/encoding/ndr.c:233:	n->data = kzalloc(n->length, KSMBD_DEFAULT_GFP);
+src/encoding/ndr.c:238:		snprintf(hex_attr, 10, "0x%x", da->attr);
+src/encoding/ndr.c:428:	n->data = kzalloc(n->length, KSMBD_DEFAULT_GFP);
+src/encoding/ndr.c:514:	n->data = kzalloc(n->length, KSMBD_DEFAULT_GFP);
+src/encoding/ndr.c:639:	acl->sd_buf = kzalloc(acl->sd_size, KSMBD_DEFAULT_GFP);
+src/fs/smbacl.c:206:	if (check_add_overflow(1u + 1u + 2u + 4u + 1u + 1u + 6u,
+src/fs/smbacl.c:702:	state->users = kzalloc(alloc, KSMBD_DEFAULT_GFP);
+src/fs/smbacl.c:705:	state->groups = kzalloc(alloc, KSMBD_DEFAULT_GFP);
+src/fs/smbacl.c:980:		sid = kmalloc(sizeof(struct smb_sid), KSMBD_DEFAULT_GFP);
+src/fs/smbacl.c:1025:		    check_add_overflow((unsigned int)*size,
+src/fs/smbacl.c:1047:			    check_add_overflow((unsigned int)*size,
+src/fs/smbacl.c:1081:		sid = kmalloc(sizeof(struct smb_sid), KSMBD_DEFAULT_GFP);
+src/fs/smbacl.c:1110:		    check_add_overflow((unsigned int)*size,
+src/fs/smbacl.c:1167:			if (check_add_overflow((unsigned int)size,
+src/fs/smbacl.c:1175:			memcpy((char *)pndace + size, ntace,
+src/fs/smbacl.c:1250:	    check_add_overflow((unsigned int)ace_size, 4u,
+src/fs/smbacl.c:1252:	    check_add_overflow((unsigned int)size, new_off,
+src/fs/smbacl.c:1271:	    check_add_overflow((unsigned int)ace_size, 4u,
+src/fs/smbacl.c:1273:	    check_add_overflow((unsigned int)size, new_off,
+src/fs/smbacl.c:1298:		    check_add_overflow((unsigned int)size,
+src/fs/smbacl.c:1313:		    check_add_overflow((unsigned int)size,
+src/fs/smbacl.c:1330:	    check_add_overflow((unsigned int)size,
+src/fs/smbacl.c:1392:	 * before computing pointers.  Use check_add_overflow() to
+src/fs/smbacl.c:1403:		    (check_add_overflow(osidoff,
+src/fs/smbacl.c:1410:		    (check_add_overflow(gsidoff,
+src/fs/smbacl.c:1417:		    (check_add_overflow(dacloffset,
+src/fs/smbacl.c:1554:	nowner_sid_ptr = kmalloc(sizeof(struct smb_sid),
+src/fs/smbacl.c:1564:	ngroup_sid_ptr = kmalloc(sizeof(struct smb_sid),
+src/fs/smbacl.c:1615:		if (check_add_overflow(offset, sid_size, &new_off) ||
+src/fs/smbacl.c:1631:		if (check_add_overflow(offset, sid_size, &new_off) ||
+src/fs/smbacl.c:1666:				    !check_add_overflow(offset, pp_sacl_size,
+src/fs/smbacl.c:1676:					memcpy(sacl_ptr, pp_sacl,
+src/fs/smbacl.c:1685:		if (check_add_overflow(offset,
+src/fs/smbacl.c:1721:		if (check_add_overflow(offset,
+src/fs/smbacl.c:1848:	    check_add_overflow(dacloffset, sizeof(struct smb_acl), &dacl_struct_end) ||
+src/fs/smbacl.c:1871:	aces_base = kmalloc(aces_buf_size, KSMBD_DEFAULT_GFP);
+src/fs/smbacl.c:1994:		pntsd = kzalloc(pntsd_alloc_size, KSMBD_DEFAULT_GFP);
+src/fs/smbacl.c:2033:			memcpy(owner_sid, powner_sid, powner_sid_size);
+src/fs/smbacl.c:2040:			memcpy(group_sid, pgroup_sid, pgroup_sid_size);
+src/fs/smbacl.c:2052:			memcpy(pace, aces_base, nt_size);
+src/fs/smbacl.c:2121:	    check_add_overflow(dacl_offset, sizeof(struct smb_acl), &dacl_struct_end) ||
+src/fs/smbacl.c:2471:	memcpy(&server_conf.domain_sid, &domain, sizeof(struct smb_sid));
+src/fs/oplock.c:121:	lease = kmalloc(sizeof(struct lease), KSMBD_DEFAULT_GFP);
+src/fs/oplock.c:125:	memcpy(lease->lease_key, lctx->lease_key, SMB2_LEASE_KEY_SIZE);
+src/fs/oplock.c:131:	memcpy(lease->parent_lease_key, lctx->parent_lease_key, SMB2_LEASE_KEY_SIZE);
+src/fs/oplock.c:562:		memcpy(lease->lease_key, lctx->lease_key, SMB2_LEASE_KEY_SIZE);
+src/fs/oplock.c:594:		memcpy(lease->lease_key, lctx->lease_key, SMB2_LEASE_KEY_SIZE);
+src/fs/oplock.c:624:		memcpy(lease->lease_key, lctx->lease_key, SMB2_LEASE_KEY_SIZE);
+src/fs/oplock.c:1014:	br_info = kmalloc(sizeof(struct oplock_break_info), KSMBD_DEFAULT_GFP);
+src/fs/oplock.c:1083:	memcpy(rsp->LeaseKey, br_info->lease_key, SMB2_LEASE_KEY_SIZE);
+src/fs/oplock.c:1119:	br_info = kmalloc(sizeof(struct lease_break_info), KSMBD_DEFAULT_GFP);
+src/fs/oplock.c:1131:	memcpy(br_info->lease_key, lease->lease_key, SMB2_LEASE_KEY_SIZE);
+src/fs/oplock.c:1378:	memcpy(lease2->lease_key, lease1->lease_key,
+src/fs/oplock.c:1405:	lb = kmalloc(sizeof(struct lease_table), KSMBD_DEFAULT_GFP);
+src/fs/oplock.c:1409:	memcpy(lb->client_guid, opinfo->conn->ClientGUID,
+src/fs/oplock.c:1508:		memcpy(parent_lease_key,
+src/fs/oplock.c:1588:			memcpy(parent_lease_key,
+src/fs/oplock.c:1665:				memcpy(parent_lease_key,
+src/fs/oplock.c:2202:		memcpy(buf->lcontext.LeaseKey, lease->lease_key,
+src/fs/oplock.c:2208:			memcpy(buf->lcontext.ParentLeaseKey, lease->parent_lease_key,
+src/fs/oplock.c:2224:		memcpy(buf->lcontext.LeaseKey, lease->lease_key, SMB2_LEASE_KEY_SIZE);
+src/fs/oplock.c:2257:	lreq = kzalloc(sizeof(struct lease_ctx_info), KSMBD_DEFAULT_GFP);
+src/fs/oplock.c:2268:		memcpy(lreq->lease_key, lc->lcontext.LeaseKey, SMB2_LEASE_KEY_SIZE);
+src/fs/oplock.c:2274:			memcpy(lreq->parent_lease_key, lc->lcontext.ParentLeaseKey,
+src/fs/oplock.c:2284:		memcpy(lreq->lease_key, lc->lcontext.LeaseKey, SMB2_LEASE_KEY_SIZE);
+src/core/misc.c:299:	pathname = kmalloc(PATH_MAX, KSMBD_DEFAULT_GFP);
+src/core/misc.c:316:	nt_pathname = kmalloc(prefix + ab_pathname_len + 1, KSMBD_DEFAULT_GFP);
+src/core/misc.c:324:	memcpy(nt_pathname + prefix, &ab_pathname[share_path_len],
+src/core/misc.c:371:	cf_name = kzalloc(KSMBD_REQ_MAX_SHARE_NAME, KSMBD_DEFAULT_GFP);
+src/core/misc.c:387:	cf_len = strscpy(cf_name, name, KSMBD_REQ_MAX_SHARE_NAME);
+src/core/misc.c:434:	new_name = kmalloc(path_len + name_len + 2, KSMBD_DEFAULT_GFP);
+src/core/misc.c:438:	memcpy(new_name, share->path, path_len);
+src/core/misc.c:444:	memcpy(new_name + path_len + no_slash, name, name_len);
+src/core/misc.c:460:	out_path = kzalloc(path_len + 2, KSMBD_DEFAULT_GFP);
+src/core/misc.c:502:				snprintf(out_next, name_len + 2, "%.*s/", (int)name_len, name);
+src/core/misc.c:531:	new_name = kmalloc(path_len + name_len + 2, KSMBD_DEFAULT_GFP);
+src/core/misc.c:537:	memcpy(new_name, share->path, path_len);
+src/core/misc.c:543:	memcpy(new_name + path_len + no_slash, norm_name, name_len);
+src/core/misc.c:562:	conv = kmalloc(sz + 2, KSMBD_DEFAULT_GFP);
+src/core/ksmbd_md4.c:182:		memcpy((char *)mctx->block + (sizeof(mctx->block) - avail),
+src/core/ksmbd_md4.c:187:	memcpy((char *)mctx->block + (sizeof(mctx->block) - avail),
+src/core/ksmbd_md4.c:194:		memcpy(mctx->block, data, sizeof(mctx->block));
+src/core/ksmbd_md4.c:200:	memcpy(mctx->block, data, len);
+src/core/ksmbd_md4.c:226:	memcpy(out, mctx->hash, sizeof(mctx->hash));
+src/fs/ksmbd_branchcache.c:167:	read_buf = kmalloc(PCCRC_READ_BUF_SIZE, KSMBD_DEFAULT_GFP);
+src/fs/ksmbd_branchcache.c:368:	memcpy(hashes, xattr_buf + sizeof(struct pccrc_cache_header),
+src/fs/ksmbd_branchcache.c:404:	cache_hdr = kzalloc(cache_size, KSMBD_DEFAULT_GFP);
+src/fs/ksmbd_branchcache.c:417:	memcpy((u8 *)cache_hdr + sizeof(struct pccrc_cache_header),
+src/fs/ksmbd_branchcache.c:545:		if (check_mul_overflow((size_t)num_segments,
+src/fs/ksmbd_branchcache.c:549:		segment_hashes = kvzalloc(hash_alloc_size,
+src/fs/ksmbd_branchcache.c:597:		memcpy(seg[i].SegmentHashOfData, hash, PCCRC_V1_HASH_SIZE);
+src/fs/ksmbd_branchcache.c:605:		memcpy(seg[i].SegmentSecret, secret, PCCRC_V1_HASH_SIZE);
+src/core/auth.c:65:	memcpy(buf, NEGOTIATE_GSS_HEADER, AUTH_GSS_LENGTH);
+src/core/auth.c:279:	uniname = kzalloc(2 + UNICODE_LEN(len), KSMBD_DEFAULT_GFP);
+src/core/auth.c:303:	domain = kzalloc(2 + UNICODE_LEN(len), KSMBD_DEFAULT_GFP);
+src/core/auth.c:350:	memcpy(p21, user_passkey(sess->user), CIFS_NTHASH_SIZE);
+src/core/auth.c:359:	memcpy(sess->sess_key + CIFS_SMB1_SESSKEY_SIZE, key,
+src/core/auth.c:428:	if (check_add_overflow(CIFS_CRYPTO_KEY_SIZE, blen, &len)) {
+src/core/auth.c:432:	construct = kzalloc(len, KSMBD_DEFAULT_GFP);
+src/core/auth.c:438:	memcpy(construct, cryptkey, CIFS_CRYPTO_KEY_SIZE);
+src/core/auth.c:439:	memcpy(construct + CIFS_CRYPTO_KEY_SIZE, &ntlmv2->blob_signature, blen);
+src/core/auth.c:504:	memcpy(p21, user_passkey(sess->user), CIFS_NTHASH_SIZE);
+src/core/auth.c:688:			memcpy(&av_id, bstart + pos, sizeof(av_id));
+src/core/auth.c:689:			memcpy(&av_len, bstart + pos + 2, sizeof(av_len));
+src/core/auth.c:737:		ctx_arc4 = kmalloc(sizeof(*ctx_arc4), KSMBD_DEFAULT_GFP);
+src/core/auth.c:805:	memcpy(chgblob->Signature, NTLMSSP_SIGNATURE, 8);
+src/core/auth.c:836:	name = kmalloc(2 + UNICODE_LEN(len), KSMBD_DEFAULT_GFP);
+src/core/auth.c:873:	memcpy(chgblob->Challenge, conn->ntlmssp.cryptkey,
+src/core/auth.c:880:	memcpy(target_name, name, uni_len);
+src/core/auth.c:889:		memcpy(tinfo->Content, name, uni_len);
+src/core/auth.c:969:	memcpy(sess->sess_key, resp->payload, resp->session_key_len);
+src/core/auth.c:970:	memcpy(out_blob, resp->payload + resp->session_key_len,
+src/core/auth.c:1180:	memcpy(nonce, &hdr->MessageId, sizeof(hdr->MessageId));
+src/core/auth.c:1188:		memcpy(nonce + 8, &high_bits, sizeof(high_bits));
+src/core/auth.c:1228:	 * responses with total_len > 64 KiB, kzalloc() may fail under memory
+src/core/auth.c:1229:	 * pressure (order-4+ allocation).  Use kvzalloc() which falls back to
+src/core/auth.c:1230:	 * vmalloc() for large allocations, avoiding high-order kmalloc failures.
+src/core/auth.c:1239:	aad_buf = kvzalloc(total_len, KSMBD_DEFAULT_GFP);
+src/core/auth.c:1249:			memcpy(aad_buf + offset, iov[i].iov_base,
+src/core/auth.c:1280:	memcpy(sig, tag, SMB2_SIGNATURE_SIZE);
+src/core/auth.c:1379:	memcpy(key, hashptr, key_size);
+src/core/auth.c:1410:		memcpy(chann->smb3signingkey, key, SMB3_SIGN_KEY_SIZE);
+src/core/auth.c:1447:		memcpy(preauth_hash, preauth_sess->Preauth_HashValue,
+src/core/auth.c:1642:	memcpy(key, ses_enc_key, SMB3_ENC_DEC_KEY_SIZE);
+src/core/auth.c:1685:		if (check_add_overflow(total_entries, nr_entries[i],
+src/core/auth.c:1693:	if (check_add_overflow(total_entries, 2, &total_entries)) {
+src/core/auth.c:1819:		memcpy(sign, &tr_hdr->Signature, SMB2_SIGNATURE_SIZE);
+src/core/auth.c:1831:	iv = kzalloc(iv_len, KSMBD_DEFAULT_GFP);
+src/core/auth.c:1839:		memcpy(iv, (char *)tr_hdr->Nonce, SMB3_AES_GCM_NONCE);
+src/core/auth.c:1869:		memcpy(iv + 1, (char *)tr_hdr->Nonce, SMB3_AES_CCM_NONCE);
+src/core/auth.c:1884:		memcpy(&tr_hdr->Signature, sign, SMB2_SIGNATURE_SIZE);
+src/fs/ksmbd_app_instance.c:174:	memcpy(fp->app_instance_id, data + APP_INSTANCE_ID_GUID_OFFSET,
+src/core/server.c:740:	ctrl = kmalloc(sizeof(struct server_ctrl_struct), KSMBD_DEFAULT_GFP);
+src/fs/ksmbd_quota.c:183:	memcpy(qi->Sid, sid, sid_len);
+src/fs/ksmbd_quota.c:363:		if (check_add_overflow(start_sid_off, start_sid_len,
+src/core/connection.c:159:	conn = kzalloc(sizeof(struct ksmbd_conn), KSMBD_DEFAULT_GFP);
+src/core/connection.c:620:		if (check_add_overflow(pdu_size, 5u, (unsigned int *)&size))
+src/core/connection.c:622:		conn->request_buf = kvmalloc(size, KSMBD_DEFAULT_GFP);
+src/core/connection.c:626:		memcpy(conn->request_buf, hdr_buf, sizeof(hdr_buf));
+src/core/connection.c:661:						if (check_add_overflow(expected_pdu, 5u,
+src/core/connection.c:665:						new_buf = kvmalloc(size, KSMBD_DEFAULT_GFP);
+src/core/connection.c:669:						memcpy(new_buf, conn->request_buf,
+src/core/ksmbd_work.c:32:		work->iov = kzalloc(sizeof(struct kvec) * work->iov_alloc_cnt,
+src/core/ksmbd_work.c:134:		ar = kmalloc(sizeof(struct aux_read), KSMBD_DEFAULT_GFP);
+src/core/ksmbd_work.c:189:	work->response_buf = kzalloc(MAX_CIFS_SMALL_BUFFER_SIZE, KSMBD_DEFAULT_GFP);
+src/core/ksmbd_debugfs.c:82:			snprintf(snaps[count].addr_buf,
+src/core/ksmbd_buffer.c:7: *   Pre-allocates buffers in two tiers to reduce kvzalloc() overhead
+src/core/ksmbd_buffer.c:69:		entry = kvzalloc(sizeof(*entry) + buf_size,
+src/core/ksmbd_buffer.c:166: * Otherwise falls back to kvzalloc().
+src/core/ksmbd_buffer.c:191:		entry = kvzalloc(sizeof(*entry) + pool->buf_size,
+src/core/ksmbd_buffer.c:200:	entry = kvzalloc(sizeof(*entry) + size, KSMBD_DEFAULT_GFP);
+src/core/crypto_ctx.c:116:	shash = kzalloc(sizeof(*shash) + crypto_shash_descsize(tfm),
+src/core/crypto_ctx.c:176:		ctx = kzalloc(sizeof(struct ksmbd_crypto_ctx),
+src/core/crypto_ctx.c:327:	ctx = kzalloc(sizeof(struct ksmbd_crypto_ctx), KSMBD_DEFAULT_GFP);
+src/transport/transport_tcp.c:117:	t = kzalloc(sizeof(*t), KSMBD_DEFAULT_GFP);
+src/transport/transport_tcp.c:130:		memcpy(&conn->inet6_addr, &client_sk->sk->sk_v6_daddr, 16);
+src/transport/transport_tcp.c:191:	memcpy(new, iov, sizeof(*iov) * nr_segs);
+src/transport/transport_tcp.c:892:	iface = kzalloc(sizeof(struct interface), KSMBD_DEFAULT_GFP);
+src/core/smb2_compress.c:282:			memcpy(out + out_pos, in + in_pos, chunk_data_size);
+src/core/smb2_compress.c:512:				memcpy(out + out_pos, in + chunk_start_in,
+src/core/smb2_compress.c:1091:		dec = kvmalloc(sizeof(*dec), GFP_KERNEL);
+src/core/smb2_compress.c:1511:			memcpy(out_buf + out_pos, seg_data, seg_comp_len);
+src/core/smb2_compress.c:1601:		decompressed_buf = kvmalloc(original_size + 5,
+src/core/smb2_compress.c:1677:	if (check_add_overflow(
+src/core/smb2_compress.c:1717:	decompressed_buf = kvmalloc(total_decompressed_len + 5,
+src/core/smb2_compress.c:1727:		memcpy(decompressed_buf + 4, uncompressed_part, offset);
+src/core/smb2_compress.c:1856:		linear = kvmalloc(payload_len, KSMBD_DEFAULT_GFP);
+src/core/smb2_compress.c:1870:				memcpy(linear,
+src/core/smb2_compress.c:1883:				memcpy(linear + linear_off,
+src/core/smb2_compress.c:1901:	compressed_buf = kvmalloc(payload_len, KSMBD_DEFAULT_GFP);
+src/core/smb2_compress.c:1935:	comp_transform_buf = kvmalloc(comp_transform_len, KSMBD_DEFAULT_GFP);
+src/core/smb2_compress.c:1954:	memcpy(comp_transform_buf + 4 +
+src/core/smb2_compress.c:1959:	memcpy(comp_transform_buf + 4 +
+src/transport/transport_rdma.c:423:	t = kzalloc(sizeof(*t), KSMBD_DEFAULT_GFP);
+src/transport/transport_rdma.c:490:			memcpy(&conn->inet6_addr, &sin6->sin6_addr, 16);
+src/transport/transport_rdma.c:1065:			memcpy(buf + data_read, (char *)data_transfer + data_offset + offset,
+src/transport/transport_rdma.c:1855:		msg = kzalloc(struct_size(msg, sg_list, SG_CHUNK_SIZE),
+src/transport/transport_rdma.c:2294:	snprintf(name, sizeof(name), "smb_direct_rqst_pool_%p", t);
+src/transport/transport_rdma.c:2308:	snprintf(name, sizeof(name), "smb_direct_resp_%p", t);
+src/transport/transport_rdma.c:2671:	smb_dev = kzalloc(sizeof(*smb_dev), KSMBD_DEFAULT_GFP);
+src/include/core/ksmbd_buffer.h:57: * Otherwise falls back to kvzalloc().
+src/transport/transport_quic.c:489:	memcpy(p, QUIC_HKDF_LABEL_PREFIX, strlen(QUIC_HKDF_LABEL_PREFIX));
+src/transport/transport_quic.c:491:	memcpy(p, label, strlen(label));
+src/transport/transport_quic.c:497:		memcpy(p, context, ctx_len);
+src/transport/transport_quic.c:725:	memcpy(nonce, iv, QUIC_AEAD_IV_SIZE);
+src/transport/transport_quic.c:762:	work_buf = kmalloc(work_len, GFP_KERNEL);
+src/transport/transport_quic.c:769:		memcpy(work_buf, in, in_len);
+src/transport/transport_quic.c:771:		memcpy(work_buf, in, in_len);
+src/transport/transport_quic.c:795:			memcpy(out, work_buf, copy_len);
+src/transport/transport_quic.c:859:	memcpy(tx_info.key,  write_key,  TLS_CIPHER_AES_GCM_128_KEY_SIZE);
+src/transport/transport_quic.c:860:	memcpy(tx_info.iv,   write_iv,   TLS_CIPHER_AES_GCM_128_IV_SIZE);
+src/transport/transport_quic.c:861:	memcpy(tx_info.salt, write_salt, TLS_CIPHER_AES_GCM_128_SALT_SIZE);
+src/transport/transport_quic.c:874:	memcpy(rx_info.key,  read_key,  TLS_CIPHER_AES_GCM_128_KEY_SIZE);
+src/transport/transport_quic.c:875:	memcpy(rx_info.iv,   read_iv,   TLS_CIPHER_AES_GCM_128_IV_SIZE);
+src/transport/transport_quic.c:876:	memcpy(rx_info.salt, read_salt, TLS_CIPHER_AES_GCM_128_SALT_SIZE);
+src/transport/transport_quic.c:1075:		memcpy(qconn->app_crypto.write_key, rsp->write_key, key_len);
+src/transport/transport_quic.c:1076:		memcpy(qconn->app_crypto.write_iv, rsp->write_iv,
+src/transport/transport_quic.c:1078:		memcpy(qconn->app_crypto.read_key, rsp->read_key, key_len);
+src/transport/transport_quic.c:1079:		memcpy(qconn->app_crypto.read_iv, rsp->read_iv,
+src/transport/transport_quic.c:1167:	req = kzalloc(sizeof(*req), GFP_KERNEL);
+src/transport/transport_quic.c:1189:		memcpy(req->peer_addr, &sin6->sin6_addr, 16);
+src/transport/transport_quic.c:1196:		memcpy(req->peer_addr + 12, &sin->sin_addr, 4);
+src/transport/transport_quic.c:1203:	memcpy(req->client_hello, qconn->crypto_buf, req->client_hello_len);
+src/transport/transport_quic.c:1359:		memcpy(fp, reason, reason_len);
+src/transport/transport_quic.c:1371:	memcpy(p, qconn->scid, qconn->scid_len);
+src/transport/transport_quic.c:1376:	memcpy(p, qconn->dcid, qconn->dcid_len);
+src/transport/transport_quic.c:1400:	memcpy(p, frame, frame_len);
+src/transport/transport_quic.c:1543:					memcpy(qconn->crypto_buf +
+src/transport/transport_quic.c:1633:		memcpy(p, qconn->scid, qconn->scid_len);
+src/transport/transport_quic.c:1638:		memcpy(p, qconn->dcid, qconn->dcid_len);
+src/transport/transport_quic.c:1680:		memcpy(p, data, chunk);
+src/transport/transport_quic.c:1749:	qconn = kzalloc(sizeof(*qconn), KSMBD_DEFAULT_GFP);
+src/transport/transport_quic.c:1753:	qconn->stream_buf = kvmalloc(QUIC_STREAM_BUF_SIZE, KSMBD_DEFAULT_GFP);
+src/transport/transport_quic.c:1849:	memcpy(dcid_out, p, dcid_len);
+src/transport/transport_quic.c:1863:	memcpy(scid_out, p, scid_len);
+src/transport/transport_quic.c:1928:	memcpy(qconn->stream_buf + qconn->stream_len, data, len);
+src/transport/transport_quic.c:1982:			memcpy(buf, qconn->stream_buf, to_read);
+src/transport/transport_quic.c:1984:			memmove(qconn->stream_buf,
+src/transport/transport_quic.c:2064:	memcpy(p, qconn->scid, qconn->scid_len);
+src/transport/transport_quic.c:2230:	t = kzalloc(sizeof(*t), KSMBD_DEFAULT_GFP);
+src/transport/transport_quic.c:2257:		memcpy(&conn->inet6_addr, &sin6->sin6_addr, 16);
+src/transport/transport_quic.c:2261:		memcpy(&conn->inet_addr,
+src/transport/transport_quic.c:2408:	memcpy(p, scid, scid_len);
+src/transport/transport_quic.c:2413:	memcpy(p, dcid, dcid_len);
+src/transport/transport_quic.c:2597:	memcpy(qconn->dcid, dcid, dcid_len);
+src/transport/transport_quic.c:2601:	memcpy(qconn->scid, scid, scid_len);
+src/transport/transport_quic.c:2604:	memcpy(&qconn->peer, peer, peer_len);
+src/transport/transport_quic.c:2903:	pkt_buf = kmalloc(QUIC_MAX_PKT_SIZE, KSMBD_DEFAULT_GFP);
+src/transport/transport_quic.c:2974:							memcpy(dcid, pkt_buf + 6, dl);
+src/transport/transport_quic.c:2979:								memcpy(scid,
+src/transport/transport_ipc.c:333:	if (check_add_overflow(sz, sizeof(struct ksmbd_ipc_msg), &msg_sz))
+src/transport/transport_ipc.c:336:	msg = kvzalloc(msg_sz, KSMBD_DEFAULT_GFP);
+src/transport/transport_ipc.c:382:		entry->response = kvzalloc(sz, KSMBD_DEFAULT_GFP);
+src/transport/transport_ipc.c:388:		memcpy(entry->response, payload, sz);
+src/transport/transport_ipc.c:408:	if (check_mul_overflow(req->deadtime, SMB_ECHO_INTERVAL,
+src/transport/transport_ipc.c:440:	strscpy(server_conf.fruit_model, req->fruit_model,
+src/transport/transport_ipc.c:591:		if (check_add_overflow(msg_sz, resp->payload_sz, &msg_sz))
+src/transport/transport_ipc.c:601:		if (check_add_overflow(resp->session_key_len,
+src/transport/transport_ipc.c:604:		if (check_add_overflow(msg_sz, payload_sz, &msg_sz))
+src/transport/transport_ipc.c:618:		if (check_add_overflow(msg_sz, resp->payload_sz, &msg_sz))
+src/transport/transport_ipc.c:630:			if (check_mul_overflow(resp->ngroups,
+src/transport/transport_ipc.c:634:			if (check_add_overflow(msg_sz, groups_sz, &msg_sz))
+src/transport/transport_ipc.c:718:	strscpy(req->account, account, KSMBD_REQ_MAX_ACCOUNT_NAME_SZ);
+src/transport/transport_ipc.c:741:	strscpy(req->account, account, KSMBD_REQ_MAX_ACCOUNT_NAME_SZ);
+src/transport/transport_ipc.c:767:	memcpy(req->spnego_blob, spnego_blob, blob_len);
+src/transport/transport_ipc.c:802:	strscpy(req->account, user_name(sess->user), KSMBD_REQ_MAX_ACCOUNT_NAME_SZ);
+src/transport/transport_ipc.c:803:	strscpy(req->share, share->name, KSMBD_REQ_MAX_SHARE_NAME);
+src/transport/transport_ipc.c:804:	snprintf(req->peer_addr, sizeof(req->peer_addr), "%pIS", peer_addr);
+src/transport/transport_ipc.c:854:	strscpy(req->account, account, KSMBD_REQ_MAX_ACCOUNT_NAME_SZ);
+src/transport/transport_ipc.c:878:	strscpy(req->share_name, name, KSMBD_REQ_MAX_SHARE_NAME);
+src/transport/transport_ipc.c:954:	memcpy(req->payload, payload, payload_sz);
+src/transport/transport_ipc.c:1013:	memcpy(req->payload, payload, payload_sz);
+src/transport/transport_ipc.c:1041:	memcpy(req->payload, payload, payload_sz);
+src/transport/transport_ipc.c:1138:	memcpy(msg->payload, &resp, sizeof(resp));
+src/transport/transport_ipc.c:1177:	memcpy(msg->payload, &resp, sizeof(resp));
+src/transport/transport_ipc.c:1256:		strscpy(entry->if_name, dev->name, sizeof(entry->if_name));
+src/transport/transport_ipc.c:1264:				snprintf(entry->ipv4_addr,
+src/transport/transport_ipc.c:1312:	strscpy(notify->resource_name, resource_name,
+src/protocol/smb2/smb2_pdu_common.c:670:	memcpy(rsp_hdr->Signature, rcv_hdr->Signature, 16);
+src/protocol/smb2/smb2_pdu_common.c:753:	memcpy(rsp_hdr->Signature, rcv_hdr->Signature, 16);
+src/protocol/smb2/smb2_pdu_common.c:794:	work->response_buf = kvzalloc(sz, KSMBD_DEFAULT_GFP);
+src/protocol/smb2/smb2_pdu_common.c:990:	memcpy(smb2_get_msg(in_work->response_buf), ksmbd_resp_buf_next(work),
+src/protocol/smb2/smb2_pdu_common.c:1154:	memcpy(signature_req, hdr->Signature, SMB2_SIGNATURE_SIZE);
+src/protocol/smb2/smb2_pdu_common.c:1211:		memcpy(hdr->Signature, signature, SMB2_SIGNATURE_SIZE);
+src/protocol/smb2/smb2_pdu_common.c:1275:	memcpy(signature_req, hdr->Signature, SMB2_SIGNATURE_SIZE);
+src/protocol/smb2/smb2_pdu_common.c:1368:		memcpy(hdr->Signature, signature, SMB2_SIGNATURE_SIZE);
+src/protocol/smb2/smb2_pdu_common.c:1458:			memcpy(&tr_hdr->Nonce,
+src/protocol/smb2/smb2_pdu_common.c:1461:			memcpy(&tr_hdr->Nonce[4],
+src/protocol/smb2/smb2_pdu_common.c:1479:	memcpy(&tr_hdr->SessionId, &hdr->SessionId, 8);
+src/protocol/smb2/smb2_pdu_common.c:1492:	tr_buf = kzalloc(sizeof(struct smb2_transform_hdr) + 4, KSMBD_DEFAULT_GFP);
+src/protocol/smb2/smb2_pdu_common.c:1574:	memmove(buf + 4, iov[1].iov_base, buf_data_size);
+src/protocol/smb2/smb2_dir.c:315:		memcpy(ffdinfo->FileName, conv_name, conv_len);
+src/protocol/smb2/smb2_dir.c:338:		memcpy(fbdinfo->FileName, conv_name, conv_len);
+src/protocol/smb2/smb2_dir.c:350:		memcpy(fdinfo->FileName, conv_name, conv_len);
+src/protocol/smb2/smb2_dir.c:360:		memcpy(fninfo->FileName, conv_name, conv_len);
+src/protocol/smb2/smb2_dir.c:394:		memcpy(dinfo->FileName, conv_name, conv_len);
+src/protocol/smb2/smb2_dir.c:433:		memcpy(fibdinfo->FileName, conv_name, conv_len);
+src/protocol/smb2/smb2_dir.c:451:		memcpy(&extdinfo->FileId[0], &ino, sizeof(ino));
+src/protocol/smb2/smb2_dir.c:455:		memcpy(extdinfo->FileName, conv_name, conv_len);
+src/protocol/smb2/smb2_dir.c:473:		memcpy(&extdbinfo->FileId[0], &ino, sizeof(ino));
+src/protocol/smb2/smb2_dir.c:483:		memcpy(extdbinfo->FileName, conv_name, conv_len);
+src/protocol/smb2/smb2_dir.c:503:		memcpy(extd64info->FileName, conv_name, conv_len);
+src/protocol/smb2/smb2_dir.c:530:		memcpy(extd64binfo->FileName, conv_name, conv_len);
+src/protocol/smb2/smb2_dir.c:549:		memcpy(&allexdinfo->FileId128[0], &ino, sizeof(ino));
+src/protocol/smb2/smb2_dir.c:553:		memcpy(allexdinfo->FileName, conv_name, conv_len);
+src/protocol/smb2/smb2_dir.c:572:		memcpy(&allexdbinfo->FileId128[0], &ino, sizeof(ino));
+src/protocol/smb2/smb2_dir.c:583:		memcpy(allexdbinfo->FileName, conv_name, conv_len);
+src/protocol/smb2/smb2_dir.c:643:		memcpy(posix_info->name, conv_name, conv_len);
+src/protocol/smb2/smb2_dir.c:810:		memcpy(ffdinfo->FileName, d_info->name, d_info->name_len);
+src/protocol/smb2/smb2_dir.c:822:		memcpy(fbdinfo->FileName, d_info->name, d_info->name_len);
+src/protocol/smb2/smb2_dir.c:834:		memcpy(fdinfo->FileName, d_info->name, d_info->name_len);
+src/protocol/smb2/smb2_dir.c:846:		memcpy(fninfo->FileName, d_info->name, d_info->name_len);
+src/protocol/smb2/smb2_dir.c:858:		memcpy(dinfo->FileName, d_info->name, d_info->name_len);
+src/protocol/smb2/smb2_dir.c:871:		memcpy(fibdinfo->FileName, d_info->name, d_info->name_len);
+src/protocol/smb2/smb2_dir.c:883:		memcpy(extdinfo->FileName, d_info->name, d_info->name_len);
+src/protocol/smb2/smb2_dir.c:895:		memcpy(extdbinfo->FileName, d_info->name, d_info->name_len);
+src/protocol/smb2/smb2_dir.c:907:		memcpy(extd64info->FileName, d_info->name, d_info->name_len);
+src/protocol/smb2/smb2_dir.c:919:		memcpy(extd64binfo->FileName, d_info->name, d_info->name_len);
+src/protocol/smb2/smb2_dir.c:931:		memcpy(allexdinfo->FileName, d_info->name, d_info->name_len);
+src/protocol/smb2/smb2_dir.c:944:		memcpy(allexdbinfo->FileName, d_info->name, d_info->name_len);
+src/protocol/smb2/smb2_dir.c:955:		memcpy(posix_info->name, d_info->name, d_info->name_len);
+src/protocol/smb2/smb2_notify.c:141:	argv = kmalloc(3 * sizeof(void *), KSMBD_DEFAULT_GFP);
+src/protocol/smb2/smb2_notify.c:211:		memcpy(smb2_get_msg(async_work->response_buf), rsp,
+src/protocol/smb2/smb2_notify.c:258:			memcpy(rsp, smb2_get_msg(async_work->response_buf),
+src/protocol/smb2/smb2_misc_cmds.c:536:	memcpy(rsp->LeaseKey, req->LeaseKey, 16);
+src/protocol/smb2/smb2_create.c:189:	    check_add_overflow(dacl_offset, sizeof(struct smb_acl),
+src/protocol/smb2/smb2_create.c:365:	attr_name = kmalloc(XATTR_NAME_MAX + 1, KSMBD_DEFAULT_GFP);
+src/protocol/smb2/smb2_create.c:385:		memcpy(attr_name, XATTR_USER_PREFIX, XATTR_USER_PREFIX_LEN);
+src/protocol/smb2/smb2_create.c:386:		memcpy(&attr_name[XATTR_USER_PREFIX_LEN], eabuf->name,
+src/protocol/smb2/smb2_create.c:1241:	memcpy(file_id_le, (char *)req + name_off, name_len);
+src/protocol/smb2/smb2_create.c:1261:		memmove(path_name, path_name + 1, strlen(path_name));
+src/protocol/smb2/smb2_create.c:1769:			snprintf(gmt_token, sizeof(gmt_token),
+src/protocol/smb2/smb2_create.c:1775:			snap_path = kzalloc(PATH_MAX,
+src/protocol/smb2/smb2_create.c:2289:					pntsd = kmalloc(sd_buf_size,
+src/protocol/smb2/smb2_create.c:2607:					client_info = kzalloc(sizeof(struct fruit_client_info),
+src/protocol/smb2/smb2_create.c:2616:					memcpy(client_info, context_data, copy_len);
+src/protocol/smb2/smb2_create.c:2663:	memcpy(fp->client_guid, conn->ClientGUID, SMB2_CLIENT_GUID_SIZE);
+src/protocol/smb2/smb2_create.c:2674:			memcpy(fp->create_guid, dh_info.CreateGuid,
+src/protocol/smb2/smb2_session.c:177:	neg_blob = kzalloc(sz, KSMBD_DEFAULT_GFP);
+src/protocol/smb2/smb2_session.c:202:	memcpy(rsp->Buffer, spnego_blob, spnego_blob_len);
+src/protocol/smb2/smb2_session.c:294:		memcpy(rsp->Buffer, spnego_blob, spnego_blob_len);
+src/protocol/smb2/smb2_session.c:444:			chann = kmalloc(sizeof(struct channel), KSMBD_DEFAULT_GFP);
+src/protocol/smb2/smb2_session.c:584:			chann = kmalloc(sizeof(struct channel), KSMBD_DEFAULT_GFP);
+src/protocol/smb2/smb2_read_write.c:143:	argv = kmalloc(sizeof(void *), KSMBD_DEFAULT_GFP);
+src/protocol/smb2/smb2_read_write.c:254:			kvmalloc(nbytes, KSMBD_DEFAULT_GFP);
+src/protocol/smb2/smb2_read_write.c:260:		memcpy(aux_payload_buf, rpc_resp->payload, nbytes);
+src/protocol/smb2/smb2_read_write.c:635:		memcpy(rsp->Buffer, aux_payload_buf, nbytes);
+src/protocol/smb2/smb2fruit.c:81:	memcpy(state->client_build, &client_info->build_number,
+src/protocol/smb2/smb2fruit.c:116:		conn->fruit_state = kzalloc(sizeof(struct fruit_conn_state),
+src/protocol/smb2/smb2fruit.c:252:	memcpy(state->client_build, &client_info->build_number,
+src/protocol/smb2/smb2fruit.c:307:	*response_data = kzalloc(size, GFP_KERNEL);
+src/protocol/smb2/smb2fruit.c:404:	memcpy(buf, &val, 4);
+src/protocol/smb2/smb2fruit.c:407:	memcpy(buf + 4, &val, 4);
+src/protocol/smb2/smb2fruit.c:412:	memcpy(buf + 12, &val, 4);
+src/protocol/smb2/smb2fruit.c:499:		memcpy(buf, &val, 4);
+src/protocol/smb2/smb2fruit.c:502:		memcpy(buf + 4, &val, 4);
+src/protocol/smb2/smb2fruit.c:505:		memcpy(buf + 12, &val, 4);
+src/protocol/smb2/smb2_lock.c:372:	lock = kzalloc(sizeof(struct ksmbd_lock), KSMBD_DEFAULT_GFP);
+src/protocol/smb2/smb2_lock.c:913:				argv = kmalloc(sizeof(void *), KSMBD_DEFAULT_GFP);
+src/protocol/smb2/smb2_negotiate.c:342:	if (check_mul_overflow((size_t)cph_cnt, sizeof(__le16), &cphs_size)) {
+src/protocol/smb2/smb2_negotiate.c:433:	if (check_mul_overflow((size_t)algo_cnt, sizeof(__le16), &algos_size)) {
+src/protocol/smb2/smb2_negotiate.c:493:	if (check_mul_overflow((int)sign_algo_cnt, (int)sizeof(__le16), &sign_alos_size))
+src/protocol/smb2/smb2_negotiate.c:564:	if (check_mul_overflow((int)xform_cnt, (int)sizeof(__le16), &xforms_size))
+src/protocol/smb2/smb2_negotiate.c:834:			kzalloc(sizeof(struct preauth_integrity_info),
+src/protocol/smb2/smb2_negotiate.c:950:		memcpy(conn->ClientGUID, req->ClientGUID,
+src/protocol/smb2/smb2_negotiate.c:967:	memcpy(rsp->ServerGUID, server_conf.server_guid,
+src/protocol/smb2/smb2_query_set.c:311:		memcpy(ptr, buf, value_len);
+src/protocol/smb2/smb2_query_set.c:319:			memcpy(eainfo->name, &name[XATTR_USER_PREFIX_LEN],
+src/protocol/smb2/smb2_query_set.c:322:			memcpy(eainfo->name, name, name_len);
+src/protocol/smb2/smb2_query_set.c:618:		stream_buf = kmalloc(streamlen + 1, KSMBD_DEFAULT_GFP);
+src/protocol/smb2/smb2_query_set.c:622:		streamlen = snprintf(stream_buf, streamlen + 1,
+src/protocol/smb2/smb2_query_set.c:1018:		memcpy(&reparse_tag, reparse_buf, sizeof(reparse_tag));
+src/protocol/smb2/smb2_query_set.c:1062:		memcpy(&reparse_tag, reparse_buf, sizeof(reparse_tag));
+src/protocol/smb2/smb2_query_set.c:1159:	memcpy(&info->FileId[0], &ino_le, sizeof(ino_le));
+src/protocol/smb2/smb2_query_set.c:1176:	memcpy(object_id, &ino, sizeof(ino));
+src/protocol/smb2/smb2_query_set.c:1177:	memcpy(object_id + sizeof(ino), &gen, sizeof(gen));
+src/protocol/smb2/smb2_query_set.c:1178:	memcpy(object_id + sizeof(ino) + sizeof(gen), &dev, sizeof(dev));
+src/protocol/smb2/smb2_query_set.c:1203:		memcpy(object_id, xattr_buf, 16);
+src/protocol/smb2/smb2_query_set.c:1698:		memcpy(info->extended_info.version_string, "1.1.0", strlen("1.1.0"));
+src/protocol/smb2/smb2_query_set.c:2228:	pathname = kmalloc(PATH_MAX, KSMBD_DEFAULT_GFP);
+src/protocol/smb2/smb2_query_set.c:2462:	pathname = kmalloc(PATH_MAX, KSMBD_DEFAULT_GFP);
+src/protocol/smb2/smb2_query_set.c:2721:		if (check_add_overflow(alloc_sz, (u64)511, &alloc_rounded)) {
+src/protocol/smb2/smb2_query_set.c:3157:	legacy = kzalloc(legacy_len, KSMBD_DEFAULT_GFP);
+src/protocol/smb2/smb2_query_set.c:3164:	memcpy(legacy->FileName, file_info->FileName, name_len);
+src/protocol/common/smb_common.c:434:	work->response_buf = kzalloc(MAX_CIFS_SMALL_BUFFER_SIZE,
+src/protocol/common/smb_common.c:606:		strscpy(extension, "___", sizeof(extension));
+src/protocol/common/smb_common.c:633:	memcpy(out, base, baselen + 1);
+src/protocol/common/smb_common.c:646:		memcpy(out + baselen + 4, extension, 4);
+src/protocol/smb1/smb1pdu.c:222:	memcpy(rsp_hdr->Protocol, rcv_hdr->Protocol, 4);
+src/protocol/smb1/smb1pdu.c:289:	work->response_buf = kvmalloc(sz, KSMBD_DEFAULT_GFP | __GFP_ZERO);
+src/protocol/smb1/smb1pdu.c:540:		memcpy(__smb1_unfence(buf), SERVICE_IPC_SHARE, length);
+src/protocol/smb1/smb1pdu.c:548:		memcpy(__smb1_unfence(buf), SERVICE_DISK_SHARE, length);
+src/protocol/smb1/smb1pdu.c:882:	pattern = kmalloc(pattern_len + 1, KSMBD_DEFAULT_GFP);
+src/protocol/smb1/smb1pdu.c:887:	memcpy(pattern, pattern_pos, pattern_len);
+src/protocol/smb1/smb1pdu.c:1098:		memcpy((neg_rsp->u.EncryptionKey), conn->ntlmssp.cryptkey,
+src/protocol/smb1/smb1pdu.c:1104:		memcpy(__smb1_unfence(domain_ptr), ksmbd_work_group(),
+src/protocol/smb1/smb1pdu.c:1232:	memcpy(rsp->NativeOS + offset, str, len);
+src/protocol/smb1/smb1pdu.c:1237:	memcpy(rsp->NativeOS + offset, str, len);
+src/protocol/smb1/smb1pdu.c:1244:	memcpy(rsp->NativeOS + offset, str, len);
+src/protocol/smb1/smb1pdu.c:1311:			neg_blob = kmalloc(sz, KSMBD_DEFAULT_GFP);
+src/protocol/smb1/smb1pdu.c:1336:			memcpy((char *)rsp->SecurityBlob, spnego_blob,
+src/protocol/smb1/smb1pdu.c:1427:			memcpy((char *)rsp->SecurityBlob, spnego_blob,
+src/protocol/smb1/smb1pdu.c:1454:		memcpy(__smb1_unfence(str_base + str_offset), str22, slen);
+src/protocol/smb1/smb1pdu.c:1459:		memcpy(__smb1_unfence(str_base + str_offset), str22, slen);
+src/protocol/smb1/smb1pdu.c:1466:		memcpy(__smb1_unfence(str_base + str_offset), str22, slen);
+src/protocol/smb1/smb1pdu.c:1836:	lock = kzalloc(sizeof(struct ksmbd_lock), KSMBD_DEFAULT_GFP);
+src/protocol/smb1/smb1pdu.c:2461:				memcpy((char *)rsp +
+src/protocol/smb1/smb1pdu.c:2505:				memcpy((char *)rsp +
+src/protocol/smb1/smb1pdu.c:2741:	src = kzalloc(le16_to_cpu(req->NameLength) + 2, KSMBD_DEFAULT_GFP);
+src/protocol/smb1/smb1pdu.c:2749:		memcpy(src, req->fileName + 1, le16_to_cpu(req->NameLength));
+src/protocol/smb1/smb1pdu.c:2752:		memcpy(src, req->fileName, le16_to_cpu(req->NameLength));
+src/protocol/smb1/smb1pdu.c:3290:		aux_buf = kvmalloc(nbytes, GFP_KERNEL);
+src/protocol/smb1/smb1pdu.c:3295:		memcpy(aux_buf, rpc_resp->payload, nbytes);
+src/protocol/smb1/smb1pdu.c:3398:	work->aux_payload_buf = kvmalloc(count, KSMBD_DEFAULT_GFP | __GFP_ZERO);
+src/protocol/smb1/smb1pdu.c:3720:	memcpy(rsp->Data, req->Data, data_count);
+src/protocol/smb1/smb1pdu.c:4185:	buf = vmalloc(XATTR_SIZE_MAX);
+src/protocol/smb1/smb1pdu.c:4263:	nptr = kvmalloc(new_sz, KSMBD_DEFAULT_GFP | __GFP_ZERO);
+src/protocol/smb1/smb1pdu.c:4266:	memcpy(nptr, ptr, sz);
+src/protocol/smb1/smb1pdu.c:4284:	buf = kzalloc((CIFS_MF_SYMLINK_LINK_MAXLEN), KSMBD_DEFAULT_GFP);
+src/protocol/smb1/smb1pdu.c:4333:		name_len = strscpy(ptr, buf, link_len);
+src/protocol/smb1/smb1pdu.c:4423:		memcpy(ptr, buf, value_len);
+src/protocol/smb1/smb1pdu.c:4429:			memcpy(temp_fea->name, &name[XATTR_USER_PREFIX_LEN],
+src/protocol/smb1/smb1pdu.c:4432:			memcpy(temp_fea->name, name, name_len);
+src/protocol/smb1/smb1pdu.c:5115:		memcpy(vbuf + 5, share->name, vlabel_len);
+src/protocol/smb1/smb1pdu.c:5879:		attr_name = kmalloc(XATTR_NAME_MAX + 1, KSMBD_DEFAULT_GFP);
+src/protocol/smb1/smb1pdu.c:5885:		memcpy(attr_name, XATTR_USER_PREFIX, XATTR_USER_PREFIX_LEN);
+src/protocol/smb1/smb1pdu.c:5886:		memcpy(&attr_name[XATTR_USER_PREFIX_LEN], ea->name,
+src/protocol/smb1/smb1pdu.c:6267:		memcpy(fsinfo->FileName, conv_name, conv_len);
+src/protocol/smb1/smb1pdu.c:6296:		memcpy(fesize->FileName, conv_name, conv_len);
+src/protocol/smb1/smb1pdu.c:6307:		memcpy(fdinfo->FileName, conv_name, conv_len);
+src/protocol/smb1/smb1pdu.c:6322:		memcpy(ffdinfo->FileName, conv_name, conv_len);
+src/protocol/smb1/smb1pdu.c:6335:		memcpy(fninfo->FileName, conv_name, conv_len);
+src/protocol/smb1/smb1pdu.c:6353:		memcpy(fbdinfo->FileName, conv_name, conv_len);
+src/protocol/smb1/smb1pdu.c:6370:		memcpy(dinfo->FileName, conv_name, conv_len);
+src/protocol/smb1/smb1pdu.c:6389:		memcpy(fibdinfo->FileName, conv_name, conv_len);
+src/protocol/smb1/smb1pdu.c:6407:		memcpy(finfo->FileName, conv_name, conv_len + 2);
+src/protocol/smb1/smb1pdu.c:6465:	memcpy(de->name, name, namlen);
+src/protocol/smb1/smb1pdu.c:6577:	d_info.smb1_name = kmalloc(NAME_MAX + 1, KSMBD_DEFAULT_GFP);
+src/protocol/smb1/smb1pdu.c:6662:		memcpy(d_info.smb1_name, de->name, de->namelen);
+src/protocol/smb1/smb1pdu.c:6834:	d_info.smb1_name = kmalloc(NAME_MAX + 1, KSMBD_DEFAULT_GFP);
+src/protocol/smb1/smb1pdu.c:6900:		memcpy(d_info.smb1_name, de->name, de->namelen);
+src/protocol/smb1/smb1pdu.c:7536:		memcpy(sinfo->StreamName, default_stream_name, sname_bytes);
+src/protocol/smb1/smb1pdu.c:9408:	memcpy(signature_req, rcv_hdr1->Signature.SecuritySignature,
+src/protocol/smb1/smb1pdu.c:9460:		memcpy(rsp_hdr->Signature.SecuritySignature, signature,

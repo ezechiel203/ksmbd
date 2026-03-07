@@ -1,0 +1,9 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772585218
+time: 2026-03-04 00:46:58.427295
+test: session-id
+time: 2026-03-04 00:46:58.429138
+Testing qfileinfo with wrong sessid
+time: 2026-03-04 00:46:58.444059
+success: session-id

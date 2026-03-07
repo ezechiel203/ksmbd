@@ -1,0 +1,50 @@
+[  423.983532] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[  423.987871] ksmbd: ksmbd: witness protocol support initialised
+[  434.555881] ksmbd: ksmbd: witness protocol support removed
+[  435.012651] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[  435.271185] ksmbd: Configuration subsystem initialized with 12 parameters
+[  435.272464] ksmbd: ksmbd: kernel provides md4, skipping built-in registration
+[  435.274376] ksmbd: ksmbd: Fruit SMB extensions loaded
+[  435.276544] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[  435.277652] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[  435.278984] ksmbd: ksmbd: witness protocol support initialised
+[  445.038720] ksmbd: ksmbd: witness protocol support removed
+[  445.514648] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[  445.805765] ksmbd: Configuration subsystem initialized with 12 parameters
+[  445.807195] ksmbd: ksmbd: kernel provides md4, skipping built-in registration
+[  445.812086] ksmbd: ksmbd: Fruit SMB extensions loaded
+[  445.814197] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[  445.816255] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[  445.817986] ksmbd: ksmbd: witness protocol support initialised
+[  455.918723] ksmbd: ksmbd: witness protocol support removed
+[  456.422721] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[  456.720766] ksmbd: Configuration subsystem initialized with 12 parameters
+[  456.722251] ksmbd: ksmbd: kernel provides md4, skipping built-in registration
+[  456.724327] ksmbd: ksmbd: Fruit SMB extensions loaded
+[  456.726440] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[  456.727977] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[  456.729294] ksmbd: ksmbd: witness protocol support initialised
+[  465.977732] ksmbd: ksmbd: witness protocol support removed
+[  466.439643] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[  466.712984] ksmbd: Configuration subsystem initialized with 12 parameters
+[  466.714401] ksmbd: ksmbd: kernel provides md4, skipping built-in registration
+[  466.716723] ksmbd: ksmbd: Fruit SMB extensions loaded
+[  466.717789] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[  466.718891] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[  466.720160] ksmbd: ksmbd: witness protocol support initialised
+[  476.125846] ksmbd: ksmbd: witness protocol support removed
+[  476.585642] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[  476.880024] ksmbd: Configuration subsystem initialized with 12 parameters
+[  476.881332] ksmbd: ksmbd: kernel provides md4, skipping built-in registration
+[  476.883250] ksmbd: ksmbd: Fruit SMB extensions loaded
+[  476.885314] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[  476.886546] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[  476.887856] ksmbd: ksmbd: witness protocol support initialised
+[  486.657765] ksmbd: ksmbd: witness protocol support removed
+[  487.132641] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[  487.406444] ksmbd: Configuration subsystem initialized with 12 parameters
+[  487.407741] ksmbd: ksmbd: kernel provides md4, skipping built-in registration
+[  487.410530] ksmbd: ksmbd: Fruit SMB extensions loaded
+[  487.411722] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[  487.412783] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[  487.413967] ksmbd: ksmbd: witness protocol support initialised

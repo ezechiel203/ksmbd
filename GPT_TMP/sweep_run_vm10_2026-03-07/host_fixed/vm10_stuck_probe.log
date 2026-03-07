@@ -1,0 +1,131 @@
+status
+ksmbd module:   loaded (version 3.5.4)
+[ksmbdctl(control)/8932]: ERROR: Invalid lock entry `8756'
+ksmbd.mountd:   not running
+Debug:          smb auth vfs oplock ipc conn rdma 
+---ps---
+root        8901    8900 75 11:39 ?        00:02:35 ksmbdctl stop
+---lsmod---
+ksmbd                1077248  2
+libdes                 20480  1 ksmbd
+---dmesg---
+[  765.141169] ksmbd: inherit ACL overflow
+[  765.142444] ksmbd: inherit ACL overflow
+[  765.143776] ksmbd: inherit ACL overflow
+[  765.144956] ksmbd: inherit ACL overflow
+[  765.146098] ksmbd: inherit ACL overflow
+[  767.047526] ksmbd: error while processing smb2 query dir rc = -2
+[  770.136564] smb_inherit_dacl: 3525 callbacks suppressed
+[  770.136568] ksmbd: inherit ACL overflow
+[  770.139900] ksmbd: inherit ACL overflow
+[  770.145769] ksmbd: inherit ACL overflow
+[  770.147895] ksmbd: inherit ACL overflow
+[  770.150144] ksmbd: inherit ACL overflow
+[  770.152536] ksmbd: inherit ACL overflow
+[  770.154901] ksmbd: inherit ACL overflow
+[  770.157139] ksmbd: inherit ACL overflow
+[  770.159601] ksmbd: inherit ACL overflow
+[  770.162856] ksmbd: inherit ACL overflow
+[  777.495710] ksmbd: ksmbd: witness protocol support removed
+[  778.030741] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[  778.316814] ksmbd: Configuration subsystem initialized with 12 parameters
+[  778.318280] ksmbd: ksmbd: kernel provides md4, skipping built-in registration
+[  778.320475] ksmbd: ksmbd: Fruit SMB extensions loaded
+[  778.322229] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[  778.323391] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[  778.324731] ksmbd: ksmbd: witness protocol support initialised
+[  786.123009] ksmbd: inherit ACL overflow
+[  787.125035] ksmbd: inherit ACL overflow
+[  800.199131] ksmbd: inherit ACL overflow
+[  806.219388] ksmbd: inherit ACL overflow
+[  812.241484] ksmbd: inherit ACL overflow
+[  818.265195] ksmbd: inherit ACL overflow
+[  824.290982] ksmbd: inherit ACL overflow
+[  830.313928] ksmbd: inherit ACL overflow
+[  837.335809] ksmbd: inherit ACL overflow
+[  838.342165] ksmbd: inherit ACL overflow
+[  839.348887] ksmbd: inherit ACL overflow
+[  840.356006] ksmbd: inherit ACL overflow
+[  842.367019] ksmbd: inherit ACL overflow
+[  843.380171] ksmbd: inherit ACL overflow
+[  844.392504] ksmbd: inherit ACL overflow
+[  845.409334] ksmbd: inherit ACL overflow
+[  847.426775] ksmbd: inherit ACL overflow
+[  849.445287] ksmbd: inherit ACL overflow
+[  850.452628] ksmbd: inherit ACL overflow
+[  851.463388] ksmbd: inherit ACL overflow
+[  852.477877] ksmbd: inherit ACL overflow
+[  854.488454] ksmbd: inherit ACL overflow
+[  855.496569] ksmbd: inherit ACL overflow
+[  857.517206] ksmbd: inherit ACL overflow
+[  859.534191] ksmbd: inherit ACL overflow
+[  861.555397] ksmbd: inherit ACL overflow
+[  862.567509] ksmbd: inherit ACL overflow
+[  862.586803] ksmbd: inherit ACL overflow
+[  867.089727] ksmbd: ksmbd: witness protocol support removed
+[  867.609659] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[  867.902844] ksmbd: Configuration subsystem initialized with 12 parameters
+[  867.904109] ksmbd: ksmbd: kernel provides md4, skipping built-in registration
+[  867.906988] ksmbd: ksmbd: Fruit SMB extensions loaded
+[  867.907961] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[  867.909267] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[  867.910594] ksmbd: ksmbd: witness protocol support initialised
+[  873.920489] ksmbd: inherit ACL overflow
+[  873.922792] ksmbd: inherit ACL overflow
+[  877.562854] ksmbd: ksmbd: witness protocol support removed
+[  878.048642] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[  878.359233] ksmbd: Configuration subsystem initialized with 12 parameters
+[  878.360786] ksmbd: ksmbd: kernel provides md4, skipping built-in registration
+[  878.363333] ksmbd: ksmbd: Fruit SMB extensions loaded
+[  878.364954] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[  878.366208] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[  878.367573] ksmbd: ksmbd: witness protocol support initialised
+[  884.414666] ksmbd: durable reconnect: client GUID mismatch
+[  884.418690] ksmbd: durable reconnect: client GUID mismatch
+[  891.835672] ksmbd: ksmbd: witness protocol support removed
+[  892.294638] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[  893.425927] ksmbd: Configuration subsystem initialized with 12 parameters
+[  893.427375] ksmbd: ksmbd: kernel provides md4, skipping built-in registration
+[  893.429418] ksmbd: ksmbd: Fruit SMB extensions loaded
+[  893.431170] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[  893.432315] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[  893.434490] ksmbd: ksmbd: witness protocol support initialised
+[  899.306297] ksmbd: durable reconnect v2: client GUID mismatch
+[  899.312940] ksmbd: durable reconnect v2: client GUID mismatch
+[  899.346299] ksmbd: inherit ACL overflow
+[  899.355270] ksmbd: inherit ACL overflow
+[  899.383852] ksmbd: inherit ACL overflow
+[  899.400843] ksmbd: inherit ACL overflow
+[  899.407028] ksmbd: inherit ACL overflow
+[  899.416557] ksmbd: inherit ACL overflow
+[  899.426513] ksmbd: inherit ACL overflow
+[  899.437324] ksmbd: inherit ACL overflow
+[  903.452989] ksmbd: inherit ACL overflow
+[  905.463253] ksmbd: inherit ACL overflow
+[  907.479197] ksmbd: inherit ACL overflow
+[  911.496968] ksmbd: inherit ACL overflow
+[  915.513898] ksmbd: inherit ACL overflow
+[  919.531058] ksmbd: inherit ACL overflow
+[  923.547726] ksmbd: inherit ACL overflow
+[  927.564641] ksmbd: inherit ACL overflow
+[  984.630172] clocksource: Long readout interval, skipping watchdog check: cs_nsec: 1509199790 wd_nsec: 1509199745
+[ 1107.256691] INFO: task ksmbd-durable-s:8856 blocked for more than 122 seconds.
+[ 1107.258439]       Tainted: G           OE       6.18.13-arch1-1 #1
+[ 1107.260969] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+[ 1107.263636] task:ksmbd-durable-s state:D stack:0     pid:8856  tgid:8856  ppid:2      task_flags:0x200040 flags:0x00080000
+[ 1107.265984] Call Trace:
+[ 1107.266484]  <TASK>
+[ 1107.267125]  __schedule+0x418/0x1320
+[ 1107.267981]  ? lock_timer_base+0x70/0x90
+[ 1107.269886]  schedule+0x27/0xd0
+[ 1107.270522]  schedule_timeout+0x83/0x100
+[ 1107.271477]  ? __pfx_process_timeout+0x10/0x10
+[ 1107.272493]  ksmbd_durable_scavenger+0x37b/0x3f0 [ksmbd 83cbec8f884050b7893c25594469b389b0997d3b]
+[ 1107.275434]  ? __pfx_autoremove_wake_function+0x10/0x10
+[ 1107.277624]  ? __pfx_ksmbd_durable_scavenger+0x10/0x10 [ksmbd 83cbec8f884050b7893c25594469b389b0997d3b]
+[ 1107.279704]  kthread+0xfc/0x240
+[ 1107.280366]  ? __pfx_kthread+0x10/0x10
+[ 1107.282269]  ret_from_fork+0x1c2/0x1f0
+[ 1107.283127]  ? __pfx_kthread+0x10/0x10
+[ 1107.283998]  ret_from_fork_asm+0x1a/0x30
+[ 1107.285079]  </TASK>

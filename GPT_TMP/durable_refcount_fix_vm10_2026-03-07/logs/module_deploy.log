@@ -1,0 +1,13 @@
+Deploying ksmbd to: VM10
+
+==> Deploying to VM10 (SSH 20022)...
+[ksmbdctl(control)/806]: INFO: Killed ksmbd
+[ksmbdctl(user)/833]: ERROR: Failed to create file “/usr/local/etc/ksmbd/ksmbdpwd.db.0CXPL3”: No such file or directory
+[ksmbdctl(start)/834]: INFO: Started manager
+[ksmbdctl(start)/834]: ERROR: Can't init manager, check syslog
+  WARN: VM10 port 445 not listening, retrying...
+[ksmbdctl(start)/853]: INFO: Started manager
+[ksmbdctl(start)/853]: ERROR: Can't init manager, check syslog
+  FAIL: VM10 ksmbd NOT running
+
+Done. 1 VMs targeted, 1 failed.

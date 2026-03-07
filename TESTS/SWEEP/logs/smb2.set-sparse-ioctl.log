@@ -1,0 +1,10 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772585225
+time: 2026-03-04 00:47:05.135826
+test: set-sparse-ioctl
+time: 2026-03-04 00:47:05.137397
+time: 2026-03-04 00:47:05.137407
+failure: set-sparse-ioctl [
+../../source4/torture/smb2/ioctl.c:3258: Need to provide filename through --option=torture:filename=testfile
+]

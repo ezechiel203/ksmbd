@@ -1,0 +1,19 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772524530
+time: 2026-03-03 07:55:30.660144
+progress: 3
+test: compound_find_related
+time: 2026-03-03 07:55:30.660540
+time: 2026-03-03 07:55:30.671715
+success: compound_find_related
+test: compound_find_unrelated
+time: 2026-03-03 07:55:30.671777
+time: 2026-03-03 07:55:30.677308
+success: compound_find_unrelated
+test: compound_find_close
+time: 2026-03-03 07:55:30.677363
+time: 2026-03-03 07:55:49.688472
+failure: compound_find_close [
+../../source4/torture/smb2/compound.c:2199: status was NT_STATUS_FILE_CLOSED, expected NT_STATUS_OK: smb2_util_close failed
+]

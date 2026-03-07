@@ -1,0 +1,19 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772530480
+time: 2026-03-03 09:34:40.548184
+progress: 3
+test: compound_find_related
+time: 2026-03-03 09:34:40.549180
+time: 2026-03-03 09:34:40.559843
+success: compound_find_related
+test: compound_find_unrelated
+time: 2026-03-03 09:34:40.559904
+time: 2026-03-03 09:34:40.565183
+success: compound_find_unrelated
+test: compound_find_close
+time: 2026-03-03 09:34:40.565237
+time: 2026-03-03 09:34:53.381688
+failure: compound_find_close [
+../../source4/torture/smb2/compound.c:2202: status was NT_STATUS_INVALID_PARAMETER, expected NT_STATUS_OK: smb2_find_recv failed
+]

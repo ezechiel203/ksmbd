@@ -1,0 +1,71 @@
+smbtorture 4.23.6
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772857294
+time: 2026-03-07 04:21:34.623611
+progress: 10
+test: flush_close
+time: 2026-03-07 04:21:34.624585
+time: 2026-03-07 04:21:36.936613
+success: flush_close
+test: flush_flush
+time: 2026-03-07 04:21:36.936665
+time: 2026-03-07 04:21:39.288296
+success: flush_flush
+test: write_write
+time: 2026-03-07 04:21:39.288429
+time: 2026-03-07 04:21:39.581281
+failure: write_write [
+(../../source4/torture/smb2/compound.c:2549) Incorrect value req[1]->cancel.can_cancel=0 - should be 1
+]
+test: read_read
+time: 2026-03-07 04:21:39.581361
+time: 2026-03-07 04:21:39.939790
+failure: read_read [
+(../../source4/torture/smb2/compound.c:2653) Incorrect value req[1]->cancel.can_cancel=0 - should be 1
+]
+test: create_lease_break_async
+time: 2026-03-07 04:21:39.939849
+Waiting for a potential lease break...
+transport[0x55fc9a2529f0] Skip acking to 0x3 (RH) in lease handler
+Got 1 lease breaks
+time: 2026-03-07 04:21:40.403338
+success: create_lease_break_async
+test: getinfo_middle
+time: 2026-03-07 04:21:40.403384
+Waiting for a potential lease break...
+transport[0x55fc9a2529f0] Skip acking to 0x3 (RH) in lease handler
+Got 1 lease breaks
+time: 2026-03-07 04:21:40.886395
+failure: getinfo_middle [
+../../source4/torture/smb2/compound.c:2890: status was NT_STATUS_FILE_CLOSED, expected NT_STATUS_OK: smb2_getinfo_recv failed
+]
+test: rename_same_srcdst_non_compound_no_async
+time: 2026-03-07 04:21:40.886448
+Waiting for a potential lease break...
+transport[0x55fc9a2529f0] Skip acking to 0x1 (R) in lease handler
+Got 1 lease breaks
+time: 2026-03-07 04:21:42.499476
+success: rename_same_srcdst_non_compound_no_async
+test: rename_non_compound_no_async
+time: 2026-03-07 04:21:42.499518
+Waiting for a potential lease break...
+transport[0x55fc9a2529f0] Skip acking to 0x1 (R) in lease handler
+Got 1 lease breaks
+time: 2026-03-07 04:21:44.341300
+success: rename_non_compound_no_async
+test: rename_last
+time: 2026-03-07 04:21:44.342191
+Waiting for a potential lease break...
+transport[0x55fc9a2529f0] Skip acking to 0x1 (R) in lease handler
+Got 1 lease breaks
+time: 2026-03-07 04:21:45.789824
+failure: rename_last [
+../../source4/torture/smb2/compound.c:3239: Expression `req[0]->state == SMB2_REQUEST_RECV' failed: state not SMB2_REQUEST_RECV
+]
+test: rename_middle
+time: 2026-03-07 04:21:45.789872
+Waiting for a potential lease break...
+transport[0x55fc9a2529f0] Skip acking to 0x1 (R) in lease handler
+Got 1 lease breaks
+time: 2026-03-07 04:21:47.236484
+success: rename_middle

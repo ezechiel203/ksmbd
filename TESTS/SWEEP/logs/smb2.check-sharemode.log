@@ -1,0 +1,8 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772586202
+time: 2026-03-04 01:03:22.474175
+test: check-sharemode
+time: 2026-03-04 01:03:22.475097
+time: 2026-03-04 01:03:22.661198
+success: check-sharemode

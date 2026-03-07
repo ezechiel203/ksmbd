@@ -1,0 +1,14 @@
+id,severity,file,line,summary,status
+F-001,critical,src/core/server.c,379,Abort path can call credit settlement without confirmed charge causing desync,patched_local
+F-001,critical,src/protocol/smb2/smb2_pdu_common.c,436,Outstanding credits can underflow when settling unmatched charge,patched_local
+F-002,critical,src/protocol/common/smb_common.c,178,outstanding_credits incremented without credits_lock,patched_local
+F-002,critical,src/protocol/common/smb_common.c,189,outstanding_credits incremented without credits_lock in SMB1 negotiate path,patched_local
+F-003,high,src/transport/transport_ipc.c,366,IPC entry mutated under read lock in handle_response,patched_local
+F-003,high,src/transport/transport_ipc.c,371,entry->response reset before validation can clobber valid response,patched_local
+F-004,high,src/transport/transport_ipc.c,529,WARN_ON(1) externally reachable via unsupported IPC event type,patched_local
+F-005,medium,src/protocol/smb2/smb2_lock.c,275,Unbounded wait loop may enable worker starvation under lock contention,patched_local
+F-006,medium,Makefile,153,Host review lane missing matching kernel headers prevents full build/sanitizer checks,open
+F-007,high,src/transport/transport_ipc.c,418,ipc_timeout jiffies assignment could truncate due unsigned short storage,patched_local
+F-007,high,src/include/core/server.h,39,ipc_timeout field width insufficient for jiffies-based timeout storage,patched_local
+F-008,high,src/protocol/smb2/smb2_lock.c,271,Deferred POSIX lock wait loop had no hard upper bound,patched_local
+F-008,high,src/protocol/smb2/smb2_lock.c,945,Lock wait timeout mapping to SMB status was missing,patched_local

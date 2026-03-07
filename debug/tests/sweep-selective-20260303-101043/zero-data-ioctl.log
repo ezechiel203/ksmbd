@@ -1,0 +1,10 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772529443
+time: 2026-03-03 09:17:23.391334
+test: zero-data-ioctl
+time: 2026-03-03 09:17:23.393002
+time: 2026-03-03 09:17:23.393010
+failure: zero-data-ioctl [
+../../source4/torture/smb2/ioctl.c:4131: Need to provide non-negative offset through --option=torture:offset=NNN
+]

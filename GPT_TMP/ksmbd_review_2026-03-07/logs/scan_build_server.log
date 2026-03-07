@@ -1,0 +1,6 @@
+scan-build: Using '/usr/bin/clang-21' for static analysis
+clang: error: unknown argument: '-mpreferred-stack-boundary=3'
+clang: warning: optimization flag '-falign-jumps=1' is not supported [-Wignored-optimization-argument]
+scan-build: Analysis run complete.
+scan-build: Removing directory '/home/ezechiel203/ksmbd/GPT_TMP/ksmbd_review_2026-03-07/logs/scan_build_server/2026-03-07-011034-3285992-1' because it contains no reports.
+scan-build: No bugs found.

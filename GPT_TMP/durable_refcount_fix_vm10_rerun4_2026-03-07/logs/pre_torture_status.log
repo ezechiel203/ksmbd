@@ -1,0 +1,4 @@
+[ksmbdctl(control)/1474]: INFO: ksmbd-tools version : 3.5.6
+[ksmbdctl(control)/1474]: INFO: ksmbd version : 4.2.18
+LISTEN 0      64            *%ens4:445             *:*                                             
+LISTEN 0      64              *%lo:445             *:*                                             

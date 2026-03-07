@@ -1,0 +1,69 @@
+=== SMB2 Sweep: ven. 06 mars 2026 02:27:25 CET ===
+SSH=13022  SMB=13445
+Output: /tmp/sweep-20260306-022725
+
+Restarting ksmbd...
+[ksmbd.control/1847]: INFO: Terminated mountd
+[ksmbd.control/1847]: INFO: Killed ksmbd
+[ksmbd.mountd/1875]: INFO: Started manager
+  smb2.compound ... P=20 F=0 S=0 E=0
+  smb2.compound_async ... P=7 F=3 S=0 E=0
+  smb2.compound_find ... P=3 F=0 S=0 E=0
+  smb2.connect ... P=1 F=0 S=0 E=0
+  smb2.create ... [ksmbd.control/2532]: INFO: Terminated mountd
+[ksmbd.control/2532]: INFO: Killed ksmbd
+[ksmbd.mountd/2560]: INFO: Started manager
+P=14 F=3 S=1 E=0
+  smb2.credits ... [ksmbd.control/2733]: INFO: Terminated mountd
+[ksmbd.control/2733]: INFO: Killed ksmbd
+[ksmbd.mountd/2761]: INFO: Started manager
+P=3 F=7 S=0 E=0
+  smb2.delete-on-close-perms ... [ksmbd.control/2880]: INFO: Terminated mountd
+[ksmbd.control/2880]: INFO: Killed ksmbd
+[ksmbd.mountd/2908]: INFO: Started manager
+P=8 F=1 S=0 E=0
+  smb2.dir ... [ksmbd.control/3029]: INFO: Terminated mountd
+[ksmbd.control/3029]: INFO: Killed ksmbd
+[ksmbd.mountd/3057]: INFO: Started manager
+P=8 F=1 S=0 E=0
+  smb2.dirlease ... [ksmbd.control/3276]: ERROR: Invalid lock entry `3058'
+[ksmbd.control/3276]: INFO: Killed ksmbd
+[ksmbd.mountd/3316]: INFO: Started manager
+P=3 F=15 S=0 E=0
+  smb2.dosmode ... P=0 F=1 S=0 E=0
+  smb2.durable-open ... P=20 F=5 S=1 E=0
+  smb2.durable-v2-open ... P=0 F=0 S=0 E=0
+  smb2.getinfo ... P=0 F=0 S=0 E=0
+  smb2.ioctl ... P=0 F=0 S=0 E=0
+  smb2.lease ... P=0 F=0 S=0 E=0
+  smb2.lock ... P=0 F=0 S=0 E=0
+  smb2.maxfid ... P=0 F=0 S=0 E=0
+  smb2.maximum_allowed ... P=0 F=0 S=0 E=0
+  smb2.mkdir ... P=0 F=0 S=0 E=0
+  smb2.mux ... P=0 F=0 S=0 E=0
+  smb2.notify ... P=0 F=0 S=0 E=0
+  smb2.openattr ... P=0 F=0 S=0 E=0
+  smb2.oplock ... P=0 F=0 S=0 E=0
+  smb2.read ... P=0 F=0 S=0 E=0
+  smb2.rename ... P=0 F=13 S=0 E=0
+  smb2.replay ... [ksmbd.control/870]: ERROR: Can't kill ksmbd
+[ksmbd.mountd/960]: INFO: Started manager
+P=0 F=60 S=0 E=0
+  smb2.rw ... P=3 F=1 S=0 E=0
+  smb2.secleak ... P=0 F=1 S=0 E=0
+  smb2.session ... [ksmbd.control/1829]: ERROR: Invalid lock entry `961'
+[ksmbd.control/1829]: INFO: Killed ksmbd
+[ksmbd.mountd/1871]: INFO: Started manager
+P=17 F=44 S=10 E=0
+  smb2.setinfo ... P=1 F=0 S=0 E=0
+  smb2.streams ... [ksmbd.control/2113]: INFO: Terminated mountd
+[ksmbd.control/2113]: INFO: Killed ksmbd
+[ksmbd.mountd/2171]: INFO: Started manager
+P=12 F=2 S=0 E=0
+  smb2.zero-data-ioctl ... P=0 F=1 S=0 E=0
+
+=== TOTALS ===
+PASS=120  FAIL=158  SKIP=12  ERROR=0
+Total tests: 290
+
+Results saved to: /tmp/sweep-20260306-022725

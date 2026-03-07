@@ -1,0 +1,428 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772541341
+time: 2026-03-03 12:35:41.693570
+progress: 60
+test: replay-commands
+time: 2026-03-03 12:35:41.695204
+Try Commands with Replay Flags Enabled
+Trying create
+Trying write
+Trying flush
+Trying read
+Trying setinfo
+Trying getinfo
+Trying ioctl
+Trying lock
+time: 2026-03-03 12:35:41.722634
+success: replay-commands
+test: replay-regular
+time: 2026-03-03 12:35:41.722688
+No replay detection for regular create
+time: 2026-03-03 12:35:41.731956
+success: replay-regular
+test: replay-dhv2-oplock1
+time: 2026-03-03 12:35:41.732008
+Replay of DurableHandleReqV2 on Single Channel
+time: 2026-03-03 12:35:41.738687
+success: replay-dhv2-oplock1
+test: replay-dhv2-oplock2
+time: 2026-03-03 12:35:41.738741
+Replay of DurableHandleReqV2 on Single Channel
+transport[0x56296526dd10] Acking to level II [0x01] in oplock handler
+time: 2026-03-03 12:35:41.747325
+success: replay-dhv2-oplock2
+test: replay-dhv2-oplock3
+time: 2026-03-03 12:35:41.747378
+Replay of DurableHandleReqV2 on Single Channel
+transport[0x56296526dd10] Acking to level II [0x01] in oplock handler
+time: 2026-03-03 12:35:41.754751
+success: replay-dhv2-oplock3
+test: replay-dhv2-oplock-lease
+time: 2026-03-03 12:35:41.754802
+Replay of DurableHandleReqV2 on Single Channel
+time: 2026-03-03 12:35:41.761894
+success: replay-dhv2-oplock-lease
+test: replay-dhv2-lease1
+time: 2026-03-03 12:35:41.761947
+Replay of DurableHandleReqV2 with Lease on Single Channel
+time: 2026-03-03 12:35:41.769180
+success: replay-dhv2-lease1
+test: replay-dhv2-lease2
+time: 2026-03-03 12:35:41.769257
+Replay of DurableHandleReqV2 with Lease on Single Channel
+time: 2026-03-03 12:35:41.776151
+success: replay-dhv2-lease2
+test: replay-dhv2-lease3
+time: 2026-03-03 12:35:41.776211
+Replay of DurableHandleReqV2 with Lease on Single Channel
+time: 2026-03-03 12:35:41.782627
+success: replay-dhv2-lease3
+test: replay-dhv2-lease-oplock
+time: 2026-03-03 12:35:41.782682
+Replay of DurableHandleReqV2 with Lease on Single Channel
+time: 2026-03-03 12:35:41.790017
+success: replay-dhv2-lease-oplock
+test: dhv2-pending1n-vs-violation-lease-close-sane
+time: 2026-03-03 12:35:41.790069
+Waiting for a potential lease break...
+transport[0x56296526dd10] Skip acking to 0x3 (RH) in lease handler
+Got 1 lease breaks
+time: 2026-03-03 12:35:41.798827
+failure: dhv2-pending1n-vs-violation-lease-close-sane [
+(../../source4/torture/smb2/replay.c:1569): wrong value for lb->new_lease_state got 0x3 - should be 0x5
+]
+test: dhv2-pending1n-vs-violation-lease-ack-sane
+time: 2026-03-03 12:35:41.798883
+Waiting for a potential lease break...
+transport[0x56296557ba70] Skip acking to 0x3 (RH) in lease handler
+Got 1 lease breaks
+time: 2026-03-03 12:35:41.808515
+failure: dhv2-pending1n-vs-violation-lease-ack-sane [
+(../../source4/torture/smb2/replay.c:1569): wrong value for lb->new_lease_state got 0x3 - should be 0x5
+]
+test: dhv2-pending1n-vs-violation-lease-close-windows
+time: 2026-03-03 12:35:41.808577
+Waiting for a potential lease break...
+transport[0x56296526dd10] Skip acking to 0x3 (RH) in lease handler
+Got 1 lease breaks
+time: 2026-03-03 12:35:41.819611
+failure: dhv2-pending1n-vs-violation-lease-close-windows [
+(../../source4/torture/smb2/replay.c:1569): wrong value for lb->new_lease_state got 0x3 - should be 0x5
+]
+test: dhv2-pending1n-vs-violation-lease-ack-windows
+time: 2026-03-03 12:35:41.819668
+Waiting for a potential lease break...
+transport[0x56296557ba70] Skip acking to 0x3 (RH) in lease handler
+Got 1 lease breaks
+time: 2026-03-03 12:35:41.830361
+failure: dhv2-pending1n-vs-violation-lease-ack-windows [
+(../../source4/torture/smb2/replay.c:1569): wrong value for lb->new_lease_state got 0x3 - should be 0x5
+]
+test: dhv2-pending1n-vs-oplock-sane
+time: 2026-03-03 12:35:41.830422
+Waiting for a potential oplock break...
+transport[0x56296554bcb0] skip acking to level II [0x01] in oplock handler
+Got 1 oplock breaks
+Waiting for async response: req21
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+time: 2026-03-03 12:36:04.022768
+failure: dhv2-pending1n-vs-oplock-sane [
+../../source4/torture/smb2/replay.c:2228: Incorrect status NT_STATUS_CONNECTION_DISCONNECTED - should be NT_STATUS_FILE_NOT_AVAILABLE
+]
+test: dhv2-pending1n-vs-oplock-windows
+time: 2026-03-03 12:36:04.022845
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 12:36:04.023643
+failure: dhv2-pending1n-vs-oplock-windows [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: dhv2-pending1n-vs-lease-sane
+time: 2026-03-03 12:36:04.023688
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 12:36:04.025788
+failure: dhv2-pending1n-vs-lease-sane [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: dhv2-pending1n-vs-lease-windows
+time: 2026-03-03 12:36:04.025827
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 12:36:04.027724
+failure: dhv2-pending1n-vs-lease-windows [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: dhv2-pending1l-vs-oplock-sane
+time: 2026-03-03 12:36:04.027770
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 12:36:04.028410
+failure: dhv2-pending1l-vs-oplock-sane [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: dhv2-pending1l-vs-oplock-windows
+time: 2026-03-03 12:36:04.028450
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 12:36:04.029075
+failure: dhv2-pending1l-vs-oplock-windows [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: dhv2-pending1l-vs-lease-sane
+time: 2026-03-03 12:36:04.029129
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 12:36:04.029727
+failure: dhv2-pending1l-vs-lease-sane [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: dhv2-pending1l-vs-lease-windows
+time: 2026-03-03 12:36:04.029769
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 12:36:04.031888
+failure: dhv2-pending1l-vs-lease-windows [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: dhv2-pending1o-vs-oplock-sane
+time: 2026-03-03 12:36:04.031929
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 12:36:04.032583
+failure: dhv2-pending1o-vs-oplock-sane [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: dhv2-pending1o-vs-oplock-windows
+time: 2026-03-03 12:36:04.032621
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 12:36:04.033804
+failure: dhv2-pending1o-vs-oplock-windows [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: dhv2-pending1o-vs-lease-sane
+time: 2026-03-03 12:36:04.033844
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 12:36:04.035229
+failure: dhv2-pending1o-vs-lease-sane [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: dhv2-pending1o-vs-lease-windows
+time: 2026-03-03 12:36:04.035269
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 12:36:04.036893
+failure: dhv2-pending1o-vs-lease-windows [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: dhv2-pending2n-vs-oplock-sane
+time: 2026-03-03 12:36:04.036933
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 12:36:04.037913
+failure: dhv2-pending2n-vs-oplock-sane [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: dhv2-pending2n-vs-oplock-windows
+time: 2026-03-03 12:36:04.037952
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 12:36:04.039265
+failure: dhv2-pending2n-vs-oplock-windows [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: dhv2-pending2n-vs-lease-sane
+time: 2026-03-03 12:36:04.039304
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_DISCONNECTED
+time: 2026-03-03 12:36:04.040262
+failure: dhv2-pending2n-vs-lease-sane [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: dhv2-pending2n-vs-lease-windows
+time: 2026-03-03 12:36:04.040301
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_DISCONNECTED
+time: 2026-03-03 12:36:04.041806
+failure: dhv2-pending2n-vs-lease-windows [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: dhv2-pending2l-vs-oplock-sane
+time: 2026-03-03 12:36:04.041845
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_DISCONNECTED
+time: 2026-03-03 12:36:04.042827
+failure: dhv2-pending2l-vs-oplock-sane [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: dhv2-pending2l-vs-oplock-windows
+time: 2026-03-03 12:36:04.042864
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_DISCONNECTED
+time: 2026-03-03 12:36:04.044060
+failure: dhv2-pending2l-vs-oplock-windows [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: dhv2-pending2l-vs-lease-sane
+time: 2026-03-03 12:36:04.044109
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_DISCONNECTED
+time: 2026-03-03 12:36:04.045195
+failure: dhv2-pending2l-vs-lease-sane [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: dhv2-pending2l-vs-lease-windows
+time: 2026-03-03 12:36:04.045233
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 12:36:04.048462
+failure: dhv2-pending2l-vs-lease-windows [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: dhv2-pending2o-vs-oplock-sane
+time: 2026-03-03 12:36:04.048502
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 12:36:04.049185
+failure: dhv2-pending2o-vs-oplock-sane [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: dhv2-pending2o-vs-oplock-windows
+time: 2026-03-03 12:36:04.049223
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 12:36:04.049839
+failure: dhv2-pending2o-vs-oplock-windows [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: dhv2-pending2o-vs-lease-sane
+time: 2026-03-03 12:36:04.049877
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 12:36:04.050463
+failure: dhv2-pending2o-vs-lease-sane [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: dhv2-pending2o-vs-lease-windows
+time: 2026-03-03 12:36:04.050500
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 12:36:04.051126
+failure: dhv2-pending2o-vs-lease-windows [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: dhv2-pending3n-vs-oplock-sane
+time: 2026-03-03 12:36:04.051165
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 12:36:04.051847
+failure: dhv2-pending3n-vs-oplock-sane [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: dhv2-pending3n-vs-oplock-windows
+time: 2026-03-03 12:36:04.051885
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 12:36:04.054803
+failure: dhv2-pending3n-vs-oplock-windows [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: dhv2-pending3n-vs-lease-sane
+time: 2026-03-03 12:36:04.054845
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 12:36:04.055508
+failure: dhv2-pending3n-vs-lease-sane [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: dhv2-pending3n-vs-lease-windows
+time: 2026-03-03 12:36:04.055546
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 12:36:04.056844
+failure: dhv2-pending3n-vs-lease-windows [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: dhv2-pending3l-vs-oplock-sane
+time: 2026-03-03 12:36:04.056895
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_DISCONNECTED
+time: 2026-03-03 12:36:04.057544
+failure: dhv2-pending3l-vs-oplock-sane [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: dhv2-pending3l-vs-oplock-windows
+time: 2026-03-03 12:36:04.057583
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_DISCONNECTED
+time: 2026-03-03 12:36:04.058785
+failure: dhv2-pending3l-vs-oplock-windows [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: dhv2-pending3l-vs-lease-sane
+time: 2026-03-03 12:36:04.058823
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 12:36:04.061609
+failure: dhv2-pending3l-vs-lease-sane [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: dhv2-pending3l-vs-lease-windows
+time: 2026-03-03 12:36:04.061651
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 12:36:04.062988
+failure: dhv2-pending3l-vs-lease-windows [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: dhv2-pending3o-vs-oplock-sane
+time: 2026-03-03 12:36:04.063026
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 12:36:04.063653
+failure: dhv2-pending3o-vs-oplock-sane [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: dhv2-pending3o-vs-oplock-windows
+time: 2026-03-03 12:36:04.063696
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 12:36:04.064891
+failure: dhv2-pending3o-vs-oplock-windows [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: dhv2-pending3o-vs-lease-sane
+time: 2026-03-03 12:36:04.064931
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 12:36:04.066932
+failure: dhv2-pending3o-vs-lease-sane [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: dhv2-pending3o-vs-lease-windows
+time: 2026-03-03 12:36:04.066974
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 12:36:04.069307
+failure: dhv2-pending3o-vs-lease-windows [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: channel-sequence
+time: 2026-03-03 12:36:04.069346
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 12:36:04.069972
+failure: channel-sequence [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: replay3
+time: 2026-03-03 12:36:04.070011
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_DISCONNECTED
+time: 2026-03-03 12:36:04.070827
+failure: replay3 [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: replay4
+time: 2026-03-03 12:36:04.070864
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 12:36:04.072846
+failure: replay4 [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: replay5
+time: 2026-03-03 12:36:04.072887
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 12:36:04.075128
+failure: replay5 [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: replay6
+time: 2026-03-03 12:36:04.075173
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 12:36:04.077180
+failure: replay6 [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: replay7
+time: 2026-03-03 12:36:04.077218
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 12:36:04.078792
+failure: replay7 [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: durable-reconnect-replay1
+time: 2026-03-03 12:36:04.078830
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 12:36:04.079443
+failure: durable-reconnect-replay1 [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: durable-reconnect-replay2
+time: 2026-03-03 12:36:04.079486
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 12:36:04.080155
+failure: durable-reconnect-replay2 [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: durable-reconnect-replay3
+time: 2026-03-03 12:36:04.080802
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 12:36:04.081612
+failure: durable-reconnect-replay3 [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: replay-twice-durable
+time: 2026-03-03 12:36:04.081650
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 12:36:04.082926
+failure: replay-twice-durable [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]

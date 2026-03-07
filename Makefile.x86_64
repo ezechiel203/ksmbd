@@ -1,0 +1,21 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+#
+# x86_64 cross-build + remote deploy wrapper
+#
+# Usage: make -f Makefile.x86_64 <target>
+#
+
+ARCH ?= x86_64
+ARCH_LABEL := x86_64
+CROSS_COMPILE ?= x86_64-linux-gnu-
+KERNEL_VERSION ?= 6.1.0
+
+X86_64_HOST ?=
+X86_64_REMOTE_TMP ?= /tmp/ksmbd.ko
+REMOTE_HOST ?= $(X86_64_HOST)
+REMOTE_TMP ?= $(X86_64_REMOTE_TMP)
+HOST_VAR_HINT := X86_64_HOST
+TMP_VAR_HINT := X86_64_REMOTE_TMP
+EXPECTED_REMOTE_ARCH_RE := ^(x86_64|amd64)$
+
+include Makefile.cross

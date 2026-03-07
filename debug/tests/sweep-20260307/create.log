@@ -1,0 +1,299 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772889315
+time: 2026-03-07 13:15:15.741740
+progress: 18
+test: gentest
+time: 2026-03-07 13:15:15.742304
+time: 2026-03-07 13:15:15.793511
+failure: gentest [
+(../../source4/torture/smb2/create.c:253) Incorrect value for access_mask 0x0de0fe00 - should be 0x0df0fe00
+]
+test: blob
+time: 2026-03-07 13:15:15.793552
+Testing alloc size
+Testing durable open
+Testing query maximal access
+Testing timewarp
+Testing query_on_disk
+Testing unknown tag
+Testing bad tag length 0
+Testing bad tag length 1
+Testing bad tag length 2
+Testing bad tag length 3
+Testing tag length 4
+Testing tag length 5
+Testing tag length 6
+Testing tag length 7
+Testing tag length 8
+Testing tag length 16
+Testing tag length 17
+Testing tag length 34
+time: 2026-03-07 13:15:15.806215
+success: blob
+test: open
+time: 2026-03-07 13:15:15.806257
+Checking SMB2 Open
+time: 2026-03-07 13:15:15.847530
+success: open
+test: brlocked
+time: 2026-03-07 13:15:15.847572
+Testing SMB2 open with a byte range locked file
+time: 2026-03-07 13:15:15.857351
+success: brlocked
+test: multi
+time: 2026-03-07 13:15:15.857389
+Testing SMB2 Open with multiple connections
+waiting for replies
+File 0 returned status NT_STATUS_OK
+File 1 returned status NT_STATUS_OBJECT_NAME_COLLISION
+File 2 returned status NT_STATUS_OBJECT_NAME_COLLISION
+time: 2026-03-07 13:15:15.883616
+success: multi
+test: delete
+time: 2026-03-07 13:15:15.883694
+Checking SMB2_OPEN for delete on a readonly file.
+time: 2026-03-07 13:15:15.895361
+success: delete
+test: leading-slash
+time: 2026-03-07 13:15:15.895400
+Trying to create a directory with leading slash on path
+time: 2026-03-07 13:15:15.904265
+success: leading-slash
+test: impersonation
+time: 2026-03-07 13:15:15.904301
+Testing SMB2 open with an invalid impersonation level.
+time: 2026-03-07 13:15:15.914609
+success: impersonation
+test: aclfile
+time: 2026-03-07 13:15:15.914647
+Testing nttrans create with sec_desc on files
+basic create
+adding a new ACE
+creating a file with an initial ACL
+creating with attributes
+creating with attributes and ACL
+creating with attributes, ACL and owner
+time: 2026-03-07 13:15:15.929565
+success: aclfile
+test: acldir
+time: 2026-03-07 13:15:15.929606
+Testing nttrans create with sec_desc on directories
+basic create
+adding a new ACE
+creating a file with an initial ACL
+creating with attributes
+creating with attributes and ACL
+creating with attributes, ACL and owner
+time: 2026-03-07 13:15:15.944428
+success: acldir
+test: nulldacl
+time: 2026-03-07 13:15:15.944467
+TESTING SEC_DESC WITH A NULL DACL
+creating a file with a empty sd
+get the original sd
+set NULL DACL
+get the sd
+try open for read control
+try open for write
+try open for read
+try open for generic write
+try open for generic read
+set DACL with 0 aces
+get the sd
+try open for read control
+try open for write => access_denied
+try open for read => access_denied
+try open for generic write => access_denied
+try open for generic read => access_denied
+set empty sd
+get the sd
+time: 2026-03-07 13:15:15.957976
+success: nulldacl
+test: mkdir-dup
+time: 2026-03-07 13:15:15.958013
+Testing SMB2 Create Directory with multiple connections
+waiting for replies
+time: 2026-03-07 13:15:15.980336
+success: mkdir-dup
+test: mkdir-visible
+time: 2026-03-07 13:15:15.980401
+Testing SMB2 Create Directory is visible with multiple connections
+test_mkdir_visible:mkdir_visible\visible_dir\file_0: try[1] starting
+test_mkdir_visible:mkdir_visible\visible_dir\file_1: try[1] starting
+test_mkdir_visible:mkdir_visible\visible_dir\file_2: try[1] starting
+test_mkdir_visible:mkdir_visible\visible_dir\file_3: try[1] starting
+test_mkdir_visible:mkdir_visible\visible_dir\file_4: try[1] starting
+test_mkdir_visible:mkdir_visible\visible_dir\file_5: try[1] starting
+test_mkdir_visible:mkdir_visible\visible_dir\file_6: try[1] starting
+test_mkdir_visible:mkdir_visible\visible_dir\file_7: try[1] starting
+test_mkdir_visible:mkdir_visible\visible_dir\file_8: try[1] starting
+test_mkdir_visible:mkdir_visible\visible_dir\file_9: try[1] starting
+test_mkdir_visible:mkdir_visible\visible_dir\file_10: try[1] starting
+test_mkdir_visible:mkdir_visible\visible_dir\file_11: try[1] starting
+test_mkdir_visible:mkdir_visible\visible_dir\file_12: try[1] starting
+test_mkdir_visible:mkdir_visible\visible_dir\file_13: try[1] starting
+test_mkdir_visible:mkdir_visible\visible_dir\file_14: try[1] starting
+test_mkdir_visible:mkdir_visible\visible_dir\file_15: try[1] starting
+test_mkdir_visible:mkdir_visible\visible_dir\file_16: try[1] starting
+test_mkdir_visible:mkdir_visible\visible_dir\file_17: try[1] starting
+test_mkdir_visible:mkdir_visible\visible_dir\file_18: try[1] starting
+test_mkdir_visible:mkdir_visible\visible_dir\file_19: try[1] starting
+test_mkdir_visible:mkdir_visible\visible_dir\file_20: try[1] starting
+test_mkdir_visible:mkdir_visible\visible_dir\file_21: try[1] starting
+test_mkdir_visible:mkdir_visible\visible_dir\file_22: try[1] starting
+test_mkdir_visible:mkdir_visible\visible_dir\file_23: try[1] starting
+test_mkdir_visible:mkdir_visible\visible_dir\file_24: try[1] starting
+test_mkdir_visible:mkdir_visible\visible_dir\file_25: try[1] starting
+test_mkdir_visible:mkdir_visible\visible_dir\file_26: try[1] starting
+test_mkdir_visible:mkdir_visible\visible_dir\file_27: try[1] starting
+test_mkdir_visible:mkdir_visible\visible_dir\file_28: try[1] starting
+test_mkdir_visible:mkdir_visible\visible_dir\file_29: try[1] starting
+test_mkdir_visible:mkdir_visible\visible_dir\file_30: try[1] starting
+test_mkdir_visible:mkdir_visible\visible_dir\file_31: try[1] starting
+test_mkdir_visible:mkdir_visible\visible_dir\file_32: try[1] starting
+test_mkdir_visible:mkdir_visible\visible_dir\file_33: try[1] starting
+test_mkdir_visible:mkdir_visible\visible_dir\file_34: try[1] starting
+test_mkdir_visible:mkdir_visible\visible_dir\file_35: try[1] starting
+test_mkdir_visible:mkdir_visible\visible_dir\file_36: try[1] starting
+test_mkdir_visible:mkdir_visible\visible_dir\file_37: try[1] starting
+test_mkdir_visible:mkdir_visible\visible_dir\file_38: try[1] starting
+test_mkdir_visible:mkdir_visible\visible_dir\file_39: try[1] starting
+test_mkdir_visible:mkdir_visible\visible_dir\file_40: try[1] starting
+test_mkdir_visible:mkdir_visible\visible_dir\file_41: try[1] starting
+test_mkdir_visible:mkdir_visible\visible_dir\file_42: try[1] starting
+test_mkdir_visible:mkdir_visible\visible_dir\file_43: try[1] starting
+test_mkdir_visible:mkdir_visible\visible_dir\file_44: try[1] starting
+test_mkdir_visible:mkdir_visible\visible_dir\file_45: try[1] starting
+test_mkdir_visible:mkdir_visible\visible_dir\file_46: try[1] starting
+test_mkdir_visible:mkdir_visible\visible_dir\file_47: try[1] starting
+test_mkdir_visible:mkdir_visible\visible_dir\file_48: try[1] starting
+test_mkdir_visible:mkdir_visible\visible_dir\file_49: try[1] starting
+test_mkdir_visible:mkdir_visible\visible_dir: starting
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_32: try[1] NT_STATUS_OBJECT_PATH_NOT_FOUND
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_32: try[2] starting
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_33: try[1] NT_STATUS_OBJECT_PATH_NOT_FOUND
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_33: try[2] starting
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_34: try[1] NT_STATUS_OBJECT_PATH_NOT_FOUND
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_34: try[2] starting
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_35: try[1] NT_STATUS_OBJECT_PATH_NOT_FOUND
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_35: try[2] starting
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_31: try[1] NT_STATUS_OBJECT_PATH_NOT_FOUND
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_31: try[2] starting
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_29: try[1] NT_STATUS_OBJECT_PATH_NOT_FOUND
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_29: try[2] starting
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_28: try[1] NT_STATUS_OBJECT_PATH_NOT_FOUND
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_28: try[2] starting
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_27: try[1] NT_STATUS_OBJECT_PATH_NOT_FOUND
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_27: try[2] starting
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_26: try[1] NT_STATUS_OBJECT_PATH_NOT_FOUND
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_26: try[2] starting
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_25: try[1] NT_STATUS_OBJECT_PATH_NOT_FOUND
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_25: try[2] starting
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_23: try[1] NT_STATUS_OBJECT_PATH_NOT_FOUND
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_23: try[2] starting
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_21: try[1] NT_STATUS_OBJECT_PATH_NOT_FOUND
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_21: try[2] starting
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_19: try[1] NT_STATUS_OBJECT_PATH_NOT_FOUND
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_19: try[2] starting
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_18: try[1] NT_STATUS_OBJECT_PATH_NOT_FOUND
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_18: try[2] starting
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_16: try[1] NT_STATUS_OBJECT_PATH_NOT_FOUND
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_16: try[2] starting
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_2: try[1] NT_STATUS_OBJECT_PATH_NOT_FOUND
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_2: try[2] starting
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_1: try[1] NT_STATUS_OBJECT_PATH_NOT_FOUND
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_1: try[2] starting
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_37: try[1] NT_STATUS_OBJECT_PATH_NOT_FOUND
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_37: try[2] starting
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_39: try[1] NT_STATUS_OBJECT_PATH_NOT_FOUND
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_39: try[2] starting
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_42: try[1] NT_STATUS_OBJECT_PATH_NOT_FOUND
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_42: try[2] starting
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_41: try[1] NT_STATUS_OBJECT_PATH_NOT_FOUND
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_41: try[2] starting
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_40: try[1] NT_STATUS_OBJECT_PATH_NOT_FOUND
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_40: try[2] starting
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_43: try[1] NT_STATUS_OBJECT_PATH_NOT_FOUND
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_43: try[2] starting
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_44: try[1] NT_STATUS_OBJECT_PATH_NOT_FOUND
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_44: try[2] starting
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_40: try[2] NT_STATUS_OBJECT_PATH_NOT_FOUND
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_40: try[3] starting
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_41: try[2] NT_STATUS_OBJECT_PATH_NOT_FOUND
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_41: try[3] starting
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_39: try[2] NT_STATUS_OBJECT_PATH_NOT_FOUND
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_39: try[3] starting
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_37: try[2] NT_STATUS_OBJECT_PATH_NOT_FOUND
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_37: try[3] starting
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_42: try[2] NT_STATUS_OBJECT_PATH_NOT_FOUND
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_42: try[3] starting
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_32: try[2] NT_STATUS_OBJECT_PATH_NOT_FOUND
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_32: try[3] starting
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_33: try[2] NT_STATUS_OBJECT_PATH_NOT_FOUND
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_33: try[3] starting
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_1: try[2] NT_STATUS_OBJECT_PATH_NOT_FOUND
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_1: try[3] starting
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_34: try[2] NT_STATUS_OBJECT_PATH_NOT_FOUND
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_34: try[3] starting
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_2: try[2] NT_STATUS_OBJECT_PATH_NOT_FOUND
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_2: try[3] starting
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_35: try[2] NT_STATUS_OBJECT_PATH_NOT_FOUND
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_35: try[3] starting
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_16: try[2] NT_STATUS_OBJECT_PATH_NOT_FOUND
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_16: try[3] starting
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_18: try[2] NT_STATUS_OBJECT_PATH_NOT_FOUND
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_18: try[3] starting
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_19: try[2] NT_STATUS_OBJECT_PATH_NOT_FOUND
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_19: try[3] starting
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_21: try[2] NT_STATUS_OBJECT_PATH_NOT_FOUND
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_21: try[3] starting
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_23: try[2] NT_STATUS_OBJECT_PATH_NOT_FOUND
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_23: try[3] starting
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_25: try[2] NT_STATUS_OBJECT_PATH_NOT_FOUND
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_25: try[3] starting
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_26: try[2] NT_STATUS_OBJECT_PATH_NOT_FOUND
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_26: try[3] starting
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_27: try[2] NT_STATUS_OBJECT_PATH_NOT_FOUND
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_27: try[3] starting
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_28: try[2] NT_STATUS_OBJECT_PATH_NOT_FOUND
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_28: try[3] starting
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_29: try[2] NT_STATUS_OBJECT_PATH_NOT_FOUND
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_29: try[3] starting
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_31: try[2] NT_STATUS_OBJECT_PATH_NOT_FOUND
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_31: try[3] starting
+test_mkdir_visible_open_retry:mkdir_visible\visible_dir\file_38: try[1] NT_STATUS_OK
+WARNING!: ../../source4/torture/smb2/create.c:1735: op->status was NT_STATUS_OK, expected NT_STATUS_OBJECT_PATH_NOT_FOUND: smb2cli_create_recv
+time: 2026-03-07 13:15:16.368970
+failure: mkdir-visible [
+../../source4/torture/smb2/create.c:2022: Expression `dop->done' failed: dop->done after dop
+]
+test: dir-alloc-size
+time: 2026-03-07 13:15:16.370071
+Checking initial allocation size on directories
+Got directory alloc size: 8192
+time: 2026-03-07 13:15:16.387045
+success: dir-alloc-size
+test: dosattr_tmp_dir
+time: 2026-03-07 13:15:16.387096
+time: 2026-03-07 13:15:16.398808
+success: dosattr_tmp_dir
+test: quota-fake-file
+time: 2026-03-07 13:15:16.398849
+time: 2026-03-07 13:15:16.406041
+success: quota-fake-file
+test: path-length
+time: 2026-03-07 13:15:16.406079
+time: 2026-03-07 13:15:16.412753
+skip: path-length [
+Interactive Test: Skipping... (enable with --interactive)
+]
+test: bench-path-contention-shared
+time: 2026-03-07 13:15:16.412801
+Opening 4 connections
+Opened 4 connections with qdepth=1 => 4 loops
+Running for 10 seconds
+1.00 second: open[num/s=2411,avslat=0.000210,minlat=0.000000,maxlat=0.003729] close[num/s=2410,avslat=0.000203,minlat=0.000000,maxlat=0.003820]     2.00 second: open[num/s=2324,avslat=0.000218,minlat=0.000000,maxlat=0.010024] close[num/s=2325,avslat=0.000211,minlat=0.000000,maxlat=0.007232]     3.00 second: open[num/s=2614,avslat=0.000193,minlat=0.000000,maxlat=0.003384] close[num/s=2614,avslat=0.000188,minlat=0.000000,maxlat=0.010237]     4.00 second: open[num/s=2700,avslat=0.000189,minlat=0.000000,maxlat=0.001903] close[num/s=2700,avslat=0.000180,minlat=0.000000,maxlat=0.001305]     5.00 second: open[num/s=2574,avslat=0.000203,minlat=0.000000,maxlat=0.012069] close[num/s=2574,avslat=0.000183,minlat=0.000000,maxlat=0.004239]     6.00 second: open[num/s=3010,avslat=0.000174,minlat=0.000000,maxlat=0.003846] close[num/s=3009,avslat=0.000156,minlat=0.000000,maxlat=0.003641]     7.00 second: open[num/s=2802,avslat=0.000183,minlat=0.000000,maxlat=0.003151] close[num/s=2803,avslat=0.000173,minlat=0.000000,maxlat=0.003037]     8.00 second: open[num/s=2748,avslat=0.000187,minlat=0.000000,maxlat=0.003725] close[num/s=2747,avslat=0.000175,minlat=0.000000,maxlat=0.004326]     9.00 second: open[num/s=2943,avslat=0.000171,minlat=0.000000,maxlat=0.005368] close[num/s=2944,avslat=0.000167,minlat=0.000000,maxlat=0.006421]     10.00 second: open[num/s=2713,avslat=0.000188,minlat=0.000000,maxlat=0.012069] close[num/s=2713,avslat=0.000179,minlat=0.000000,maxlat=0.010237]
+10.00 seconds
+time: 2026-03-07 13:15:26.451614
+success: bench-path-contention-shared

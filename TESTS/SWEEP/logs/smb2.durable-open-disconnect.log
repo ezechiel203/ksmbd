@@ -1,0 +1,9 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772586928
+time: 2026-03-04 01:15:28.483863
+progress: 1
+test: open-oplock-disconnect
+time: 2026-03-04 01:15:28.484588
+time: 2026-03-04 01:15:28.667775
+success: open-oplock-disconnect

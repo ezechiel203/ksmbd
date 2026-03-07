@@ -1,0 +1,609 @@
+src/core/auth.c:20:information:missingInclude:Include file: "auth.h" not found.
+src/core/auth.c:21:information:missingInclude:Include file: "glob.h" not found.
+src/core/auth.c:28:information:missingInclude:Include file: "server.h" not found.
+src/core/auth.c:29:information:missingInclude:Include file: "smb_common.h" not found.
+src/core/auth.c:30:information:missingInclude:Include file: "connection.h" not found.
+src/core/auth.c:31:information:missingInclude:Include file: "mgmt/user_session.h" not found.
+src/core/auth.c:32:information:missingInclude:Include file: "mgmt/user_config.h" not found.
+src/core/auth.c:33:information:missingInclude:Include file: "crypto_ctx.h" not found.
+src/core/auth.c:34:information:missingInclude:Include file: "transport_ipc.h" not found.
+src/core/auth.c:656:error:syntaxError:failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... )
+src/core/auth.c:0:information:noValidConfiguration:This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details.
+src/core/compat.c:3:information:missingInclude:Include file: "compat.h" not found.
+src/core/compat.c:4:information:missingInclude:Include file: "vfs.h" not found.
+src/core/compat.c:10:error:syntaxError:failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... )
+src/core/connection.c:12:information:missingInclude:Include file: "server.h" not found.
+src/core/connection.c:13:information:missingInclude:Include file: "smb_common.h" not found.
+src/core/connection.c:17:information:missingInclude:Include file: "mgmt/ksmbd_ida.h" not found.
+src/core/connection.c:18:information:missingInclude:Include file: "connection.h" not found.
+src/core/connection.c:19:information:missingInclude:Include file: "transport_tcp.h" not found.
+src/core/connection.c:20:information:missingInclude:Include file: "transport_rdma.h" not found.
+src/core/connection.c:21:information:missingInclude:Include file: "smb2fruit.h" not found.
+src/core/connection.c:146:error:syntaxError:failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... )
+src/core/connection.c:15:information:missingInclude:Include file: "smb1pdu.h" not found.
+src/core/connection.c:0:information:noValidConfiguration:This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details.
+src/core/crypto_ctx.c:13:information:missingInclude:Include file: "glob.h" not found.
+src/core/crypto_ctx.c:14:information:missingInclude:Include file: "crypto_ctx.h" not found.
+src/core/ksmbd_buffer.c:17:information:missingInclude:Include file: "glob.h" not found.
+src/core/ksmbd_buffer.c:18:information:missingInclude:Include file: "ksmbd_buffer.h" not found.
+src/core/ksmbd_config.c:10:information:missingInclude:Include file: "ksmbd_config.h" not found.
+src/core/ksmbd_config.c:11:information:missingInclude:Include file: "glob.h" not found.
+src/core/ksmbd_debugfs.c:12:information:missingInclude:Include file: "glob.h" not found.
+src/core/ksmbd_debugfs.c:13:information:missingInclude:Include file: "server.h" not found.
+src/core/ksmbd_debugfs.c:14:information:missingInclude:Include file: "connection.h" not found.
+src/core/ksmbd_feature.c:9:information:missingInclude:Include file: "ksmbd_feature.h" not found.
+src/core/ksmbd_feature.c:10:information:missingInclude:Include file: "server.h" not found.
+src/core/ksmbd_feature.c:11:information:missingInclude:Include file: "connection.h" not found.
+src/core/ksmbd_hooks.c:21:information:missingInclude:Include file: "glob.h" not found.
+src/core/ksmbd_hooks.c:22:information:missingInclude:Include file: "ksmbd_hooks.h" not found.
+src/core/ksmbd_hooks.c:23:information:missingInclude:Include file: "ksmbd_work.h" not found.
+src/core/ksmbd_work.c:11:information:missingInclude:Include file: "server.h" not found.
+src/core/ksmbd_work.c:12:information:missingInclude:Include file: "connection.h" not found.
+src/core/ksmbd_work.c:13:information:missingInclude:Include file: "ksmbd_work.h" not found.
+src/core/ksmbd_work.c:14:information:missingInclude:Include file: "ksmbd_buffer.h" not found.
+src/core/ksmbd_work.c:15:information:missingInclude:Include file: "mgmt/ksmbd_ida.h" not found.
+src/core/ksmbd_work.c:89:error:syntaxError:failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... )
+src/core/ksmbd_work.c:0:information:noValidConfiguration:This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details.
+src/core/misc.c:13:information:missingInclude:Include file: "misc.h" not found.
+src/core/misc.c:14:information:missingInclude:Include file: "smb_common.h" not found.
+src/core/misc.c:15:information:missingInclude:Include file: "connection.h" not found.
+src/core/misc.c:16:information:missingInclude:Include file: "vfs.h" not found.
+src/core/misc.c:18:information:missingInclude:Include file: "mgmt/share_config.h" not found.
+src/core/misc.c:298:error:syntaxError:failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... )
+src/core/server.c:7:information:missingInclude:Include file: "glob.h" not found.
+src/core/server.c:8:information:missingInclude:Include file: "oplock.h" not found.
+src/core/server.c:9:information:missingInclude:Include file: "misc.h" not found.
+src/core/server.c:16:information:missingInclude:Include file: "server.h" not found.
+src/core/server.c:17:information:missingInclude:Include file: "smb_common.h" not found.
+src/core/server.c:18:information:missingInclude:Include file: "smbstatus.h" not found.
+src/core/server.c:19:information:missingInclude:Include file: "connection.h" not found.
+src/core/server.c:20:information:missingInclude:Include file: "transport_ipc.h" not found.
+src/core/server.c:21:information:missingInclude:Include file: "mgmt/user_session.h" not found.
+src/core/server.c:22:information:missingInclude:Include file: "crypto_ctx.h" not found.
+src/core/server.c:23:information:missingInclude:Include file: "auth.h" not found.
+src/core/server.c:24:information:missingInclude:Include file: "smb2fruit.h" not found.
+src/core/server.c:25:information:missingInclude:Include file: "ksmbd_fsctl.h" not found.
+src/core/server.c:26:information:missingInclude:Include file: "ksmbd_create_ctx.h" not found.
+src/core/server.c:27:information:missingInclude:Include file: "ksmbd_info.h" not found.
+src/core/server.c:28:information:missingInclude:Include file: "ksmbd_dfs.h" not found.
+src/core/server.c:29:information:missingInclude:Include file: "ksmbd_vss.h" not found.
+src/core/server.c:30:information:missingInclude:Include file: "ksmbd_notify.h" not found.
+src/core/server.c:31:information:missingInclude:Include file: "ksmbd_reparse.h" not found.
+src/core/server.c:32:information:missingInclude:Include file: "ksmbd_resilient.h" not found.
+src/core/server.c:33:information:missingInclude:Include file: "ksmbd_quota.h" not found.
+src/core/server.c:34:information:missingInclude:Include file: "ksmbd_app_instance.h" not found.
+src/core/server.c:35:information:missingInclude:Include file: "ksmbd_fsctl_extra.h" not found.
+src/core/server.c:36:information:missingInclude:Include file: "ksmbd_hooks.h" not found.
+src/core/server.c:37:information:missingInclude:Include file: "ksmbd_buffer.h" not found.
+src/core/server.c:454:error:syntaxError:failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... )
+src/encoding/asn1.c:16:information:missingInclude:Include file: "glob.h" not found.
+src/encoding/asn1.c:18:information:missingInclude:Include file: "asn1.h" not found.
+src/encoding/asn1.c:19:information:missingInclude:Include file: "connection.h" not found.
+src/encoding/asn1.c:20:information:missingInclude:Include file: "auth.h" not found.
+src/encoding/asn1.c:110:style:constParameterPointer:Parameter 'oid1' can be declared as pointer to const
+src/encoding/asn1.c:111:style:constParameterPointer:Parameter 'oid2' can be declared as pointer to const
+src/encoding/asn1.c:184:style:constParameterPointer:Parameter 'ntlm_blob' can be declared as pointer to const
+src/encoding/ndr.c:9:error:syntaxError:failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... )
+src/encoding/unicode.c:12:error:syntaxError:failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... )
+src/encoding/unicode.c:0:information:noValidConfiguration:This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details.
+src/fs/ksmbd_app_instance.c:22:information:missingInclude:Include file: "ksmbd_app_instance.h" not found.
+src/fs/ksmbd_app_instance.c:23:information:missingInclude:Include file: "ksmbd_create_ctx.h" not found.
+src/fs/ksmbd_app_instance.c:24:information:missingInclude:Include file: "glob.h" not found.
+src/fs/ksmbd_app_instance.c:25:information:missingInclude:Include file: "vfs_cache.h" not found.
+src/fs/ksmbd_app_instance.c:81:style:constParameterPointer:Parameter 'fp' can be declared as pointer to const
+src/fs/ksmbd_create_ctx.c:24:information:missingInclude:Include file: "ksmbd_create_ctx.h" not found.
+src/fs/ksmbd_create_ctx.c:25:information:missingInclude:Include file: "glob.h" not found.
+src/fs/ksmbd_create_ctx.c:211:style:knownConditionTrueFalse:Condition 'ret' is always false
+src/fs/ksmbd_dfs.c:18:information:missingInclude:Include file: "ksmbd_dfs.h" not found.
+src/fs/ksmbd_dfs.c:19:information:missingInclude:Include file: "ksmbd_fsctl.h" not found.
+src/fs/ksmbd_dfs.c:20:information:missingInclude:Include file: "smb2pdu.h" not found.
+src/fs/ksmbd_dfs.c:21:information:missingInclude:Include file: "smbfsctl.h" not found.
+src/fs/ksmbd_dfs.c:22:information:missingInclude:Include file: "smbstatus.h" not found.
+src/fs/ksmbd_dfs.c:23:information:missingInclude:Include file: "glob.h" not found.
+src/fs/ksmbd_dfs.c:24:information:missingInclude:Include file: "ksmbd_feature.h" not found.
+src/fs/ksmbd_dfs.c:25:information:missingInclude:Include file: "ksmbd_work.h" not found.
+src/fs/ksmbd_fsctl.c:20:information:missingInclude:Include file: "ksmbd_fsctl.h" not found.
+src/fs/ksmbd_fsctl.c:21:information:missingInclude:Include file: "smb2pdu.h" not found.
+src/fs/ksmbd_fsctl.c:22:information:missingInclude:Include file: "smbfsctl.h" not found.
+src/fs/ksmbd_fsctl.c:23:information:missingInclude:Include file: "smbstatus.h" not found.
+src/fs/ksmbd_fsctl.c:24:information:missingInclude:Include file: "smb_common.h" not found.
+src/fs/ksmbd_fsctl.c:25:information:missingInclude:Include file: "glob.h" not found.
+src/fs/ksmbd_fsctl.c:26:information:missingInclude:Include file: "connection.h" not found.
+src/fs/ksmbd_fsctl.c:27:information:missingInclude:Include file: "transport_ipc.h" not found.
+src/fs/ksmbd_fsctl.c:28:information:missingInclude:Include file: "ksmbd_netlink.h" not found.
+src/fs/ksmbd_fsctl.c:29:information:missingInclude:Include file: "vfs_cache.h" not found.
+src/fs/ksmbd_fsctl.c:30:information:missingInclude:Include file: "ksmbd_work.h" not found.
+src/fs/ksmbd_fsctl.c:31:information:missingInclude:Include file: "mgmt/user_session.h" not found.
+src/fs/ksmbd_fsctl.c:0:information:normalCheckLevelMaxBranches:Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches.
+src/fs/ksmbd_fsctl.c:176:style:constParameterCallback:Parameter 'work' can be declared as pointer to const. However it seems that 'fsctl_validate_negotiate_info_handler' is a callback function, if 'work' is declared with const you might also need to cast function pointer(s).
+src/fs/ksmbd_fsctl_extra.c:18:information:missingInclude:Include file: "ksmbd_fsctl_extra.h" not found.
+src/fs/ksmbd_fsctl_extra.c:19:information:missingInclude:Include file: "ksmbd_fsctl.h" not found.
+src/fs/ksmbd_fsctl_extra.c:20:information:missingInclude:Include file: "smb2pdu.h" not found.
+src/fs/ksmbd_fsctl_extra.c:21:information:missingInclude:Include file: "smbfsctl.h" not found.
+src/fs/ksmbd_fsctl_extra.c:22:information:missingInclude:Include file: "smbstatus.h" not found.
+src/fs/ksmbd_fsctl_extra.c:23:information:missingInclude:Include file: "glob.h" not found.
+src/fs/ksmbd_fsctl_extra.c:24:information:missingInclude:Include file: "ksmbd_work.h" not found.
+src/fs/ksmbd_fsctl_extra.c:25:information:missingInclude:Include file: "vfs.h" not found.
+src/fs/ksmbd_fsctl_extra.c:26:information:missingInclude:Include file: "vfs_cache.h" not found.
+src/fs/ksmbd_fsctl_extra.c:27:information:missingInclude:Include file: "oplock.h" not found.
+src/fs/ksmbd_fsctl_extra.c:28:information:missingInclude:Include file: "connection.h" not found.
+src/fs/ksmbd_fsctl_extra.c:29:information:missingInclude:Include file: "mgmt/tree_connect.h" not found.
+src/fs/ksmbd_fsctl_extra.c:0:information:normalCheckLevelMaxBranches:Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches.
+src/fs/ksmbd_info.c:31:information:missingInclude:Include file: "ksmbd_info.h" not found.
+src/fs/ksmbd_info.c:32:information:missingInclude:Include file: "glob.h" not found.
+src/fs/ksmbd_info.c:33:information:missingInclude:Include file: "smb2pdu.h" not found.
+src/fs/ksmbd_info.c:34:information:missingInclude:Include file: "connection.h" not found.
+src/fs/ksmbd_info.c:35:information:missingInclude:Include file: "misc.h" not found.
+src/fs/ksmbd_info.c:36:information:missingInclude:Include file: "oplock.h" not found.
+src/fs/ksmbd_info.c:37:information:missingInclude:Include file: "mgmt/share_config.h" not found.
+src/fs/ksmbd_notify.c:13:information:missingInclude:Include file: "glob.h" not found.
+src/fs/ksmbd_notify.c:14:information:missingInclude:Include file: "smb2pdu.h" not found.
+src/fs/ksmbd_notify.c:15:information:missingInclude:Include file: "smbstatus.h" not found.
+src/fs/ksmbd_notify.c:16:information:missingInclude:Include file: "ksmbd_work.h" not found.
+src/fs/ksmbd_notify.c:17:information:missingInclude:Include file: "vfs_cache.h" not found.
+src/fs/ksmbd_notify.c:18:information:missingInclude:Include file: "connection.h" not found.
+src/fs/ksmbd_notify.c:19:information:missingInclude:Include file: "ksmbd_notify.h" not found.
+src/fs/ksmbd_notify.c:0:information:normalCheckLevelMaxBranches:Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches.
+src/fs/ksmbd_notify.c:493:style:variableScope:The scope of the variable 'hdr' can be reduced.
+src/fs/ksmbd_notify.c:524:style:variableScope:The scope of the variable 'rsp' can be reduced.
+src/fs/ksmbd_notify.c:258:style:constParameterCallback:Parameter 'group' can be declared as pointer to const. However it seems that 'ksmbd_notify_handle_event' is a callback function, if 'group' is declared with const you might also need to cast function pointer(s).
+src/fs/ksmbd_notify.c:493:style:constVariablePointer:Variable 'hdr' can be declared as pointer to const
+src/fs/ksmbd_quota.c:21:information:missingInclude:Include file: "glob.h" not found.
+src/fs/ksmbd_quota.c:22:information:missingInclude:Include file: "smb2pdu.h" not found.
+src/fs/ksmbd_quota.c:23:information:missingInclude:Include file: "smbacl.h" not found.
+src/fs/ksmbd_quota.c:24:information:missingInclude:Include file: "ksmbd_info.h" not found.
+src/fs/ksmbd_quota.c:25:information:missingInclude:Include file: "ksmbd_quota.h" not found.
+src/fs/ksmbd_quota.c:26:information:missingInclude:Include file: "connection.h" not found.
+src/fs/ksmbd_quota.c:27:information:missingInclude:Include file: "vfs_cache.h" not found.
+src/fs/ksmbd_quota.c:0:information:normalCheckLevelMaxBranches:Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches.
+src/fs/ksmbd_quota.c:259:style:constVariablePointer:Variable 'sid' can be declared as pointer to const
+src/fs/ksmbd_quota.c:324:style:constVariablePointer:Variable 'sid' can be declared as pointer to const
+src/fs/ksmbd_quota.c:243:portability:arithOperationsOnVoidPointer:'(void*)req' is of type 'void *'. When using void pointers in calculations, the behaviour is undefined.
+src/fs/ksmbd_quota.c:254:portability:arithOperationsOnVoidPointer:'(void*)qqi' is of type 'void *'. When using void pointers in calculations, the behaviour is undefined.
+src/fs/ksmbd_quota.c:268:portability:arithOperationsOnVoidPointer:'sid_list' is of type 'void *'. When using void pointers in calculations, the behaviour is undefined.
+src/fs/ksmbd_reparse.c:21:information:missingInclude:Include file: "ksmbd_reparse.h" not found.
+src/fs/ksmbd_reparse.c:22:information:missingInclude:Include file: "ksmbd_fsctl.h" not found.
+src/fs/ksmbd_reparse.c:23:information:missingInclude:Include file: "smb2pdu.h" not found.
+src/fs/ksmbd_reparse.c:24:information:missingInclude:Include file: "smbfsctl.h" not found.
+src/fs/ksmbd_reparse.c:25:information:missingInclude:Include file: "smbstatus.h" not found.
+src/fs/ksmbd_reparse.c:26:information:missingInclude:Include file: "glob.h" not found.
+src/fs/ksmbd_reparse.c:27:information:missingInclude:Include file: "ksmbd_work.h" not found.
+src/fs/ksmbd_reparse.c:28:information:missingInclude:Include file: "vfs_cache.h" not found.
+src/fs/ksmbd_reparse.c:29:information:missingInclude:Include file: "connection.h" not found.
+src/fs/ksmbd_reparse.c:0:information:normalCheckLevelMaxBranches:Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches.
+src/fs/ksmbd_reparse.c:425:style:variableScope:The scope of the variable 'reparse_ptr' can be reduced.
+src/fs/ksmbd_reparse.c:426:style:variableScope:The scope of the variable 'symdata' can be reduced.
+src/fs/ksmbd_reparse.c:428:style:variableScope:The scope of the variable 'conv_len' can be reduced.
+src/fs/ksmbd_reparse.c:429:style:variableScope:The scope of the variable 'ucs2_bytes' can be reduced.
+src/fs/ksmbd_reparse.c:429:style:variableScope:The scope of the variable 'total_len' can be reduced.
+src/fs/ksmbd_reparse.c:275:style:constVariablePointer:Variable 'hdr' can be declared as pointer to const
+src/fs/ksmbd_resilient.c:17:information:missingInclude:Include file: "ksmbd_resilient.h" not found.
+src/fs/ksmbd_resilient.c:18:information:missingInclude:Include file: "ksmbd_fsctl.h" not found.
+src/fs/ksmbd_resilient.c:19:information:missingInclude:Include file: "smb2pdu.h" not found.
+src/fs/ksmbd_resilient.c:20:information:missingInclude:Include file: "smbfsctl.h" not found.
+src/fs/ksmbd_resilient.c:21:information:missingInclude:Include file: "smbstatus.h" not found.
+src/fs/ksmbd_resilient.c:22:information:missingInclude:Include file: "glob.h" not found.
+src/fs/ksmbd_resilient.c:23:information:missingInclude:Include file: "ksmbd_work.h" not found.
+src/fs/ksmbd_resilient.c:24:information:missingInclude:Include file: "vfs_cache.h" not found.
+src/fs/ksmbd_vss.c:23:information:missingInclude:Include file: "glob.h" not found.
+src/fs/ksmbd_vss.c:24:information:missingInclude:Include file: "ksmbd_vss.h" not found.
+src/fs/ksmbd_vss.c:25:information:missingInclude:Include file: "ksmbd_fsctl.h" not found.
+src/fs/ksmbd_vss.c:26:information:missingInclude:Include file: "smbfsctl.h" not found.
+src/fs/ksmbd_vss.c:27:information:missingInclude:Include file: "smb2pdu.h" not found.
+src/fs/ksmbd_vss.c:28:information:missingInclude:Include file: "vfs_cache.h" not found.
+src/fs/ksmbd_vss.c:29:information:missingInclude:Include file: "vfs.h" not found.
+src/fs/ksmbd_vss.c:30:information:missingInclude:Include file: "connection.h" not found.
+src/fs/ksmbd_vss.c:31:information:missingInclude:Include file: "mgmt/share_config.h" not found.
+src/fs/ksmbd_vss.c:32:information:missingInclude:Include file: "mgmt/tree_connect.h" not found.
+src/fs/ksmbd_vss.c:33:information:missingInclude:Include file: "ksmbd_work.h" not found.
+src/fs/ksmbd_vss.c:262:error:syntaxError:failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... )
+src/fs/oplock.c:9:information:missingInclude:Include file: "glob.h" not found.
+src/fs/oplock.c:10:information:missingInclude:Include file: "oplock.h" not found.
+src/fs/oplock.c:12:information:missingInclude:Include file: "smb_common.h" not found.
+src/fs/oplock.c:16:information:missingInclude:Include file: "smbstatus.h" not found.
+src/fs/oplock.c:17:information:missingInclude:Include file: "connection.h" not found.
+src/fs/oplock.c:18:information:missingInclude:Include file: "server.h" not found.
+src/fs/oplock.c:19:information:missingInclude:Include file: "smb2fruit.h" not found.
+src/fs/oplock.c:20:information:missingInclude:Include file: "mgmt/user_session.h" not found.
+src/fs/oplock.c:21:information:missingInclude:Include file: "mgmt/share_config.h" not found.
+src/fs/oplock.c:22:information:missingInclude:Include file: "mgmt/tree_connect.h" not found.
+src/fs/oplock.c:1957:error:syntaxError:failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... )
+src/fs/oplock.c:14:information:missingInclude:Include file: "smb1pdu.h" not found.
+src/fs/oplock.c:0:information:noValidConfiguration:This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details.
+src/fs/smbacl.c:14:error:syntaxError:failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... )
+src/fs/vfs.c:10:error:syntaxError:failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... )
+src/fs/vfs.c:0:information:noValidConfiguration:This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details.
+src/fs/vfs_cache.c:9:error:syntaxError:failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... )
+src/fs/vfs_cache.c:0:information:noValidConfiguration:This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details.
+src/mgmt/ksmbd_ida.c:6:information:missingInclude:Include file: "glob.h" not found.
+src/mgmt/user_config.h:9:information:missingInclude:Include file: "glob.h" not found.
+src/mgmt/user_session.h:15:information:missingInclude:Include file: "smb_common.h" not found.
+src/mgmt/user_session.h:16:information:missingInclude:Include file: "ntlmssp.h" not found.
+src/mgmt/share_config.c:20:information:missingInclude:Include file: "connection.h" not found.
+src/mgmt/share_config.c:21:information:missingInclude:Include file: "transport_ipc.h" not found.
+src/mgmt/share_config.c:22:information:missingInclude:Include file: "misc.h" not found.
+src/mgmt/share_config.c:112:style:variableScope:The scope of the variable 'sz' can be reduced.
+src/mgmt/share_config.h:44:style:constParameterPointer:Parameter 'share' can be declared as pointer to const
+src/mgmt/share_config.h:53:style:constParameterPointer:Parameter 'share' can be declared as pointer to const
+src/mgmt/share_config.h:61:style:constParameterPointer:Parameter 'share' can be declared as pointer to const
+src/mgmt/user_config.h:25:style:constParameterPointer:Parameter 'user' can be declared as pointer to const
+src/mgmt/user_config.h:35:style:constParameterPointer:Parameter 'user' can be declared as pointer to const
+src/mgmt/user_config.h:40:style:constParameterPointer:Parameter 'user' can be declared as pointer to const
+src/mgmt/user_config.h:44:style:constParameterPointer:Parameter 'user' can be declared as pointer to const
+src/mgmt/user_config.h:49:style:constParameterPointer:Parameter 'user' can be declared as pointer to const
+src/mgmt/user_config.h:54:style:constParameterPointer:Parameter 'user' can be declared as pointer to const
+src/mgmt/user_config.h:59:style:constParameterPointer:Parameter 'user' can be declared as pointer to const
+src/mgmt/user_session.h:81:style:constParameterPointer:Parameter 'sess' can be declared as pointer to const
+src/mgmt/share_config.c:102:error:uninitvar:Uninitialized variable: share->name
+src/mgmt/share_config.c:112:style:unreadVariable:Variable 'sz' is assigned a value that is never used.
+src/mgmt/tree_connect.c:10:information:missingInclude:Include file: "transport_ipc.h" not found.
+src/mgmt/tree_connect.c:11:information:missingInclude:Include file: "connection.h" not found.
+src/mgmt/tree_connect.h:12:information:missingInclude:Include file: "ksmbd_netlink.h" not found.
+src/mgmt/tree_connect.h:45:style:constParameterPointer:Parameter 'tree_conn' can be declared as pointer to const
+src/mgmt/tree_connect.c:159:error:uninitvar:Uninitialized variable: tc->t_state
+src/mgmt/user_config.c:11:information:missingInclude:Include file: "transport_ipc.h" not found.
+src/mgmt/user_config.c:94:style:constParameterPointer:Parameter 'user' can be declared as pointer to const
+src/mgmt/user_session.c:20:information:missingInclude:Include file: "transport_ipc.h" not found.
+src/mgmt/user_session.c:21:information:missingInclude:Include file: "connection.h" not found.
+src/mgmt/user_session.c:22:information:missingInclude:Include file: "vfs_cache.h" not found.
+src/mgmt/user_session.c:0:information:normalCheckLevelMaxBranches:Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches.
+src/mgmt/user_session.c:513:warning:nullPointer:Possible null pointer dereference: sess
+src/mgmt/user_session.c:353:style:constVariablePointer:Variable 'sess' can be declared as pointer to const
+src/mgmt/user_session.c:510:style:constParameterPointer:Parameter 'sess' can be declared as pointer to const
+src/mgmt/user_session.c:71:error:uninitvar:Uninitialized variables: entry.id, entry.method
+src/mgmt/user_session.c:190:error:uninitvar:Uninitialized variable: sess->id
+src/mgmt/user_session.c:213:error:uninitvar:Uninitialized variable: sess->state
+src/mgmt/user_session.c:275:error:uninitvar:Uninitialized variables: sess.id, sess.dialect, sess.user, sess.sequence_number, sess.flags, sess.sign, sess.enc, sess.is_anonymous, sess.state, sess.state_lock, sess.Preauth_HashValue, sess.hlist, sess.ksmbd_chann_list, sess.tree_conns, sess.tree_conn_ida, sess.rpc_handle_list, sess.file_table, sess.last_active, sess.tree_conns_lock, sess.gcm_nonce_counter, sess.refcnt, sess.rpc_lock, sess.rcu_head
+src/mgmt/user_session.c:310:error:uninitvar:Uninitialized variable: chann->conn
+src/protocol/common/netmisc.c:10:information:missingInclude:Include file: "glob.h" not found.
+src/protocol/common/netmisc.c:11:information:missingInclude:Include file: "smberr.h" not found.
+src/protocol/common/netmisc.c:12:information:missingInclude:Include file: "nterr.h" not found.
+src/protocol/common/netmisc.c:13:information:missingInclude:Include file: "smb_common.h" not found.
+src/protocol/common/smb_common.c:9:information:missingInclude:Include file: "smb_common.h" not found.
+src/protocol/common/smb_common.c:10:information:missingInclude:Include file: "smb1pdu.h" not found.
+src/protocol/common/smb_common.c:11:information:missingInclude:Include file: "server.h" not found.
+src/protocol/common/smb_common.c:12:information:missingInclude:Include file: "misc.h" not found.
+src/protocol/common/smb_common.c:13:information:missingInclude:Include file: "smbstatus.h" not found.
+src/protocol/common/smb_common.c:14:information:missingInclude:Include file: "connection.h" not found.
+src/protocol/common/smb_common.c:15:information:missingInclude:Include file: "ksmbd_work.h" not found.
+src/protocol/common/smb_common.c:16:information:missingInclude:Include file: "mgmt/user_session.h" not found.
+src/protocol/common/smb_common.c:17:information:missingInclude:Include file: "mgmt/user_config.h" not found.
+src/protocol/common/smb_common.c:18:information:missingInclude:Include file: "mgmt/tree_connect.h" not found.
+src/protocol/common/smb_common.c:19:information:missingInclude:Include file: "mgmt/share_config.h" not found.
+src/protocol/common/smb_common.c:487:error:syntaxError:failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... )
+src/protocol/common/smb_common.c:0:information:noValidConfiguration:This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details.
+src/protocol/smb1/smb1misc.c:7:information:missingInclude:Include file: "glob.h" not found.
+src/protocol/smb1/smb1misc.c:8:information:missingInclude:Include file: "asn1.h" not found.
+src/protocol/smb1/smb1misc.c:9:information:missingInclude:Include file: "nterr.h" not found.
+src/protocol/smb1/smb1misc.c:10:information:missingInclude:Include file: "ksmbd_work.h" not found.
+src/protocol/smb1/smb1misc.c:11:information:missingInclude:Include file: "smb_common.h" not found.
+src/protocol/smb1/smb1misc.c:12:information:missingInclude:Include file: "smb1pdu.h" not found.
+src/protocol/smb1/smb1misc.c:13:information:missingInclude:Include file: "mgmt/user_session.h" not found.
+src/protocol/smb1/smb1misc.c:0:information:normalCheckLevelMaxBranches:Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches.
+src/protocol/smb1/smb1misc.c:44:style:constParameterPointer:Parameter 'hdr' can be declared as pointer to const
+src/protocol/smb1/smb1ops.c:9:information:missingInclude:Include file: "glob.h" not found.
+src/protocol/smb1/smb1ops.c:10:information:missingInclude:Include file: "connection.h" not found.
+src/protocol/smb1/smb1ops.c:11:information:missingInclude:Include file: "smb_common.h" not found.
+src/protocol/smb1/smb1ops.c:12:information:missingInclude:Include file: "smb1pdu.h" not found.
+src/protocol/smb1/smb1pdu.c:13:error:syntaxError:failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... )
+src/protocol/smb2/smb2_create.c:25:error:syntaxError:failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... )
+src/protocol/smb2/smb2_create.c:0:information:noValidConfiguration:This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details.
+src/protocol/smb2/smb2_dir.c:25:error:syntaxError:failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... )
+src/protocol/smb2/smb2_dir.c:0:information:noValidConfiguration:This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details.
+src/protocol/smb2/smb2_ioctl.c:25:error:syntaxError:failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... )
+src/protocol/smb2/smb2_ioctl.c:0:information:noValidConfiguration:This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details.
+src/protocol/smb2/smb2_lock.c:25:error:syntaxError:failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... )
+src/protocol/smb2/smb2_misc_cmds.c:17:error:syntaxError:failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... )
+src/protocol/smb2/smb2_negotiate.c:25:error:syntaxError:failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... )
+src/protocol/smb2/smb2_notify.c:12:information:missingInclude:Include file: "glob.h" not found.
+src/protocol/smb2/smb2_notify.c:13:information:missingInclude:Include file: "smb2pdu.h" not found.
+src/protocol/smb2/smb2_notify.c:14:information:missingInclude:Include file: "smbstatus.h" not found.
+src/protocol/smb2/smb2_notify.c:15:information:missingInclude:Include file: "ksmbd_work.h" not found.
+src/protocol/smb2/smb2_notify.c:16:information:missingInclude:Include file: "vfs_cache.h" not found.
+src/protocol/smb2/smb2_notify.c:17:information:missingInclude:Include file: "connection.h" not found.
+src/protocol/smb2/smb2_notify.c:18:information:missingInclude:Include file: "mgmt/user_session.h" not found.
+src/protocol/smb2/smb2_notify.c:19:information:missingInclude:Include file: "ksmbd_notify.h" not found.
+src/protocol/smb2/smb2_notify.c:20:information:missingInclude:Include file: "smb2pdu_internal.h" not found.
+src/protocol/smb2/smb2_notify.c:0:information:normalCheckLevelMaxBranches:Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches.
+src/protocol/smb2/smb2_pdu_common.c:25:error:syntaxError:failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... )
+src/protocol/smb2/smb2_query_set.c:17:error:syntaxError:failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... )
+src/protocol/smb2/smb2_query_set.c:0:information:noValidConfiguration:This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details.
+src/protocol/smb2/smb2_read_write.c:25:error:syntaxError:failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... )
+src/protocol/smb2/smb2_read_write.c:0:information:noValidConfiguration:This file is not analyzed. Cppcheck failed to extract a valid configuration. Use -v for more details.
+src/protocol/smb2/smb2_session.c:25:error:syntaxError:failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... )
+src/protocol/smb2/smb2_tree.c:17:error:syntaxError:failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... )
+src/protocol/smb2/smb2fruit.c:20:information:missingInclude:Include file: "smb2fruit.h" not found.
+src/protocol/smb2/smb2fruit.c:21:information:missingInclude:Include file: "smb_common.h" not found.
+src/protocol/smb2/smb2fruit.c:22:information:missingInclude:Include file: "connection.h" not found.
+src/protocol/smb2/smb2fruit.c:23:information:missingInclude:Include file: "server.h" not found.
+src/protocol/smb2/smb2fruit.c:24:information:missingInclude:Include file: "ksmbd_netlink.h" not found.
+src/protocol/smb2/smb2fruit.c:25:information:missingInclude:Include file: "mgmt/share_config.h" not found.
+src/protocol/smb2/smb2fruit.c:26:information:missingInclude:Include file: "oplock.h" not found.
+src/protocol/smb2/smb2fruit.c:27:information:missingInclude:Include file: "vfs_cache.h" not found.
+src/protocol/smb2/smb2fruit.c:593:error:unknownMacro:There is an unknown macro here somewhere. Configuration is required. If AFP_RESOURCE_STREAM is a macro then please configure it.
+src/protocol/smb2/smb2misc.c:7:information:missingInclude:Include file: "glob.h" not found.
+src/protocol/smb2/smb2misc.c:8:information:missingInclude:Include file: "nterr.h" not found.
+src/protocol/smb2/smb2misc.c:9:information:missingInclude:Include file: "smb2pdu.h" not found.
+src/protocol/smb2/smb2misc.c:10:information:missingInclude:Include file: "smb_common.h" not found.
+src/protocol/smb2/smb2misc.c:11:information:missingInclude:Include file: "smbstatus.h" not found.
+src/protocol/smb2/smb2misc.c:12:information:missingInclude:Include file: "mgmt/user_session.h" not found.
+src/protocol/smb2/smb2misc.c:13:information:missingInclude:Include file: "connection.h" not found.
+src/protocol/smb2/smb2misc.c:0:information:normalCheckLevelMaxBranches:Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches.
+src/protocol/smb2/smb2misc.c:15:style:constParameterPointer:Parameter 'hdr' can be declared as pointer to const
+src/protocol/smb2/smb2ops.c:8:information:missingInclude:Include file: "glob.h" not found.
+src/protocol/smb2/smb2ops.c:9:information:missingInclude:Include file: "smb2pdu.h" not found.
+src/protocol/smb2/smb2ops.c:11:information:missingInclude:Include file: "auth.h" not found.
+src/protocol/smb2/smb2ops.c:12:information:missingInclude:Include file: "connection.h" not found.
+src/protocol/smb2/smb2ops.c:13:information:missingInclude:Include file: "smb_common.h" not found.
+src/protocol/smb2/smb2ops.c:14:information:missingInclude:Include file: "server.h" not found.
+src/protocol/smb2/smb2ops.c:15:information:missingInclude:Include file: "ksmbd_dfs.h" not found.
+src/protocol/smb2/smb2ops.c:0:information:normalCheckLevelMaxBranches:Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches.
+src/protocol/smb2/smb2ops.c:243:style:constParameterPointer:Parameter 'conn' can be declared as pointer to const
+src/tools/memory_usage_validator.c:0:information:normalCheckLevelMaxBranches:Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches.
+src/transport/transport_ipc.c:17:information:missingInclude:Include file: "vfs_cache.h" not found.
+src/transport/transport_ipc.c:18:information:missingInclude:Include file: "transport_ipc.h" not found.
+src/transport/transport_ipc.c:19:information:missingInclude:Include file: "server.h" not found.
+src/transport/transport_ipc.c:20:information:missingInclude:Include file: "smb_common.h" not found.
+src/transport/transport_ipc.c:22:information:missingInclude:Include file: "mgmt/user_config.h" not found.
+src/transport/transport_ipc.c:23:information:missingInclude:Include file: "mgmt/share_config.h" not found.
+src/transport/transport_ipc.c:24:information:missingInclude:Include file: "mgmt/user_session.h" not found.
+src/transport/transport_ipc.c:25:information:missingInclude:Include file: "mgmt/tree_connect.h" not found.
+src/transport/transport_ipc.c:26:information:missingInclude:Include file: "mgmt/ksmbd_ida.h" not found.
+src/transport/transport_ipc.c:27:information:missingInclude:Include file: "connection.h" not found.
+src/transport/transport_ipc.c:28:information:missingInclude:Include file: "transport_tcp.h" not found.
+src/transport/transport_ipc.c:29:information:missingInclude:Include file: "transport_rdma.h" not found.
+src/transport/transport_ipc.c:233:error:syntaxError:failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... )
+src/transport/transport_rdma.c:21:information:missingInclude:Include file: "glob.h" not found.
+src/transport/transport_rdma.c:22:information:missingInclude:Include file: "compat.h" not found.
+src/transport/transport_rdma.c:23:information:missingInclude:Include file: "connection.h" not found.
+src/transport/transport_rdma.c:24:information:missingInclude:Include file: "smb_common.h" not found.
+src/transport/transport_rdma.c:25:information:missingInclude:Include file: "smbstatus.h" not found.
+src/transport/transport_rdma.c:26:information:missingInclude:Include file: "transport_rdma.h" not found.
+src/transport/transport_rdma.c:1947:error:syntaxError:failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... )
+src/transport/transport_tcp.c:24:information:missingInclude:Include file: "smb_common.h" not found.
+src/transport/transport_tcp.c:25:information:missingInclude:Include file: "server.h" not found.
+src/transport/transport_tcp.c:26:information:missingInclude:Include file: "auth.h" not found.
+src/transport/transport_tcp.c:27:information:missingInclude:Include file: "connection.h" not found.
+src/transport/transport_tcp.c:28:information:missingInclude:Include file: "transport_tcp.h" not found.
+src/transport/transport_tcp.c:65:error:syntaxError:failed to evaluate #if condition, undefined function-like macro invocation: KERNEL_VERSION( ... )
+ksmbd-tools/addshare/addshare.c:20:information:missingInclude:Include file: "config_parser.h" not found.
+ksmbd-tools/addshare/addshare.c:21:information:missingInclude:Include file: "tools.h" not found.
+ksmbd-tools/addshare/addshare.c:22:information:missingInclude:Include file: "management/share.h" not found.
+ksmbd-tools/addshare/addshare.c:23:information:missingInclude:Include file: "management/user.h" not found.
+ksmbd-tools/addshare/addshare.c:24:information:missingInclude:Include file: "linux/ksmbd_server.h" not found.
+ksmbd-tools/addshare/addshare.c:38:error:unknownMacro:There is an unknown macro here somewhere. Configuration is required. If STR is a macro then please configure it.
+ksmbd-tools/addshare/share_admin.c:0:information:normalCheckLevelMaxBranches:Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches.
+ksmbd-tools/addshare/share_admin.c:385:style:variableScope:The scope of the variable 'row' can be reduced.
+ksmbd-tools/addshare/share_admin.c:346:portability:varFuncNullUB:Passing NULL after the last typed argument to a variadic function leads to undefined behaviour.
+ksmbd-tools/addshare/share_admin.c:367:portability:varFuncNullUB:Passing NULL after the last typed argument to a variadic function leads to undefined behaviour.
+ksmbd-tools/addshare/share_admin.c:296:style:constParameterPointer:Parameter 'buf' can be declared as pointer to const
+ksmbd-tools/addshare/share_admin.c:304:style:constParameterPointer:Parameter 'buf' can be declared as pointer to const
+ksmbd-tools/addshare/share_admin.c:494:style:constVariablePointer:Variable 'u8c' can be declared as pointer to const
+ksmbd-tools/addshare/share_admin.c:697:style:constVariablePointer:Variable 'g' can be declared as pointer to const
+ksmbd-tools/adduser/adduser.c:20:information:missingInclude:Include file: "config_parser.h" not found.
+ksmbd-tools/adduser/adduser.c:21:information:missingInclude:Include file: "tools.h" not found.
+ksmbd-tools/adduser/adduser.c:22:information:missingInclude:Include file: "management/user.h" not found.
+ksmbd-tools/adduser/adduser.c:23:information:missingInclude:Include file: "management/share.h" not found.
+ksmbd-tools/adduser/adduser.c:25:information:missingInclude:Include file: "linux/ksmbd_server.h" not found.
+ksmbd-tools/adduser/adduser.c:38:error:unknownMacro:There is an unknown macro here somewhere. Configuration is required. If STR is a macro then please configure it.
+ksmbd-tools/adduser/user_admin.c:0:information:normalCheckLevelMaxBranches:Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches.
+ksmbd-tools/adduser/user_admin.c:87:style:constVariablePointer:Variable 'u8c' can be declared as pointer to const
+ksmbd-tools/control/control.c:19:information:missingInclude:Include file: "tools.h" not found.
+ksmbd-tools/control/control.c:20:information:missingInclude:Include file: "config_parser.h" not found.
+ksmbd-tools/control/control.c:339:style:variableScope:The scope of the variable 'version' can be reduced.
+ksmbd-tools/mountd/ipc.c:50:style:constParameterPointer:Parameter 'payload' can be declared as pointer to const
+ksmbd-tools/mountd/ipc.c:112:style:constVariablePointer:Variable 'p' can be declared as pointer to const
+ksmbd-tools/mountd/ipc.c:193:style:constVariablePointer:Variable 'p' can be declared as pointer to const
+ksmbd-tools/mountd/ipc.c:431:style:constVariablePointer:Variable 'hdr' can be declared as pointer to const
+ksmbd-tools/mountd/mountd.c:22:information:missingInclude:Include file: "ipc.h" not found.
+ksmbd-tools/mountd/mountd.c:23:information:missingInclude:Include file: "management/share.h" not found.
+ksmbd-tools/mountd/mountd.c:24:information:missingInclude:Include file: "config_parser.h" not found.
+ksmbd-tools/mountd/mountd.c:45:error:unknownMacro:There is an unknown macro here somewhere. Configuration is required. If PATH_SMBCONF is a macro then please configure it.
+ksmbd-tools/mountd/rpc.c:0:information:normalCheckLevelMaxBranches:Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches.
+ksmbd-tools/mountd/rpc.c:444:warning:identicalConditionAfterEarlyExit:Identical condition and return expression 'ret', return value is always 0
+ksmbd-tools/mountd/rpc.c:353:style:constParameterPointer:Parameter 'value' can be declared as pointer to const
+ksmbd-tools/mountd/rpc.c:374:style:constParameterPointer:Parameter 'dce' can be declared as pointer to const
+ksmbd-tools/mountd/rpc.c:673:style:constParameterPointer:Parameter 'pipe' can be declared as pointer to const
+ksmbd-tools/mountd/rpc.c:1033:style:constParameterPointer:Parameter 'a' can be declared as pointer to const
+ksmbd-tools/mountd/rpc.c:1033:style:constParameterPointer:Parameter 'b' can be declared as pointer to const
+ksmbd-tools/mountd/rpc.c:1059:style:constParameterPointer:Parameter 'pipe' can be declared as pointer to const
+ksmbd-tools/mountd/rpc.c:1097:style:constParameterPointer:Parameter 'pipe' can be declared as pointer to const
+ksmbd-tools/mountd/rpc.c:1226:style:constParameterPointer:Parameter 'req' can be declared as pointer to const
+ksmbd-tools/mountd/rpc_lsarpc.c:705:error:unknownMacro:There is an unknown macro here somewhere. Configuration is required. If ghash_for_each is a macro then please configure it.
+ksmbd-tools/mountd/rpc_samr.c:1033:error:unknownMacro:There is an unknown macro here somewhere. Configuration is required. If ghash_for_each is a macro then please configure it.
+ksmbd-tools/mountd/rpc_srvsvc.c:0:information:normalCheckLevelMaxBranches:Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches.
+ksmbd-tools/mountd/rpc_srvsvc.c:48:style:constParameterCallback:Parameter 'dce' can be declared as pointer to const. However it seems that '__share_entry_size_ctr0' is a callback function, if 'dce' is declared with const you might also need to cast function pointer(s).
+ksmbd-tools/mountd/rpc_srvsvc.c:50:style:constVariablePointer:Variable 'share' can be declared as pointer to const
+ksmbd-tools/mountd/rpc_srvsvc.c:55:style:constParameterCallback:Parameter 'dce' can be declared as pointer to const. However it seems that '__share_entry_size_ctr1' is a callback function, if 'dce' is declared with const you might also need to cast function pointer(s).
+ksmbd-tools/mountd/rpc_srvsvc.c:57:style:constVariablePointer:Variable 'share' can be declared as pointer to const
+ksmbd-tools/mountd/rpc_wkssvc.c:86:style:constParameterPointer:Parameter 'pipe' can be declared as pointer to const
+ksmbd-tools/mountd/rpc_wkssvc.c:155:style:constParameterPointer:Parameter 'pipe' can be declared as pointer to const
+ksmbd-tools/mountd/rpc_wkssvc.c:156:style:constParameterPointer:Parameter 'hdr' can be declared as pointer to const
+ksmbd-tools/mountd/smbacl.c:0:information:normalCheckLevelMaxBranches:Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches.
+ksmbd-tools/mountd/smbacl.c:142:style:constParameterPointer:Parameter 'sid' can be declared as pointer to const
+ksmbd-tools/mountd/worker.c:258:style:constParameterPointer:Parameter 'msg' can be declared as pointer to const
+ksmbd-tools/tests/test_config_parser.c:16:information:missingInclude:Include file: "tools.h" not found.
+ksmbd-tools/tests/test_config_parser.c:17:information:missingInclude:Include file: "config_parser.h" not found.
+ksmbd-tools/tests/test_config_parser.c:18:information:missingInclude:Include file: "management/user.h" not found.
+ksmbd-tools/tests/test_config_parser.c:19:information:missingInclude:Include file: "management/share.h" not found.
+ksmbd-tools/tests/test_config_parser.c:20:information:missingInclude:Include file: "linux/ksmbd_server.h" not found.
+ksmbd-tools/tests/test_host_acl.c:0:information:normalCheckLevelMaxBranches:Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches.
+ksmbd-tools/tools/asn1.c:20:information:missingInclude:Include file: "asn1.h" not found.
+ksmbd-tools/tools/asn1.c:0:information:normalCheckLevelMaxBranches:Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches.
+ksmbd-tools/tools/asn1.c:81:style:variableScope:The scope of the variable 'cnt' can be reduced.
+ksmbd-tools/tools/asn1.c:315:style:variableScope:The scope of the variable 'id' can be reduced.
+ksmbd-tools/tools/asn1.c:140:style:constParameterPointer:Parameter 'eoc' can be declared as pointer to const
+ksmbd-tools/tools/asn1.c:172:style:constParameterPointer:Parameter 'eoc' can be declared as pointer to const
+ksmbd-tools/tools/asn1.c:231:style:constParameterPointer:Parameter 'eoc' can be declared as pointer to const
+ksmbd-tools/tools/config_parser.c:0:information:normalCheckLevelMaxBranches:Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches.
+ksmbd-tools/tools/config_parser.c:31:style:constParameterPointer:Parameter 'v' can be declared as pointer to const
+ksmbd-tools/tools/config_parser.c:98:style:constVariablePointer:Variable 'delim' can be declared as pointer to const
+ksmbd-tools/tools/config_parser.c:294:style:constParameterPointer:Parameter 'v' can be declared as pointer to const
+ksmbd-tools/tools/config_parser.c:302:style:constParameterPointer:Parameter 'v' can be declared as pointer to const
+ksmbd-tools/tools/config_parser.c:313:style:constParameterPointer:Parameter 'v' can be declared as pointer to const
+ksmbd-tools/tools/config_parser.c:866:style:constVariablePointer:Variable 'delim' can be declared as pointer to const
+ksmbd-tools/tools/config_parser.c:952:style:constVariablePointer:Variable 'delim' can be declared as pointer to const
+ksmbd-tools/tools/ksmbdctl.c:19:information:missingInclude:Include file: "tools.h" not found.
+ksmbd-tools/tools/ksmbdctl.c:20:information:missingInclude:Include file: "config_parser.h" not found.
+ksmbd-tools/tools/ksmbdctl.c:21:information:missingInclude:Include file: "management/share.h" not found.
+ksmbd-tools/tools/ksmbdctl.c:22:information:missingInclude:Include file: "management/user.h" not found.
+ksmbd-tools/tools/ksmbdctl.c:23:information:missingInclude:Include file: "linux/ksmbd_server.h" not found.
+ksmbd-tools/tools/ksmbdctl.c:24:information:missingInclude:Include file: "share_admin.h" not found.
+ksmbd-tools/tools/ksmbdctl.c:25:information:missingInclude:Include file: "user_admin.h" not found.
+ksmbd-tools/tools/ksmbdctl.c:26:information:missingInclude:Include file: "control.h" not found.
+ksmbd-tools/tools/ksmbdctl.c:0:information:normalCheckLevelMaxBranches:Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches.
+ksmbd-tools/tools/ksmbdctl.c:312:style:constParameterCallback:Parameter 'user' can be declared as pointer to const. However it seems that '__list_user_cb' is a callback function, if 'user' is declared with const you might also need to cast function pointer(s).
+ksmbd-tools/tools/main.c:8:information:missingInclude:Include file: "tools.h" not found.
+ksmbd-tools/tools/management/session.c:12:information:missingInclude:Include file: "linux/ksmbd_server.h" not found.
+ksmbd-tools/tools/management/session.c:13:information:missingInclude:Include file: "management/session.h" not found.
+ksmbd-tools/tools/management/session.c:14:information:missingInclude:Include file: "management/tree_conn.h" not found.
+ksmbd-tools/tools/management/session.c:15:information:missingInclude:Include file: "management/user.h" not found.
+ksmbd-tools/tools/management/session.c:16:information:missingInclude:Include file: "tools.h" not found.
+ksmbd-tools/tools/management/session.c:49:error:unknownMacro:There is an unknown macro here somewhere. Configuration is required. If ghash_for_each is a macro then please configure it.
+ksmbd-tools/tools/management/share.c:18:information:missingInclude:Include file: "config_parser.h" not found.
+ksmbd-tools/tools/management/share.c:19:information:missingInclude:Include file: "linux/ksmbd_server.h" not found.
+ksmbd-tools/tools/management/share.c:20:information:missingInclude:Include file: "management/share.h" not found.
+ksmbd-tools/tools/management/share.c:21:information:missingInclude:Include file: "management/user.h" not found.
+ksmbd-tools/tools/management/share.c:22:information:missingInclude:Include file: "tools.h" not found.
+ksmbd-tools/tools/management/share.c:174:error:unknownMacro:There is an unknown macro here somewhere. Configuration is required. If ghash_for_each is a macro then please configure it.
+ksmbd-tools/tools/management/spnego.c:8:information:missingInclude:Include file: "tools.h" not found.
+ksmbd-tools/tools/management/spnego.c:0:information:normalCheckLevelMaxBranches:Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches.
+ksmbd-tools/tools/management/spnego.c:77:style:constParameterPointer:Parameter 'oid1' can be declared as pointer to const
+ksmbd-tools/tools/management/spnego.c:78:style:constParameterPointer:Parameter 'oid2' can be declared as pointer to const
+ksmbd-tools/tools/management/spnego.c:220:style:constParameterCallback:Parameter 'in_blob' can be declared as pointer to const. However it seems that 'encode_negTokenTarg' is a callback function, if 'in_blob' is declared with const you might also need to cast function pointer(s).
+ksmbd-tools/tools/management/spnego_krb5.c:8:information:missingInclude:Include file: "tools.h" not found.
+ksmbd-tools/tools/management/spnego_krb5.c:313:style:unusedLabelConfiguration:Label 'out_free_auth' is not used. There is #if in function body so the label might be used in code that is removed by the preprocessor.
+ksmbd-tools/tools/management/tree_conn.c:12:information:missingInclude:Include file: "linux/ksmbd_server.h" not found.
+ksmbd-tools/tools/management/tree_conn.c:13:information:missingInclude:Include file: "management/tree_conn.h" not found.
+ksmbd-tools/tools/management/tree_conn.c:14:information:missingInclude:Include file: "management/session.h" not found.
+ksmbd-tools/tools/management/tree_conn.c:15:information:missingInclude:Include file: "management/share.h" not found.
+ksmbd-tools/tools/management/tree_conn.c:16:information:missingInclude:Include file: "management/user.h" not found.
+ksmbd-tools/tools/management/tree_conn.c:17:information:missingInclude:Include file: "tools.h" not found.
+ksmbd-tools/tools/management/user.c:15:information:missingInclude:Include file: "linux/ksmbd_server.h" not found.
+ksmbd-tools/tools/management/user.c:16:information:missingInclude:Include file: "management/share.h" not found.
+ksmbd-tools/tools/management/user.c:17:information:missingInclude:Include file: "management/user.h" not found.
+ksmbd-tools/tools/management/user.c:18:information:missingInclude:Include file: "config_parser.h" not found.
+ksmbd-tools/tools/management/user.c:19:information:missingInclude:Include file: "tools.h" not found.
+ksmbd-tools/tools/management/user.c:162:error:unknownMacro:There is an unknown macro here somewhere. Configuration is required. If ghash_for_each is a macro then please configure it.
+ksmbd-tools/tools/tools.c:15:information:missingInclude:Include file: "tools.h" not found.
+ksmbd-tools/tools/tools.c:16:information:missingInclude:Include file: "ipc.h" not found.
+ksmbd-tools/tools/tools.c:17:information:missingInclude:Include file: "rpc.h" not found.
+ksmbd-tools/tools/tools.c:18:information:missingInclude:Include file: "worker.h" not found.
+ksmbd-tools/tools/tools.c:19:information:missingInclude:Include file: "config_parser.h" not found.
+ksmbd-tools/tools/tools.c:20:information:missingInclude:Include file: "management/user.h" not found.
+ksmbd-tools/tools/tools.c:21:information:missingInclude:Include file: "management/share.h" not found.
+ksmbd-tools/tools/tools.c:22:information:missingInclude:Include file: "management/session.h" not found.
+ksmbd-tools/tools/tools.c:23:information:missingInclude:Include file: "management/tree_conn.h" not found.
+ksmbd-tools/tools/tools.c:24:information:missingInclude:Include file: "management/spnego.h" not found.
+ksmbd-tools/tools/tools.c:25:information:missingInclude:Include file: "version.h" not found.
+ksmbd-tools/tools/tools.c:146:error:unknownMacro:There is an unknown macro here somewhere. Configuration is required. If G_GNUC_PRINTF is a macro then please configure it.
+test/fuzz/asn1_fuzz.c:0:information:normalCheckLevelMaxBranches:Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches.
+test/fuzz/asn1_fuzz.c:220:style:variableScope:The scope of the variable 'tag' can be reduced.
+test/fuzz/asn1_fuzz.c:220:style:variableScope:The scope of the variable 'length_byte' can be reduced.
+test/fuzz/asn1_fuzz.c:276:error:uninitvar:Uninitialized variable: test_data
+test/fuzz/create_context_fuzz.c:0:information:normalCheckLevelMaxBranches:Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches.
+test/fuzz/create_context_fuzz.c:93:style:variableScope:The scope of the variable 'name_off' can be reduced.
+test/fuzz/create_context_fuzz.c:93:style:variableScope:The scope of the variable 'name_len' can be reduced.
+test/fuzz/create_context_fuzz.c:93:style:variableScope:The scope of the variable 'value_off' can be reduced.
+test/fuzz/create_context_fuzz.c:93:style:variableScope:The scope of the variable 'value_len' can be reduced.
+test/fuzz/create_context_fuzz.c:93:style:variableScope:The scope of the variable 'cc_len' can be reduced.
+test/fuzz/create_context_fuzz.c:94:style:variableScope:The scope of the variable 'name' can be reduced.
+test/fuzz/create_context_fuzz.c:152:style:variableScope:The scope of the variable 'result' can be reduced.
+test/fuzz/create_context_fuzz.c:94:style:constVariablePointer:Variable 'name' can be declared as pointer to const
+test/fuzz/dfs_referral_fuzz.c:0:information:normalCheckLevelMaxBranches:Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches.
+test/fuzz/lock_request_fuzz.c:0:information:normalCheckLevelMaxBranches:Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches.
+test/fuzz/ndr_fuzz.c:0:information:normalCheckLevelMaxBranches:Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches.
+test/fuzz/ndr_fuzz.c:70:style:constParameterPointer:Parameter 'n' can be declared as pointer to const
+test/fuzz/negotiate_context_fuzz.c:0:information:normalCheckLevelMaxBranches:Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches.
+test/fuzz/negotiate_context_fuzz.c:64:style:variableScope:The scope of the variable 'ctx' can be reduced.
+test/fuzz/negotiate_context_fuzz.c:66:style:variableScope:The scope of the variable 'ctx_type' can be reduced.
+test/fuzz/negotiate_context_fuzz.c:67:style:variableScope:The scope of the variable 'data_length' can be reduced.
+test/fuzz/negotiate_context_fuzz.c:68:style:variableScope:The scope of the variable 'ctx_total' can be reduced.
+test/fuzz/negotiate_context_fuzz.c:148:style:variableScope:The scope of the variable 'ctx' can be reduced.
+test/fuzz/negotiate_context_fuzz.c:150:style:variableScope:The scope of the variable 'data_length' can be reduced.
+test/fuzz/negotiate_context_fuzz.c:151:style:variableScope:The scope of the variable 'ctx_total' can be reduced.
+test/fuzz/path_parse_fuzz.c:0:information:normalCheckLevelMaxBranches:Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches.
+test/fuzz/path_parse_fuzz.c:232:style:variableScope:The scope of the variable 's_type' can be reduced.
+test/fuzz/path_parse_fuzz.c:265:style:constVariablePointer:Variable 'p' can be declared as pointer to const
+test/fuzz/query_set_info_fuzz.c:0:information:normalCheckLevelMaxBranches:Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches.
+test/fuzz/quota_request_fuzz.c:0:information:normalCheckLevelMaxBranches:Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches.
+test/fuzz/quota_request_fuzz.c:113:style:variableScope:The scope of the variable 'entry' can be reduced.
+test/fuzz/quota_request_fuzz.c:115:style:variableScope:The scope of the variable 'next_entry_offset' can be reduced.
+test/fuzz/quota_request_fuzz.c:116:style:variableScope:The scope of the variable 'sid_length' can be reduced.
+test/fuzz/security_descriptor_fuzz.c:0:information:normalCheckLevelMaxBranches:Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches.
+test/fuzz/security_descriptor_fuzz.c:129:style:variableScope:The scope of the variable 'ace' can be reduced.
+test/fuzz/security_descriptor_fuzz.c:134:style:variableScope:The scope of the variable 'ace_size' can be reduced.
+test/fuzz/smb2_header_fuzz.c:0:information:normalCheckLevelMaxBranches:Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches.
+test/fuzz/transform_header_fuzz.c:0:information:normalCheckLevelMaxBranches:Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches.
+test/ksmbd_test_acl.c:13:information:missingInclude:Include file: "smbacl.h" not found.
+test/ksmbd_test_auth.c:21:style:constParameterPointer:Parameter 'str' can be declared as pointer to const
+test/ksmbd_test_buffer.c:203:style:constParameterCallback:Parameter 'test' can be declared as pointer to const. However it seems that 'buffer_test_exit' is a callback function, if 'test' is declared with const you might also need to cast function pointer(s).
+test/ksmbd_test_buffer.c:454:style:constParameterCallback:Parameter 'test' can be declared as pointer to const. However it seems that 'test_put_null_safe' is a callback function, if 'test' is declared with const you might also need to cast function pointer(s).
+test/ksmbd_test_config.c:11:information:missingInclude:Include file: "ksmbd_config.h" not found.
+test/ksmbd_test_create_ctx.c:90:style:constParameterCallback:Parameter 'work' can be declared as pointer to const. However it seems that 'stub_on_request' is a callback function, if 'work' is declared with const you might also need to cast function pointer(s).
+test/ksmbd_test_create_ctx.c:62:error:uninitvar:Uninitialized variable: h->tag_len
+test/ksmbd_test_fruit.c:259:style:constVariable:Variable 'sig' can be declared as const array
+test/ksmbd_test_fruit.c:266:style:constVariable:Variable 'sig' can be declared as const array
+test/ksmbd_test_fsctl_dispatch.c:396:style:knownConditionTrueFalse:Condition 'hash1!=hash2' is always true
+test/ksmbd_test_fsctl_dispatch.c:396:style:knownConditionTrueFalse:Condition 'hash1!=hash3' is always false
+test/ksmbd_test_fsctl_dispatch.c:417:style:variableScope:The scope of the variable 'hash' can be reduced.
+test/ksmbd_test_fsctl_dispatch.c:52:style:constParameterPointer:Parameter 'h' can be declared as pointer to const
+test/ksmbd_test_hooks.c:77:error:uninitvar:Uninitialized variable: pos->priority
+test/ksmbd_test_info_dispatch.c:56:error:uninitvar:Uninitialized variable: cur->info_type
+test/ksmbd_test_info_dispatch.c:83:error:uninitvar:Uninitialized variable: h->info_type
+test/ksmbd_test_misc.c:14:information:missingInclude:Include file: "misc.h" not found.
+test/ksmbd_test_ndr.c:13:information:missingInclude:Include file: "xattr.h" not found.
+test/ksmbd_test_ndr.c:14:information:missingInclude:Include file: "ndr.h" not found.
+test/ksmbd_test_oplock.c:20:information:missingInclude:Include file: "oplock.h" not found.
+test/ksmbd_test_oplock.c:21:information:missingInclude:Include file: "smb2pdu.h" not found.
+test/ksmbd_test_reparse.c:0:information:normalCheckLevelMaxBranches:Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches.
+test/ksmbd_test_smb1_parser.c:13:information:missingInclude:Include file: "smb_common.h" not found.
+test/ksmbd_test_smb1_parser.c:14:information:missingInclude:Include file: "smb1pdu.h" not found.
+test/ksmbd_test_smb1_parser.c:0:information:normalCheckLevelMaxBranches:Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches.
+test/ksmbd_test_smb1_parser.c:31:style:constVariablePointer:Variable 'buf_end' can be declared as pointer to const
+test/ksmbd_test_smb_common.c:31:style:unusedStructMember:struct member 'test_smb_protocol::prot_id' is never used.
+test/ksmbd_test_unicode.c:48:style:variableScope:The scope of the variable 'ftmp' can be reduced.
+test/ksmbd_test_unicode.c:72:style:variableScope:The scope of the variable 'ftmp' can be reduced.
+test/ksmbd_test_unicode.c:27:style:constParameterPointer:Parameter 'ch' can be declared as pointer to const
+test/ksmbd_test_unicode.c:197:style:constVariable:Variable 'str' can be declared as const array
+test/ksmbd_test_unicode.c:212:style:constVariable:Variable 'str' can be declared as const array
+test/ksmbd_test_unicode.c:223:style:constVariable:Variable 'str' can be declared as const array
+test/ksmbd_test_unicode.c:240:style:constVariable:Variable 'str' can be declared as const array
+test/ksmbd_test_unicode.c:252:style:constVariable:Variable 'str' can be declared as const array
+test/ksmbd_test_unicode.c:267:style:constVariable:Variable 'str' can be declared as const array
+test/ksmbd_test_unicode.c:281:style:constVariable:Variable 'str' can be declared as const array
+ksmbd-tools/control/control.c:313:style:staticFunction:The function 'read_sysfs_string' should have static linkage since it is not used outside of its translation unit.
+ksmbd-tools/mountd/rpc.c:227:style:staticFunction:The function 'auto_align_offset' should have static linkage since it is not used outside of its translation unit.
+ksmbd-tools/mountd/rpc.c:306:style:staticFunction:The function 'ndr_read_int16' should have static linkage since it is not used outside of its translation unit.
+ksmbd-tools/mountd/rpc.c:329:style:staticFunction:The function 'ndr_write_union_int16' should have static linkage since it is not used outside of its translation unit.
+ksmbd-tools/mountd/rpc.c:353:style:staticFunction:The function 'ndr_write_bytes' should have static linkage since it is not used outside of its translation unit.
+ksmbd-tools/mountd/rpc.c:364:style:staticFunction:The function 'ndr_read_bytes' should have static linkage since it is not used outside of its translation unit.
+ksmbd-tools/mountd/rpc.c:515:style:staticFunction:The function 'ndr_read_vstring' should have static linkage since it is not used outside of its translation unit.
+ksmbd-tools/mountd/smbacl.c:52:style:staticFunction:The function 'smb_write_sid' should have static linkage since it is not used outside of its translation unit.
+ksmbd-tools/mountd/smbacl.c:99:style:staticFunction:The function 'smb_compare_sids' should have static linkage since it is not used outside of its translation unit.
+ksmbd-tools/tools/config_parser.c:277:style:staticFunction:The function 'cp_rtrim' should have static linkage since it is not used outside of its translation unit.
+ksmbd-tools/tools/config_parser.c:284:style:staticFunction:The function 'cp_key_cmp' should have static linkage since it is not used outside of its translation unit.
+ksmbd-tools/tools/config_parser.c:289:style:staticFunction:The function 'cp_get_group_kv_string' should have static linkage since it is not used outside of its translation unit.
+ksmbd-tools/tools/config_parser.c:323:style:staticFunction:The function 'cp_get_group_kv_list' should have static linkage since it is not used outside of its translation unit.
+ksmbd-tools/tools/config_parser.c:333:style:staticFunction:The function 'cp_group_kv_steal' should have static linkage since it is not used outside of its translation unit.
+ksmbd-tools/tools/config_parser.c:721:style:staticFunction:The function 'cp_smbconf_parser_init' should have static linkage since it is not used outside of its translation unit.
+ksmbd-tools/tools/config_parser.c:731:style:staticFunction:The function 'cp_smbconf_parser_destroy' should have static linkage since it is not used outside of its translation unit.
+ksmbd-tools/tools/management/spnego_krb5.c:23:style:staticFunction:The function 'krb5_auth_con_getrecvsubkey' should have static linkage since it is not used outside of its translation unit.
+ksmbd-tools/tools/management/tree_conn.c:31:style:staticFunction:The function 'tcm_tree_conn_free' should have static linkage since it is not used outside of its translation unit.
+src/core/crypto_ctx.c:176:style:staticFunction:The function 'ksmbd_release_crypto_ctx' should have static linkage since it is not used outside of its translation unit.
+src/core/ksmbd_feature.c:23:style:staticFunction:The function 'ksmbd_feature_global_enabled' should have static linkage since it is not used outside of its translation unit.
+src/core/ksmbd_hooks.c:102:style:staticFunction:The function 'ksmbd_register_hook' should have static linkage since it is not used outside of its translation unit.
+src/core/ksmbd_hooks.c:153:style:staticFunction:The function 'ksmbd_unregister_hook' should have static linkage since it is not used outside of its translation unit.
+src/mgmt/user_config.c:35:style:staticFunction:The function 'ksmbd_alloc_user' should have static linkage since it is not used outside of its translation unit.
+src/mgmt/user_session.c:163:style:staticFunction:The function 'ksmbd_session_destroy' should have static linkage since it is not used outside of its translation unit.
+src/mgmt/user_session.c:185:style:staticFunction:The function '__session_lookup' should have static linkage since it is not used outside of its translation unit.
+src/mgmt/user_session.c:366:style:staticFunction:The function 'ksmbd_session_lookup' should have static linkage since it is not used outside of its translation unit.
+src/mgmt/user_session.c:392:style:staticFunction:The function 'ksmbd_session_lookup_slowpath' should have static linkage since it is not used outside of its translation unit.
+src/mgmt/user_session.c:428:style:staticFunction:The function 'ksmbd_user_session_get' should have static linkage since it is not used outside of its translation unit.
+src/mgmt/user_session.c:433:style:staticFunction:The function 'ksmbd_user_session_put' should have static linkage since it is not used outside of its translation unit.
+src/tools/memory_usage_validator.c:59:style:staticFunction:The function 'calculate_memory_usage' should have static linkage since it is not used outside of its translation unit.
+src/tools/memory_usage_validator.c:71:style:staticFunction:The function 'validate_memory_efficiency' should have static linkage since it is not used outside of its translation unit.
+src/tools/memory_usage_validator.c:88:style:staticFunction:The function 'test_allocation_patterns' should have static linkage since it is not used outside of its translation unit.
+src/tools/memory_usage_validator.c:124:style:staticFunction:The function 'simulate_memory_load' should have static linkage since it is not used outside of its translation unit.
+src/tools/memory_usage_validator.c:148:style:staticFunction:The function 'test_memory_pressure' should have static linkage since it is not used outside of its translation unit.
+src/tools/memory_usage_validator.c:209:style:staticFunction:The function 'validate_structure_layout' should have static linkage since it is not used outside of its translation unit.

@@ -1,0 +1,24 @@
+make -C /usr/lib/modules/6.18.13-arch1-1/build M=/home/ezechiel203/ksmbd ARCH=x86_64 \
+	CONFIG_SMB_SERVER_SMBDIRECT=n \
+	CONFIG_SMB_INSECURE_SERVER=y \
+	CONFIG_KSMBD_FRUIT=y \
+	CONFIG_SMB_SERVER_QUIC=n \
+	CONFIG_KSMBD_KUNIT_TEST=n \
+	modules
+make[1]: Entering directory '/usr/lib/modules/6.18.13-arch1-1/build'
+make[2] : on entre dans le répertoire « /home/ezechiel203/ksmbd »
+  CC [M]  src/fs/ksmbd_notify.o
+src/fs/ksmbd_notify.c: Dans la fonction « ksmbd_notify_add_watch »:
+src/fs/ksmbd_notify.c:1915:25: attention: cette instruction « if » ne protège pas… [-Wmisleading-indentation]
+ 1915 |                         if (cancel_argv)
+      |                         ^~
+src/fs/ksmbd_notify.c:1923:33: note: …cette instruction, mais l'indentation de cette dernière est trompeuse car elle fait croire qu'elle est gardée par le « if »
+ 1923 |                                 atomic_inc(&notify_watch_count);
+      |                                 ^~~~~~~~~~
+  LD [M]  ksmbd.o
+  MODPOST Module.symvers
+  CC [M]  ksmbd.mod.o
+  LD [M]  ksmbd.ko
+  BTF [M] ksmbd.ko
+make[2] : on quitte le répertoire « /home/ezechiel203/ksmbd »
+make[1]: Leaving directory '/usr/lib/modules/6.18.13-arch1-1/build'

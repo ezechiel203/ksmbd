@@ -1,0 +1,824 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772529370
+time: 2026-03-03 09:16:10.869993
+progress: 18
+test: v2_request_parent
+time: 2026-03-03 09:16:10.870485
+time: 2026-03-03 09:16:10.876413
+success: v2_request_parent
+test: v2_request
+time: 2026-03-03 09:16:10.876469
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+WARNING!: (../../source4/torture/smb2/lease.c:1841): wrong value for lease_break_info.count got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:1841): wrong value for (&lease_break_info.lease_break)->new_lease_state got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:1841): wrong value for (&lease_break_info.lease_break)->current_lease.lease_state got 0x0 - should be 0x3
+
+WARNING!: (../../source4/torture/smb2/lease.c:1841): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[0] got 0x0 - should be 0xfeedbead
+
+WARNING!: (../../source4/torture/smb2/lease.c:1841): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[1] got 0x0 - should be 0x1124152
+
+WARNING!: (../../source4/torture/smb2/lease.c:1841): wrong value for (&lease_break_info.lease_break)->break_flags got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:1841): wrong value for lease_break_info.lease_break.new_epoch got 0x0 - should be 0x25
+
+WARNING!: (../../source4/torture/smb2/lease.c:1841): wrong value for (uintptr_t)lease_break_info.lease_transport got 0x0 - should be 0xbf1ded10
+
+WARNING!: (../../source4/torture/smb2/lease.c:1751): wrong value for (&io)->out.lease_response_v2.lease_epoch got 0x24 - should be 0x26
+
+time: 2026-03-03 09:16:11.891698
+failure: v2_request [
+../../source4/torture/smb2/lease.c:1846: Expression `ret == (1)' failed: Rearm dirlease failed
+]
+test: oplocks
+time: 2026-03-03 09:16:11.891756
+time: 2026-03-03 09:16:11.898700
+success: oplocks
+test: leases
+time: 2026-03-03 09:16:11.898749
+time: 2026-03-03 09:16:11.905361
+success: leases
+test: seteof
+time: 2026-03-03 09:16:11.905417
+WARNING!: (../../source4/torture/smb2/lease.c:6242): wrong value for (&c)->out.lease_response_v2.lease_version got 0x0 - should be 0x2
+
+WARNING!: (../../source4/torture/smb2/lease.c:6242): wrong value for (&c)->out.oplock_level got 0x0 - should be 0xff
+
+WARNING!: (../../source4/torture/smb2/lease.c:6242): wrong value for (&c)->out.lease_response_v2.lease_key.data[0] got 0x0 - should be 0xe0ddf00d
+
+WARNING!: (../../source4/torture/smb2/lease.c:6242): wrong value for (&c)->out.lease_response_v2.lease_key.data[1] got 0x0 - should be 0x1f220ff2
+
+WARNING!: (../../source4/torture/smb2/lease.c:6242): wrong value for (&c)->out.lease_response_v2.lease_state got 0x0 - should be 0x3
+
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+WARNING!: (../../source4/torture/smb2/lease.c:6242): wrong value for (&c)->out.lease_response_v2.lease_epoch got 0x0 - should be 0x2
+
+WARNING!: (../../source4/torture/smb2/lease.c:6098): wrong value for lease_break_info.count got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:6098): wrong value for (&lease_break_info.lease_break)->current_lease.lease_state got 0x0 - should be 0x3
+
+WARNING!: (../../source4/torture/smb2/lease.c:6098): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[0] got 0x0 - should be 0xe0ddf00d
+
+WARNING!: (../../source4/torture/smb2/lease.c:6098): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[1] got 0x0 - should be 0x1f220ff2
+
+WARNING!: (../../source4/torture/smb2/lease.c:6098): wrong value for (&lease_break_info.lease_break)->break_flags got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:6098): wrong value for lease_break_info.lease_break.new_epoch got 0x0 - should be 0x4
+
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+WARNING!: (../../source4/torture/smb2/lease.c:6098): wrong value for (uintptr_t)lease_break_info.lease_transport got 0x0 - should be 0xbf1ded10
+
+WARNING!: (../../source4/torture/smb2/lease.c:6123): wrong value for lease_break_info.count got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:6123): wrong value for (&lease_break_info.lease_break)->current_lease.lease_state got 0x0 - should be 0x3
+
+WARNING!: (../../source4/torture/smb2/lease.c:6123): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[0] got 0x0 - should be 0xe0ddf00d
+
+WARNING!: (../../source4/torture/smb2/lease.c:6123): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[1] got 0x0 - should be 0x1f220ff2
+
+WARNING!: (../../source4/torture/smb2/lease.c:6123): wrong value for (&lease_break_info.lease_break)->break_flags got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:6123): wrong value for lease_break_info.lease_break.new_epoch got 0x0 - should be 0x7
+
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+WARNING!: (../../source4/torture/smb2/lease.c:6123): wrong value for (uintptr_t)lease_break_info.lease_transport got 0x0 - should be 0xbf1ded10
+
+WARNING!: (../../source4/torture/smb2/lease.c:6169): wrong value for lease_break_info.count got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:6169): wrong value for (&lease_break_info.lease_break)->current_lease.lease_state got 0x0 - should be 0x3
+
+WARNING!: (../../source4/torture/smb2/lease.c:6169): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[0] got 0x0 - should be 0xe0ddf00d
+
+WARNING!: (../../source4/torture/smb2/lease.c:6169): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[1] got 0x0 - should be 0x1f220ff2
+
+WARNING!: (../../source4/torture/smb2/lease.c:6169): wrong value for (&lease_break_info.lease_break)->break_flags got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:6169): wrong value for lease_break_info.lease_break.new_epoch got 0x0 - should be 0xa
+
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+WARNING!: (../../source4/torture/smb2/lease.c:6169): wrong value for (uintptr_t)lease_break_info.lease_transport got 0x0 - should be 0xbf1ded10
+
+WARNING!: (../../source4/torture/smb2/lease.c:6194): wrong value for lease_break_info.count got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:6194): wrong value for (&lease_break_info.lease_break)->current_lease.lease_state got 0x0 - should be 0x3
+
+WARNING!: (../../source4/torture/smb2/lease.c:6194): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[0] got 0x0 - should be 0xe0ddf00d
+
+WARNING!: (../../source4/torture/smb2/lease.c:6194): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[1] got 0x0 - should be 0x1f220ff2
+
+WARNING!: (../../source4/torture/smb2/lease.c:6194): wrong value for (&lease_break_info.lease_break)->break_flags got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:6194): wrong value for lease_break_info.lease_break.new_epoch got 0x0 - should be 0xd
+
+time: 2026-03-03 09:16:17.925439
+failure: seteof [
+(../../source4/torture/smb2/lease.c:6194): wrong value for (uintptr_t)lease_break_info.lease_transport got 0x0 - should be 0xbf1ded10
+]
+test: setdos
+time: 2026-03-03 09:16:17.925500
+WARNING!: (../../source4/torture/smb2/lease.c:6297): wrong value for (&c)->out.lease_response_v2.lease_version got 0x0 - should be 0x2
+
+WARNING!: (../../source4/torture/smb2/lease.c:6297): wrong value for (&c)->out.oplock_level got 0x0 - should be 0xff
+
+WARNING!: (../../source4/torture/smb2/lease.c:6297): wrong value for (&c)->out.lease_response_v2.lease_key.data[0] got 0x0 - should be 0xe0ddf00d
+
+WARNING!: (../../source4/torture/smb2/lease.c:6297): wrong value for (&c)->out.lease_response_v2.lease_key.data[1] got 0x0 - should be 0x1f220ff2
+
+WARNING!: (../../source4/torture/smb2/lease.c:6297): wrong value for (&c)->out.lease_response_v2.lease_state got 0x0 - should be 0x3
+
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+WARNING!: (../../source4/torture/smb2/lease.c:6297): wrong value for (&c)->out.lease_response_v2.lease_epoch got 0x0 - should be 0x2
+
+WARNING!: (../../source4/torture/smb2/lease.c:6098): wrong value for lease_break_info.count got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:6098): wrong value for (&lease_break_info.lease_break)->current_lease.lease_state got 0x0 - should be 0x3
+
+WARNING!: (../../source4/torture/smb2/lease.c:6098): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[0] got 0x0 - should be 0xe0ddf00d
+
+WARNING!: (../../source4/torture/smb2/lease.c:6098): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[1] got 0x0 - should be 0x1f220ff2
+
+WARNING!: (../../source4/torture/smb2/lease.c:6098): wrong value for (&lease_break_info.lease_break)->break_flags got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:6098): wrong value for lease_break_info.lease_break.new_epoch got 0x0 - should be 0x4
+
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+WARNING!: (../../source4/torture/smb2/lease.c:6098): wrong value for (uintptr_t)lease_break_info.lease_transport got 0x0 - should be 0xbf1ded10
+
+WARNING!: (../../source4/torture/smb2/lease.c:6123): wrong value for lease_break_info.count got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:6123): wrong value for (&lease_break_info.lease_break)->current_lease.lease_state got 0x0 - should be 0x3
+
+WARNING!: (../../source4/torture/smb2/lease.c:6123): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[0] got 0x0 - should be 0xe0ddf00d
+
+WARNING!: (../../source4/torture/smb2/lease.c:6123): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[1] got 0x0 - should be 0x1f220ff2
+
+WARNING!: (../../source4/torture/smb2/lease.c:6123): wrong value for (&lease_break_info.lease_break)->break_flags got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:6123): wrong value for lease_break_info.lease_break.new_epoch got 0x0 - should be 0x7
+
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+WARNING!: (../../source4/torture/smb2/lease.c:6123): wrong value for (uintptr_t)lease_break_info.lease_transport got 0x0 - should be 0xbf1ded10
+
+WARNING!: (../../source4/torture/smb2/lease.c:6169): wrong value for lease_break_info.count got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:6169): wrong value for (&lease_break_info.lease_break)->current_lease.lease_state got 0x0 - should be 0x3
+
+WARNING!: (../../source4/torture/smb2/lease.c:6169): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[0] got 0x0 - should be 0xe0ddf00d
+
+WARNING!: (../../source4/torture/smb2/lease.c:6169): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[1] got 0x0 - should be 0x1f220ff2
+
+WARNING!: (../../source4/torture/smb2/lease.c:6169): wrong value for (&lease_break_info.lease_break)->break_flags got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:6169): wrong value for lease_break_info.lease_break.new_epoch got 0x0 - should be 0xa
+
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+WARNING!: (../../source4/torture/smb2/lease.c:6169): wrong value for (uintptr_t)lease_break_info.lease_transport got 0x0 - should be 0xbf1ded10
+
+WARNING!: (../../source4/torture/smb2/lease.c:6194): wrong value for lease_break_info.count got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:6194): wrong value for (&lease_break_info.lease_break)->current_lease.lease_state got 0x0 - should be 0x3
+
+WARNING!: (../../source4/torture/smb2/lease.c:6194): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[0] got 0x0 - should be 0xe0ddf00d
+
+WARNING!: (../../source4/torture/smb2/lease.c:6194): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[1] got 0x0 - should be 0x1f220ff2
+
+WARNING!: (../../source4/torture/smb2/lease.c:6194): wrong value for (&lease_break_info.lease_break)->break_flags got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:6194): wrong value for lease_break_info.lease_break.new_epoch got 0x0 - should be 0xd
+
+time: 2026-03-03 09:16:23.960934
+failure: setdos [
+(../../source4/torture/smb2/lease.c:6194): wrong value for (uintptr_t)lease_break_info.lease_transport got 0x0 - should be 0xbf1ded10
+]
+test: setbtime
+time: 2026-03-03 09:16:23.960997
+WARNING!: (../../source4/torture/smb2/lease.c:6356): wrong value for (&c)->out.lease_response_v2.lease_version got 0x0 - should be 0x2
+
+WARNING!: (../../source4/torture/smb2/lease.c:6356): wrong value for (&c)->out.oplock_level got 0x0 - should be 0xff
+
+WARNING!: (../../source4/torture/smb2/lease.c:6356): wrong value for (&c)->out.lease_response_v2.lease_key.data[0] got 0x0 - should be 0xe0ddf00d
+
+WARNING!: (../../source4/torture/smb2/lease.c:6356): wrong value for (&c)->out.lease_response_v2.lease_key.data[1] got 0x0 - should be 0x1f220ff2
+
+WARNING!: (../../source4/torture/smb2/lease.c:6356): wrong value for (&c)->out.lease_response_v2.lease_state got 0x0 - should be 0x3
+
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+WARNING!: (../../source4/torture/smb2/lease.c:6356): wrong value for (&c)->out.lease_response_v2.lease_epoch got 0x0 - should be 0x2
+
+WARNING!: (../../source4/torture/smb2/lease.c:6098): wrong value for lease_break_info.count got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:6098): wrong value for (&lease_break_info.lease_break)->current_lease.lease_state got 0x0 - should be 0x3
+
+WARNING!: (../../source4/torture/smb2/lease.c:6098): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[0] got 0x0 - should be 0xe0ddf00d
+
+WARNING!: (../../source4/torture/smb2/lease.c:6098): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[1] got 0x0 - should be 0x1f220ff2
+
+WARNING!: (../../source4/torture/smb2/lease.c:6098): wrong value for (&lease_break_info.lease_break)->break_flags got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:6098): wrong value for lease_break_info.lease_break.new_epoch got 0x0 - should be 0x4
+
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+WARNING!: (../../source4/torture/smb2/lease.c:6098): wrong value for (uintptr_t)lease_break_info.lease_transport got 0x0 - should be 0xbf4a8160
+
+WARNING!: (../../source4/torture/smb2/lease.c:6123): wrong value for lease_break_info.count got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:6123): wrong value for (&lease_break_info.lease_break)->current_lease.lease_state got 0x0 - should be 0x3
+
+WARNING!: (../../source4/torture/smb2/lease.c:6123): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[0] got 0x0 - should be 0xe0ddf00d
+
+WARNING!: (../../source4/torture/smb2/lease.c:6123): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[1] got 0x0 - should be 0x1f220ff2
+
+WARNING!: (../../source4/torture/smb2/lease.c:6123): wrong value for (&lease_break_info.lease_break)->break_flags got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:6123): wrong value for lease_break_info.lease_break.new_epoch got 0x0 - should be 0x7
+
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+WARNING!: (../../source4/torture/smb2/lease.c:6123): wrong value for (uintptr_t)lease_break_info.lease_transport got 0x0 - should be 0xbf4a8160
+
+WARNING!: (../../source4/torture/smb2/lease.c:6169): wrong value for lease_break_info.count got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:6169): wrong value for (&lease_break_info.lease_break)->current_lease.lease_state got 0x0 - should be 0x3
+
+WARNING!: (../../source4/torture/smb2/lease.c:6169): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[0] got 0x0 - should be 0xe0ddf00d
+
+WARNING!: (../../source4/torture/smb2/lease.c:6169): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[1] got 0x0 - should be 0x1f220ff2
+
+WARNING!: (../../source4/torture/smb2/lease.c:6169): wrong value for (&lease_break_info.lease_break)->break_flags got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:6169): wrong value for lease_break_info.lease_break.new_epoch got 0x0 - should be 0xa
+
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+WARNING!: (../../source4/torture/smb2/lease.c:6169): wrong value for (uintptr_t)lease_break_info.lease_transport got 0x0 - should be 0xbf4a8160
+
+WARNING!: (../../source4/torture/smb2/lease.c:6194): wrong value for lease_break_info.count got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:6194): wrong value for (&lease_break_info.lease_break)->current_lease.lease_state got 0x0 - should be 0x3
+
+WARNING!: (../../source4/torture/smb2/lease.c:6194): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[0] got 0x0 - should be 0xe0ddf00d
+
+WARNING!: (../../source4/torture/smb2/lease.c:6194): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[1] got 0x0 - should be 0x1f220ff2
+
+WARNING!: (../../source4/torture/smb2/lease.c:6194): wrong value for (&lease_break_info.lease_break)->break_flags got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:6194): wrong value for lease_break_info.lease_break.new_epoch got 0x0 - should be 0xd
+
+time: 2026-03-03 09:16:29.981902
+failure: setbtime [
+(../../source4/torture/smb2/lease.c:6194): wrong value for (uintptr_t)lease_break_info.lease_transport got 0x0 - should be 0xbf4a8160
+]
+test: setmtime
+time: 2026-03-03 09:16:29.981972
+WARNING!: (../../source4/torture/smb2/lease.c:6408): wrong value for (&c)->out.lease_response_v2.lease_version got 0x0 - should be 0x2
+
+WARNING!: (../../source4/torture/smb2/lease.c:6408): wrong value for (&c)->out.oplock_level got 0x0 - should be 0xff
+
+WARNING!: (../../source4/torture/smb2/lease.c:6408): wrong value for (&c)->out.lease_response_v2.lease_key.data[0] got 0x0 - should be 0xe0ddf00d
+
+WARNING!: (../../source4/torture/smb2/lease.c:6408): wrong value for (&c)->out.lease_response_v2.lease_key.data[1] got 0x0 - should be 0x1f220ff2
+
+WARNING!: (../../source4/torture/smb2/lease.c:6408): wrong value for (&c)->out.lease_response_v2.lease_state got 0x0 - should be 0x3
+
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+WARNING!: (../../source4/torture/smb2/lease.c:6408): wrong value for (&c)->out.lease_response_v2.lease_epoch got 0x0 - should be 0x2
+
+WARNING!: (../../source4/torture/smb2/lease.c:6098): wrong value for lease_break_info.count got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:6098): wrong value for (&lease_break_info.lease_break)->current_lease.lease_state got 0x0 - should be 0x3
+
+WARNING!: (../../source4/torture/smb2/lease.c:6098): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[0] got 0x0 - should be 0xe0ddf00d
+
+WARNING!: (../../source4/torture/smb2/lease.c:6098): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[1] got 0x0 - should be 0x1f220ff2
+
+WARNING!: (../../source4/torture/smb2/lease.c:6098): wrong value for (&lease_break_info.lease_break)->break_flags got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:6098): wrong value for lease_break_info.lease_break.new_epoch got 0x0 - should be 0x4
+
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+WARNING!: (../../source4/torture/smb2/lease.c:6098): wrong value for (uintptr_t)lease_break_info.lease_transport got 0x0 - should be 0xbf4e6140
+
+WARNING!: (../../source4/torture/smb2/lease.c:6123): wrong value for lease_break_info.count got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:6123): wrong value for (&lease_break_info.lease_break)->current_lease.lease_state got 0x0 - should be 0x3
+
+WARNING!: (../../source4/torture/smb2/lease.c:6123): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[0] got 0x0 - should be 0xe0ddf00d
+
+WARNING!: (../../source4/torture/smb2/lease.c:6123): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[1] got 0x0 - should be 0x1f220ff2
+
+WARNING!: (../../source4/torture/smb2/lease.c:6123): wrong value for (&lease_break_info.lease_break)->break_flags got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:6123): wrong value for lease_break_info.lease_break.new_epoch got 0x0 - should be 0x7
+
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+WARNING!: (../../source4/torture/smb2/lease.c:6123): wrong value for (uintptr_t)lease_break_info.lease_transport got 0x0 - should be 0xbf4e6140
+
+WARNING!: (../../source4/torture/smb2/lease.c:6169): wrong value for lease_break_info.count got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:6169): wrong value for (&lease_break_info.lease_break)->current_lease.lease_state got 0x0 - should be 0x3
+
+WARNING!: (../../source4/torture/smb2/lease.c:6169): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[0] got 0x0 - should be 0xe0ddf00d
+
+WARNING!: (../../source4/torture/smb2/lease.c:6169): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[1] got 0x0 - should be 0x1f220ff2
+
+WARNING!: (../../source4/torture/smb2/lease.c:6169): wrong value for (&lease_break_info.lease_break)->break_flags got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:6169): wrong value for lease_break_info.lease_break.new_epoch got 0x0 - should be 0xa
+
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+WARNING!: (../../source4/torture/smb2/lease.c:6169): wrong value for (uintptr_t)lease_break_info.lease_transport got 0x0 - should be 0xbf4e6140
+
+WARNING!: (../../source4/torture/smb2/lease.c:6194): wrong value for lease_break_info.count got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:6194): wrong value for (&lease_break_info.lease_break)->current_lease.lease_state got 0x0 - should be 0x3
+
+WARNING!: (../../source4/torture/smb2/lease.c:6194): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[0] got 0x0 - should be 0xe0ddf00d
+
+WARNING!: (../../source4/torture/smb2/lease.c:6194): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[1] got 0x0 - should be 0x1f220ff2
+
+WARNING!: (../../source4/torture/smb2/lease.c:6194): wrong value for (&lease_break_info.lease_break)->break_flags got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:6194): wrong value for lease_break_info.lease_break.new_epoch got 0x0 - should be 0xd
+
+time: 2026-03-03 09:16:36.040611
+failure: setmtime [
+(../../source4/torture/smb2/lease.c:6194): wrong value for (uintptr_t)lease_break_info.lease_transport got 0x0 - should be 0xbf4e6140
+]
+test: setctime
+time: 2026-03-03 09:16:36.040682
+WARNING!: (../../source4/torture/smb2/lease.c:6460): wrong value for (&c)->out.lease_response_v2.lease_version got 0x0 - should be 0x2
+
+WARNING!: (../../source4/torture/smb2/lease.c:6460): wrong value for (&c)->out.oplock_level got 0x0 - should be 0xff
+
+WARNING!: (../../source4/torture/smb2/lease.c:6460): wrong value for (&c)->out.lease_response_v2.lease_key.data[0] got 0x0 - should be 0xe0ddf00d
+
+WARNING!: (../../source4/torture/smb2/lease.c:6460): wrong value for (&c)->out.lease_response_v2.lease_key.data[1] got 0x0 - should be 0x1f220ff2
+
+WARNING!: (../../source4/torture/smb2/lease.c:6460): wrong value for (&c)->out.lease_response_v2.lease_state got 0x0 - should be 0x3
+
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+WARNING!: (../../source4/torture/smb2/lease.c:6460): wrong value for (&c)->out.lease_response_v2.lease_epoch got 0x0 - should be 0x2
+
+WARNING!: (../../source4/torture/smb2/lease.c:6098): wrong value for lease_break_info.count got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:6098): wrong value for (&lease_break_info.lease_break)->current_lease.lease_state got 0x0 - should be 0x3
+
+WARNING!: (../../source4/torture/smb2/lease.c:6098): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[0] got 0x0 - should be 0xe0ddf00d
+
+WARNING!: (../../source4/torture/smb2/lease.c:6098): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[1] got 0x0 - should be 0x1f220ff2
+
+WARNING!: (../../source4/torture/smb2/lease.c:6098): wrong value for (&lease_break_info.lease_break)->break_flags got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:6098): wrong value for lease_break_info.lease_break.new_epoch got 0x0 - should be 0x4
+
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+WARNING!: (../../source4/torture/smb2/lease.c:6098): wrong value for (uintptr_t)lease_break_info.lease_transport got 0x0 - should be 0xbf4e9c10
+
+WARNING!: (../../source4/torture/smb2/lease.c:6123): wrong value for lease_break_info.count got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:6123): wrong value for (&lease_break_info.lease_break)->current_lease.lease_state got 0x0 - should be 0x3
+
+WARNING!: (../../source4/torture/smb2/lease.c:6123): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[0] got 0x0 - should be 0xe0ddf00d
+
+WARNING!: (../../source4/torture/smb2/lease.c:6123): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[1] got 0x0 - should be 0x1f220ff2
+
+WARNING!: (../../source4/torture/smb2/lease.c:6123): wrong value for (&lease_break_info.lease_break)->break_flags got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:6123): wrong value for lease_break_info.lease_break.new_epoch got 0x0 - should be 0x7
+
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+WARNING!: (../../source4/torture/smb2/lease.c:6123): wrong value for (uintptr_t)lease_break_info.lease_transport got 0x0 - should be 0xbf4e9c10
+
+WARNING!: (../../source4/torture/smb2/lease.c:6169): wrong value for lease_break_info.count got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:6169): wrong value for (&lease_break_info.lease_break)->current_lease.lease_state got 0x0 - should be 0x3
+
+WARNING!: (../../source4/torture/smb2/lease.c:6169): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[0] got 0x0 - should be 0xe0ddf00d
+
+WARNING!: (../../source4/torture/smb2/lease.c:6169): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[1] got 0x0 - should be 0x1f220ff2
+
+WARNING!: (../../source4/torture/smb2/lease.c:6169): wrong value for (&lease_break_info.lease_break)->break_flags got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:6169): wrong value for lease_break_info.lease_break.new_epoch got 0x0 - should be 0xa
+
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+WARNING!: (../../source4/torture/smb2/lease.c:6169): wrong value for (uintptr_t)lease_break_info.lease_transport got 0x0 - should be 0xbf4e9c10
+
+WARNING!: (../../source4/torture/smb2/lease.c:6194): wrong value for lease_break_info.count got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:6194): wrong value for (&lease_break_info.lease_break)->current_lease.lease_state got 0x0 - should be 0x3
+
+WARNING!: (../../source4/torture/smb2/lease.c:6194): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[0] got 0x0 - should be 0xe0ddf00d
+
+WARNING!: (../../source4/torture/smb2/lease.c:6194): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[1] got 0x0 - should be 0x1f220ff2
+
+WARNING!: (../../source4/torture/smb2/lease.c:6194): wrong value for (&lease_break_info.lease_break)->break_flags got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:6194): wrong value for lease_break_info.lease_break.new_epoch got 0x0 - should be 0xd
+
+time: 2026-03-03 09:16:42.067402
+failure: setctime [
+(../../source4/torture/smb2/lease.c:6194): wrong value for (uintptr_t)lease_break_info.lease_transport got 0x0 - should be 0xbf4e9c10
+]
+test: setatime
+time: 2026-03-03 09:16:42.067460
+WARNING!: (../../source4/torture/smb2/lease.c:6512): wrong value for (&c)->out.lease_response_v2.lease_version got 0x0 - should be 0x2
+
+WARNING!: (../../source4/torture/smb2/lease.c:6512): wrong value for (&c)->out.oplock_level got 0x0 - should be 0xff
+
+WARNING!: (../../source4/torture/smb2/lease.c:6512): wrong value for (&c)->out.lease_response_v2.lease_key.data[0] got 0x0 - should be 0xe0ddf00d
+
+WARNING!: (../../source4/torture/smb2/lease.c:6512): wrong value for (&c)->out.lease_response_v2.lease_key.data[1] got 0x0 - should be 0x1f220ff2
+
+WARNING!: (../../source4/torture/smb2/lease.c:6512): wrong value for (&c)->out.lease_response_v2.lease_state got 0x0 - should be 0x3
+
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+WARNING!: (../../source4/torture/smb2/lease.c:6512): wrong value for (&c)->out.lease_response_v2.lease_epoch got 0x0 - should be 0x2
+
+WARNING!: (../../source4/torture/smb2/lease.c:6098): wrong value for lease_break_info.count got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:6098): wrong value for (&lease_break_info.lease_break)->current_lease.lease_state got 0x0 - should be 0x3
+
+WARNING!: (../../source4/torture/smb2/lease.c:6098): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[0] got 0x0 - should be 0xe0ddf00d
+
+WARNING!: (../../source4/torture/smb2/lease.c:6098): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[1] got 0x0 - should be 0x1f220ff2
+
+WARNING!: (../../source4/torture/smb2/lease.c:6098): wrong value for (&lease_break_info.lease_break)->break_flags got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:6098): wrong value for lease_break_info.lease_break.new_epoch got 0x0 - should be 0x4
+
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+WARNING!: (../../source4/torture/smb2/lease.c:6098): wrong value for (uintptr_t)lease_break_info.lease_transport got 0x0 - should be 0xbf4ed660
+
+WARNING!: (../../source4/torture/smb2/lease.c:6123): wrong value for lease_break_info.count got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:6123): wrong value for (&lease_break_info.lease_break)->current_lease.lease_state got 0x0 - should be 0x3
+
+WARNING!: (../../source4/torture/smb2/lease.c:6123): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[0] got 0x0 - should be 0xe0ddf00d
+
+WARNING!: (../../source4/torture/smb2/lease.c:6123): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[1] got 0x0 - should be 0x1f220ff2
+
+WARNING!: (../../source4/torture/smb2/lease.c:6123): wrong value for (&lease_break_info.lease_break)->break_flags got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:6123): wrong value for lease_break_info.lease_break.new_epoch got 0x0 - should be 0x7
+
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+WARNING!: (../../source4/torture/smb2/lease.c:6123): wrong value for (uintptr_t)lease_break_info.lease_transport got 0x0 - should be 0xbf4ed660
+
+WARNING!: (../../source4/torture/smb2/lease.c:6169): wrong value for lease_break_info.count got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:6169): wrong value for (&lease_break_info.lease_break)->current_lease.lease_state got 0x0 - should be 0x3
+
+WARNING!: (../../source4/torture/smb2/lease.c:6169): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[0] got 0x0 - should be 0xe0ddf00d
+
+WARNING!: (../../source4/torture/smb2/lease.c:6169): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[1] got 0x0 - should be 0x1f220ff2
+
+WARNING!: (../../source4/torture/smb2/lease.c:6169): wrong value for (&lease_break_info.lease_break)->break_flags got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:6169): wrong value for lease_break_info.lease_break.new_epoch got 0x0 - should be 0xa
+
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+WARNING!: (../../source4/torture/smb2/lease.c:6169): wrong value for (uintptr_t)lease_break_info.lease_transport got 0x0 - should be 0xbf4ed660
+
+WARNING!: (../../source4/torture/smb2/lease.c:6194): wrong value for lease_break_info.count got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:6194): wrong value for (&lease_break_info.lease_break)->current_lease.lease_state got 0x0 - should be 0x3
+
+WARNING!: (../../source4/torture/smb2/lease.c:6194): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[0] got 0x0 - should be 0xe0ddf00d
+
+WARNING!: (../../source4/torture/smb2/lease.c:6194): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[1] got 0x0 - should be 0x1f220ff2
+
+WARNING!: (../../source4/torture/smb2/lease.c:6194): wrong value for (&lease_break_info.lease_break)->break_flags got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:6194): wrong value for lease_break_info.lease_break.new_epoch got 0x0 - should be 0xd
+
+time: 2026-03-03 09:16:48.094556
+failure: setatime [
+(../../source4/torture/smb2/lease.c:6194): wrong value for (uintptr_t)lease_break_info.lease_transport got 0x0 - should be 0xbf4ed660
+]
+test: rename
+time: 2026-03-03 09:16:48.094621
+
+Rename subtest: samedir-correct-parent-leaskey
+==================================
+WARNING!: (../../source4/torture/smb2/lease.c:6666): wrong value for (&c)->out.lease_response_v2.lease_version got 0x0 - should be 0x2
+
+WARNING!: (../../source4/torture/smb2/lease.c:6666): wrong value for (&c)->out.oplock_level got 0x0 - should be 0xff
+
+WARNING!: (../../source4/torture/smb2/lease.c:6666): wrong value for (&c)->out.lease_response_v2.lease_key.data[0] got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:6666): wrong value for (&c)->out.lease_response_v2.lease_key.data[1] got 0x0 - should be 0xfffffffe
+
+WARNING!: (../../source4/torture/smb2/lease.c:6666): wrong value for (&c)->out.lease_response_v2.lease_state got 0x0 - should be 0x3
+
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+WARNING!: (../../source4/torture/smb2/lease.c:6666): wrong value for (&c)->out.lease_response_v2.lease_epoch got 0x0 - should be 0x2
+
+time: 2026-03-03 09:16:49.106322
+failure: rename [
+../../source4/torture/smb2/lease.c:6778: Expression `ret' failed: samedir-correct-parent-leaskey failed
+]
+test: rename_dst_parent
+time: 2026-03-03 09:16:49.106373
+WARNING!: (../../source4/torture/smb2/lease.c:6833): wrong value for (&create_dp)->out.lease_response_v2.lease_version got 0x0 - should be 0x2
+
+WARNING!: (../../source4/torture/smb2/lease.c:6833): wrong value for (&create_dp)->out.oplock_level got 0x0 - should be 0xff
+
+WARNING!: (../../source4/torture/smb2/lease.c:6833): wrong value for (&create_dp)->out.lease_response_v2.lease_key.data[0] got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:6833): wrong value for (&create_dp)->out.lease_response_v2.lease_key.data[1] got 0x0 - should be 0xfffffffe
+
+WARNING!: (../../source4/torture/smb2/lease.c:6833): wrong value for (&create_dp)->out.lease_response_v2.lease_state got 0x0 - should be 0x3
+
+WARNING!: (../../source4/torture/smb2/lease.c:6833): wrong value for (&create_dp)->out.lease_response_v2.lease_epoch got 0x0 - should be 0x1
+
+time: 2026-03-03 09:16:49.116606
+failure: rename_dst_parent [
+../../source4/torture/smb2/lease.c:6845: status was NT_STATUS_OK, expected NT_STATUS_SHARING_VIOLATION: smb2_setinfo_file
+]
+test: overwrite
+time: 2026-03-03 09:16:49.116684
+WARNING!: (../../source4/torture/smb2/lease.c:6936): wrong value for (&c)->out.lease_response_v2.lease_version got 0x0 - should be 0x2
+
+WARNING!: (../../source4/torture/smb2/lease.c:6936): wrong value for (&c)->out.oplock_level got 0x0 - should be 0xff
+
+WARNING!: (../../source4/torture/smb2/lease.c:6936): wrong value for (&c)->out.lease_response_v2.lease_key.data[0] got 0x0 - should be 0xe0ddf00d
+
+WARNING!: (../../source4/torture/smb2/lease.c:6936): wrong value for (&c)->out.lease_response_v2.lease_key.data[1] got 0x0 - should be 0x1f220ff2
+
+WARNING!: (../../source4/torture/smb2/lease.c:6936): wrong value for (&c)->out.lease_response_v2.lease_state got 0x0 - should be 0x3
+
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+transport[0x562abf4f0770] Skip acking to 0x0 () in lease handler
+Got 1 lease breaks
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+WARNING!: (../../source4/torture/smb2/lease.c:6936): wrong value for (&c)->out.lease_response_v2.lease_epoch got 0x0 - should be 0x2
+
+WARNING!: (../../source4/torture/smb2/lease.c:7002): wrong value for lease_break_info.count got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:7002): wrong value for (&lease_break_info.lease_break)->current_lease.lease_state got 0x0 - should be 0x3
+
+WARNING!: (../../source4/torture/smb2/lease.c:7002): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[0] got 0x0 - should be 0xe0ddf00d
+
+WARNING!: (../../source4/torture/smb2/lease.c:7002): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[1] got 0x0 - should be 0x1f220ff2
+
+WARNING!: (../../source4/torture/smb2/lease.c:7002): wrong value for (&lease_break_info.lease_break)->break_flags got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:7002): wrong value for lease_break_info.lease_break.new_epoch got 0x0 - should be 0x4
+
+WARNING!: (../../source4/torture/smb2/lease.c:7002): wrong value for (uintptr_t)lease_break_info.lease_transport got 0x0 - should be 0xbf4f0770
+
+time: 2026-03-03 09:16:51.130096
+failure: overwrite [
+../../source4/torture/smb2/lease.c:7012: status was NT_STATUS_UNSUCCESSFUL, expected NT_STATUS_OK: smb2_lease_break_ack failed
+]
+test: hardlink
+time: 2026-03-03 09:16:51.130158
+
+Hardlink subtest: samedir-correct-parent-leaskey
+==================================
+WARNING!: (../../source4/torture/smb2/lease.c:7168): wrong value for (&c)->out.lease_response_v2.lease_version got 0x0 - should be 0x2
+
+WARNING!: (../../source4/torture/smb2/lease.c:7168): wrong value for (&c)->out.oplock_level got 0x0 - should be 0xff
+
+WARNING!: (../../source4/torture/smb2/lease.c:7168): wrong value for (&c)->out.lease_response_v2.lease_key.data[0] got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:7168): wrong value for (&c)->out.lease_response_v2.lease_key.data[1] got 0x0 - should be 0xfffffffe
+
+WARNING!: (../../source4/torture/smb2/lease.c:7168): wrong value for (&c)->out.lease_response_v2.lease_state got 0x0 - should be 0x3
+
+WARNING!: (../../source4/torture/smb2/lease.c:7168): wrong value for (&c)->out.lease_response_v2.lease_epoch got 0x0 - should be 0x2
+
+WARNING!: ../../source4/torture/smb2/lease.c:7214: status was NT_STATUS_INVALID_PARAMETER, expected NT_STATUS_OK: smb2_setinfo_file failed
+
+time: 2026-03-03 09:16:51.139951
+failure: hardlink [
+../../source4/torture/smb2/lease.c:7280: Expression `ret' failed: samedir-correct-parent-leaskey failed
+]
+test: unlink_same_set_and_close
+time: 2026-03-03 09:16:51.140010
+First open test directory with RH-dirlease
+WARNING!: (../../source4/torture/smb2/lease.c:7331): wrong value for (&c)->out.lease_response_v2.lease_version got 0x0 - should be 0x2
+
+WARNING!: (../../source4/torture/smb2/lease.c:7331): wrong value for (&c)->out.oplock_level got 0x0 - should be 0xff
+
+WARNING!: (../../source4/torture/smb2/lease.c:7331): wrong value for (&c)->out.lease_response_v2.lease_key.data[0] got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:7331): wrong value for (&c)->out.lease_response_v2.lease_key.data[1] got 0x0 - should be 0xfffffffe
+
+WARNING!: (../../source4/torture/smb2/lease.c:7331): wrong value for (&c)->out.lease_response_v2.lease_state got 0x0 - should be 0x3
+
+Second open test directory with RH-dirlease
+WARNING!: (../../source4/torture/smb2/lease.c:7331): wrong value for (&c)->out.lease_response_v2.lease_epoch got 0x0 - should be 0x2
+
+WARNING!: (../../source4/torture/smb2/lease.c:7342): wrong value for (&c)->out.lease_response_v2.lease_version got 0x0 - should be 0x2
+
+WARNING!: (../../source4/torture/smb2/lease.c:7342): wrong value for (&c)->out.oplock_level got 0x0 - should be 0xff
+
+WARNING!: (../../source4/torture/smb2/lease.c:7342): wrong value for (&c)->out.lease_response_v2.lease_key.data[0] got 0x0 - should be 0x2
+
+WARNING!: (../../source4/torture/smb2/lease.c:7342): wrong value for (&c)->out.lease_response_v2.lease_key.data[1] got 0x0 - should be 0xfffffffd
+
+WARNING!: (../../source4/torture/smb2/lease.c:7342): wrong value for (&c)->out.lease_response_v2.lease_state got 0x0 - should be 0x3
+
+First open test file
+Second open test file
+Sets delete on close on open 2
+Closing first handle that has not set delete-on-close, this should not trigger a break
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Closing second and last handle will remove the file, trigger a break on first directory with different parent lease key
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+WARNING!: (../../source4/torture/smb2/lease.c:7342): wrong value for (&c)->out.lease_response_v2.lease_epoch got 0x0 - should be 0x2
+
+WARNING!: (../../source4/torture/smb2/lease.c:7390): wrong value for lease_break_info.count got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:7390): wrong value for (&lease_break_info.lease_break)->current_lease.lease_state got 0x0 - should be 0x3
+
+WARNING!: (../../source4/torture/smb2/lease.c:7390): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[0] got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:7390): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[1] got 0x0 - should be 0xfffffffe
+
+WARNING!: (../../source4/torture/smb2/lease.c:7390): wrong value for (&lease_break_info.lease_break)->break_flags got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:7390): wrong value for lease_break_info.lease_break.new_epoch got 0x0 - should be 0x4
+
+time: 2026-03-03 09:16:53.150969
+failure: unlink_same_set_and_close [
+(../../source4/torture/smb2/lease.c:7390): wrong value for (uintptr_t)lease_break_info.lease_transport got 0x0 - should be 0xbf4f0770
+]
+test: unlink_different_set_and_close
+time: 2026-03-03 09:16:53.151023
+First open test directory with RH-dirlease
+WARNING!: (../../source4/torture/smb2/lease.c:7458): wrong value for (&c)->out.lease_response_v2.lease_version got 0x0 - should be 0x2
+
+WARNING!: (../../source4/torture/smb2/lease.c:7458): wrong value for (&c)->out.oplock_level got 0x0 - should be 0xff
+
+WARNING!: (../../source4/torture/smb2/lease.c:7458): wrong value for (&c)->out.lease_response_v2.lease_key.data[0] got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:7458): wrong value for (&c)->out.lease_response_v2.lease_key.data[1] got 0x0 - should be 0xfffffffe
+
+WARNING!: (../../source4/torture/smb2/lease.c:7458): wrong value for (&c)->out.lease_response_v2.lease_state got 0x0 - should be 0x3
+
+Second open test directory with RH-dirlease
+WARNING!: (../../source4/torture/smb2/lease.c:7458): wrong value for (&c)->out.lease_response_v2.lease_epoch got 0x0 - should be 0x2
+
+WARNING!: (../../source4/torture/smb2/lease.c:7469): wrong value for (&c)->out.lease_response_v2.lease_version got 0x0 - should be 0x2
+
+WARNING!: (../../source4/torture/smb2/lease.c:7469): wrong value for (&c)->out.oplock_level got 0x0 - should be 0xff
+
+WARNING!: (../../source4/torture/smb2/lease.c:7469): wrong value for (&c)->out.lease_response_v2.lease_key.data[0] got 0x0 - should be 0x2
+
+WARNING!: (../../source4/torture/smb2/lease.c:7469): wrong value for (&c)->out.lease_response_v2.lease_key.data[1] got 0x0 - should be 0xfffffffd
+
+WARNING!: (../../source4/torture/smb2/lease.c:7469): wrong value for (&c)->out.lease_response_v2.lease_state got 0x0 - should be 0x3
+
+First open test file
+Second open test file
+Client 1 sets delete on close
+Closing first handle that has set delete-on-close, will not delete the file and not trigger a break
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Closing second and last handle will remove the file, and trigger a break as the parent lease keys don't match
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+WARNING!: (../../source4/torture/smb2/lease.c:7469): wrong value for (&c)->out.lease_response_v2.lease_epoch got 0x0 - should be 0x2
+
+WARNING!: (../../source4/torture/smb2/lease.c:7532): wrong value for lease_break_info.count got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:7532): wrong value for (&lease_break_info.lease_break)->current_lease.lease_state got 0x0 - should be 0x3
+
+WARNING!: (../../source4/torture/smb2/lease.c:7532): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[0] got 0x0 - should be 0x2
+
+WARNING!: (../../source4/torture/smb2/lease.c:7532): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[1] got 0x0 - should be 0xfffffffd
+
+WARNING!: (../../source4/torture/smb2/lease.c:7532): wrong value for (&lease_break_info.lease_break)->break_flags got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:7532): wrong value for lease_break_info.lease_break.new_epoch got 0x0 - should be 0x4
+
+WARNING!: (../../source4/torture/smb2/lease.c:7532): wrong value for (uintptr_t)lease_break_info.lease_transport got 0x0 - should be 0xbf4f0770
+
+time: 2026-03-03 09:16:55.163216
+failure: unlink_different_set_and_close [
+../../source4/torture/smb2/lease.c:7540: status was NT_STATUS_UNSUCCESSFUL, expected NT_STATUS_OK: smb2_lease_break_ack failed
+]
+test: unlink_same_initial_and_close
+time: 2026-03-03 09:16:55.163269
+First open test directory with RH-dirlease
+WARNING!: (../../source4/torture/smb2/lease.c:7606): wrong value for (&c)->out.lease_response_v2.lease_version got 0x0 - should be 0x2
+
+WARNING!: (../../source4/torture/smb2/lease.c:7606): wrong value for (&c)->out.oplock_level got 0x0 - should be 0xff
+
+WARNING!: (../../source4/torture/smb2/lease.c:7606): wrong value for (&c)->out.lease_response_v2.lease_key.data[0] got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:7606): wrong value for (&c)->out.lease_response_v2.lease_key.data[1] got 0x0 - should be 0xfffffffe
+
+WARNING!: (../../source4/torture/smb2/lease.c:7606): wrong value for (&c)->out.lease_response_v2.lease_state got 0x0 - should be 0x3
+
+Second open test directory with RH-dirlease
+WARNING!: (../../source4/torture/smb2/lease.c:7606): wrong value for (&c)->out.lease_response_v2.lease_epoch got 0x0 - should be 0x2
+
+WARNING!: (../../source4/torture/smb2/lease.c:7617): wrong value for (&c)->out.lease_response_v2.lease_version got 0x0 - should be 0x2
+
+WARNING!: (../../source4/torture/smb2/lease.c:7617): wrong value for (&c)->out.oplock_level got 0x0 - should be 0xff
+
+WARNING!: (../../source4/torture/smb2/lease.c:7617): wrong value for (&c)->out.lease_response_v2.lease_key.data[0] got 0x0 - should be 0x2
+
+WARNING!: (../../source4/torture/smb2/lease.c:7617): wrong value for (&c)->out.lease_response_v2.lease_key.data[1] got 0x0 - should be 0xfffffffd
+
+WARNING!: (../../source4/torture/smb2/lease.c:7617): wrong value for (&c)->out.lease_response_v2.lease_state got 0x0 - should be 0x3
+
+First open test file with initial delete-on-close
+WARNING!: (../../source4/torture/smb2/lease.c:7617): wrong value for (&c)->out.lease_response_v2.lease_epoch got 0x0 - should be 0x2
+
+time: 2026-03-03 09:16:55.171353
+failure: unlink_same_initial_and_close [
+../../source4/torture/smb2/lease.c:7627: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: smb2_create failed
+]
+test: unlink_different_initial_and_close
+time: 2026-03-03 09:16:55.171402
+First open test directory with RH-dirlease
+WARNING!: (../../source4/torture/smb2/lease.c:7720): wrong value for (&c)->out.lease_response_v2.lease_version got 0x0 - should be 0x2
+
+WARNING!: (../../source4/torture/smb2/lease.c:7720): wrong value for (&c)->out.oplock_level got 0x0 - should be 0xff
+
+WARNING!: (../../source4/torture/smb2/lease.c:7720): wrong value for (&c)->out.lease_response_v2.lease_key.data[0] got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:7720): wrong value for (&c)->out.lease_response_v2.lease_key.data[1] got 0x0 - should be 0xfffffffe
+
+WARNING!: (../../source4/torture/smb2/lease.c:7720): wrong value for (&c)->out.lease_response_v2.lease_state got 0x0 - should be 0x3
+
+Second open test directory with RH-dirlease
+WARNING!: (../../source4/torture/smb2/lease.c:7720): wrong value for (&c)->out.lease_response_v2.lease_epoch got 0x0 - should be 0x2
+
+WARNING!: (../../source4/torture/smb2/lease.c:7731): wrong value for (&c)->out.lease_response_v2.lease_version got 0x0 - should be 0x2
+
+WARNING!: (../../source4/torture/smb2/lease.c:7731): wrong value for (&c)->out.oplock_level got 0x0 - should be 0xff
+
+WARNING!: (../../source4/torture/smb2/lease.c:7731): wrong value for (&c)->out.lease_response_v2.lease_key.data[0] got 0x0 - should be 0x2
+
+WARNING!: (../../source4/torture/smb2/lease.c:7731): wrong value for (&c)->out.lease_response_v2.lease_key.data[1] got 0x0 - should be 0xfffffffd
+
+WARNING!: (../../source4/torture/smb2/lease.c:7731): wrong value for (&c)->out.lease_response_v2.lease_state got 0x0 - should be 0x3
+
+First open test file
+WARNING!: (../../source4/torture/smb2/lease.c:7731): wrong value for (&c)->out.lease_response_v2.lease_epoch got 0x0 - should be 0x2
+
+time: 2026-03-03 09:16:55.180487
+failure: unlink_different_initial_and_close [
+../../source4/torture/smb2/lease.c:7741: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: smb2_create failed
+]

@@ -1,0 +1,25 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772884513
+time: 2026-03-07 11:55:13.102508
+progress: 33
+test: create-blob
+time: 2026-03-07 11:55:13.103256
+time: 2026-03-07 11:55:13.240349
+failure: create-blob [
+../../source4/torture/smb2/durable_v2_open.c:166: status was NT_STATUS_OBJECT_NAME_NOT_FOUND, expected NT_STATUS_INVALID_PARAMETER: ../../source4/torture/smb2/durable_v2_open.c:166
+]
+test: open-oplock
+time: 2026-03-07 11:55:13.240410
+time: 2026-03-07 11:55:13.278607
+success: open-oplock
+test: open-lease
+time: 2026-03-07 11:55:13.278663
+time: 2026-03-07 11:55:13.323941
+success: open-lease
+test: reopen1
+time: 2026-03-07 11:55:13.323997
+time: 2026-03-07 11:55:13.327332
+success: reopen1
+test: reopen1a
+time: 2026-03-07 11:55:13.327381

@@ -1,0 +1,4 @@
+[ksmbd.control/3283]: ERROR: Can't kill ksmbd
+[ksmbd.adduser/3321]: ERROR: User `testuser' already exists
+[ksmbd.mountd/3322]: INFO: Started manager
+PREPARE_RC:0

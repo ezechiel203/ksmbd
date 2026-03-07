@@ -1,0 +1,26 @@
+== 717 ==
+bash
+[<0>] do_wait+0x53/0x120
+[<0>] kernel_wait4+0xb6/0x160
+[<0>] __do_sys_wait4+0xa7/0xc0
+[<0>] do_syscall_64+0x81/0x7f0
+[<0>] entry_SYSCALL_64_after_hwframe+0x76/0x7e
+
+== 718 ==
+timeout
+[<0>] sigsuspend.isra.0+0x77/0xa0
+[<0>] __x64_sys_rt_sigsuspend+0x6d/0x80
+[<0>] do_syscall_64+0x81/0x7f0
+[<0>] entry_SYSCALL_64_after_hwframe+0x76/0x7e
+
+== 719 ==
+ksmbdctl
+[<0>] preempt_schedule_thunk+0x16/0x30
+[<0>] ksmbd_conn_transport_destroy+0xf0/0x1a0 [ksmbd]
+[<0>] kill_server_store+0x63/0x100 [ksmbd]
+[<0>] kernfs_fop_write_iter+0x14d/0x200
+[<0>] vfs_write+0x25d/0x480
+[<0>] ksys_write+0x73/0xf0
+[<0>] do_syscall_64+0x81/0x7f0
+[<0>] entry_SYSCALL_64_after_hwframe+0x76/0x7e
+

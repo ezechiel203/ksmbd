@@ -1,0 +1,71 @@
+[1] smb2.acls ... PASS=3 FAIL=3 SKIP=0 
+[2] smb2.acls_non_canonical ... PASS=0 FAIL=1 SKIP=0 
+[SKIP] smb2.aio_delay
+[3] smb2.async_dosmode ... PASS=1 FAIL=0 SKIP=0 
+[SKIP] smb2.bench
+[4] smb2.change_notify_disabled ... PASS=0 FAIL=1 SKIP=0 
+[5] smb2.charset ... PASS=0 FAIL=4 SKIP=0 
+[6] smb2.check-sharemode ... PASS=1 FAIL=0 SKIP=0 
+[7] smb2.compound ... PASS=20 FAIL=0 SKIP=0 
+[8] smb2.compound_async ... PASS=4 FAIL=6 SKIP=0 
+[9] smb2.compound_find ... PASS=2 FAIL=0 SKIP=0 TIMEOUT
+[10] smb2.connect ... PASS=1 FAIL=0 SKIP=0 
+[11] smb2.create ... PASS=15 FAIL=2 SKIP=1 
+[12] smb2.create_no_streams ... PASS=0 FAIL=1 SKIP=0 
+[13] smb2.credits ... PASS=2 FAIL=0 SKIP=0 TIMEOUT
+[14] smb2.delete-on-close-perms ... PASS=8 FAIL=1 SKIP=0 
+[15] smb2.deny ... PASS=2 FAIL=0 SKIP=0 
+[16] smb2.dir ... PASS=7 FAIL=0 SKIP=0 TIMEOUT
+[17] smb2.dirlease ... PASS=3 FAIL=15 SKIP=0 
+[18] smb2.dosmode ... PASS=0 FAIL=1 SKIP=0 
+[19] smb2.durable-open ... PASS=19 FAIL=6 SKIP=1 
+[20] smb2.durable-open-disconnect ... PASS=1 FAIL=0 SKIP=0 
+[21] smb2.durable-v2-delay ... PASS=2 FAIL=0 SKIP=0 
+[22] smb2.durable-v2-open ... PASS=29 FAIL=4 SKIP=0 
+[23] smb2.durable-v2-regressions ... PASS=0 FAIL=0 SKIP=1 
+[24] smb2.ea ... PASS=0 FAIL=1 SKIP=0 
+[25] smb2.fileid ... PASS=4 FAIL=0 SKIP=0 
+[26] smb2.getinfo ... PASS=8 FAIL=0 SKIP=0 
+[SKIP] smb2.hold-oplock
+[SKIP] smb2.hold-sharemode
+[27] smb2.ioctl ... PASS=40 FAIL=20 SKIP=15 
+[28] smb2.ioctl-on-stream ... PASS=1 FAIL=0 SKIP=0 
+[29] smb2.kernel-oplocks ... PASS=3 FAIL=4 SKIP=1 
+[30] smb2.lease ... PASS=10 FAIL=10 SKIP=0 TIMEOUT
+[31] smb2.lock ... PASS=22 FAIL=0 SKIP=4 
+[32] smb2.maxfid ... PASS=0 FAIL=0 SKIP=0 TIMEOUT
+[33] smb2.maximum_allowed ... PASS=1 FAIL=1 SKIP=0 
+[34] smb2.mkdir ... PASS=0 FAIL=1 SKIP=0 
+[SKIP] smb2.multichannel
+[35] smb2.name-mangling ... PASS=0 FAIL=2 SKIP=0 
+[36] smb2.notify ... PASS=6 FAIL=7 SKIP=0 TIMEOUT
+[37] smb2.notify-inotify ... PASS=1 FAIL=0 SKIP=0 
+[38] smb2.openattr ... PASS=0 FAIL=1 SKIP=0 
+[39] smb2.oplock ... PASS=15 FAIL=2 SKIP=0 TIMEOUT
+[40] smb2.read ... PASS=3 FAIL=1 SKIP=1 
+[41] smb2.rename ... PASS=12 FAIL=1 SKIP=0 
+[42] smb2.replay ... PASS=10 FAIL=8 SKIP=0 TIMEOUT
+[43] smb2.rw ... PASS=3 FAIL=1 SKIP=0 
+[44] smb2.samba3misc ... PASS=0 FAIL=1 SKIP=0 
+[45] smb2.scan ... PASS=0 FAIL=0 SKIP=0 TIMEOUT
+[46] smb2.sdread ... PASS=1 FAIL=0 SKIP=0 
+[47] smb2.secleak ... PASS=0 FAIL=1 SKIP=0 
+[48] smb2.session ... PASS=16 FAIL=42 SKIP=10 TIMEOUT
+[49] smb2.session-id ... PASS=1 FAIL=0 SKIP=0 
+[50] smb2.session-require-signing ... PASS=0 FAIL=1 SKIP=0 
+[51] smb2.setinfo ... PASS=1 FAIL=0 SKIP=0 
+[52] smb2.set-sparse-ioctl ... PASS=0 FAIL=1 SKIP=0 
+[53] smb2.sharemode ... PASS=3 FAIL=0 SKIP=0 
+[54] smb2.stream-inherit-perms ... PASS=1 FAIL=0 SKIP=0 
+[55] smb2.streams ... PASS=12 FAIL=2 SKIP=0 
+[56] smb2.tcon ... PASS=1 FAIL=0 SKIP=0 
+[57] smb2.timestamp_resolution ... PASS=0 FAIL=1 SKIP=0 
+[58] smb2.timestamps ... PASS=14 FAIL=3 SKIP=0 
+[59] smb2.twrp ... PASS=0 FAIL=1 SKIP=3 
+[60] smb2.winattr ... PASS=1 FAIL=0 SKIP=0 
+[61] smb2.winattr2 ... PASS=1 FAIL=0 SKIP=0 
+[62] smb2.zero-data-ioctl ... PASS=0 FAIL=1 SKIP=0 
+
+=== SWEEP COMPLETE ===
+PASS: 311 | FAIL: 159 | Timeouts: 10 | ConnFail: 0
+Summary: /home/ezechiel203/ksmbd/TESTS/SWEEP/summary.txt
