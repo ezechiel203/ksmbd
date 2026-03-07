@@ -1,0 +1,266 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772586773
+time: 2026-03-04 01:12:53.153408
+progress: 18
+test: v2_request_parent
+time: 2026-03-04 01:12:53.154364
+time: 2026-03-04 01:12:53.600207
+success: v2_request_parent
+test: v2_request
+time: 2026-03-04 01:12:53.600262
+transport[0x559c094f5fa0] acking to 0x1 (R) in lease handler
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+transport[0x559c094f5fa0] Skip acking to 0x1 (R) in lease handler
+Got 1 lease breaks
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+transport[0x559c094f5fa0] acking to 0x0 () in lease handler
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+WARNING!: (../../source4/torture/smb2/lease.c:1751): wrong value for (&io)->out.lease_response_v2.lease_epoch got 0x26 - should be 0x25
+
+time: 2026-03-04 01:12:59.912219
+failure: v2_request [
+../../source4/torture/smb2/lease.c:1938: Expression `ret == (1)' failed: Rearm dirlease failed
+]
+test: oplocks
+time: 2026-03-04 01:12:59.912276
+time: 2026-03-04 01:13:00.395723
+success: oplocks
+test: leases
+time: 2026-03-04 01:13:00.395776
+time: 2026-03-04 01:13:01.100877
+success: leases
+test: seteof
+time: 2026-03-04 01:13:01.100934
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+transport[0x559c094f5fa0] acking to 0x0 () in lease handler
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+WARNING!: (../../source4/torture/smb2/lease.c:1751): wrong value for (&io)->out.lease_response_v2.lease_epoch got 0x4 - should be 0x3
+
+WARNING!: ../../source4/torture/smb2/lease.c:6103: Expression `ret == (1)' failed: Rearm dirlease failed
+
+transport[0x559c094f5fa0] acking to 0x3 (RH) in lease handler
+time: 2026-03-04 01:13:05.093686
+failure: seteof [
+../../source4/torture/smb2/lease.c:6256: Expression `ret' failed: seteof test failed
+]
+test: setdos
+time: 2026-03-04 01:13:05.093739
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+transport[0x559c094f5fa0] acking to 0x0 () in lease handler
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+WARNING!: (../../source4/torture/smb2/lease.c:1751): wrong value for (&io)->out.lease_response_v2.lease_epoch got 0x4 - should be 0x3
+
+WARNING!: ../../source4/torture/smb2/lease.c:6103: Expression `ret == (1)' failed: Rearm dirlease failed
+
+transport[0x559c094f5fa0] acking to 0x3 (RH) in lease handler
+time: 2026-03-04 01:13:09.120201
+failure: setdos [
+../../source4/torture/smb2/lease.c:6312: Expression `ret' failed: setdos test failed
+]
+test: setbtime
+time: 2026-03-04 01:13:09.120256
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+transport[0x559c094f5fa0] acking to 0x0 () in lease handler
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+WARNING!: (../../source4/torture/smb2/lease.c:1751): wrong value for (&io)->out.lease_response_v2.lease_epoch got 0x4 - should be 0x3
+
+WARNING!: ../../source4/torture/smb2/lease.c:6103: Expression `ret == (1)' failed: Rearm dirlease failed
+
+transport[0x559c094f5fa0] acking to 0x3 (RH) in lease handler
+time: 2026-03-04 01:13:13.072381
+failure: setbtime [
+../../source4/torture/smb2/lease.c:6364: Expression `ret' failed: setbtime test failed
+]
+test: setmtime
+time: 2026-03-04 01:13:13.072470
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+transport[0x559c094f5fa0] acking to 0x0 () in lease handler
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+WARNING!: (../../source4/torture/smb2/lease.c:1751): wrong value for (&io)->out.lease_response_v2.lease_epoch got 0x4 - should be 0x3
+
+WARNING!: ../../source4/torture/smb2/lease.c:6103: Expression `ret == (1)' failed: Rearm dirlease failed
+
+transport[0x559c094f5fa0] acking to 0x3 (RH) in lease handler
+time: 2026-03-04 01:13:17.065295
+failure: setmtime [
+../../source4/torture/smb2/lease.c:6416: Expression `ret' failed: setmtime test failed
+]
+test: setctime
+time: 2026-03-04 01:13:17.065351
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+transport[0x559c094f5fa0] acking to 0x0 () in lease handler
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+WARNING!: (../../source4/torture/smb2/lease.c:1751): wrong value for (&io)->out.lease_response_v2.lease_epoch got 0x4 - should be 0x3
+
+WARNING!: ../../source4/torture/smb2/lease.c:6103: Expression `ret == (1)' failed: Rearm dirlease failed
+
+transport[0x559c094f5fa0] acking to 0x3 (RH) in lease handler
+time: 2026-03-04 01:13:21.030789
+failure: setctime [
+../../source4/torture/smb2/lease.c:6468: Expression `ret' failed: setctime test failed
+]
+test: setatime
+time: 2026-03-04 01:13:21.030855
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+transport[0x559c094f5fa0] acking to 0x0 () in lease handler
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+WARNING!: (../../source4/torture/smb2/lease.c:1751): wrong value for (&io)->out.lease_response_v2.lease_epoch got 0x4 - should be 0x3
+
+WARNING!: ../../source4/torture/smb2/lease.c:6103: Expression `ret == (1)' failed: Rearm dirlease failed
+
+transport[0x559c094f5fa0] acking to 0x3 (RH) in lease handler
+time: 2026-03-04 01:13:24.872402
+failure: setatime [
+../../source4/torture/smb2/lease.c:6520: Expression `ret' failed: setctime test failed
+]
+test: rename
+time: 2026-03-04 01:13:24.872459
+
+Rename subtest: samedir-correct-parent-leaskey
+==================================
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+
+Rename subtest: samedir-wrong-parent-leaskey
+==================================
+WARNING!: ../../source4/torture/smb2/lease.c:6663: status was NT_STATUS_USER_SESSION_DELETED, expected NT_STATUS_OK: smb2_create failed
+
+time: 2026-03-04 01:13:26.229904
+failure: rename [
+../../source4/torture/smb2/lease.c:6778: Expression `ret' failed: samedir-wrong-parent-leaskey failed
+]
+test: rename_dst_parent
+time: 2026-03-04 01:13:26.229954
+transport[0x559c097ece50] acking to 0x0 () in lease handler
+time: 2026-03-04 01:13:27.015036
+failure: rename_dst_parent [
+../../source4/torture/smb2/lease.c:6845: status was NT_STATUS_OK, expected NT_STATUS_SHARING_VIOLATION: smb2_setinfo_file
+]
+test: overwrite
+time: 2026-03-04 01:13:27.015105
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+WARNING!: (../../source4/torture/smb2/lease.c:6988): wrong value for lease_break_info.count got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:6988): wrong value for (&lease_break_info.lease_break)->current_lease.lease_state got 0x0 - should be 0x3
+
+WARNING!: (../../source4/torture/smb2/lease.c:6988): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[0] got 0x0 - should be 0xfeedbead
+
+WARNING!: (../../source4/torture/smb2/lease.c:6988): wrong value for (&lease_break_info.lease_break)->current_lease.lease_key.data[1] got 0x0 - should be 0x1124152
+
+WARNING!: (../../source4/torture/smb2/lease.c:6988): wrong value for (&lease_break_info.lease_break)->break_flags got 0x0 - should be 0x1
+
+WARNING!: (../../source4/torture/smb2/lease.c:6988): wrong value for lease_break_info.lease_break.new_epoch got 0x0 - should be 0x3
+
+WARNING!: (../../source4/torture/smb2/lease.c:6988): wrong value for (uintptr_t)lease_break_info.lease_transport got 0x0 - should be 0x97ece50
+
+WARNING!: ../../source4/torture/smb2/lease.c:6996: status was NT_STATUS_USER_SESSION_DELETED, expected NT_STATUS_OK: smb2_lease_break_ack failed
+
+time: 2026-03-04 01:13:29.376327
+failure: overwrite [
+../../source4/torture/smb2/lease.c:7033: Expression `n != -1' failed: smb2_deltree failed
+]
+test: hardlink
+time: 2026-03-04 01:13:29.376376
+
+Hardlink subtest: samedir-correct-parent-leaskey
+==================================
+transport[0x559c097ece50] acking to 0x0 () in lease handler
+WARNING!: ../../source4/torture/smb2/lease.c:7214: status was NT_STATUS_INVALID_PARAMETER, expected NT_STATUS_OK: smb2_setinfo_file failed
+
+time: 2026-03-04 01:13:30.233519
+failure: hardlink [
+../../source4/torture/smb2/lease.c:7280: Expression `ret' failed: samedir-correct-parent-leaskey failed
+]
+test: unlink_same_set_and_close
+time: 2026-03-04 01:13:30.233570
+First open test directory with RH-dirlease
+Second open test directory with RH-dirlease
+First open test file
+transport[0x559c097ece50] acking to 0x0 () in lease handler
+Second open test file
+transport[0x559c097ece50] acking to 0x0 () in lease handler
+Sets delete on close on open 2
+Closing first handle that has not set delete-on-close, this should not trigger a break
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Closing second and last handle will remove the file, trigger a break on first directory with different parent lease key
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+WARNING!: (../../source4/torture/smb2/lease.c:7381): wrong value for lease_break_info.count got 0x2 - should be 0x0
+
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+time: 2026-03-04 01:13:34.129423
+failure: unlink_same_set_and_close [
+(../../source4/torture/smb2/lease.c:7390): wrong value for lease_break_info.count got 0x2 - should be 0x1
+]
+test: unlink_different_set_and_close
+time: 2026-03-04 01:13:34.129482
+First open test directory with RH-dirlease
+Second open test directory with RH-dirlease
+First open test file
+transport[0x559c097ece50] Skip acking to 0x0 () in lease handler
+Second open test file
+transport[0x559c097ece50] Skip acking to 0x0 () in lease handler
+Client 1 sets delete on close
+Closing first handle that has set delete-on-close, will not delete the file and not trigger a break
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Closing second and last handle will remove the file, and trigger a break as the parent lease keys don't match
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+WARNING!: (../../source4/torture/smb2/lease.c:7508): wrong value for lease_break_info.count got 0x2 - should be 0x0
+
+WARNING!: (../../source4/torture/smb2/lease.c:7532): wrong value for lease_break_info.count got 0x2 - should be 0x1
+
+time: 2026-03-04 01:14:51.324805
+failure: unlink_different_set_and_close [
+../../source4/torture/smb2/lease.c:7540: status was NT_STATUS_UNSUCCESSFUL, expected NT_STATUS_OK: smb2_lease_break_ack failed
+]
+test: unlink_same_initial_and_close
+time: 2026-03-04 01:14:51.324948
+First open test directory with RH-dirlease
+Second open test directory with RH-dirlease
+First open test file with initial delete-on-close
+time: 2026-03-04 01:14:52.411390
+failure: unlink_same_initial_and_close [
+../../source4/torture/smb2/lease.c:7627: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: smb2_create failed
+]
+test: unlink_different_initial_and_close
+time: 2026-03-04 01:14:52.411450

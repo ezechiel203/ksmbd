@@ -1,0 +1,47 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772586339
+time: 2026-03-04 01:05:39.921622
+progress: 10
+test: session_setup_credits_granted
+time: 2026-03-04 01:05:39.924803
+time: 2026-03-04 01:05:40.064175
+success: session_setup_credits_granted
+test: single_req_credits_granted
+time: 2026-03-04 01:05:40.064225
+time: 2026-03-04 01:05:40.247596
+success: single_req_credits_granted
+test: skipped_mid
+time: 2026-03-04 01:05:40.247651
+time: 2026-03-04 01:06:14.084791
+success: skipped_mid
+test: ipc_max_data_zero
+time: 2026-03-04 01:06:14.084849
+time: 2026-03-04 01:06:14.198581
+failure: ipc_max_data_zero [
+../../source4/torture/smb2/credits.c:570: status was NT_STATUS_OBJECT_NAME_NOT_FOUND, expected NT_STATUS_OK: FSCTL_NAMED_PIPE_READ_WRITE failed
+]
+test: 1conn_ipc_max_async_credits
+time: 2026-03-04 01:06:14.198648
+time: 2026-03-04 01:06:14.346832
+failure: 1conn_ipc_max_async_credits [
+../../source4/torture/smb2/credits.c:570: status was NT_STATUS_OBJECT_NAME_NOT_FOUND, expected NT_STATUS_OK: FSCTL_NAMED_PIPE_READ_WRITE failed
+]
+test: 2conn_ipc_max_async_credits
+time: 2026-03-04 01:06:14.346893
+time: 2026-03-04 01:06:14.552242
+failure: 2conn_ipc_max_async_credits [
+../../source4/torture/smb2/credits.c:570: status was NT_STATUS_OBJECT_NAME_NOT_FOUND, expected NT_STATUS_OK: FSCTL_NAMED_PIPE_READ_WRITE failed
+]
+test: multichannel_ipc_max_async_credits
+time: 2026-03-04 01:06:14.552313
+time: 2026-03-04 01:06:14.632604
+failure: multichannel_ipc_max_async_credits [
+../../source4/torture/smb2/credits.c:983: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: smb2_session_setup_spnego failed
+]
+test: 1conn_notify_max_async_credits
+time: 2026-03-04 01:06:14.632681
+time: 2026-03-04 01:06:19.682788
+success: 1conn_notify_max_async_credits
+test: 2conn_notify_max_async_credits
+time: 2026-03-04 01:06:19.682843

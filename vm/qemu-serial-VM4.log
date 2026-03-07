@@ -1,0 +1,2443 @@
+[    0.000000] Linux version 6.18.13-arch1-1 (linux@archlinux) (gcc (GCC) 15.2.1 20260209, GNU ld (GNU Binutils) 2.46) #1 SMP PREEMPT_DYNAMIC Wed, 25 Feb 2026 23:12:35 +0000
+[    0.000000] Command line: root=/dev/vda1 rw console=ttyS0,115200 loglevel=7
+[    0.000000] BIOS-provided physical RAM map:
+[    0.000000] BIOS-e820: [mem 0x0000000000000000-0x000000000009fbff] usable
+[    0.000000] BIOS-e820: [mem 0x000000000009fc00-0x000000000009ffff] reserved
+[    0.000000] BIOS-e820: [mem 0x00000000000f0000-0x00000000000fffff] reserved
+[    0.000000] BIOS-e820: [mem 0x0000000000100000-0x000000007ffdcfff] usable
+[    0.000000] BIOS-e820: [mem 0x000000007ffdd000-0x000000007fffffff] reserved
+[    0.000000] BIOS-e820: [mem 0x00000000feffc000-0x00000000feffffff] reserved
+[    0.000000] BIOS-e820: [mem 0x00000000fffc0000-0x00000000ffffffff] reserved
+[    0.000000] NX (Execute Disable) protection: active
+[    0.000000] APIC: Static calls initialized
+[    0.000000] SMBIOS 2.8 present.
+[    0.000000] DMI: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Arch Linux 1.17.0-2-2 04/01/2014
+[    0.000000] DMI: Memory slots populated: 1/1
+[    0.000000] Hypervisor detected: KVM
+[    0.000000] last_pfn = 0x7ffdd max_arch_pfn = 0x400000000
+[    0.000000] kvm-clock: Using msrs 4b564d01 and 4b564d00
+[    0.000002] kvm-clock: using sched offset of 544575672 cycles
+[    0.000004] clocksource: kvm-clock: mask: 0xffffffffffffffff max_cycles: 0x1cd42e4dffb, max_idle_ns: 881590591483 ns
+[    0.000009] tsc: Detected 3600.000 MHz processor
+[    0.003955] last_pfn = 0x7ffdd max_arch_pfn = 0x400000000
+[    0.003992] MTRR map: 4 entries (3 fixed + 1 variable; max 19), built from 8 variable MTRRs
+[    0.003996] x86/PAT: Configuration [0-7]: WB  WC  UC- UC  WB  WP  UC- WT  
+[    0.026615] found SMP MP-table at [mem 0x000f66b0-0x000f66bf]
+[    0.026639] Using GB pages for direct mapping
+[    0.026773] RAMDISK: [mem 0x7f508000-0x7ffcffff]
+[    0.026847] ACPI: Early table checksum verification disabled
+[    0.026851] ACPI: RSDP 0x00000000000F64E0 000014 (v00 BOCHS )
+[    0.026856] ACPI: RSDT 0x000000007FFE239C 000034 (v01 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.026863] ACPI: FACP 0x000000007FFE2248 000074 (v01 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.026872] ACPI: DSDT 0x000000007FFE0040 002208 (v01 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.026876] ACPI: FACS 0x000000007FFE0000 000040
+[    0.026880] ACPI: APIC 0x000000007FFE22BC 000080 (v03 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.026885] ACPI: HPET 0x000000007FFE233C 000038 (v01 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.026889] ACPI: WAET 0x000000007FFE2374 000028 (v01 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.026892] ACPI: Reserving FACP table memory at [mem 0x7ffe2248-0x7ffe22bb]
+[    0.026894] ACPI: Reserving DSDT table memory at [mem 0x7ffe0040-0x7ffe2247]
+[    0.026895] ACPI: Reserving FACS table memory at [mem 0x7ffe0000-0x7ffe003f]
+[    0.026895] ACPI: Reserving APIC table memory at [mem 0x7ffe22bc-0x7ffe233b]
+[    0.026896] ACPI: Reserving HPET table memory at [mem 0x7ffe233c-0x7ffe2373]
+[    0.026897] ACPI: Reserving WAET table memory at [mem 0x7ffe2374-0x7ffe239b]
+[    0.027370] No NUMA configuration found
+[    0.027372] Faking a node at [mem 0x0000000000000000-0x000000007ffdcfff]
+[    0.027380] NODE_DATA(0) allocated [mem 0x7f4dd280-0x7f507fff]
+[    0.027700] Zone ranges:
+[    0.027701]   DMA      [mem 0x0000000000001000-0x0000000000ffffff]
+[    0.027703]   DMA32    [mem 0x0000000001000000-0x000000007ffdcfff]
+[    0.027705]   Normal   empty
+[    0.027705]   Device   empty
+[    0.027706] Movable zone start for each node
+[    0.027709] Early memory node ranges
+[    0.027709]   node   0: [mem 0x0000000000001000-0x000000000009efff]
+[    0.027711]   node   0: [mem 0x0000000000100000-0x000000007ffdcfff]
+[    0.027712] Initmem setup node 0 [mem 0x0000000000001000-0x000000007ffdcfff]
+[    0.027731] On node 0, zone DMA: 1 pages in unavailable ranges
+[    0.027913] On node 0, zone DMA: 97 pages in unavailable ranges
+[    0.062794] On node 0, zone DMA32: 35 pages in unavailable ranges
+[    0.063530] ACPI: PM-Timer IO Port: 0x608
+[    0.063548] ACPI: LAPIC_NMI (acpi_id[0xff] dfl dfl lint[0x1])
+[    0.063586] IOAPIC[0]: apic_id 0, version 17, address 0xfec00000, GSI 0-23
+[    0.063590] ACPI: INT_SRC_OVR (bus 0 bus_irq 0 global_irq 2 dfl dfl)
+[    0.063592] ACPI: INT_SRC_OVR (bus 0 bus_irq 5 global_irq 5 high level)
+[    0.063594] ACPI: INT_SRC_OVR (bus 0 bus_irq 9 global_irq 9 high level)
+[    0.063595] ACPI: INT_SRC_OVR (bus 0 bus_irq 10 global_irq 10 high level)
+[    0.063596] ACPI: INT_SRC_OVR (bus 0 bus_irq 11 global_irq 11 high level)
+[    0.063602] ACPI: Using ACPI (MADT) for SMP configuration information
+[    0.063603] ACPI: HPET id: 0x8086a201 base: 0xfed00000
+[    0.063608] TSC deadline timer available
+[    0.063615] CPU topo: Max. logical packages:   1
+[    0.063616] CPU topo: Max. logical dies:       1
+[    0.063617] CPU topo: Max. dies per package:   1
+[    0.063623] CPU topo: Max. threads per core:   1
+[    0.063624] CPU topo: Num. cores per package:     2
+[    0.063625] CPU topo: Num. threads per package:   2
+[    0.063625] CPU topo: Allowing 2 present CPUs plus 0 hotplug CPUs
+[    0.063646] kvm-guest: APIC: eoi() replaced with kvm_guest_apic_eoi_write()
+[    0.063660] kvm-guest: KVM setup pv remote TLB flush
+[    0.063664] kvm-guest: setup PV sched yield
+[    0.063671] PM: hibernation: Registered nosave memory: [mem 0x00000000-0x00000fff]
+[    0.063673] PM: hibernation: Registered nosave memory: [mem 0x0009f000-0x000fffff]
+[    0.063675] [mem 0x80000000-0xfeffbfff] available for PCI devices
+[    0.063677] Booting paravirtualized kernel on KVM
+[    0.063679] clocksource: refined-jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 1910969940391419 ns
+[    0.075000] setup_percpu: NR_CPUS:8192 nr_cpumask_bits:2 nr_cpu_ids:2 nr_node_ids:1
+[    0.076862] percpu: Embedded 62 pages/cpu s217088 r8192 d28672 u1048576
+[    0.076921] kvm-guest: PV spinlocks enabled
+[    0.076924] PV qspinlock hash table entries: 256 (order: 0, 4096 bytes, linear)
+[    0.076928] Kernel command line: root=/dev/vda1 rw console=ttyS0,115200 loglevel=7
+[    0.076993] random: crng init done
+[    0.076994] printk: log buffer data + meta data: 131072 + 458752 = 589824 bytes
+[    0.078816] Dentry cache hash table entries: 262144 (order: 9, 2097152 bytes, linear)
+[    0.079955] Inode-cache hash table entries: 131072 (order: 8, 1048576 bytes, linear)
+[    0.080066] Fallback order for Node 0: 0 
+[    0.080079] Built 1 zonelists, mobility grouping on.  Total pages: 524155
+[    0.080080] Policy zone: DMA32
+[    0.082149] mem auto-init: stack:all(zero), heap alloc:on, heap free:off
+[    0.087887] SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=2, Nodes=1
+[    0.087910] Kernel/User page tables isolation: enabled
+[    0.101170] ftrace: allocating 57060 entries in 224 pages
+[    0.101174] ftrace: allocated 224 pages with 3 groups
+[    0.101490] Dynamic Preempt: full
+[    0.101550] rcu: Preemptible hierarchical RCU implementation.
+[    0.101551] rcu: 	RCU restricting CPUs from NR_CPUS=8192 to nr_cpu_ids=2.
+[    0.101552] rcu: 	RCU priority boosting: priority 1 delay 500 ms.
+[    0.101554] 	Trampoline variant of Tasks RCU enabled.
+[    0.101554] 	Rude variant of Tasks RCU enabled.
+[    0.101554] 	Tracing variant of Tasks RCU enabled.
+[    0.101555] rcu: RCU calculated value of scheduler-enlistment delay is 100 jiffies.
+[    0.101556] rcu: Adjusting geometry for rcu_fanout_leaf=16, nr_cpu_ids=2
+[    0.101563] RCU Tasks: Setting shift to 1 and lim to 1 rcu_task_cb_adjust=1 rcu_task_cpu_ids=2.
+[    0.101565] RCU Tasks Rude: Setting shift to 1 and lim to 1 rcu_task_cb_adjust=1 rcu_task_cpu_ids=2.
+[    0.101567] RCU Tasks Trace: Setting shift to 1 and lim to 1 rcu_task_cb_adjust=1 rcu_task_cpu_ids=2.
+[    0.110580] NR_IRQS: 524544, nr_irqs: 440, preallocated irqs: 16
+[    0.110976] rcu: srcu_init: Setting srcu_struct sizes based on contention.
+[    0.111678] kfence: initialized - using 2097152 bytes for 255 objects at 0x(____ptrval____)-0x(____ptrval____)
+[    0.152761] Console: colour VGA+ 80x25
+[    0.152883] printk: legacy console [ttyS0] enabled
+[    0.502112] ACPI: Core revision 20250807
+[    0.503657] clocksource: hpet: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 19112604467 ns
+[    0.507163] APIC: Switch to symmetric I/O mode setup
+[    0.508916] x2apic enabled
+[    0.510411] APIC: Switched APIC routing to: physical x2apic
+[    0.512002] kvm-guest: APIC: send_IPI_mask() replaced with kvm_send_ipi_mask()
+[    0.514015] kvm-guest: APIC: send_IPI_mask_allbutself() replaced with kvm_send_ipi_mask_allbutself()
+[    0.516754] kvm-guest: setup PV IPIs
+[    0.519085] ..TIMER: vector=0x30 apic1=0 pin1=2 apic2=-1 pin2=-1
+[    0.520861] clocksource: tsc-early: mask: 0xffffffffffffffff max_cycles: 0x33e452fbb2f, max_idle_ns: 440795236593 ns
+[    0.524131] Calibrating delay loop (skipped) preset value.. 7200.00 BogoMIPS (lpj=3600000)
+[    0.526285] x86/cpu: User Mode Instruction Prevention (UMIP) activated
+[    0.527243] Last level iTLB entries: 4KB 0, 2MB 0, 4MB 0
+[    0.528127] Last level dTLB entries: 4KB 0, 2MB 0, 4MB 0, 1GB 0
+[    0.528148] mitigations: Enabled attack vectors: user_kernel, user_user, guest_host, guest_guest, SMT mitigations: auto
+[    0.529131] Speculative Store Bypass: Mitigation: Speculative Store Bypass disabled via prctl
+[    0.530132] SRBDS: Unknown: Dependent on hypervisor status
+[    0.531132] Spectre V2 : Mitigation: IBRS
+[    0.532130] RETBleed: Mitigation: IBRS
+[    0.533130] MDS: Mitigation: Clear CPU buffers
+[    0.534130] TAA: Mitigation: Clear CPU buffers
+[    0.535130] MMIO Stale Data: Mitigation: Clear CPU buffers
+[    0.536131] Spectre V1 : Mitigation: usercopy/swapgs barriers and __user pointer sanitization
+[    0.537138] Spectre V2 : Spectre v2 / SpectreRSB: Filling RSB on context switch and VMEXIT
+[    0.538127] Spectre V2 : mitigation: Enabling conditional Indirect Branch Prediction Barrier
+[    0.538146] GDS: Unknown: Dependent on hypervisor status
+[    0.539133] Spectre V2 : Spectre BHI mitigation: SW BHB clearing on syscall and VM exit
+[    0.540164] x86/fpu: Supporting XSAVE feature 0x001: 'x87 floating point registers'
+[    0.541133] x86/fpu: Supporting XSAVE feature 0x002: 'SSE registers'
+[    0.542133] x86/fpu: Supporting XSAVE feature 0x004: 'AVX registers'
+[    0.543133] x86/fpu: Supporting XSAVE feature 0x008: 'MPX bounds registers'
+[    0.544137] x86/fpu: Supporting XSAVE feature 0x010: 'MPX CSR'
+[    0.545134] x86/fpu: xstate_offset[2]:  576, xstate_sizes[2]:  256
+[    0.546135] x86/fpu: xstate_offset[3]:  832, xstate_sizes[3]:   64
+[    0.547134] x86/fpu: xstate_offset[4]:  896, xstate_sizes[4]:   64
+[    0.548134] x86/fpu: Enabled xstate features 0x1f, context size is 960 bytes, using 'compacted' format.
+[    0.593155] Freeing SMP alternatives memory: 56K
+[    0.594136] pid_max: default: 32768 minimum: 301
+[    0.595206] LSM: initializing lsm=capability,landlock,lockdown,yama,bpf
+[    0.596235] landlock: Up and running.
+[    0.597135] Yama: becoming mindful.
+[    0.598400] LSM support for eBPF active
+[    0.600176] Mount-cache hash table entries: 4096 (order: 3, 32768 bytes, linear)
+[    0.601159] Mountpoint-cache hash table entries: 4096 (order: 3, 32768 bytes, linear)
+[    0.603874] smpboot: CPU0: Intel(R) Core(TM) i7-7700 CPU @ 3.60GHz (family: 0x6, model: 0x9e, stepping: 0x9)
+[    0.604715] Performance Events: Skylake events, full-width counters, Intel PMU driver.
+[    0.605140] ... version:                   2
+[    0.606207] ... bit width:                 48
+[    0.607133] ... generic counters:          4
+[    0.608132] ... generic bitmap:            000000000000000f
+[    0.609132] ... fixed-purpose counters:    3
+[    0.610132] ... fixed-purpose bitmap:      0000000000000007
+[    0.611133] ... value mask:                0000ffffffffffff
+[    0.612132] ... max period:                00007fffffffffff
+[    0.613130] ... global_ctrl mask:          000000070000000f
+[    0.614383] signal: max sigframe size: 2032
+[    0.615241] rcu: Hierarchical SRCU implementation.
+[    0.616132] rcu: 	Max phase no-delay instances is 400.
+[    0.617505] Timer migration: 1 hierarchy levels; 8 children per group; 1 crossnode level
+[    0.618769] smp: Bringing up secondary CPUs ...
+[    0.619547] smpboot: x86: Booting SMP configuration:
+[    0.620139] .... node  #0, CPUs:      #1
+[    0.621170] smp: Brought up 1 node, 2 CPUs
+[    0.623140] smpboot: Total of 2 processors activated (14400.00 BogoMIPS)
+[    0.625549] Memory: 1985452K/2096620K available (20319K kernel code, 2939K rwdata, 16368K rodata, 4736K init, 4772K bss, 105892K reserved, 0K cma-reserved)
+[    0.626419] devtmpfs: initialized
+[    0.627182] x86/mm: Memory block size: 128MB
+[    0.629306] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 1911260446275000 ns
+[    0.630165] posixtimers hash table entries: 1024 (order: 2, 16384 bytes, linear)
+[    0.631176] futex hash table entries: 512 (32768 bytes on 1 NUMA nodes, total 32 KiB, linear).
+[    0.632224] pinctrl core: initialized pinctrl subsystem
+[    0.633416] PM: RTC time: 13:38:56, date: 2026-03-04
+[    0.636728] NET: Registered PF_NETLINK/PF_ROUTE protocol family
+[    0.637598] DMA: preallocated 256 KiB GFP_KERNEL pool for atomic allocations
+[    0.638164] DMA: preallocated 256 KiB GFP_KERNEL|GFP_DMA pool for atomic allocations
+[    0.639427] DMA: preallocated 256 KiB GFP_KERNEL|GFP_DMA32 pool for atomic allocations
+[    0.640147] audit: initializing netlink subsys (disabled)
+[    0.641442] thermal_sys: Registered thermal governor 'fair_share'
+[    0.641444] thermal_sys: Registered thermal governor 'bang_bang'
+[    0.642133] thermal_sys: Registered thermal governor 'step_wise'
+[    0.642133] audit: type=2000 audit(1772631536.688:1): state=initialized audit_enabled=0 res=1
+[    0.643135] thermal_sys: Registered thermal governor 'user_space'
+[    0.643137] thermal_sys: Registered thermal governor 'power_allocator'
+[    0.649169] cpuidle: using governor ladder
+[    0.651149] cpuidle: using governor menu
+[    0.652339] acpiphp: ACPI Hot Plug PCI Controller Driver version: 0.5
+[    0.653452] PCI: Using configuration type 1 for base access
+[    0.654369] kprobes: kprobe jump-optimization is enabled. All kprobes are optimized if possible.
+[    0.669138] HugeTLB: registered 1.00 GiB page size, pre-allocated 0 pages
+[    0.671137] HugeTLB: 16380 KiB vmemmap can be freed for a 1.00 GiB page
+[    0.672172] HugeTLB: registered 2.00 MiB page size, pre-allocated 0 pages
+[    0.675135] HugeTLB: 28 KiB vmemmap can be freed for a 2.00 MiB page
+[    0.687539] raid6: skipped pq benchmark and selected avx2x4
+[    0.688134] raid6: using avx2x2 recovery algorithm
+[    0.689290] ACPI: Added _OSI(Module Device)
+[    0.690139] ACPI: Added _OSI(Processor Device)
+[    0.691138] ACPI: Added _OSI(Processor Aggregator Device)
+[    0.694909] ACPI: 1 ACPI AML tables successfully acquired and loaded
+[    0.700444] ACPI: Interpreter enabled
+[    0.701157] ACPI: PM: (supports S0 S3 S4 S5)
+[    0.703127] ACPI: Using IOAPIC for interrupt routing
+[    0.703328] PCI: Using host bridge windows from ACPI; if necessary, use "pci=nocrs" and report a bug
+[    0.704137] PCI: Using E820 reservations for host bridge windows
+[    0.705352] ACPI: Enabled 2 GPEs in block 00 to 0F
+[    0.712882] ACPI: PCI Root Bridge [PCI0] (domain 0000 [bus 00-ff])
+[    0.713149] acpi PNP0A03:00: _OSC: OS supports [ASPM ClockPM Segments MSI EDR HPX-Type3]
+[    0.714139] acpi PNP0A03:00: _OSC: not requesting OS control; OS requires [ExtendedConfig ASPM ClockPM MSI]
+[    0.715164] acpi PNP0A03:00: fail to add MMCONFIG information, can't access extended configuration space under this bridge
+[    0.717418] acpiphp: Slot [3] registered
+[    0.718183] acpiphp: Slot [4] registered
+[    0.719195] acpiphp: Slot [5] registered
+[    0.720127] acpiphp: Slot [6] registered
+[    0.721169] acpiphp: Slot [7] registered
+[    0.722180] acpiphp: Slot [8] registered
+[    0.724127] acpiphp: Slot [9] registered
+[    0.727185] acpiphp: Slot [10] registered
+[    0.733186] acpiphp: Slot [11] registered
+[    0.737229] acpiphp: Slot [12] registered
+[    0.739177] acpiphp: Slot [13] registered
+[    0.741170] acpiphp: Slot [14] registered
+[    0.747199] acpiphp: Slot [15] registered
+[    0.750199] acpiphp: Slot [16] registered
+[    0.753180] acpiphp: Slot [17] registered
+[    0.756174] acpiphp: Slot [18] registered
+[    0.757213] acpiphp: Slot [19] registered
+[    0.759171] acpiphp: Slot [20] registered
+[    0.760176] acpiphp: Slot [21] registered
+[    0.762185] acpiphp: Slot [22] registered
+[    0.764180] acpiphp: Slot [23] registered
+[    0.768187] acpiphp: Slot [24] registered
+[    0.769168] acpiphp: Slot [25] registered
+[    0.770171] acpiphp: Slot [26] registered
+[    0.772188] acpiphp: Slot [27] registered
+[    0.773169] acpiphp: Slot [28] registered
+[    0.775170] acpiphp: Slot [29] registered
+[    0.776178] acpiphp: Slot [30] registered
+[    0.778174] acpiphp: Slot [31] registered
+[    0.779175] PCI host bridge to bus 0000:00
+[    0.780143] pci_bus 0000:00: root bus resource [io  0x0000-0x0cf7 window]
+[    0.783137] pci_bus 0000:00: root bus resource [io  0x0d00-0xffff window]
+[    0.784127] pci_bus 0000:00: root bus resource [mem 0x000a0000-0x000bffff window]
+[    0.785138] pci_bus 0000:00: root bus resource [mem 0x80000000-0xfebfffff window]
+[    0.788138] pci_bus 0000:00: root bus resource [mem 0x100000000-0x17fffffff window]
+[    0.790136] pci_bus 0000:00: root bus resource [bus 00-ff]
+[    0.792229] pci 0000:00:00.0: [8086:1237] type 00 class 0x060000 conventional PCI endpoint
+[    0.796316] pci 0000:00:01.0: [8086:7000] type 00 class 0x060100 conventional PCI endpoint
+[    0.799275] pci 0000:00:01.1: [8086:7010] type 00 class 0x010180 conventional PCI endpoint
+[    0.811127] pci 0000:00:01.1: BAR 4 [io  0xc0e0-0xc0ef]
+[    0.814218] pci 0000:00:01.1: BAR 0 [io  0x01f0-0x01f7]: legacy IDE quirk
+[    0.816136] pci 0000:00:01.1: BAR 1 [io  0x03f6]: legacy IDE quirk
+[    0.825139] pci 0000:00:01.1: BAR 2 [io  0x0170-0x0177]: legacy IDE quirk
+[    0.828142] pci 0000:00:01.1: BAR 3 [io  0x0376]: legacy IDE quirk
+[    0.830660] pci 0000:00:01.3: [8086:7113] type 00 class 0x068000 conventional PCI endpoint
+[    0.835411] pci 0000:00:01.3: quirk: [io  0x0600-0x063f] claimed by PIIX4 ACPI
+[    0.839162] pci 0000:00:01.3: quirk: [io  0x0700-0x070f] claimed by PIIX4 SMB
+[    0.845744] pci 0000:00:02.0: [1234:1111] type 00 class 0x030000 conventional PCI endpoint
+[    0.871310] pci 0000:00:02.0: BAR 0 [mem 0xfd000000-0xfdffffff pref]
+[    0.873183] pci 0000:00:02.0: BAR 2 [mem 0xfebd0000-0xfebd0fff]
+[    0.874213] pci 0000:00:02.0: ROM [mem 0xfebc0000-0xfebcffff pref]
+[    0.882523] pci 0000:00:02.0: Video device with shadowed ROM at [mem 0x000c0000-0x000dffff]
+[    0.885999] pci 0000:00:03.0: [1af4:1009] type 00 class 0x000200 conventional PCI endpoint
+[    0.889127] pci 0000:00:03.0: BAR 0 [io  0xc080-0xc0bf]
+[    0.890148] pci 0000:00:03.0: BAR 1 [mem 0xfebd1000-0xfebd1fff]
+[    0.892270] pci 0000:00:03.0: BAR 4 [mem 0xfe000000-0xfe003fff 64bit pref]
+[    0.896330] pci 0000:00:04.0: [1af4:1000] type 00 class 0x020000 conventional PCI endpoint
+[    0.903162] pci 0000:00:04.0: BAR 0 [io  0xc0c0-0xc0df]
+[    0.904164] pci 0000:00:04.0: BAR 1 [mem 0xfebd2000-0xfebd2fff]
+[    0.906224] pci 0000:00:04.0: BAR 4 [mem 0xfe004000-0xfe007fff 64bit pref]
+[    0.907156] pci 0000:00:04.0: ROM [mem 0xfeb80000-0xfebbffff pref]
+[    0.910127] pci 0000:00:05.0: [1af4:1001] type 00 class 0x010000 conventional PCI endpoint
+[    0.935157] pci 0000:00:05.0: BAR 0 [io  0xc000-0xc07f]
+[    0.938153] pci 0000:00:05.0: BAR 1 [mem 0xfebd3000-0xfebd3fff]
+[    0.944211] pci 0000:00:05.0: BAR 4 [mem 0xfe008000-0xfe00bfff 64bit pref]
+[    0.976108] ACPI: PCI: Interrupt link LNKA configured for IRQ 10
+[    0.977298] ACPI: PCI: Interrupt link LNKB configured for IRQ 10
+[    0.979338] ACPI: PCI: Interrupt link LNKC configured for IRQ 11
+[    0.980301] ACPI: PCI: Interrupt link LNKD configured for IRQ 11
+[    0.982230] ACPI: PCI: Interrupt link LNKS configured for IRQ 9
+[    0.986163] iommu: Default domain type: Translated
+[    0.987131] iommu: DMA domain TLB invalidation policy: lazy mode
+[    0.988805] SCSI subsystem initialized
+[    0.990220] ACPI: bus type USB registered
+[    0.991127] usbcore: registered new interface driver usbfs
+[    0.991151] usbcore: registered new interface driver hub
+[    0.992149] usbcore: registered new device driver usb
+[    0.994250] EDAC MC: Ver: 3.0.0
+[    0.997528] NetLabel: Initializing
+[    0.998132] NetLabel:  domain hash size = 128
+[    1.000132] NetLabel:  protocols = UNLABELED CIPSOv4 CALIPSO
+[    1.002184] NetLabel:  unlabeled traffic allowed by default
+[    1.004150] mctp: management component transport protocol core
+[    1.006142] NET: Registered PF_MCTP protocol family
+[    1.007182] PCI: Using ACPI for IRQ routing
+[    1.009747] pci 0000:00:02.0: vgaarb: setting as boot VGA device
+[    1.010127] pci 0000:00:02.0: vgaarb: bridge control possible
+[    1.010127] pci 0000:00:02.0: vgaarb: VGA device added: decodes=io+mem,owns=io+mem,locks=none
+[    1.016142] vgaarb: loaded
+[    1.017574] hpet0: at MMIO 0xfed00000, IRQs 2, 8, 0
+[    1.019142] hpet0: 3 comparators, 64-bit 100.000000 MHz counter
+[    1.026480] clocksource: Switched to clocksource kvm-clock
+[    1.028912] VFS: Disk quotas dquot_6.6.0
+[    1.032957] VFS: Dquot-cache hash table entries: 512 (order 0, 4096 bytes)
+[    1.035781] pnp: PnP ACPI init
+[    1.037740] pnp: PnP ACPI: found 6 devices
+[    1.048242] clocksource: acpi_pm: mask: 0xffffff max_cycles: 0xffffff, max_idle_ns: 2085701024 ns
+[    1.051764] NET: Registered PF_INET protocol family
+[    1.054024] IP idents hash table entries: 32768 (order: 6, 262144 bytes, linear)
+[    1.104374] tcp_listen_portaddr_hash hash table entries: 1024 (order: 2, 16384 bytes, linear)
+[    1.107744] Table-perturb hash table entries: 65536 (order: 6, 262144 bytes, linear)
+[    1.110458] TCP established hash table entries: 16384 (order: 5, 131072 bytes, linear)
+[    1.113091] TCP bind hash table entries: 16384 (order: 7, 524288 bytes, linear)
+[    1.115668] TCP: Hash tables configured (established 16384 bind 16384)
+[    1.117705] MPTCP token hash table entries: 2048 (order: 4, 49152 bytes, linear)
+[    1.119938] UDP hash table entries: 1024 (order: 4, 65536 bytes, linear)
+[    1.122061] UDP-Lite hash table entries: 1024 (order: 4, 65536 bytes, linear)
+[    1.124491] NET: Registered PF_UNIX/PF_LOCAL protocol family
+[    1.126085] NET: Registered PF_XDP protocol family
+[    1.127759] pci_bus 0000:00: resource 4 [io  0x0000-0x0cf7 window]
+[    1.129565] pci_bus 0000:00: resource 5 [io  0x0d00-0xffff window]
+[    1.131388] pci_bus 0000:00: resource 6 [mem 0x000a0000-0x000bffff window]
+[    1.133631] pci_bus 0000:00: resource 7 [mem 0x80000000-0xfebfffff window]
+[    1.136408] pci_bus 0000:00: resource 8 [mem 0x100000000-0x17fffffff window]
+[    1.138994] pci 0000:00:01.0: PIIX3: Enabling Passive Release
+[    1.141049] pci 0000:00:00.0: Limiting direct PCI/PCI transfers
+[    1.143303] PCI: CLS 0 bytes, default 64
+[    1.146039] clocksource: tsc: mask: 0xffffffffffffffff max_cycles: 0x33e452fbb2f, max_idle_ns: 440795236593 ns
+[    1.149618] Trying to unpack rootfs image as initramfs...
+[    1.230072] Initialise system trusted keyrings
+[    1.231447] Key type blacklist registered
+[    1.232773] workingset: timestamp_bits=36 max_order=19 bucket_order=0
+[    1.235126] fuse: init (API version 7.45)
+[    1.238589] integrity: Platform Keyring initialized
+[    1.239984] integrity: Machine keyring initialized
+[    1.256011] xor: automatically using best checksumming function   avx       
+[    1.258229] Key type asymmetric registered
+[    1.259470] Asymmetric key parser 'x509' registered
+[    1.260911] Block layer SCSI generic (bsg) driver version 0.4 loaded (major 245)
+[    1.263283] io scheduler mq-deadline registered
+[    1.264611] io scheduler kyber registered
+[    1.265835] io scheduler bfq registered
+[    1.267124] ledtrig-cpu: registered to indicate activity on CPUs
+[    1.269502] input: Power Button as /devices/LNXSYSTM:00/LNXPWRBN:00/input/input0
+[    1.271731] ACPI: button: Power Button [PWRF]
+[    1.274802] ACPI: \_SB_.LNKC: Enabled at IRQ 11
+[    1.279083] ACPI: \_SB_.LNKD: Enabled at IRQ 10
+[    1.283343] ACPI: \_SB_.LNKA: Enabled at IRQ 10
+[    1.314562] Serial: 8250/16550 driver, 32 ports, IRQ sharing enabled
+[    1.317814] 00:04: ttyS0 at I/O 0x3f8 (irq = 4, base_baud = 115200) is a 16550A
+[    1.333568] Non-volatile memory driver v1.3
+[    1.334815] Linux agpgart interface v0.103
+[    1.336128] ACPI: bus type drm_connector registered
+[    1.341516] virtio_blk virtio2: 2/0/0 default/read/poll queues
+[    1.345801] virtio_blk virtio2: [vda] 25165824 512-byte logical blocks (12.9 GB/12.0 GiB)
+[    1.380869] Freeing initrd memory: 11040K
+[    1.381529]  vda: vda1
+[    1.388733] usbcore: registered new interface driver usbserial_generic
+[    1.393107] usbserial: USB Serial support registered for generic
+[    1.398602] i8042: PNP: PS/2 Controller [PNP0303:KBD,PNP0f13:MOU] at 0x60,0x64 irq 1,12
+[    1.408752] serio: i8042 KBD port at 0x60,0x64 irq 1
+[    1.412027] serio: i8042 AUX port at 0x60,0x64 irq 12
+[    1.416891] rtc_cmos 00:05: RTC can wake from S4
+[    1.422946] input: AT Translated Set 2 keyboard as /devices/platform/i8042/serio0/input/input1
+[    1.435255] rtc_cmos 00:05: registered as rtc0
+[    1.438865] rtc_cmos 00:05: setting system clock to 2026-03-04T13:38:57 UTC (1772631537)
+[    1.446329] rtc_cmos 00:05: alarms up to one day, y3k, 242 bytes nvram, hpet irqs
+[    1.457928] intel_pstate: CPU model not supported
+[    1.464130] hid: raw HID events driver (C) Jiri Kosina
+[    1.469017] usbcore: registered new interface driver usbhid
+[    1.470778] usbhid: USB HID core driver
+[    1.475951] rust_binder: Loaded Rust Binder.
+[    1.476013] drop_monitor: Initializing network drop monitor service
+[    1.483479] NET: Registered PF_INET6 protocol family
+[    1.487319] Segment Routing with IPv6
+[    1.488907] RPL Segment Routing with IPv6
+[    1.490491] In-situ OAM (IOAM) with IPv6
+[    1.492082] NET: Registered PF_PACKET protocol family
+[    1.494838] IPI shorthand broadcast: enabled
+[    1.503457] sched_clock: Marking stable (1097123421, 406142542)->(1771213791, -267947828)
+[    1.506445] registered taskstats version 1
+[    1.508589] Loading compiled-in X.509 certificates
+[    1.520060] Loaded X.509 cert 'Build time autogenerated kernel key: 4f282eb87851fdb04b530c5e67453df628afff93'
+[    1.529773] zswap: loaded using pool zstd
+[    1.531376] Demotion targets for Node 0: null
+[    1.533279] Key type .fscrypt registered
+[    1.534558] Key type fscrypt-provisioning registered
+[    1.536331] Btrfs loaded, zoned=yes, fsverity=yes
+[    1.537785] Key type big_key registered
+[    1.541497] PM:   Magic number: 2:241:634
+[    1.544043] RAS: Correctable Errors collector initialized.
+[    1.554608] clk: Disabling unused clocks
+[    1.555698] PM: genpd: Disabling unused power domains
+[    1.561368] Freeing unused decrypted memory: 2028K
+[    1.565849] Freeing unused kernel image (initmem) memory: 4736K
+[    1.567799] Write protecting the kernel read-only data: 36864k
+[    1.569670] Freeing unused kernel image (text/rodata gap) memory: 160K
+[    1.571312] Freeing unused kernel image (rodata/data gap) memory: 16K
+[    1.627255] x86/mm: Checked W+X mappings: passed, no W+X pages found.
+[    1.628756] rodata_test: all tests were successful
+[    1.633016] x86/mm: Checking user space page tables
+[    1.695042] x86/mm: Checked W+X mappings: passed, no W+X pages found.
+[    1.698266] Run /init as init process
+P+q6E616D65\[    2.056861] systemd[1]: Successfully made /usr/ read-only.
+[6n[32766;32766H[6n[!p]104\[0m[?7h[1G[0J[    2.392728] systemd[1]: systemd 259.2-1-arch running in system mode (+PAM +AUDIT -SELINUX +APPARMOR -IMA +IPE +SMACK +SECCOMP +GCRYPT +GNUTLS +OPENSSL +ACL +BLKID +CURL +ELFUTILS +FIDO2 +IDN2 -IDN +KMOD +LIBCRYPTSETUP +LIBCRYPTSETUP_PLUGINS +LIBFDISK +PCRE2 +PWQUALITY +P11KIT +QRENCODE +TPM2 +BZIP2 +LZ4 +XZ +ZLIB +ZSTD +BPF_FRAMEWORK +BTF +XKBCOMMON +UTMP -SYSVINIT +LIBARCHIVE)
+[    2.399286] systemd[1]: Detected virtualization kvm.
+[    2.400284] systemd[1]: Detected architecture x86-64.
+[    2.401828] systemd[1]: Running in initrd.
+[0;1;39mBooting initrd of [0m[38;2;23;147;209mArch Linux[0m[0;1;39m.[0m
+[    2.405398] systemd[1]: Initializing machine ID from random generator.
+]3008;start=ccf0cc757695436d9826a52f8742be5d;user=root;hostname=archlinux;machineid=945b51a2b1e148bcb9f8e677f2eb0b0e;bootid=23947586c3364482b51fe45826783744;pid=1;pidfdid=2;comm=systemd;type=boot\[    2.469321] systemd[1]: Queued start job for default target Initrd Default Target.
+[    2.540539] systemd[1]: Expecting device /dev/vda1...
+         Expecting device [0;1;39m/dev/vda1[0m...
+[    2.543869] systemd[1]: Reached target Path Units.
+[[0;32m  OK  [0m] Reached target [0;1;39mPath Units[0m.
+[    2.547883] systemd[1]: Reached target Slice Units.
+[[0;32m  OK  [0m] Reached target [0;1;39mSlice Units[0m.
+[    2.551834] systemd[1]: Reached target Swaps.
+[[0;32m  OK  [0m] Reached target [0;1;39mSwaps[0m.
+[    2.554434] systemd[1]: Reached target Timer Units.
+[[0;32m  OK  [0m] Reached target [0;1;39mTimer Units[0m.
+[    2.558496] systemd[1]: Listening on Journal Socket (/dev/log).
+[[0;32m  OK  [0m] Listening on [0;1;39mJournal Socket (/dev/log)[0m.
+[    2.561574] systemd[1]: Listening on Journal Sockets.
+[[0;32m  OK  [0m] Listening on [0;1;39mJournal Sockets[0m.
+[    2.566451] systemd[1]: Listening on udev Control Socket.
+[[0;32m  OK  [0m] Listening on [0;1;39mudev Control Socket[0m.
+[    2.569655] systemd[1]: Listening on udev Kernel Socket.
+[[0;32m  OK  [0m] Listening on [0;1;39mudev Kernel Socket[0m.
+[    2.573620] systemd[1]: Reached target Socket Units.
+[[0;32m  OK  [0m] Reached target [0;1;39mSocket Units[0m.
+[    2.576133] systemd[1]: Create List of Static Device Nodes skipped, unmet condition check ConditionFileNotEmpty=/lib/modules/6.18.13-arch1-1/modules.devname
+[    2.579081] systemd[1]: Early Battery Level Check skipped, unmet condition check ConditionDirectoryNotEmpty=/sys/class/power_supply
+[    2.581820] systemd[1]: Display Boot-Time Emergency Messages In Full Screen skipped, unmet condition check ConditionVirtualization=no
+[    2.599912] systemd[1]: Starting Journal Service...
+         Starting [0;1;39mJournal Service[0m...
+[    2.615992] systemd[1]: Starting Load Kernel Modules...
+         Starting [0;1;39mLoad Kernel Modules[0m...
+[    2.620315] systemd[1]: TPM PCR Barrier (initrd) skipped, unmet condition check ConditionSecurity=measured-uki
+[    2.642428] systemd[1]: Starting Create Static Device Nodes in /dev...
+         Starting [0;1;39mCreate Static Device Nodes in /dev[0m...
+[    2.657814] systemd-journald[104]: Collecting audit messages is disabled.
+[    2.660295] systemd[1]: Starting Coldplug All udev Devices...
+         Starting [0;1;39mColdplug All udev Devices[0m...
+[    2.691909] systemd[1]: Finished Create Static Device Nodes in /dev.
+[[0;32m  OK  [0m] Finished [0;1;39mCreate Static Device Nodes in /dev[0m.
+[    2.698927] systemd[1]: Reached target Preparation for Local File Systems.
+[[0;32m  OK  [0m] Reached target [0;1;39mPreparation for Local File Systems[0m.
+[    2.709262] systemd[1]: Reached target Local File Systems.
+[[0;32m  OK  [0m] Reached target [0;1;39mLocal File Systems[0m.
+[    2.726475] systemd[1]: Starting Rule-based Manager for Device Events and Files...
+         Starting [0;1;39mRule-based Manager for Device Events and Files[0m...
+[    2.735491] systemd[1]: Started Journal Service.
+[[0;32m  OK  [0m] Started [0;1;39mJournal Service[0m.
+[    2.749749] netfs: FS-Cache loaded
+         Starting [0;1;39mCreate System Files and Directories[0m...
+[    2.767333] 9pnet: Installing 9P2000 support
+[    2.790359] 9p: Installing v9fs 9p2000 file system support
+[[0;32m  OK  [0m] Finished [0;1;39mLoad Kernel Modules[0m.
+[[0;32m  OK  [0m] Finished [0;1;39mCreate System Files and Directories[0m.
+[[0;32m  OK  [0m] Started [0;1;39mRule-based Manager for Device Events and Files[0m.
+[[0;32m  OK  [0m] Finished [0;1;39mColdplug All udev Devices[0m.
+[[0;32m  OK  [0m] Reached target [0;1;39mSystem Initialization[0m.
+[[0;32m  OK  [0m] Reached target [0;1;39mBasic System[0m.
+[[0;32m  OK  [0m] Found device [0;1;39m/dev/vda1[0m.
+[[0;32m  OK  [0m] Reached target [0;1;39mInitrd Root Device[0m.
+         Starting [0;1;39mFile System Check on /dev/vda1[0m...
+[    3.475262] bochs-drm 0000:00:02.0: vgaarb: deactivate vga console
+[    3.512970] Floppy drive(s): fd0 is 2.88M AMI BIOS
+[    3.524141] Console: switching to colour dummy device 80x25
+[    3.527495] FDC 0 is a S82078B
+[    3.530741] scsi host0: ata_piix
+[    3.536641] [drm] Found bochs VGA, ID 0xb0c5.
+[    3.540868] [drm] Framebuffer size 16384 kB @ 0xfd000000, mmio @ 0xfebd0000.
+[    3.544101] scsi host1: ata_piix
+[    3.550213] bochs-drm 0000:00:02.0: [drm] Registered 1 planes with drm panic
+[    3.553548] [drm] Initialized bochs-drm 1.0.0 for 0000:00:02.0 on minor 0
+         Starting [0;1;39mVirtual Console Setup[0m...
+[    3.590515] ata1: PATA max MWDMA2 cmd 0x1f0 ctl 0x3f6 bmdma 0xc0e0 irq 14 lpm-pol 0
+[    3.607499] fbcon: bochs-drmdrmfb (fb0) is primary device
+[    3.638175] ata2: PATA max MWDMA2 cmd 0x170 ctl 0x376 bmdma 0xc0e8 irq 15 lpm-pol 0
+[    3.680520] Console: switching to colour frame buffer device 160x50
+[    3.700655] bochs-drm 0000:00:02.0: [drm] fb0: bochs-drmdrmfb frame buffer device
+[[0;32m  OK  [0m] Stopped [0;1;39mVirtual Console Setup[0m.
+         Starting [0;1;39mVirtual Console Setup[0m...
+[[0;32m  OK  [0m] Stopped [0;1;39mVirtual Console Setup[0m.
+[    3.798057] ata2: found unknown device (class 0)
+[    3.806261] ata2.00: ATAPI: QEMU DVD-ROM, 2.5+, max UDMA/100
+         Starting [0;1;39mVirtual Console Setup[0m...
+[    3.837570] scsi 1:0:0:0: CD-ROM            QEMU     QEMU DVD-ROM     2.5+ PQ: 0 ANSI: 5
+[[0;32m  OK  [0m] Finished [0;1;39mVirtual Console Setup[0m.
+[[0;32m  OK  [0m] Finished [0;1;39mFile System Check on /dev/vda1[0m.
+         Mounting [0;1;39m/sysroot[0m...
+[    4.231332] EXT4-fs (vda1): mounted filesystem ddfae1cc-629e-47f4-9008-261996ba3811 r/w with ordered data mode. Quota mode: none.
+[[0;32m  OK  [0m] Mounted [0;1;39m/sysroot[0m.
+[[0;32m  OK  [0m] Reached target [0;1;39mInitrd Root File System[0m.
+         Starting [0;1;39mMountpoints Configured in the Real Root[0m...
+[[0;32m  OK  [0m] Finished [0;1;39mMountpoints Configured in the Real Root[0m.
+[[0;32m  OK  [0m] Reached target [0;1;39mInitrd File Systems[0m.
+[[0;32m  OK  [0m] Reached target [0;1;39mInit[    4.335337] sr 1:0:0:0: [sr0] scsi3-mmc drive: 4x/4x cd/rw xa/form2 tray
+[    4.340856] cdrom: Uniform CD-ROM driver Revision: 3.20
+rd Default Target[0m.
+         Starting [0;1;39mCleaning Up and Shutting Down Daemons[0m...
+[[0;32m  OK  [0m] Finished [0;1;39mCleaning Up and Shutting Down Daemons[0m.
+[[0;32m  OK  [0m] Stopped target [0;1;39mInitrd Default Target[0m.
+[[0;32m  OK  [0m] Stopped target [0;1;39mBasic System[0m.
+[[0;32m  OK  [0m] Stopped target [0;1;39mInitrd Root Device[0m.
+[[0;32m  OK  [0m] Stopped target [0;1;39mPath Units[0m.
+[[0;32m  OK  [0m] Stopped target [0;1;39mSlice Units[0m.
+[[0;32m  OK  [0m] Stopped target [0;1;39mSocket Units[0m.
+[[0;32m  OK  [0m] Stopped target [0;1;39mSystem Initialization[0m.
+[[0;32m  OK  [0m] Stopped target [0;1;39mSwaps[0m.
+[[0;32m  OK  [0m] Stopped target [0;1;39mTimer Units[0m.
+[[0;32m  OK  [0m] Stopped [0;1;39mLoad Kernel Modules[0m.
+[[0;32m  OK  [0m] Stopped [0;1;39mCreate System Files and Directories[0m.
+[[0;32m  OK  [0m] Stopped target [0;1;39mLocal File Systems[0m.
+[[0;32m  OK  [0m] Stopped target [0;1;39mPreparation for Local File Systems[0m.
+[[0;32m  OK  [0m] Stopped [0;1;39mColdplug All udev Devices[0m.
+         Stopping [0;1;39mRule-based Manager for Device Events and Files[0m...
+[[0;32m  OK  [0m] Stopped [0;1;39mVirtual Console Setup[0m.
+[[0;32m  OK  [0m] Stopped [0;1;39mRule-based Manager for Device Events and Files[0m.
+[[0;32m  OK  [0m] Closed [0;1;39mudev Control Socket[0m.
+         Starting [0;1;39mCleanup udev Database[0m...
+[[0;32m  OK  [0m] Stopped [0;1;39mCreate Static Device Nodes in /dev[0m.
+[[0;32m  OK  [0m] Finished [0;1;39mCleanup udev Database[0m.
+[[0;32m  OK  [0m] Reached target [0;1;39mSwitch Root[0m.
+         Starting [0;1;39mSwitch Root[0m...
+[    5.324315] systemd-journald[104]: Received SIGTERM from PID 1 (systemd).
+P+q6E616D65\[    5.794913] NET: Registered PF_VSOCK protocol family
+[6n[32766;32766H[6n[!p]104\[0m[?7h[1G[0J[    6.155566] systemd[1]: systemd 259.2-1-arch running in system mode (+PAM +AUDIT -SELINUX +APPARMOR -IMA +IPE +SMACK +SECCOMP +GCRYPT +GNUTLS +OPENSSL +ACL +BLKID +CURL +ELFUTILS +FIDO2 +IDN2 -IDN +KMOD +LIBCRYPTSETUP +LIBCRYPTSETUP_PLUGINS +LIBFDISK +PCRE2 +PWQUALITY +P11KIT +QRENCODE +TPM2 +BZIP2 +LZ4 +XZ +ZLIB +ZSTD +BPF_FRAMEWORK +BTF +XKBCOMMON +UTMP -SYSVINIT +LIBARCHIVE)
+[    6.170248] systemd[1]: Detected virtualization kvm.
+[    6.172526] systemd[1]: Detected architecture x86-64.
+
+[0;1;39mWelcome to [0m[38;2;23;147;209mArch Linux[0m[0;1;39m![0m
+
+[    6.191603] systemd[1]: Hostname set to <ksmbd-vm>.
+]3008;start=792c975df5314fa0b0f29d6032dc3fc9;user=root;hostname=ksmbd-vm;machineid=0ab76daf18ce42b0b036a81eb53bdd79;bootid=23947586c3364482b51fe45826783744;pid=1;pidfdid=2;comm=systemd;type=boot\[    6.478268] systemd[1]: bpf-restrict-fs: LSM BPF program attached
+[    6.956771] systemd[1]: initrd-switch-root.service: Deactivated successfully.
+[    6.958356] systemd[1]: Stopped Switch Root.
+[[0;32m  OK  [0m] Stopped [0;1;39mSwitch Root[0m.
+[    6.992936] systemd[1]: systemd-journald.service: Scheduled restart job, restart counter is at 1.
+[    7.002542] systemd[1]: Created slice Slice /system/dirmngr.
+[[0;32m  OK  [0m] Created slice [0;1;39mSlice /system/dirmngr[0m.
+[    7.013040] systemd[1]: Created slice Slice /system/getty.
+[[0;32m  OK  [0m] Created slice [0;1;39mSlice /system/getty[0m.
+[    7.027499] systemd[1]: Created slice Slice /system/gpg-agent.
+[[0;32m  OK  [0m] Created slice [0;1;39mSlice /system/gpg-agent[0m.
+[    7.035020] systemd[1]: Created slice Slice /system/gpg-agent-browser.
+[[0;32m  OK  [0m] Created slice [0;1;39mSlice /system/gpg-agent-browser[0m.
+[    7.038965] systemd[1]: Created slice Slice /system/gpg-agent-extra.
+[[0;32m  OK  [0m] Created slice [0;1;39mSlice /system/gpg-agent-extra[0m.
+[    7.043601] systemd[1]: Created slice Slice /system/gpg-agent-ssh.
+[[0;32m  OK  [0m] Created slice [0;1;39mSlice /system/gpg-agent-ssh[0m.
+[    7.048000] systemd[1]: Created slice Slice /system/keyboxd.
+[[0;32m  OK  [0m] Created slice [0;1;39mSlice /system/keyboxd[0m.
+[    7.051969] systemd[1]: Created slice Slice /system/modprobe.
+[[0;32m  OK  [0m] Created slice [0;1;39mSlice /system/modprobe[0m.
+[    7.055700] systemd[1]: Created slice Slice /system/serial-getty.
+[[0;32m  OK  [0m] Created slice [0;1;39mSlice /system/serial-getty[0m.
+[    7.059784] systemd[1]: Created slice User and Session Slice.
+[[0;32m  OK  [0m] Created slice [0;1;39mUser and Session Slice[0m.
+[    7.063039] systemd[1]: Started Dispatch Password Requests to Console Directory Watch.
+[[0;32m  OK  [0m] Started [0;1;39mDispatch Password Requests to Console Directory Watch[0m.
+[    7.068224] systemd[1]: Started Forward Password Requests to Wall Directory Watch.
+[[0;32m  OK  [0m] Started [0;1;39mForward Password Requests to Wall Directory Watch[0m.
+[    7.073734] systemd[1]: Set up automount Arbitrary Executable File Formats File System Automount Point.
+[[0;32m  OK  [0m] Set up automount [0;1;39mArbitrary Executa…ormats File System Automount Point[0m.
+[    7.078346] systemd[1]: Expecting device /dev/ttyS0...
+         Expecting device [0;1;39m/dev/ttyS0[0m...
+[    7.080800] systemd[1]: Reached target Local Encrypted Volumes.
+[[0;32m  OK  [0m] Reached target [0;1;39mLocal Encrypted Volumes[0m.
+[    7.085308] systemd[1]: Reached target Image Downloads.
+[[0;32m  OK  [0m] Reached target [0;1;39mImage Downloads[0m.
+[    7.088259] systemd[1]: Stopped target Switch Root.
+[[0;32m  OK  [0m] Stopped target [0;1;39mSwitch Root[0m.
+[    7.092314] systemd[1]: Stopped target Initrd File Systems.
+[[0;32m  OK  [0m] Stopped target [0;1;39mInitrd File Systems[0m.
+[    7.096435] systemd[1]: Stopped target Initrd Root File System.
+[[0;32m  OK  [0m] Stopped target [0;1;39mInitrd Root File System[0m.
+[    7.099759] systemd[1]: Reached target Local Integrity Protected Volumes.
+[[0;32m  OK  [0m] Reached target [0;1;39mLocal Integrity Protected Volumes[0m.
+[    7.103897] systemd[1]: Reached target Path Units.
+[[0;32m  OK  [0m] Reached target [0;1;39mPath Units[0m.
+[    7.107264] systemd[1]: Reached target Remote File Systems.
+[[0;32m  OK  [0m] Reached target [0;1;39mRemote File Systems[0m.
+[    7.110298] systemd[1]: Reached target Slice Units.
+[[0;32m  OK  [0m] Reached target [0;1;39mSlice Units[0m.
+[    7.112719] systemd[1]: Reached target Swaps.
+[[0;32m  OK  [0m] Reached target [0;1;39mSwaps[0m.
+[    7.115042] systemd[1]: Reached target Local Verity Protected Volumes.
+[[0;32m  OK  [0m] Reached target [0;1;39mLocal Verity Protected Volumes[0m.
+[    7.119523] systemd[1]: Listening on Device-mapper event daemon FIFOs.
+[[0;32m  OK  [0m] Listening on [0;1;39mDevice-mapper event daemon FIFOs[0m.
+[    7.126370] systemd[1]: Listening on Query the User Interactively for a Password.
+[[0;32m  OK  [0m] Listening on [0;1;39mQuery the User Interactively for a Password[0m.
+[    7.132746] systemd[1]: Listening on Process Core Dump Socket.
+[[0;32m  OK  [0m] Listening on [0;1;39mProcess Core Dump Socket[0m.
+[    7.138891] systemd[1]: Listening on Credential Encryption/Decryption.
+[[0;32m  OK  [0m] Listening on [0;1;39mCredential Encryption/Decryption[0m.
+[    7.145662] systemd[1]: Listening on Factory Reset Management.
+[[0;32m  OK  [0m] Listening on [0;1;39mFactory Reset Management[0m.
+[    7.150961] systemd[1]: Listening on Console Output Muting Service Socket.
+[[0;32m  OK  [0m] Listening on [0;1;39mConsole Output Muting Service Socket[0m.
+[    7.156083] systemd[1]: Listening on Network Management Resolve Hook Socket.
+[[0;32m  OK  [0m] Listening on [0;1;39mNetwork Management Resolve Hook Socket[0m.
+[    7.160961] systemd[1]: Listening on Network Management Varlink Socket.
+[[0;32m  OK  [0m] Listening on [0;1;39mNetwork Management Varlink Socket[0m.
+[    7.164693] systemd[1]: Listening on Network Management Netlink Socket.
+[[0;32m  OK  [0m] Listening on [0;1;39mNetwork Management Netlink Socket[0m.
+[    7.169535] systemd[1]: TPM PCR Measurements skipped, unmet condition check ConditionSecurity=measured-uki
+[    7.171689] systemd[1]: Make TPM PCR Policy skipped, unmet condition check ConditionSecurity=measured-uki
+[    7.175550] systemd[1]: Listening on Disk Repartitioning Service Socket.
+[[0;32m  OK  [0m] Listening on [0;1;39mDisk Repartitioning Service Socket[0m.
+[    7.179103] systemd[1]: Listening on Resolve Monitor Varlink Socket.
+[[0;32m  OK  [0m] Listening on [0;1;39mResolve Monitor Varlink Socket[0m.
+[    7.184357] systemd[1]: Listening on Resolve Service Varlink Socket.
+[[0;32m  OK  [0m] Listening on [0;1;39mResolve Service Varlink Socket[0m.
+[    7.188723] systemd[1]: Listening on udev Control Socket.
+[[0;32m  OK  [0m] Listening on [0;1;39mudev Control Socket[0m.
+[    7.193311] systemd[1]: Listening on udev Varlink Socket.
+[[0;32m  OK  [0m] Listening on [0;1;39mudev Varlink Socket[0m.
+[    7.196799] systemd[1]: Listening on User Database Manager Socket.
+[[0;32m  OK  [0m] Listening on [0;1;39mUser Database Manager Socket[0m.
+[    7.206692] systemd[1]: Mounting Huge Pages File System...
+         Mounting [0;1;39mHuge Pages File System[0m...
+[    7.214596] systemd[1]: Mounting POSIX Message Queue File System...
+         Mounting [0;1;39mPOSIX Message Queue File System[0m...
+[    7.228342] systemd[1]: Mounting Kernel Debug File System...
+         Mounting [0;1;39mKernel Debug File System[0m...
+[    7.246311] systemd[1]: Mounting Kernel Trace File System...
+         Mounting [0;1;39mKernel Trace File System[0m...
+[    7.253443] systemd[1]: Mounting Temporary Directory /tmp...
+         Mounting [0;1;39mTemporary Directory /tmp[0m...
+[    7.261537] systemd[1]: Starting Create List of Static Device Nodes...
+         Starting [0;1;39mCreate List of Static Device Nodes[0m...
+[    7.271418] systemd[1]: Load Kernel Module configfs skipped, unmet condition check ConditionKernelModuleLoaded=!configfs
+[    7.294383] systemd[1]: Mounting Kernel Configuration File System...
+         Mounting [0;1;39mKernel Configuration File System[0m...
+[    7.309914] systemd[1]: Load Kernel Module drm skipped, unmet condition check ConditionKernelModuleLoaded=!drm
+[    7.316505] systemd[1]: Load Kernel Module fuse skipped, unmet condition check ConditionKernelModuleLoaded=!fuse
+[    7.325300] systemd[1]: Mounting FUSE Control File System...
+         Mounting [0;1;39mFUSE Control File System[0m...
+[    7.329615] systemd[1]: Clear Stale Hibernate Storage Info skipped, unmet condition check ConditionPathExists=/sys/firmware/efi/efivars/HibernateLocation-8cf2644b-4b0b-428f-9387-6d876050dc67
+[    7.336846] systemd[1]: Starting Journal Service...
+         Starting [0;1;39mJournal Service[0m...
+[    7.345532] systemd[1]: Load Kernel Modules skipped, no trigger condition checks were met.
+[    7.356536] systemd[1]: Starting Generate Network Units from Kernel Command Line...
+         Starting [0;1;39mGenerate Network Units from Kernel Command Line[0m...
+[    7.364463] systemd[1]: TPM PCR Machine ID Measurement skipped, unmet condition check ConditionSecurity=measured-uki
+[    7.370607] systemd[1]: TPM NvPCR Product ID Measurement skipped, unmet condition check ConditionSecurity=measured-uki
+[    7.375340] systemd[1]: Starting Remount Root and Kernel File Systems...
+         Starting [0;1;39mRemount Root and Kernel File Systems[0m...
+[    7.410136] systemd[1]: Starting Apply Kernel Variables...
+         Starting [0;1;39mApply Kernel Variables[0m...
+[    7.439531] systemd[1]: Early TPM SRK Setup skipped, unmet condition check ConditionSecurity=measured-uki
+[    7.440713] systemd-journald[346]: Collecting audit messages is disabled.
+[    7.467530] EXT4-fs (vda1): re-mounted ddfae1cc-629e-47f4-9008-261996ba3811.
+[    7.474899] systemd[1]: Starting Load udev Rules from Credentials...
+         Starting [0;1;39mLoad udev Rules from Credentials[0m...
+[    7.492814] systemd[1]: Starting Coldplug All udev Devices...
+         Starting [0;1;39mColdplug All udev Devices[0m...
+[    7.504015] systemd[1]: Started Journal Service.
+[[0;32m  OK  [0m] Started [0;1;39mJournal Service[0m.
+[[0;32m  OK  [0m] Mounted [0;1;39mHuge Pages File System[0m.
+[[0;32m  OK  [0m] Mounted [0;1;39mPOSIX Message Queue File System[0m.
+[[0;32m  OK  [0m] Mounted [0;1;39mKernel Debug File System[0m.
+[[0;32m  OK  [0m] Mounted [0;1;39mKernel Trace File System[0m.
+[[0;32m  OK  [0m] Mounted [0;1;39mTemporary Directory /tmp[0m.
+[[0;32m  OK  [0m] Finished [0;1;39mCreate List of Static Device Nodes[0m.
+[[0;32m  OK  [0m] Mounted [0;1;39mKernel Configuration File System[0m.
+[[0;32m  OK  [0m] Mounted [0;1;39mFUSE Control File System[0m.
+[[0;32m  OK  [0m] Finished [0;1;39mGenerate Network Units from Kernel Command Line[0m.
+[[0;32m  OK  [0m] Finished [0;1;39mRemount Root and Kernel File Systems[0m.
+[[0;32m  OK  [0m] Finished [0;1;39mApply Kernel Variables[0m.
+[[0;32m  OK  [0m] Finished [0;1;39mLoad udev Rules from Credentials[0m.
+[[0;32m  OK  [0m] Reached target [0;1;39mPreparation for Network[0m.
+         Starting [0;1;39mFlush Journal to Persistent Storage[0m...
+         Starting [0;1;39mLoad/Save OS Random Seed[0m...
+         Starting [0;1;39mCreate Static Device Nodes in /dev gracefully[0m...
+[    7.670535] systemd-journald[346]: Received client request to flush runtime journal.
+[    7.705749] systemd-journald[346]: File /var/log/journal/0ab76daf18ce42b0b036a81eb53bdd79/system.journal corrupted or uncleanly shut down, renaming and replacing.
+         Starting [0;1;39mUser Database Manager[0m...
+[[0;32m  OK  [0m] Finished [0;1;39mLoad/Save OS Random Seed[0m.
+[[0;32m  OK  [0m] Started [0;1;39mUser Database Manager[0m.
+[[0;32m  OK  [0m] Finished [0;1;39mFlush Journal to Persistent Storage[0m.
+[[0;32m  OK  [0m] Finished [0;1;39mColdplug All udev Devices[0m.
+[[0;32m  OK  [0m] Finished [0;1;39mCreate Static Device Nodes in /dev gracefully[0m.
+         Starting [0;1;39mNetwork Name Resolution[0m...
+         Starting [0;1;39mCreate Static Device Nodes in /dev[0m...
+[[0;32m  OK  [0m] Finished [0;1;39mCreate Static Device Nodes in /dev[0m.
+[[0;32m  OK  [0m] Reached target [0;1;39mPreparation for Local File Systems[0m.
+         Mounting [0;1;39m/mnt/ksmbd[0m...
+[[0;32m  OK  [0m] Reached target [0;1;39mLocal File Systems[0m.
+[[0;32m  OK  [0m] Listening on [0;1;39mBoot Entries Service Socket[0m.
+[[0;32m  OK  [0m] Listening on [0;1;39mDisk Image Download Service Socket[0m.
+[[0;32m  OK  [0m] Listening on [0;1;39mSystem Extension Image Management[0m.
+         Starting [0;1;39mCreate System Files and Directories[0m...
+[    8.281756] 9pnet: Limiting 'msize' to 512000 as this is the maximum supported by transport virtio
+         Starting [0;1;39mRule-based Manager for Device Events and Files[0m...
+         Starting [0;1;39mLoad JSON user/group Records from Credentials[0m...
+[[0;32m  OK  [0m] Started [0;1;39mNetwork Name Resolution[0m.
+[[0;32m  OK  [0m] Mounted [0;1;39m/mnt/ksmbd[0m.
+[[0;32m  OK  [0m] Reached target [0;1;39mHost and Network Name Lookups[0m.
+[[0;32m  OK  [0m] Finished [0;1;39mLoad JSON user/group Records from Credentials[0m.
+[[0;32m  OK  [0m] Started [0;1;39mRule-based Manager for Device Events and Files[0m.
+         Starting [0;1;39mNetwork Management[0m...
+[[0;32m  OK  [0m] Finished [0;1;39mCreate System Files and Directories[0m.
+         Starting [0;1;39mRecord System Boot/Shutdown in UTMP[0m...
+[[0;32m  OK  [0m] Finished [0;1;39mRecord System Boot/Shutdown in UTMP[0m.
+[[0;32m  OK  [0m] Reached target [0;1;39mSystem Initialization[0m.
+[[0;32m  OK  [0m] Started [0;1;39mRefresh existing PGP keys of archlinux-keyring regularly[0m.
+[[0;32m  OK  [0m] Started [0;1;39mDaily verification of password and group files[0m.
+[[0;32m  OK  [0m] Started [0;1;39mDaily Cleanup of Temporary Directories[0m.
+[[0;32m  OK  [0m] Reached target [0;1;39mTimer Units[0m.
+[[0;32m  OK  [0m] Listening on [0;1;39mD-Bus System Message Bus Socket[0m.
+[[0;32m  OK  [0m] Listening on [0;1;39mGnuPG network certifi…ent daemon for /etc/pacman.d/gnupg[0m.
+[[0;32m  OK  [0m] Listening on [0;1;39mGnuPG cryptographic a… browsers) for /etc/pacman.d/gnupg[0m.
+[[0;32m  OK  [0m] Listening on [0;1;39mGnuPG cryptographic a…estricted) for /etc/pacman.d/gnupg[0m.
+[[0;32m  OK  [0m] Listening on [0;1;39mGnuPG cryptographic a…emulation) for /etc/pacman.d/gnupg[0m.
+[[0;32m  OK  [0m] Listening on [0;1;39mGnuPG cryptographic a…rase cache for /etc/pacman.d/gnupg[0m.
+[[0;32m  OK  [0m] Listening on [0;1;39mGnuPG public key mana…nt service for /etc/pacman.d/gnupg[0m.
+[[0;32m  OK  [0m] Listening on [0;1;39mOpenSSH Server Socket…temd-ssh-generator, AF_UNIX Local)[0m.
+         Starting [0;1;39mOpenSSH Server Socket (systemd-ssh-generator, AF_VSOCK)[0m...
+[[0;32m  OK  [0m] Listening on [0;1;39mHostname Service Socket[0m.
+[[0;32m  OK  [0m] Listening on [0;1;39mUser Login Management Varlink Socket[0m.
+[[0;32m  OK  [0m] Listening on [0;1;39mVirtual Machine and C…tainer Registration Service Socket[0m.
+         Starting [0;1;39mD-Bus System Message Bus[0m...
+[[0;32m  OK  [0m] Listening on [0;1;39mOpenSSH Server Socket (systemd-ssh-generator, AF_VSOCK)[0m.
+[[0;32m  OK  [0m] Reached target [0;1;39mSocket Units[0m.
+[[0;32m  OK  [0m] Started [0;1;39mD-Bus System Message Bus[0m.
+[[0;32m  OK  [0m] Reached target [0;1;39mBasic System[0m.
+[    9.596397] cfg80211: Loading compiled-in X.509 certificates for regulatory database
+         Starting [0;1;39mUser Login Management[0m...
+[    9.619213] Loaded X.509 cert 'sforshee: 00b28ddf47aef9cea7'
+[    9.623574] Loaded X.509 cert 'wens: 61c038651aabdcf94bd0ac7ff06c7248db18c600'
+[    9.627911] virtio_net virtio1 ens4: renamed from eth0
+[    9.675870] faux_driver regulatory: Direct firmware load for regulatory.db failed with error -2
+[    9.680039] cfg80211: failed to load regulatory.db
+[[0;32m  OK  [0m] Started [0;1;39mNetwork Management[0m.
+[[0;32m  OK  [0m] Reached target [0;1;39mNetwork[0m.
+         Starting [0;1;39mOpenSSH Daemon[0m...
+         Starting [0;1;39mEnable Persistent Storage in systemd-networkd[0m...
+         Starting [0;1;39mPermit User Sessions[0m...
+[[0;32m  OK  [0m] Started [0;1;39mUser Login Management[0m.
+[[0;32m  OK  [0m] Started [0;1;39mOpenSSH Daemon[0m.
+[[0;32m  OK  [0m] Finished [0;1;39mEnable Persistent Storage in systemd-networkd[0m.
+[[0;32m  OK  [0m] Finished [0;1;39mPermit User Sessions[0m.
+[[0;32m  OK  [0m] Reached target [0;1;39mSSH Access Available[0m.
+[[0;32m  OK  [0m] Started [0;1;39mGetty on tty1[0m.
+[[0;32m  OK  [0m] Started [0;1;39mSerial Getty on ttyS0[0m.
+[[0;32m  OK  [0m] Reached target [0;1;39mLogin Prompts[0m.
+[[0;32m  OK  [0m] Reached target [0;1;39mMulti-User System[0m.
+[[0;32m  OK  [0m] Reached target [0;1;39mGraphical Interface[0m.
+[!p]104\[0m[?7h[1G[0J[6n[32766;32766H[6n[   10.215599] input: PC Speaker as /devices/platform/pcspkr/input/input3
+[   10.224686] piix4_smbus 0000:00:01.3: SMBus Host Controller at 0x700, revision 0
+[   10.244676] i2c i2c-0: Memory type 0x07 not supported yet, not instantiating SPD
+[   10.269494] input: VirtualPS/2 VMware VMMouse as /devices/platform/i8042/serio1/input/input5
+[   10.283655] input: VirtualPS/2 VMware VMMouse as /devices/platform/i8042/serio1/input/input4
+[   10.305363] parport_pc 00:03: reported by Plug and Play ACPI
+[   10.307272] parport0: PC-style at 0x378, irq 7 [PCSPP,TRISTATE]
+[!p]104\[0m[?7h[1G[0J[6n[32766;32766H[6n[   10.406871] mousedev: PS/2 mouse device common for all mice
+[   10.477260] RAPL PMU: API unit is 2^-32 Joules, 0 fixed counters, 10737418240 ms ovfl timer
+[   10.489821] ppdev: user-space parallel port driver
+]3008;start=6440100edc9542ce8e87d6618c76a68f;user=root;hostname=ksmbd-vm;machineid=0ab76daf18ce42b0b036a81eb53bdd79;bootid=23947586c3364482b51fe45826783744;pid=443;pidfdid=444;comm=(agetty);servicename=serial-getty@ttyS0.service;invocationid=7954b968f6314ad9a54176fd1d5f46e6;type=service\P+q6E616D65\
+Arch Linux 6.18.13-arch1-1 (ttyS0)
+
+Try contacting this VM's SSH server via 'ssh vsock%4294967295' from host.
+
+ksmbd-vm login: root (automatic login)
+
+]3008;start=4e99391f3ca841b7a9567f7d0179135c;user=root;hostname=ksmbd-vm;machineid=0ab76daf18ce42b0b036a81eb53bdd79;bootid=23947586c3364482b51fe45826783744;pid=443;pidfdid=444;comm=login;targetuser=root;sessionid=1;type=session\
+  ╔══════════════════════════════════════════════╗
+  ║         ksmbd Test VM                        ║
+  ╠══════════════════════════════════════════════╣
+  ║  /root/start-ksmbd.sh   - Start server      ║
+  ║  /root/reload-ksmbd.sh  - Reload module      ║
+  ║  /root/dev-info.sh      - Debug/analysis info║
+  ║  /mnt/ksmbd/            - Shared source      ║
+  ║  poweroff                - Shutdown VM        ║
+  ╚══════════════════════════════════════════════╝
+
+]3008;start=13368217-34da-497f-97f0-6bb731ff1998;machineid=0ab76daf18ce42b0b036a81eb53bdd79;user=root;hostname=ksmbd-vm;bootid=23947586-c336-4482-b51f-e45826783744;pid=00000000000000000471;type=shell;cwd=/root\[?2004h[root@ksmbd-vm ~]# [   33.943464] ksmbd: loading out-of-tree module taints kernel.
+[   33.944567] ksmbd: module verification failed: signature and/or required key missing - tainting kernel
+[   33.985480] ksmbd: Configuration subsystem initialized with 17 parameters
+[   33.996103] ksmbd: kernel provides md4, skipping built-in registration
+[   33.999639] ksmbd: ksmbd: Fruit SMB extensions loaded
+[   34.001655] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[   34.002921] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[   34.004503] ksmbd: ksmbd: witness protocol support initialised
+[   76.392335] ksmbd: ksmbd: witness protocol support removed
+[   76.843501] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[   77.355178] ksmbd: Configuration subsystem initialized with 17 parameters
+[   77.356753] ksmbd: kernel provides md4, skipping built-in registration
+[   77.368242] ksmbd: ksmbd: Fruit SMB extensions loaded
+[   77.372040] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[   77.374320] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[   77.377377] ksmbd: ksmbd: witness protocol support initialised
+[   82.971391] ksmbd: ksmbd: witness protocol support removed
+[   83.432190] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[   83.943852] ksmbd: Configuration subsystem initialized with 17 parameters
+[   83.945211] ksmbd: kernel provides md4, skipping built-in registration
+[   83.949133] ksmbd: ksmbd: Fruit SMB extensions loaded
+[   83.950162] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[   83.951775] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[   83.953208] ksmbd: ksmbd: witness protocol support initialised
+[  107.135466] ksmbd: ksmbd: witness protocol support removed
+[  107.593185] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[  108.014891] ksmbd: Configuration subsystem initialized with 17 parameters
+[  108.016189] ksmbd: kernel provides md4, skipping built-in registration
+[  108.018071] ksmbd: ksmbd: Fruit SMB extensions loaded
+[  108.019317] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[  108.020392] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[  108.021600] ksmbd: ksmbd: witness protocol support initialised
+[  113.208360] ksmbd: ksmbd: witness protocol support removed
+[  113.660179] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[  114.058897] ksmbd: Configuration subsystem initialized with 17 parameters
+[  114.060200] ksmbd: kernel provides md4, skipping built-in registration
+[  114.062125] ksmbd: ksmbd: Fruit SMB extensions loaded
+[  114.063167] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[  114.064334] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[  114.065531] ksmbd: ksmbd: witness protocol support initialised
+[  120.065923] ksmbd: ksmbd: witness protocol support removed
+[  120.529219] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[  120.933326] ksmbd: Configuration subsystem initialized with 17 parameters
+[  120.934615] ksmbd: kernel provides md4, skipping built-in registration
+[  120.936572] ksmbd: ksmbd: Fruit SMB extensions loaded
+[  120.937545] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[  120.938678] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[  120.939886] ksmbd: ksmbd: witness protocol support initialised
+[  240.100265] ksmbd: ksmbd: cmd 0x5 handler took 41010 ms (pid=27)
+[  240.101558] ksmbd: ksmbd: handle_ksmbd_work took 41011 ms
+[  285.156281] ksmbd: ksmbd: cmd 0x5 handler took 39858 ms (pid=11)
+[  285.157746] ksmbd: ksmbd: handle_ksmbd_work took 39859 ms
+[ 1191.868991] ksmbd: ksmbd: witness protocol support removed
+[ 1192.345189] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[ 1193.412748] ksmbd: Configuration subsystem initialized with 17 parameters
+[ 1193.414140] ksmbd: kernel provides md4, skipping built-in registration
+[ 1193.415999] ksmbd: ksmbd: Fruit SMB extensions loaded
+[ 1193.419122] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[ 1193.420495] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[ 1193.421972] ksmbd: ksmbd: witness protocol support initialised
+[ 1225.439209] ksmbd: connect success: accepted new connection
+[ 1225.440498] ksmbd: RFC1002 hdr=00 00 00 e2 len=226 status=0
+[ 1225.443483] ksmbd: PDU sig=fe 53 4d 42 pdu=226 req_running=0
+[ 1225.445079] ksmbd: got SMB2 command
+[ 1225.445922] ksmbd: no length check for command
+[ 1225.446832] ksmbd: SMB2 data length 0 offset 0
+[ 1225.447751] ksmbd: SMB2 len 100
+[ 1225.448462] ksmbd: Unknown command 0 in credit charge validation, defaulting to 1
+[ 1225.449797] ksmbd: credit_check: cmd=0 charge=1 calc=1 req_len=1 resp_len=0 total=1 out=0
+[ 1225.451231] ksmbd: credit_check: lock_enter cmd=0 charge=1 total=1 out=0
+[ 1225.452454] ksmbd: credit_check: lock_exit cmd=0 ret=0 total=1 out=1
+[ 1225.453594] ksmbd: client requested dialect 0x311
+[ 1225.454522] ksmbd: selected SMB 3.1.1 dialect
+[ 1225.455320] ksmbd: conn->dialect 0x311
+[ 1225.456076] ksmbd: Received negotiate request
+[ 1225.456891] ksmbd: decoding 4 negotiate contexts
+[ 1225.457820] ksmbd: deassemble SMB2_PREAUTH_INTEGRITY_CAPABILITIES context
+[ 1225.459018] ksmbd: deassemble SMB2_ENCRYPTION_CAPABILITIES context
+[ 1225.460094] ksmbd: Cipher ID = 0x4
+[ 1225.460949] ksmbd: deassemble SMB2_SIGNING_CAPABILITIES context
+[ 1225.462126] ksmbd: Signing Algorithm ID = 0x2
+[ 1225.463048] ksmbd: deassemble SMB2_NETNAME_NEGOTIATE_CONTEXT_ID context
+[ 1225.464629] ksmbd: NETNAME context name '127.0.0.1' != server name 'KSMBD-VM'
+[ 1225.466282] ksmbd: negotiate: preauth after NEG_REQ: [0..15]=1577bd41199a377fa05158ce9901c9d5
+[ 1225.467986] ksmbd: assemble SMB2_PREAUTH_INTEGRITY_CAPABILITIES context
+[ 1225.469292] ksmbd: assemble SMB2_ENCRYPTION_CAPABILITIES context
+[ 1225.470643] ksmbd: assemble SMB2_SIGNING_CAPABILITIES context
+[ 1225.472065] ksmbd: negotiate context offset 224, count 3
+[ 1225.473265] ksmbd: credit_rsp: dispatch cmd=0 total=1 out=1 granted_total=0
+[ 1225.474642] ksmbd: credit_rsp: lock_enter cmd=0 charge=1 req=31 total=1 out=1 granted_total=0
+[ 1225.476258] ksmbd: credit_rsp: lock_exit cmd=0 charge=1 req=31 granted=1 total=1 out=0 granted_total=1
+[ 1225.478017] ksmbd: credits: requested[31] granted[1] total_granted[1]
+[ 1225.479278] ksmbd: negotiate: preauth after NEG_RSP: [0..15]=03cdc1567e53d695520eb1374f700171 rsp_size=300
+[ 1225.484869] ksmbd: RFC1002 hdr=00 00 00 a2 len=162 status=5
+[ 1225.485907] ksmbd: PDU sig=fe 53 4d 42 pdu=162 req_running=0
+[ 1225.486970] ksmbd: got SMB2 command
+[ 1225.487846] ksmbd: SMB2 data length 74 offset 88
+[ 1225.488795] ksmbd: SMB2 len 162
+[ 1225.489527] ksmbd: Unknown command 1 in credit charge validation, defaulting to 1
+[ 1225.491023] ksmbd: credit_check: cmd=1 charge=1 calc=1 req_len=1 resp_len=0 total=1 out=0
+[ 1225.492701] ksmbd: credit_check: lock_enter cmd=1 charge=1 total=1 out=0
+[ 1225.493921] ksmbd: credit_check: lock_exit cmd=1 ret=0 total=1 out=1
+[ 1225.495193] ksmbd: Received smb2 session setup request
+[ 1225.496180] ksmbd: preauth_hash BEFORE request: [0..15]=03cdc1567e53d695520eb1374f700171 msg_size=162
+[ 1225.497842] ksmbd: preauth_hash AFTER  request: [0..15]=7581756a0457c584bba88b1a2fe43e39
+[ 1225.499241] ksmbd: negotiate phase
+[ 1225.499901] ksmbd: NTLMSSP SecurityBufferLength 148
+[ 1225.500775] ksmbd: credit_rsp: dispatch cmd=1 total=1 out=1 granted_total=0
+[ 1225.502027] ksmbd: credit_rsp: lock_enter cmd=1 charge=1 req=31 total=1 out=1 granted_total=0
+[ 1225.503639] ksmbd: credit_rsp: lock_exit cmd=1 charge=1 req=31 granted=31 total=31 out=0 granted_total=31
+[ 1225.505355] ksmbd: credits: requested[31] granted[31] total_granted[31]
+[ 1225.506522] ksmbd: preauth_hash BEFORE response: [0..15]=7581756a0457c584bba88b1a2fe43e39 rsp_size=251 status=0xc0000016
+[ 1225.508476] ksmbd: preauth_hash AFTER  response: [0..15]=4f370c26753f6f754666258dd51dee7d
+[ 1225.510279] ksmbd: RFC1002 hdr=00 00 01 fa len=506 status=5
+[ 1225.511296] ksmbd: PDU sig=fe 53 4d 42 pdu=506 req_running=0
+[ 1225.512343] ksmbd: got SMB2 command
+[ 1225.512996] ksmbd: SMB2 data length 418 offset 88
+[ 1225.513869] ksmbd: SMB2 len 506
+[ 1225.514480] ksmbd: Unknown command 1 in credit charge validation, defaulting to 1
+[ 1225.515819] ksmbd: credit_check: cmd=1 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 1225.517283] ksmbd: credit_check: lock_enter cmd=1 charge=1 total=31 out=0
+[ 1225.518526] ksmbd: credit_check: lock_exit cmd=1 ret=0 total=31 out=1
+[ 1225.519770] ksmbd: Received smb2 session setup request
+[ 1225.520716] ksmbd: preauth_hash BEFORE request: [0..15]=4f370c26753f6f754666258dd51dee7d msg_size=506
+[ 1225.522351] ksmbd: preauth_hash AFTER  request: [0..15]=5a1db5a66c9f3311b583936475e297e1
+[ 1225.523803] ksmbd: authenticate phase
+[ 1225.524497] ksmbd: session setup request for user testuser
+[ 1225.525657] ksmbd: login_user returned: name='testuser' flags=0x1 anon=0 guest=0
+[ 1225.526996] ksmbd: decode_ntlmssp_authenticate_blob dnameWORKGROUP
+[ 1225.528415] ksmbd: generated encryption keys for session 1, cipher type 4
+[ 1225.529897] ksmbd: generate_signingkey: sess_key[0..15]=2a402e5b94fd8ee90da9dc8ba367f4c0 label_len=14 ctx_len=64
+[ 1225.531850] ksmbd: generate_signingkey: preauth[0..15]=5a1db5a66c9f3311b583936475e297e1
+[ 1225.533717] ksmbd: generated signing key for session 1: key[0..15]=5b9d16f1b2871a1b51a839facbacffcc
+[ 1225.535564] ksmbd: credit_rsp: dispatch cmd=1 total=31 out=1 granted_total=0
+[ 1225.536896] ksmbd: credit_rsp: lock_enter cmd=1 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1225.538444] ksmbd: credit_rsp: lock_exit cmd=1 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1225.540070] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1225.541451] ksmbd: smb3_set_sign_rsp: cmd=1 signing_key[0..15]=5b9d16f1b2871a1b51a839facbacffcc algo=2
+[ 1225.543105] ksmbd: preauth_hash BEFORE response: [0..15]=5a1db5a66c9f3311b583936475e297e1 rsp_size=81 status=0x0
+[ 1225.544933] ksmbd: preauth_hash AFTER  response: [0..15]=5f50c3501fe38c934ff000c9b9f60c7e
+[ 1225.546687] ksmbd: RFC1002 hdr=00 00 00 68 len=104 status=1
+[ 1225.547707] ksmbd: PDU sig=fe 53 4d 42 pdu=104 req_running=0
+[ 1225.548800] ksmbd: skip to check tree connect request
+[ 1225.549769] ksmbd: got SMB2 command
+[ 1225.550595] ksmbd: SMB2 data length 32 offset 72
+[ 1225.551608] ksmbd: SMB2 len 104
+[ 1225.552275] ksmbd: Unknown command 3 in credit charge validation, defaulting to 1
+[ 1225.553687] ksmbd: credit_check: cmd=3 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 1225.555160] ksmbd: credit_check: lock_enter cmd=3 charge=1 total=31 out=0
+[ 1225.556428] ksmbd: credit_check: lock_exit cmd=3 ret=0 total=31 out=1
+[ 1225.557598] ksmbd: Received smb2 tree connect request
+[ 1225.558637] ksmbd: tree connect request for tree test treename \\127.0.0.1\test
+[ 1225.560018] ksmbd: tree_conn_connect returned: ret=0 tcon=00000000bf3390ad
+[ 1225.561264] ksmbd: MaximalAccess: perm_r=0 perm_w=0 perm_x=0 access=0x001f01ff
+[ 1225.562600] ksmbd: tree connect final status.ret=0
+[ 1225.563525] ksmbd: credit_rsp: dispatch cmd=3 total=31 out=1 granted_total=0
+[ 1225.564786] ksmbd: credit_rsp: lock_enter cmd=3 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1225.566399] ksmbd: credit_rsp: lock_exit cmd=3 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1225.568084] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1225.569233] ksmbd: smb3_set_sign_rsp: cmd=3 signing_key[0..15]=5b9d16f1b2871a1b51a839facbacffcc algo=2
+[ 1225.571607] ksmbd: RFC1002 hdr=00 00 00 a4 len=164 status=1
+[ 1225.572634] ksmbd: PDU sig=fe 53 4d 42 pdu=164 req_running=0
+[ 1225.573732] ksmbd: got SMB2 command
+[ 1225.574374] ksmbd: SMB2 data length 44 offset 120
+[ 1225.575655] ksmbd: SMB2 len 164
+[ 1225.576346] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 1225.577864] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 1225.579347] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 1225.580589] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 1225.581908] ksmbd: Received smb2 create request
+[ 1225.582743] ksmbd: converted name = teststreams/stream.txt
+[ 1225.583821] ksmbd: can not get linux path for teststreams/stream.txt, rc = -2
+[ 1225.585285] ksmbd: Error response: c0000034
+[ 1225.586070] ksmbd: Failed to process 5 [-9]
+[ 1225.586866] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 1225.588153] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1225.589781] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1225.591479] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1225.593025] ksmbd: RFC1002 hdr=00 00 00 8e len=142 status=1
+[ 1225.594210] ksmbd: PDU sig=fe 53 4d 42 pdu=142 req_running=0
+[ 1225.595441] ksmbd: got SMB2 command
+[ 1225.596074] ksmbd: SMB2 data length 22 offset 120
+[ 1225.597246] ksmbd: SMB2 len 142
+[ 1225.597942] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 1225.599337] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 1225.601106] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 1225.602472] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 1225.603652] ksmbd: Received smb2 create request
+[ 1225.604506] ksmbd: converted name = teststreams
+[ 1225.605371] ksmbd: can not get linux path for teststreams, rc = -2
+[ 1225.606883] ksmbd: Error response: c0000034
+[ 1225.608039] ksmbd: Failed to process 5 [-9]
+[ 1225.609072] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 1225.610480] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1225.612027] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1225.613724] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1225.615099] ksmbd: RFC1002 hdr=00 00 00 8e len=142 status=1
+[ 1225.616128] ksmbd: PDU sig=fe 53 4d 42 pdu=142 req_running=0
+[ 1225.617178] ksmbd: got SMB2 command
+[ 1225.617843] ksmbd: SMB2 data length 22 offset 120
+[ 1225.618725] ksmbd: SMB2 len 142
+[ 1225.619336] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 1225.620775] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 1225.622282] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 1225.623625] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 1225.624947] ksmbd: Received smb2 create request
+[ 1225.625899] ksmbd: converted name = teststreams
+[ 1225.626916] ksmbd: can not get linux path for teststreams, rc = -2
+[ 1225.628204] ksmbd: Discard write access to a directory
+[ 1225.629196] ksmbd: file does not exist, so creating
+[ 1225.630111] ksmbd: creating directory
+[ 1225.630859] ksmbd: inherit posix acl failed : -2
+[ 1225.631726] ksmbd: Set posix acls
+[ 1225.632514] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 1225.633805] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1225.635342] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1225.637025] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1225.638414] ksmbd: RFC1002 hdr=00 00 00 ba len=186 status=1
+[ 1225.639447] ksmbd: PDU sig=fe 53 4d 42 pdu=186 req_running=0
+[ 1225.640688] ksmbd: got SMB2 command
+[ 1225.641463] ksmbd: SMB2 data length 66 offset 120
+[ 1225.642451] ksmbd: SMB2 len 186
+[ 1225.643026] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 1225.644414] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 1225.645892] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 1225.647111] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 1225.648274] ksmbd: Received smb2 create request
+[ 1225.649130] ksmbd: converted name = teststreams/stream.txt:Stream One
+[ 1225.650293] ksmbd: Error response: c0000034
+[ 1225.651069] ksmbd: Failed to process 5 [-9]
+[ 1225.651846] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 1225.653119] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1225.654680] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1225.656478] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1225.657872] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 1225.658981] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+[ 1225.660477] ksmbd: got SMB2 command
+[ 1225.661372] ksmbd: SMB2 len 88
+[ 1225.661979] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 1225.663346] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 1225.664836] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 1225.666050] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 1225.667193] ksmbd: Received smb2 close request
+[ 1225.668044] ksmbd: volatile_id = 0
+[ 1225.668851] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 1225.670399] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1225.672079] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1225.673760] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1225.675231] ksmbd: RFC1002 hdr=00 00 00 8e len=142 status=1
+[ 1225.676242] ksmbd: PDU sig=fe 53 4d 42 pdu=142 req_running=0
+[ 1225.677391] ksmbd: got SMB2 command
+[ 1225.678038] ksmbd: SMB2 data length 22 offset 120
+[ 1225.678950] ksmbd: SMB2 len 142
+[ 1225.679744] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 1225.681174] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 1225.682707] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 1225.683927] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 1225.685156] ksmbd: Received smb2 create request
+[ 1225.686008] ksmbd: converted name = teststreams
+[ 1225.686859] ksmbd: open() argument is a directory: teststreams, 1040
+[ 1225.688006] ksmbd: Error response: c00000ba
+[ 1225.688839] ksmbd: Failed to process 5 [-5]
+[ 1225.689816] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 1225.691289] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1225.692866] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1225.694530] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1225.696252] ksmbd: RFC1002 hdr=00 00 00 8e len=142 status=1
+[ 1225.697287] ksmbd: PDU sig=fe 53 4d 42 pdu=142 req_running=0
+[ 1225.698448] ksmbd: got SMB2 command
+[ 1225.699080] ksmbd: SMB2 data length 22 offset 120
+[ 1225.699946] ksmbd: SMB2 len 142
+[ 1225.700545] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 1225.701889] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 1225.703682] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 1225.704886] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 1225.706057] ksmbd: Received smb2 create request
+[ 1225.706882] ksmbd: converted name = teststreams
+[ 1225.707863] ksmbd: check permission using windows acl
+[ 1225.708998] ksmbd: Discard write access to a directory
+[ 1225.710172] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 1225.711758] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1225.713286] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1225.714981] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1225.716361] ksmbd: RFC1002 hdr=00 00 00 69 len=105 status=1
+[ 1225.717379] ksmbd: PDU sig=fe 53 4d 42 pdu=105 req_running=0
+[ 1225.718428] ksmbd: got SMB2 command
+[ 1225.719076] ksmbd: SMB2 data length 0 offset 104
+[ 1225.719926] ksmbd: SMB2 len 105
+[ 1225.720537] ksmbd: credit_check: cmd=16 charge=1 calc=1 req_len=65536 resp_len=0 total=31 out=0
+[ 1225.722102] ksmbd: credit_check: lock_enter cmd=16 charge=1 total=31 out=0
+[ 1225.723349] ksmbd: credit_check: lock_exit cmd=16 ret=0 total=31 out=1
+[ 1225.724533] ksmbd: Received request smb2 query info request
+[ 1225.725557] ksmbd: GOT SMB2_O_INFO_FILE
+[ 1225.726266] ksmbd: system.posix_acl_access, len 23
+[ 1225.727126] ksmbd: user.DOSATTRIB, len 14
+[ 1225.728026] ksmbd: system.posix_acl_default, len 24
+[ 1225.728937] ksmbd: credit_rsp: dispatch cmd=16 total=31 out=1 granted_total=0
+[ 1225.730366] ksmbd: credit_rsp: lock_enter cmd=16 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1225.732042] ksmbd: credit_rsp: lock_exit cmd=16 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1225.733730] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1225.735119] ksmbd: RFC1002 hdr=00 00 00 62 len=98 status=1
+[ 1225.736129] ksmbd: PDU sig=fe 53 4d 42 pdu=98 req_running=0
+[ 1225.737653] ksmbd: got SMB2 command
+[ 1225.738349] ksmbd: SMB2 data length 2 offset 96
+[ 1225.739200] ksmbd: SMB2 len 98
+[ 1225.739786] ksmbd: credit_check: cmd=14 charge=1 calc=1 req_len=65536 resp_len=0 total=31 out=0
+[ 1225.741342] ksmbd: credit_check: lock_enter cmd=14 charge=1 total=31 out=0
+[ 1225.742778] ksmbd: credit_check: lock_exit cmd=14 ret=0 total=31 out=1
+[ 1225.744239] ksmbd: Received smb2 query directory request
+[ 1225.745358] ksmbd: Search pattern is *
+[ 1225.746060] ksmbd: info_level : 12, buf_len :65520, next_offset : 16, data_count : 16
+[ 1225.747498] ksmbd: failed to load dos attribute in xattr
+[ 1225.748468] ksmbd: fail to load dos attribute.
+[ 1225.749269] ksmbd: info_level : 12, buf_len :65504, next_offset : 16, data_count : 32
+[ 1225.750712] ksmbd: credit_rsp: dispatch cmd=14 total=31 out=1 granted_total=0
+[ 1225.752010] ksmbd: credit_rsp: lock_enter cmd=14 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1225.753579] ksmbd: credit_rsp: lock_exit cmd=14 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1225.755246] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1225.756872] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 1225.757975] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+[ 1225.759118] ksmbd: got SMB2 command
+[ 1225.759882] ksmbd: SMB2 len 88
+[ 1225.760511] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 1225.761866] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 1225.763422] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 1225.764703] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 1225.765948] ksmbd: Received smb2 close request
+[ 1225.766783] ksmbd: volatile_id = 1
+[ 1225.767526] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 1225.768806] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1225.770344] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1225.772023] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1225.773445] ksmbd: RFC1002 hdr=00 00 00 8e len=142 status=1
+[ 1225.774490] ksmbd: PDU sig=fe 53 4d 42 pdu=142 req_running=0
+[ 1225.775519] ksmbd: got SMB2 command
+[ 1225.776156] ksmbd: SMB2 data length 22 offset 120
+[ 1225.777271] ksmbd: SMB2 len 142
+[ 1225.777877] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 1225.779223] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 1225.780738] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 1225.781973] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 1225.783153] ksmbd: Received smb2 create request
+[ 1225.783997] ksmbd: converted name = teststreams
+[ 1225.784849] ksmbd: check permission using windows acl
+[ 1225.785797] ksmbd: Discard write access to a directory
+[ 1225.786871] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 1225.788264] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1225.789921] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1225.791701] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1225.793216] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 1225.794600] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+[ 1225.795880] ksmbd: got SMB2 command
+[ 1225.796745] ksmbd: SMB2 len 88
+[ 1225.797418] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 1225.798776] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 1225.800245] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 1225.801607] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 1225.803195] ksmbd: Received smb2 close request
+[ 1225.804187] ksmbd: volatile_id = 2
+[ 1225.804895] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 1225.806193] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1225.807786] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1225.809456] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1225.811417] ksmbd: Wait for all pending requests(0)
+[ 1408.538684] ksmbd: netdev-down event: netdev(lo) is going down
+[ 1408.540054] ksmbd: releasing socket
+[ 1408.540892] ksmbd: netdev-down event: netdev(ens4) is going down
+[ 1408.542166] ksmbd: releasing socket
+[ 1410.559184] ksmbd: ksmbd: witness protocol support removed
+[ 1410.751196] ksmbd: VSS backend 'generic' unregistered
+[ 1410.752125] ksmbd: VSS backend 'zfs' unregistered
+[ 1410.752971] ksmbd: VSS backend 'btrfs' unregistered
+[ 1411.012186] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[ 1412.456735] ksmbd: Configuration subsystem initialized with 17 parameters
+[ 1412.458328] ksmbd: kernel provides md4, skipping built-in registration
+[ 1412.460583] ksmbd: ksmbd: Fruit SMB extensions loaded
+[ 1412.462296] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[ 1412.463515] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[ 1412.464910] ksmbd: ksmbd: witness protocol support initialised
+[ 1415.769621] ksmbd: STREAMS flag NOT set! share=test flags=0x1482d7 STREAMS=0x800
+[ 1492.497448] ksmbd: ksmbd: witness protocol support removed
+[ 1492.982176] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[ 1494.730328] ksmbd: Configuration subsystem initialized with 17 parameters
+[ 1494.731626] ksmbd: kernel provides md4, skipping built-in registration
+[ 1494.733654] ksmbd: ksmbd: Fruit SMB extensions loaded
+[ 1494.735390] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[ 1494.736428] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[ 1494.737589] ksmbd: ksmbd: witness protocol support initialised
+[ 1538.895843] ksmbd: ksmbd: witness protocol support removed
+[ 1539.359183] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[ 1540.427800] ksmbd: Configuration subsystem initialized with 17 parameters
+[ 1540.429386] ksmbd: kernel provides md4, skipping built-in registration
+[ 1540.431525] ksmbd: ksmbd: Fruit SMB extensions loaded
+[ 1540.435162] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[ 1540.437096] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[ 1540.440042] ksmbd: ksmbd: witness protocol support initialised
+[ 1549.558159] ksmbd: ksmbd: witness protocol support removed
+[ 1550.018197] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[ 1551.078435] ksmbd: Configuration subsystem initialized with 17 parameters
+[ 1551.079871] ksmbd: kernel provides md4, skipping built-in registration
+[ 1551.081858] ksmbd: ksmbd: Fruit SMB extensions loaded
+[ 1551.083683] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[ 1551.084887] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[ 1551.086287] ksmbd: ksmbd: witness protocol support initialised
+[ 1567.820312] ksmbd: ksmbd: witness protocol support removed
+[ 1568.269187] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[ 1569.329886] ksmbd: Configuration subsystem initialized with 17 parameters
+[ 1569.331471] ksmbd: kernel provides md4, skipping built-in registration
+[ 1569.334351] ksmbd: ksmbd: Fruit SMB extensions loaded
+[ 1569.335636] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[ 1569.336972] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[ 1569.338726] ksmbd: ksmbd: witness protocol support initialised
+[ 1592.188664] ksmbd: ksmbd: witness protocol support removed
+[ 1592.653194] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[ 1593.711808] ksmbd: Configuration subsystem initialized with 17 parameters
+[ 1593.713157] ksmbd: kernel provides md4, skipping built-in registration
+[ 1593.715067] ksmbd: ksmbd: Fruit SMB extensions loaded
+[ 1593.716139] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[ 1593.717292] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[ 1593.718665] ksmbd: ksmbd: witness protocol support initialised
+[ 1612.389249] ksmbd: ksmbd: witness protocol support removed
+[ 1612.846206] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[ 1614.689535] ksmbd: Configuration subsystem initialized with 17 parameters
+[ 1614.690831] ksmbd: kernel provides md4, skipping built-in registration
+[ 1614.695006] ksmbd: ksmbd: Fruit SMB extensions loaded
+[ 1614.696112] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[ 1614.697399] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[ 1614.698680] ksmbd: ksmbd: witness protocol support initialised
+[ 1626.078914] ksmbd: Stream name validation failed: /
+[ 1626.089232] ksmbd: Stream name validation failed: /
+[ 1626.123197] ksmbd: not allow base filename in rename
+[ 1626.144121] ksmbd: no right to read the attributes : 0x1
+[ 1626.190927] ksmbd: no right to delete : 0x1ff
+[ 1775.728230] ksmbd: ksmbd: witness protocol support removed
+[ 1776.210198] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[ 1777.691292] ksmbd: Configuration subsystem initialized with 17 parameters
+[ 1777.692595] ksmbd: kernel provides md4, skipping built-in registration
+[ 1777.695420] ksmbd: ksmbd: Fruit SMB extensions loaded
+[ 1777.696422] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[ 1777.697462] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[ 1777.698622] ksmbd: ksmbd: witness protocol support initialised
+[ 1828.864239] ksmbd: connect success: accepted new connection
+[ 1828.865542] ksmbd: RFC1002 hdr=00 00 00 e2 len=226 status=0
+[ 1828.866905] ksmbd: PDU sig=fe 53 4d 42 pdu=226 req_running=0
+[ 1828.868029] ksmbd: got SMB2 command
+[ 1828.868718] ksmbd: no length check for command
+[ 1828.869616] ksmbd: SMB2 data length 0 offset 0
+[ 1828.870549] ksmbd: SMB2 len 100
+[ 1828.871184] ksmbd: Unknown command 0 in credit charge validation, defaulting to 1
+[ 1828.872577] ksmbd: credit_check: cmd=0 charge=1 calc=1 req_len=1 resp_len=0 total=1 out=0
+[ 1828.874087] ksmbd: credit_check: lock_enter cmd=0 charge=1 total=1 out=0
+[ 1828.875334] ksmbd: credit_check: lock_exit cmd=0 ret=0 total=1 out=1
+[ 1828.876682] ksmbd: client requested dialect 0x311
+[ 1828.877655] ksmbd: selected SMB 3.1.1 dialect
+[ 1828.878517] ksmbd: conn->dialect 0x311
+[ 1828.879254] ksmbd: Received negotiate request
+[ 1828.880094] ksmbd: decoding 4 negotiate contexts
+[ 1828.881041] ksmbd: deassemble SMB2_PREAUTH_INTEGRITY_CAPABILITIES context
+[ 1828.882474] ksmbd: deassemble SMB2_ENCRYPTION_CAPABILITIES context
+[ 1828.883746] ksmbd: Cipher ID = 0x4
+[ 1828.884467] ksmbd: deassemble SMB2_SIGNING_CAPABILITIES context
+[ 1828.885664] ksmbd: Signing Algorithm ID = 0x2
+[ 1828.886575] ksmbd: deassemble SMB2_NETNAME_NEGOTIATE_CONTEXT_ID context
+[ 1828.887940] ksmbd: NETNAME context name '127.0.0.1' != server name 'KSMBD-VM'
+[ 1828.889380] ksmbd: negotiate: preauth after NEG_REQ: [0..15]=67da4db8a7c0fe040a4dbbc4238e56c7
+[ 1828.891097] ksmbd: assemble SMB2_PREAUTH_INTEGRITY_CAPABILITIES context
+[ 1828.892494] ksmbd: assemble SMB2_ENCRYPTION_CAPABILITIES context
+[ 1828.893790] ksmbd: assemble SMB2_SIGNING_CAPABILITIES context
+[ 1828.895008] ksmbd: negotiate context offset 224, count 3
+[ 1828.896162] ksmbd: credit_rsp: dispatch cmd=0 total=1 out=1 granted_total=0
+[ 1828.897603] ksmbd: credit_rsp: lock_enter cmd=0 charge=1 req=31 total=1 out=1 granted_total=0
+[ 1828.899413] ksmbd: credit_rsp: lock_exit cmd=0 charge=1 req=31 granted=1 total=1 out=0 granted_total=1
+[ 1828.901435] ksmbd: credits: requested[31] granted[1] total_granted[1]
+[ 1828.902848] ksmbd: negotiate: preauth after NEG_RSP: [0..15]=0b15609c18206ac656a88dddfc0fba96 rsp_size=300
+[ 1828.906179] ksmbd: RFC1002 hdr=00 00 00 a2 len=162 status=5
+[ 1828.907213] ksmbd: PDU sig=fe 53 4d 42 pdu=162 req_running=0
+[ 1828.908340] ksmbd: got SMB2 command
+[ 1828.909067] ksmbd: SMB2 data length 74 offset 88
+[ 1828.909920] ksmbd: SMB2 len 162
+[ 1828.910521] ksmbd: Unknown command 1 in credit charge validation, defaulting to 1
+[ 1828.911881] ksmbd: credit_check: cmd=1 charge=1 calc=1 req_len=1 resp_len=0 total=1 out=0
+[ 1828.913341] ksmbd: credit_check: lock_enter cmd=1 charge=1 total=1 out=0
+[ 1828.914692] ksmbd: credit_check: lock_exit cmd=1 ret=0 total=1 out=1
+[ 1828.915942] ksmbd: Received smb2 session setup request
+[ 1828.917072] ksmbd: preauth_hash BEFORE request: [0..15]=0b15609c18206ac656a88dddfc0fba96 msg_size=162
+[ 1828.918973] ksmbd: preauth_hash AFTER  request: [0..15]=259de8e29e5fa08b30a28f190d1302db
+[ 1828.920556] ksmbd: negotiate phase
+[ 1828.921189] ksmbd: NTLMSSP SecurityBufferLength 148
+[ 1828.922118] ksmbd: credit_rsp: dispatch cmd=1 total=1 out=1 granted_total=0
+[ 1828.923855] ksmbd: credit_rsp: lock_enter cmd=1 charge=1 req=31 total=1 out=1 granted_total=0
+[ 1828.925478] ksmbd: credit_rsp: lock_exit cmd=1 charge=1 req=31 granted=31 total=31 out=0 granted_total=31
+[ 1828.927318] ksmbd: credits: requested[31] granted[31] total_granted[31]
+[ 1828.928535] ksmbd: preauth_hash BEFORE response: [0..15]=259de8e29e5fa08b30a28f190d1302db rsp_size=251 status=0xc0000016
+[ 1828.930558] ksmbd: preauth_hash AFTER  response: [0..15]=167ac1db9c43af586d46fd863ed11927
+[ 1828.933871] ksmbd: RFC1002 hdr=00 00 01 fa len=506 status=5
+[ 1828.935104] ksmbd: PDU sig=fe 53 4d 42 pdu=506 req_running=0
+[ 1828.936675] ksmbd: got SMB2 command
+[ 1828.937594] ksmbd: SMB2 data length 418 offset 88
+[ 1828.938534] ksmbd: SMB2 len 506
+[ 1828.939141] ksmbd: Unknown command 1 in credit charge validation, defaulting to 1
+[ 1828.940482] ksmbd: credit_check: cmd=1 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 1828.941960] ksmbd: credit_check: lock_enter cmd=1 charge=1 total=31 out=0
+[ 1828.943203] ksmbd: credit_check: lock_exit cmd=1 ret=0 total=31 out=1
+[ 1828.944447] ksmbd: Received smb2 session setup request
+[ 1828.945403] ksmbd: preauth_hash BEFORE request: [0..15]=167ac1db9c43af586d46fd863ed11927 msg_size=506
+[ 1828.947098] ksmbd: preauth_hash AFTER  request: [0..15]=cf22a8b6949bc526291290680617a1ea
+[ 1828.948913] ksmbd: authenticate phase
+[ 1828.949856] ksmbd: session setup request for user testuser
+[ 1828.951294] ksmbd: login_user returned: name='testuser' flags=0x1 anon=0 guest=0
+[ 1828.952885] ksmbd: decode_ntlmssp_authenticate_blob dnameWORKGROUP
+[ 1828.954288] ksmbd: generated encryption keys for session 1, cipher type 4
+[ 1828.956006] ksmbd: generate_signingkey: sess_key[0..15]=188d9a2c918b50f770a09e3f6adf7c35 label_len=14 ctx_len=64
+[ 1828.958335] ksmbd: generate_signingkey: preauth[0..15]=cf22a8b6949bc526291290680617a1ea
+[ 1828.960093] ksmbd: generated signing key for session 1: key[0..15]=bbf7d6a8677c8f8883ba9eafc00dea43
+[ 1828.961961] ksmbd: credit_rsp: dispatch cmd=1 total=31 out=1 granted_total=0
+[ 1828.963482] ksmbd: credit_rsp: lock_enter cmd=1 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1828.965516] ksmbd: credit_rsp: lock_exit cmd=1 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1828.967735] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1828.969166] ksmbd: smb3_set_sign_rsp: cmd=1 signing_key[0..15]=bbf7d6a8677c8f8883ba9eafc00dea43 algo=2
+[ 1828.971207] ksmbd: preauth_hash BEFORE response: [0..15]=cf22a8b6949bc526291290680617a1ea rsp_size=81 status=0x0
+[ 1828.973376] ksmbd: preauth_hash AFTER  response: [0..15]=15088f03cfd2bb3b5c57bc8daed14076
+[ 1828.975545] ksmbd: RFC1002 hdr=00 00 00 68 len=104 status=1
+[ 1828.976703] ksmbd: PDU sig=fe 53 4d 42 pdu=104 req_running=0
+[ 1828.977809] ksmbd: skip to check tree connect request
+[ 1828.978803] ksmbd: got SMB2 command
+[ 1828.979505] ksmbd: SMB2 data length 32 offset 72
+[ 1828.980379] ksmbd: SMB2 len 104
+[ 1828.980983] ksmbd: Unknown command 3 in credit charge validation, defaulting to 1
+[ 1828.982297] ksmbd: credit_check: cmd=3 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 1828.983896] ksmbd: credit_check: lock_enter cmd=3 charge=1 total=31 out=0
+[ 1828.985193] ksmbd: credit_check: lock_exit cmd=3 ret=0 total=31 out=1
+[ 1828.986435] ksmbd: Received smb2 tree connect request
+[ 1828.987420] ksmbd: tree connect request for tree test treename \\127.0.0.1\test
+[ 1828.988872] ksmbd: tree_conn_connect returned: ret=0 tcon=000000000f1eaec3
+[ 1828.990197] ksmbd: MaximalAccess: perm_r=0 perm_w=0 perm_x=0 access=0x001f01ff
+[ 1828.991621] ksmbd: tree connect final status.ret=0
+[ 1828.992508] ksmbd: credit_rsp: dispatch cmd=3 total=31 out=1 granted_total=0
+[ 1828.994030] ksmbd: credit_rsp: lock_enter cmd=3 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1828.995589] ksmbd: credit_rsp: lock_exit cmd=3 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1828.997344] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1828.998608] ksmbd: smb3_set_sign_rsp: cmd=3 signing_key[0..15]=bbf7d6a8677c8f8883ba9eafc00dea43 algo=2
+[ 1829.000774] ksmbd: RFC1002 hdr=00 00 00 a4 len=164 status=1
+[ 1829.001799] ksmbd: PDU sig=fe 53 4d 42 pdu=164 req_running=0
+[ 1829.002976] ksmbd: got SMB2 command
+[ 1829.003766] ksmbd: SMB2 data length 44 offset 120
+[ 1829.004827] ksmbd: SMB2 len 164
+[ 1829.005520] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 1829.007095] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 1829.008810] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 1829.010235] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 1829.011419] ksmbd: Received smb2 create request
+[ 1829.012293] ksmbd: converted name = teststreams/stream.txt
+[ 1829.013374] ksmbd: can not get linux path for teststreams/stream.txt, rc = -2
+[ 1829.014704] ksmbd: Error response: c0000034
+[ 1829.015542] ksmbd: Failed to process 5 [-9]
+[ 1829.016342] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 1829.017629] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1829.019335] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1829.021077] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1829.022469] ksmbd: RFC1002 hdr=00 00 00 8e len=142 status=1
+[ 1829.023505] ksmbd: PDU sig=fe 53 4d 42 pdu=142 req_running=0
+[ 1829.024610] ksmbd: got SMB2 command
+[ 1829.025344] ksmbd: SMB2 data length 22 offset 120
+[ 1829.026296] ksmbd: SMB2 len 142
+[ 1829.026986] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 1829.028361] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 1829.030542] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 1829.031890] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 1829.033104] ksmbd: Received smb2 create request
+[ 1829.034004] ksmbd: converted name = teststreams
+[ 1829.034932] ksmbd: can not get linux path for teststreams, rc = -2
+[ 1829.036119] ksmbd: Error response: c0000034
+[ 1829.036972] ksmbd: Failed to process 5 [-9]
+[ 1829.037743] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 1829.039148] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1829.040904] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1829.042661] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1829.044118] ksmbd: RFC1002 hdr=00 00 00 8e len=142 status=1
+[ 1829.045156] ksmbd: PDU sig=fe 53 4d 42 pdu=142 req_running=0
+[ 1829.046217] ksmbd: got SMB2 command
+[ 1829.046870] ksmbd: SMB2 data length 22 offset 120
+[ 1829.047736] ksmbd: SMB2 len 142
+[ 1829.048405] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 1829.049746] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 1829.051253] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 1829.052497] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 1829.053735] ksmbd: Received smb2 create request
+[ 1829.054702] ksmbd: converted name = teststreams
+[ 1829.055686] ksmbd: can not get linux path for teststreams, rc = -2
+[ 1829.056862] ksmbd: Discard write access to a directory
+[ 1829.057842] ksmbd: file does not exist, so creating
+[ 1829.058728] ksmbd: creating directory
+[ 1829.059484] ksmbd: inherit posix acl failed : -2
+[ 1829.060405] ksmbd: Set posix acls
+[ 1829.061133] ksmbd: mode: 7, access flags now 0x1f01bf
+[ 1829.062174] ksmbd: mode: 7, access flags now 0x1f01bf
+[ 1829.063162] ksmbd: mode: 7, access flags now 0x1f01bf
+[ 1829.064171] ksmbd: mode: 7, access flags now 0x1f01bf
+[ 1829.065123] ksmbd: mode: 7, access flags now 0x1f01bf
+[ 1829.066085] ksmbd: mode: 7, access flags now 0x1f01bf
+[ 1829.067194] ksmbd: mode: 7, access flags now 0x1f01bf
+[ 1829.068267] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 1829.069563] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1829.071461] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1829.073453] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1829.074852] ksmbd: RFC1002 hdr=00 00 00 ba len=186 status=1
+[ 1829.075856] ksmbd: PDU sig=fe 53 4d 42 pdu=186 req_running=0
+[ 1829.076931] ksmbd: got SMB2 command
+[ 1829.077560] ksmbd: SMB2 data length 66 offset 120
+[ 1829.078455] ksmbd: SMB2 len 186
+[ 1829.079066] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 1829.080443] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 1829.082115] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 1829.083367] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 1829.084553] ksmbd: Received smb2 create request
+[ 1829.085430] ksmbd: converted name = teststreams/stream.txt:Stream One
+[ 1829.087971] ksmbd: filename : teststreams/stream.txt, streams : Stream One
+[ 1829.090790] ksmbd: can not get linux path for teststreams/stream.txt, rc = -2
+[ 1829.092229] ksmbd: Error response: c0000103
+[ 1829.093099] ksmbd: Failed to process 5 [-5]
+[ 1829.093926] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 1829.095330] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1829.097027] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1829.098694] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1829.100139] ksmbd: RFC1002 hdr=00 00 00 9c len=156 status=1
+[ 1829.101211] ksmbd: PDU sig=fe 53 4d 42 pdu=156 req_running=0
+[ 1829.102277] ksmbd: got SMB2 command
+[ 1829.103013] ksmbd: SMB2 data length 36 offset 120
+[ 1829.103937] ksmbd: SMB2 len 156
+[ 1829.104513] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 1829.105874] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 1829.107344] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 1829.108694] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 1829.109875] ksmbd: Received smb2 create request
+[ 1829.110840] ksmbd: converted name = teststreams::$DATA
+[ 1829.111772] ksmbd: filename : teststreams, streams : :$DATA
+[ 1829.112804] ksmbd: stream name : , stream type : $DATA
+[ 1829.113852] ksmbd: check permission using windows acl
+[ 1829.114790] ksmbd: Discard write access to a directory
+[ 1829.115782] ksmbd: Desired access mode does not permit FILE_READ
+[ 1829.116921] ksmbd: Current mode: 0x7 Desired mode: 0x2
+[ 1829.117902] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 1829.119187] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1829.120773] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1829.122543] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1829.123961] ksmbd: RFC1002 hdr=00 00 00 a4 len=164 status=1
+[ 1829.124990] ksmbd: PDU sig=fe 53 4d 42 pdu=164 req_running=0
+[ 1829.126034] ksmbd: got SMB2 command
+[ 1829.126689] ksmbd: SMB2 data length 44 offset 120
+[ 1829.127570] ksmbd: SMB2 len 164
+[ 1829.128169] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 1829.129525] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 1829.131022] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 1829.132244] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 1829.133465] ksmbd: Received smb2 create request
+[ 1829.134537] ksmbd: converted name = teststreams/stream.txt
+[ 1829.135879] ksmbd: can not get linux path for teststreams/stream.txt, rc = -2
+[ 1829.137269] ksmbd: Error response: c0000034
+[ 1829.138059] ksmbd: Failed to process 5 [-9]
+[ 1829.138875] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 1829.140167] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1829.141723] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1829.143424] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1829.144802] ksmbd: RFC1002 hdr=00 00 00 8e len=142 status=1
+[ 1829.145838] ksmbd: PDU sig=fe 53 4d 42 pdu=142 req_running=0
+[ 1829.146872] ksmbd: got SMB2 command
+[ 1829.147538] ksmbd: SMB2 data length 22 offset 120
+[ 1829.148412] ksmbd: SMB2 len 142
+[ 1829.149019] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 1829.150359] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 1829.151888] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 1829.153112] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 1829.154343] ksmbd: Received smb2 create request
+[ 1829.155246] ksmbd: converted name = teststreams
+[ 1829.156172] ksmbd: open() argument is a directory: teststreams, 1040
+[ 1829.157392] ksmbd: Error response: c00000ba
+[ 1829.158310] ksmbd: Failed to process 5 [-5]
+[ 1829.159079] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 1829.160590] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1829.162289] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1829.164033] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1829.165447] ksmbd: RFC1002 hdr=00 00 00 8e len=142 status=1
+[ 1829.166485] ksmbd: PDU sig=fe 53 4d 42 pdu=142 req_running=1
+[ 1829.167578] ksmbd: got SMB2 command
+[ 1829.168253] ksmbd: SMB2 data length 22 offset 120
+[ 1829.169171] ksmbd: SMB2 len 142
+[ 1829.169772] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 1829.171162] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 1829.172689] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 1829.173967] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 1829.175155] ksmbd: Received smb2 create request
+[ 1829.176018] ksmbd: converted name = teststreams
+[ 1829.176962] ksmbd: check permission using windows acl
+[ 1829.177951] ksmbd: Discard write access to a directory
+[ 1829.178928] ksmbd: Current access mode does not permit SHARE_READ
+[ 1829.180302] ksmbd: Current mode: 0x0 Desired mode: 0x1
+[ 1829.181510] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 1829.182932] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1829.184473] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1829.186184] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1829.187785] ksmbd: RFC1002 hdr=00 00 00 69 len=105 status=1
+[ 1829.188846] ksmbd: PDU sig=fe 53 4d 42 pdu=105 req_running=1
+[ 1829.189900] ksmbd: got SMB2 command
+[ 1829.190542] ksmbd: SMB2 data length 0 offset 104
+[ 1829.191430] ksmbd: SMB2 len 105
+[ 1829.192061] ksmbd: credit_check: cmd=16 charge=1 calc=1 req_len=65536 resp_len=0 total=31 out=0
+[ 1829.193648] ksmbd: credit_check: lock_enter cmd=16 charge=1 total=31 out=0
+[ 1829.194976] ksmbd: credit_check: lock_exit cmd=16 ret=0 total=31 out=1
+[ 1829.196187] ksmbd: Received request smb2 query info request
+[ 1829.197393] ksmbd: GOT SMB2_O_INFO_FILE
+[ 1829.198239] ksmbd: system.posix_acl_access, len 23
+[ 1829.199510] ksmbd: user.DOSATTRIB, len 14
+[ 1829.200550] ksmbd: system.posix_acl_default, len 24
+[ 1829.201638] ksmbd: security.NTACL, len 14
+[ 1829.202568] ksmbd: credit_rsp: dispatch cmd=16 total=31 out=1 granted_total=0
+[ 1829.203971] ksmbd: credit_rsp: lock_enter cmd=16 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1829.205643] ksmbd: credit_rsp: lock_exit cmd=16 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1829.207348] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1829.208735] ksmbd: RFC1002 hdr=00 00 00 62 len=98 status=1
+[ 1829.209992] ksmbd: PDU sig=fe 53 4d 42 pdu=98 req_running=1
+[ 1829.211694] ksmbd: got SMB2 command
+[ 1829.212535] ksmbd: SMB2 data length 2 offset 96
+[ 1829.213559] ksmbd: SMB2 len 98
+[ 1829.214231] ksmbd: credit_check: cmd=14 charge=1 calc=1 req_len=65536 resp_len=0 total=31 out=0
+[ 1829.216037] ksmbd: credit_check: lock_enter cmd=14 charge=1 total=31 out=0
+[ 1829.217377] ksmbd: credit_check: lock_exit cmd=14 ret=0 total=31 out=1
+[ 1829.218607] ksmbd: Received smb2 query directory request
+[ 1829.219621] ksmbd: Search pattern is *
+[ 1829.220422] ksmbd: info_level : 12, buf_len :65520, next_offset : 16, data_count : 16
+[ 1829.221903] ksmbd: failed to load dos attribute in xattr
+[ 1829.222892] ksmbd: fail to load dos attribute.
+[ 1829.223707] ksmbd: info_level : 12, buf_len :65504, next_offset : 16, data_count : 32
+[ 1829.225353] ksmbd: credit_rsp: dispatch cmd=14 total=31 out=1 granted_total=0
+[ 1829.226948] ksmbd: credit_rsp: lock_enter cmd=14 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1829.228726] ksmbd: credit_rsp: lock_exit cmd=14 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1829.230685] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1829.232379] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 1829.233559] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=1
+[ 1829.235041] ksmbd: got SMB2 command
+[ 1829.235876] ksmbd: SMB2 len 88
+[ 1829.236726] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 1829.238368] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 1829.240152] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 1829.241630] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 1829.242913] ksmbd: Received smb2 close request
+[ 1829.243854] ksmbd: volatile_id = 2
+[ 1829.244582] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 1829.246098] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1829.247723] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1829.249442] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1829.250839] ksmbd: RFC1002 hdr=00 00 00 8e len=142 status=1
+[ 1829.251836] ksmbd: PDU sig=fe 53 4d 42 pdu=142 req_running=0
+[ 1829.252883] ksmbd: got SMB2 command
+[ 1829.253547] ksmbd: SMB2 data length 22 offset 120
+[ 1829.254429] ksmbd: SMB2 len 142
+[ 1829.255053] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 1829.256387] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 1829.258166] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 1829.259655] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 1829.261079] ksmbd: Received smb2 create request
+[ 1829.262063] ksmbd: converted name = teststreams
+[ 1829.262976] ksmbd: check permission using windows acl
+[ 1829.263940] ksmbd: Discard write access to a directory
+[ 1829.264892] ksmbd: Current access mode does not permit SHARE_DELETE
+[ 1829.266062] ksmbd: Current mode: 0x0 Desired mode: 0x10000
+[ 1829.267130] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 1829.268409] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1829.270092] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1829.271936] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1829.274354] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 1829.275563] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+[ 1829.276802] ksmbd: got SMB2 command
+[ 1829.277771] ksmbd: SMB2 len 88
+[ 1829.278452] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 1829.279814] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 1829.281316] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 1829.282540] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 1829.283712] ksmbd: Received smb2 close request
+[ 1829.284561] ksmbd: volatile_id = 3
+[ 1829.285262] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 1829.286540] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1829.288212] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1829.289869] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1829.291332] ksmbd: Wait for all pending requests(0)
+[ 2140.852509] ksmbd: connect success: accepted new connection
+[ 2140.853819] ksmbd: RFC1002 hdr=00 00 00 e2 len=226 status=0
+[ 2140.855100] ksmbd: PDU sig=fe 53 4d 42 pdu=226 req_running=0
+[ 2140.856432] ksmbd: got SMB2 command
+[ 2140.857196] ksmbd: no length check for command
+[ 2140.858184] ksmbd: SMB2 data length 0 offset 0
+[ 2140.859164] ksmbd: SMB2 len 100
+[ 2140.859831] ksmbd: Unknown command 0 in credit charge validation, defaulting to 1
+[ 2140.861437] ksmbd: credit_check: cmd=0 charge=1 calc=1 req_len=1 resp_len=0 total=1 out=0
+[ 2140.863210] ksmbd: credit_check: lock_enter cmd=0 charge=1 total=1 out=0
+[ 2140.864684] ksmbd: credit_check: lock_exit cmd=0 ret=0 total=1 out=1
+[ 2140.866060] ksmbd: client requested dialect 0x311
+[ 2140.867078] ksmbd: selected SMB 3.1.1 dialect
+[ 2140.868011] ksmbd: conn->dialect 0x311
+[ 2140.868833] ksmbd: Received negotiate request
+[ 2140.869891] ksmbd: decoding 4 negotiate contexts
+[ 2140.870887] ksmbd: deassemble SMB2_PREAUTH_INTEGRITY_CAPABILITIES context
+[ 2140.872342] ksmbd: deassemble SMB2_ENCRYPTION_CAPABILITIES context
+[ 2140.873681] ksmbd: Cipher ID = 0x4
+[ 2140.874427] ksmbd: deassemble SMB2_SIGNING_CAPABILITIES context
+[ 2140.876343] ksmbd: Signing Algorithm ID = 0x2
+[ 2140.877269] ksmbd: deassemble SMB2_NETNAME_NEGOTIATE_CONTEXT_ID context
+[ 2140.878639] ksmbd: NETNAME context name '127.0.0.1' != server name 'KSMBD-VM'
+[ 2140.880150] ksmbd: negotiate: preauth after NEG_REQ: [0..15]=d09cbb8b76384f14cd150ee66806d02b
+[ 2140.881918] ksmbd: assemble SMB2_PREAUTH_INTEGRITY_CAPABILITIES context
+[ 2140.883403] ksmbd: assemble SMB2_ENCRYPTION_CAPABILITIES context
+[ 2140.884679] ksmbd: assemble SMB2_SIGNING_CAPABILITIES context
+[ 2140.885877] ksmbd: negotiate context offset 224, count 3
+[ 2140.887005] ksmbd: credit_rsp: dispatch cmd=0 total=1 out=1 granted_total=0
+[ 2140.888463] ksmbd: credit_rsp: lock_enter cmd=0 charge=1 req=31 total=1 out=1 granted_total=0
+[ 2140.890250] ksmbd: credit_rsp: lock_exit cmd=0 charge=1 req=31 granted=1 total=1 out=0 granted_total=1
+[ 2140.892161] ksmbd: credits: requested[31] granted[1] total_granted[1]
+[ 2140.893495] ksmbd: negotiate: preauth after NEG_RSP: [0..15]=4e9319676f668ecfd7f2f1eb912acb26 rsp_size=300
+[ 2140.897724] ksmbd: RFC1002 hdr=00 00 00 a2 len=162 status=5
+[ 2140.898948] ksmbd: PDU sig=fe 53 4d 42 pdu=162 req_running=0
+[ 2140.900178] ksmbd: got SMB2 command
+[ 2140.900920] ksmbd: SMB2 data length 74 offset 88
+[ 2140.901923] ksmbd: SMB2 len 162
+[ 2140.902634] ksmbd: Unknown command 1 in credit charge validation, defaulting to 1
+[ 2140.904244] ksmbd: credit_check: cmd=1 charge=1 calc=1 req_len=1 resp_len=0 total=1 out=0
+[ 2140.905923] ksmbd: credit_check: lock_enter cmd=1 charge=1 total=1 out=0
+[ 2140.907358] ksmbd: credit_check: lock_exit cmd=1 ret=0 total=1 out=1
+[ 2140.908689] ksmbd: Received smb2 session setup request
+[ 2140.909782] ksmbd: preauth_hash BEFORE request: [0..15]=4e9319676f668ecfd7f2f1eb912acb26 msg_size=162
+[ 2140.911719] ksmbd: preauth_hash AFTER  request: [0..15]=8a77c124a55c61495a12dfb228305c22
+[ 2140.913417] ksmbd: negotiate phase
+[ 2140.914164] ksmbd: NTLMSSP SecurityBufferLength 148
+[ 2140.915236] ksmbd: credit_rsp: dispatch cmd=1 total=1 out=1 granted_total=0
+[ 2140.916687] ksmbd: credit_rsp: lock_enter cmd=1 charge=1 req=31 total=1 out=1 granted_total=0
+[ 2140.918458] ksmbd: credit_rsp: lock_exit cmd=1 charge=1 req=31 granted=31 total=31 out=0 granted_total=31
+[ 2140.920437] ksmbd: credits: requested[31] granted[31] total_granted[31]
+[ 2140.921835] ksmbd: preauth_hash BEFORE response: [0..15]=8a77c124a55c61495a12dfb228305c22 rsp_size=251 status=0xc0000016
+[ 2140.924147] ksmbd: preauth_hash AFTER  response: [0..15]=682b7cb8dc6dbb3184cbb7f0e963b632
+[ 2140.926215] ksmbd: RFC1002 hdr=00 00 01 fa len=506 status=5
+[ 2140.927408] ksmbd: PDU sig=fe 53 4d 42 pdu=506 req_running=0
+[ 2140.928611] ksmbd: got SMB2 command
+[ 2140.929379] ksmbd: SMB2 data length 418 offset 88
+[ 2140.930396] ksmbd: SMB2 len 506
+[ 2140.931079] ksmbd: Unknown command 1 in credit charge validation, defaulting to 1
+[ 2140.932632] ksmbd: credit_check: cmd=1 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2140.934358] ksmbd: credit_check: lock_enter cmd=1 charge=1 total=31 out=0
+[ 2140.935778] ksmbd: credit_check: lock_exit cmd=1 ret=0 total=31 out=1
+[ 2140.937147] ksmbd: Received smb2 session setup request
+[ 2140.938252] ksmbd: preauth_hash BEFORE request: [0..15]=682b7cb8dc6dbb3184cbb7f0e963b632 msg_size=506
+[ 2140.940205] ksmbd: preauth_hash AFTER  request: [0..15]=fac0353f7255dda4e1d1061de514f50f
+[ 2140.941878] ksmbd: authenticate phase
+[ 2140.942680] ksmbd: session setup request for user testuser
+[ 2140.944014] ksmbd: login_user returned: name='testuser' flags=0x1 anon=0 guest=0
+[ 2140.945555] ksmbd: decode_ntlmssp_authenticate_blob dnameWORKGROUP
+[ 2140.946922] ksmbd: generated encryption keys for session 1, cipher type 4
+[ 2140.948470] ksmbd: generate_signingkey: sess_key[0..15]=6676504734cae2b51f5c8ffd3daaec8b label_len=14 ctx_len=64
+[ 2140.950602] ksmbd: generate_signingkey: preauth[0..15]=fac0353f7255dda4e1d1061de514f50f
+[ 2140.952327] ksmbd: generated signing key for session 1: key[0..15]=62065fcf3d3b8a15e5eb7ca15088be83
+[ 2140.954216] ksmbd: credit_rsp: dispatch cmd=1 total=31 out=1 granted_total=0
+[ 2140.955719] ksmbd: credit_rsp: lock_enter cmd=1 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2140.957517] ksmbd: credit_rsp: lock_exit cmd=1 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2140.959455] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2140.960777] ksmbd: smb3_set_sign_rsp: cmd=1 signing_key[0..15]=62065fcf3d3b8a15e5eb7ca15088be83 algo=2
+[ 2140.962710] ksmbd: preauth_hash BEFORE response: [0..15]=fac0353f7255dda4e1d1061de514f50f rsp_size=81 status=0x0
+[ 2140.964841] ksmbd: preauth_hash AFTER  response: [0..15]=e02bf8b18088cefe50362fe601b1a4f8
+[ 2140.966842] ksmbd: RFC1002 hdr=00 00 00 68 len=104 status=1
+[ 2140.968052] ksmbd: PDU sig=fe 53 4d 42 pdu=104 req_running=0
+[ 2140.969293] ksmbd: skip to check tree connect request
+[ 2140.970382] ksmbd: got SMB2 command
+[ 2140.971134] ksmbd: SMB2 data length 32 offset 72
+[ 2140.972134] ksmbd: SMB2 len 104
+[ 2140.972826] ksmbd: Unknown command 3 in credit charge validation, defaulting to 1
+[ 2140.974404] ksmbd: credit_check: cmd=3 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2140.976147] ksmbd: credit_check: lock_enter cmd=3 charge=1 total=31 out=0
+[ 2140.977590] ksmbd: credit_check: lock_exit cmd=3 ret=0 total=31 out=1
+[ 2140.978993] ksmbd: Received smb2 tree connect request
+[ 2140.980127] ksmbd: tree connect request for tree test treename \\127.0.0.1\test
+[ 2140.981804] ksmbd: tree_conn_connect returned: ret=0 tcon=00000000ca75f889
+[ 2140.983289] ksmbd: MaximalAccess: perm_r=0 perm_w=0 perm_x=0 access=0x001f01ff
+[ 2140.984853] ksmbd: tree connect final status.ret=0
+[ 2140.985868] ksmbd: credit_rsp: dispatch cmd=3 total=31 out=1 granted_total=0
+[ 2140.987402] ksmbd: credit_rsp: lock_enter cmd=3 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2140.989229] ksmbd: credit_rsp: lock_exit cmd=3 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2140.991193] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2140.992561] ksmbd: smb3_set_sign_rsp: cmd=3 signing_key[0..15]=62065fcf3d3b8a15e5eb7ca15088be83 algo=2
+[ 2140.994794] ksmbd: RFC1002 hdr=00 00 00 8a len=138 status=1
+[ 2140.996005] ksmbd: PDU sig=fe 53 4d 42 pdu=138 req_running=0
+[ 2140.997281] ksmbd: got SMB2 command
+[ 2140.998062] ksmbd: SMB2 data length 18 offset 120
+[ 2140.999088] ksmbd: SMB2 len 138
+[ 2140.999782] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 2141.001409] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2141.003156] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 2141.004604] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 2141.005979] ksmbd: Received smb2 create request
+[ 2141.006975] ksmbd: converted name = test9.dat
+[ 2141.007944] ksmbd: check permission using windows acl
+[ 2141.009072] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 2141.010565] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2141.012387] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2141.014367] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2141.015926] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 2141.017154] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+[ 2141.018374] ksmbd: got SMB2 command
+[ 2141.019112] ksmbd: SMB2 len 88
+[ 2141.019801] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 2141.021408] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2141.023152] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 2141.024588] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 2141.025958] ksmbd: Received smb2 close request
+[ 2141.026917] ksmbd: volatile_id = 0
+[ 2141.027700] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 2141.029288] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2141.031137] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2141.033314] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2141.035186] ksmbd: RFC1002 hdr=00 00 00 8a len=138 status=1
+[ 2141.036412] ksmbd: PDU sig=fe 53 4d 42 pdu=138 req_running=0
+[ 2141.037657] ksmbd: got SMB2 command
+[ 2141.040358] ksmbd: SMB2 data length 18 offset 120
+[ 2141.041379] ksmbd: SMB2 len 138
+[ 2141.042054] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 2141.043436] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2141.044914] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 2141.046146] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 2141.047325] ksmbd: Received smb2 create request
+[ 2141.048306] ksmbd: converted name = test9.dat
+[ 2141.049704] ksmbd: can not get linux path for test9.dat, rc = -2
+[ 2141.050988] ksmbd: file does not exist, so creating
+[ 2141.052156] ksmbd: creating regular file
+[ 2141.053021] ksmbd: inherit posix acl failed : -2
+[ 2141.054019] ksmbd: Set posix acls
+[ 2141.054670] ksmbd: mode: 7, access flags now 0x1f01bf
+[ 2141.055593] ksmbd: mode: 7, access flags now 0x1f01bf
+[ 2141.056507] ksmbd: mode: 7, access flags now 0x1f01bf
+[ 2141.057476] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 2141.058744] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2141.060282] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2141.061905] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2141.063307] ksmbd: RFC1002 hdr=00 00 00 8a len=138 status=1
+[ 2141.064491] ksmbd: PDU sig=fe 53 4d 42 pdu=138 req_running=0
+[ 2141.065537] ksmbd: got SMB2 command
+[ 2141.066278] ksmbd: SMB2 data length 18 offset 120
+[ 2141.067257] ksmbd: SMB2 len 138
+[ 2141.067922] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 2141.069495] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2141.070964] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 2141.072177] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 2141.073303] ksmbd: Received smb2 create request
+[ 2141.074139] ksmbd: converted name = test9.dat
+[ 2141.074924] ksmbd: check permission using windows acl
+[ 2141.075862] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 2141.077135] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2141.078624] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2141.080417] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2141.082041] ksmbd: RFC1002 hdr=00 01 00 70 len=65648 status=1
+[ 2141.083484] ksmbd: PDU sig=fe 53 4d 42 pdu=65648 req_running=0
+[ 2141.084694] ksmbd: got SMB2 command
+[ 2141.085332] ksmbd: SMB2 data length 65536 offset 112
+[ 2141.086208] ksmbd: SMB2 len 65648
+[ 2141.086784] ksmbd: credit_check: cmd=9 charge=1 calc=1 req_len=65536 resp_len=0 total=31 out=0
+[ 2141.088272] ksmbd: credit_check: lock_enter cmd=9 charge=1 total=31 out=0
+[ 2141.089439] ksmbd: credit_check: lock_exit cmd=9 ret=0 total=31 out=1
+[ 2141.090578] ksmbd: Received smb2 write request
+[ 2141.091375] ksmbd: flags 0
+[ 2141.091858] ksmbd: filename test9.dat, offset 0, len 65536
+[ 2141.092828] ksmbd: unexpected oplock(0x0)
+[ 2141.093545] ksmbd: unexpected oplock(0x0)
+[ 2141.094309] ksmbd: credit_rsp: dispatch cmd=9 total=31 out=1 granted_total=0
+[ 2141.095536] ksmbd: credit_rsp: lock_enter cmd=9 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2141.097074] ksmbd: credit_rsp: lock_exit cmd=9 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2141.098906] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2141.100474] ksmbd: RFC1002 hdr=00 00 00 69 len=105 status=1
+[ 2141.101629] ksmbd: PDU sig=fe 53 4d 42 pdu=105 req_running=0
+[ 2141.103305] ksmbd: got SMB2 command
+[ 2141.104062] ksmbd: SMB2 data length 0 offset 104
+[ 2141.105027] ksmbd: SMB2 len 105
+[ 2141.105686] ksmbd: credit_check: cmd=16 charge=1 calc=1 req_len=65536 resp_len=0 total=31 out=0
+[ 2141.107432] ksmbd: credit_check: lock_enter cmd=16 charge=1 total=31 out=0
+[ 2141.108840] ksmbd: credit_check: lock_exit cmd=16 ret=0 total=31 out=1
+[ 2141.110256] ksmbd: Received request smb2 query info request
+[ 2141.111576] ksmbd: GOT SMB2_O_INFO_FILE
+[ 2141.112427] ksmbd: filename = \test9.dat
+[ 2141.113290] ksmbd: credit_rsp: dispatch cmd=16 total=31 out=1 granted_total=0
+[ 2141.114763] ksmbd: credit_rsp: lock_enter cmd=16 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2141.116319] ksmbd: credit_rsp: lock_exit cmd=16 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2141.117958] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2141.119464] ksmbd: RFC1002 hdr=00 00 00 69 len=105 status=1
+[ 2141.120527] ksmbd: PDU sig=fe 53 4d 42 pdu=105 req_running=0
+[ 2141.121650] ksmbd: got SMB2 command
+[ 2141.122323] ksmbd: SMB2 data length 0 offset 104
+[ 2141.123262] ksmbd: SMB2 len 105
+[ 2141.123896] ksmbd: credit_check: cmd=16 charge=1 calc=1 req_len=65536 resp_len=0 total=31 out=0
+[ 2141.125489] ksmbd: credit_check: lock_enter cmd=16 charge=1 total=31 out=0
+[ 2141.126747] ksmbd: credit_check: lock_exit cmd=16 ret=0 total=31 out=1
+[ 2141.127944] ksmbd: Received request smb2 query info request
+[ 2141.128980] ksmbd: GOT SMB2_O_INFO_FILE
+[ 2141.129706] ksmbd: credit_rsp: dispatch cmd=16 total=31 out=1 granted_total=0
+[ 2141.131090] ksmbd: credit_rsp: lock_enter cmd=16 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2141.132803] ksmbd: credit_rsp: lock_exit cmd=16 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2141.134656] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2141.136845] ksmbd: RFC1002 hdr=00 00 00 69 len=105 status=1
+[ 2141.137963] ksmbd: PDU sig=fe 53 4d 42 pdu=105 req_running=0
+[ 2141.139486] ksmbd: got SMB2 command
+[ 2141.140222] ksmbd: SMB2 data length 0 offset 104
+[ 2141.141128] ksmbd: SMB2 len 105
+[ 2141.141728] ksmbd: credit_check: cmd=16 charge=1 calc=1 req_len=65536 resp_len=0 total=31 out=0
+[ 2141.143392] ksmbd: credit_check: lock_enter cmd=16 charge=1 total=31 out=0
+[ 2141.144903] ksmbd: credit_check: lock_exit cmd=16 ret=0 total=31 out=1
+[ 2141.146570] ksmbd: Received request smb2 query info request
+[ 2141.147777] ksmbd: GOT SMB2_O_INFO_FILE
+[ 2141.148512] ksmbd: system.posix_acl_access, len 23
+[ 2141.149495] ksmbd: user.DOSATTRIB, len 14
+[ 2141.150351] ksmbd: security.NTACL, len 14
+[ 2141.151221] ksmbd: credit_rsp: dispatch cmd=16 total=31 out=1 granted_total=0
+[ 2141.152699] ksmbd: credit_rsp: lock_enter cmd=16 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2141.156187] ksmbd: credit_rsp: lock_exit cmd=16 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2141.158050] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2141.161090] ksmbd: RFC1002 hdr=00 00 00 69 len=105 status=1
+[ 2141.162204] ksmbd: PDU sig=fe 53 4d 42 pdu=105 req_running=0
+[ 2141.163328] ksmbd: got SMB2 command
+[ 2141.164040] ksmbd: SMB2 data length 0 offset 104
+[ 2141.165203] ksmbd: SMB2 len 105
+[ 2141.165784] ksmbd: credit_check: cmd=16 charge=1 calc=1 req_len=65536 resp_len=0 total=31 out=0
+[ 2141.167581] ksmbd: credit_check: lock_enter cmd=16 charge=1 total=31 out=0
+[ 2141.169263] ksmbd: credit_check: lock_exit cmd=16 ret=0 total=31 out=1
+[ 2141.170727] ksmbd: Received request smb2 query info request
+[ 2141.171972] ksmbd: GOT SMB2_O_INFO_FILE
+[ 2141.172840] ksmbd: system.posix_acl_access, len 23
+[ 2141.175428] ksmbd: user.DOSATTRIB, len 14
+[ 2141.176486] ksmbd: security.NTACL, len 14
+[ 2141.177386] ksmbd: credit_rsp: dispatch cmd=16 total=31 out=1 granted_total=0
+[ 2141.178924] ksmbd: credit_rsp: lock_enter cmd=16 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2141.180798] ksmbd: credit_rsp: lock_exit cmd=16 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2141.182899] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2141.184788] ksmbd: RFC1002 hdr=00 01 00 70 len=65648 status=1
+[ 2141.186307] ksmbd: PDU sig=fe 53 4d 42 pdu=65648 req_running=0
+[ 2141.187777] ksmbd: got SMB2 command
+[ 2141.188557] ksmbd: SMB2 data length 65536 offset 112
+[ 2141.189571] ksmbd: SMB2 len 65648
+[ 2141.190273] ksmbd: credit_check: cmd=9 charge=1 calc=1 req_len=65536 resp_len=0 total=31 out=0
+[ 2141.192138] ksmbd: credit_check: lock_enter cmd=9 charge=1 total=31 out=0
+[ 2141.193508] ksmbd: credit_check: lock_exit cmd=9 ret=0 total=31 out=1
+[ 2141.194810] ksmbd: Received smb2 write request
+[ 2141.195747] ksmbd: flags 0
+[ 2141.196374] ksmbd: filename test9.dat, offset 0, len 65536
+[ 2141.197521] ksmbd: unexpected oplock(0x0)
+[ 2141.198377] ksmbd: unexpected oplock(0x0)
+[ 2141.199274] ksmbd: credit_rsp: dispatch cmd=9 total=31 out=1 granted_total=0
+[ 2141.205130] ksmbd: credit_rsp: lock_enter cmd=9 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2141.206907] ksmbd: credit_rsp: lock_exit cmd=9 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2141.218177] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2141.220034] ksmbd: RFC1002 hdr=00 00 00 69 len=105 status=1
+[ 2141.221397] ksmbd: PDU sig=fe 53 4d 42 pdu=105 req_running=0
+[ 2141.223371] ksmbd: got SMB2 command
+[ 2141.224178] ksmbd: SMB2 data length 0 offset 104
+[ 2141.225397] ksmbd: SMB2 len 105
+[ 2141.226136] ksmbd: credit_check: cmd=16 charge=1 calc=1 req_len=65536 resp_len=0 total=31 out=0
+[ 2141.228131] ksmbd: credit_check: lock_enter cmd=16 charge=1 total=31 out=0
+[ 2141.229792] ksmbd: credit_check: lock_exit cmd=16 ret=0 total=31 out=1
+[ 2141.231281] ksmbd: Received request smb2 query info request
+[ 2141.232507] ksmbd: GOT SMB2_O_INFO_FILE
+[ 2141.233331] ksmbd: filename = \test9.dat
+[ 2141.234288] ksmbd: credit_rsp: dispatch cmd=16 total=31 out=1 granted_total=0
+[ 2141.235847] ksmbd: credit_rsp: lock_enter cmd=16 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2141.237596] ksmbd: credit_rsp: lock_exit cmd=16 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2141.239530] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2141.241258] ksmbd: RFC1002 hdr=00 00 00 69 len=105 status=1
+[ 2141.242322] ksmbd: PDU sig=fe 53 4d 42 pdu=105 req_running=0
+[ 2141.243378] ksmbd: got SMB2 command
+[ 2141.244040] ksmbd: SMB2 data length 0 offset 104
+[ 2141.244882] ksmbd: SMB2 len 105
+[ 2141.245480] ksmbd: credit_check: cmd=16 charge=1 calc=1 req_len=65536 resp_len=0 total=31 out=0
+[ 2141.247077] ksmbd: credit_check: lock_enter cmd=16 charge=1 total=31 out=0
+[ 2141.248452] ksmbd: credit_check: lock_exit cmd=16 ret=0 total=31 out=1
+[ 2141.249836] ksmbd: Received request smb2 query info request
+[ 2141.251301] ksmbd: GOT SMB2_O_INFO_FILE
+[ 2141.252479] ksmbd: credit_rsp: dispatch cmd=16 total=31 out=1 granted_total=0
+[ 2141.254057] ksmbd: credit_rsp: lock_enter cmd=16 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2141.256009] ksmbd: credit_rsp: lock_exit cmd=16 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2141.257734] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2141.259169] ksmbd: RFC1002 hdr=00 00 00 69 len=105 status=1
+[ 2141.260179] ksmbd: PDU sig=fe 53 4d 42 pdu=105 req_running=0
+[ 2141.261663] ksmbd: got SMB2 command
+[ 2141.262362] ksmbd: SMB2 data length 0 offset 104
+[ 2141.263228] ksmbd: SMB2 len 105
+[ 2141.263797] ksmbd: credit_check: cmd=16 charge=1 calc=1 req_len=65536 resp_len=0 total=31 out=0
+[ 2141.265343] ksmbd: credit_check: lock_enter cmd=16 charge=1 total=31 out=0
+[ 2141.266662] ksmbd: credit_check: lock_exit cmd=16 ret=0 total=31 out=1
+[ 2141.268078] ksmbd: Received request smb2 query info request
+[ 2141.269247] ksmbd: GOT SMB2_O_INFO_FILE
+[ 2141.270072] ksmbd: system.posix_acl_access, len 23
+[ 2141.271138] ksmbd: user.DOSATTRIB, len 14
+[ 2141.271860] ksmbd: security.NTACL, len 14
+[ 2141.272725] ksmbd: credit_rsp: dispatch cmd=16 total=31 out=1 granted_total=0
+[ 2141.274288] ksmbd: credit_rsp: lock_enter cmd=16 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2141.276192] ksmbd: credit_rsp: lock_exit cmd=16 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2141.278017] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2141.280263] ksmbd: RFC1002 hdr=00 00 00 69 len=105 status=1
+[ 2141.281310] ksmbd: PDU sig=fe 53 4d 42 pdu=105 req_running=0
+[ 2141.282486] ksmbd: got SMB2 command
+[ 2141.283295] ksmbd: SMB2 data length 0 offset 104
+[ 2141.284213] ksmbd: SMB2 len 105
+[ 2141.284921] ksmbd: credit_check: cmd=16 charge=1 calc=1 req_len=65536 resp_len=0 total=31 out=0
+[ 2141.286728] ksmbd: credit_check: lock_enter cmd=16 charge=1 total=31 out=0
+[ 2141.288207] ksmbd: credit_check: lock_exit cmd=16 ret=0 total=31 out=1
+[ 2141.289568] ksmbd: Received request smb2 query info request
+[ 2141.290715] ksmbd: GOT SMB2_O_INFO_FILE
+[ 2141.291624] ksmbd: system.posix_acl_access, len 23
+[ 2141.292718] ksmbd: user.DOSATTRIB, len 14
+[ 2141.293548] ksmbd: security.NTACL, len 14
+[ 2141.294414] ksmbd: credit_rsp: dispatch cmd=16 total=31 out=1 granted_total=0
+[ 2141.295833] ksmbd: credit_rsp: lock_enter cmd=16 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2141.297618] ksmbd: credit_rsp: lock_exit cmd=16 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2141.299879] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2141.301602] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 2141.302716] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+[ 2141.303852] ksmbd: got SMB2 command
+[ 2141.304585] ksmbd: SMB2 len 88
+[ 2141.305227] ksmbd: Unknown command 7 in credit charge validation, defaulting to 1
+[ 2141.306748] ksmbd: credit_check: cmd=7 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2141.308400] ksmbd: credit_check: lock_enter cmd=7 charge=1 total=31 out=0
+[ 2141.309752] ksmbd: credit_check: lock_exit cmd=7 ret=0 total=31 out=1
+[ 2141.311073] ksmbd: Received smb2 flush request(fid : 1)
+[ 2141.331900] ksmbd: credit_rsp: dispatch cmd=7 total=31 out=1 granted_total=0
+[ 2141.333214] ksmbd: credit_rsp: lock_enter cmd=7 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2141.334723] ksmbd: credit_rsp: lock_exit cmd=7 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2141.336372] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2141.337747] ksmbd: RFC1002 hdr=00 00 00 71 len=113 status=1
+[ 2141.338907] ksmbd: PDU sig=fe 53 4d 42 pdu=113 req_running=0
+[ 2141.340167] ksmbd: got SMB2 command
+[ 2141.340879] ksmbd: SMB2 data length 0 offset 112
+[ 2141.341851] ksmbd: SMB2 len 113
+[ 2141.342658] ksmbd: credit_check: cmd=8 charge=1 calc=1 req_len=65536 resp_len=0 total=31 out=0
+[ 2141.344410] ksmbd: credit_check: lock_enter cmd=8 charge=1 total=31 out=0
+[ 2141.345803] ksmbd: credit_check: lock_exit cmd=8 ret=0 total=31 out=1
+[ 2141.347163] ksmbd: Received smb2 read request
+[ 2141.348092] ksmbd: filename test9.dat, offset 0, len 65536
+[ 2141.349226] ksmbd: zero-copy nbytes 65536, offset 0
+[ 2141.350294] ksmbd: credit_rsp: dispatch cmd=8 total=31 out=1 granted_total=0
+[ 2141.351746] ksmbd: credit_rsp: lock_enter cmd=8 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2141.353501] ksmbd: credit_rsp: lock_exit cmd=8 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2141.355396] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2141.357449] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 2141.358577] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+[ 2141.359745] ksmbd: got SMB2 command
+[ 2141.360482] ksmbd: SMB2 len 88
+[ 2141.361123] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 2141.362629] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2141.364296] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 2141.365640] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 2141.366917] ksmbd: Received smb2 close request
+[ 2141.367856] ksmbd: volatile_id = 1
+[ 2141.368627] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 2141.370098] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2141.371807] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2141.373674] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2141.375220] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 2141.376279] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+[ 2141.377318] ksmbd: got SMB2 command
+[ 2141.377973] ksmbd: SMB2 len 88
+[ 2141.378571] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 2141.379940] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2141.381500] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 2141.382723] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 2141.383933] ksmbd: Received smb2 close request
+[ 2141.384818] ksmbd: volatile_id = 2
+[ 2141.385499] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 2141.386793] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2141.388371] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2141.390101] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2141.391498] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 2141.392850] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+[ 2141.394195] ksmbd: got SMB2 command
+[ 2141.394904] ksmbd: SMB2 len 88
+[ 2141.395584] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 2141.397112] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2141.398786] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 2141.400255] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 2141.401688] ksmbd: Received smb2 close request
+[ 2141.402868] ksmbd: volatile_id = 1
+[ 2141.403749] ksmbd: Failed to process 6 [-22]
+[ 2141.404661] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 2141.406262] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2141.408022] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2141.409897] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2141.411574] ksmbd: RFC1002 hdr=00 00 00 44 len=68 status=1
+[ 2141.412652] ksmbd: PDU sig=fe 53 4d 42 pdu=68 req_running=0
+[ 2141.413876] ksmbd: got SMB2 command
+[ 2141.414679] ksmbd: SMB2 len 68
+[ 2141.415444] ksmbd: Unknown command 4 in credit charge validation, defaulting to 1
+[ 2141.417046] ksmbd: credit_check: cmd=4 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2141.418737] ksmbd: credit_check: lock_enter cmd=4 charge=1 total=31 out=0
+[ 2141.420229] ksmbd: credit_check: lock_exit cmd=4 ret=0 total=31 out=1
+[ 2141.421560] ksmbd: Received smb2 tree disconnect request
+[ 2141.422747] ksmbd: credit_rsp: dispatch cmd=4 total=31 out=1 granted_total=0
+[ 2141.424061] ksmbd: credit_rsp: lock_enter cmd=4 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2141.425613] ksmbd: credit_rsp: lock_exit cmd=4 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2141.427353] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2141.428735] ksmbd: RFC1002 hdr=00 00 00 44 len=68 status=1
+[ 2141.429878] ksmbd: PDU sig=fe 53 4d 42 pdu=68 req_running=0
+[ 2141.431061] ksmbd: NO tree connected
+[ 2141.432029] ksmbd: RFC1002 hdr=00 00 00 44 len=68 status=1
+[ 2141.433161] ksmbd: PDU sig=fe 53 4d 42 pdu=68 req_running=0
+[ 2141.434395] ksmbd: skip to check tree connect request
+[ 2141.435407] ksmbd: got SMB2 command
+[ 2141.436211] ksmbd: SMB2 len 68
+[ 2141.436870] ksmbd: Unknown command 2 in credit charge validation, defaulting to 1
+[ 2141.438459] ksmbd: credit_check: cmd=2 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2141.439895] ksmbd: credit_check: lock_enter cmd=2 charge=1 total=31 out=0
+[ 2141.441111] ksmbd: credit_check: lock_exit cmd=2 ret=0 total=31 out=1
+[ 2141.442244] ksmbd: Received smb2 session logoff request
+[ 2141.443239] ksmbd: credit_rsp: dispatch cmd=2 total=31 out=1 granted_total=0
+[ 2141.444509] ksmbd: credit_rsp: lock_enter cmd=2 charge=1 req=2 total=31 out=1 granted_total=0
+[ 2141.446152] ksmbd: credit_rsp: lock_exit cmd=2 charge=1 req=2 granted=2 total=32 out=0 granted_total=2
+[ 2141.447806] ksmbd: credits: requested[2] granted[2] total_granted[32]
+[ 2141.450155] ksmbd: RFC1002 hdr=00 00 00 44 len=68 status=5
+[ 2141.451328] ksmbd: PDU sig=fe 53 4d 42 pdu=68 req_running=0
+[ 2141.452680] ksmbd: RFC1002 hdr=00 00 00 44 len=68 status=5
+[ 2141.453858] ksmbd: PDU sig=fe 53 4d 42 pdu=68 req_running=0
+[ 2141.455072] ksmbd: got SMB2 command
+[ 2141.455805] ksmbd: SMB2 len 68
+[ 2141.456473] ksmbd: Unknown command 13 in credit charge validation, defaulting to 1
+[ 2141.458008] ksmbd: credit_check: cmd=13 charge=1 calc=1 req_len=1 resp_len=0 total=32 out=0
+[ 2141.459874] ksmbd: credit_check: lock_enter cmd=13 charge=1 total=32 out=0
+[ 2141.461418] ksmbd: credit_check: lock_exit cmd=13 ret=0 total=32 out=1
+[ 2141.462893] ksmbd: Received smb2 echo request
+[ 2141.463885] ksmbd: credit_rsp: dispatch cmd=13 total=32 out=1 granted_total=0
+[ 2141.465455] ksmbd: credit_rsp: lock_enter cmd=13 charge=1 req=2 total=32 out=1 granted_total=0
+[ 2141.467161] ksmbd: credit_rsp: lock_exit cmd=13 charge=1 req=2 granted=2 total=33 out=0 granted_total=2
+[ 2141.468826] ksmbd: credits: requested[2] granted[2] total_granted[33]
+[ 2141.470247] ksmbd: Wait for all pending requests(0)
+[ 2206.775325] ksmbd: netdev-down event: netdev(lo) is going down
+[ 2206.794674] ksmbd: releasing socket
+[ 2206.802943] ksmbd: netdev-down event: netdev(ens4) is going down
+[ 2206.805374] ksmbd: releasing socket
+[ 2209.218347] ksmbd: ksmbd: witness protocol support removed
+[ 2209.409200] ksmbd: VSS backend 'generic' unregistered
+[ 2209.410202] ksmbd: VSS backend 'zfs' unregistered
+[ 2209.411054] ksmbd: VSS backend 'btrfs' unregistered
+[ 2209.684219] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[ 2210.220835] ksmbd: Configuration subsystem initialized with 17 parameters
+[ 2210.223055] ksmbd: kernel provides md4, skipping built-in registration
+[ 2210.226243] ksmbd: ksmbd: Fruit SMB extensions loaded
+[ 2210.228390] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[ 2210.230284] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[ 2210.231632] ksmbd: ksmbd: witness protocol support initialised
+[ 2215.588189] ksmbd: Not permitted to write : 0x1
+[ 2215.645980] ksmbd: Outstanding credits underflow: charge 1, outstanding 0
+[ 2218.305889] ksmbd: ksmbd: witness protocol support removed
+[ 2218.814201] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[ 2219.252513] ksmbd: Configuration subsystem initialized with 17 parameters
+[ 2219.253857] ksmbd: kernel provides md4, skipping built-in registration
+[ 2219.255895] ksmbd: ksmbd: Fruit SMB extensions loaded
+[ 2219.257183] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[ 2219.258332] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[ 2219.259567] ksmbd: ksmbd: witness protocol support initialised
+[ 2227.255252] ksmbd: ksmbd: witness protocol support removed
+[ 2227.746198] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[ 2228.219995] ksmbd: Configuration subsystem initialized with 17 parameters
+[ 2228.221354] ksmbd: kernel provides md4, skipping built-in registration
+[ 2228.223433] ksmbd: ksmbd: Fruit SMB extensions loaded
+[ 2228.224559] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[ 2228.225786] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[ 2228.227412] ksmbd: ksmbd: witness protocol support initialised
+[ 2244.030675] ksmbd: ksmbd: witness protocol support removed
+[ 2244.489185] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[ 2244.917543] ksmbd: Configuration subsystem initialized with 17 parameters
+[ 2244.918808] ksmbd: kernel provides md4, skipping built-in registration
+[ 2244.921064] ksmbd: ksmbd: Fruit SMB extensions loaded
+[ 2244.922211] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[ 2244.923402] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[ 2244.924771] ksmbd: ksmbd: witness protocol support initialised
+[ 2262.660360] ksmbd: ksmbd: witness protocol support removed
+[ 2263.106334] =============================================================================
+[ 2263.107770] BUG ksmbd_file_cache (Tainted: G           OE      ): Objects remaining on __kmem_cache_shutdown()
+[ 2263.109553] -----------------------------------------------------------------------------
+[ 2263.109553] 
+[ 2263.111549] Object 0x0000000093e0b059 @offset=6912
+[ 2263.112401] Slab 0x00000000e6c7ee77 objects=14 used=1 fp=0x00000000359a82dc flags=0xfffffc0000240(workingset|head|node=0|zone=1|lastcpupid=0x1fffff)
+[ 2263.114668] Disabling lock debugging due to kernel taint
+[ 2263.115787] ------------[ cut here ]------------
+[ 2263.116679] WARNING: CPU: 1 PID: 2022 at mm/slub.c:1257 __slab_err+0x19/0x20
+[ 2263.118194] Modules linked in: ksmbd(OE-) nls_utf8 md4 lz4_compress libdes intel_rapl_msr intel_rapl_common intel_uncore_frequency_common intel_pmc_core pmt_telemetry pmt_discovery pmt_class intel_pmc_ssram_telemetry intel_vsec kvm_intel kvm irqbypass polyval_clmulni ghash_clmulni_intel aesni_intel ppdev rapl joydev mousedev parport_pc parport psmouse pcspkr i2c_piix4 i2c_smbus mac_hid cfg80211 rfkill nfnetlink qemu_fw_cfg vmw_vsock_virtio_transport vmw_vsock_virtio_transport_common vsock sr_mod cdrom ata_generic pata_acpi ata_piix floppy intel_agp bochs intel_gtt serio_raw 9p 9pnet_virtio 9pnet virtio_net net_failover netfs failover
+[ 2263.118249] Unloaded tainted modules: ksmbd(OE):18 [last unloaded: ksmbd(OE)]
+[ 2263.130104] CPU: 1 UID: 0 PID: 2022 Comm: rmmod Tainted: G    B      OE       6.18.13-arch1-1 #1 PREEMPT(full)  37d84e5c59d38b1e3c61214631c6e0356ae9b977
+[ 2263.132484] Tainted: [B]=BAD_PAGE, [O]=OOT_MODULE, [E]=UNSIGNED_MODULE
+[ 2263.133634] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Arch Linux 1.17.0-2-2 04/01/2014
+[ 2263.135283] RIP: 0010:__slab_err+0x19/0x20
+[ 2263.136032] Code: 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 0f 1f 44 00 00 e8 76 ff ff ff be 01 00 00 00 bf 05 00 00 00 e8 17 bd 12 00 <0f> 0b c3 cc cc cc cc 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90
+[ 2263.139246] RSP: 0018:ffffd16f4226fdc0 EFLAGS: 00010086
+[ 2263.140187] RAX: 0000000000000000 RBX: ffff89bf82b13e00 RCX: 0000000000000027
+[ 2263.141636] RDX: 0000000000000005 RSI: 0000000000000001 RDI: ffff89bffd31d000
+[ 2263.143173] RBP: dead000000000122 R08: 0000000000000000 R09: 00000000ffffefff
+[ 2263.144667] R10: ffffffffb3c61440 R11: ffffd16f4226fc50 R12: dead000000000100
+[ 2263.146062] R13: ffff89bf82b14180 R14: ffffd16f4226fde8 R15: fffff97e40133100
+[ 2263.147520] FS:  00007f2788712740(0000) GS:ffff89c0489ee000(0000) knlGS:0000000000000000
+[ 2263.149168] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[ 2263.150371] CR2: 00005597c16e1b98 CR3: 00000000039a4004 CR4: 0000000000372ef0
+[ 2263.151892] Call Trace:
+[ 2263.152422]  <TASK>
+[ 2263.152891]  __kmem_cache_shutdown.cold+0x132/0x137
+[ 2263.153897]  kmem_cache_destroy+0x50/0x160
+[ 2263.154753]  ksmbd_exit_file_cache+0x15/0x30 [ksmbd f7e8d0a4b439a08fcbe026f7d3ac8fc641906c31]
+[ 2263.156501]  ksmbd_server_exit+0x9c/0x950 [ksmbd f7e8d0a4b439a08fcbe026f7d3ac8fc641906c31]
+[ 2263.158208]  __do_sys_delete_module+0x1b2/0x310
+[ 2263.159122]  do_syscall_64+0x81/0x7f0
+[ 2263.159908]  ? do_syscall_64+0x81/0x7f0
+[ 2263.160716]  ? clear_bhb_loop+0x50/0xa0
+[ 2263.161533]  ? clear_bhb_loop+0x50/0xa0
+[ 2263.162383]  ? clear_bhb_loop+0x50/0xa0
+[ 2263.163224]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+[ 2263.164289] RIP: 0033:0x7f2787f29fdb
+[ 2263.165062] Code: 73 01 c3 48 8b 0d 35 bd 0c 00 f7 d8 64 89 01 48 83 c8 ff c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa b8 b0 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 05 bd 0c 00 f7 d8 64 89 01 48
+[ 2263.168814] RSP: 002b:00007ffef03d9f08 EFLAGS: 00000206 ORIG_RAX: 00000000000000b0
+[ 2263.170129] RAX: ffffffffffffffda RBX: 00005612dd58e4c0 RCX: 00007f2787f29fdb
+[ 2263.171379] RDX: 0000000000000003 RSI: 0000000000000800 RDI: 00005612dd58e520
+[ 2263.172670] RBP: 00007ffef03d9f30 R08: 0000000000000000 R09: 0000000000000000
+[ 2263.173961] R10: 0000000000000000 R11: 0000000000000206 R12: 0000000000000000
+[ 2263.175232] R13: 0000000000000000 R14: 00007ffef03da190 R15: 00007ffef03da198
+[ 2263.176579]  </TASK>
+[ 2263.177057] ---[ end trace 0000000000000000 ]---
+[ 2263.178125] ------------[ cut here ]------------
+[ 2263.179007] kmem_cache_destroy ksmbd_file_cache: Slab cache still has objects when called from ksmbd_exit_file_cache+0x15/0x30 [ksmbd]
+[ 2263.179080] WARNING: CPU: 1 PID: 2022 at mm/slab_common.c:531 kmem_cache_destroy+0x14f/0x160
+[ 2263.182924] Modules linked in: ksmbd(OE-) nls_utf8 md4 lz4_compress libdes intel_rapl_msr intel_rapl_common intel_uncore_frequency_common intel_pmc_core pmt_telemetry pmt_discovery pmt_class intel_pmc_ssram_telemetry intel_vsec kvm_intel kvm irqbypass polyval_clmulni ghash_clmulni_intel aesni_intel ppdev rapl joydev mousedev parport_pc parport psmouse pcspkr i2c_piix4 i2c_smbus mac_hid cfg80211 rfkill nfnetlink qemu_fw_cfg vmw_vsock_virtio_transport vmw_vsock_virtio_transport_common vsock sr_mod cdrom ata_generic pata_acpi ata_piix floppy intel_agp bochs intel_gtt serio_raw 9p 9pnet_virtio 9pnet virtio_net net_failover netfs failover
+[ 2263.182964] Unloaded tainted modules: ksmbd(OE):18 [last unloaded: ksmbd(OE)]
+[ 2263.194820] CPU: 1 UID: 0 PID: 2022 Comm: rmmod Tainted: G    B   W  OE       6.18.13-arch1-1 #1 PREEMPT(full)  37d84e5c59d38b1e3c61214631c6e0356ae9b977
+[ 2263.197278] Tainted: [B]=BAD_PAGE, [W]=WARN, [O]=OOT_MODULE, [E]=UNSIGNED_MODULE
+[ 2263.198711] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Arch Linux 1.17.0-2-2 04/01/2014
+[ 2263.200487] RIP: 0010:kmem_cache_destroy+0x14f/0x160
+[ 2263.201473] Code: 00 85 ed 74 92 eb b1 e8 cf b9 de ff eb 8f 48 8b 53 68 48 8b 4c 24 10 48 c7 c6 10 1e c9 b2 48 c7 c7 18 1b 3a b3 e8 61 89 d1 ff <0f> 0b e9 04 ff ff ff c3 cc cc cc cc 0f 1f 44 00 00 90 90 90 90 90
+[ 2263.204964] RSP: 0018:ffffd16f4226fe38 EFLAGS: 00010246
+[ 2263.205995] RAX: 0000000000000000 RBX: ffff89bf82b13e00 RCX: 0000000000000027
+[ 2263.207479] RDX: ffff89bffd31d008 RSI: 0000000000000001 RDI: ffff89bffd31d000
+[ 2263.208971] RBP: 0000000000000001 R08: 0000000000000000 R09: 00000000ffffefff
+[ 2263.210310] R10: ffffffffb3c61440 R11: ffffd16f4226fcd0 R12: ffffd16f4226ff48
+[ 2263.211702] R13: 00000000000000b0 R14: 0000000000000800 R15: 0000000000000000
+[ 2263.213198] FS:  00007f2788712740(0000) GS:ffff89c0489ee000(0000) knlGS:0000000000000000
+[ 2263.214946] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[ 2263.216133] CR2: 00005597c16e1b98 CR3: 00000000039a4004 CR4: 0000000000372ef0
+[ 2263.217589] Call Trace:
+[ 2263.218110]  <TASK>
+[ 2263.218579]  ksmbd_exit_file_cache+0x15/0x30 [ksmbd f7e8d0a4b439a08fcbe026f7d3ac8fc641906c31]
+[ 2263.220414]  ksmbd_server_exit+0x9c/0x950 [ksmbd f7e8d0a4b439a08fcbe026f7d3ac8fc641906c31]
+[ 2263.222156]  __do_sys_delete_module+0x1b2/0x310
+[ 2263.223141]  do_syscall_64+0x81/0x7f0
+[ 2263.223971]  ? do_syscall_64+0x81/0x7f0
+[ 2263.224851]  ? clear_bhb_loop+0x50/0xa0
+[ 2263.225750]  ? clear_bhb_loop+0x50/0xa0
+[ 2263.226580]  ? clear_bhb_loop+0x50/0xa0
+[ 2263.227428]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+[ 2263.228531] RIP: 0033:0x7f2787f29fdb
+[ 2263.229318] Code: 73 01 c3 48 8b 0d 35 bd 0c 00 f7 d8 64 89 01 48 83 c8 ff c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa b8 b0 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 05 bd 0c 00 f7 d8 64 89 01 48
+[ 2263.233154] RSP: 002b:00007ffef03d9f08 EFLAGS: 00000206 ORIG_RAX: 00000000000000b0
+[ 2263.234791] RAX: ffffffffffffffda RBX: 00005612dd58e4c0 RCX: 00007f2787f29fdb
+[ 2263.236121] RDX: 0000000000000003 RSI: 0000000000000800 RDI: 00005612dd58e520
+[ 2263.237424] RBP: 00007ffef03d9f30 R08: 0000000000000000 R09: 0000000000000000
+[ 2263.238759] R10: 0000000000000000 R11: 0000000000000206 R12: 0000000000000000
+[ 2263.240053] R13: 0000000000000000 R14: 00007ffef03da190 R15: 00007ffef03da198
+[ 2263.241385]  </TASK>
+[ 2263.241835] ---[ end trace 0000000000000000 ]---
+[ 2263.248191] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[ 2263.660796] ksmbd: Configuration subsystem initialized with 17 parameters
+[ 2263.662322] ksmbd: kernel provides md4, skipping built-in registration
+[ 2263.664573] ksmbd: ksmbd: Fruit SMB extensions loaded
+[ 2263.665591] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[ 2263.666903] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[ 2263.668115] ksmbd: ksmbd: witness protocol support initialised
+[ 2275.512757] ksmbd: ksmbd: witness protocol support removed
+[ 2275.967189] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[ 2276.359292] ksmbd: Configuration subsystem initialized with 17 parameters
+[ 2276.360578] ksmbd: kernel provides md4, skipping built-in registration
+[ 2276.362664] ksmbd: ksmbd: Fruit SMB extensions loaded
+[ 2276.363684] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[ 2276.364815] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[ 2276.366015] ksmbd: ksmbd: witness protocol support initialised
+[ 2284.203952] ksmbd: ksmbd: witness protocol support removed
+[ 2284.658189] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[ 2285.081176] ksmbd: Configuration subsystem initialized with 17 parameters
+[ 2285.082438] ksmbd: kernel provides md4, skipping built-in registration
+[ 2285.084334] ksmbd: ksmbd: Fruit SMB extensions loaded
+[ 2285.085326] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[ 2285.086413] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[ 2285.087629] ksmbd: ksmbd: witness protocol support initialised
+[ 2491.620207] ksmbd: wait_idle_sess_id: timed out after 120 retries for session 2
+[ 2491.621803] ksmbd: ksmbd: cmd 0x1 handler took 122899 ms (pid=1203)
+[ 2491.623087] ksmbd: ksmbd: handle_ksmbd_work took 122900 ms
+[ 2651.696330] ksmbd: ksmbd: witness protocol support removed
+[ 2652.158178] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[ 2653.767889] ksmbd: Configuration subsystem initialized with 17 parameters
+[ 2653.769288] ksmbd: kernel provides md4, skipping built-in registration
+[ 2653.771445] ksmbd: ksmbd: Fruit SMB extensions loaded
+[ 2653.772566] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[ 2653.773817] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[ 2653.775178] ksmbd: ksmbd: witness protocol support initialised
+[ 2664.027345] BUG: unable to handle page fault for address: ffffffffc0a9d2a0
+[ 2664.028886] #PF: supervisor read access in kernel mode
+[ 2664.029974] #PF: error_code(0x0000) - not-present page
+[ 2664.031033] PGD 33a29067 P4D 33a29067 PUD 33a2b067 PMD 7142067 PTE 0
+[ 2664.032363] Oops: Oops: 0000 [#1] SMP PTI
+[ 2664.033224] CPU: 1 UID: 0 PID: 1203 Comm: kworker/1:2 Tainted: G    B   W  OE       6.18.13-arch1-1 #1 PREEMPT(full)  37d84e5c59d38b1e3c61214631c6e0356ae9b977
+[ 2664.036167] Tainted: [B]=BAD_PAGE, [W]=WARN, [O]=OOT_MODULE, [E]=UNSIGNED_MODULE
+[ 2664.037720] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Arch Linux 1.17.0-2-2 04/01/2014
+[ 2664.039707] Workqueue: ksmbd-io handle_ksmbd_work [ksmbd]
+[ 2664.040933] RIP: 0010:fsnotify+0x3fe/0x1530
+[ 2664.041838] Code: 38 48 85 d2 0f 85 46 02 00 00 83 c1 01 83 f9 06 75 df 0f 1f 44 00 00 45 89 ea 44 23 4c 24 2c 41 f7 d2 45 85 ca 74 4b 49 8b 3f <48> 8b 07 48 85 c0 0f 84 b4 03 00 00 41 56 8b bc 24 c0 00 00 00 57
+[ 2664.045745] RSP: 0018:ffffd16f422779b0 EFLAGS: 00010202
+[ 2664.046888] RAX: 0000000000000001 RBX: 0000000000000001 RCX: 0000000000000006
+[ 2664.048396] RDX: 0000000000000020 RSI: 0000000000000000 RDI: ffffffffc0a9d2a0
+[ 2664.049915] RBP: ffffd16f422779e8 R08: 0000000000000000 R09: 0000000000000001
+[ 2664.051372] R10: 00000000ffffffff R11: 0000000000000002 R12: ffffd16f42277a18
+[ 2664.052850] R13: 0000000000000000 R14: ffffd16f422779e8 R15: ffff89bf90528200
+[ 2664.054316] FS:  0000000000000000(0000) GS:ffff89c0489ee000(0000) knlGS:0000000000000000
+[ 2664.055969] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[ 2664.057141] CR2: ffffffffc0a9d2a0 CR3: 0000000014eb8004 CR4: 0000000000372ef0
+[ 2664.058605] Call Trace:
+[ 2664.059158]  <TASK>
+[ 2664.059630]  iterate_dir+0x227/0x270
+[ 2664.060374]  __ksmbd_vfs_kern_path+0x3a9/0x440 [ksmbd f7e8d0a4b439a08fcbe026f7d3ac8fc641906c31]
+[ 2664.062254]  ? __pfx___caseless_lookup+0x10/0x10 [ksmbd f7e8d0a4b439a08fcbe026f7d3ac8fc641906c31]
+[ 2664.064193]  smb2_open+0x106d/0x4250 [ksmbd f7e8d0a4b439a08fcbe026f7d3ac8fc641906c31]
+[ 2664.065909]  ? release_sock+0x4f/0xa0
+[ 2664.066744]  ? _raw_spin_unlock_bh+0xe/0x20
+[ 2664.067674]  ? tcp_sendmsg+0x39/0x50
+[ 2664.068448]  ? sock_sendmsg+0xc8/0x130
+[ 2664.069292]  ? xas_load+0xd/0xd0
+[ 2664.069965]  ? xa_load+0x76/0xb0
+[ 2664.070548]  ? ksmbd_config_get_u32+0x41/0x50 [ksmbd f7e8d0a4b439a08fcbe026f7d3ac8fc641906c31]
+[ 2664.072352]  ? _raw_spin_unlock+0xe/0x30
+[ 2664.073182]  ? ksmbd_smb2_check_message+0x787/0x820 [ksmbd f7e8d0a4b439a08fcbe026f7d3ac8fc641906c31]
+[ 2664.075086]  ? ksmbd_tree_conn_lookup+0x47/0x80 [ksmbd f7e8d0a4b439a08fcbe026f7d3ac8fc641906c31]
+[ 2664.077006]  handle_ksmbd_work+0x42f/0x890 [ksmbd f7e8d0a4b439a08fcbe026f7d3ac8fc641906c31]
+[ 2664.078803]  process_one_work+0x193/0x350
+[ 2664.079669]  worker_thread+0x2d7/0x410
+[ 2664.080433]  ? __pfx_worker_thread+0x10/0x10
+[ 2664.081316]  kthread+0xfc/0x240
+[ 2664.081987]  ? __pfx_kthread+0x10/0x10
+[ 2664.082765]  ? __pfx_kthread+0x10/0x10
+[ 2664.083520]  ret_from_fork+0x1c2/0x1f0
+[ 2664.084302]  ? __pfx_kthread+0x10/0x10
+[ 2664.085104]  ret_from_fork_asm+0x1a/0x30
+[ 2664.085926]  </TASK>
+[ 2664.086386] Modules linked in: ksmbd(OE) des_generic nls_utf8 md4 lz4_compress libdes intel_rapl_msr intel_rapl_common intel_uncore_frequency_common intel_pmc_core pmt_telemetry pmt_discovery pmt_class intel_pmc_ssram_telemetry intel_vsec kvm_intel kvm irqbypass polyval_clmulni ghash_clmulni_intel aesni_intel ppdev rapl joydev mousedev parport_pc parport psmouse pcspkr i2c_piix4 i2c_smbus mac_hid cfg80211 rfkill nfnetlink qemu_fw_cfg vmw_vsock_virtio_transport vmw_vsock_virtio_transport_common vsock sr_mod cdrom ata_generic pata_acpi ata_piix floppy intel_agp bochs intel_gtt serio_raw 9p 9pnet_virtio 9pnet virtio_net net_failover netfs failover
+[ 2664.086439] Unloaded tainted modules: ksmbd(OE):22 [last unloaded: ksmbd(OE)]
+[ 2664.099477] CR2: ffffffffc0a9d2a0
+[ 2664.100194] ---[ end trace 0000000000000000 ]---
+[ 2664.101158] RIP: 0010:fsnotify+0x3fe/0x1530
+[ 2664.102043] Code: 38 48 85 d2 0f 85 46 02 00 00 83 c1 01 83 f9 06 75 df 0f 1f 44 00 00 45 89 ea 44 23 4c 24 2c 41 f7 d2 45 85 ca 74 4b 49 8b 3f <48> 8b 07 48 85 c0 0f 84 b4 03 00 00 41 56 8b bc 24 c0 00 00 00 57
+[ 2664.105841] RSP: 0018:ffffd16f422779b0 EFLAGS: 00010202
+[ 2664.106934] RAX: 0000000000000001 RBX: 0000000000000001 RCX: 0000000000000006
+[ 2664.108408] RDX: 0000000000000020 RSI: 0000000000000000 RDI: ffffffffc0a9d2a0
+[ 2664.109897] RBP: ffffd16f422779e8 R08: 0000000000000000 R09: 0000000000000001
+[ 2664.111370] R10: 00000000ffffffff R11: 0000000000000002 R12: ffffd16f42277a18
+[ 2664.112860] R13: 0000000000000000 R14: ffffd16f422779e8 R15: ffff89bf90528200
+[ 2664.114346] FS:  0000000000000000(0000) GS:ffff89c0489ee000(0000) knlGS:0000000000000000
+[ 2664.116112] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[ 2664.117363] CR2: ffffffffc0a9d2a0 CR3: 0000000014eb8004 CR4: 0000000000372ef0
+[ 2664.118846] note: kworker/1:2[1203] exited with irqs disabled
+[ 2724.086710] BUG: unable to handle page fault for address: ffffffffc0a9d2a0
+[ 2724.088157] #PF: supervisor read access in kernel mode
+[ 2724.089250] #PF: error_code(0x0000) - not-present page
+[ 2724.090325] PGD 33a29067 P4D 33a29067 PUD 33a2b067 PMD 7142067 PTE 0
+[ 2724.091657] Oops: Oops: 0000 [#2] SMP PTI
+[ 2724.092482] CPU: 1 UID: 0 PID: 2276 Comm: kworker/1:0 Tainted: G    B D W  OE       6.18.13-arch1-1 #1 PREEMPT(full)  37d84e5c59d38b1e3c61214631c6e0356ae9b977
+[ 2724.095353] Tainted: [B]=BAD_PAGE, [D]=DIE, [W]=WARN, [O]=OOT_MODULE, [E]=UNSIGNED_MODULE
+[ 2724.097018] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Arch Linux 1.17.0-2-2 04/01/2014
+[ 2724.099000] Workqueue: ksmbd-io handle_ksmbd_work [ksmbd]
+[ 2724.100192] RIP: 0010:fsnotify+0x3fe/0x1530
+[ 2724.101076] Code: 38 48 85 d2 0f 85 46 02 00 00 83 c1 01 83 f9 06 75 df 0f 1f 44 00 00 45 89 ea 44 23 4c 24 2c 41 f7 d2 45 85 ca 74 4b 49 8b 3f <48> 8b 07 48 85 c0 0f 84 b4 03 00 00 41 56 8b bc 24 c0 00 00 00 57
+[ 2724.104825] RSP: 0018:ffffd16f400eb9b0 EFLAGS: 00010202
+[ 2724.106349] RAX: 0000000000000001 RBX: 0000000000000001 RCX: 0000000000000006
+[ 2724.107758] RDX: 0000000000000020 RSI: 0000000000000000 RDI: ffffffffc0a9d2a0
+[ 2724.109036] RBP: ffffd16f400eb9e8 R08: 0000000000000000 R09: 0000000000000001
+[ 2724.110258] R10: 00000000ffffffff R11: 0000000000000002 R12: ffffd16f400eba18
+[ 2724.111507] R13: 0000000000000000 R14: ffffd16f400eb9e8 R15: ffff89bf90528200
+[ 2724.112739] FS:  0000000000000000(0000) GS:ffff89c0489ee000(0000) knlGS:0000000000000000
+[ 2724.114114] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[ 2724.115112] CR2: ffffffffc0a9d2a0 CR3: 0000000005d14001 CR4: 0000000000372ef0
+[ 2724.116346] Call Trace:
+[ 2724.116808]  <TASK>
+[ 2724.117192]  iterate_dir+0x227/0x270
+[ 2724.117843]  __ksmbd_vfs_kern_path+0x3a9/0x440 [ksmbd f7e8d0a4b439a08fcbe026f7d3ac8fc641906c31]
+[ 2724.119368]  ? __pfx___caseless_lookup+0x10/0x10 [ksmbd f7e8d0a4b439a08fcbe026f7d3ac8fc641906c31]
+[ 2724.120938]  smb2_open+0x106d/0x4250 [ksmbd f7e8d0a4b439a08fcbe026f7d3ac8fc641906c31]
+[ 2724.122318]  ? get_nohz_timer_target+0x2f/0x150
+[ 2724.123160]  ? common_interrupt+0x13/0xa0
+[ 2724.123882]  ? xas_load+0xd/0xd0
+[ 2724.124465]  ? xa_load+0x76/0xb0
+[ 2724.125050]  ? ksmbd_config_get_u32+0x41/0x50 [ksmbd f7e8d0a4b439a08fcbe026f7d3ac8fc641906c31]
+[ 2724.126670]  ? _raw_spin_unlock+0xe/0x30
+[ 2724.127488]  ? ksmbd_smb2_check_message+0x787/0x820 [ksmbd f7e8d0a4b439a08fcbe026f7d3ac8fc641906c31]
+[ 2724.129335]  ? ksmbd_tree_conn_lookup+0x47/0x80 [ksmbd f7e8d0a4b439a08fcbe026f7d3ac8fc641906c31]
+[ 2724.131338]  handle_ksmbd_work+0x42f/0x890 [ksmbd f7e8d0a4b439a08fcbe026f7d3ac8fc641906c31]
+[ 2724.133167]  ? psi_avgs_work+0x97/0xd0
+[ 2724.133976]  process_one_work+0x193/0x350
+[ 2724.134853]  worker_thread+0x2d7/0x410
+[ 2724.135687]  ? __pfx_worker_thread+0x10/0x10
+[ 2724.136614]  kthread+0xfc/0x240
+[ 2724.137292]  ? __pfx_kthread+0x10/0x10
+[ 2724.138108]  ? __pfx_kthread+0x10/0x10
+[ 2724.138890]  ret_from_fork+0x1c2/0x1f0
+[ 2724.139695]  ? __pfx_kthread+0x10/0x10
+[ 2724.140505]  ret_from_fork_asm+0x1a/0x30
+[ 2724.141325]  </TASK>
+[ 2724.141806] Modules linked in: ksmbd(OE) des_generic nls_utf8 md4 lz4_compress libdes intel_rapl_msr intel_rapl_common intel_uncore_frequency_common intel_pmc_core pmt_telemetry pmt_discovery pmt_class intel_pmc_ssram_telemetry intel_vsec kvm_intel kvm irqbypass polyval_clmulni ghash_clmulni_intel aesni_intel ppdev rapl joydev mousedev parport_pc parport psmouse pcspkr i2c_piix4 i2c_smbus mac_hid cfg80211 rfkill nfnetlink qemu_fw_cfg vmw_vsock_virtio_transport vmw_vsock_virtio_transport_common vsock sr_mod cdrom ata_generic pata_acpi ata_piix floppy intel_agp bochs intel_gtt serio_raw 9p 9pnet_virtio 9pnet virtio_net net_failover netfs failover
+[ 2724.141863] Unloaded tainted modules: ksmbd(OE):22 [last unloaded: ksmbd(OE)]
+[ 2724.154941] CR2: ffffffffc0a9d2a0
+[ 2724.155669] ---[ end trace 0000000000000000 ]---
+[ 2724.156635] RIP: 0010:fsnotify+0x3fe/0x1530
+[ 2724.157567] Code: 38 48 85 d2 0f 85 46 02 00 00 83 c1 01 83 f9 06 75 df 0f 1f 44 00 00 45 89 ea 44 23 4c 24 2c 41 f7 d2 45 85 ca 74 4b 49 8b 3f <48> 8b 07 48 85 c0 0f 84 b4 03 00 00 41 56 8b bc 24 c0 00 00 00 57
+[ 2724.161100] RSP: 0018:ffffd16f422779b0 EFLAGS: 00010202
+[ 2724.162145] RAX: 0000000000000001 RBX: 0000000000000001 RCX: 0000000000000006
+[ 2724.163582] RDX: 0000000000000020 RSI: 0000000000000000 RDI: ffffffffc0a9d2a0
+[ 2724.165012] RBP: ffffd16f422779e8 R08: 0000000000000000 R09: 0000000000000001
+[ 2724.166434] R10: 00000000ffffffff R11: 0000000000000002 R12: ffffd16f42277a18
+[ 2724.167935] R13: 0000000000000000 R14: ffffd16f422779e8 R15: ffff89bf90528200
+[ 2724.169356] FS:  0000000000000000(0000) GS:ffff89c0489ee000(0000) knlGS:0000000000000000
+[ 2724.170940] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[ 2724.172080] CR2: ffffffffc0a9d2a0 CR3: 0000000005d14001 CR4: 0000000000372ef0
+[ 2724.173512] note: kworker/1:0[2276] exited with irqs disabled
+[ 2794.280565] BUG: unable to handle page fault for address: ffffffffc0a9d2a0
+[ 2794.281907] #PF: supervisor read access in kernel mode
+[ 2794.282904] #PF: error_code(0x0000) - not-present page
+[ 2794.283900] PGD 33a29067 P4D 33a29067 PUD 33a2b067 PMD 7142067 PTE 0
+[ 2794.285124] Oops: Oops: 0000 [#3] SMP PTI
+[ 2794.285917] CPU: 0 UID: 0 PID: 1687 Comm: kworker/0:0 Tainted: G    B D W  OE       6.18.13-arch1-1 #1 PREEMPT(full)  37d84e5c59d38b1e3c61214631c6e0356ae9b977
+[ 2794.288616] Tainted: [B]=BAD_PAGE, [D]=DIE, [W]=WARN, [O]=OOT_MODULE, [E]=UNSIGNED_MODULE
+[ 2794.290158] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Arch Linux 1.17.0-2-2 04/01/2014
+[ 2794.291959] Workqueue: ksmbd-io handle_ksmbd_work [ksmbd]
+[ 2794.293066] RIP: 0010:fsnotify+0x3fe/0x1530
+[ 2794.293891] Code: 38 48 85 d2 0f 85 46 02 00 00 83 c1 01 83 f9 06 75 df 0f 1f 44 00 00 45 89 ea 44 23 4c 24 2c 41 f7 d2 45 85 ca 74 4b 49 8b 3f <48> 8b 07 48 85 c0 0f 84 b4 03 00 00 41 56 8b bc 24 c0 00 00 00 57
+[ 2794.297448] RSP: 0018:ffffd16f422df9b0 EFLAGS: 00010202
+[ 2794.298464] RAX: 0000000000000001 RBX: 0000000000000001 RCX: 0000000000000006
+[ 2794.299828] RDX: 0000000000000020 RSI: 0000000000000000 RDI: ffffffffc0a9d2a0
+[ 2794.301215] RBP: ffffd16f422df9e8 R08: 0000000000000000 R09: 0000000000000001
+[ 2794.302607] R10: 00000000ffffffff R11: 0000000000000002 R12: ffffd16f422dfa18
+[ 2794.303977] R13: 0000000000000000 R14: ffffd16f422df9e8 R15: ffff89bf90528200
+[ 2794.305364] FS:  0000000000000000(0000) GS:ffff89c0488ee000(0000) knlGS:0000000000000000
+[ 2794.306903] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[ 2794.308024] CR2: ffffffffc0a9d2a0 CR3: 0000000014eb8001 CR4: 0000000000372ef0
+[ 2794.309417] Call Trace:
+[ 2794.309904]  <TASK>
+[ 2794.310357]  iterate_dir+0x227/0x270
+[ 2794.311057]  __ksmbd_vfs_kern_path+0x3a9/0x440 [ksmbd f7e8d0a4b439a08fcbe026f7d3ac8fc641906c31]
+[ 2794.312798]  ? __pfx___caseless_lookup+0x10/0x10 [ksmbd f7e8d0a4b439a08fcbe026f7d3ac8fc641906c31]
+[ 2794.314577]  smb2_open+0x106d/0x4250 [ksmbd f7e8d0a4b439a08fcbe026f7d3ac8fc641906c31]
+[ 2794.316129]  ? release_sock+0x4f/0xa0
+[ 2794.316867]  ? _raw_spin_unlock_bh+0xe/0x20
+[ 2794.317698]  ? _raw_spin_unlock+0xe/0x30
+[ 2794.318477]  ? sched_balance_update_blocked_averages+0x5dc/0x6b0
+[ 2794.319645]  ? xas_load+0xd/0xd0
+[ 2794.320291]  ? xa_load+0x76/0xb0
+[ 2794.320942]  ? ksmbd_config_get_u32+0x41/0x50 [ksmbd f7e8d0a4b439a08fcbe026f7d3ac8fc641906c31]
+[ 2794.322691]  ? _raw_spin_unlock+0xe/0x30
+[ 2794.323476]  ? ksmbd_smb2_check_message+0x787/0x820 [ksmbd f7e8d0a4b439a08fcbe026f7d3ac8fc641906c31]
+[ 2794.325284]  ? ksmbd_tree_conn_lookup+0x47/0x80 [ksmbd f7e8d0a4b439a08fcbe026f7d3ac8fc641906c31]
+[ 2794.327019]  handle_ksmbd_work+0x42f/0x890 [ksmbd f7e8d0a4b439a08fcbe026f7d3ac8fc641906c31]
+[ 2794.328692]  process_one_work+0x193/0x350
+[ 2794.329486]  worker_thread+0x2d7/0x410
+[ 2794.330213]  ? __pfx_worker_thread+0x10/0x10
+[ 2794.331048]  kthread+0xfc/0x240
+[ 2794.331684]  ? __pfx_kthread+0x10/0x10
+[ 2794.332427]  ? __pfx_kthread+0x10/0x10
+[ 2794.333152]  ret_from_fork+0x1c2/0x1f0
+[ 2794.333916]  ? __pfx_kthread+0x10/0x10
+[ 2794.334705]  ret_from_fork_asm+0x1a/0x30
+[ 2794.335537]  </TASK>
+[ 2794.335977] Modules linked in: ksmbd(OE) des_generic nls_utf8 md4 lz4_compress libdes intel_rapl_msr intel_rapl_common intel_uncore_frequency_common intel_pmc_core pmt_telemetry pmt_discovery pmt_class intel_pmc_ssram_telemetry intel_vsec kvm_intel kvm irqbypass polyval_clmulni ghash_clmulni_intel aesni_intel ppdev rapl joydev mousedev parport_pc parport psmouse pcspkr i2c_piix4 i2c_smbus mac_hid cfg80211 rfkill nfnetlink qemu_fw_cfg vmw_vsock_virtio_transport vmw_vsock_virtio_transport_common vsock sr_mod cdrom ata_generic pata_acpi ata_piix floppy intel_agp bochs intel_gtt serio_raw 9p 9pnet_virtio 9pnet virtio_net net_failover netfs failover
+[ 2794.336035] Unloaded tainted modules: ksmbd(OE):22 [last unloaded: ksmbd(OE)]
+[ 2794.348104] CR2: ffffffffc0a9d2a0
+[ 2794.348767] ---[ end trace 0000000000000000 ]---
+[ 2794.349670] RIP: 0010:fsnotify+0x3fe/0x1530
+[ 2794.350527] Code: 38 48 85 d2 0f 85 46 02 00 00 83 c1 01 83 f9 06 75 df 0f 1f 44 00 00 45 89 ea 44 23 4c 24 2c 41 f7 d2 45 85 ca 74 4b 49 8b 3f <48> 8b 07 48 85 c0 0f 84 b4 03 00 00 41 56 8b bc 24 c0 00 00 00 57
+[ 2794.354076] RSP: 0018:ffffd16f422779b0 EFLAGS: 00010202
+[ 2794.355095] RAX: 0000000000000001 RBX: 0000000000000001 RCX: 0000000000000006
+[ 2794.356490] RDX: 0000000000000020 RSI: 0000000000000000 RDI: ffffffffc0a9d2a0
+[ 2794.357858] RBP: ffffd16f422779e8 R08: 0000000000000000 R09: 0000000000000001
+[ 2794.359247] R10: 00000000ffffffff R11: 0000000000000002 R12: ffffd16f42277a18
+[ 2794.360640] R13: 0000000000000000 R14: ffffd16f422779e8 R15: ffff89bf90528200
+[ 2794.362022] FS:  0000000000000000(0000) GS:ffff89c0488ee000(0000) knlGS:0000000000000000
+[ 2794.363599] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[ 2794.364724] CR2: ffffffffc0a9d2a0 CR3: 0000000014eb8001 CR4: 0000000000372ef0
+[ 2794.366086] note: kworker/0:0[1687] exited with irqs disabled
+[ 2854.340408] BUG: unable to handle page fault for address: ffffffffc0a9d2a0
+[ 2854.342048] #PF: supervisor read access in kernel mode
+[ 2854.343532] #PF: error_code(0x0000) - not-present page
+[ 2854.344810] PGD 33a29067 P4D 33a29067 PUD 33a2b067 PMD 7142067 PTE 0
+[ 2854.346414] Oops: Oops: 0000 [#4] SMP PTI
+[ 2854.347467] CPU: 0 UID: 0 PID: 2260 Comm: kworker/0:2 Tainted: G    B D W  OE       6.18.13-arch1-1 #1 PREEMPT(full)  37d84e5c59d38b1e3c61214631c6e0356ae9b977
+[ 2854.350835] Tainted: [B]=BAD_PAGE, [D]=DIE, [W]=WARN, [O]=OOT_MODULE, [E]=UNSIGNED_MODULE
+[ 2854.352841] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Arch Linux 1.17.0-2-2 04/01/2014
+[ 2854.355071] Workqueue: ksmbd-io handle_ksmbd_work [ksmbd]
+[ 2854.356089] RIP: 0010:fsnotify+0x3fe/0x1530
+[ 2854.356840] Code: 38 48 85 d2 0f 85 46 02 00 00 83 c1 01 83 f9 06 75 df 0f 1f 44 00 00 45 89 ea 44 23 4c 24 2c 41 f7 d2 45 85 ca 74 4b 49 8b 3f <48> 8b 07 48 85 c0 0f 84 b4 03 00 00 41 56 8b bc 24 c0 00 00 00 57
+[ 2854.360081] RSP: 0018:ffffd16f405239b0 EFLAGS: 00010202
+[ 2854.361098] RAX: 0000000000000001 RBX: 0000000000000001 RCX: 0000000000000006
+[ 2854.362403] RDX: 0000000000000020 RSI: 0000000000000000 RDI: ffffffffc0a9d2a0
+[ 2854.363657] RBP: ffffd16f405239e8 R08: 0000000000000000 R09: 0000000000000001
+[ 2854.364889] R10: 00000000ffffffff R11: 0000000000000002 R12: ffffd16f40523a18
+[ 2854.366120] R13: 0000000000000000 R14: ffffd16f405239e8 R15: ffff89bf90528200
+[ 2854.367371] FS:  0000000000000000(0000) GS:ffff89c0488ee000(0000) knlGS:0000000000000000
+[ 2854.368778] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[ 2854.369797] CR2: ffffffffc0a9d2a0 CR3: 000000000132e003 CR4: 0000000000372ef0
+[ 2854.371050] Call Trace:
+[ 2854.371519]  <TASK>
+[ 2854.371908]  iterate_dir+0x227/0x270
+[ 2854.372573]  __ksmbd_vfs_kern_path+0x3a9/0x440 [ksmbd f7e8d0a4b439a08fcbe026f7d3ac8fc641906c31]
+[ 2854.374125]  ? __pfx___caseless_lookup+0x10/0x10 [ksmbd f7e8d0a4b439a08fcbe026f7d3ac8fc641906c31]
+[ 2854.375696]  smb2_open+0x106d/0x4250 [ksmbd f7e8d0a4b439a08fcbe026f7d3ac8fc641906c31]
+[ 2854.377121]  ? update_irq_load_avg+0x47/0x520
+[ 2854.377931]  ? update_irq_load_avg+0x47/0x520
+[ 2854.378746]  ? _raw_spin_unlock+0xe/0x30
+[ 2854.379459]  ? sched_balance_update_blocked_averages+0x5dc/0x6b0
+[ 2854.380539]  ? xas_load+0xd/0xd0
+[ 2854.381116]  ? xa_load+0x76/0xb0
+[ 2854.381714]  ? ksmbd_config_get_u32+0x41/0x50 [ksmbd f7e8d0a4b439a08fcbe026f7d3ac8fc641906c31]
+[ 2854.383271]  ? _raw_spin_unlock+0xe/0x30
+[ 2854.383964]  ? ksmbd_smb2_check_message+0x787/0x820 [ksmbd f7e8d0a4b439a08fcbe026f7d3ac8fc641906c31]
+[ 2854.385616]  ? ksmbd_tree_conn_lookup+0x47/0x80 [ksmbd f7e8d0a4b439a08fcbe026f7d3ac8fc641906c31]
+[ 2854.387196]  handle_ksmbd_work+0x42f/0x890 [ksmbd f7e8d0a4b439a08fcbe026f7d3ac8fc641906c31]
+[ 2854.388692]  process_one_work+0x193/0x350
+[ 2854.389400]  worker_thread+0x2d7/0x410
+[ 2854.390070]  ? __pfx_worker_thread+0x10/0x10
+[ 2854.390839]  kthread+0xfc/0x240
+[ 2854.391414]  ? __pfx_kthread+0x10/0x10
+[ 2854.392081]  ? __pfx_kthread+0x10/0x10
+[ 2854.392763]  ret_from_fork+0x1c2/0x1f0
+[ 2854.393437]  ? __pfx_kthread+0x10/0x10
+[ 2854.394102]  ret_from_fork_asm+0x1a/0x30
+[ 2854.394811]  </TASK>
+[ 2854.395224] Modules linked in: ksmbd(OE) des_generic nls_utf8 md4 lz4_compress libdes intel_rapl_msr intel_rapl_common intel_uncore_frequency_common intel_pmc_core pmt_telemetry pmt_discovery pmt_class intel_pmc_ssram_telemetry intel_vsec kvm_intel kvm irqbypass polyval_clmulni ghash_clmulni_intel aesni_intel ppdev rapl joydev mousedev parport_pc parport psmouse pcspkr i2c_piix4 i2c_smbus mac_hid cfg80211 rfkill nfnetlink qemu_fw_cfg vmw_vsock_virtio_transport vmw_vsock_virtio_transport_common vsock sr_mod cdrom ata_generic pata_acpi ata_piix floppy intel_agp bochs intel_gtt serio_raw 9p 9pnet_virtio 9pnet virtio_net net_failover netfs failover
+[ 2854.395268] Unloaded tainted modules: ksmbd(OE):22 [last unloaded: ksmbd(OE)]
+[ 2854.406206] CR2: ffffffffc0a9d2a0
+[ 2854.406801] ---[ end trace 0000000000000000 ]---
+[ 2854.407787] RIP: 0010:fsnotify+0x3fe/0x1530
+[ 2854.408540] Code: 38 48 85 d2 0f 85 46 02 00 00 83 c1 01 83 f9 06 75 df 0f 1f 44 00 00 45 89 ea 44 23 4c 24 2c 41 f7 d2 45 85 ca 74 4b 49 8b 3f <48> 8b 07 48 85 c0 0f 84 b4 03 00 00 41 56 8b bc 24 c0 00 00 00 57
+[ 2854.411779] RSP: 0018:ffffd16f422779b0 EFLAGS: 00010202
+[ 2854.412716] RAX: 0000000000000001 RBX: 0000000000000001 RCX: 0000000000000006
+[ 2854.413978] RDX: 0000000000000020 RSI: 0000000000000000 RDI: ffffffffc0a9d2a0
+[ 2854.415254] RBP: ffffd16f422779e8 R08: 0000000000000000 R09: 0000000000000001
+[ 2854.416539] R10: 00000000ffffffff R11: 0000000000000002 R12: ffffd16f42277a18
+[ 2854.417811] R13: 0000000000000000 R14: ffffd16f422779e8 R15: ffff89bf90528200
+[ 2854.419077] FS:  0000000000000000(0000) GS:ffff89c0488ee000(0000) knlGS:0000000000000000
+[ 2854.420510] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[ 2854.421536] CR2: ffffffffc0a9d2a0 CR3: 000000000132e003 CR4: 0000000000372ef0
+[ 2854.422795] note: kworker/0:2[2260] exited with irqs disabled
+[ 7145.375160] hrtimer: interrupt took 4854187 ns

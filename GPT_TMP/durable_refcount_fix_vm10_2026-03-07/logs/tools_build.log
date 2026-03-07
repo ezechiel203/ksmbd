@@ -1,0 +1,32 @@
+ninja: Entering directory `/home/ezechiel203/ksmbd/ksmbd-tools/build-codex'
+[1/29] Compiling C object addshare/libaddshare.a.p/share_admin.c.o
+[2/29] Compiling C object addshare/libaddshare.a.p/addshare.c.o
+[3/29] Compiling C object adduser/libadduser.a.p/md4_hash.c.o
+[4/29] Compiling C object adduser/libadduser.a.p/user_admin.c.o
+[5/29] Compiling C object adduser/libadduser.a.p/adduser.c.o
+[6/29] Compiling C object mountd/libmountd.a.p/ipc.c.o
+[7/29] Compiling C object mountd/libmountd.a.p/rpc.c.o
+[8/29] Compiling C object tools/libtools.a.p/management_tree_conn.c.o
+[9/29] Compiling C object mountd/libmountd.a.p/rpc_wkssvc.c.o
+[10/29] Compiling C object mountd/libmountd.a.p/mountd.c.o
+[11/29] Compiling C object tools/libtools.a.p/management_share.c.o
+[12/29] Compiling C object tools/libtools.a.p/management_session.c.o
+[13/29] Compiling C object tools/libtools.a.p/management_user.c.o
+[14/29] Linking static target addshare/libaddshare.a
+[15/29] Linking static target adduser/libadduser.a
+[16/29] Compiling C object mountd/libmountd.a.p/rpc_lsarpc.c.o
+[17/29] Compiling C object tools/ksmbdctl.p/main.c.o
+[18/29] Compiling C object mountd/libmountd.a.p/smbacl.c.o
+[19/29] Compiling C object mountd/libmountd.a.p/rpc_samr.c.o
+[20/29] Compiling C object control/libcontrol.a.p/control.c.o
+[21/29] Compiling C object tools/libtools.a.p/tools.c.o
+[22/29] Linking static target control/libcontrol.a
+[23/29] Compiling C object tools/libtools.a.p/config_parser.c.o
+[24/29] Compiling C object mountd/libmountd.a.p/worker.c.o
+[25/29] Compiling C object tools/libtools.a.p/ksmbdctl.c.o
+[26/29] Linking static target tools/libtools.a
+[27/29] Compiling C object mountd/libmountd.a.p/rpc_srvsvc.c.o
+[28/29] Linking static target mountd/libmountd.a
+[29/29] Linking target tools/ksmbdctl
+INFO: autodetecting backend as ninja
+INFO: calculating backend command to run: /usr/bin/ninja -C /home/ezechiel203/ksmbd/ksmbd-tools/build-codex tools/ksmbdctl

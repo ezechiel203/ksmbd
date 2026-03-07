@@ -1,0 +1,11 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772584990
+time: 2026-03-04 00:43:10.966856
+progress: 1
+test: localposixlock1
+time: 2026-03-04 00:43:10.968682
+time: 2026-03-04 00:43:10.984046
+failure: localposixlock1 [
+../../source4/torture/smb2/samba3misc.c:102: Expression `localdir != ((void *)0)' failed: --option=torture:localdir=<LOCALDIR> required
+]

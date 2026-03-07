@@ -1,0 +1,120 @@
+[    4.833628] systemd[1]: Started Journal Service.
+[[0;32m  OK  [0m] Started [0;1;39mJournal Service[0m.
+[[0;32m  OK  [0m] Mounted [0;1;39mKernel Debug File System[0m.
+[[0;32m  OK  [0m] Mounted [0;1;39mKernel Trace File System[0m.
+[[0;32m  OK  [0m] Mounted [0;1;39mTemporary Directory /tmp[0m.
+[[0;32m  OK  [0m] Finished [0;1;39mCreate List of Static Device Nodes[0m.
+[[0;32m  OK  [0m] Mounted [0;1;39mKernel Configuration File System[0m.
+[[0;32m  OK  [0m] Mounted [0;1;39mFUSE Control File System[0m.
+[[0;32m  OK  [0m] Finished [0;1;39mGenerate Network Units from Kernel Command Line[0m.
+[[0;32m  OK  [0m] Finished [0;1;39mRemount Root and Kernel File Systems[0m.
+[[0;32m  OK  [0m] Finished [0;1;39mApply Kernel Variables[0m.
+[[0;32m  OK  [0m] Finished [0;1;39mLoad udev Rules from Credentials[0m.
+[[0;32m  OK  [0m] Reached target [0;1;39mPreparation for Network[0m.
+         Starting [0;1;39mFlush Journal to Persistent Storage[0m...
+         Starting [0;1;39mLoad/Save OS Random Seed[0m...
+         Starting [0;1;39mCreate Static Device Nodes in /dev gracefully[0m...
+[    4.903139] systemd-journald[341]: Received client request to flush runtime journal.
+[    4.921444] systemd-journald[341]: File /var/log/journal/0ab76daf18ce42b0b036a81eb53bdd79/system.journal corrupted or uncleanly shut down, renaming and replacing.
+         Starting [0;1;39mUser Database Manager[0m...
+[[0;32m  OK  [0m] Finished [0;1;39mLoad/Save OS Random Seed[0m.
+[[0;32m  OK  [0m] Started [0;1;39mUser Database Manager[0m.
+[[0;32m  OK  [0m] Finished [0;1;39mFlush Journal to Persistent Storage[0m.
+[[0;32m  OK  [0m] Finished [0;1;39mCreate Static Device Nodes in /dev gracefully[0m.
+         Starting [0;1;39mNetwork Name Resolution[0m...
+         Starting [0;1;39mCreate Static Device Nodes in /dev[0m...
+[[0;32m  OK  [0m] Finished [0;1;39mColdplug All udev Devices[0m.
+[[0;32m  OK  [0m] Finished [0;1;39mCreate Static Device Nodes in /dev[0m.
+[[0;32m  OK  [0m] Reached target [0;1;39mPreparation for Local File Systems[0m.
+         Starting [0;1;39mRule-based Manager for Device Events and Files[0m...
+[[0;32m  OK  [0m] Started [0;1;39mNetwork Name Resolution[0m.
+[[0;32m  OK  [0m] Reached target [0;1;39mHost and Network Name Lookups[0m.
+[[0;32m  OK  [0m] Started [0;1;39mRule-based Manager for Device Events and Files[0m.
+         Starting [0;1;39mNetwork Management[0m...
+[    5.419001] cfg80211: Loading compiled-in X.509 certificates for regulatory database
+[    5.428491] Loaded X.509 cert 'sforshee: 00b28ddf47aef9cea7'
+[    5.430187] Loaded X.509 cert 'wens: 61c038651aabdcf94bd0ac7ff06c7248db18c600'
+[    5.432085] faux_driver regulatory: Direct firmware load for regulatory.db failed with error -2
+[    5.434975] cfg80211: failed to load regulatory.db
+[    5.446104] virtio_net virtio1 ens4: renamed from eth0
+[[0;32m  OK  [0m] Started [0;1;39mNetwork Management[0m.
+[[0;32m  OK  [0m] Reached target [0;1;39mNetwork[0m.
+         Starting [0;1;39mEnable Persistent Storage in systemd-networkd[0m...
+         Mounting [0;1;39m/mnt/ksmbd[0m...
+[[0;32m  OK  [0m] Reached target [0;1;39mLocal File Systems[0m.
+[[0;32m  OK  [0m] Listening on [0;1;39mBoot Entries Service Socket[0m.
+[[0;32m  OK  [0m] Listening on [0;1;39mDisk Image Download Service Socket[0m.
+[[0;32m  OK  [0m] Listening on [0;1;39mSystem Extension Image Management[0m.
+         Starting [0;1;39mCreate System Files and Directories[0m...
+         Starting [0;1;39mLoad JSON user/group Records from Credentials[0m...
+[[0;32m  OK  [0m] Finished [0;1;39mEnable Persistent Storage in systemd-networkd[0m.
+[    5.601048] 9pnet: Limiting 'msize' to 512000 as this is the maximum supported by transport virtio
+[[0;32m  OK  [0m] Mounted [0;1;39m/mnt/ksmbd[0m.
+[[0;32m  OK  [0m] Finished [0;1;39mLoad JSON user/group Records from Credentials[0m.
+[    5.784602] piix4_smbus 0000:00:01.3: SMBus Host Controller at 0x700, revision 0
+[    5.789170] i2c i2c-0: Memory type 0x07 not supported yet, not instantiating SPD
+[[0;32m  OK  [0m] Finished [0;1;39mCreate System Files and Directories[0m.
+         Starting [0;1;39mRecord System Boot/Shutdown in UTMP[0m...
+[    5.831416] input: PC Speaker as /devices/platform/pcspkr/input/input3
+[    5.842417] input: VirtualPS/2 VMware VMMouse as /devices/platform/i8042/serio1/input/input5
+[[0;32m  OK  [0m] Finished [0;1;39mRecord System Boot/Shutdown in UTMP[0m.
+[    5.849876] input: VirtualPS/2 VMware VMMouse as /devices/platform/i8042/serio1/input/input4
+[[0;32m  OK  [0m] Reached target [0;1;39mSystem Initialization[0m.
+[[0;32m  OK  [0m] Started [0;1;39mRefresh existing PGP keys of archlinux-keyring regularly[0m.
+[[0;32m  OK  [0m] Started [0;1;39mDaily verification of password and group files[0m.
+[[0;32m  OK  [0m] Started [0;1;39mDaily Cleanup of Temporary Directories[0m.
+[[0;32m  OK  [0m] Reached target [0;1;39mTimer Units[0m.
+[[0;32m  OK  [0m] Listening on [0;1;39mD-Bus System Message Bus Socket[0m.
+[[0;32m  OK  [0m] Listening on [0;1;39mGnuPG network certifi…ent daemon for /etc/pacman.d/gnupg[0m.
+[[0;32m  OK  [0m] Listening on [0;1;39mGnuPG cryptographic a… browsers) for /etc/pacman.d/gnupg[0m.
+[[0;32m  OK  [0m] Listening on [0;1;39mGnuPG cryptographic a…estricted) for /etc/pacman.d/gnupg[0m.
+[[0;32m  OK  [0m] Listening on [0;1;39mGnuPG cryptographic a…emulation) for /etc/pacman.d/gnupg[0m.
+[[0;32m  OK  [0m] Listening on [0;1;39mGnuPG cryptographic a…rase cache for /etc/pacman.d/gnupg[0m.
+[[0;32m  OK  [0m] Listening on [0;1;39mGnuPG public key mana…nt service for /etc/pacman.d/gnupg[0m.
+[[0;32m  OK  [0m] Listening on [0;1;39mOpenSSH Server Socket…temd-ssh-generator, AF_UNIX Local)[0m.
+[[0;32m  OK  [0m] Listening on [0;1;39mHostname Service Socket[0m.
+[[0;32m  OK  [0m] Listening on [0;1;39mUser Login Management Varlink Socket[0m.
+[[0;32m  OK  [0m] Listening on [0;1;39mVirtual Machine and C…tainer Registration Service Socket[0m.
+[[0;32m  OK  [0m] Reached target [0;1;39mSocket Units[0m.
+         Starting [0;1;39mD-Bus System Message Bus[0m...
+[    5.913987] parport_pc 00:03: reported by Plug and Play ACPI
+[[0;32m  OK  [0m] Listening on [0;1;39mLoad/Save RF Kill Switch Status /dev/rfkill Watch[0m.
+[    5.941296] parport0: PC-style at 0x378, irq 7 [PCSPP,TRISTATE]
+[[0;32m  OK  [0m] Started [0;1;39mD-Bus System Message Bus[0m.
+[    5.976967] mousedev: PS/2 mouse device common for all mice
+[[0;32m  OK  [0m] Reached target [0;1;39mBasic System[0m.
+         Starting [0;1;39mOpenSSH Daemon[0m...
+         Starting [0;1;39mUser Login Management[0m...
+         Starting [0;1;39mPermit User Sessions[0m...
+         Starting [0;1;39mVirtual Console Setup[0m...
+[    6.039066] RAPL PMU: API unit is 2^-32 Joules, 0 fixed counters, 10737418240 ms ovfl timer
+[[0;32m  OK  [0m] Stopped [0;1;39mVirtual Console Setup[0m.
+         Starting [0;1;39mVirtual Console Setup[0m...
+[[0;32m  OK  [0m] Finished [0;1;39mPermit User Sessions[0m.
+[[0;32m  OK  [0m] Started [0;1;39mOpenSSH Daemon[0m.[    6.096254] ppdev: user-space parallel port driver
+
+[[0;32m  OK  [0m] Reached target [0;1;39mSSH Access Available[0m.
+[[0;32m  OK  [0m] Started [0;1;39mGetty on tty1[0m.
+[[0;32m  OK  [0m] Started [0;1;39mSerial Getty on ttyS0[0m.
+[[0;32m  OK  [0m] Reached target [0;1;39mLogin Prompts[0m.
+[[0;32m  OK  [0m] Started [0;1;39mUser Login Management[0m.
+[[0;32m  OK  [0m] Reached target [0;1;39mMulti-User System[0m.
+[[0;32m  OK  [0m] Reached target [0;1;39mGraphical Interface[0m.
+[[0;32m  OK  [0m] Finished [0;1;39mVirtual Console Setup[0m.
+[!p]104\[0m[?7h[1G[0J[6n[32766;32766H[6n[!p]104\[0m[?7h[1G[0J[6n[32766;32766H[6n]3008;start=29ddaa055095415e99cd9d2912703d49;user=root;hostname=ksmbd-vm;machineid=0ab76daf18ce42b0b036a81eb53bdd79;bootid=2a234bb57b2d48b6b5bb7288a5c67f1f;pid=443;pidfdid=444;comm=(agetty);servicename=serial-getty@ttyS0.service;invocationid=783dec11801c4428a62911423ba23f3f;type=service\P+q6E616D65\
+Arch Linux 6.18.13-arch1-1 (ttyS0)
+
+ksmbd-vm login: root (automatic login)
+
+]3008;start=8f881e3560d64734beab43699ca7e9f0;user=root;hostname=ksmbd-vm;machineid=0ab76daf18ce42b0b036a81eb53bdd79;bootid=2a234bb57b2d48b6b5bb7288a5c67f1f;pid=443;pidfdid=444;comm=login;targetuser=root;sessionid=1;type=session\
+  ╔══════════════════════════════════════════════╗
+  ║         ksmbd Test VM                        ║
+  ╠══════════════════════════════════════════════╣
+  ║  /root/start-ksmbd.sh   - Start server      ║
+  ║  /root/reload-ksmbd.sh  - Reload module      ║
+  ║  /root/dev-info.sh      - Debug/analysis info║
+  ║  /mnt/ksmbd/            - Shared source      ║
+  ║  poweroff                - Shutdown VM        ║
+  ╚══════════════════════════════════════════════╝
+
+]3008;start=dac67bbe-e555-44ee-9a87-a3558fbef1af;machineid=0ab76daf18ce42b0b036a81eb53bdd79;user=root;hostname=ksmbd-vm;bootid=2a234bb5-7b2d-48b6-b5bb-7288a5c67f1f;pid=459;type=shell;cwd=/root\[?2004h[root@ksmbd-vm ~]# 

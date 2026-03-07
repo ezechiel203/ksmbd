@@ -1,0 +1,8 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772500083
+time: 2026-03-03 01:08:03.069366
+test: openattr
+time: 2026-03-03 01:08:03.070274
+time: 2026-03-03 01:08:25.673110
+success: openattr

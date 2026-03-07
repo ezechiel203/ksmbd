@@ -1,0 +1,172 @@
+make: Entering directory '/usr/lib/modules/6.18.13-arch1-1/build'
+make[1] : on entre dans le répertoire « /home/ezechiel203/ksmbd »
+  CC [M]  src/encoding/unicode.o
+  CC [M]  src/core/auth.o
+  CC [M]  src/fs/vfs.o
+src/fs/vfs.c: Dans la fonction « ksmbd_vfs_get_ea_size »:
+src/fs/vfs.c:2568:21: attention: variable inutilisée « entry_size » [-Wunused-variable]
+ 2568 |                 u32 entry_size;
+      |                     ^~~~~~~~~~
+  CC [M]  src/fs/vfs_cache.o
+  CC [M]  src/core/connection.o
+  CC [M]  src/core/crypto_ctx.o
+  CC [M]  src/core/server.o
+  CC [M]  src/core/misc.o
+  CC [M]  src/fs/oplock.o
+  CC [M]  src/core/ksmbd_work.o
+  CC [M]  src/fs/smbacl.o
+src/fs/smbacl.c:127:6: attention: aucun prototype précédent pour « smb_copy_sid » [-Wmissing-prototypes]
+  127 | void smb_copy_sid(struct smb_sid *dst, const struct smb_sid *src)
+      |      ^~~~~~~~~~~~
+src/fs/smbacl.c:146:9: attention: aucun prototype précédent pour « access_flags_to_mode » [-Wmissing-prototypes]
+  146 | umode_t access_flags_to_mode(struct smb_fattr *fattr, __le32 ace_flags,
+      |         ^~~~~~~~~~~~~~~~~~~~
+src/fs/smbacl.c:183:6: attention: aucun prototype précédent pour « mode_to_access_flags » [-Wmissing-prototypes]
+  183 | void mode_to_access_flags(umode_t mode, umode_t bits_to_use,
+      |      ^~~~~~~~~~~~~~~~~~~~
+src/fs/smbacl.c:229:7: attention: aucun prototype précédent pour « fill_ace_for_sid » [-Wmissing-prototypes]
+  229 | __u16 fill_ace_for_sid(struct smb_ace *pntace,
+      |       ^~~~~~~~~~~~~~~~
+src/fs/smbacl.c:478:5: attention: aucun prototype précédent pour « ksmbd_sid_to_id_domain_aware » [-Wmissing-prototypes]
+  478 | int ksmbd_sid_to_id_domain_aware(struct smb_sid *psid, uid_t *id_out)
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/fs/smbacl.c:804:6: attention: aucun prototype précédent pour « parse_dacl » [-Wmissing-prototypes]
+  804 | void parse_dacl(struct mnt_idmap *idmap,
+      |      ^~~~~~~~~~
+src/fs/smbacl.c:1972:6: attention: aucun prototype précédent pour « smb_set_ace » [-Wmissing-prototypes]
+ 1972 | void smb_set_ace(struct smb_ace *ace, const struct smb_sid *sid, u8 type,
+      |      ^~~~~~~~~~~
+  CC [M]  src/encoding/ndr.o
+  CC [M]  src/core/ksmbd_buffer.o
+  CC [M]  src/core/smb2_compress.o
+src/core/smb2_compress.c:86:22: attention: aucun prototype précédent pour « smb2_pattern_v1_compress » [-Wmissing-prototypes]
+   86 | VISIBLE_IF_KUNIT int smb2_pattern_v1_compress(const void *src, unsigned int src_len,
+      |                      ^~~~~~~~~~~~~~~~~~~~~~~~
+src/core/smb2_compress.c:130:22: attention: aucun prototype précédent pour « smb2_pattern_v1_decompress » [-Wmissing-prototypes]
+  130 | VISIBLE_IF_KUNIT int smb2_pattern_v1_decompress(const void *src, unsigned int src_len,
+      |                      ^~~~~~~~~~~~~~~~~~~~~~~~~~
+src/core/smb2_compress.c:169:22: attention: aucun prototype précédent pour « smb2_lz4_decompress » [-Wmissing-prototypes]
+  169 | VISIBLE_IF_KUNIT int smb2_lz4_decompress(const void *src, unsigned int src_len,
+      |                      ^~~~~~~~~~~~~~~~~~~
+src/core/smb2_compress.c:1349:22: attention: aucun prototype précédent pour « smb2_compress_data » [-Wmissing-prototypes]
+ 1349 | VISIBLE_IF_KUNIT int smb2_compress_data(__le16 algorithm, const void *src,
+      |                      ^~~~~~~~~~~~~~~~~~
+src/core/smb2_compress.c:1404:22: attention: aucun prototype précédent pour « smb2_decompress_data » [-Wmissing-prototypes]
+ 1404 | VISIBLE_IF_KUNIT int smb2_decompress_data(__le16 algorithm, const void *src,
+      |                      ^~~~~~~~~~~~~~~~~~~~
+  CC [M]  src/core/ksmbd_md4.o
+  CC [M]  src/mgmt/ksmbd_ida.o
+  CC [M]  src/mgmt/user_config.o
+  CC [M]  src/mgmt/share_config.o
+  CC [M]  src/mgmt/tree_connect.o
+  CC [M]  src/mgmt/user_session.o
+  CC [M]  src/mgmt/ksmbd_witness.o
+  CC [M]  src/protocol/common/smb_common.o
+  CC [M]  src/transport/transport_tcp.o
+  CC [M]  src/transport/transport_ipc.o
+  CC [M]  src/core/ksmbd_debugfs.o
+  CC [M]  src/core/ksmbd_config.o
+  CC [M]  src/core/ksmbd_feature.o
+  CC [M]  src/protocol/smb2/smb2_pdu_common.o
+  CC [M]  src/protocol/smb2/smb2_negotiate.o
+  CC [M]  src/protocol/smb2/smb2_session.o
+  CC [M]  src/protocol/smb2/smb2_tree.o
+  CC [M]  src/protocol/smb2/smb2_create.o
+  CC [M]  src/protocol/smb2/smb2_ph.o
+src/protocol/smb2/smb2_ph.c: Dans la fonction « ksmbd_ph_save »:
+src/protocol/smb2/smb2_ph.c:143:1: attention: la taille de trame de 4344 octets est plus grande que 2048 octets [-Wframe-larger-than=]
+  143 | }
+      | ^
+  CC [M]  src/protocol/smb2/smb2_dir.o
+  CC [M]  src/protocol/smb2/smb2_query_set.o
+src/protocol/smb2/smb2_query_set.c:68:5: attention: aucun prototype précédent pour « buffer_check_err » [-Wmissing-prototypes]
+   68 | int buffer_check_err(int reqOutputBufferLength,
+      |     ^~~~~~~~~~~~~~~~
+src/protocol/smb2/smb2_query_set.c:89:6: attention: aucun prototype précédent pour « get_standard_info_pipe » [-Wmissing-prototypes]
+   89 | void get_standard_info_pipe(struct smb2_query_info_rsp *rsp,
+      |      ^~~~~~~~~~~~~~~~~~~~~~
+src/protocol/smb2/smb2_query_set.c:107:6: attention: aucun prototype précédent pour « get_internal_info_pipe » [-Wmissing-prototypes]
+  107 | void get_internal_info_pipe(struct smb2_query_info_rsp *rsp, u64 num,
+      |      ^~~~~~~~~~~~~~~~~~~~~~
+src/protocol/smb2/smb2_query_set.c:379:6: attention: aucun prototype précédent pour « get_file_access_info » [-Wmissing-prototypes]
+  379 | void get_file_access_info(struct smb2_query_info_rsp *rsp,
+      |      ^~~~~~~~~~~~~~~~~~~~
+src/protocol/smb2/smb2_query_set.c:392:5: attention: aucun prototype précédent pour « get_file_basic_info » [-Wmissing-prototypes]
+  392 | int get_file_basic_info(struct smb2_query_info_rsp *rsp,
+      |     ^~~~~~~~~~~~~~~~~~~
+src/protocol/smb2/smb2_query_set.c:428:5: attention: aucun prototype précédent pour « get_file_standard_info » [-Wmissing-prototypes]
+  428 | int get_file_standard_info(struct smb2_query_info_rsp *rsp,
+      |     ^~~~~~~~~~~~~~~~~~~~~~
+src/protocol/smb2/smb2_query_set.c:462:6: attention: aucun prototype précédent pour « get_file_alignment_info » [-Wmissing-prototypes]
+  462 | void get_file_alignment_info(struct smb2_query_info_rsp *rsp,
+      |      ^~~~~~~~~~~~~~~~~~~~~~~
+src/protocol/smb2/smb2_query_set.c:837:5: attention: aucun prototype précédent pour « get_file_internal_info » [-Wmissing-prototypes]
+  837 | int get_file_internal_info(struct smb2_query_info_rsp *rsp,
+      |     ^~~~~~~~~~~~~~~~~~~~~~
+src/protocol/smb2/smb2_query_set.c:909:6: attention: aucun prototype précédent pour « get_file_ea_info » [-Wmissing-prototypes]
+  909 | void get_file_ea_info(struct smb2_query_info_rsp *rsp,
+      |      ^~~~~~~~~~~~~~~~
+src/protocol/smb2/smb2_query_set.c:996:6: attention: aucun prototype précédent pour « get_file_position_info » [-Wmissing-prototypes]
+  996 | void get_file_position_info(struct smb2_query_info_rsp *rsp,
+      |      ^~~~~~~~~~~~~~~~~~~~~~
+src/protocol/smb2/smb2_query_set.c:1013:6: attention: aucun prototype précédent pour « get_file_mode_info » [-Wmissing-prototypes]
+ 1013 | void get_file_mode_info(struct smb2_query_info_rsp *rsp,
+      |      ^~~~~~~~~~~~~~~~~~
+src/protocol/smb2/smb2_query_set.c:1026:5: attention: aucun prototype précédent pour « get_file_compression_info » [-Wmissing-prototypes]
+ 1026 | int get_file_compression_info(struct smb2_query_info_rsp *rsp,
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~
+src/protocol/smb2/smb2_query_set.c:1073:5: attention: aucun prototype précédent pour « get_file_attribute_tag_info » [-Wmissing-prototypes]
+ 1073 | int get_file_attribute_tag_info(struct smb2_query_info_rsp *rsp,
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/protocol/smb2/smb2_query_set.c:1209:5: attention: aucun prototype précédent pour « get_file_id_info » [-Wmissing-prototypes]
+ 1209 | int get_file_id_info(struct smb2_query_info_rsp *rsp,
+      |     ^~~~~~~~~~~~~~~~
+src/protocol/smb2/smb2_query_set.c:1255:6: attention: aucun prototype précédent pour « fill_fallback_object_id » [-Wmissing-prototypes]
+ 1255 | void fill_fallback_object_id(struct ksmbd_file *fp, u8 *object_id)
+      |      ^~~~~~~~~~~~~~~~~~~~~~~
+src/protocol/smb2/smb2_query_set.c:3560:5: attention: aucun prototype précédent pour « set_file_position_info » [-Wmissing-prototypes]
+ 3560 | int set_file_position_info(struct ksmbd_file *fp,
+      |     ^~~~~~~~~~~~~~~~~~~~~~
+src/protocol/smb2/smb2_query_set.c:3600:5: attention: aucun prototype précédent pour « set_file_mode_info » [-Wmissing-prototypes]
+ 3600 | int set_file_mode_info(struct ksmbd_file *fp,
+      |     ^~~~~~~~~~~~~~~~~~
+  CC [M]  src/protocol/smb2/smb2_read_write.o
+  CC [M]  src/protocol/smb2/smb2_lock.o
+  CC [M]  src/protocol/smb2/smb2_ioctl.o
+  CC [M]  src/protocol/smb2/smb2_notify.o
+  CC [M]  src/protocol/smb2/smb2_misc_cmds.o
+  CC [M]  src/protocol/smb2/smb2ops.o
+  CC [M]  src/protocol/smb2/smb2misc.o
+  ASN.1   src/encoding/ksmbd_spnego_negtokeninit.asn1.[ch]
+  CC [M]  src/encoding/ksmbd_spnego_negtokeninit.asn1.o
+  ASN.1   src/encoding/ksmbd_spnego_negtokentarg.asn1.[ch]
+  CC [M]  src/encoding/ksmbd_spnego_negtokentarg.asn1.o
+  CC [M]  src/encoding/asn1.o
+  CC [M]  src/core/compat.o
+  CC [M]  src/fs/ksmbd_fsctl.o
+  CC [M]  src/fs/ksmbd_create_ctx.o
+  CC [M]  src/fs/ksmbd_info.o
+  CC [M]  src/fs/ksmbd_dfs.o
+  CC [M]  src/fs/ksmbd_vss.o
+  CC [M]  src/fs/ksmbd_notify.o
+  CC [M]  src/fs/ksmbd_reparse.o
+  CC [M]  src/fs/ksmbd_resilient.o
+  CC [M]  src/fs/ksmbd_quota.o
+  CC [M]  src/fs/ksmbd_app_instance.o
+  CC [M]  src/fs/ksmbd_fsctl_extra.o
+  CC [M]  src/fs/ksmbd_rsvd.o
+  CC [M]  src/fs/ksmbd_branchcache.o
+  CC [M]  src/core/ksmbd_hooks.o
+  CC [M]  src/protocol/smb2/smb2fruit.o
+  CC [M]  src/protocol/smb1/smb1pdu.o
+  CC [M]  src/protocol/smb1/smb1ops.o
+  CC [M]  src/protocol/smb1/smb1misc.o
+  CC [M]  src/protocol/common/netmisc.o
+  LD [M]  ksmbd.o
+  MODPOST Module.symvers
+  CC [M]  ksmbd.mod.o
+  CC [M]  .module-common.o
+  LD [M]  ksmbd.ko
+  BTF [M] ksmbd.ko
+make[1] : on quitte le répertoire « /home/ezechiel203/ksmbd »
+make: Leaving directory '/usr/lib/modules/6.18.13-arch1-1/build'

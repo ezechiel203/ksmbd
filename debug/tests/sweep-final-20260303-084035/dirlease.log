@@ -1,0 +1,131 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772524136
+time: 2026-03-03 07:48:56.590418
+progress: 18
+test: v2_request_parent
+time: 2026-03-03 07:48:56.591329
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 07:48:56.592139
+failure: v2_request_parent [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: v2_request
+time: 2026-03-03 07:48:56.592183
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 07:48:56.592788
+failure: v2_request [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: oplocks
+time: 2026-03-03 07:48:56.592828
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 07:48:56.593349
+failure: oplocks [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: leases
+time: 2026-03-03 07:48:56.593386
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 07:48:56.594011
+failure: leases [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: seteof
+time: 2026-03-03 07:48:56.594050
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 07:48:56.594552
+failure: seteof [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: setdos
+time: 2026-03-03 07:48:56.594589
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 07:48:56.595075
+failure: setdos [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: setbtime
+time: 2026-03-03 07:48:56.595123
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 07:48:56.595600
+failure: setbtime [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: setmtime
+time: 2026-03-03 07:48:56.595636
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 07:48:56.596121
+failure: setmtime [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: setctime
+time: 2026-03-03 07:48:56.596157
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 07:48:56.596647
+failure: setctime [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: setatime
+time: 2026-03-03 07:48:56.596683
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 07:48:56.597165
+failure: setatime [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: rename
+time: 2026-03-03 07:48:56.597202
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 07:48:56.597678
+failure: rename [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: rename_dst_parent
+time: 2026-03-03 07:48:56.597714
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 07:48:56.598205
+failure: rename_dst_parent [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: overwrite
+time: 2026-03-03 07:48:56.598241
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 07:48:56.598728
+failure: overwrite [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: hardlink
+time: 2026-03-03 07:48:56.598764
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 07:48:56.599269
+failure: hardlink [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: unlink_same_set_and_close
+time: 2026-03-03 07:48:56.599304
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 07:48:56.599858
+failure: unlink_same_set_and_close [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: unlink_different_set_and_close
+time: 2026-03-03 07:48:56.599895
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_DISCONNECTED
+time: 2026-03-03 07:48:56.600432
+failure: unlink_different_set_and_close [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: unlink_same_initial_and_close
+time: 2026-03-03 07:48:56.600469
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 07:48:56.600973
+failure: unlink_same_initial_and_close [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: unlink_different_initial_and_close
+time: 2026-03-03 07:48:56.601010
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_RESET
+time: 2026-03-03 07:48:56.601502
+failure: unlink_different_initial_and_close [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]

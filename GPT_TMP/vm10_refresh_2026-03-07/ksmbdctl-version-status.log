@@ -1,0 +1,6 @@
+[ksmbdctl(control)/3284]: INFO: ksmbd-tools version : 3.5.6
+[ksmbdctl(control)/3284]: INFO: ksmbd version : 3.5.4
+---
+ksmbd module:   loaded (version 3.5.4)
+ksmbd.mountd:   running (PID 3240)
+Debug:          smb auth vfs oplock ipc conn rdma 

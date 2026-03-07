@@ -1,0 +1,13 @@
+make: Entering directory '/usr/lib/modules/6.18.13-arch1-1/build'
+make[1] : on entre dans le répertoire « /home/ezechiel203/ksmbd »
+  CC [M]  src/fs/vfs_cache.o
+  CC [M]  src/transport/transport_tcp.o
+  LD [M]  ksmbd.o
+  MODPOST Module.symvers
+ERROR: modpost: "ksmbd_lookup_fd_filename" [ksmbd.ko] undefined!
+make[3]: *** [/usr/lib/modules/6.18.13-arch1-1/build/scripts/Makefile.modpost:147: Module.symvers] Error 1
+make[2]: *** [/usr/lib/modules/6.18.13-arch1-1/build/Makefile:1961: modpost] Error 2
+make[1]: *** [/usr/lib/modules/6.18.13-arch1-1/build/Makefile:248: __sub-make] Error 2
+make[1] : on quitte le répertoire « /home/ezechiel203/ksmbd »
+make: *** [Makefile:248: __sub-make] Error 2
+make: Leaving directory '/usr/lib/modules/6.18.13-arch1-1/build'

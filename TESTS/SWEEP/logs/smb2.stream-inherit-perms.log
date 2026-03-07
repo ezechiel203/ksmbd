@@ -1,0 +1,9 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772585230
+time: 2026-03-04 00:47:10.450843
+test: stream-inherit-perms
+time: 2026-03-04 00:47:10.451826
+getting original sd
+time: 2026-03-04 00:47:10.465370
+success: stream-inherit-perms

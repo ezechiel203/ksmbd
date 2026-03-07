@@ -1,0 +1,39 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772880543
+time: 2026-03-07 10:49:03.817071
+progress: 23
+test: valid-req
+time: 2026-03-07 10:49:03.817676
+TESTING VALIDITY OF CHANGE NOTIFY REQUEST
+time: 2026-03-07 10:49:03.843803
+failure: valid-req [
+(../../source4/torture/smb2/notify.c:208) Incorrect status NT_STATUS_OK - should be NT_STATUS_NOTIFY_ENUM_DIR
+]
+test: tcon
+time: 2026-03-07 10:49:03.843858
+TESTING SIMPLE CHANGE NOTIFY
+Testing notify mkdir
+time: 2026-03-07 10:50:08.553377
+failure: tcon [
+(../../source4/torture/smb2/notify.c:2303) Incorrect status NT_STATUS_CONNECTION_DISCONNECTED - should be NT_STATUS_CANCELLED
+]
+test: dir
+time: 2026-03-07 10:50:08.553441
+TESTING CHANGE NOTIFY ON DIRECTORIES
+Testing notify cancel
+time: 2026-03-07 10:51:13.066362
+failure: dir [
+(../../source4/torture/smb2/notify.c:291) Incorrect status NT_STATUS_CONNECTION_DISCONNECTED - should be NT_STATUS_CANCELLED
+]
+test: mask
+time: 2026-03-07 10:51:13.066417
+TESTING CHANGE NOTIFY COMPLETION FILTERS
+Testing mkdir
+time: 2026-03-07 10:52:17.579437
+failure: mask [
+(../../source4/torture/smb2/notify.c:975) Incorrect status NT_STATUS_CONNECTION_DISCONNECTED - should be NT_STATUS_CANCELLED
+]
+test: tdis
+time: 2026-03-07 10:52:17.579493
+TESTING CHANGE NOTIFY+CANCEL FOLLOWED BY TREE-DISCONNECT

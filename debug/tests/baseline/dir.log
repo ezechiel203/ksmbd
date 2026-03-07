@@ -1,0 +1,72 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772498748
+time: 2026-03-03 00:45:48.090722
+progress: 9
+test: find
+time: 2026-03-03 00:45:48.091430
+time: 2026-03-03 00:45:58.529785
+success: find
+test: fixed
+time: 2026-03-03 00:45:58.529839
+time: 2026-03-03 00:46:06.958107
+success: fixed
+test: one
+time: 2026-03-03 00:46:06.958158
+Testing SMB2_FIND_DIRECTORY_INFO 1
+Testing SMB2_FIND_FULL_DIRECTORY_INFO 2
+Testing SMB2_FIND_NAME_INFO 12
+Testing SMB2_FIND_BOTH_DIRECTORY_INFO 3
+Testing SMB2_FIND_ID_FULL_DIRECTORY_INFO 38
+Testing SMB2_FIND_ID_BOTH_DIRECTORY_INFO 37
+time: 2026-03-03 00:46:07.399067
+success: one
+test: many
+time: 2026-03-03 00:46:07.399133
+Testing with 700 files
+Continue SMB2_FIND_BOTH_DIRECTORY_INFO via SINGLE
+Continue SMB2_FIND_BOTH_DIRECTORY_INFO via INDEX
+Continue SMB2_FIND_BOTH_DIRECTORY_INFO via RESTART
+Continue SMB2_FIND_BOTH_DIRECTORY_INFO via REOPEN
+Continue SMB2_FIND_DIRECTORY_INFO via SINGLE
+Continue SMB2_FIND_DIRECTORY_INFO via INDEX
+Continue SMB2_FIND_DIRECTORY_INFO via RESTART
+Continue SMB2_FIND_DIRECTORY_INFO via REOPEN
+Continue SMB2_FIND_FULL_DIRECTORY_INFO via SINGLE
+Continue SMB2_FIND_FULL_DIRECTORY_INFO via INDEX
+Continue SMB2_FIND_FULL_DIRECTORY_INFO via RESTART
+Continue SMB2_FIND_FULL_DIRECTORY_INFO via REOPEN
+Continue SMB2_FIND_ID_FULL_DIRECTORY_INFO via SINGLE
+Continue SMB2_FIND_ID_FULL_DIRECTORY_INFO via INDEX
+Continue SMB2_FIND_ID_FULL_DIRECTORY_INFO via RESTART
+Continue SMB2_FIND_ID_FULL_DIRECTORY_INFO via REOPEN
+Continue SMB2_FIND_ID_BOTH_DIRECTORY_INFO via SINGLE
+Continue SMB2_FIND_ID_BOTH_DIRECTORY_INFO via INDEX
+Continue SMB2_FIND_ID_BOTH_DIRECTORY_INFO via RESTART
+Continue SMB2_FIND_ID_BOTH_DIRECTORY_INFO via REOPEN
+time: 2026-03-03 00:47:24.492127
+success: many
+test: modify
+time: 2026-03-03 00:47:24.492185
+Creating 700 files
+pulling the first two files
+Changing attributes and deleting
+time: 2026-03-03 00:48:36.663597
+success: modify
+test: sorted
+time: 2026-03-03 00:48:36.663662
+Testing if directories always come back sorted
+non-alphabetical order at entry 0 'ojaaaaaa' 'mdaaaaaa'
+Server does not produce sorted directory listings(not an error)
+time: 2026-03-03 00:49:49.953522
+success: sorted
+test: file-index
+time: 2026-03-03 00:49:49.953581
+Testing the behavior of file_index flag
+Next expected file: smb2_dir\file66.txt but the server returned file17.txt
+Not an error. Resuming using a file index is an optional feature of the protocol.
+time: 2026-03-03 00:50:00.560017
+success: file-index
+test: large-files
+time: 2026-03-03 00:50:00.560060
+Testing directory enumeration in a directory with >1000 files

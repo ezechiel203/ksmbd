@@ -1,0 +1,138 @@
+
+In tests/run_smbtorture.sh line 37:
+PWD_DB="${KSMBD_CONF_DIR}/ksmbdpwd.db"
+^----^ SC2034 (warning): PWD_DB appears unused. Verify use (or export if used externally).
+
+
+In tests/run_smbtorture.sh line 60:
+BLUE='\033[0;34m'
+^--^ SC2034 (warning): BLUE appears unused. Verify use (or export if used externally).
+
+
+In tests/run_smbtorture.sh line 104:
+TORTURE_SUITES_CONNECT=(
+^--------------------^ SC2034 (warning): TORTURE_SUITES_CONNECT appears unused. Verify use (or export if used externally).
+
+
+In tests/run_smbtorture.sh line 108:
+TORTURE_SUITES_READ=(
+^-----------------^ SC2034 (warning): TORTURE_SUITES_READ appears unused. Verify use (or export if used externally).
+
+
+In tests/run_smbtorture.sh line 115:
+TORTURE_SUITES_SCAN=(
+^-----------------^ SC2034 (warning): TORTURE_SUITES_SCAN appears unused. Verify use (or export if used externally).
+
+
+In tests/run_smbtorture.sh line 122:
+TORTURE_SUITES_DIR=(
+^----------------^ SC2034 (warning): TORTURE_SUITES_DIR appears unused. Verify use (or export if used externally).
+
+
+In tests/run_smbtorture.sh line 132:
+TORTURE_SUITES_RENAME=(
+^-------------------^ SC2034 (warning): TORTURE_SUITES_RENAME appears unused. Verify use (or export if used externally).
+
+
+In tests/run_smbtorture.sh line 143:
+TORTURE_SUITES_MAXFID=(
+^-------------------^ SC2034 (warning): TORTURE_SUITES_MAXFID appears unused. Verify use (or export if used externally).
+
+
+In tests/run_smbtorture.sh line 147:
+TORTURE_SUITES_SHAREMODE=(
+^----------------------^ SC2034 (warning): TORTURE_SUITES_SHAREMODE appears unused. Verify use (or export if used externally).
+
+
+In tests/run_smbtorture.sh line 152:
+TORTURE_SUITES_COMPOUND=(
+^---------------------^ SC2034 (warning): TORTURE_SUITES_COMPOUND appears unused. Verify use (or export if used externally).
+
+
+In tests/run_smbtorture.sh line 165:
+TORTURE_SUITES_STREAMS=(
+^--------------------^ SC2034 (warning): TORTURE_SUITES_STREAMS appears unused. Verify use (or export if used externally).
+
+
+In tests/run_smbtorture.sh line 179:
+TORTURE_SUITES_CREATE=(
+^-------------------^ SC2034 (warning): TORTURE_SUITES_CREATE appears unused. Verify use (or export if used externally).
+
+
+In tests/run_smbtorture.sh line 192:
+TORTURE_SUITES_DELETE_ON_CLOSE=(
+^----------------------------^ SC2034 (warning): TORTURE_SUITES_DELETE_ON_CLOSE appears unused. Verify use (or export if used externally).
+
+
+In tests/run_smbtorture.sh line 202:
+TORTURE_SUITES_OPLOCK=(
+^-------------------^ SC2034 (warning): TORTURE_SUITES_OPLOCK appears unused. Verify use (or export if used externally).
+
+
+In tests/run_smbtorture.sh line 244:
+TORTURE_SUITES_SESSION=(
+^--------------------^ SC2034 (warning): TORTURE_SUITES_SESSION appears unused. Verify use (or export if used externally).
+
+
+In tests/run_smbtorture.sh line 253:
+TORTURE_SUITES_LOCK=(
+^-----------------^ SC2034 (warning): TORTURE_SUITES_LOCK appears unused. Verify use (or export if used externally).
+
+
+In tests/run_smbtorture.sh line 272:
+TORTURE_SUITES_LEASE=(
+^------------------^ SC2034 (warning): TORTURE_SUITES_LEASE appears unused. Verify use (or export if used externally).
+
+
+In tests/run_smbtorture.sh line 301:
+TORTURE_SUITES_ACLS=(
+^-----------------^ SC2034 (warning): TORTURE_SUITES_ACLS appears unused. Verify use (or export if used externally).
+
+
+In tests/run_smbtorture.sh line 310:
+TORTURE_SUITES_CREDITS=(
+^--------------------^ SC2034 (warning): TORTURE_SUITES_CREDITS appears unused. Verify use (or export if used externally).
+
+
+In tests/run_smbtorture.sh line 316:
+TORTURE_SUITES_DURABLE=(
+^--------------------^ SC2034 (warning): TORTURE_SUITES_DURABLE appears unused. Verify use (or export if used externally).
+
+
+In tests/run_smbtorture.sh line 519:
+	mkdir -m 777 -p "${SHARE_DIR}"
+              ^-- SC2174 (warning): When used with -p, -m only applies to the deepest directory.
+
+
+In tests/run_xfstests.sh line 38:
+SERVER="127.0.0.1"
+^----^ SC2034 (warning): SERVER appears unused. Verify use (or export if used externally).
+
+
+In tests/run_xfstests.sh line 61:
+BLUE='\033[0;34m'
+^--^ SC2034 (warning): BLUE appears unused. Verify use (or export if used externally).
+
+
+In tests/run_xfstests.sh line 400:
+	mkdir -m 777 -p "${MNT_TEST1}"
+              ^-- SC2174 (warning): When used with -p, -m only applies to the deepest directory.
+
+
+In tests/run_xfstests.sh line 401:
+	mkdir -m 777 -p "${MNT_TEST2}"
+              ^-- SC2174 (warning): When used with -p, -m only applies to the deepest directory.
+
+
+In tests/run_xfstests.sh line 402:
+	mkdir -m 777 -p "${MNT_TEST3}"
+              ^-- SC2174 (warning): When used with -p, -m only applies to the deepest directory.
+
+
+In tests/run_xfstests.sh line 446:
+	PWD_DB="${KSMBD_CONF_DIR}/ksmbdpwd.db"
+        ^----^ SC2034 (warning): PWD_DB appears unused. Verify use (or export if used externally).
+
+For more information:
+  https://www.shellcheck.net/wiki/SC2034 -- BLUE appears unused. Verify use (...
+  https://www.shellcheck.net/wiki/SC2174 -- When used with -p, -m only applie...

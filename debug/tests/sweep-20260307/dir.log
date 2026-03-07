@@ -1,0 +1,283 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772889359
+time: 2026-03-07 13:15:59.701529
+progress: 9
+test: find
+time: 2026-03-07 13:15:59.702367
+time: 2026-03-07 13:15:59.911039
+success: find
+test: fixed
+time: 2026-03-07 13:15:59.911079
+time: 2026-03-07 13:16:00.010153
+success: fixed
+test: one
+time: 2026-03-07 13:16:00.010193
+Testing SMB2_FIND_DIRECTORY_INFO 1
+Testing SMB2_FIND_FULL_DIRECTORY_INFO 2
+Testing SMB2_FIND_NAME_INFO 12
+Testing SMB2_FIND_BOTH_DIRECTORY_INFO 3
+Testing SMB2_FIND_ID_FULL_DIRECTORY_INFO 38
+Testing SMB2_FIND_ID_BOTH_DIRECTORY_INFO 37
+time: 2026-03-07 13:16:00.019599
+success: one
+test: many
+time: 2026-03-07 13:16:00.019636
+Testing with 700 files
+Continue SMB2_FIND_BOTH_DIRECTORY_INFO via SINGLE
+Continue SMB2_FIND_BOTH_DIRECTORY_INFO via INDEX
+Continue SMB2_FIND_BOTH_DIRECTORY_INFO via RESTART
+Continue SMB2_FIND_BOTH_DIRECTORY_INFO via REOPEN
+Continue SMB2_FIND_DIRECTORY_INFO via SINGLE
+Continue SMB2_FIND_DIRECTORY_INFO via INDEX
+Continue SMB2_FIND_DIRECTORY_INFO via RESTART
+Continue SMB2_FIND_DIRECTORY_INFO via REOPEN
+Continue SMB2_FIND_FULL_DIRECTORY_INFO via SINGLE
+Continue SMB2_FIND_FULL_DIRECTORY_INFO via INDEX
+Continue SMB2_FIND_FULL_DIRECTORY_INFO via RESTART
+Continue SMB2_FIND_FULL_DIRECTORY_INFO via REOPEN
+Continue SMB2_FIND_ID_FULL_DIRECTORY_INFO via SINGLE
+Continue SMB2_FIND_ID_FULL_DIRECTORY_INFO via INDEX
+Continue SMB2_FIND_ID_FULL_DIRECTORY_INFO via RESTART
+Continue SMB2_FIND_ID_FULL_DIRECTORY_INFO via REOPEN
+Continue SMB2_FIND_ID_BOTH_DIRECTORY_INFO via SINGLE
+Continue SMB2_FIND_ID_BOTH_DIRECTORY_INFO via INDEX
+Continue SMB2_FIND_ID_BOTH_DIRECTORY_INFO via RESTART
+Continue SMB2_FIND_ID_BOTH_DIRECTORY_INFO via REOPEN
+time: 2026-03-07 13:16:00.956455
+success: many
+test: modify
+time: 2026-03-07 13:16:00.956495
+Creating 700 files
+pulling the first two files
+Changing attributes and deleting
+time: 2026-03-07 13:16:01.793911
+success: modify
+test: sorted
+time: 2026-03-07 13:16:01.793975
+Testing if directories always come back sorted
+non-alphabetical order at entry 0 'ojaaaaaa' 'mdaaaaaa'
+Server does not produce sorted directory listings(not an error)
+time: 2026-03-07 13:16:02.568140
+success: sorted
+test: file-index
+time: 2026-03-07 13:16:02.568182
+Testing the behavior of file_index flag
+Next expected file: smb2_dir\file66.txt but the server returned file17.txt
+Not an error. Resuming using a file index is an optional feature of the protocol.
+time: 2026-03-07 13:16:02.668311
+success: file-index
+test: large-files
+time: 2026-03-07 13:16:02.668353
+Testing directory enumeration in a directory with >1000 files
+Directory enumeration completed in 0.097 s.
+time: 2026-03-07 13:16:05.309636
+success: large-files
+test: 1kfiles_rename
+time: 2026-03-07 13:16:05.309677
+Testing with 1000 files
+Create files.
+Iteration: 00 of 100.
+Renaming test file to: smb2_dir\t000-rename.txt
+Iteration: 01 of 100.
+Renaming test file to: smb2_dir\t001-rename.txt
+Iteration: 02 of 100.
+Renaming test file to: smb2_dir\t002-rename.txt
+Iteration: 03 of 100.
+Renaming test file to: smb2_dir\t003-rename.txt
+Iteration: 04 of 100.
+Renaming test file to: smb2_dir\t004-rename.txt
+Iteration: 05 of 100.
+Renaming test file to: smb2_dir\t005-rename.txt
+Iteration: 06 of 100.
+Renaming test file to: smb2_dir\t006-rename.txt
+Iteration: 07 of 100.
+Renaming test file to: smb2_dir\t007-rename.txt
+Iteration: 08 of 100.
+Renaming test file to: smb2_dir\t008-rename.txt
+Iteration: 09 of 100.
+Renaming test file to: smb2_dir\t009-rename.txt
+Iteration: 10 of 100.
+Renaming test file to: smb2_dir\t010-rename.txt
+Iteration: 11 of 100.
+Renaming test file to: smb2_dir\t011-rename.txt
+Iteration: 12 of 100.
+Renaming test file to: smb2_dir\t012-rename.txt
+Iteration: 13 of 100.
+Renaming test file to: smb2_dir\t013-rename.txt
+Iteration: 14 of 100.
+Renaming test file to: smb2_dir\t014-rename.txt
+Iteration: 15 of 100.
+Renaming test file to: smb2_dir\t015-rename.txt
+Iteration: 16 of 100.
+Renaming test file to: smb2_dir\t016-rename.txt
+Iteration: 17 of 100.
+Renaming test file to: smb2_dir\t017-rename.txt
+Iteration: 18 of 100.
+Renaming test file to: smb2_dir\t018-rename.txt
+Iteration: 19 of 100.
+Renaming test file to: smb2_dir\t019-rename.txt
+Iteration: 20 of 100.
+Renaming test file to: smb2_dir\t020-rename.txt
+Iteration: 21 of 100.
+Renaming test file to: smb2_dir\t021-rename.txt
+Iteration: 22 of 100.
+Renaming test file to: smb2_dir\t022-rename.txt
+Iteration: 23 of 100.
+Renaming test file to: smb2_dir\t023-rename.txt
+Iteration: 24 of 100.
+Renaming test file to: smb2_dir\t024-rename.txt
+Iteration: 25 of 100.
+Renaming test file to: smb2_dir\t025-rename.txt
+Iteration: 26 of 100.
+Renaming test file to: smb2_dir\t026-rename.txt
+Iteration: 27 of 100.
+Renaming test file to: smb2_dir\t027-rename.txt
+Iteration: 28 of 100.
+Renaming test file to: smb2_dir\t028-rename.txt
+Iteration: 29 of 100.
+Renaming test file to: smb2_dir\t029-rename.txt
+Iteration: 30 of 100.
+Renaming test file to: smb2_dir\t030-rename.txt
+Iteration: 31 of 100.
+Renaming test file to: smb2_dir\t031-rename.txt
+Iteration: 32 of 100.
+Renaming test file to: smb2_dir\t032-rename.txt
+Iteration: 33 of 100.
+Renaming test file to: smb2_dir\t033-rename.txt
+Iteration: 34 of 100.
+Renaming test file to: smb2_dir\t034-rename.txt
+Iteration: 35 of 100.
+Renaming test file to: smb2_dir\t035-rename.txt
+Iteration: 36 of 100.
+Renaming test file to: smb2_dir\t036-rename.txt
+Iteration: 37 of 100.
+Renaming test file to: smb2_dir\t037-rename.txt
+Iteration: 38 of 100.
+Renaming test file to: smb2_dir\t038-rename.txt
+Iteration: 39 of 100.
+Renaming test file to: smb2_dir\t039-rename.txt
+Iteration: 40 of 100.
+Renaming test file to: smb2_dir\t040-rename.txt
+Iteration: 41 of 100.
+Renaming test file to: smb2_dir\t041-rename.txt
+Iteration: 42 of 100.
+Renaming test file to: smb2_dir\t042-rename.txt
+Iteration: 43 of 100.
+Renaming test file to: smb2_dir\t043-rename.txt
+Iteration: 44 of 100.
+Renaming test file to: smb2_dir\t044-rename.txt
+Iteration: 45 of 100.
+Renaming test file to: smb2_dir\t045-rename.txt
+Iteration: 46 of 100.
+Renaming test file to: smb2_dir\t046-rename.txt
+Iteration: 47 of 100.
+Renaming test file to: smb2_dir\t047-rename.txt
+Iteration: 48 of 100.
+Renaming test file to: smb2_dir\t048-rename.txt
+Iteration: 49 of 100.
+Renaming test file to: smb2_dir\t049-rename.txt
+Iteration: 50 of 100.
+Renaming test file to: smb2_dir\t050-rename.txt
+Iteration: 51 of 100.
+Renaming test file to: smb2_dir\t051-rename.txt
+Iteration: 52 of 100.
+Renaming test file to: smb2_dir\t052-rename.txt
+Iteration: 53 of 100.
+Renaming test file to: smb2_dir\t053-rename.txt
+Iteration: 54 of 100.
+Renaming test file to: smb2_dir\t054-rename.txt
+Iteration: 55 of 100.
+Renaming test file to: smb2_dir\t055-rename.txt
+Iteration: 56 of 100.
+Renaming test file to: smb2_dir\t056-rename.txt
+Iteration: 57 of 100.
+Renaming test file to: smb2_dir\t057-rename.txt
+Iteration: 58 of 100.
+Renaming test file to: smb2_dir\t058-rename.txt
+Iteration: 59 of 100.
+Renaming test file to: smb2_dir\t059-rename.txt
+Iteration: 60 of 100.
+Renaming test file to: smb2_dir\t060-rename.txt
+Iteration: 61 of 100.
+Renaming test file to: smb2_dir\t061-rename.txt
+Iteration: 62 of 100.
+Renaming test file to: smb2_dir\t062-rename.txt
+Iteration: 63 of 100.
+Renaming test file to: smb2_dir\t063-rename.txt
+Iteration: 64 of 100.
+Renaming test file to: smb2_dir\t064-rename.txt
+Iteration: 65 of 100.
+Renaming test file to: smb2_dir\t065-rename.txt
+Iteration: 66 of 100.
+Renaming test file to: smb2_dir\t066-rename.txt
+Iteration: 67 of 100.
+Renaming test file to: smb2_dir\t067-rename.txt
+Iteration: 68 of 100.
+Renaming test file to: smb2_dir\t068-rename.txt
+Iteration: 69 of 100.
+Renaming test file to: smb2_dir\t069-rename.txt
+Iteration: 70 of 100.
+Renaming test file to: smb2_dir\t070-rename.txt
+Iteration: 71 of 100.
+Renaming test file to: smb2_dir\t071-rename.txt
+Iteration: 72 of 100.
+Renaming test file to: smb2_dir\t072-rename.txt
+Iteration: 73 of 100.
+Renaming test file to: smb2_dir\t073-rename.txt
+Iteration: 74 of 100.
+Renaming test file to: smb2_dir\t074-rename.txt
+Iteration: 75 of 100.
+Renaming test file to: smb2_dir\t075-rename.txt
+Iteration: 76 of 100.
+Renaming test file to: smb2_dir\t076-rename.txt
+Iteration: 77 of 100.
+Renaming test file to: smb2_dir\t077-rename.txt
+Iteration: 78 of 100.
+Renaming test file to: smb2_dir\t078-rename.txt
+Iteration: 79 of 100.
+Renaming test file to: smb2_dir\t079-rename.txt
+Iteration: 80 of 100.
+Renaming test file to: smb2_dir\t080-rename.txt
+Iteration: 81 of 100.
+Renaming test file to: smb2_dir\t081-rename.txt
+Iteration: 82 of 100.
+Renaming test file to: smb2_dir\t082-rename.txt
+Iteration: 83 of 100.
+Renaming test file to: smb2_dir\t083-rename.txt
+Iteration: 84 of 100.
+Renaming test file to: smb2_dir\t084-rename.txt
+Iteration: 85 of 100.
+Renaming test file to: smb2_dir\t085-rename.txt
+Iteration: 86 of 100.
+Renaming test file to: smb2_dir\t086-rename.txt
+Iteration: 87 of 100.
+Renaming test file to: smb2_dir\t087-rename.txt
+Iteration: 88 of 100.
+Renaming test file to: smb2_dir\t088-rename.txt
+Iteration: 89 of 100.
+Renaming test file to: smb2_dir\t089-rename.txt
+Iteration: 90 of 100.
+Renaming test file to: smb2_dir\t090-rename.txt
+Iteration: 91 of 100.
+Renaming test file to: smb2_dir\t091-rename.txt
+Iteration: 92 of 100.
+Renaming test file to: smb2_dir\t092-rename.txt
+Iteration: 93 of 100.
+Renaming test file to: smb2_dir\t093-rename.txt
+Iteration: 94 of 100.
+Renaming test file to: smb2_dir\t094-rename.txt
+Iteration: 95 of 100.
+Renaming test file to: smb2_dir\t095-rename.txt
+Iteration: 96 of 100.
+Renaming test file to: smb2_dir\t096-rename.txt
+Iteration: 97 of 100.
+Renaming test file to: smb2_dir\t097-rename.txt
+Iteration: 98 of 100.
+Renaming test file to: smb2_dir\t098-rename.txt
+Iteration: 99 of 100.
+Renaming test file to: smb2_dir\t099-rename.txt
+
+Directory enumeration completed in 0.910 s.
+time: 2026-03-07 13:16:07.523900
+success: 1kfiles_rename

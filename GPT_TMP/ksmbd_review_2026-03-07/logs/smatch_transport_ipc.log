@@ -1,0 +1,4 @@
+src/transport/transport_ipc.c: note: in included file (through /usr/lib/modules/6.18.13-arch1-1/build/include/net/dst.h, /usr/lib/modules/6.18.13-arch1-1/build/include/net/sock.h, ./src/include/core/connection.h):
+/usr/lib/modules/6.18.13-arch1-1/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+/usr/lib/modules/6.18.13-arch1-1/build/include/net/neighbour.h:315:9: error: static assertion failed: "pointer type mismatch in container_of()"
+src/transport/transport_ipc.c:1373 handle_witness_iface_list_event() warn: ignoring unreachable code.

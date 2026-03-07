@@ -1,0 +1,236 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772530775
+time: 2026-03-03 09:39:35.944498
+progress: 33
+test: create-blob
+time: 2026-03-03 09:39:35.944916
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:35.949516
+failure: create-blob [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: open-oplock
+time: 2026-03-03 09:39:35.949562
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:35.951065
+failure: open-oplock [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: open-lease
+time: 2026-03-03 09:39:35.951115
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:35.952883
+failure: open-lease [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: reopen1
+time: 2026-03-03 09:39:35.952927
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:35.954373
+failure: reopen1 [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: reopen1a
+time: 2026-03-03 09:39:35.954413
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:35.956119
+failure: reopen1a [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: reopen1a-lease
+time: 2026-03-03 09:39:35.956157
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:35.958278
+failure: reopen1a-lease [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: reopen2
+time: 2026-03-03 09:39:35.958322
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:35.960104
+failure: reopen2 [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: reopen2b
+time: 2026-03-03 09:39:35.960147
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:35.963230
+failure: reopen2b [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: reopen2c
+time: 2026-03-03 09:39:35.963282
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:35.966691
+failure: reopen2c [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: reopen2-lease
+time: 2026-03-03 09:39:35.966743
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:35.969138
+failure: reopen2-lease [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: reopen2-lease-v2
+time: 2026-03-03 09:39:35.969212
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:35.971739
+failure: reopen2-lease-v2 [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: durable-v2-setinfo
+time: 2026-03-03 09:39:35.971813
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:35.974282
+failure: durable-v2-setinfo [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: lock-oplock
+time: 2026-03-03 09:39:35.974325
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:35.976497
+failure: lock-oplock [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: lock-lease
+time: 2026-03-03 09:39:35.976538
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:35.980233
+failure: lock-lease [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: lock-noW-lease
+time: 2026-03-03 09:39:35.980281
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:35.984592
+failure: lock-noW-lease [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: stat-and-lease
+time: 2026-03-03 09:39:35.984640
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:35.987757
+failure: stat-and-lease [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: nonstat-and-lease
+time: 2026-03-03 09:39:35.987805
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:35.990982
+failure: nonstat-and-lease [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: statRH-and-lease
+time: 2026-03-03 09:39:35.991023
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:35.993892
+failure: statRH-and-lease [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: two-same-lease
+time: 2026-03-03 09:39:35.993941
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:35.997322
+failure: two-same-lease [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: two-different-lease
+time: 2026-03-03 09:39:35.997369
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:36.002319
+failure: two-different-lease [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: keep-disconnected-rh-with-stat-open
+time: 2026-03-03 09:39:36.002368
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:36.009710
+failure: keep-disconnected-rh-with-stat-open [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: keep-disconnected-rh-with-rh-open
+time: 2026-03-03 09:39:36.009762
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:36.013030
+failure: keep-disconnected-rh-with-rh-open [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: keep-disconnected-rh-with-rwh-open
+time: 2026-03-03 09:39:36.013079
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:36.017179
+failure: keep-disconnected-rh-with-rwh-open [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: keep-disconnected-rwh-with-stat-open
+time: 2026-03-03 09:39:36.017227
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:36.019514
+failure: keep-disconnected-rwh-with-stat-open [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: purge-disconnected-rwh-with-rwh-open
+time: 2026-03-03 09:39:36.019562
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:36.021332
+failure: purge-disconnected-rwh-with-rwh-open [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: purge-disconnected-rwh-with-rh-open
+time: 2026-03-03 09:39:36.021377
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:36.023228
+failure: purge-disconnected-rwh-with-rh-open [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: purge-disconnected-rh-with-share-none-open
+time: 2026-03-03 09:39:36.023271
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:36.025167
+failure: purge-disconnected-rh-with-share-none-open [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: purge-disconnected-rh-with-write
+time: 2026-03-03 09:39:36.025210
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:36.027519
+failure: purge-disconnected-rh-with-write [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: purge-disconnected-rh-with-rename
+time: 2026-03-03 09:39:36.027565
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:36.029390
+failure: purge-disconnected-rh-with-rename [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: app-instance
+time: 2026-03-03 09:39:36.029515
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:36.031565
+failure: app-instance [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: persistent-open-oplock
+time: 2026-03-03 09:39:36.031615
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:36.033676
+failure: persistent-open-oplock [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: persistent-open-lease
+time: 2026-03-03 09:39:36.033721
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:36.035732
+failure: persistent-open-lease [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: reconnect-twice
+time: 2026-03-03 09:39:36.035777
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_LOGON_FAILURE
+time: 2026-03-03 09:39:36.037683
+failure: reconnect-twice [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]

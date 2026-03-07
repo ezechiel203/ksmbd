@@ -1,0 +1,148 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772585240
+time: 2026-03-04 00:47:20.226739
+progress: 17
+test: test_close_not_attrib
+time: 2026-03-04 00:47:20.228480
+time: 2026-03-04 00:47:20.291886
+success: test_close_not_attrib
+test: time_t_15032385535
+time: 2026-03-04 00:47:20.291955
+Got: create: Fri May 11 00:38:55 2446 CEST, write: Fri May 11 00:38:55 2446 CEST, change: Wed Mar  4 01:47:20 2026 CET
+Got: create: Fri May 11 00:38:55 2446 CEST, write: Fri May 11 00:38:55 2446 CEST, change: Wed Mar  4 01:47:20 2026 CET
+time: 2026-03-04 00:47:20.332760
+success: time_t_15032385535
+test: time_t_10000000000
+time: 2026-03-04 00:47:20.332814
+Got: create: Sat Nov 20 18:46:40 2286 CET, write: Sat Nov 20 18:46:40 2286 CET, change: Wed Mar  4 01:47:20 2026 CET
+Got: create: Sat Nov 20 18:46:40 2286 CET, write: Sat Nov 20 18:46:40 2286 CET, change: Wed Mar  4 01:47:20 2026 CET
+time: 2026-03-04 00:47:20.344524
+success: time_t_10000000000
+test: time_t_4294967295
+time: 2026-03-04 00:47:20.344574
+Got: create: Sun Feb  7 07:28:15 2106 CET, write: Sun Feb  7 07:28:15 2106 CET, change: Wed Mar  4 01:47:20 2026 CET
+Got: create: Sun Feb  7 07:28:15 2106 CET, write: Sun Feb  7 07:28:15 2106 CET, change: Wed Mar  4 01:47:20 2026 CET
+time: 2026-03-04 00:47:20.356059
+success: time_t_4294967295
+test: time_t_1
+time: 2026-03-04 00:47:20.356129
+Got: create: Thu Jan  1 01:00:01 1970 CET, write: Thu Jan  1 01:00:01 1970 CET, change: Wed Mar  4 01:47:20 2026 CET
+Got: create: Thu Jan  1 01:00:01 1970 CET, write: Thu Jan  1 01:00:01 1970 CET, change: Wed Mar  4 01:47:20 2026 CET
+time: 2026-03-04 00:47:20.367626
+success: time_t_1
+test: time_t_0
+time: 2026-03-04 00:47:20.367683
+Got: create: Thu Jan  1 01:00:00 1970 CET, write: Thu Jan  1 01:00:00 1970 CET, change: Wed Mar  4 01:47:20 2026 CET
+Got: create: Thu Jan  1 01:00:00 1970 CET, write: Thu Jan  1 01:00:00 1970 CET, change: Wed Mar  4 01:47:20 2026 CET
+time: 2026-03-04 00:47:20.379337
+success: time_t_0
+test: time_t_-1
+time: 2026-03-04 00:47:20.379389
+Got: create: Thu Jan  1 00:59:59 1970 CET, write: Thu Jan  1 00:59:59 1970 CET, change: Wed Mar  4 01:47:20 2026 CET
+Got: create: Thu Jan  1 00:59:59 1970 CET, write: Thu Jan  1 00:59:59 1970 CET, change: Wed Mar  4 01:47:20 2026 CET
+time: 2026-03-04 00:47:20.441912
+success: time_t_-1
+test: time_t_-2
+time: 2026-03-04 00:47:20.441976
+Got: create: Thu Jan  1 00:59:58 1970 CET, write: Thu Jan  1 00:59:58 1970 CET, change: Wed Mar  4 01:47:21 2026 CET
+Got: create: Thu Jan  1 00:59:58 1970 CET, write: Thu Jan  1 00:59:58 1970 CET, change: Wed Mar  4 01:47:21 2026 CET
+time: 2026-03-04 00:47:20.479644
+success: time_t_-2
+test: time_t_1968
+time: 2026-03-04 00:47:20.479702
+Got: create: Mon Jan  1 01:00:00 1968 CET, write: Mon Jan  1 01:00:00 1968 CET, change: Wed Mar  4 01:47:21 2026 CET
+Got: create: Mon Jan  1 01:00:00 1968 CET, write: Mon Jan  1 01:00:00 1968 CET, change: Wed Mar  4 01:47:21 2026 CET
+time: 2026-03-04 00:47:20.523566
+success: time_t_1968
+test: freeze-thaw
+time: 2026-03-04 00:47:20.523624
+Got: create: Wed Mar  4 01:47:20 2026 CET, write: Wed Mar  4 01:47:20 2026 CET, change: Wed Mar  4 01:47:21 2026 CET
+Got: create: Thu Jan  1 01:00:00 1970 CET, write: Fri Dec 13 21:45:52 1901 CET, change: Wed Mar  4 01:47:21 2026 CET
+time: 2026-03-04 00:47:20.582906
+failure: freeze-thaw [
+../../source4/torture/smb2/timestamps.c:449: gi.basic_info.out.create_time was 18446744073709551615 (0xFFFFFFFFFFFFFFFF), expected 134170588400000000 (0x1DCAB7074E31C00): Wrong create time
+]
+test: delayed-write-vs-seteof
+time: 2026-03-04 00:47:20.582973
+Open file-handle 1
+Setinfo EOF on file-handle 1, should update writetime
+Check writetime has been updated by the setinfo EOF
+Write to file-handle 1
+Check writetime has been updated
+Setinfo EOF on file-handle 1, should update writetime
+Check writetime has been updated by the setinfo EOF
+Open file-handle 2
+Set write time on file-handle 2
+Close file-handle 1, write-time should not be updated
+time: 2026-03-04 00:47:21.715944
+success: delayed-write-vs-seteof
+test: delayed-write-vs-flush
+time: 2026-03-04 00:47:21.716002
+Open file-handle 1
+Write to file-handle 1
+Check writetime has been updated
+Flush file, there should be no pending writetime update
+Check writetime has not been updated by the flush
+Close file-handle 1, write-time should not be updated
+time: 2026-03-04 00:47:22.827454
+success: delayed-write-vs-flush
+test: delayed-write-vs-setbasic
+time: 2026-03-04 00:47:22.827510
+Test: setting all-0 timestamps
+Create testfile
+Write to file
+Get timestamps
+Set timestamps
+Check timestamps
+Test: setting create_time flushes?
+Create testfile
+Write to file
+Get timestamps
+Set timestamps
+Check timestamps
+Test: setting access_time flushes?
+Create testfile
+Write to file
+Get timestamps
+Set timestamps
+Check timestamps
+Test: setting change_time flushes?
+Create testfile
+Write to file
+Get timestamps
+Set timestamps
+Check timestamps
+time: 2026-03-04 00:47:22.954396
+success: delayed-write-vs-setbasic
+test: delayed-1write
+time: 2026-03-04 00:47:22.954449
+Open file-handle 1
+Write to file-handle 1
+Check writetime has been updated
+Close file-handle 1
+time: 2026-03-04 00:47:28.007300
+success: delayed-1write
+test: delayed-2write
+time: 2026-03-04 00:47:28.007357
+Open file
+Write to file
+Check writetime has been updated
+Write a second time
+Check writetime has also been updated
+Close file-handle 1
+Check writetime has not been updated
+time: 2026-03-04 00:47:37.056866
+success: delayed-2write
+test: modern_write_time_update-1
+time: 2026-03-04 00:47:37.056919
+time: 2026-03-04 00:47:37.151252
+failure: modern_write_time_update-1 [
+../../source4/torture/smb2/timestamps.c:1371: currenttime1 was Wed Mar  4 01:47:37 2026 CET, expected Thu Mar  5 01:47:37 2026 CET: bad time
+]
+test: modern_write_time_update-2
+time: 2026-03-04 00:47:37.151380
+time: 2026-03-04 00:47:37.252659
+failure: modern_write_time_update-2 [
+../../source4/torture/smb2/timestamps.c:1619: currenttime1 was Wed Mar  4 01:47:37 2026 CET, expected Wed Mar  4 01:47:37 2026 CET: bad time
+]

@@ -1,0 +1,27 @@
+[CI-LOCAL] start 2026-02-23T21:47:17Z
+[STEP] build module
+build_rc=0
+[STEP] build W=1
+build_w1_rc=0
+[STEP] sparse C=2
+sparse_rc=0
+[STEP] BUG_ON scan
+bug_on_found=0
+[STEP] mixed tabs/spaces scan
+mixed_indent_files=122
+[STEP] KUnit source checks
+kunit_check_issues=0
+[STEP] fuzz source checks
+fuzz_check_issues=0
+[STEP] test Makefile registration
+test_makefile_missing=0
+[STEP] benchmark scripts exist/executable
+bench_script_issues=0
+[STEP] benchmark --help
+bench_help_failures=0
+[STEP] bash -n run_tests.sh
+run_tests_syntax=ok
+[STEP] optional tools
+cppcheck=missing
+shellcheck=missing
+[CI-LOCAL] end 2026-02-23T21:47:49Z

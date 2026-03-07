@@ -1,0 +1,21 @@
+
+=== Test Registration Check ===
+
+OK: All test and fuzz source files are registered in Makefiles
+PASS: All test/fuzz files registered in Makefiles
+
+=== KUnit Tests ===
+
+INFO: Kernel headers found at /usr/lib/modules/6.18.13-arch1-1/build (compile-check only)
+INFO: Set LINUX_SRC=/path/to/linux to run tests via kunit.py
+make: Entering directory '/usr/lib/modules/6.18.13-arch1-1/build'
+make[1] : on entre dans le répertoire « /home/ezechiel203/ksmbd »
+make[1] : on quitte le répertoire « /home/ezechiel203/ksmbd »
+make: Leaving directory '/usr/lib/modules/6.18.13-arch1-1/build'
+PASS: KUnit test compilation (external module build)
+
+=== Summary ===
+
+Total: 2  |  Passed: 2  |  Failed: 0  |  Skipped: 0
+
+RESULT: PASS

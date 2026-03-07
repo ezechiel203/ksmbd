@@ -1,0 +1,120 @@
+[    4.553026] systemd[1]: Created slice Slice /system/gpg-agent-browser.
+[    4.556909] systemd[1]: Created slice Slice /system/gpg-agent-extra.
+[    4.560507] systemd[1]: Created slice Slice /system/gpg-agent-ssh.
+[    4.564016] systemd[1]: Created slice Slice /system/keyboxd.
+[    4.567611] systemd[1]: Created slice Slice /system/modprobe.
+[    4.570954] systemd[1]: Created slice Slice /system/serial-getty.
+[    4.574183] systemd[1]: Created slice User and Session Slice.
+[    4.577065] systemd[1]: Started Dispatch Password Requests to Console Directory Watch.
+[    4.580836] systemd[1]: Started Forward Password Requests to Wall Directory Watch.
+[    4.584631] systemd[1]: Set up automount Arbitrary Executable File Formats File System Automount Point.
+[    4.589114] systemd[1]: Expecting device /dev/ttyS0...
+[    4.591556] systemd[1]: Reached target Local Encrypted Volumes.
+[    4.594416] systemd[1]: Reached target Image Downloads.
+[    4.597053] systemd[1]: Stopped target Switch Root.
+[    4.599544] systemd[1]: Stopped target Initrd File Systems.
+[    4.602310] systemd[1]: Stopped target Initrd Root File System.
+[    4.605193] systemd[1]: Reached target Local Integrity Protected Volumes.
+[    4.608487] systemd[1]: Reached target Path Units.
+[    4.610882] systemd[1]: Reached target Remote File Systems.
+[    4.613697] systemd[1]: Reached target Slice Units.
+[    4.616302] systemd[1]: Reached target Swaps.
+[    4.618425] systemd[1]: Reached target Local Verity Protected Volumes.
+[    4.621274] systemd[1]: Listening on Device-mapper event daemon FIFOs.
+[    4.625390] systemd[1]: Listening on Query the User Interactively for a Password.
+[    4.630601] systemd[1]: Listening on Process Core Dump Socket.
+[    4.634997] systemd[1]: Listening on Credential Encryption/Decryption.
+[    4.640063] systemd[1]: Listening on Factory Reset Management.
+[    4.646230] systemd[1]: Listening on Console Output Muting Service Socket.
+[    4.650184] systemd[1]: Listening on Network Management Resolve Hook Socket.
+[    4.653787] systemd[1]: Listening on Network Management Varlink Socket.
+[    4.657053] systemd[1]: Listening on Network Management Netlink Socket.
+[    4.660166] systemd[1]: TPM PCR Measurements skipped, unmet condition check ConditionSecurity=measured-uki
+[    4.662179] systemd[1]: Make TPM PCR Policy skipped, unmet condition check ConditionSecurity=measured-uki
+[    4.665934] systemd[1]: Listening on Disk Repartitioning Service Socket.
+[    4.669005] systemd[1]: Listening on Resolve Monitor Varlink Socket.
+[    4.672058] systemd[1]: Listening on Resolve Service Varlink Socket.
+[    4.674954] systemd[1]: Listening on udev Control Socket.
+[    4.677465] systemd[1]: Listening on udev Varlink Socket.
+[    4.679962] systemd[1]: Listening on User Database Manager Socket.
+[    4.683914] systemd[1]: Mounting Huge Pages File System...
+[    4.687352] systemd[1]: Mounting POSIX Message Queue File System...
+[    4.697921] systemd[1]: Mounting Kernel Debug File System...
+[    4.701875] systemd[1]: Mounting Kernel Trace File System...
+[    4.708955] systemd[1]: Mounting Temporary Directory /tmp...
+[    4.715003] systemd[1]: Starting Create List of Static Device Nodes...
+[    4.719524] systemd[1]: Load Kernel Module configfs skipped, unmet condition check ConditionKernelModuleLoaded=!configfs
+[    4.724468] systemd[1]: Mounting Kernel Configuration File System...
+[    4.727390] systemd[1]: Load Kernel Module drm skipped, unmet condition check ConditionKernelModuleLoaded=!drm
+[    4.730377] systemd[1]: Load Kernel Module fuse skipped, unmet condition check ConditionKernelModuleLoaded=!fuse
+[    4.740940] systemd[1]: Mounting FUSE Control File System...
+[    4.743680] systemd[1]: Clear Stale Hibernate Storage Info skipped, unmet condition check ConditionPathExists=/sys/firmware/efi/efivars/HibernateLocation-8cf2644b-4b0b-428f-9387-6d876050dc67
+[    4.759361] systemd[1]: Starting Journal Service...
+[    4.764103] systemd[1]: Load Kernel Modules skipped, no trigger condition checks were met.
+[    4.767902] systemd[1]: Starting Generate Network Units from Kernel Command Line...
+[    4.770937] systemd[1]: TPM PCR Machine ID Measurement skipped, unmet condition check ConditionSecurity=measured-uki
+[    4.772931] systemd[1]: TPM NvPCR Product ID Measurement skipped, unmet condition check ConditionSecurity=measured-uki
+[    4.776927] systemd[1]: Starting Remount Root and Kernel File Systems...
+[    4.782584] systemd[1]: Starting Apply Kernel Variables...
+[    4.787373] systemd[1]: Early TPM SRK Setup skipped, unmet condition check ConditionSecurity=measured-uki
+[    4.796387] systemd[1]: Starting Load udev Rules from Credentials...
+[    4.800611] systemd[1]: Starting Coldplug All udev Devices...
+[    4.811201] systemd-journald[341]: Collecting audit messages is disabled.
+[    4.814222] EXT4-fs (vda1): re-mounted ddfae1cc-629e-47f4-9008-261996ba3811.
+[    4.818869] systemd[1]: Mounted Huge Pages File System.
+[    4.827089] systemd[1]: Mounted POSIX Message Queue File System.
+[    4.833628] systemd[1]: Started Journal Service.
+[    4.903139] systemd-journald[341]: Received client request to flush runtime journal.
+[    4.921444] systemd-journald[341]: File /var/log/journal/0ab76daf18ce42b0b036a81eb53bdd79/system.journal corrupted or uncleanly shut down, renaming and replacing.
+[    5.419001] cfg80211: Loading compiled-in X.509 certificates for regulatory database
+[    5.428491] Loaded X.509 cert 'sforshee: 00b28ddf47aef9cea7'
+[    5.430187] Loaded X.509 cert 'wens: 61c038651aabdcf94bd0ac7ff06c7248db18c600'
+[    5.432085] faux_driver regulatory: Direct firmware load for regulatory.db failed with error -2
+[    5.434975] cfg80211: failed to load regulatory.db
+[    5.446104] virtio_net virtio1 ens4: renamed from eth0
+[    5.601048] 9pnet: Limiting 'msize' to 512000 as this is the maximum supported by transport virtio
+[    5.784602] piix4_smbus 0000:00:01.3: SMBus Host Controller at 0x700, revision 0
+[    5.789170] i2c i2c-0: Memory type 0x07 not supported yet, not instantiating SPD
+[    5.831416] input: PC Speaker as /devices/platform/pcspkr/input/input3
+[    5.842417] input: VirtualPS/2 VMware VMMouse as /devices/platform/i8042/serio1/input/input5
+[    5.849876] input: VirtualPS/2 VMware VMMouse as /devices/platform/i8042/serio1/input/input4
+[    5.913987] parport_pc 00:03: reported by Plug and Play ACPI
+[    5.941296] parport0: PC-style at 0x378, irq 7 [PCSPP,TRISTATE]
+[    5.976967] mousedev: PS/2 mouse device common for all mice
+[    6.039066] RAPL PMU: API unit is 2^-32 Joules, 0 fixed counters, 10737418240 ms ovfl timer
+[    6.096254] ppdev: user-space parallel port driver
+[103641.856392] clocksource: Long readout interval, skipping watchdog check: cs_nsec: 1072537661 wd_nsec: 1072537593
+[120820.661898] hrtimer: interrupt took 3718297 ns
+[124580.701041] clocksource: Long readout interval, skipping watchdog check: cs_nsec: 2333193460 wd_nsec: 2333193127
+[248114.564249] ksmbd: loading out-of-tree module taints kernel.
+[248114.565486] ksmbd: module verification failed: signature and/or required key missing - tainting kernel
+[248114.721363] ksmbd: Configuration subsystem initialized with 12 parameters
+[248114.762953] ksmbd: ksmbd: kernel provides md4, skipping built-in registration
+[248114.807047] ksmbd: ksmbd: Fruit SMB extensions loaded
+[248114.809557] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[248114.811565] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[248114.817988] ksmbd: ksmbd: witness protocol support initialised
+[248143.461039] ksmbd: ksmbd: witness protocol support removed
+[248143.967858] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[248144.170956] ksmbd: Configuration subsystem initialized with 12 parameters
+[248144.174700] ksmbd: ksmbd: kernel provides md4, skipping built-in registration
+[248144.287855] ksmbd: ksmbd: Fruit SMB extensions loaded
+[248144.288839] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[248144.297962] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[248144.304868] ksmbd: ksmbd: witness protocol support initialised
+[248145.664574] ksmbd: ksmbd: witness protocol support removed
+[248146.150861] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[248146.894695] ksmbd: Configuration subsystem initialized with 12 parameters
+[248146.898998] ksmbd: ksmbd: kernel provides md4, skipping built-in registration
+[248146.922962] ksmbd: ksmbd: Fruit SMB extensions loaded
+[248146.924064] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[248146.926576] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[248146.931904] ksmbd: ksmbd: witness protocol support initialised
+[248148.055945] ksmbd: ksmbd: witness protocol support removed
+[248148.557876] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[248148.712806] ksmbd: Configuration subsystem initialized with 12 parameters
+[248148.714264] ksmbd: ksmbd: kernel provides md4, skipping built-in registration
+[248148.719215] ksmbd: ksmbd: Fruit SMB extensions loaded
+[248148.720444] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[248148.721712] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[248148.724464] ksmbd: ksmbd: witness protocol support initialised

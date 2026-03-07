@@ -1,0 +1,10 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772524545
+time: 2026-03-03 07:55:45.179108
+test: zero-data-ioctl
+time: 2026-03-03 07:55:45.180750
+time: 2026-03-03 07:55:45.180764
+failure: zero-data-ioctl [
+../../source4/torture/smb2/ioctl.c:4139: Need to provide non-negative 'beyond final zero' through --option=torture:beyond_final_zero=NNN
+]

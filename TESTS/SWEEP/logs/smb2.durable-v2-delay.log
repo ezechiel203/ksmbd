@@ -1,0 +1,13 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772586930
+time: 2026-03-04 01:15:30.820833
+progress: 2
+test: durable_v2_reconnect_delay
+time: 2026-03-04 01:15:30.821612
+time: 2026-03-04 01:15:31.053413
+success: durable_v2_reconnect_delay
+test: durable_v2_reconnect_delay_msec
+time: 2026-03-04 01:15:31.053463
+time: 2026-03-04 01:15:41.406584
+success: durable_v2_reconnect_delay_msec

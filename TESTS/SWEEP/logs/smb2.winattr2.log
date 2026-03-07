@@ -1,0 +1,8 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772585264
+time: 2026-03-04 00:47:44.253169
+test: winattr2
+time: 2026-03-04 00:47:44.253979
+time: 2026-03-04 00:47:44.277696
+success: winattr2

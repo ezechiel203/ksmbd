@@ -1,0 +1,134 @@
+config SMB_SERVER
+	tristate "SMB3 server support"
+	depends on INET
+	depends on MULTIUSER
+	depends on FILE_LOCKING
+	select NLS
+	select NLS_UTF8
+	select CRYPTO
+	select CRYPTO_MD5
+	select CRYPTO_HMAC
+	select CRYPTO_ECB
+	select CRYPTO_LIB_DES
+	select CRYPTO_SHA256
+	select CRYPTO_CMAC
+	select CRYPTO_SHA512
+	select CRYPTO_AEAD2
+	select CRYPTO_CCM
+	select CRYPTO_GCM
+	select ASN1
+	select OID_REGISTRY
+	select CRC32
+	default n
+	help
+	  Choose Y here if you want to allow SMB3 compliant clients
+	  to access files residing on this system using SMB3 protocol.
+	  To compile the SMB3 server support as a module,
+	  choose M here: the module will be called ksmbd.
+
+	  You may choose to use a samba server instead, in which
+	  case you can choose N here.
+
+	  You also need to install user space programs which can be found
+	  in ksmbd-tools, available from
+	  https://github.com/cifsd-team/ksmbd-tools
+	  More detail about how to run the ksmbd kernel server is
+	  available via README file
+	  (https://github.com/cifsd-team/ksmbd-tools/blob/master/README.md).
+
+	  ksmbd kernel server includes support for auto-negotiation,
+	  Secure negotiate, Pre-authentication integrity, oplock/lease,
+	  compound requests, multi-credit, packet signing, RDMA(smbdirect),
+	  smb3 encryption, copy-offload, secure per-user session
+	  establishment via NTLM or NTLMv2.
+
+	  For production deployments, enable CONFIG_MODULE_SIG and
+	  CONFIG_MODULE_SIG_FORCE to ensure the ksmbd module is
+	  cryptographically signed before loading. This prevents
+	  unauthorized or tampered modules from being inserted.
+
+	  Security hardening for production (in ksmbd.conf):
+	    - Set "smb signing = mandatory" (not "auto" or "disabled")
+	    - Set "smb encryption = mandatory" for SMB3 connections
+	    - Disable SMB1 support (do not enable SMB_INSECURE_SERVER)
+	    - Set appropriate "max connections" limits per IP
+
+config SMB_INSECURE_SERVER
+	bool "Support for insecure SMB1/CIFS and SMB2.0 protocols"
+	depends on SMB_SERVER && INET
+	select NLS
+	# CRYPTO_MD4 has been removed from newer kernels (>= 6.6).
+	# Only select it when the symbol is available. On kernels where MD4
+	# is absent, NTLM (v1) password hashing will not be available;
+	# NTLMv2 (which uses MD5/HMAC) remains functional.
+	select CRYPTO_MD4 if CRYPTO_MD4
+	default n
+
+	help
+	  This enables deprecated insecure protocols dialects: SMB1/CIFS
+	  and SMB2.0
+
+config SMB_SERVER_SMBDIRECT
+	bool "Support for SMB Direct protocol"
+	depends on SMB_SERVER=m && INFINIBAND && INFINIBAND_ADDR_TRANS || SMB_SERVER=y && INFINIBAND=y && INFINIBAND_ADDR_TRANS=y
+	select SG_POOL
+	default n
+
+	help
+	  Enables SMB Direct support for SMB 3.0, 3.02 and 3.1.1.
+
+	  SMB Direct allows transferring SMB packets over RDMA. If unsure,
+	  say N.
+
+config SMB_SERVER_QUIC
+	bool "Support for SMB over QUIC transport"
+	depends on SMB_SERVER
+	depends on NET
+	select CRYPTO_AES
+	select CRYPTO_GCM
+	select CRYPTO_HMAC
+	select CRYPTO_SHA256
+	imply TLS
+	default n
+
+	help
+	  Enables kernel-native SMB over QUIC transport support (port 443).
+
+	  This implements RFC 9000 (QUIC transport) and RFC 9001 (QUIC-TLS)
+	  entirely in kernel space using a UDP socket.  No userspace QUIC
+	  proxy is required.
+
+	  QUIC Initial packets are processed with HKDF-SHA-256 key derivation
+	  (RFC 5869) and AES-128-GCM AEAD encryption (RFC 9001 §5).  Header
+	  protection uses AES-128-ECB (RFC 9001 §5.4).
+
+	  When CONFIG_TLS is enabled, session keys can be installed into kTLS
+	  for hardware-accelerated TLS record encryption after the handshake.
+
+	  SMB PDUs are carried in QUIC STREAM frames without the RFC1002
+	  NetBIOS 4-byte length prefix (MS-SMB2 Appendix C).
+
+	  If unsure, say N.
+
+config KSMBD_FRUIT
+	bool "Support for Apple SMB extensions (macOS compatibility)"
+	depends on SMB_SERVER
+	default n
+
+	help
+	  Enables Apple-specific SMB2 create context extensions for
+	  improved macOS client compatibility. This includes support for
+	  the AAPL create context, Time Machine backups, Finder metadata,
+	  and resource fork handling.
+
+	  Enable this if ksmbd will serve macOS or iOS clients. If unsure,
+	  say N.
+
+config KSMBD_KUNIT_TEST
+	tristate "KUnit tests for ksmbd" if !KUNIT_ALL_TESTS
+	depends on SMB_SERVER && KUNIT
+	default KUNIT_ALL_TESTS
+	help
+	  KUnit tests for the ksmbd SMB server. Only useful for kernel
+	  developers running KUnit test suites.
+

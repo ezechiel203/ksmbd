@@ -1,0 +1,26 @@
+lock: PASS=22 FAIL=0
+0 SKIP=4
+oplock: PASS=35 FAIL=7 SKIP=0
+0
+rw: PASS=3 FAIL=1 SKIP=0
+0
+dir: PASS=7 FAIL=2 SKIP=0
+0
+read: PASS=3 FAIL=1 SKIP=1
+compound: PASS=17 FAIL=3 SKIP=0
+0
+delete-on-close-perms: PASS=8 FAIL=1 SKIP=0
+0
+credits: PASS=5 FAIL=5 SKIP=0
+0
+secleak: PASS=0
+0 FAIL=1 SKIP=0
+0
+zero-data-ioctl: PASS=0
+0 FAIL=1 SKIP=0
+0
+dosmode: PASS=0
+0 FAIL=1 SKIP=0
+0
+notify: PASS=9 FAIL=9 SKIP=0
+0

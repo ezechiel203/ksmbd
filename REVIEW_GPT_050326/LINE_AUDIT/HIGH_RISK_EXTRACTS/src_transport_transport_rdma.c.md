@@ -1,0 +1,242 @@
+# src/transport/transport_rdma.c
+
+Risk-tagged lines (LOCK/LIFETIME/WAIT_LOOP/ERROR_PATH/MEM_BOUNDS/PROTO_GATE):
+
+- L00078 [LIFETIME|] `static atomic_t smbd_active_conn;`
+- L00144 [LIFETIME|] `	atomic_t		send_credits;`
+- L00149 [LIFETIME|] `	atomic_t		rw_credits;`
+- L00160 [LIFETIME|] `	atomic_t		send_pending;`
+- L00185 [LIFETIME|] `	atomic_t		recv_posted;`
+- L00186 [LIFETIME|] `	atomic_t		total_credits_granted;`
+- L00187 [LIFETIME|] `	atomic_t		total_credits_reclaimed;`
+- L00288 [WAIT_LOOP|] `	ret = wait_event_timeout(t->wait_send_pending,`
+- L00289 [LIFETIME|] `				 atomic_read(&t->send_pending) == 0 ||`
+- L00293 [ERROR_PATH|] `		pr_err_ratelimited("%s: timeout waiting for pending sends (pending=%d status=%d)\n",`
+- L00294 [LIFETIME|] `				   caller, atomic_read(&t->send_pending), t->status);`
+- L00295 [ERROR_PATH|] `		return -ETIMEDOUT;`
+- L00298 [LIFETIME|] `	if (atomic_read(&t->send_pending) == 0)`
+- L00301 [ERROR_PATH|] `	return -ENOTCONN;`
+- L00328 [LOCK|] `	spin_lock(&t->recvmsg_queue_lock);`
+- L00335 [LOCK|] `	spin_unlock(&t->recvmsg_queue_lock);`
+- L00350 [LOCK|] `	spin_lock(&t->recvmsg_queue_lock);`
+- L00352 [LOCK|] `	spin_unlock(&t->recvmsg_queue_lock);`
+- L00359 [LOCK|] `	spin_lock(&t->reassembly_queue_lock);`
+- L00370 [LOCK|] `	spin_unlock(&t->reassembly_queue_lock);`
+- L00423 [MEM_BOUNDS|] `	t = kzalloc(sizeof(*t), KSMBD_DEFAULT_GFP);`
+- L00446 [LIFETIME|] `	atomic_set(&t->send_pending, 0);`
+- L00450 [LIFETIME|] `	atomic_set(&t->recv_posted, 0);`
+- L00451 [LIFETIME|] `	atomic_set(&t->total_credits_granted, 0);`
+- L00452 [LIFETIME|] `	atomic_set(&t->total_credits_reclaimed, 0);`
+- L00461 [ERROR_PATH|] `		goto err;`
+- L00464 [LIFETIME|] `	 * J.5: IPv6 address enumeration RCU locking note.`
+- L00469 [LIFETIME|] `	 * address lists, so no rcu_read_lock() is required here.`
+- L00471 [LIFETIME|] `	 * The IPv6 addr_list iteration that DOES need an RCU lock is in`
+- L00474 [LIFETIME|] `	 * uses the non-RCU list_for_each_entry() instead of`
+- L00478 [LIFETIME|] `	 * list_for_each_entry_rcu() correctly under rcu_read_lock().`
+- L00490 [MEM_BOUNDS|] `			memcpy(&conn->inet6_addr, &sin6->sin6_addr, 16);`
+- L00546 [LIFETIME|] `	if (atomic_read(&t->send_pending))`
+- L00557 [LOCK|] `		spin_lock(&t->reassembly_queue_lock);`
+- L00561 [LOCK|] `			spin_unlock(&t->reassembly_queue_lock);`
+- L00564 [LOCK|] `			spin_unlock(&t->reassembly_queue_lock);`
+- L00631 [ERROR_PATH|] `			pr_err("data_offset %u + data_length %u exceeds buffer %u\n",`
+- L00633 [ERROR_PATH|] `			return -EINVAL;`
+- L00638 [ERROR_PATH|] `			pr_err("Invalid data_offset %u in SMB_DIRECT data transfer\n",`
+- L00640 [ERROR_PATH|] `			return -EINVAL;`
+- L00653 [PROTO_GATE|] `				    hdr->ProtocolId, hdr->Command);`
+- L00670 [ERROR_PATH|] `			return -EOPNOTSUPP;`
+- L00675 [ERROR_PATH|] `			return -ECONNABORTED;`
+- L00680 [ERROR_PATH|] `		return -EINVAL;`
+- L00696 [LOCK|] `	spin_lock(&t->receive_credit_lock);`
+- L00700 [LOCK|] `	spin_unlock(&t->receive_credit_lock);`
+- L00702 [LIFETIME|] `	posted = atomic_read(&t->recv_posted);`
+- L00703 [LIFETIME|] `	granted = atomic_read(&t->total_credits_granted);`
+- L00704 [LIFETIME|] `	reclaimed = atomic_read(&t->total_credits_reclaimed);`
+- L00713 [ERROR_PATH|] `		pr_warn_ratelimited(`
+- L00717 [ERROR_PATH|] `		return -EINVAL;`
+- L00724 [ERROR_PATH|] `		pr_warn_ratelimited(`
+- L00726 [ERROR_PATH|] `		return -EINVAL;`
+- L00735 [ERROR_PATH|] `		pr_warn_ratelimited(`
+- L00739 [ERROR_PATH|] `		return -EINVAL;`
+- L00758 [LIFETIME|] `	posted = atomic_read(&t->recv_posted);`
+- L00760 [LOCK|] `	spin_lock(&t->receive_credit_lock);`
+- L00774 [LOCK|] `	spin_unlock(&t->receive_credit_lock);`
+- L00777 [LIFETIME|] `	posted = atomic_xchg(&t->recv_posted, 0);`
+- L00783 [LIFETIME|] `	leaked = atomic_read(&t->total_credits_granted) -`
+- L00784 [LIFETIME|] `		 atomic_read(&t->total_credits_reclaimed);`
+- L00786 [ERROR_PATH|] `		pr_warn_ratelimited(`
+- L00789 [LIFETIME|] `			atomic_read(&t->total_credits_granted),`
+- L00790 [LIFETIME|] `			atomic_read(&t->total_credits_reclaimed),`
+- L00803 [LIFETIME|] `	atomic_dec(&t->recv_posted);`
+- L00804 [LIFETIME|] `	atomic_inc(&t->total_credits_reclaimed);`
+- L00816 [LOCK|] `		spin_lock(&t->receive_credit_lock);`
+- L00821 [LOCK|] `		spin_unlock(&t->receive_credit_lock);`
+- L00825 [ERROR_PATH|] `			pr_err("Recv error. status='%s (%d)' opcode=%d\n",`
+- L00893 [LOCK|] `			spin_lock(&t->receive_credit_lock);`
+- L00895 [LOCK|] `				spin_unlock(&t->receive_credit_lock);`
+- L00902 [LOCK|] `			spin_unlock(&t->receive_credit_lock);`
+- L00904 [LOCK|] `			spin_lock(&t->receive_credit_lock);`
+- L00906 [LOCK|] `				spin_unlock(&t->receive_credit_lock);`
+- L00913 [LOCK|] `			spin_unlock(&t->receive_credit_lock);`
+- L00920 [LIFETIME|] `		atomic_add(le16_to_cpu(data_transfer->credits_granted),`
+- L00927 [LIFETIME|] `		if (atomic_read(&t->send_credits) > 0)`
+- L00974 [ERROR_PATH|] `		pr_err("Can't post recv: %d\n", ret);`
+- L00984 [LIFETIME|] `	atomic_inc(&t->recv_posted);`
+- L00985 [LIFETIME|] `	atomic_inc(&t->total_credits_granted);`
+- L01002 [ERROR_PATH|] `		return -ESHUTDOWN;`
+- L01005 [ERROR_PATH|] `		pr_err("disconnected\n");`
+- L01006 [ERROR_PATH|] `		return -ENOTCONN;`
+- L01051 [ERROR_PATH|] `					pr_err("Invalid rfc1002 length %u\n",`
+- L01053 [ERROR_PATH|] `					return -EINVAL;`
+- L01061 [ERROR_PATH|] `				goto read_rfc1002_done;`
+- L01065 [MEM_BOUNDS|] `			memcpy(buf + data_read, (char *)data_transfer + data_offset + offset,`
+- L01098 [LOCK|] `		spin_lock(&st->receive_credit_lock);`
+- L01101 [LOCK|] `			spin_unlock(&st->receive_credit_lock);`
+- L01104 [LOCK|] `			spin_unlock(&st->receive_credit_lock);`
+- L01116 [WAIT_LOOP|] `	ksmbd_debug(RDMA, "wait_event on more data\n");`
+- L01117 [WAIT_LOOP|] `	rc = wait_event_interruptible_timeout(st->wait_reassembly_queue,`
+- L01122 [ERROR_PATH|] `		return -EINTR;`
+- L01129 [ERROR_PATH|] `			return -EAGAIN;`
+- L01134 [ERROR_PATH|] `	goto again;`
+- L01145 [LOCK|] `	spin_lock(&t->receive_credit_lock);`
+- L01147 [LOCK|] `	spin_unlock(&t->receive_credit_lock);`
+- L01160 [ERROR_PATH|] `				pr_err("Can't post recv: %d\n", ret);`
+- L01168 [LOCK|] `	spin_lock(&t->receive_credit_lock);`
+- L01175 [ERROR_PATH|] `		pr_warn_ratelimited(`
+- L01187 [ERROR_PATH|] `		pr_warn_ratelimited(`
+- L01192 [LOCK|] `	spin_unlock(&t->receive_credit_lock);`
+- L01194 [LOCK|] `	spin_lock(&t->lock_new_recv_credits);`
+- L01196 [LOCK|] `	spin_unlock(&t->lock_new_recv_credits);`
+- L01216 [ERROR_PATH|] `		pr_err("Send error. status='%s (%d)', opcode=%d\n",`
+- L01222 [LIFETIME|] `	if (atomic_dec_and_test(&t->send_pending))`
+- L01242 [LOCK|] `	spin_lock(&t->lock_new_recv_credits);`
+- L01245 [LOCK|] `	spin_unlock(&t->lock_new_recv_credits);`
+- L01255 [LIFETIME|] `	atomic_inc(&t->send_pending);`
+- L01258 [ERROR_PATH|] `		pr_err("failed to post send: %d\n", ret);`
+- L01259 [LIFETIME|] `		if (atomic_dec_and_test(&t->send_pending))`
+- L01307 [LIFETIME|] `		atomic_add(send_ctx->wr_cnt, &t->send_credits);`
+- L01318 [LIFETIME|] `			    wait_queue_head_t *waitq, atomic_t *total_credits,`
+- L01324 [LIFETIME|] `		if (atomic_sub_return(needed, total_credits) >= 0)`
+- L01327 [LIFETIME|] `		atomic_add(needed, total_credits);`
+- L01328 [WAIT_LOOP|] `		ret = wait_event_interruptible_timeout(*waitq,`
+- L01329 [LIFETIME|] `						       atomic_read(total_credits) >= needed ||`
+- L01334 [ERROR_PATH|] `			return -ENOTCONN;`
+- L01336 [ERROR_PATH|] `			pr_err_ratelimited("timeout waiting for RDMA credits (needed=%d avail=%d)\n",`
+- L01337 [LIFETIME|] `					   needed, atomic_read(total_credits));`
+- L01339 [ERROR_PATH|] `			return -ETIMEDOUT;`
+- L01351 [LIFETIME|] `	    (send_ctx->wr_cnt >= 16 || atomic_read(&t->send_credits) <= 1)) {`
+- L01441 [ERROR_PATH|] `		return -EINVAL;`
+- L01453 [ERROR_PATH|] `			return -EINVAL;`
+- L01473 [ERROR_PATH|] `		return -EINVAL;`
+- L01536 [LIFETIME|] `		atomic_inc(&t->send_credits);`
+- L01550 [ERROR_PATH|] `			pr_err("failed to map buffer\n");`
+- L01552 [ERROR_PATH|] `			goto err;`
+- L01554 [ERROR_PATH|] `			pr_err("buffer not fitted into sges\n");`
+- L01558 [ERROR_PATH|] `			goto err;`
+- L01572 [ERROR_PATH|] `		goto err;`
+- L01576 [LIFETIME|] `	atomic_inc(&t->send_credits);`
+- L01595 [ERROR_PATH|] `		return -ENOTCONN;`
+- L01599 [ERROR_PATH|] `		return -EINVAL;`
+- L01621 [ERROR_PATH|] `			goto done;`
+- L01679 [ERROR_PATH|] `					goto done;`
+- L01701 [ERROR_PATH|] `			goto done;`
+- L01742 [ERROR_PATH|] `		pr_err("read/write error. opcode = %d, status = %s(%d)\n",`
+- L01777 [ERROR_PATH|] `		return -ENOTCONN;`
+- L01780 [ERROR_PATH|] `		return -EINVAL;`
+- L01790 [PROTO_GATE|] `	 * (ProtocolId 0xFB534D42, MS-SMB2 §2.2.43).`
+- L01796 [PROTO_GATE|] `	 * SMB2_RDMA_TRANSFORM_ENCRYPTION believe their data is protected`
+- L01800 [PROTO_GATE|] `	 *   1. Defining struct smb2_rdma_transform_hdr (ProtocolId 0xFB534D42).`
+- L01814 [PROTO_GATE|] `					SMB2_RDMA_TRANSFORM_ENCRYPTION)) {`
+- L01815 [ERROR_PATH|] `			pr_warn_ratelimited("ksmbd: RDMA encryption transform negotiated but not applied — data sent plaintext (BUG-R01)\n");`
+- L01817 [PROTO_GATE|] `					SMB2_RDMA_TRANSFORM_SIGNING)) {`
+- L01818 [ERROR_PATH|] `			pr_warn_ratelimited("ksmbd: RDMA signing transform negotiated but not applied — data sent unsigned (BUG-R01)\n");`
+- L01831 [ERROR_PATH|] `			return -EINVAL;`
+- L01855 [MEM_BOUNDS|] `		msg = kzalloc(struct_size(msg, sg_list, SG_CHUNK_SIZE),`
+- L01859 [ERROR_PATH|] `			goto out;`
+- L01875 [ERROR_PATH|] `			goto out;`
+- L01883 [ERROR_PATH|] `			goto out;`
+- L01894 [ERROR_PATH|] `			pr_err("failed to init rdma_rw_ctx: %d\n", ret);`
+- L01897 [ERROR_PATH|] `			goto out;`
+- L01913 [ERROR_PATH|] `		pr_err("failed to post send wr for RDMA R/W: %d\n", ret);`
+- L01914 [ERROR_PATH|] `		goto out;`
+- L01920 [ERROR_PATH|] `		pr_err_ratelimited("timeout waiting for RDMA %s completion\n",`
+- L01924 [ERROR_PATH|] `		goto out;`
+- L01933 [LIFETIME|] `	atomic_add(credits_needed, &t->rw_credits);`
+- L01964 [WAIT_LOOP|] `	ret = wait_event_interruptible_timeout(st->wait_status,`
+- L01968 [ERROR_PATH|] `		pr_err_ratelimited("timeout waiting for RDMA disconnect (status=%d)\n",`
+- L01972 [LIFETIME|] `		atomic_dec(&smbd_active_conn);`
+- L02020 [ERROR_PATH|] `		pr_err("Unexpected RDMA CM event. cm_id=%p, event=%s (%d)\n",`
+- L02054 [ERROR_PATH|] `		return -ENOMEM;`
+- L02061 [PROTO_GATE|] `		resp->status = STATUS_NOT_SUPPORTED;`
+- L02063 [PROTO_GATE|] `		resp->status = STATUS_SUCCESS;`
+- L02130 [ERROR_PATH|] `		pr_err("error at rdma_accept: %d\n", ret);`
+- L02143 [ERROR_PATH|] `		return -ENOMEM;`
+- L02148 [ERROR_PATH|] `		pr_err("Can't post recv: %d\n", ret);`
+- L02149 [ERROR_PATH|] `		goto out_err;`
+- L02155 [ERROR_PATH|] `		pr_err("Can't accept client\n");`
+- L02156 [ERROR_PATH|] `		goto out_err;`
+- L02186 [ERROR_PATH|] `		pr_err("max_send_size %d is too large\n", t->max_send_size);`
+- L02187 [ERROR_PATH|] `		return -EINVAL;`
+- L02217 [ERROR_PATH|] `		pr_err("consider lowering send_credit_target = %d\n",`
+- L02219 [ERROR_PATH|] `		pr_err("Possible CQE overrun, device reporting max_cqe %d max_qp_wr %d\n",`
+- L02221 [ERROR_PATH|] `		return -EINVAL;`
+- L02226 [ERROR_PATH|] `		pr_err("consider lowering receive_credit_max = %d\n",`
+- L02228 [ERROR_PATH|] `		pr_err("Possible CQE overrun, device reporting max_cpe %d max_qp_wr %d\n",`
+- L02230 [ERROR_PATH|] `		return -EINVAL;`
+- L02234 [ERROR_PATH|] `		pr_err("warning: device max_send_sge = %d too small\n",`
+- L02236 [ERROR_PATH|] `		return -EINVAL;`
+- L02239 [ERROR_PATH|] `		pr_err("warning: device max_recv_sge = %d too small\n",`
+- L02241 [ERROR_PATH|] `		return -EINVAL;`
+- L02252 [LIFETIME|] `	atomic_set(&t->send_credits, 0);`
+- L02253 [LIFETIME|] `	atomic_set(&t->rw_credits, t->max_rw_credits);`
+- L02294 [MEM_BOUNDS|] `	snprintf(name, sizeof(name), "smb_direct_rqst_pool_%p", t);`
+- L02300 [ERROR_PATH|] `		return -ENOMEM;`
+- L02306 [ERROR_PATH|] `		goto err;`
+- L02308 [MEM_BOUNDS|] `	snprintf(name, sizeof(name), "smb_direct_resp_%p", t);`
+- L02314 [ERROR_PATH|] `		goto err;`
+- L02320 [ERROR_PATH|] `		goto err;`
+- L02327 [ERROR_PATH|] `			goto err;`
+- L02337 [ERROR_PATH|] `	return -ENOMEM;`
+- L02351 [ERROR_PATH|] `		pr_err("Can't create RDMA PD\n");`
+- L02361 [ERROR_PATH|] `		pr_err("Can't create RDMA send CQ\n");`
+- L02364 [ERROR_PATH|] `		goto err;`
+- L02370 [ERROR_PATH|] `		pr_err("Can't create RDMA recv CQ\n");`
+- L02373 [ERROR_PATH|] `		goto err;`
+- L02388 [ERROR_PATH|] `		pr_err("Can't create RDMA QP: %d\n", ret);`
+- L02389 [ERROR_PATH|] `		goto err;`
+- L02403 [ERROR_PATH|] `			pr_err("failed to init mr pool count %d pages %d\n",`
+- L02405 [ERROR_PATH|] `			goto err;`
+- L02439 [WAIT_LOOP|] `	ret = wait_event_interruptible_timeout(st->wait_status,`
+- L02448 [ERROR_PATH|] `		return -ECONNABORTED;`
+- L02452 [ERROR_PATH|] `		goto out;`
+- L02467 [ERROR_PATH|] `		pr_err("RDMA: client max_recv_size too small: %d\n",`
+- L02470 [ERROR_PATH|] `		goto out;`
+- L02474 [ERROR_PATH|] `		pr_err("RDMA: client max_send_size too small: %d\n",`
+- L02477 [ERROR_PATH|] `		goto out;`
+- L02508 [ERROR_PATH|] `		pr_err("Can't configure RDMA parameters\n");`
+- L02514 [ERROR_PATH|] `		pr_err("Can't init RDMA pool: %d\n", ret);`
+- L02520 [ERROR_PATH|] `		pr_err("Can't accept RDMA client: %d\n", ret);`
+- L02526 [ERROR_PATH|] `		pr_err("Can't negotiate: %d\n", ret);`
+- L02551 [ERROR_PATH|] `		return -EPROTONOSUPPORT;`
+- L02555 [LIFETIME|] `	    atomic_inc_return(&smbd_active_conn) > server_conf.max_connections) {`
+- L02556 [LIFETIME|] `		atomic_dec(&smbd_active_conn);`
+- L02557 [ERROR_PATH|] `		pr_err_ratelimited("RDMA: max connections reached\n");`
+- L02559 [ERROR_PATH|] `		return -ECONNREFUSED;`
+- L02565 [LIFETIME|] `			atomic_dec(&smbd_active_conn);`
+- L02566 [ERROR_PATH|] `		return -ENOMEM;`
+- L02571 [ERROR_PATH|] `		goto out_err;`
+- L02578 [ERROR_PATH|] `		pr_err("Can't start thread\n");`
+- L02579 [ERROR_PATH|] `		goto out_err;`
+- L02586 [LIFETIME|] `		atomic_dec(&smbd_active_conn);`
+- L02598 [ERROR_PATH|] `			pr_err("Can't create transport: %d\n", ret);`
+- L02607 [ERROR_PATH|] `		pr_err("Unexpected listen event. cm_id=%p, event=%s (%d)\n",`
+- L02627 [ERROR_PATH|] `		pr_err("Can't create cm id: %ld\n", PTR_ERR(cm_id));`
+- L02633 [ERROR_PATH|] `		pr_err("Can't bind: %d\n", ret);`
+- L02634 [ERROR_PATH|] `		goto err;`
+- L02641 [ERROR_PATH|] `		pr_err("Can't listen: %d\n", ret);`
+- L02642 [ERROR_PATH|] `		goto err;`
+- L02671 [MEM_BOUNDS|] `	smb_dev = kzalloc(sizeof(*smb_dev), KSMBD_DEFAULT_GFP);`
+- L02674 [ERROR_PATH|] `		return -ENOMEM;`
+- L02722 [ERROR_PATH|] `		pr_err("failed to ib_register_client\n");`
+- L02741 [ERROR_PATH|] `		return -ENOMEM;`
+- L02749 [ERROR_PATH|] `		pr_err("Can't listen: %d\n", ret);`
+- L02796 [ERROR_PATH|] `				goto out;`

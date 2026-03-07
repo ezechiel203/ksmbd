@@ -1,0 +1,1918 @@
+[ 2741.812079] ksmbd: credit_rsp: lock_exit cmd=16 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2741.814013] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2741.815618] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 2741.816821] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+[ 2741.818010] ksmbd: got SMB2 command
+[ 2741.818816] ksmbd: SMB2 len 88
+[ 2741.819443] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 2741.821032] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2741.822766] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 2741.824185] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 2741.825500] ksmbd: Received smb2 close request
+[ 2741.826476] ksmbd: volatile_id = 61
+[ 2741.827246] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 2741.828750] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2741.830486] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2741.832444] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2741.834044] ksmbd: RFC1002 hdr=00 00 00 90 len=144 status=1
+[ 2741.835227] ksmbd: PDU sig=fe 53 4d 42 pdu=144 req_running=0
+[ 2741.836473] ksmbd: got SMB2 command
+[ 2741.837236] ksmbd: SMB2 data length 24 offset 120
+[ 2741.838257] ksmbd: SMB2 len 144
+[ 2741.838949] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 2741.840486] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2741.842239] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 2741.843681] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 2741.845017] ksmbd: Received smb2 create request
+[ 2741.845989] ksmbd: converted name = winattr1.dir
+[ 2741.846994] ksmbd: check permission using windows acl
+[ 2741.848075] ksmbd: Discard write access to a directory
+[ 2741.849213] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 2741.850703] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2741.852585] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2741.854466] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2741.856065] ksmbd: RFC1002 hdr=00 00 00 88 len=136 status=1
+[ 2741.857265] ksmbd: PDU sig=fe 53 4d 42 pdu=136 req_running=0
+[ 2741.858472] ksmbd: got SMB2 command
+[ 2741.859233] ksmbd: SMB2 data length 40 offset 96
+[ 2741.860187] ksmbd: SMB2 len 136
+[ 2741.860907] ksmbd: credit_check: cmd=17 charge=1 calc=1 req_len=40 resp_len=0 total=31 out=0
+[ 2741.862688] ksmbd: credit_check: lock_enter cmd=17 charge=1 total=31 out=0
+[ 2741.864094] ksmbd: credit_check: lock_exit cmd=17 ret=0 total=31 out=1
+[ 2741.865469] ksmbd: Received smb2 set info request
+[ 2741.866442] ksmbd: GOT SMB2_O_INFO_FILE
+[ 2741.867326] ksmbd: credit_rsp: dispatch cmd=17 total=31 out=1 granted_total=0
+[ 2741.868839] ksmbd: credit_rsp: lock_enter cmd=17 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2741.870640] ksmbd: credit_rsp: lock_exit cmd=17 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2741.872578] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2741.874090] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 2741.875264] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+[ 2741.876458] ksmbd: got SMB2 command
+[ 2741.877209] ksmbd: SMB2 len 88
+[ 2741.877878] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 2741.879441] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2741.881170] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 2741.882634] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 2741.883958] ksmbd: Received smb2 close request
+[ 2741.884924] ksmbd: volatile_id = 62
+[ 2741.885716] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 2741.887192] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2741.888986] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2741.890910] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2741.892543] ksmbd: RFC1002 hdr=00 00 00 90 len=144 status=1
+[ 2741.893744] ksmbd: PDU sig=fe 53 4d 42 pdu=144 req_running=0
+[ 2741.894944] ksmbd: got SMB2 command
+[ 2741.895737] ksmbd: SMB2 data length 24 offset 120
+[ 2741.896760] ksmbd: SMB2 len 144
+[ 2741.897403] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 2741.898972] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2741.900700] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 2741.902096] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 2741.903467] ksmbd: Received smb2 create request
+[ 2741.904432] ksmbd: converted name = winattr1.dir
+[ 2741.905429] ksmbd: check permission using windows acl
+[ 2741.906560] ksmbd: Discard write access to a directory
+[ 2741.907659] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 2741.909105] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2741.910898] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2741.912831] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2741.914386] ksmbd: RFC1002 hdr=00 00 00 69 len=105 status=1
+[ 2741.915586] ksmbd: PDU sig=fe 53 4d 42 pdu=105 req_running=1
+[ 2741.917264] ksmbd: got SMB2 command
+[ 2741.918084] ksmbd: SMB2 data length 0 offset 104
+[ 2741.919099] ksmbd: SMB2 len 105
+[ 2741.919812] ksmbd: credit_check: cmd=16 charge=1 calc=1 req_len=65536 resp_len=0 total=31 out=0
+[ 2741.921636] ksmbd: credit_check: lock_enter cmd=16 charge=1 total=31 out=0
+[ 2741.923048] ksmbd: credit_check: lock_exit cmd=16 ret=0 total=31 out=1
+[ 2741.924409] ksmbd: Received request smb2 query info request
+[ 2741.925640] ksmbd: GOT SMB2_O_INFO_FILE
+[ 2741.926438] ksmbd: filename = \winattr1.dir
+[ 2741.927344] ksmbd: credit_rsp: dispatch cmd=16 total=31 out=1 granted_total=0
+[ 2741.928855] ksmbd: credit_rsp: lock_enter cmd=16 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2741.930657] ksmbd: credit_rsp: lock_exit cmd=16 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2741.932600] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2741.934178] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 2741.935301] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=1
+[ 2741.936863] ksmbd: got SMB2 command
+[ 2741.937647] ksmbd: SMB2 len 88
+[ 2741.938307] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 2741.939872] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2741.941608] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 2741.943032] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 2741.944494] ksmbd: Received smb2 close request
+[ 2741.945383] ksmbd: volatile_id = 63
+[ 2741.946300] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 2741.947897] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2741.949778] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2741.951950] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2741.953758] ksmbd: RFC1002 hdr=00 00 00 90 len=144 status=1
+[ 2741.954922] ksmbd: PDU sig=fe 53 4d 42 pdu=144 req_running=0
+[ 2741.956322] ksmbd: got SMB2 command
+[ 2741.957190] ksmbd: SMB2 data length 24 offset 120
+[ 2741.958283] ksmbd: SMB2 len 144
+[ 2741.959056] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 2741.960731] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2741.962598] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 2741.964100] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 2741.965584] ksmbd: Received smb2 create request
+[ 2741.966648] ksmbd: converted name = winattr1.dir
+[ 2741.967720] ksmbd: check permission using windows acl
+[ 2741.968895] ksmbd: Discard write access to a directory
+[ 2741.970079] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 2741.971670] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2741.973504] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2741.975442] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2741.977086] ksmbd: RFC1002 hdr=00 00 00 69 len=105 status=1
+[ 2741.978360] ksmbd: PDU sig=fe 53 4d 42 pdu=105 req_running=0
+[ 2741.980093] ksmbd: got SMB2 command
+[ 2741.980946] ksmbd: SMB2 data length 0 offset 104
+[ 2741.981968] ksmbd: SMB2 len 105
+[ 2741.982695] ksmbd: credit_check: cmd=16 charge=1 calc=1 req_len=65536 resp_len=0 total=31 out=0
+[ 2741.984462] ksmbd: credit_check: lock_enter cmd=16 charge=1 total=31 out=0
+[ 2741.985945] ksmbd: credit_check: lock_exit cmd=16 ret=0 total=31 out=1
+[ 2741.987326] ksmbd: Received request smb2 query info request
+[ 2741.988557] ksmbd: GOT SMB2_O_INFO_SECURITY
+[ 2741.989409] ksmbd: credit_rsp: dispatch cmd=16 total=31 out=1 granted_total=0
+[ 2741.990955] ksmbd: credit_rsp: lock_enter cmd=16 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2741.992809] ksmbd: credit_rsp: lock_exit cmd=16 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2741.994771] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2741.996388] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 2741.997573] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=1
+[ 2741.999018] ksmbd: got SMB2 command
+[ 2741.999805] ksmbd: SMB2 len 88
+[ 2742.000479] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 2742.002035] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2742.003765] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 2742.005202] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 2742.006577] ksmbd: Received smb2 close request
+[ 2742.007488] ksmbd: volatile_id = 64
+[ 2742.008301] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 2742.009802] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2742.011596] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2742.013495] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2742.015092] ksmbd: RFC1002 hdr=00 00 00 90 len=144 status=1
+[ 2742.016301] ksmbd: PDU sig=fe 53 4d 42 pdu=144 req_running=0
+[ 2742.017510] ksmbd: got SMB2 command
+[ 2742.018266] ksmbd: SMB2 data length 24 offset 120
+[ 2742.019266] ksmbd: SMB2 len 144
+[ 2742.019988] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 2742.021568] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2742.023277] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 2742.024826] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 2742.026229] ksmbd: Received smb2 create request
+[ 2742.027189] ksmbd: converted name = winattr1.dir
+[ 2742.028202] ksmbd: check permission using windows acl
+[ 2742.029296] ksmbd: Discard write access to a directory
+[ 2742.030404] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 2742.031899] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2742.033695] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2742.035624] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2742.037207] ksmbd: RFC1002 hdr=00 00 00 88 len=136 status=1
+[ 2742.038379] ksmbd: PDU sig=fe 53 4d 42 pdu=136 req_running=0
+[ 2742.039624] ksmbd: got SMB2 command
+[ 2742.040327] ksmbd: SMB2 data length 40 offset 96
+[ 2742.041345] ksmbd: SMB2 len 136
+[ 2742.042047] ksmbd: credit_check: cmd=17 charge=1 calc=1 req_len=40 resp_len=0 total=31 out=0
+[ 2742.043818] ksmbd: credit_check: lock_enter cmd=17 charge=1 total=31 out=0
+[ 2742.045260] ksmbd: credit_check: lock_exit cmd=17 ret=0 total=31 out=1
+[ 2742.046646] ksmbd: Received smb2 set info request
+[ 2742.047667] ksmbd: GOT SMB2_O_INFO_FILE
+[ 2742.048503] ksmbd: credit_rsp: dispatch cmd=17 total=31 out=1 granted_total=0
+[ 2742.049999] ksmbd: credit_rsp: lock_enter cmd=17 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2742.052260] ksmbd: credit_rsp: lock_exit cmd=17 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2742.054230] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2742.055826] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 2742.056996] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+[ 2742.058218] ksmbd: got SMB2 command
+[ 2742.058984] ksmbd: SMB2 len 88
+[ 2742.059690] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 2742.061240] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2742.062963] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 2742.064394] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 2742.065768] ksmbd: Received smb2 close request
+[ 2742.066734] ksmbd: volatile_id = 65
+[ 2742.067497] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 2742.068971] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2742.070767] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2742.072685] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2742.074263] ksmbd: RFC1002 hdr=00 00 00 90 len=144 status=1
+[ 2742.075412] ksmbd: PDU sig=fe 53 4d 42 pdu=144 req_running=0
+[ 2742.076671] ksmbd: got SMB2 command
+[ 2742.077396] ksmbd: SMB2 data length 24 offset 120
+[ 2742.078398] ksmbd: SMB2 len 144
+[ 2742.079100] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 2742.080693] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2742.082391] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 2742.083829] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 2742.085187] ksmbd: Received smb2 create request
+[ 2742.086170] ksmbd: converted name = winattr1.dir
+[ 2742.087150] ksmbd: check permission using windows acl
+[ 2742.088249] ksmbd: Discard write access to a directory
+[ 2742.089356] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 2742.090848] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2742.092639] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2742.094565] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2742.096084] ksmbd: RFC1002 hdr=00 00 00 69 len=105 status=1
+[ 2742.097283] ksmbd: PDU sig=fe 53 4d 42 pdu=105 req_running=0
+[ 2742.098972] ksmbd: got SMB2 command
+[ 2742.099808] ksmbd: SMB2 data length 0 offset 104
+[ 2742.100819] ksmbd: SMB2 len 105
+[ 2742.101502] ksmbd: credit_check: cmd=16 charge=1 calc=1 req_len=65536 resp_len=0 total=31 out=0
+[ 2742.103326] ksmbd: credit_check: lock_enter cmd=16 charge=1 total=31 out=0
+[ 2742.104770] ksmbd: credit_check: lock_exit cmd=16 ret=0 total=31 out=1
+[ 2742.106120] ksmbd: Received request smb2 query info request
+[ 2742.107310] ksmbd: GOT SMB2_O_INFO_FILE
+[ 2742.108131] ksmbd: filename = \winattr1.dir
+[ 2742.109023] ksmbd: credit_rsp: dispatch cmd=16 total=31 out=1 granted_total=0
+[ 2742.110512] ksmbd: credit_rsp: lock_enter cmd=16 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2742.112284] ksmbd: credit_rsp: lock_exit cmd=16 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2742.114246] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2742.115852] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 2742.116982] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+[ 2742.118223] ksmbd: got SMB2 command
+[ 2742.119063] ksmbd: SMB2 len 88
+[ 2742.119869] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 2742.121540] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2742.123340] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 2742.124876] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 2742.126337] ksmbd: Received smb2 close request
+[ 2742.127397] ksmbd: volatile_id = 66
+[ 2742.128283] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 2742.129874] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2742.131787] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2742.133827] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2742.135631] ksmbd: RFC1002 hdr=00 00 00 90 len=144 status=1
+[ 2742.136800] ksmbd: PDU sig=fe 53 4d 42 pdu=144 req_running=0
+[ 2742.138134] ksmbd: got SMB2 command
+[ 2742.138998] ksmbd: SMB2 data length 24 offset 120
+[ 2742.140102] ksmbd: SMB2 len 144
+[ 2742.140921] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 2742.142606] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2742.144410] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 2742.145903] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 2742.147365] ksmbd: Received smb2 create request
+[ 2742.148432] ksmbd: converted name = winattr1.dir
+[ 2742.149572] ksmbd: check permission using windows acl
+[ 2742.150670] ksmbd: Discard write access to a directory
+[ 2742.151880] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 2742.153685] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2742.155574] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2742.157607] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2742.159245] ksmbd: RFC1002 hdr=00 00 00 69 len=105 status=1
+[ 2742.160526] ksmbd: PDU sig=fe 53 4d 42 pdu=105 req_running=1
+[ 2742.162321] ksmbd: got SMB2 command
+[ 2742.163284] ksmbd: SMB2 data length 0 offset 104
+[ 2742.164391] ksmbd: SMB2 len 105
+[ 2742.165199] ksmbd: credit_check: cmd=16 charge=1 calc=1 req_len=65536 resp_len=0 total=31 out=0
+[ 2742.167157] ksmbd: credit_check: lock_enter cmd=16 charge=1 total=31 out=0
+[ 2742.168702] ksmbd: credit_check: lock_exit cmd=16 ret=0 total=31 out=1
+[ 2742.170195] ksmbd: Received request smb2 query info request
+[ 2742.171461] ksmbd: GOT SMB2_O_INFO_SECURITY
+[ 2742.172364] ksmbd: credit_rsp: dispatch cmd=16 total=31 out=1 granted_total=0
+[ 2742.173904] ksmbd: credit_rsp: lock_enter cmd=16 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2742.175725] ksmbd: credit_rsp: lock_exit cmd=16 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2742.177715] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2742.179306] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 2742.180454] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=1
+[ 2742.182010] ksmbd: got SMB2 command
+[ 2742.182800] ksmbd: SMB2 len 88
+[ 2742.183466] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 2742.185045] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2742.186793] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 2742.188203] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 2742.189595] ksmbd: Received smb2 close request
+[ 2742.190562] ksmbd: volatile_id = 67
+[ 2742.191314] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 2742.192821] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2742.194613] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2742.196560] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2742.198154] ksmbd: RFC1002 hdr=00 00 00 90 len=144 status=1
+[ 2742.199334] ksmbd: PDU sig=fe 53 4d 42 pdu=144 req_running=1
+[ 2742.200573] ksmbd: got SMB2 command
+[ 2742.201309] ksmbd: SMB2 data length 24 offset 120
+[ 2742.202305] ksmbd: SMB2 len 144
+[ 2742.203012] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 2742.204597] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2742.206315] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 2742.207751] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 2742.209092] ksmbd: Received smb2 create request
+[ 2742.210069] ksmbd: converted name = winattr1.dir
+[ 2742.211073] ksmbd: check permission using windows acl
+[ 2742.212165] ksmbd: Discard write access to a directory
+[ 2742.213301] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 2742.214786] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2742.216578] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2742.218486] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2742.220049] ksmbd: RFC1002 hdr=00 00 00 88 len=136 status=1
+[ 2742.221249] ksmbd: PDU sig=fe 53 4d 42 pdu=136 req_running=1
+[ 2742.222430] ksmbd: got SMB2 command
+[ 2742.223225] ksmbd: SMB2 data length 40 offset 96
+[ 2742.224216] ksmbd: SMB2 len 136
+[ 2742.224910] ksmbd: credit_check: cmd=17 charge=1 calc=1 req_len=40 resp_len=0 total=31 out=0
+[ 2742.226689] ksmbd: credit_check: lock_enter cmd=17 charge=1 total=31 out=0
+[ 2742.228103] ksmbd: credit_check: lock_exit cmd=17 ret=0 total=31 out=1
+[ 2742.229494] ksmbd: Received smb2 set info request
+[ 2742.230499] ksmbd: GOT SMB2_O_INFO_FILE
+[ 2742.231347] ksmbd: credit_rsp: dispatch cmd=17 total=31 out=1 granted_total=0
+[ 2742.232856] ksmbd: credit_rsp: lock_enter cmd=17 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2742.234676] ksmbd: credit_rsp: lock_exit cmd=17 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2742.236640] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2742.238158] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 2742.239337] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=1
+[ 2742.240562] ksmbd: got SMB2 command
+[ 2742.241299] ksmbd: SMB2 len 88
+[ 2742.241972] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 2742.243574] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2742.245285] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 2742.246735] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 2742.248078] ksmbd: Received smb2 close request
+[ 2742.249034] ksmbd: volatile_id = 68
+[ 2742.249832] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 2742.251346] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2742.253404] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2742.255393] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2742.256969] ksmbd: RFC1002 hdr=00 00 00 90 len=144 status=1
+[ 2742.258146] ksmbd: PDU sig=fe 53 4d 42 pdu=144 req_running=1
+[ 2742.259374] ksmbd: got SMB2 command
+[ 2742.260165] ksmbd: SMB2 data length 24 offset 120
+[ 2742.261152] ksmbd: SMB2 len 144
+[ 2742.261863] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 2742.263435] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2742.265165] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 2742.266635] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 2742.267974] ksmbd: Received smb2 create request
+[ 2742.268957] ksmbd: converted name = winattr1.dir
+[ 2742.269959] ksmbd: check permission using windows acl
+[ 2742.271044] ksmbd: Discard write access to a directory
+[ 2742.272178] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 2742.273659] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2742.275415] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2742.277355] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2742.278887] ksmbd: RFC1002 hdr=00 00 00 69 len=105 status=1
+[ 2742.280063] ksmbd: PDU sig=fe 53 4d 42 pdu=105 req_running=1
+[ 2742.281800] ksmbd: got SMB2 command
+[ 2742.282611] ksmbd: SMB2 data length 0 offset 104
+[ 2742.283615] ksmbd: SMB2 len 105
+[ 2742.284286] ksmbd: credit_check: cmd=16 charge=1 calc=1 req_len=65536 resp_len=0 total=31 out=0
+[ 2742.286080] ksmbd: credit_check: lock_enter cmd=16 charge=1 total=31 out=0
+[ 2742.287558] ksmbd: credit_check: lock_exit cmd=16 ret=0 total=31 out=1
+[ 2742.288914] ksmbd: Received request smb2 query info request
+[ 2742.290089] ksmbd: GOT SMB2_O_INFO_FILE
+[ 2742.290934] ksmbd: filename = \winattr1.dir
+[ 2742.291850] ksmbd: credit_rsp: dispatch cmd=16 total=31 out=1 granted_total=0
+[ 2742.293364] ksmbd: credit_rsp: lock_enter cmd=16 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2742.295176] ksmbd: credit_rsp: lock_exit cmd=16 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2742.297111] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2742.298733] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 2742.299913] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+[ 2742.301090] ksmbd: got SMB2 command
+[ 2742.301860] ksmbd: SMB2 len 88
+[ 2742.302498] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 2742.304078] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2742.305811] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 2742.307243] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 2742.308605] ksmbd: Received smb2 close request
+[ 2742.309544] ksmbd: volatile_id = 69
+[ 2742.310270] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 2742.311785] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2742.313498] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2742.315423] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2742.317019] ksmbd: RFC1002 hdr=00 00 00 90 len=144 status=1
+[ 2742.318460] ksmbd: PDU sig=fe 53 4d 42 pdu=144 req_running=0
+[ 2742.319760] ksmbd: got SMB2 command
+[ 2742.320498] ksmbd: SMB2 data length 24 offset 120
+[ 2742.321507] ksmbd: SMB2 len 144
+[ 2742.322218] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 2742.323831] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2742.325580] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 2742.327047] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 2742.328419] ksmbd: Received smb2 create request
+[ 2742.329394] ksmbd: converted name = winattr1.dir
+[ 2742.330428] ksmbd: check permission using windows acl
+[ 2742.331551] ksmbd: Discard write access to a directory
+[ 2742.332716] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 2742.334178] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2742.336022] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2742.337974] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2742.339633] ksmbd: RFC1002 hdr=00 00 00 69 len=105 status=1
+[ 2742.340924] ksmbd: PDU sig=fe 53 4d 42 pdu=105 req_running=0
+[ 2742.342675] ksmbd: got SMB2 command
+[ 2742.343522] ksmbd: SMB2 data length 0 offset 104
+[ 2742.344544] ksmbd: SMB2 len 105
+[ 2742.345254] ksmbd: credit_check: cmd=16 charge=1 calc=1 req_len=65536 resp_len=0 total=31 out=0
+[ 2742.347174] ksmbd: credit_check: lock_enter cmd=16 charge=1 total=31 out=0
+[ 2742.348714] ksmbd: credit_check: lock_exit cmd=16 ret=0 total=31 out=1
+[ 2742.350144] ksmbd: Received request smb2 query info request
+[ 2742.351379] ksmbd: GOT SMB2_O_INFO_SECURITY
+[ 2742.352319] ksmbd: credit_rsp: dispatch cmd=16 total=31 out=1 granted_total=0
+[ 2742.353958] ksmbd: credit_rsp: lock_enter cmd=16 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2742.355866] ksmbd: credit_rsp: lock_exit cmd=16 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2742.357937] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2742.359671] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 2742.361022] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+[ 2742.362305] ksmbd: got SMB2 command
+[ 2742.363347] ksmbd: SMB2 len 88
+[ 2742.364180] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 2742.365965] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2742.367857] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 2742.369456] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 2742.371020] ksmbd: Received smb2 close request
+[ 2742.372027] ksmbd: volatile_id = 70
+[ 2742.372981] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 2742.374609] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2742.376568] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2742.378745] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2742.380474] ksmbd: RFC1002 hdr=00 00 00 90 len=144 status=1
+[ 2742.381862] ksmbd: PDU sig=fe 53 4d 42 pdu=144 req_running=0
+[ 2742.383156] ksmbd: got SMB2 command
+[ 2742.384108] ksmbd: SMB2 data length 24 offset 120
+[ 2742.385274] ksmbd: SMB2 len 144
+[ 2742.386137] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 2742.387955] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2742.389856] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 2742.391431] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 2742.393016] ksmbd: Received smb2 create request
+[ 2742.394140] ksmbd: converted name = winattr1.dir
+[ 2742.395309] ksmbd: check permission using windows acl
+[ 2742.396559] ksmbd: Discard write access to a directory
+[ 2742.397825] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 2742.399445] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2742.401502] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2742.403556] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2742.405294] ksmbd: RFC1002 hdr=00 00 00 88 len=136 status=1
+[ 2742.406518] ksmbd: PDU sig=fe 53 4d 42 pdu=136 req_running=0
+[ 2742.407966] ksmbd: got SMB2 command
+[ 2742.408873] ksmbd: SMB2 data length 40 offset 96
+[ 2742.410023] ksmbd: SMB2 len 136
+[ 2742.410904] ksmbd: credit_check: cmd=17 charge=1 calc=1 req_len=40 resp_len=0 total=31 out=0
+[ 2742.412848] ksmbd: credit_check: lock_enter cmd=17 charge=1 total=31 out=0
+[ 2742.414436] ksmbd: credit_check: lock_exit cmd=17 ret=0 total=31 out=1
+[ 2742.415923] ksmbd: Received smb2 set info request
+[ 2742.417098] ksmbd: GOT SMB2_O_INFO_FILE
+[ 2742.418100] ksmbd: credit_rsp: dispatch cmd=17 total=31 out=1 granted_total=0
+[ 2742.419760] ksmbd: credit_rsp: lock_enter cmd=17 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2742.421764] ksmbd: credit_rsp: lock_exit cmd=17 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2742.423817] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2742.425533] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 2742.426827] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+[ 2742.428101] ksmbd: got SMB2 command
+[ 2742.429072] ksmbd: SMB2 len 88
+[ 2742.429899] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 2742.431616] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2742.433544] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 2742.435125] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 2742.436539] ksmbd: Received smb2 close request
+[ 2742.438065] ksmbd: volatile_id = 71
+[ 2742.438985] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 2742.440614] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2742.442564] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2742.444743] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2742.446422] ksmbd: RFC1002 hdr=00 00 00 90 len=144 status=1
+[ 2742.447969] ksmbd: PDU sig=fe 53 4d 42 pdu=144 req_running=0
+[ 2742.449281] ksmbd: got SMB2 command
+[ 2742.450145] ksmbd: SMB2 data length 24 offset 120
+[ 2742.451239] ksmbd: SMB2 len 144
+[ 2742.452024] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 2742.453666] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2742.455433] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 2742.456947] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 2742.458340] ksmbd: Received smb2 create request
+[ 2742.459395] ksmbd: converted name = winattr1.dir
+[ 2742.460478] ksmbd: check permission using windows acl
+[ 2742.461648] ksmbd: Discard write access to a directory
+[ 2742.462829] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 2742.464405] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2742.466235] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2742.468238] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2742.469856] ksmbd: RFC1002 hdr=00 00 00 69 len=105 status=1
+[ 2742.471023] ksmbd: PDU sig=fe 53 4d 42 pdu=105 req_running=0
+[ 2742.472883] ksmbd: got SMB2 command
+[ 2742.473681] ksmbd: SMB2 data length 0 offset 104
+[ 2742.474809] ksmbd: SMB2 len 105
+[ 2742.475567] ksmbd: credit_check: cmd=16 charge=1 calc=1 req_len=65536 resp_len=0 total=31 out=0
+[ 2742.477428] ksmbd: credit_check: lock_enter cmd=16 charge=1 total=31 out=0
+[ 2742.478892] ksmbd: credit_check: lock_exit cmd=16 ret=0 total=31 out=1
+[ 2742.480347] ksmbd: Received request smb2 query info request
+[ 2742.481601] ksmbd: GOT SMB2_O_INFO_FILE
+[ 2742.482388] ksmbd: filename = \winattr1.dir
+[ 2742.483399] ksmbd: credit_rsp: dispatch cmd=16 total=31 out=1 granted_total=0
+[ 2742.484986] ksmbd: credit_rsp: lock_enter cmd=16 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2742.486861] ksmbd: credit_rsp: lock_exit cmd=16 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2742.488891] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2742.490556] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 2742.491722] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+[ 2742.493250] ksmbd: got SMB2 command
+[ 2742.494113] ksmbd: SMB2 len 88
+[ 2742.494865] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 2742.496457] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2742.498265] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 2742.499873] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 2742.501317] ksmbd: Received smb2 close request
+[ 2742.502362] ksmbd: volatile_id = 72
+[ 2742.503224] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 2742.504838] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2742.506685] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2742.508607] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2742.510303] ksmbd: RFC1002 hdr=00 00 00 90 len=144 status=1
+[ 2742.511499] ksmbd: PDU sig=fe 53 4d 42 pdu=144 req_running=0
+[ 2742.512811] ksmbd: got SMB2 command
+[ 2742.513559] ksmbd: SMB2 data length 24 offset 120
+[ 2742.514709] ksmbd: SMB2 len 144
+[ 2742.515357] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 2742.517069] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2742.518822] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 2742.520327] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 2742.521799] ksmbd: Received smb2 create request
+[ 2742.522840] ksmbd: converted name = winattr1.dir
+[ 2742.523925] ksmbd: check permission using windows acl
+[ 2742.525097] ksmbd: Discard write access to a directory
+[ 2742.526285] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 2742.527852] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2742.529631] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2742.531657] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2742.533355] ksmbd: RFC1002 hdr=00 00 00 69 len=105 status=1
+[ 2742.534534] ksmbd: PDU sig=fe 53 4d 42 pdu=105 req_running=0
+[ 2742.536318] ksmbd: got SMB2 command
+[ 2742.537242] ksmbd: SMB2 data length 0 offset 104
+[ 2742.538334] ksmbd: SMB2 len 105
+[ 2742.539132] ksmbd: credit_check: cmd=16 charge=1 calc=1 req_len=65536 resp_len=0 total=31 out=0
+[ 2742.540946] ksmbd: credit_check: lock_enter cmd=16 charge=1 total=31 out=0
+[ 2742.542458] ksmbd: credit_check: lock_exit cmd=16 ret=0 total=31 out=1
+[ 2742.543848] ksmbd: Received request smb2 query info request
+[ 2742.545010] ksmbd: GOT SMB2_O_INFO_SECURITY
+[ 2742.546031] ksmbd: credit_rsp: dispatch cmd=16 total=31 out=1 granted_total=0
+[ 2742.547623] ksmbd: credit_rsp: lock_enter cmd=16 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2742.549531] ksmbd: credit_rsp: lock_exit cmd=16 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2742.551547] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2742.553438] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 2742.554763] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+[ 2742.556161] ksmbd: got SMB2 command
+[ 2742.557147] ksmbd: SMB2 len 88
+[ 2742.558052] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 2742.559953] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2742.562251] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 2742.565226] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 2742.567457] ksmbd: Received smb2 close request
+[ 2742.568419] ksmbd: volatile_id = 73
+[ 2742.569201] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 2742.571895] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2742.573695] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2742.575635] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2742.577277] ksmbd: RFC1002 hdr=00 00 00 90 len=144 status=1
+[ 2742.578456] ksmbd: PDU sig=fe 53 4d 42 pdu=144 req_running=0
+[ 2742.579774] ksmbd: got SMB2 command
+[ 2742.580605] ksmbd: SMB2 data length 24 offset 120
+[ 2742.581653] ksmbd: SMB2 len 144
+[ 2742.582295] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 2742.583936] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2742.585692] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 2742.587175] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 2742.588561] ksmbd: Received smb2 create request
+[ 2742.589569] ksmbd: converted name = winattr1.dir
+[ 2742.590598] ksmbd: check permission using windows acl
+[ 2742.591722] ksmbd: Discard write access to a directory
+[ 2742.592877] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 2742.594387] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2742.596191] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2742.598153] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2742.600201] ksmbd: RFC1002 hdr=00 00 00 88 len=136 status=1
+[ 2742.601346] ksmbd: PDU sig=fe 53 4d 42 pdu=136 req_running=0
+[ 2742.602652] ksmbd: got SMB2 command
+[ 2742.603354] ksmbd: SMB2 data length 40 offset 96
+[ 2742.604458] ksmbd: SMB2 len 136
+[ 2742.605131] ksmbd: credit_check: cmd=17 charge=1 calc=1 req_len=40 resp_len=0 total=31 out=0
+[ 2742.606930] ksmbd: credit_check: lock_enter cmd=17 charge=1 total=31 out=0
+[ 2742.608390] ksmbd: credit_check: lock_exit cmd=17 ret=0 total=31 out=1
+[ 2742.609824] ksmbd: Received smb2 set info request
+[ 2742.610885] ksmbd: GOT SMB2_O_INFO_FILE
+[ 2742.611788] ksmbd: credit_rsp: dispatch cmd=17 total=31 out=1 granted_total=0
+[ 2742.613329] ksmbd: credit_rsp: lock_enter cmd=17 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2742.615147] ksmbd: credit_rsp: lock_exit cmd=17 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2742.617126] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2742.619195] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 2742.620337] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+[ 2742.621636] ksmbd: got SMB2 command
+[ 2742.622339] ksmbd: SMB2 len 88
+[ 2742.623126] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 2742.624750] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2742.626473] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 2742.627955] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 2742.629346] ksmbd: Received smb2 close request
+[ 2742.630341] ksmbd: volatile_id = 74
+[ 2742.631167] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 2742.632704] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2742.634522] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2742.636521] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2742.638093] ksmbd: RFC1002 hdr=00 00 00 90 len=144 status=1
+[ 2742.639241] ksmbd: PDU sig=fe 53 4d 42 pdu=144 req_running=0
+[ 2742.640506] ksmbd: got SMB2 command
+[ 2742.641242] ksmbd: SMB2 data length 24 offset 120
+[ 2742.642334] ksmbd: SMB2 len 144
+[ 2742.643102] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 2742.644706] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2742.646440] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 2742.647942] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 2742.649333] ksmbd: Received smb2 create request
+[ 2742.650363] ksmbd: converted name = winattr1.dir
+[ 2742.651433] ksmbd: check permission using windows acl
+[ 2742.652572] ksmbd: Discard write access to a directory
+[ 2742.653709] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 2742.655224] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2742.657025] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2742.659002] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2742.660582] ksmbd: RFC1002 hdr=00 00 00 69 len=105 status=1
+[ 2742.661742] ksmbd: PDU sig=fe 53 4d 42 pdu=105 req_running=0
+[ 2742.663402] ksmbd: got SMB2 command
+[ 2742.664373] ksmbd: SMB2 data length 0 offset 104
+[ 2742.665434] ksmbd: SMB2 len 105
+[ 2742.666199] ksmbd: credit_check: cmd=16 charge=1 calc=1 req_len=65536 resp_len=0 total=31 out=0
+[ 2742.668106] ksmbd: credit_check: lock_enter cmd=16 charge=1 total=31 out=0
+[ 2742.669573] ksmbd: credit_check: lock_exit cmd=16 ret=0 total=31 out=1
+[ 2742.670984] ksmbd: Received request smb2 query info request
+[ 2742.672225] ksmbd: GOT SMB2_O_INFO_FILE
+[ 2742.673122] ksmbd: filename = \winattr1.dir
+[ 2742.674083] ksmbd: credit_rsp: dispatch cmd=16 total=31 out=1 granted_total=0
+[ 2742.675598] ksmbd: credit_rsp: lock_enter cmd=16 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2742.677404] ksmbd: credit_rsp: lock_exit cmd=16 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2742.679377] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2742.681258] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 2742.682485] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+[ 2742.683788] ksmbd: got SMB2 command
+[ 2742.684611] ksmbd: SMB2 len 88
+[ 2742.685244] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 2742.686901] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2742.688627] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 2742.690094] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 2742.691482] ksmbd: Received smb2 close request
+[ 2742.692405] ksmbd: volatile_id = 75
+[ 2742.693167] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 2742.694591] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2742.696489] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2742.698522] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2742.700236] ksmbd: RFC1002 hdr=00 00 00 90 len=144 status=1
+[ 2742.703816] ksmbd: PDU sig=fe 53 4d 42 pdu=144 req_running=0
+[ 2742.705170] ksmbd: got SMB2 command
+[ 2742.706032] ksmbd: SMB2 data length 24 offset 120
+[ 2742.707030] ksmbd: SMB2 len 144
+[ 2742.708194] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 2742.710715] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2742.713889] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 2742.715277] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 2742.717701] ksmbd: Received smb2 create request
+[ 2742.719718] ksmbd: converted name = winattr1.dir
+[ 2742.720701] ksmbd: check permission using windows acl
+[ 2742.722838] ksmbd: Discard write access to a directory
+[ 2742.724976] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 2742.726414] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2742.729216] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2742.732077] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2742.734690] ksmbd: RFC1002 hdr=00 00 00 69 len=105 status=1
+[ 2742.735850] ksmbd: PDU sig=fe 53 4d 42 pdu=105 req_running=0
+[ 2742.737535] ksmbd: got SMB2 command
+[ 2742.738295] ksmbd: SMB2 data length 0 offset 104
+[ 2742.739266] ksmbd: SMB2 len 105
+[ 2742.739953] ksmbd: credit_check: cmd=16 charge=1 calc=1 req_len=65536 resp_len=0 total=31 out=0
+[ 2742.741734] ksmbd: credit_check: lock_enter cmd=16 charge=1 total=31 out=0
+[ 2742.743121] ksmbd: credit_check: lock_exit cmd=16 ret=0 total=31 out=1
+[ 2742.744455] ksmbd: Received request smb2 query info request
+[ 2742.745635] ksmbd: GOT SMB2_O_INFO_SECURITY
+[ 2742.746509] ksmbd: credit_rsp: dispatch cmd=16 total=31 out=1 granted_total=0
+[ 2742.748049] ksmbd: credit_rsp: lock_enter cmd=16 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2742.751390] ksmbd: credit_rsp: lock_exit cmd=16 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2742.753297] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2742.756116] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 2742.757256] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+[ 2742.759820] ksmbd: got SMB2 command
+[ 2742.760541] ksmbd: SMB2 len 88
+[ 2742.761201] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 2742.763804] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2742.765464] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 2742.767830] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 2742.770764] ksmbd: Received smb2 close request
+[ 2742.771708] ksmbd: volatile_id = 76
+[ 2742.772434] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 2742.773919] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2742.775656] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2742.777511] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2742.780267] ksmbd: RFC1002 hdr=00 00 00 90 len=144 status=1
+[ 2742.781418] ksmbd: PDU sig=fe 53 4d 42 pdu=144 req_running=0
+[ 2742.782614] ksmbd: got SMB2 command
+[ 2742.783326] ksmbd: SMB2 data length 24 offset 120
+[ 2742.784311] ksmbd: SMB2 len 144
+[ 2742.784996] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 2742.786523] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2742.789272] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 2742.790701] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 2742.792013] ksmbd: Received smb2 create request
+[ 2742.792985] ksmbd: converted name = winattr1.dir
+[ 2742.793958] ksmbd: check permission using windows acl
+[ 2742.795093] ksmbd: Discard write access to a directory
+[ 2742.796170] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 2742.797615] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2742.799353] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2742.802313] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2742.803893] ksmbd: RFC1002 hdr=00 00 00 88 len=136 status=1
+[ 2742.805094] ksmbd: PDU sig=fe 53 4d 42 pdu=136 req_running=0
+[ 2742.806268] ksmbd: got SMB2 command
+[ 2742.807018] ksmbd: SMB2 data length 40 offset 96
+[ 2742.809041] ksmbd: SMB2 len 136
+[ 2742.809722] ksmbd: credit_check: cmd=17 charge=1 calc=1 req_len=40 resp_len=0 total=31 out=0
+[ 2742.811412] ksmbd: credit_check: lock_enter cmd=17 charge=1 total=31 out=0
+[ 2742.812917] ksmbd: credit_check: lock_exit cmd=17 ret=0 total=31 out=1
+[ 2742.814233] ksmbd: Received smb2 set info request
+[ 2742.816272] ksmbd: GOT SMB2_O_INFO_FILE
+[ 2742.817130] ksmbd: credit_rsp: dispatch cmd=17 total=31 out=1 granted_total=0
+[ 2742.818603] ksmbd: credit_rsp: lock_enter cmd=17 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2742.820332] ksmbd: credit_rsp: lock_exit cmd=17 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2742.822221] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2742.824831] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 2742.825965] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+[ 2742.827119] ksmbd: got SMB2 command
+[ 2742.827864] ksmbd: SMB2 len 88
+[ 2742.828506] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 2742.830054] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2742.832314] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 2742.834303] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 2742.836717] ksmbd: Received smb2 close request
+[ 2742.837650] ksmbd: volatile_id = 77
+[ 2742.838369] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 2742.839838] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2742.841533] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2742.844465] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2742.846248] ksmbd: RFC1002 hdr=00 00 00 90 len=144 status=1
+[ 2742.847391] ksmbd: PDU sig=fe 53 4d 42 pdu=144 req_running=0
+[ 2742.848595] ksmbd: got SMB2 command
+[ 2742.849316] ksmbd: SMB2 data length 24 offset 120
+[ 2742.850302] ksmbd: SMB2 len 144
+[ 2742.852050] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 2742.853587] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2742.855245] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 2742.856646] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 2742.857957] ksmbd: Received smb2 create request
+[ 2742.859985] ksmbd: converted name = winattr1.dir
+[ 2742.860954] ksmbd: check permission using windows acl
+[ 2742.862012] ksmbd: Discard write access to a directory
+[ 2742.863080] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 2742.864500] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2742.866305] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2742.868888] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2742.870669] ksmbd: RFC1002 hdr=00 00 00 69 len=105 status=1
+[ 2742.872413] ksmbd: PDU sig=fe 53 4d 42 pdu=105 req_running=0
+[ 2742.874076] ksmbd: got SMB2 command
+[ 2742.874874] ksmbd: SMB2 data length 0 offset 104
+[ 2742.876904] ksmbd: SMB2 len 105
+[ 2742.877583] ksmbd: credit_check: cmd=16 charge=1 calc=1 req_len=65536 resp_len=0 total=31 out=0
+[ 2742.879324] ksmbd: credit_check: lock_enter cmd=16 charge=1 total=31 out=0
+[ 2742.881816] ksmbd: credit_check: lock_exit cmd=16 ret=0 total=31 out=1
+[ 2742.883142] ksmbd: Received request smb2 query info request
+[ 2742.884328] ksmbd: GOT SMB2_O_INFO_FILE
+[ 2742.886211] ksmbd: filename = \winattr1.dir
+[ 2742.887097] ksmbd: credit_rsp: dispatch cmd=16 total=31 out=1 granted_total=0
+[ 2742.888546] ksmbd: credit_rsp: lock_enter cmd=16 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2742.891369] ksmbd: credit_rsp: lock_exit cmd=16 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2742.893265] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2742.894837] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 2742.895965] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+[ 2742.898183] ksmbd: got SMB2 command
+[ 2742.898942] ksmbd: SMB2 len 88
+[ 2742.899602] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 2742.901110] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2742.902781] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 2742.904144] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 2742.906074] ksmbd: Received smb2 close request
+[ 2742.907010] ksmbd: volatile_id = 78
+[ 2742.908828] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 2742.910253] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2742.911998] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2742.913873] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2742.915337] ksmbd: RFC1002 hdr=00 00 00 90 len=144 status=1
+[ 2742.916483] ksmbd: PDU sig=fe 53 4d 42 pdu=144 req_running=0
+[ 2742.918255] ksmbd: got SMB2 command
+[ 2742.919017] ksmbd: SMB2 data length 24 offset 120
+[ 2742.919999] ksmbd: SMB2 len 144
+[ 2742.921760] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 2742.923282] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2742.924960] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 2742.926330] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 2742.927732] ksmbd: Received smb2 create request
+[ 2742.929276] ksmbd: converted name = winattr1.dir
+[ 2742.930246] ksmbd: check permission using windows acl
+[ 2742.931307] ksmbd: Discard write access to a directory
+[ 2742.932386] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 2742.934916] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2742.936641] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2742.938502] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2742.940015] ksmbd: RFC1002 hdr=00 00 00 69 len=105 status=1
+[ 2742.941160] ksmbd: PDU sig=fe 53 4d 42 pdu=105 req_running=0
+[ 2742.942826] ksmbd: got SMB2 command
+[ 2742.944199] ksmbd: SMB2 data length 0 offset 104
+[ 2742.945239] ksmbd: SMB2 len 105
+[ 2742.945999] ksmbd: credit_check: cmd=16 charge=1 calc=1 req_len=65536 resp_len=0 total=31 out=0
+[ 2742.948357] ksmbd: credit_check: lock_enter cmd=16 charge=1 total=31 out=0
+[ 2742.949775] ksmbd: credit_check: lock_exit cmd=16 ret=0 total=31 out=1
+[ 2742.951160] ksmbd: Received request smb2 query info request
+[ 2742.952922] ksmbd: GOT SMB2_O_INFO_SECURITY
+[ 2742.953824] ksmbd: credit_rsp: dispatch cmd=16 total=31 out=1 granted_total=0
+[ 2742.955275] ksmbd: credit_rsp: lock_enter cmd=16 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2742.958096] ksmbd: credit_rsp: lock_exit cmd=16 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2742.959988] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2742.961588] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 2742.962587] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+[ 2742.963735] ksmbd: got SMB2 command
+[ 2742.964359] ksmbd: SMB2 len 88
+[ 2742.964974] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 2742.966313] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2742.967826] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 2742.969050] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 2742.970211] ksmbd: Received smb2 close request
+[ 2742.971050] ksmbd: volatile_id = 79
+[ 2742.971734] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 2742.973009] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2742.974546] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2742.976224] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2742.977663] ksmbd: RFC1002 hdr=00 00 00 90 len=144 status=1
+[ 2742.978682] ksmbd: PDU sig=fe 53 4d 42 pdu=144 req_running=0
+[ 2742.979727] ksmbd: got SMB2 command
+[ 2742.980347] ksmbd: SMB2 data length 24 offset 120
+[ 2742.981228] ksmbd: SMB2 len 144
+[ 2742.981852] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 2742.983190] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2742.984700] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 2742.985919] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 2742.987090] ksmbd: Received smb2 create request
+[ 2742.987942] ksmbd: converted name = winattr1.dir
+[ 2742.988808] ksmbd: check permission using windows acl
+[ 2742.989776] ksmbd: Discard write access to a directory
+[ 2742.990757] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 2742.992042] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2742.993608] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2742.995303] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2742.996752] ksmbd: RFC1002 hdr=00 00 00 88 len=136 status=1
+[ 2742.997804] ksmbd: PDU sig=fe 53 4d 42 pdu=136 req_running=0
+[ 2742.998866] ksmbd: got SMB2 command
+[ 2742.999508] ksmbd: SMB2 data length 40 offset 96
+[ 2743.000365] ksmbd: SMB2 len 136
+[ 2743.000982] ksmbd: credit_check: cmd=17 charge=1 calc=1 req_len=40 resp_len=0 total=31 out=0
+[ 2743.002504] ksmbd: credit_check: lock_enter cmd=17 charge=1 total=31 out=0
+[ 2743.003791] ksmbd: credit_check: lock_exit cmd=17 ret=0 total=31 out=1
+[ 2743.004977] ksmbd: Received smb2 set info request
+[ 2743.005980] ksmbd: GOT SMB2_O_INFO_FILE
+[ 2743.006743] ksmbd: credit_rsp: dispatch cmd=17 total=31 out=1 granted_total=0
+[ 2743.008040] ksmbd: credit_rsp: lock_enter cmd=17 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2743.009628] ksmbd: credit_rsp: lock_exit cmd=17 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2743.011469] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2743.012913] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 2743.013943] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+[ 2743.014989] ksmbd: got SMB2 command
+[ 2743.015669] ksmbd: SMB2 len 88
+[ 2743.016222] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 2743.017643] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2743.019129] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 2743.020344] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 2743.021553] ksmbd: Received smb2 close request
+[ 2743.022363] ksmbd: volatile_id = 80
+[ 2743.023052] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 2743.024339] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2743.025928] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2743.027629] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2743.029022] ksmbd: RFC1002 hdr=00 00 00 90 len=144 status=1
+[ 2743.030205] ksmbd: PDU sig=fe 53 4d 42 pdu=144 req_running=0
+[ 2743.031395] ksmbd: got SMB2 command
+[ 2743.033837] ksmbd: SMB2 data length 24 offset 120
+[ 2743.034836] ksmbd: SMB2 len 144
+[ 2743.035499] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 2743.040231] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2743.041941] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 2743.043348] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 2743.045845] ksmbd: Received smb2 create request
+[ 2743.046817] ksmbd: converted name = winattr1.dir
+[ 2743.049482] ksmbd: check permission using windows acl
+[ 2743.050556] ksmbd: Discard write access to a directory
+[ 2743.053438] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 2743.056923] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2743.058678] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2743.062516] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2743.064073] ksmbd: RFC1002 hdr=00 00 00 69 len=105 status=1
+[ 2743.065244] ksmbd: PDU sig=fe 53 4d 42 pdu=105 req_running=0
+[ 2743.069394] ksmbd: got SMB2 command
+[ 2743.070197] ksmbd: SMB2 data length 0 offset 104
+[ 2743.071174] ksmbd: SMB2 len 105
+[ 2743.072913] ksmbd: credit_check: cmd=16 charge=1 calc=1 req_len=65536 resp_len=0 total=31 out=0
+[ 2743.075740] ksmbd: credit_check: lock_enter cmd=16 charge=1 total=31 out=0
+[ 2743.080196] ksmbd: credit_check: lock_exit cmd=16 ret=0 total=31 out=1
+[ 2743.081532] ksmbd: Received request smb2 query info request
+[ 2743.082718] ksmbd: GOT SMB2_O_INFO_FILE
+[ 2743.083506] ksmbd: filename = \winattr1.dir
+[ 2743.084372] ksmbd: credit_rsp: dispatch cmd=16 total=31 out=1 granted_total=0
+[ 2743.086917] ksmbd: credit_rsp: lock_enter cmd=16 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2743.089734] ksmbd: credit_rsp: lock_exit cmd=16 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2743.092713] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2743.095288] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 2743.096431] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+[ 2743.099945] ksmbd: got SMB2 command
+[ 2743.101765] ksmbd: SMB2 len 88
+[ 2743.102389] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 2743.105990] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2743.107669] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 2743.110102] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 2743.113497] ksmbd: Received smb2 close request
+[ 2743.114422] ksmbd: volatile_id = 81
+[ 2743.115180] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 2743.119732] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2743.121455] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2743.123334] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2743.125968] ksmbd: RFC1002 hdr=00 00 00 90 len=144 status=1
+[ 2743.126988] ksmbd: PDU sig=fe 53 4d 42 pdu=144 req_running=0
+[ 2743.128023] ksmbd: got SMB2 command
+[ 2743.128688] ksmbd: SMB2 data length 24 offset 120
+[ 2743.129553] ksmbd: SMB2 len 144
+[ 2743.130125] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 2743.131454] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2743.132953] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 2743.134160] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 2743.135313] ksmbd: Received smb2 create request
+[ 2743.136157] ksmbd: converted name = winattr1.dir
+[ 2743.137021] ksmbd: check permission using windows acl
+[ 2743.137962] ksmbd: Discard write access to a directory
+[ 2743.138927] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 2743.140182] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2743.141720] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2743.143351] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2743.144723] ksmbd: RFC1002 hdr=00 00 00 69 len=105 status=1
+[ 2743.145746] ksmbd: PDU sig=fe 53 4d 42 pdu=105 req_running=0
+[ 2743.147250] ksmbd: got SMB2 command
+[ 2743.147979] ksmbd: SMB2 data length 0 offset 104
+[ 2743.148846] ksmbd: SMB2 len 105
+[ 2743.149409] ksmbd: credit_check: cmd=16 charge=1 calc=1 req_len=65536 resp_len=0 total=31 out=0
+[ 2743.150984] ksmbd: credit_check: lock_enter cmd=16 charge=1 total=31 out=0
+[ 2743.152216] ksmbd: credit_check: lock_exit cmd=16 ret=0 total=31 out=1
+[ 2743.153390] ksmbd: Received request smb2 query info request
+[ 2743.154406] ksmbd: GOT SMB2_O_INFO_SECURITY
+[ 2743.155231] ksmbd: credit_rsp: dispatch cmd=16 total=31 out=1 granted_total=0
+[ 2743.156513] ksmbd: credit_rsp: lock_enter cmd=16 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2743.158066] ksmbd: credit_rsp: lock_exit cmd=16 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2743.159748] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2743.161364] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 2743.162371] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+[ 2743.163392] ksmbd: got SMB2 command
+[ 2743.164053] ksmbd: SMB2 len 88
+[ 2743.164640] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 2743.165972] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2743.167429] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 2743.168672] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 2743.169827] ksmbd: Received smb2 close request
+[ 2743.170654] ksmbd: volatile_id = 82
+[ 2743.171290] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 2743.172583] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2743.174116] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2743.175780] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2743.177167] ksmbd: RFC1002 hdr=00 00 00 90 len=144 status=1
+[ 2743.178182] ksmbd: PDU sig=fe 53 4d 42 pdu=144 req_running=0
+[ 2743.179223] ksmbd: got SMB2 command
+[ 2743.179893] ksmbd: SMB2 data length 24 offset 120
+[ 2743.180762] ksmbd: SMB2 len 144
+[ 2743.181323] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 2743.182679] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2743.184138] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 2743.185454] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 2743.186786] ksmbd: Received smb2 create request
+[ 2743.187620] ksmbd: converted name = winattr1.dir
+[ 2743.188436] ksmbd: check permission using windows acl
+[ 2743.189388] ksmbd: Discard write access to a directory
+[ 2743.190348] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 2743.191640] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2743.193214] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2743.195092] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2743.196488] ksmbd: RFC1002 hdr=00 00 00 88 len=136 status=1
+[ 2743.197499] ksmbd: PDU sig=fe 53 4d 42 pdu=136 req_running=0
+[ 2743.198561] ksmbd: got SMB2 command
+[ 2743.199192] ksmbd: SMB2 data length 40 offset 96
+[ 2743.200055] ksmbd: SMB2 len 136
+[ 2743.200661] ksmbd: credit_check: cmd=17 charge=1 calc=1 req_len=40 resp_len=0 total=31 out=0
+[ 2743.202174] ksmbd: credit_check: lock_enter cmd=17 charge=1 total=31 out=0
+[ 2743.203399] ksmbd: credit_check: lock_exit cmd=17 ret=0 total=31 out=1
+[ 2743.204596] ksmbd: Received smb2 set info request
+[ 2743.205459] ksmbd: GOT SMB2_O_INFO_FILE
+[ 2743.206196] ksmbd: credit_rsp: dispatch cmd=17 total=31 out=1 granted_total=0
+[ 2743.207471] ksmbd: credit_rsp: lock_enter cmd=17 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2743.209029] ksmbd: credit_rsp: lock_exit cmd=17 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2743.210707] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2743.212067] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 2743.213083] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+[ 2743.214103] ksmbd: got SMB2 command
+[ 2743.214765] ksmbd: SMB2 len 88
+[ 2743.215312] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 2743.216667] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2743.218129] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 2743.219340] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 2743.220500] ksmbd: Received smb2 close request
+[ 2743.221314] ksmbd: volatile_id = 83
+[ 2743.221993] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 2743.223258] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2743.224809] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2743.226454] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2743.227778] ksmbd: RFC1002 hdr=00 00 00 90 len=144 status=1
+[ 2743.228792] ksmbd: PDU sig=fe 53 4d 42 pdu=144 req_running=0
+[ 2743.229833] ksmbd: got SMB2 command
+[ 2743.230463] ksmbd: SMB2 data length 24 offset 120
+[ 2743.231317] ksmbd: SMB2 len 144
+[ 2743.231936] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 2743.233272] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2743.234763] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 2743.235981] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 2743.237143] ksmbd: Received smb2 create request
+[ 2743.237990] ksmbd: converted name = winattr1.dir
+[ 2743.238855] ksmbd: check permission using windows acl
+[ 2743.239797] ksmbd: Discard write access to a directory
+[ 2743.240749] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 2743.242014] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2743.243547] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2743.245195] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2743.246554] ksmbd: RFC1002 hdr=00 00 00 69 len=105 status=1
+[ 2743.247569] ksmbd: PDU sig=fe 53 4d 42 pdu=105 req_running=1
+[ 2743.249055] ksmbd: got SMB2 command
+[ 2743.249784] ksmbd: SMB2 data length 0 offset 104
+[ 2743.250654] ksmbd: SMB2 len 105
+[ 2743.251223] ksmbd: credit_check: cmd=16 charge=1 calc=1 req_len=65536 resp_len=0 total=31 out=0
+[ 2743.252797] ksmbd: credit_check: lock_enter cmd=16 charge=1 total=31 out=0
+[ 2743.254021] ksmbd: credit_check: lock_exit cmd=16 ret=0 total=31 out=1
+[ 2743.255197] ksmbd: Received request smb2 query info request
+[ 2743.256283] ksmbd: GOT SMB2_O_INFO_FILE
+[ 2743.257012] ksmbd: filename = \winattr1.dir
+[ 2743.257796] ksmbd: credit_rsp: dispatch cmd=16 total=31 out=1 granted_total=0
+[ 2743.259068] ksmbd: credit_rsp: lock_enter cmd=16 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2743.260613] ksmbd: credit_rsp: lock_exit cmd=16 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2743.262266] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2743.263632] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 2743.264605] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+[ 2743.265896] ksmbd: got SMB2 command
+[ 2743.266555] ksmbd: SMB2 len 88
+[ 2743.267115] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 2743.268457] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2743.269951] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 2743.271161] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 2743.272317] ksmbd: Received smb2 close request
+[ 2743.273153] ksmbd: volatile_id = 84
+[ 2743.273869] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 2743.275200] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2743.276746] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2743.278382] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2743.279790] ksmbd: RFC1002 hdr=00 00 00 90 len=144 status=1
+[ 2743.280788] ksmbd: PDU sig=fe 53 4d 42 pdu=144 req_running=0
+[ 2743.281805] ksmbd: got SMB2 command
+[ 2743.282424] ksmbd: SMB2 data length 24 offset 120
+[ 2743.283296] ksmbd: SMB2 len 144
+[ 2743.283909] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 2743.285244] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2743.286730] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 2743.287947] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 2743.289099] ksmbd: Received smb2 create request
+[ 2743.289942] ksmbd: converted name = winattr1.dir
+[ 2743.290799] ksmbd: check permission using windows acl
+[ 2743.291736] ksmbd: Discard write access to a directory
+[ 2743.292691] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 2743.293959] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2743.295469] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2743.297139] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2743.298495] ksmbd: RFC1002 hdr=00 00 00 69 len=105 status=1
+[ 2743.299504] ksmbd: PDU sig=fe 53 4d 42 pdu=105 req_running=1
+[ 2743.301017] ksmbd: got SMB2 command
+[ 2743.301738] ksmbd: SMB2 data length 0 offset 104
+[ 2743.302597] ksmbd: SMB2 len 105
+[ 2743.303171] ksmbd: credit_check: cmd=16 charge=1 calc=1 req_len=65536 resp_len=0 total=31 out=0
+[ 2743.304734] ksmbd: credit_check: lock_enter cmd=16 charge=1 total=31 out=0
+[ 2743.305978] ksmbd: credit_check: lock_exit cmd=16 ret=0 total=31 out=1
+[ 2743.307151] ksmbd: Received request smb2 query info request
+[ 2743.308163] ksmbd: GOT SMB2_O_INFO_SECURITY
+[ 2743.308959] ksmbd: credit_rsp: dispatch cmd=16 total=31 out=1 granted_total=0
+[ 2743.310231] ksmbd: credit_rsp: lock_enter cmd=16 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2743.311784] ksmbd: credit_rsp: lock_exit cmd=16 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2743.313423] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2743.314857] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 2743.317083] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+[ 2743.318242] ksmbd: got SMB2 command
+[ 2743.318984] ksmbd: SMB2 len 88
+[ 2743.320721] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 2743.322211] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2743.324945] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 2743.327397] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 2743.329658] ksmbd: Received smb2 close request
+[ 2743.330443] ksmbd: volatile_id = 85
+[ 2743.331342] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 2743.333009] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2743.334732] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2743.336623] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2743.338530] ksmbd: RFC1002 hdr=00 00 00 90 len=144 status=1
+[ 2743.339581] ksmbd: PDU sig=fe 53 4d 42 pdu=144 req_running=0
+[ 2743.340653] ksmbd: got SMB2 command
+[ 2743.341291] ksmbd: SMB2 data length 24 offset 120
+[ 2743.342955] ksmbd: SMB2 len 144
+[ 2743.343623] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 2743.345063] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2743.346598] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 2743.347820] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 2743.348974] ksmbd: Received smb2 create request
+[ 2743.349914] ksmbd: converted name = winattr1.dir
+[ 2743.350850] ksmbd: check permission using windows acl
+[ 2743.351860] ksmbd: Discard write access to a directory
+[ 2743.352898] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 2743.354225] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2743.355868] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2743.357589] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2743.359003] ksmbd: RFC1002 hdr=00 00 00 88 len=136 status=1
+[ 2743.360018] ksmbd: PDU sig=fe 53 4d 42 pdu=136 req_running=0
+[ 2743.361137] ksmbd: got SMB2 command
+[ 2743.361879] ksmbd: SMB2 data length 40 offset 96
+[ 2743.362808] ksmbd: SMB2 len 136
+[ 2743.363373] ksmbd: credit_check: cmd=17 charge=1 calc=1 req_len=40 resp_len=0 total=31 out=0
+[ 2743.364976] ksmbd: credit_check: lock_enter cmd=17 charge=1 total=31 out=0
+[ 2743.366274] ksmbd: credit_check: lock_exit cmd=17 ret=0 total=31 out=1
+[ 2743.367544] ksmbd: Received smb2 set info request
+[ 2743.368378] ksmbd: GOT SMB2_O_INFO_FILE
+[ 2743.369215] ksmbd: credit_rsp: dispatch cmd=17 total=31 out=1 granted_total=0
+[ 2743.370590] ksmbd: credit_rsp: lock_enter cmd=17 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2743.372199] ksmbd: credit_rsp: lock_exit cmd=17 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2743.373947] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2743.375328] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 2743.376330] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+[ 2743.377428] ksmbd: got SMB2 command
+[ 2743.378092] ksmbd: SMB2 len 88
+[ 2743.378666] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 2743.379999] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2743.381590] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 2743.382882] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 2743.384110] ksmbd: Received smb2 close request
+[ 2743.385018] ksmbd: volatile_id = 86
+[ 2743.385768] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 2743.387105] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2743.388722] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2743.390424] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2743.391818] ksmbd: RFC1002 hdr=00 00 00 90 len=144 status=1
+[ 2743.392830] ksmbd: PDU sig=fe 53 4d 42 pdu=144 req_running=0
+[ 2743.393951] ksmbd: got SMB2 command
+[ 2743.394691] ksmbd: SMB2 data length 24 offset 120
+[ 2743.395608] ksmbd: SMB2 len 144
+[ 2743.396179] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 2743.397597] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2743.399195] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 2743.400481] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 2743.401669] ksmbd: Received smb2 create request
+[ 2743.402476] ksmbd: converted name = winattr1.dir
+[ 2743.403395] ksmbd: check permission using windows acl
+[ 2743.404347] ksmbd: Discard write access to a directory
+[ 2743.405399] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 2743.406683] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2743.408190] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2743.410014] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2743.411578] ksmbd: RFC1002 hdr=00 00 00 69 len=105 status=1
+[ 2743.412593] ksmbd: PDU sig=fe 53 4d 42 pdu=105 req_running=0
+[ 2743.414234] ksmbd: got SMB2 command
+[ 2743.415177] ksmbd: SMB2 data length 0 offset 104
+[ 2743.416177] ksmbd: SMB2 len 105
+[ 2743.416905] ksmbd: credit_check: cmd=16 charge=1 calc=1 req_len=65536 resp_len=0 total=31 out=0
+[ 2743.418633] ksmbd: credit_check: lock_enter cmd=16 charge=1 total=31 out=0
+[ 2743.420006] ksmbd: credit_check: lock_exit cmd=16 ret=0 total=31 out=1
+[ 2743.421363] ksmbd: Received request smb2 query info request
+[ 2743.422483] ksmbd: GOT SMB2_O_INFO_FILE
+[ 2743.423189] ksmbd: filename = \winattr1.dir
+[ 2743.424167] ksmbd: credit_rsp: dispatch cmd=16 total=31 out=1 granted_total=0
+[ 2743.425602] ksmbd: credit_rsp: lock_enter cmd=16 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2743.427326] ksmbd: credit_rsp: lock_exit cmd=16 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2743.429149] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2743.430595] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 2743.431592] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+[ 2743.432741] ksmbd: got SMB2 command
+[ 2743.433362] ksmbd: SMB2 len 88
+[ 2743.434079] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 2743.435415] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2743.436980] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 2743.438273] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 2743.439508] ksmbd: Received smb2 close request
+[ 2743.440316] ksmbd: volatile_id = 87
+[ 2743.440989] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 2743.442357] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2743.443896] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2743.445611] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2743.446918] ksmbd: RFC1002 hdr=00 00 00 90 len=144 status=1
+[ 2743.448088] ksmbd: PDU sig=fe 53 4d 42 pdu=144 req_running=0
+[ 2743.449361] ksmbd: got SMB2 command
+[ 2743.450188] ksmbd: SMB2 data length 24 offset 120
+[ 2743.451249] ksmbd: SMB2 len 144
+[ 2743.452007] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 2743.453580] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2743.455294] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 2743.456765] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 2743.458123] ksmbd: Received smb2 create request
+[ 2743.459157] ksmbd: converted name = winattr1.dir
+[ 2743.460197] ksmbd: check permission using windows acl
+[ 2743.461326] ksmbd: Discard write access to a directory
+[ 2743.462470] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 2743.463983] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2743.465776] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2743.467730] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2743.469290] ksmbd: RFC1002 hdr=00 00 00 69 len=105 status=1
+[ 2743.470417] ksmbd: PDU sig=fe 53 4d 42 pdu=105 req_running=0
+[ 2743.472159] ksmbd: got SMB2 command
+[ 2743.473084] ksmbd: SMB2 data length 0 offset 104
+[ 2743.474138] ksmbd: SMB2 len 105
+[ 2743.474918] ksmbd: credit_check: cmd=16 charge=1 calc=1 req_len=65536 resp_len=0 total=31 out=0
+[ 2743.476728] ksmbd: credit_check: lock_enter cmd=16 charge=1 total=31 out=0
+[ 2743.478186] ksmbd: credit_check: lock_exit cmd=16 ret=0 total=31 out=1
+[ 2743.479573] ksmbd: Received request smb2 query info request
+[ 2743.480781] ksmbd: GOT SMB2_O_INFO_SECURITY
+[ 2743.481733] ksmbd: credit_rsp: dispatch cmd=16 total=31 out=1 granted_total=0
+[ 2743.483243] ksmbd: credit_rsp: lock_enter cmd=16 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2743.485032] ksmbd: credit_rsp: lock_exit cmd=16 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2743.486963] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2743.488629] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 2743.489741] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+[ 2743.491034] ksmbd: got SMB2 command
+[ 2743.491874] ksmbd: SMB2 len 88
+[ 2743.492590] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 2743.494160] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2743.495872] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 2743.497306] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 2743.498699] ksmbd: Received smb2 close request
+[ 2743.499682] ksmbd: volatile_id = 88
+[ 2743.500390] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 2743.501944] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2743.503752] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2743.505601] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2743.507158] ksmbd: RFC1002 hdr=00 00 00 90 len=144 status=1
+[ 2743.511462] ksmbd: PDU sig=fe 53 4d 42 pdu=144 req_running=0
+[ 2743.512669] ksmbd: got SMB2 command
+[ 2743.513365] ksmbd: SMB2 data length 24 offset 120
+[ 2743.514479] ksmbd: SMB2 len 144
+[ 2743.515144] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 2743.516751] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2743.518468] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 2743.519908] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 2743.521266] ksmbd: Received smb2 create request
+[ 2743.522302] ksmbd: converted name = winattr1.dir
+[ 2743.523343] ksmbd: check permission using windows acl
+[ 2743.524467] ksmbd: Discard write access to a directory
+[ 2743.525630] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 2743.527122] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2743.528901] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2743.530844] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2743.532399] ksmbd: RFC1002 hdr=00 00 00 88 len=136 status=1
+[ 2743.533528] ksmbd: PDU sig=fe 53 4d 42 pdu=136 req_running=0
+[ 2743.534687] ksmbd: got SMB2 command
+[ 2743.535384] ksmbd: SMB2 data length 40 offset 96
+[ 2743.536478] ksmbd: SMB2 len 136
+[ 2743.537138] ksmbd: credit_check: cmd=17 charge=1 calc=1 req_len=40 resp_len=0 total=31 out=0
+[ 2743.538948] ksmbd: credit_check: lock_enter cmd=17 charge=1 total=31 out=0
+[ 2743.540410] ksmbd: credit_check: lock_exit cmd=17 ret=0 total=31 out=1
+[ 2743.541852] ksmbd: Received smb2 set info request
+[ 2743.542903] ksmbd: GOT SMB2_O_INFO_FILE
+[ 2743.543812] ksmbd: credit_rsp: dispatch cmd=17 total=31 out=1 granted_total=0
+[ 2743.545326] ksmbd: credit_rsp: lock_enter cmd=17 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2743.547154] ksmbd: credit_rsp: lock_exit cmd=17 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2743.549100] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2743.550673] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 2743.551800] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+[ 2743.552960] ksmbd: got SMB2 command
+[ 2743.553717] ksmbd: SMB2 len 88
+[ 2743.554338] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 2743.555870] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2743.557531] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 2743.558903] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 2743.560197] ksmbd: Received smb2 close request
+[ 2743.561132] ksmbd: volatile_id = 89
+[ 2743.561885] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 2743.563319] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2743.565057] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2743.566935] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2743.568382] ksmbd: RFC1002 hdr=00 00 00 90 len=144 status=1
+[ 2743.569525] ksmbd: PDU sig=fe 53 4d 42 pdu=144 req_running=0
+[ 2743.570729] ksmbd: got SMB2 command
+[ 2743.571430] ksmbd: SMB2 data length 24 offset 120
+[ 2743.572412] ksmbd: SMB2 len 144
+[ 2743.573096] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 2743.574634] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2743.576278] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 2743.577671] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 2743.579007] ksmbd: Received smb2 create request
+[ 2743.579950] ksmbd: converted name = winattr1.dir
+[ 2743.580918] ksmbd: check permission using windows acl
+[ 2743.581989] ksmbd: Discard write access to a directory
+[ 2743.583049] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 2743.584467] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2743.586212] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2743.588142] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2743.589619] ksmbd: RFC1002 hdr=00 00 00 69 len=105 status=1
+[ 2743.590742] ksmbd: PDU sig=fe 53 4d 42 pdu=105 req_running=0
+[ 2743.592419] ksmbd: got SMB2 command
+[ 2743.596177] ksmbd: SMB2 data length 0 offset 104
+[ 2743.597147] ksmbd: SMB2 len 105
+[ 2743.597834] ksmbd: credit_check: cmd=16 charge=1 calc=1 req_len=65536 resp_len=0 total=31 out=0
+[ 2743.599590] ksmbd: credit_check: lock_enter cmd=16 charge=1 total=31 out=0
+[ 2743.600973] ksmbd: credit_check: lock_exit cmd=16 ret=0 total=31 out=1
+[ 2743.602292] ksmbd: Received request smb2 query info request
+[ 2743.603433] ksmbd: GOT SMB2_O_INFO_FILE
+[ 2743.604247] ksmbd: filename = \winattr1.dir
+[ 2743.605115] ksmbd: credit_rsp: dispatch cmd=16 total=31 out=1 granted_total=0
+[ 2743.606547] ksmbd: credit_rsp: lock_enter cmd=16 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2743.608251] ksmbd: credit_rsp: lock_exit cmd=16 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2743.610121] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2743.611685] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 2743.612751] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+[ 2743.613884] ksmbd: got SMB2 command
+[ 2743.614620] ksmbd: SMB2 len 88
+[ 2743.615218] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 2743.616670] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2743.618292] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 2743.619678] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 2743.620968] ksmbd: Received smb2 close request
+[ 2743.621896] ksmbd: volatile_id = 90
+[ 2743.622655] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 2743.624074] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2743.625812] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2743.627686] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2743.630255] ksmbd: RFC1002 hdr=00 00 00 90 len=144 status=1
+[ 2743.631410] ksmbd: PDU sig=fe 53 4d 42 pdu=144 req_running=0
+[ 2743.632606] ksmbd: got SMB2 command
+[ 2743.633309] ksmbd: SMB2 data length 24 offset 120
+[ 2743.634280] ksmbd: SMB2 len 144
+[ 2743.634955] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 2743.636458] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2743.639182] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 2743.640537] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 2743.641849] ksmbd: Received smb2 create request
+[ 2743.642789] ksmbd: converted name = winattr1.dir
+[ 2743.644822] ksmbd: check permission using windows acl
+[ 2743.645876] ksmbd: Discard write access to a directory
+[ 2743.646938] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 2743.648348] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2743.650134] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2743.654081] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2743.655636] ksmbd: RFC1002 hdr=00 00 00 69 len=105 status=1
+[ 2743.656791] ksmbd: PDU sig=fe 53 4d 42 pdu=105 req_running=0
+[ 2743.658420] ksmbd: got SMB2 command
+[ 2743.659209] ksmbd: SMB2 data length 0 offset 104
+[ 2743.660181] ksmbd: SMB2 len 105
+[ 2743.660866] ksmbd: credit_check: cmd=16 charge=1 calc=1 req_len=65536 resp_len=0 total=31 out=0
+[ 2743.662629] ksmbd: credit_check: lock_enter cmd=16 charge=1 total=31 out=0
+[ 2743.664012] ksmbd: credit_check: lock_exit cmd=16 ret=0 total=31 out=1
+[ 2743.665329] ksmbd: Received request smb2 query info request
+[ 2743.667526] ksmbd: GOT SMB2_O_INFO_SECURITY
+[ 2743.668406] ksmbd: credit_rsp: dispatch cmd=16 total=31 out=1 granted_total=0
+[ 2743.669876] ksmbd: credit_rsp: lock_enter cmd=16 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2743.671620] ksmbd: credit_rsp: lock_exit cmd=16 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2743.673470] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2743.676120] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 2743.677181] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+[ 2743.678248] ksmbd: got SMB2 command
+[ 2743.678946] ksmbd: SMB2 len 88
+[ 2743.679562] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 2743.680958] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2743.682482] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 2743.683774] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 2743.684982] ksmbd: Received smb2 close request
+[ 2743.685847] ksmbd: volatile_id = 91
+[ 2743.686551] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 2743.687867] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2743.689470] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2743.691202] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2743.692674] ksmbd: RFC1002 hdr=00 00 00 90 len=144 status=1
+[ 2743.693824] ksmbd: PDU sig=fe 53 4d 42 pdu=144 req_running=0
+[ 2743.694985] ksmbd: got SMB2 command
+[ 2743.695732] ksmbd: SMB2 data length 24 offset 120
+[ 2743.699805] ksmbd: SMB2 len 144
+[ 2743.700444] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 2743.702001] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2743.703681] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 2743.705044] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 2743.706348] ksmbd: Received smb2 create request
+[ 2743.707287] ksmbd: converted name = winattr1.dir
+[ 2743.708257] ksmbd: check permission using windows acl
+[ 2743.709311] ksmbd: Discard write access to a directory
+[ 2743.710388] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 2743.711855] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2743.713597] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2743.715468] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2743.717004] ksmbd: RFC1002 hdr=00 00 00 88 len=136 status=1
+[ 2743.718147] ksmbd: PDU sig=fe 53 4d 42 pdu=136 req_running=0
+[ 2743.720391] ksmbd: got SMB2 command
+[ 2743.721153] ksmbd: SMB2 data length 40 offset 96
+[ 2743.722125] ksmbd: SMB2 len 136
+[ 2743.722803] ksmbd: credit_check: cmd=17 charge=1 calc=1 req_len=40 resp_len=0 total=31 out=0
+[ 2743.724471] ksmbd: credit_check: lock_enter cmd=17 charge=1 total=31 out=0
+[ 2743.726935] ksmbd: credit_check: lock_exit cmd=17 ret=0 total=31 out=1
+[ 2743.728247] ksmbd: Received smb2 set info request
+[ 2743.729210] ksmbd: GOT SMB2_O_INFO_FILE
+[ 2743.730034] ksmbd: credit_rsp: dispatch cmd=17 total=31 out=1 granted_total=0
+[ 2743.731471] ksmbd: credit_rsp: lock_enter cmd=17 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2743.734267] ksmbd: credit_rsp: lock_exit cmd=17 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2743.736146] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2743.737711] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 2743.738828] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+[ 2743.739973] ksmbd: got SMB2 command
+[ 2743.741774] ksmbd: SMB2 len 88
+[ 2743.742391] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 2743.743910] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2743.745538] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 2743.746905] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 2743.748200] ksmbd: Received smb2 close request
+[ 2743.749187] ksmbd: volatile_id = 92
+[ 2743.749936] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 2743.754478] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2743.756205] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2743.758097] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2743.759647] ksmbd: RFC1002 hdr=00 00 00 90 len=144 status=1
+[ 2743.760779] ksmbd: PDU sig=fe 53 4d 42 pdu=144 req_running=0
+[ 2743.764180] ksmbd: got SMB2 command
+[ 2743.764990] ksmbd: SMB2 data length 24 offset 120
+[ 2743.766008] ksmbd: SMB2 len 144
+[ 2743.766634] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 2743.768030] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2743.769587] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 2743.770860] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 2743.772069] ksmbd: Received smb2 create request
+[ 2743.772952] ksmbd: converted name = winattr1.dir
+[ 2743.773857] ksmbd: check permission using windows acl
+[ 2743.774839] ksmbd: Discard write access to a directory
+[ 2743.775829] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 2743.777233] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2743.778848] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2743.780583] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2743.782009] ksmbd: RFC1002 hdr=00 00 00 69 len=105 status=1
+[ 2743.783074] ksmbd: PDU sig=fe 53 4d 42 pdu=105 req_running=0
+[ 2743.784677] ksmbd: got SMB2 command
+[ 2743.785354] ksmbd: SMB2 data length 0 offset 104
+[ 2743.786268] ksmbd: SMB2 len 105
+[ 2743.786910] ksmbd: credit_check: cmd=16 charge=1 calc=1 req_len=65536 resp_len=0 total=31 out=0
+[ 2743.788556] ksmbd: credit_check: lock_enter cmd=16 charge=1 total=31 out=0
+[ 2743.789884] ksmbd: credit_check: lock_exit cmd=16 ret=0 total=31 out=1
+[ 2743.791217] ksmbd: Received request smb2 query info request
+[ 2743.792373] ksmbd: GOT SMB2_O_INFO_FILE
+[ 2743.793156] ksmbd: filename = \winattr1.dir
+[ 2743.793967] ksmbd: credit_rsp: dispatch cmd=16 total=31 out=1 granted_total=0
+[ 2743.795285] ksmbd: credit_rsp: lock_enter cmd=16 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2743.796922] ksmbd: credit_rsp: lock_exit cmd=16 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2743.798690] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2743.800546] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 2743.801595] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+[ 2743.802668] ksmbd: got SMB2 command
+[ 2743.803323] ksmbd: SMB2 len 88
+[ 2743.804002] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 2743.805431] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2743.807040] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 2743.808306] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 2743.809505] ksmbd: Received smb2 close request
+[ 2743.810339] ksmbd: volatile_id = 93
+[ 2743.811084] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 2743.812515] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2743.814118] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2743.815959] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2743.817526] ksmbd: RFC1002 hdr=00 00 00 90 len=144 status=1
+[ 2743.818602] ksmbd: PDU sig=fe 53 4d 42 pdu=144 req_running=0
+[ 2743.819732] ksmbd: got SMB2 command
+[ 2743.820432] ksmbd: SMB2 data length 24 offset 120
+[ 2743.821338] ksmbd: SMB2 len 144
+[ 2743.821971] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 2743.823372] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2743.825012] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 2743.826321] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 2743.827554] ksmbd: Received smb2 create request
+[ 2743.828404] ksmbd: converted name = winattr1.dir
+[ 2743.829384] ksmbd: check permission using windows acl
+[ 2743.830360] ksmbd: Discard write access to a directory
+[ 2743.831352] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 2743.832744] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2743.834369] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2743.836099] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2743.837574] ksmbd: RFC1002 hdr=00 00 00 69 len=105 status=1
+[ 2743.838639] ksmbd: PDU sig=fe 53 4d 42 pdu=105 req_running=1
+[ 2743.840181] ksmbd: got SMB2 command
+[ 2743.841000] ksmbd: SMB2 data length 0 offset 104
+[ 2743.841941] ksmbd: SMB2 len 105
+[ 2743.842570] ksmbd: credit_check: cmd=16 charge=1 calc=1 req_len=65536 resp_len=0 total=31 out=0
+[ 2743.844164] ksmbd: credit_check: lock_enter cmd=16 charge=1 total=31 out=0
+[ 2743.845567] ksmbd: credit_check: lock_exit cmd=16 ret=0 total=31 out=1
+[ 2743.846785] ksmbd: Received request smb2 query info request
+[ 2743.847831] ksmbd: GOT SMB2_O_INFO_SECURITY
+[ 2743.848662] ksmbd: credit_rsp: dispatch cmd=16 total=31 out=1 granted_total=0
+[ 2743.850052] ksmbd: credit_rsp: lock_enter cmd=16 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2743.851708] ksmbd: credit_rsp: lock_exit cmd=16 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2743.853609] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2743.855269] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 2743.856327] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+[ 2743.857384] ksmbd: got SMB2 command
+[ 2743.858085] ksmbd: SMB2 len 88
+[ 2743.858719] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 2743.860114] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2743.861688] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 2743.862979] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 2743.864196] ksmbd: Received smb2 close request
+[ 2743.865138] ksmbd: volatile_id = 94
+[ 2743.865860] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 2743.867193] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2743.868826] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2743.870665] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2743.872022] ksmbd: RFC1002 hdr=00 00 00 92 len=146 status=1
+[ 2743.873165] ksmbd: PDU sig=fe 53 4d 42 pdu=146 req_running=0
+[ 2743.874340] ksmbd: got SMB2 command
+[ 2743.875097] ksmbd: SMB2 data length 26 offset 120
+[ 2743.876078] ksmbd: SMB2 len 146
+[ 2743.876762] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 2743.878264] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2743.879938] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 2743.881310] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 2743.882641] ksmbd: Received smb2 create request
+[ 2743.883588] ksmbd: converted name = winattr1.file
+[ 2743.884579] ksmbd: check permission using windows acl
+[ 2743.885661] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 2743.887086] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2743.888831] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2743.890719] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2743.892223] ksmbd: RFC1002 hdr=00 00 00 88 len=136 status=1
+[ 2743.893364] ksmbd: PDU sig=fe 53 4d 42 pdu=136 req_running=1
+[ 2743.894566] ksmbd: got SMB2 command
+[ 2743.895269] ksmbd: SMB2 data length 40 offset 96
+[ 2743.896236] ksmbd: SMB2 len 136
+[ 2743.896926] ksmbd: credit_check: cmd=17 charge=1 calc=1 req_len=40 resp_len=0 total=31 out=0
+[ 2743.898638] ksmbd: credit_check: lock_enter cmd=17 charge=1 total=31 out=0
+[ 2743.900014] ksmbd: credit_check: lock_exit cmd=17 ret=0 total=31 out=1
+[ 2743.901337] ksmbd: Received smb2 set info request
+[ 2743.902318] ksmbd: GOT SMB2_O_INFO_FILE
+[ 2743.903152] ksmbd: credit_rsp: dispatch cmd=17 total=31 out=1 granted_total=0
+[ 2743.904643] ksmbd: credit_rsp: lock_enter cmd=17 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2743.906367] ksmbd: credit_rsp: lock_exit cmd=17 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2743.908257] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2743.909754] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 2743.910918] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+[ 2743.912066] ksmbd: got SMB2 command
+[ 2743.912812] ksmbd: SMB2 len 88
+[ 2743.913437] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 2743.915000] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2743.916682] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 2743.918043] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 2743.919341] ksmbd: Received smb2 close request
+[ 2743.920283] ksmbd: volatile_id = 95
+[ 2743.921047] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 2743.922495] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2743.924234] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2743.926107] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2743.927654] ksmbd: RFC1002 hdr=00 00 00 92 len=146 status=1
+[ 2743.928813] ksmbd: PDU sig=fe 53 4d 42 pdu=146 req_running=0
+[ 2743.929998] ksmbd: got SMB2 command
+[ 2743.930755] ksmbd: SMB2 data length 26 offset 120
+[ 2743.931743] ksmbd: SMB2 len 146
+[ 2743.932376] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 2743.933899] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2743.935584] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 2743.936962] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 2743.938276] ksmbd: Received smb2 create request
+[ 2743.939224] ksmbd: converted name = winattr1.file
+[ 2743.940228] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 2743.941701] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2743.943397] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2743.945276] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2743.946843] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 2743.947997] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+[ 2743.949150] ksmbd: got SMB2 command
+[ 2743.949912] ksmbd: SMB2 len 88
+[ 2743.950567] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 2743.952090] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2743.953773] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 2743.955161] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 2743.956455] ksmbd: Received smb2 close request
+[ 2743.957386] ksmbd: volatile_id = 96
+[ 2743.958171] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 2743.959666] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2743.961376] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2743.963227] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2743.964722] ksmbd: RFC1002 hdr=00 00 00 90 len=144 status=1
+[ 2743.965840] ksmbd: PDU sig=fe 53 4d 42 pdu=144 req_running=0
+[ 2743.967082] ksmbd: got SMB2 command
+[ 2743.967845] ksmbd: SMB2 data length 24 offset 120
+[ 2743.968842] ksmbd: SMB2 len 144
+[ 2743.969490] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 2743.971031] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2743.972710] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 2743.974081] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 2743.975382] ksmbd: Received smb2 create request
+[ 2743.976327] ksmbd: converted name = winattr1.dir
+[ 2743.977298] ksmbd: open() argument is a directory: winattr1.dir, 1040
+[ 2743.978651] ksmbd: Error response: c00000ba
+[ 2743.979499] ksmbd: Failed to process 5 [-5]
+[ 2743.980370] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 2743.981829] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2743.983570] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2743.985428] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2743.987011] ksmbd: RFC1002 hdr=00 00 00 90 len=144 status=1
+[ 2743.988176] ksmbd: PDU sig=fe 53 4d 42 pdu=144 req_running=1
+[ 2743.989356] ksmbd: got SMB2 command
+[ 2743.990102] ksmbd: SMB2 data length 24 offset 120
+[ 2743.991097] ksmbd: SMB2 len 144
+[ 2743.991796] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 2743.993301] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2743.994975] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 2743.996348] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 2743.997699] ksmbd: Received smb2 create request
+[ 2743.998648] ksmbd: converted name = winattr1.dir
+[ 2743.999619] ksmbd: check permission using windows acl
+[ 2744.000691] ksmbd: Discard write access to a directory
+[ 2744.001781] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 2744.003215] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2744.004967] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2744.006847] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2744.008561] ksmbd: RFC1002 hdr=00 00 00 69 len=105 status=1
+[ 2744.009725] ksmbd: PDU sig=fe 53 4d 42 pdu=105 req_running=0
+[ 2744.010934] ksmbd: got SMB2 command
+[ 2744.011848] ksmbd: SMB2 data length 0 offset 104
+[ 2744.012892] ksmbd: SMB2 len 105
+[ 2744.013658] ksmbd: credit_check: cmd=16 charge=1 calc=1 req_len=65536 resp_len=0 total=31 out=0
+[ 2744.015551] ksmbd: credit_check: lock_enter cmd=16 charge=1 total=31 out=0
+[ 2744.017066] ksmbd: credit_check: lock_exit cmd=16 ret=0 total=31 out=1
+[ 2744.018560] ksmbd: Received request smb2 query info request
+[ 2744.019817] ksmbd: GOT SMB2_O_INFO_FILE
+[ 2744.020765] ksmbd: system.posix_acl_access, len 23
+[ 2744.021855] ksmbd: user.DOSATTRIB, len 14
+[ 2744.022782] ksmbd: system.posix_acl_default, len 24
+[ 2744.023876] ksmbd: security.NTACL, len 14
+[ 2744.024819] ksmbd: credit_rsp: dispatch cmd=16 total=31 out=1 granted_total=0
+[ 2744.026360] ksmbd: credit_rsp: lock_enter cmd=16 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2744.028210] ksmbd: credit_rsp: lock_exit cmd=16 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2744.030205] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2744.031871] ksmbd: RFC1002 hdr=00 00 00 62 len=98 status=1
+[ 2744.033023] ksmbd: PDU sig=fe 53 4d 42 pdu=98 req_running=1
+[ 2744.034878] ksmbd: got SMB2 command
+[ 2744.035687] ksmbd: SMB2 data length 2 offset 96
+[ 2744.036816] ksmbd: SMB2 len 98
+[ 2744.037440] ksmbd: credit_check: cmd=14 charge=1 calc=1 req_len=65536 resp_len=0 total=31 out=0
+[ 2744.039335] ksmbd: credit_check: lock_enter cmd=14 charge=1 total=31 out=0
+[ 2744.040869] ksmbd: credit_check: lock_exit cmd=14 ret=0 total=31 out=1
+[ 2744.042302] ksmbd: Received smb2 query directory request
+[ 2744.043557] ksmbd: Search pattern is *
+[ 2744.044321] ksmbd: info_level : 12, buf_len :65520, next_offset : 16, data_count : 16
+[ 2744.046018] ksmbd: failed to load dos attribute in xattr
+[ 2744.047206] ksmbd: fail to load dos attribute.
+[ 2744.048254] ksmbd: info_level : 12, buf_len :65504, next_offset : 16, data_count : 32
+[ 2744.049981] ksmbd: credit_rsp: dispatch cmd=14 total=31 out=1 granted_total=0
+[ 2744.051589] ksmbd: credit_rsp: lock_enter cmd=14 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2744.053422] ksmbd: credit_rsp: lock_exit cmd=14 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2744.055406] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2744.057118] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 2744.058363] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=1
+[ 2744.059940] ksmbd: got SMB2 command
+[ 2744.060793] ksmbd: SMB2 len 88
+[ 2744.061415] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 2744.063086] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2744.064869] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 2744.066311] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 2744.067774] ksmbd: Received smb2 close request
+[ 2744.068812] ksmbd: volatile_id = 97
+[ 2744.069669] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 2744.071176] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2744.073028] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2744.075010] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2744.076696] ksmbd: RFC1002 hdr=00 00 00 90 len=144 status=1
+[ 2744.077831] ksmbd: PDU sig=fe 53 4d 42 pdu=144 req_running=0
+[ 2744.079174] ksmbd: got SMB2 command
+[ 2744.079959] ksmbd: SMB2 data length 24 offset 120
+[ 2744.081081] ksmbd: SMB2 len 144
+[ 2744.081862] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 2744.083454] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2744.085237] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 2744.086745] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 2744.088159] ksmbd: Received smb2 create request
+[ 2744.089178] ksmbd: converted name = winattr1.dir
+[ 2744.090261] ksmbd: Discard write access to a directory
+[ 2744.091475] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 2744.093009] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2744.094838] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2744.096824] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2744.098418] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 2744.099690] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+[ 2744.100926] ksmbd: got SMB2 command
+[ 2744.101781] ksmbd: SMB2 len 88
+[ 2744.102400] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 2744.104066] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2744.105856] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 2744.107307] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 2744.108736] ksmbd: Received smb2 close request
+[ 2744.109770] ksmbd: volatile_id = 98
+[ 2744.110641] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 2744.112171] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2744.114002] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2744.116019] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2744.117733] ksmbd: RFC1002 hdr=00 00 00 90 len=144 status=1
+[ 2744.118903] ksmbd: PDU sig=fe 53 4d 42 pdu=144 req_running=1
+[ 2744.120206] ksmbd: got SMB2 command
+[ 2744.121042] ksmbd: SMB2 data length 24 offset 120
+[ 2744.122113] ksmbd: SMB2 len 144
+[ 2744.122904] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 2744.124513] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2744.126299] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 2744.127783] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 2744.129176] ksmbd: Received smb2 create request
+[ 2744.130212] ksmbd: converted name = winattr1.dir
+[ 2744.131311] ksmbd: can not get linux path for winattr1.dir, rc = -2
+[ 2744.132653] ksmbd: Discard write access to a directory
+[ 2744.133736] ksmbd: Error response: c0000034
+[ 2744.134623] ksmbd: Failed to process 5 [-9]
+[ 2744.135487] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 2744.136965] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2744.138752] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2744.140647] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2744.149405] ksmbd: Wait for all pending requests(1)
+[ 2746.259127] ksmbd: connect success: accepted new connection
+[ 2746.264818] ksmbd: RFC1002 hdr=00 00 00 e2 len=226 status=0
+[ 2746.265995] ksmbd: PDU sig=fe 53 4d 42 pdu=226 req_running=0
+[ 2746.267146] ksmbd: got SMB2 command
+[ 2746.267865] ksmbd: no length check for command
+[ 2746.269039] ksmbd: SMB2 data length 0 offset 0
+[ 2746.270074] ksmbd: SMB2 len 100
+[ 2746.270836] ksmbd: Unknown command 0 in credit charge validation, defaulting to 1
+[ 2746.272385] ksmbd: credit_check: cmd=0 charge=1 calc=1 req_len=1 resp_len=0 total=1 out=0
+[ 2746.274031] ksmbd: credit_check: lock_enter cmd=0 charge=1 total=1 out=0
+[ 2746.275443] ksmbd: credit_check: lock_exit cmd=0 ret=0 total=1 out=1
+[ 2746.276811] ksmbd: client requested dialect 0x311
+[ 2746.277846] ksmbd: selected \x02SMB 3.1.1 dialect
+[ 2746.278852] ksmbd: conn->dialect 0x311
+[ 2746.279708] ksmbd: Received negotiate request
+[ 2746.280739] ksmbd: decoding 4 negotiate contexts
+[ 2746.281779] ksmbd: deassemble SMB2_PREAUTH_INTEGRITY_CAPABILITIES context
+[ 2746.283190] ksmbd: deassemble SMB2_ENCRYPTION_CAPABILITIES context
+[ 2746.284568] ksmbd: Cipher ID = 0x4
+[ 2746.285208] ksmbd: deassemble SMB2_SIGNING_CAPABILITIES context
+[ 2746.286559] ksmbd: Signing Algorithm ID = 0x2 (mutually agreed)
+[ 2746.287809] ksmbd: deassemble SMB2_NETNAME_NEGOTIATE_CONTEXT_ID context
+[ 2746.289182] ksmbd: NETNAME context name '127.0.0.1' != server name 'KSMBD-VM'
+[ 2746.290759] ksmbd: assemble SMB2_PREAUTH_INTEGRITY_CAPABILITIES context
+[ 2746.292103] ksmbd: assemble SMB2_ENCRYPTION_CAPABILITIES context
+[ 2746.293428] ksmbd: assemble SMB2_SIGNING_CAPABILITIES context
+[ 2746.294754] ksmbd: negotiate context offset 224, count 3
+[ 2746.295905] ksmbd: credit_rsp: dispatch cmd=0 total=1 out=1 granted_total=0
+[ 2746.297307] ksmbd: credit_rsp: lock_enter cmd=0 charge=1 req=31 total=1 out=1 granted_total=0
+[ 2746.299155] ksmbd: credit_rsp: lock_exit cmd=0 charge=1 req=31 granted=1 total=1 out=0 granted_total=1
+[ 2746.301071] ksmbd: credits: requested[31] granted[1] total_granted[1]
+[ 2746.305711] ksmbd: RFC1002 hdr=00 00 00 a2 len=162 status=5
+[ 2746.306844] ksmbd: PDU sig=fe 53 4d 42 pdu=162 req_running=0
+[ 2746.308026] ksmbd: got SMB2 command
+[ 2746.308909] ksmbd: SMB2 data length 74 offset 88
+[ 2746.309968] ksmbd: SMB2 len 162
+[ 2746.310731] ksmbd: Unknown command 1 in credit charge validation, defaulting to 1
+[ 2746.312293] ksmbd: credit_check: cmd=1 charge=1 calc=1 req_len=1 resp_len=0 total=1 out=0
+[ 2746.313959] ksmbd: credit_check: lock_enter cmd=1 charge=1 total=1 out=0
+[ 2746.315343] ksmbd: credit_check: lock_exit cmd=1 ret=0 total=1 out=1
+[ 2746.316714] ksmbd: Received smb2 session setup request
+[ 2746.317861] ksmbd: negotiate phase
+[ 2746.318664] ksmbd: NTLMSSP SecurityBufferLength 148
+[ 2746.319703] ksmbd: credit_rsp: dispatch cmd=1 total=1 out=1 granted_total=0
+[ 2746.321128] ksmbd: credit_rsp: lock_enter cmd=1 charge=1 req=31 total=1 out=1 granted_total=0
+[ 2746.322930] ksmbd: credit_rsp: lock_exit cmd=1 charge=1 req=31 granted=31 total=31 out=0 granted_total=31
+[ 2746.324916] ksmbd: credits: requested[31] granted[31] total_granted[31]
+[ 2746.326641] ksmbd: RFC1002 hdr=00 00 01 fa len=506 status=5
+[ 2746.327791] ksmbd: PDU sig=fe 53 4d 42 pdu=506 req_running=0
+[ 2746.328949] ksmbd: got SMB2 command
+[ 2746.329801] ksmbd: SMB2 data length 418 offset 88
+[ 2746.330803] ksmbd: SMB2 len 506
+[ 2746.331411] ksmbd: Unknown command 1 in credit charge validation, defaulting to 1
+[ 2746.333029] ksmbd: credit_check: cmd=1 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2746.334686] ksmbd: credit_check: lock_enter cmd=1 charge=1 total=31 out=0
+[ 2746.336135] ksmbd: credit_check: lock_exit cmd=1 ret=0 total=31 out=1
+[ 2746.337480] ksmbd: Received smb2 session setup request
+[ 2746.338471] ksmbd: authenticate phase
+[ 2746.339186] ksmbd: session setup request for user testuser
+[ 2746.340660] ksmbd: decode_ntlmssp_authenticate_blob dnameWORKGROUP
+[ 2746.341902] ksmbd: generated encryption keys for session 3, cipher type 4
+[ 2746.343327] ksmbd: generated signing key for session 3
+[ 2746.344475] ksmbd: credit_rsp: dispatch cmd=1 total=31 out=1 granted_total=0
+[ 2746.345963] ksmbd: credit_rsp: lock_enter cmd=1 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2746.347707] ksmbd: credit_rsp: lock_exit cmd=1 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2746.349574] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2746.351199] ksmbd: RFC1002 hdr=00 00 00 68 len=104 status=1
+[ 2746.352352] ksmbd: PDU sig=fe 53 4d 42 pdu=104 req_running=0
+[ 2746.353550] ksmbd: skip to check tree connect request
+[ 2746.354668] ksmbd: got SMB2 command
+[ 2746.355328] ksmbd: SMB2 data length 32 offset 72
+[ 2746.356395] ksmbd: SMB2 len 104
+[ 2746.357115] ksmbd: Unknown command 3 in credit charge validation, defaulting to 1
+[ 2746.358699] ksmbd: credit_check: cmd=3 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2746.360423] ksmbd: credit_check: lock_enter cmd=3 charge=1 total=31 out=0
+[ 2746.361873] ksmbd: credit_check: lock_exit cmd=3 ret=0 total=31 out=1
+[ 2746.363229] ksmbd: Received smb2 tree connect request
+[ 2746.364366] ksmbd: tree connect request for tree test treename \\127.0.0.1\test
+[ 2746.366042] ksmbd: MaximalAccess: perm_r=0 perm_w=0 perm_x=0 access=0x001f01ff
+[ 2746.367504] ksmbd: credit_rsp: dispatch cmd=3 total=31 out=1 granted_total=0
+[ 2746.369068] ksmbd: credit_rsp: lock_enter cmd=3 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2746.370730] ksmbd: credit_rsp: lock_exit cmd=3 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2746.372669] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2746.374255] ksmbd: RFC1002 hdr=00 00 00 92 len=146 status=1
+[ 2746.376701] ksmbd: PDU sig=fe 53 4d 42 pdu=146 req_running=0
+[ 2746.377876] ksmbd: got SMB2 command
+[ 2746.378661] ksmbd: SMB2 data length 26 offset 120
+[ 2746.379732] ksmbd: SMB2 len 146
+[ 2746.380366] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 2746.381907] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2746.383652] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 2746.385065] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 2746.386391] ksmbd: Received smb2 create request
+[ 2746.387424] ksmbd: converted name = winattr2.file
+[ 2746.388550] ksmbd: can not get linux path for winattr2.file, rc = -2
+[ 2746.389813] ksmbd: Error response: c0000034
+[ 2746.390798] ksmbd: Failed to process 5 [-9]
+[ 2746.391732] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 2746.393247] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2746.394951] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2746.396874] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2746.398441] ksmbd: RFC1002 hdr=00 00 00 92 len=146 status=1
+[ 2746.399542] ksmbd: PDU sig=fe 53 4d 42 pdu=146 req_running=0
+[ 2746.400757] ksmbd: got SMB2 command
+[ 2746.401413] ksmbd: SMB2 data length 26 offset 120
+[ 2746.402428] ksmbd: SMB2 len 146
+[ 2746.403153] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 2746.404666] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2746.406380] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 2746.407847] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 2746.409127] ksmbd: Received smb2 create request
+[ 2746.410160] ksmbd: converted name = winattr2.file
+[ 2746.411180] ksmbd: can not get linux path for winattr2.file, rc = -2
+[ 2746.412564] ksmbd: file does not exist, so creating
+[ 2746.413617] ksmbd: creating regular file
+[ 2746.414389] ksmbd: inherit posix acl failed : -2
+[ 2746.415437] ksmbd: Set posix acls
+[ 2746.416189] ksmbd: mode: 7, access flags now 0x1f01bf
+[ 2746.417322] ksmbd: mode: 7, access flags now 0x1f01bf
+[ 2746.418454] ksmbd: mode: 7, access flags now 0x1f01bf
+[ 2746.419585] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 2746.420960] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2746.423687] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2746.425411] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2746.428639] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 2746.429704] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+[ 2746.431715] ksmbd: got SMB2 command
+[ 2746.432380] ksmbd: SMB2 len 88
+[ 2746.432996] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 2746.435358] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2746.437866] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 2746.440207] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 2746.442504] ksmbd: Received smb2 close request
+[ 2746.443361] ksmbd: volatile_id = 0
+[ 2746.445692] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 2746.448097] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2746.451805] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2746.453540] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2746.456999] ksmbd: RFC1002 hdr=00 00 00 92 len=146 status=1
+[ 2746.458064] ksmbd: PDU sig=fe 53 4d 42 pdu=146 req_running=0
+[ 2746.460235] ksmbd: got SMB2 command
+[ 2746.460953] ksmbd: SMB2 data length 26 offset 120
+[ 2746.461957] ksmbd: SMB2 len 146
+[ 2746.463666] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 2746.466148] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2746.468799] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 2746.470171] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 2746.471420] ksmbd: Received smb2 create request
+[ 2746.472320] ksmbd: converted name = winattr2.file
+[ 2746.474312] ksmbd: check permission using windows acl
+[ 2746.475314] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 2746.477746] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2746.479345] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2746.482162] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2746.483559] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 2746.484766] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+[ 2746.486903] ksmbd: got SMB2 command
+[ 2746.487636] ksmbd: SMB2 len 88
+[ 2746.488221] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 2746.489708] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2746.493328] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 2746.494665] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 2746.495887] ksmbd: Received smb2 close request
+[ 2746.496771] ksmbd: volatile_id = 1
+[ 2746.497431] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 2746.498781] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2746.502634] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2746.504486] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2746.506024] ksmbd: RFC1002 hdr=00 00 00 92 len=146 status=1
+[ 2746.507112] ksmbd: PDU sig=fe 53 4d 42 pdu=146 req_running=0
+[ 2746.508204] ksmbd: got SMB2 command
+[ 2746.508927] ksmbd: SMB2 data length 26 offset 120
+[ 2746.509851] ksmbd: SMB2 len 146
+[ 2746.510472] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 2746.511900] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2746.513442] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 2746.514747] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 2746.515973] ksmbd: Received smb2 create request
+[ 2746.516867] ksmbd: converted name = winattr2.file
+[ 2746.517810] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 2746.519133] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2746.520764] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2746.522500] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2746.523903] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 2746.524960] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+[ 2746.526987] ksmbd: got SMB2 command
+[ 2746.527757] ksmbd: SMB2 len 88
+[ 2746.528348] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 2746.530971] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 2746.533619] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 2746.535849] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 2746.537069] ksmbd: Received smb2 close request
+[ 2746.537946] ksmbd: volatile_id = 2
+[ 2746.539597] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 2746.540928] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 2746.543611] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 2746.547474] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 2746.549698] ksmbd: Wait for all pending requests(0)

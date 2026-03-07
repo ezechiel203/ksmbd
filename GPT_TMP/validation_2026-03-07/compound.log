@@ -1,0 +1,145 @@
+smbtorture 4.23.6
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772850449
+time: 2026-03-07 02:27:29.836735
+progress: 20
+test: related1
+time: 2026-03-07 02:27:29.838744
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_REFUSED
+time: 2026-03-07 02:27:29.839290
+failure: related1 [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: related2
+time: 2026-03-07 02:27:29.839328
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_REFUSED
+time: 2026-03-07 02:27:29.839751
+failure: related2 [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: related3
+time: 2026-03-07 02:27:29.839787
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_REFUSED
+time: 2026-03-07 02:27:29.840270
+failure: related3 [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: related4
+time: 2026-03-07 02:27:29.840306
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_REFUSED
+time: 2026-03-07 02:27:29.840830
+failure: related4 [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: related5
+time: 2026-03-07 02:27:29.840866
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_REFUSED
+time: 2026-03-07 02:27:29.841332
+failure: related5 [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: related6
+time: 2026-03-07 02:27:29.841367
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_REFUSED
+time: 2026-03-07 02:27:29.841819
+failure: related6 [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: related7
+time: 2026-03-07 02:27:29.841853
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_REFUSED
+time: 2026-03-07 02:27:29.842276
+failure: related7 [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: related8
+time: 2026-03-07 02:27:29.842312
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_REFUSED
+time: 2026-03-07 02:27:29.842769
+failure: related8 [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: related9
+time: 2026-03-07 02:27:29.842803
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_REFUSED
+time: 2026-03-07 02:27:29.843225
+failure: related9 [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: unrelated1
+time: 2026-03-07 02:27:29.843260
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_REFUSED
+time: 2026-03-07 02:27:29.844772
+failure: unrelated1 [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: invalid1
+time: 2026-03-07 02:27:29.844808
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_REFUSED
+time: 2026-03-07 02:27:29.845266
+failure: invalid1 [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: invalid2
+time: 2026-03-07 02:27:29.845300
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_REFUSED
+time: 2026-03-07 02:27:29.846714
+failure: invalid2 [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: invalid3
+time: 2026-03-07 02:27:29.846751
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_REFUSED
+time: 2026-03-07 02:27:29.847206
+failure: invalid3 [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: invalid4
+time: 2026-03-07 02:27:29.847242
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_REFUSED
+time: 2026-03-07 02:27:29.847690
+failure: invalid4 [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: interim1
+time: 2026-03-07 02:27:29.847727
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_REFUSED
+time: 2026-03-07 02:27:29.848230
+failure: interim1 [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: interim2
+time: 2026-03-07 02:27:29.848265
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_REFUSED
+time: 2026-03-07 02:27:29.848730
+failure: interim2 [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: interim3
+time: 2026-03-07 02:27:29.848764
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_REFUSED
+time: 2026-03-07 02:27:29.849218
+failure: interim3 [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: compound-break
+time: 2026-03-07 02:27:29.849252
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_REFUSED
+time: 2026-03-07 02:27:29.849915
+failure: compound-break [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: compound-padding
+time: 2026-03-07 02:27:29.849950
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_REFUSED
+time: 2026-03-07 02:27:29.850793
+failure: compound-padding [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: create-write-close
+time: 2026-03-07 02:27:29.850831
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_REFUSED
+time: 2026-03-07 02:27:29.851283
+failure: create-write-close [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]

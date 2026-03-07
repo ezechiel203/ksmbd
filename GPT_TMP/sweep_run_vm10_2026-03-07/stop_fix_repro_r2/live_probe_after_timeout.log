@@ -1,0 +1,22 @@
+root         717     716  0 12:00 ?        00:00:00 bash -c timeout 60 ksmbdctl stop > /tmp/ksmbd-stop-r2.log 2>&1
+root         718     717  0 12:00 ?        00:00:00 timeout 60 ksmbdctl stop
+root         719     718 82 12:00 ?        00:01:22 ksmbdctl stop
+[   38.898104] ksmbd: durable reconnect v2: client GUID mismatch
+[   38.905200] ksmbd: durable reconnect v2: client GUID mismatch
+[   38.939061] ksmbd: inherit ACL overflow
+[   38.953643] ksmbd: inherit ACL overflow
+[   38.988474] ksmbd: inherit ACL overflow
+[   39.000759] ksmbd: inherit ACL overflow
+[   39.007570] ksmbd: inherit ACL overflow
+[   39.018228] ksmbd: inherit ACL overflow
+[   39.027720] ksmbd: inherit ACL overflow
+[   39.043195] ksmbd: inherit ACL overflow
+[   43.059010] ksmbd: inherit ACL overflow
+[   45.075269] ksmbd: inherit ACL overflow
+[   47.085341] ksmbd: inherit ACL overflow
+[   51.818624] ksmbd: inherit ACL overflow
+[   55.841831] ksmbd: inherit ACL overflow
+[   59.861922] ksmbd: inherit ACL overflow
+[   63.887261] ksmbd: inherit ACL overflow
+[   67.910476] ksmbd: inherit ACL overflow
+[  165.932948] clocksource: Long readout interval, skipping watchdog check: cs_nsec: 3685808349 wd_nsec: 3685808109

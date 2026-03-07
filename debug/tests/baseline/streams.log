@@ -1,0 +1,104 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772500727
+time: 2026-03-03 01:18:47.072799
+progress: 14
+test: dir
+time: 2026-03-03 01:18:47.073449
+teststreams\stream.txt:Stream One
+(../../source4/torture/smb2/streams.c:214) opening non-existent directory stream
+(../../source4/torture/smb2/streams.c:229) opening basedir  stream
+(../../source4/torture/smb2/streams.c:245) opening basedir ::$DATA stream
+(../../source4/torture/smb2/streams.c:261) list the streams on the basedir
+time: 2026-03-03 01:18:48.366138
+success: dir
+test: io
+time: 2026-03-03 01:18:48.366194
+(../../source4/torture/smb2/streams.c:301) creating a stream on a non-existent file
+(../../source4/torture/smb2/streams.c:321) check that open of base file is allowed
+(../../source4/torture/smb2/streams.c:328) writing to stream
+(../../source4/torture/smb2/streams.c:343) modifying stream
+(../../source4/torture/smb2/streams.c:353) creating a stream2 on a existing file
+(../../source4/torture/smb2/streams.c:360) modifying stream
+(../../source4/torture/smb2/streams.c:409) deleting stream
+(../../source4/torture/smb2/streams.c:422) delete a stream via delete-on-close
+(../../source4/torture/smb2/streams.c:454) deleting file
+time: 2026-03-03 01:18:52.786355
+success: io
+test: sharemodes
+time: 2026-03-03 01:18:52.786408
+(../../source4/torture/smb2/streams.c:570) Testing stream share mode conflicts
+time: 2026-03-03 01:18:54.997725
+success: sharemodes
+test: names
+time: 2026-03-03 01:18:54.997786
+(../../source4/torture/smb2/streams.c:847) testing stream names
+time: 2026-03-03 01:18:58.304633
+success: names
+test: names2
+time: 2026-03-03 01:18:58.304694
+(../../source4/torture/smb2/streams.c:1141) testing stream names
+time: 2026-03-03 01:19:16.578554
+success: names2
+test: names3
+time: 2026-03-03 01:19:16.578612
+(../../source4/torture/smb2/streams.c:1269) testing case insensitive stream names
+time: 2026-03-03 01:19:20.150683
+success: names3
+test: rename
+time: 2026-03-03 01:19:20.150745
+(../../source4/torture/smb2/streams.c:1350) testing stream renames
+time: 2026-03-03 01:19:22.080764
+success: rename
+test: rename2
+time: 2026-03-03 01:19:22.080812
+(../../source4/torture/smb2/streams.c:1475) Checking SMB2 rename of a stream using :<stream>
+(../../source4/torture/smb2/streams.c:1489) Checking SMB2 rename of an overwriting stream using :<stream>
+(../../source4/torture/smb2/streams.c:1519) Checking SMB2 rename of a stream using <base>:<stream>
+(../../source4/torture/smb2/streams.c:1529) Checking SMB2 rename to default stream using :<stream>
+time: 2026-03-03 01:19:24.709322
+failure: rename2 [
+../../source4/torture/smb2/streams.c:1533: status was NT_STATUS_OBJECT_NAME_INVALID, expected NT_STATUS_OK: CHECK_STATUS
+]
+test: create-disposition
+time: 2026-03-03 01:19:24.709385
+(../../source4/torture/smb2/streams.c:1635) Checking create disp: open
+(../../source4/torture/smb2/streams.c:1649) Checking create disp: overwrite
+(../../source4/torture/smb2/streams.c:1663) Checking create disp: overwrite_if
+(../../source4/torture/smb2/streams.c:1681) Checking create disp: supersede
+(../../source4/torture/smb2/streams.c:1701) Checking create disp: overwrite_if on stream
+time: 2026-03-03 01:19:28.041397
+success: create-disposition
+test: attributes1
+time: 2026-03-03 01:19:28.041453
+(../../source4/torture/smb2/streams.c:1779) testing attribute setting on stream
+time: 2026-03-03 01:19:31.200298
+success: attributes1
+test: attributes2
+time: 2026-03-03 01:19:31.200350
+Let's dance!
+WARNING!: ../../source4/torture/smb2/streams.c:1955: expected_btime was 116447299403833343 (0x19DB433AC04DFFF), expected 134169743716720000 (0x1DCAAABC9D71D80): btime was updated
+
+time: 2026-03-03 01:19:34.766781
+failure: attributes2 [
+../../source4/torture/smb2/streams.c:2134: Expression `ret' failed: Bad time on stream
+]
+test: delete
+time: 2026-03-03 01:19:34.766838
+(../../source4/torture/smb2/streams.c:679) opening non-existent file stream
+time: 2026-03-03 01:19:37.380658
+failure: delete [
+../../source4/torture/smb2/streams.c:750: status was NT_STATUS_OK, expected NT_STATUS_DELETE_PENDING: CHECK_STATUS
+]
+test: zero-byte
+time: 2026-03-03 01:19:37.380740
+(../../source4/torture/smb2/streams.c:490) Check 0 byte named stream
+time: 2026-03-03 01:19:41.035674
+success: zero-byte
+test: basefile-rename-with-open-stream
+time: 2026-03-03 01:19:41.035732
+Creating file with stream
+Writing to stream
+Renaming base file
+time: 2026-03-03 01:19:42.733043
+success: basefile-rename-with-open-stream

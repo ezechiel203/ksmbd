@@ -1,0 +1,1265 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+/*
+ *   Copyright (C) 2024 Samsung Electronics Co., Ltd.
+ *
+ *   SMB2 CHANGE_NOTIFY implementation using Linux fsnotify.
+ *
+ *   Design: one fsnotify_mark per (group, inode).  Multiple
+ *   CHANGE_NOTIFY requests on the same directory are tracked
+ *   via fp->blocked_works.  When fsnotify fires, the handler
+ *   walks blocked_works and completes all matching entries.
+ *   Only the first watch per inode gets a real fsnotify mark;
+ *   subsequent watches on the same inode piggyback on it.
+ */
+
+#include <linux/fs.h>
+#include <linux/slab.h>
+#include <linux/fsnotify_backend.h>
+#include <linux/version.h>
+
+#include "glob.h"
+#include "smb2pdu.h"
+#include "smbstatus.h"
+#include "ksmbd_work.h"
+#include "vfs_cache.h"
+#include "connection.h"
+#include "server.h"
+#include "ksmbd_notify.h"
+#include "mgmt/user_session.h"
+#include "smb_common.h"
+
+/*
+ * fsnotify group flags differ across kernel versions.
+ */
+#ifdef FSNOTIFY_GROUP_NOFS
+#define KSMBD_FSNOTIFY_GROUP_FLAGS FSNOTIFY_GROUP_NOFS
+#else
+#define KSMBD_FSNOTIFY_GROUP_FLAGS FSNOTIFY_GROUP_USER
+#endif
+
+/* Global fsnotify group for all ksmbd watches */
+static struct fsnotify_group *ksmbd_notify_group;
+
+/* Limit total concurrent notify watches server-wide */
+#define KSMBD_MAX_NOTIFY_WATCHES	4096
+
+/* Limit per-connection to prevent memory DoS */
+#define KSMBD_MAX_NOTIFY_WATCHES_PER_CONN	1024
+
+static atomic_t notify_watch_count = ATOMIC_INIT(0);
+
+/*
+ * Mask of all fsnotify events we care about.
+ */
+#define KSMBD_FSNOTIFY_MASK	(FS_CREATE | FS_DELETE | FS_MODIFY |	\
+				 FS_MOVED_FROM | FS_MOVED_TO |		\
+				 FS_ATTRIB | FS_ACCESS |		\
+				 FS_EVENT_ON_CHILD)
+
+/*
+ * FILE_NOTIFY_INFORMATION on-wire structure (MS-FSCC 2.4.42).
+ */
+struct file_notify_information {
+	__le32 NextEntryOffset;
+	__le32 Action;
+	__le32 FileNameLength;
+	__le16 FileName[];
+} __packed;
+
+/* ------------------------------------------------------------------ */
+/*  fsnotify event  ->  SMB2 completion-filter mapping                 */
+/* ------------------------------------------------------------------ */
+
+static u32 ksmbd_fsnotify_to_smb2_filter(u32 mask)
+{
+	u32 filter = 0;
+
+	if (mask & FS_CREATE)
+		filter |= FILE_NOTIFY_CHANGE_FILE_NAME;
+	if (mask & FS_DELETE)
+		filter |= FILE_NOTIFY_CHANGE_FILE_NAME;
+	if (mask & FS_MODIFY)
+		filter |= FILE_NOTIFY_CHANGE_LAST_WRITE;
+	if (mask & FS_ATTRIB)
+		filter |= FILE_NOTIFY_CHANGE_ATTRIBUTES;
+	if (mask & FS_MOVED_FROM)
+		filter |= FILE_NOTIFY_CHANGE_FILE_NAME;
+	if (mask & FS_MOVED_TO)
+		filter |= FILE_NOTIFY_CHANGE_FILE_NAME;
+	if (mask & FS_ACCESS)
+		filter |= FILE_NOTIFY_CHANGE_LAST_ACCESS;
+	if (mask & FS_ISDIR) {
+		if (filter & FILE_NOTIFY_CHANGE_FILE_NAME) {
+			filter &= ~FILE_NOTIFY_CHANGE_FILE_NAME;
+			filter |= FILE_NOTIFY_CHANGE_DIR_NAME;
+		}
+	}
+
+	return filter;
+}
+
+static u32 ksmbd_fsnotify_to_action(u32 mask)
+{
+	if (mask & FS_CREATE)
+		return FILE_ACTION_ADDED;
+	if (mask & FS_DELETE)
+		return FILE_ACTION_REMOVED;
+	if (mask & FS_MOVED_FROM)
+		return FILE_ACTION_RENAMED_OLD_NAME;
+	if (mask & FS_MOVED_TO)
+		return FILE_ACTION_RENAMED_NEW_NAME;
+	return FILE_ACTION_MODIFIED;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Build FILE_NOTIFY_INFORMATION buffer and complete async work       */
+/* ------------------------------------------------------------------ */
+
+static void ksmbd_notify_build_response(
+		struct ksmbd_notify_watch *watch,
+		u32 action,
+		const struct qstr *file_name)
+{
+	struct ksmbd_work *work;
+	struct smb2_notify_rsp *rsp;
+	struct file_notify_information *info;
+	int name_bytes;
+	int info_len;
+	int total_rsp_len;
+	int uni_len;
+	u8 *out;
+
+	spin_lock(&watch->lock);
+	work = watch->pending_work;
+	if (!work || watch->completed) {
+		spin_unlock(&watch->lock);
+		return;
+	}
+	watch->completed = true;
+	spin_unlock(&watch->lock);
+
+	/*
+	 * Reset IOV state.  The main dispatch loop may have called
+	 * encrypt_resp() which allocated work->tr_buf and modified
+	 * the IOV entries.  Clean up so we start fresh.
+	 */
+	kfree(work->tr_buf);
+	work->tr_buf = NULL;
+	work->iov_idx = 0;
+	work->iov_cnt = 0;
+
+	rsp = smb2_get_msg(work->response_buf);
+
+	rsp->hdr.Flags |= SMB2_FLAGS_ASYNC_COMMAND;
+	rsp->hdr.Id.AsyncId = cpu_to_le64(work->async_id);
+
+	name_bytes = file_name->len * 2;
+	info_len = sizeof(struct file_notify_information) +
+		   name_bytes;
+
+	if (info_len > (int)watch->output_buf_len) {
+		rsp->hdr.Status = STATUS_NOTIFY_ENUM_DIR;
+		rsp->StructureSize = cpu_to_le16(9);
+		rsp->OutputBufferOffset = cpu_to_le16(0);
+		rsp->OutputBufferLength = cpu_to_le32(0);
+		total_rsp_len =
+			__SMB2_HEADER_STRUCTURE_SIZE +
+			SMB2_ERROR_STRUCTURE_SIZE2;
+		goto send;
+	}
+
+	out = (u8 *)rsp + __SMB2_HEADER_STRUCTURE_SIZE +
+	      sizeof(rsp->StructureSize) +
+	      sizeof(rsp->OutputBufferOffset) +
+	      sizeof(rsp->OutputBufferLength);
+	info = (struct file_notify_information *)out;
+
+	uni_len = smbConvertToUTF16(info->FileName, file_name->name,
+				    file_name->len,
+				    work->conn->local_nls, 0);
+	if (uni_len < 0)
+		uni_len = 0;
+	else
+		uni_len *= 2;
+
+	info_len = sizeof(struct file_notify_information) + uni_len;
+	if (info_len > (int)watch->output_buf_len) {
+		rsp->hdr.Status = STATUS_NOTIFY_ENUM_DIR;
+		rsp->StructureSize = cpu_to_le16(9);
+		rsp->OutputBufferOffset = cpu_to_le16(0);
+		rsp->OutputBufferLength = cpu_to_le32(0);
+		total_rsp_len =
+			__SMB2_HEADER_STRUCTURE_SIZE +
+			SMB2_ERROR_STRUCTURE_SIZE2;
+		goto send;
+	}
+
+	info->NextEntryOffset = cpu_to_le32(0);
+	info->Action = cpu_to_le32(action);
+	info->FileNameLength = cpu_to_le32(uni_len);
+
+	rsp->hdr.Status = STATUS_SUCCESS;
+	rsp->StructureSize = cpu_to_le16(9);
+	rsp->OutputBufferOffset = cpu_to_le16(
+		sizeof(struct smb2_hdr) +
+		sizeof(rsp->StructureSize) +
+		sizeof(rsp->OutputBufferOffset) +
+		sizeof(rsp->OutputBufferLength));
+	rsp->OutputBufferLength = cpu_to_le32(info_len);
+
+	total_rsp_len =
+		__SMB2_HEADER_STRUCTURE_SIZE +
+		sizeof(rsp->StructureSize) +
+		sizeof(rsp->OutputBufferOffset) +
+		sizeof(rsp->OutputBufferLength) + info_len;
+
+send:
+	if (ksmbd_iov_pin_rsp(work, rsp, total_rsp_len))
+		rsp->hdr.Status = STATUS_INSUFFICIENT_RESOURCES;
+
+	/*
+	 * Sign the response if the session requires it.
+	 * Per MS-SMB2 3.3.4.4, the final async response SHOULD
+	 * be signed.  Signing must happen before encryption.
+	 */
+	if (work->sess &&
+	    (work->sess->sign ||
+	     work->conn->ops->is_sign_req(work, SMB2_CHANGE_NOTIFY_HE)))
+		work->conn->ops->set_sign_rsp(work);
+
+	if (work->sess && work->sess->enc && work->encrypted &&
+	    work->conn->ops->encrypt_resp) {
+		int rc = work->conn->ops->encrypt_resp(work);
+
+		if (rc < 0) {
+			pr_err_ratelimited(
+				"ksmbd: notify encrypt failed: %d\n",
+				rc);
+			rsp->hdr.Status = STATUS_DATA_ERROR;
+		}
+	}
+
+	/*
+	 * The original smb2_notify handler set send_no_response = 1
+	 * to prevent the main dispatch loop from sending a response.
+	 * Clear it so ksmbd_conn_write actually transmits.
+	 */
+	work->send_no_response = 0;
+	ksmbd_conn_write(work);
+
+	if (watch->fp) {
+		spin_lock(&watch->fp->f_lock);
+		list_del_init(&work->fp_entry);
+		spin_unlock(&watch->fp->f_lock);
+	}
+
+	/* Remove from async_requests list before freeing */
+	spin_lock(&work->conn->request_lock);
+	list_del_init(&work->async_request_entry);
+	spin_unlock(&work->conn->request_lock);
+
+	ksmbd_conn_try_dequeue_request(work);
+
+	/* Decrement outstanding async count */
+	if (READ_ONCE(server_conf.max_async_credits))
+		atomic_dec(&work->conn->outstanding_async);
+
+	/*
+	 * Clear pending_work so the watch can accept a new NOTIFY
+	 * request.  Do NOT NULL out fp or destroy the mark -- the
+	 * watch persists for the lifetime of the file handle so
+	 * that events between this completion and the next NOTIFY
+	 * are buffered (MS-SMB2 3.3.1.6).
+	 */
+	spin_lock(&watch->lock);
+	watch->pending_work = NULL;
+	watch->completed = false;
+	spin_unlock(&watch->lock);
+
+	/* Drop the extra session reference taken in smb2_notify */
+	if (work->sess)
+		ksmbd_user_session_put(work->sess);
+
+	ksmbd_free_work_struct(work);
+}
+
+/**
+ * ksmbd_notify_complete_piggyback() - complete a piggyback notify work
+ * @work: the async work item from fp->blocked_works
+ * @action: FILE_ACTION_* constant
+ * @file_name: event filename
+ *
+ * Completes a CHANGE_NOTIFY work that does NOT own an fsnotify mark
+ * (a "piggyback" watch).  These works get completed when the real
+ * mark's event fires.
+ */
+static void ksmbd_notify_complete_piggyback(
+		struct ksmbd_work *work,
+		u32 action,
+		const struct qstr *file_name)
+{
+	struct smb2_notify_rsp *rsp;
+	struct file_notify_information *info;
+	int info_len;
+	int total_rsp_len;
+	int uni_len;
+	u8 *out;
+	u32 output_buf_len;
+	struct smb2_notify_req *req;
+
+	rsp = smb2_get_msg(work->response_buf);
+	req = smb2_get_msg(work->request_buf);
+	output_buf_len = le32_to_cpu(req->OutputBufferLength);
+
+	rsp->hdr.Flags |= SMB2_FLAGS_ASYNC_COMMAND;
+	rsp->hdr.Id.AsyncId = cpu_to_le64(work->async_id);
+
+	info_len = sizeof(struct file_notify_information) +
+		   file_name->len * 2;
+
+	if (info_len > (int)output_buf_len) {
+		rsp->hdr.Status = STATUS_NOTIFY_ENUM_DIR;
+		rsp->StructureSize = cpu_to_le16(9);
+		rsp->OutputBufferOffset = cpu_to_le16(0);
+		rsp->OutputBufferLength = cpu_to_le32(0);
+		total_rsp_len =
+			__SMB2_HEADER_STRUCTURE_SIZE +
+			SMB2_ERROR_STRUCTURE_SIZE2;
+		goto send;
+	}
+
+	out = (u8 *)rsp + __SMB2_HEADER_STRUCTURE_SIZE +
+	      sizeof(rsp->StructureSize) +
+	      sizeof(rsp->OutputBufferOffset) +
+	      sizeof(rsp->OutputBufferLength);
+	info = (struct file_notify_information *)out;
+
+	uni_len = smbConvertToUTF16(info->FileName, file_name->name,
+				    file_name->len,
+				    work->conn->local_nls, 0);
+	if (uni_len < 0)
+		uni_len = 0;
+	else
+		uni_len *= 2;
+
+	info_len = sizeof(struct file_notify_information) + uni_len;
+	if (info_len > (int)output_buf_len) {
+		rsp->hdr.Status = STATUS_NOTIFY_ENUM_DIR;
+		rsp->StructureSize = cpu_to_le16(9);
+		rsp->OutputBufferOffset = cpu_to_le16(0);
+		rsp->OutputBufferLength = cpu_to_le32(0);
+		total_rsp_len =
+			__SMB2_HEADER_STRUCTURE_SIZE +
+			SMB2_ERROR_STRUCTURE_SIZE2;
+		goto send;
+	}
+
+	info->NextEntryOffset = cpu_to_le32(0);
+	info->Action = cpu_to_le32(action);
+	info->FileNameLength = cpu_to_le32(uni_len);
+
+	rsp->hdr.Status = STATUS_SUCCESS;
+	rsp->StructureSize = cpu_to_le16(9);
+	rsp->OutputBufferOffset = cpu_to_le16(
+		sizeof(struct smb2_hdr) +
+		sizeof(rsp->StructureSize) +
+		sizeof(rsp->OutputBufferOffset) +
+		sizeof(rsp->OutputBufferLength));
+	rsp->OutputBufferLength = cpu_to_le32(info_len);
+
+	total_rsp_len =
+		__SMB2_HEADER_STRUCTURE_SIZE +
+		sizeof(rsp->StructureSize) +
+		sizeof(rsp->OutputBufferOffset) +
+		sizeof(rsp->OutputBufferLength) + info_len;
+
+send:
+	if (ksmbd_iov_pin_rsp(work, rsp, total_rsp_len))
+		rsp->hdr.Status = STATUS_INSUFFICIENT_RESOURCES;
+
+	/* Sign if required (before encryption) */
+	if (work->sess &&
+	    (work->sess->sign ||
+	     work->conn->ops->is_sign_req(work, SMB2_CHANGE_NOTIFY_HE)))
+		work->conn->ops->set_sign_rsp(work);
+
+	if (work->sess && work->sess->enc && work->encrypted &&
+	    work->conn->ops->encrypt_resp) {
+		int rc = work->conn->ops->encrypt_resp(work);
+
+		if (rc < 0)
+			rsp->hdr.Status = STATUS_DATA_ERROR;
+	}
+
+	/* Clear send_no_response so ksmbd_conn_write transmits */
+	work->send_no_response = 0;
+	ksmbd_conn_write(work);
+
+	/* Remove from async_requests list before freeing */
+	spin_lock(&work->conn->request_lock);
+	list_del_init(&work->async_request_entry);
+	spin_unlock(&work->conn->request_lock);
+
+	ksmbd_conn_try_dequeue_request(work);
+
+	/* Decrement outstanding async count */
+	if (READ_ONCE(server_conf.max_async_credits))
+		atomic_dec(&work->conn->outstanding_async);
+
+	/* Drop the extra session reference taken in smb2_notify */
+	if (work->sess)
+		ksmbd_user_session_put(work->sess);
+
+	ksmbd_free_work_struct(work);
+}
+
+/* ------------------------------------------------------------------ */
+/*  fsnotify callbacks                                                 */
+/* ------------------------------------------------------------------ */
+
+/*
+ * Helper: complete a pending NOTIFY work with STATUS_DELETE_PENDING
+ * when the watched directory itself is deleted (FS_DELETE_SELF).
+ */
+static void ksmbd_notify_complete_delete_pending(
+		struct ksmbd_notify_watch *watch)
+{
+	struct ksmbd_work *work;
+	struct smb2_hdr *rsp_hdr;
+
+	spin_lock(&watch->lock);
+	work = watch->pending_work;
+	if (!work || watch->completed) {
+		spin_unlock(&watch->lock);
+		return;
+	}
+	watch->completed = true;
+	watch->pending_work = NULL;
+	spin_unlock(&watch->lock);
+
+	kfree(work->tr_buf);
+	work->tr_buf = NULL;
+	work->iov_idx = 0;
+	work->iov_cnt = 0;
+	work->send_no_response = 0;
+
+	smb2_set_err_rsp(work);
+	rsp_hdr = smb2_get_msg(work->response_buf);
+	rsp_hdr->Flags |= SMB2_FLAGS_ASYNC_COMMAND;
+	rsp_hdr->Id.AsyncId = cpu_to_le64(work->async_id);
+	rsp_hdr->Status = STATUS_DELETE_PENDING;
+
+	if (work->sess &&
+	    (work->sess->sign ||
+	     work->conn->ops->is_sign_req(work, SMB2_CHANGE_NOTIFY_HE)))
+		work->conn->ops->set_sign_rsp(work);
+
+	if (work->sess && work->sess->enc && work->encrypted &&
+	    work->conn->ops->encrypt_resp)
+		work->conn->ops->encrypt_resp(work);
+
+	ksmbd_conn_write(work);
+
+	if (watch->fp) {
+		spin_lock(&watch->fp->f_lock);
+		list_del_init(&work->fp_entry);
+		spin_unlock(&watch->fp->f_lock);
+	}
+
+	spin_lock(&work->conn->request_lock);
+	list_del_init(&work->async_request_entry);
+	spin_unlock(&work->conn->request_lock);
+
+	ksmbd_conn_try_dequeue_request(work);
+
+	if (READ_ONCE(server_conf.max_async_credits))
+		atomic_dec(&work->conn->outstanding_async);
+
+	if (work->sess)
+		ksmbd_user_session_put(work->sess);
+
+	ksmbd_free_work_struct(work);
+}
+
+static int ksmbd_notify_handle_event(
+		struct fsnotify_group *group,
+		u32 mask,
+		const void *data,
+		int data_type,
+		struct inode *dir,
+		const struct qstr *file_name,
+		u32 cookie,
+		struct fsnotify_iter_info *iter_info)
+{
+	struct fsnotify_mark *inode_mark = NULL;
+	struct ksmbd_notify_watch *watch;
+	struct ksmbd_file *fp;
+	struct ksmbd_work *work, *tmp;
+	u32 smb2_filter;
+	u32 action;
+	int type;
+	LIST_HEAD(complete_list);
+
+	for (type = 0; type < FSNOTIFY_ITER_TYPE_COUNT; type++) {
+		struct fsnotify_mark *m;
+
+		m = fsnotify_iter_mark(iter_info, type);
+		if (m && m->group == group) {
+			inode_mark = m;
+			break;
+		}
+	}
+
+	if (!inode_mark)
+		return 0;
+
+	watch = container_of(inode_mark,
+			     struct ksmbd_notify_watch, mark);
+
+	/*
+	 * FS_DELETE_SELF: the watched directory itself was deleted.
+	 * Complete any pending NOTIFY with STATUS_DELETE_PENDING.
+	 */
+	if (mask & FS_DELETE_SELF) {
+		ksmbd_notify_complete_delete_pending(watch);
+		return 0;
+	}
+
+	spin_lock(&watch->lock);
+	if (watch->completed) {
+		spin_unlock(&watch->lock);
+		return 0;
+	}
+	fp = watch->fp;
+	if (!fp) {
+		spin_unlock(&watch->lock);
+		return 0;
+	}
+
+	smb2_filter = ksmbd_fsnotify_to_smb2_filter(mask);
+	if (!file_name) {
+		spin_unlock(&watch->lock);
+		return 0;
+	}
+
+	action = ksmbd_fsnotify_to_action(mask);
+
+	/*
+	 * If the event matches the filter and there's a pending
+	 * work, complete it.  Otherwise, buffer the change so it
+	 * can be delivered on the next NOTIFY request.
+	 */
+	if (smb2_filter & watch->completion_filter) {
+		if (watch->pending_work) {
+			spin_unlock(&watch->lock);
+			ksmbd_notify_build_response(watch, action,
+						    file_name);
+		} else {
+			/*
+			 * No pending NOTIFY -- buffer the event.
+			 * Limit buffered changes to prevent DoS.
+			 */
+			if (watch->buffered_count < 256) {
+				struct ksmbd_notify_change *chg;
+
+				chg = kzalloc(sizeof(*chg),
+					      GFP_ATOMIC);
+				if (chg) {
+					chg->name = kstrndup(
+						file_name->name,
+						file_name->len,
+						GFP_ATOMIC);
+					if (chg->name) {
+						chg->name_len =
+							file_name->len;
+						chg->action = action;
+						list_add_tail(
+							&chg->entry,
+							&watch->buffered_changes);
+						watch->buffered_count++;
+					} else {
+						kfree(chg);
+					}
+				}
+			}
+			spin_unlock(&watch->lock);
+		}
+	} else {
+		spin_unlock(&watch->lock);
+	}
+
+	/*
+	 * Also complete any piggyback watches on the same fp.
+	 * Re-read watch->fp under the lock since build_response
+	 * may have NULLed it when completing the primary watch.
+	 */
+	spin_lock(&watch->lock);
+	fp = watch->fp;
+	spin_unlock(&watch->lock);
+
+	if (!fp)
+		return 0;
+
+	spin_lock(&fp->f_lock);
+	list_for_each_entry_safe(work, tmp,
+				 &fp->blocked_works, fp_entry) {
+		struct smb2_hdr *hdr;
+		struct smb2_notify_req *nreq;
+		u32 cf;
+
+		hdr = smb2_get_msg(work->request_buf);
+		if (hdr->Command != SMB2_CHANGE_NOTIFY)
+			continue;
+
+		nreq = smb2_get_msg(work->request_buf);
+		cf = le32_to_cpu(nreq->CompletionFilter);
+		if (!(smb2_filter & cf))
+			continue;
+
+		list_del_init(&work->fp_entry);
+		list_add(&work->fp_entry, &complete_list);
+	}
+	spin_unlock(&fp->f_lock);
+
+	list_for_each_entry_safe(work, tmp, &complete_list, fp_entry) {
+		list_del_init(&work->fp_entry);
+		atomic_dec(&notify_watch_count);
+		if (work->conn)
+			atomic_dec(&work->conn->notify_watch_count);
+		ksmbd_notify_complete_piggyback(work, action, file_name);
+	}
+
+	return 0;
+}
+
+static void ksmbd_notify_free_mark(struct fsnotify_mark *mark)
+{
+	struct ksmbd_notify_watch *watch;
+	struct ksmbd_notify_change *chg, *tmp;
+
+	watch = container_of(mark,
+			     struct ksmbd_notify_watch, mark);
+
+	/* Free any buffered changes that were never delivered */
+	list_for_each_entry_safe(chg, tmp,
+				 &watch->buffered_changes, entry) {
+		list_del(&chg->entry);
+		kfree(chg->name);
+		kfree(chg);
+	}
+
+	atomic_dec(&notify_watch_count);
+	if (watch->conn)
+		atomic_dec(&watch->conn->notify_watch_count);
+	kfree(watch);
+}
+
+static const struct fsnotify_ops ksmbd_notify_ops = {
+	.handle_event	= ksmbd_notify_handle_event,
+	.free_mark	= ksmbd_notify_free_mark,
+};
+
+/* ------------------------------------------------------------------ */
+/*  Public API                                                         */
+/* ------------------------------------------------------------------ */
+
+/*
+ * Helper: flush one buffered change from the watch to return code.
+ * Returns 1 if a change was available, 0 otherwise.
+ * Must be called with watch->lock held.  Drops the lock.
+ */
+static int ksmbd_notify_flush_one(struct ksmbd_notify_watch *watch,
+				  u32 *out_action,
+				  struct qstr *out_name)
+{
+	struct ksmbd_notify_change *chg;
+
+	if (list_empty(&watch->buffered_changes)) {
+		spin_unlock(&watch->lock);
+		return 0;
+	}
+
+	chg = list_first_entry(&watch->buffered_changes,
+			       struct ksmbd_notify_change, entry);
+	list_del(&chg->entry);
+	watch->buffered_count--;
+	spin_unlock(&watch->lock);
+
+	*out_action = chg->action;
+	out_name->name = chg->name;
+	out_name->len = chg->name_len;
+	/* Caller must kfree(chg->name) and kfree(chg) after use */
+	kfree(chg);
+	return 1;
+}
+
+int ksmbd_notify_add_watch(struct ksmbd_file *fp,
+			   struct ksmbd_work *work,
+			   u32 completion_filter,
+			   bool watch_tree,
+			   u32 output_buf_len,
+			   void **cancel_argv)
+{
+	struct ksmbd_notify_watch *watch;
+	struct inode *inode;
+	u32 fs_mask;
+	int ret;
+
+	if (!fp || !fp->filp)
+		return -EINVAL;
+
+	inode = file_inode(fp->filp);
+	if (!S_ISDIR(inode->i_mode))
+		return -ENOTDIR;
+
+	if (!ksmbd_notify_group)
+		return -ENODEV;
+
+	/*
+	 * Reuse the existing per-handle watch if present.
+	 * This persists across NOTIFY/CANCEL cycles so that
+	 * events occurring between cancel and the next NOTIFY
+	 * are buffered and can be delivered immediately.
+	 */
+	watch = fp->notify_watch;
+	if (watch) {
+		u32 action;
+		struct qstr name;
+
+		spin_lock(&watch->lock);
+
+		/* Update parameters for the new request */
+		watch->completion_filter = completion_filter;
+		watch->watch_tree = watch_tree;
+		watch->output_buf_len = output_buf_len;
+		watch->completed = false;
+
+		/*
+		 * Check for buffered changes.  If present, we can
+		 * respond immediately without going async.
+		 */
+		if (ksmbd_notify_flush_one(watch, &action, &name)) {
+			/* Respond synchronously with buffered change.
+			 * Return -EIOCBQUEUED to tell the caller
+			 * to NOT go async -- we handle it here.
+			 */
+			struct smb2_notify_rsp *rsp;
+			struct file_notify_information *info;
+			int uni_len;
+			int info_len;
+			int total_rsp_len;
+			u8 *out;
+
+			rsp = smb2_get_msg(work->response_buf);
+			rsp->hdr.Status = STATUS_SUCCESS;
+
+			out = (u8 *)rsp +
+			      __SMB2_HEADER_STRUCTURE_SIZE +
+			      sizeof(rsp->StructureSize) +
+			      sizeof(rsp->OutputBufferOffset) +
+			      sizeof(rsp->OutputBufferLength);
+			info = (struct file_notify_information *)out;
+
+			uni_len = smbConvertToUTF16(
+				info->FileName, name.name,
+				name.len,
+				work->conn->local_nls, 0);
+			kfree(name.name);
+
+			if (uni_len < 0)
+				uni_len = 0;
+			else
+				uni_len *= 2;
+
+			info_len = sizeof(*info) + uni_len;
+			info->NextEntryOffset = cpu_to_le32(0);
+			info->Action = cpu_to_le32(action);
+			info->FileNameLength = cpu_to_le32(uni_len);
+
+			rsp->StructureSize = cpu_to_le16(9);
+			rsp->OutputBufferOffset = cpu_to_le16(
+				sizeof(struct smb2_hdr) +
+				sizeof(rsp->StructureSize) +
+				sizeof(rsp->OutputBufferOffset) +
+				sizeof(rsp->OutputBufferLength));
+			rsp->OutputBufferLength =
+				cpu_to_le32(info_len);
+
+			total_rsp_len =
+				__SMB2_HEADER_STRUCTURE_SIZE +
+				sizeof(rsp->StructureSize) +
+				sizeof(rsp->OutputBufferOffset) +
+				sizeof(rsp->OutputBufferLength) +
+				info_len;
+
+			ksmbd_iov_pin_rsp(work, rsp, total_rsp_len);
+
+			/* cancel_argv not needed -- synchronous */
+			if (cancel_argv)
+				cancel_argv[0] = NULL;
+			return -EIOCBQUEUED;
+		}
+		/* No buffered changes -- go async as usual */
+		watch->pending_work = work;
+
+		if (cancel_argv)
+			cancel_argv[0] = watch;
+
+		spin_lock(&fp->f_lock);
+		list_add(&work->fp_entry, &fp->blocked_works);
+		spin_unlock(&fp->f_lock);
+
+		return 0;
+	}
+
+	/* No existing watch -- create a new one */
+	if (atomic_inc_return(&notify_watch_count) >
+	    KSMBD_MAX_NOTIFY_WATCHES) {
+		atomic_dec(&notify_watch_count);
+		return -ENOSPC;
+	}
+
+	if (work->conn &&
+	    atomic_inc_return(&work->conn->notify_watch_count) >
+	    KSMBD_MAX_NOTIFY_WATCHES_PER_CONN) {
+		atomic_dec(&work->conn->notify_watch_count);
+		atomic_dec(&notify_watch_count);
+		return -ENOSPC;
+	}
+
+	watch = kzalloc(sizeof(*watch), KSMBD_DEFAULT_GFP);
+	if (!watch) {
+		if (work->conn)
+			atomic_dec(&work->conn->notify_watch_count);
+		atomic_dec(&notify_watch_count);
+		return -ENOMEM;
+	}
+
+	watch->fp = fp;
+	watch->pending_work = work;
+	watch->conn = work->conn;
+	watch->completion_filter = completion_filter;
+	watch->watch_tree = watch_tree;
+	watch->output_buf_len = output_buf_len;
+	watch->completed = false;
+	spin_lock_init(&watch->lock);
+	INIT_LIST_HEAD(&watch->list);
+	INIT_LIST_HEAD(&watch->buffered_changes);
+	watch->buffered_count = 0;
+
+	fsnotify_init_mark(&watch->mark, ksmbd_notify_group);
+
+	fs_mask = FS_EVENT_ON_CHILD | FS_DELETE_SELF;
+	if (completion_filter &
+	    (FILE_NOTIFY_CHANGE_FILE_NAME |
+	     FILE_NOTIFY_CHANGE_DIR_NAME |
+	     FILE_NOTIFY_CHANGE_NAME))
+		fs_mask |= FS_CREATE | FS_DELETE |
+			   FS_MOVED_FROM | FS_MOVED_TO;
+	if (completion_filter & FILE_NOTIFY_CHANGE_ATTRIBUTES)
+		fs_mask |= FS_ATTRIB;
+	if (completion_filter &
+	    (FILE_NOTIFY_CHANGE_SIZE |
+	     FILE_NOTIFY_CHANGE_LAST_WRITE))
+		fs_mask |= FS_MODIFY;
+	if (completion_filter & FILE_NOTIFY_CHANGE_LAST_ACCESS)
+		fs_mask |= FS_ACCESS;
+	if (completion_filter & FILE_NOTIFY_CHANGE_CREATION)
+		fs_mask |= FS_CREATE;
+	if (completion_filter & FILE_NOTIFY_CHANGE_SECURITY)
+		fs_mask |= FS_ATTRIB;
+	if (completion_filter & FILE_NOTIFY_CHANGE_EA)
+		fs_mask |= FS_ATTRIB;
+	if (completion_filter &
+	    (FILE_NOTIFY_CHANGE_STREAM_NAME |
+	     FILE_NOTIFY_CHANGE_STREAM_SIZE |
+	     FILE_NOTIFY_CHANGE_STREAM_WRITE))
+		fs_mask |= FS_MODIFY;
+
+	watch->mark.mask = fs_mask;
+
+	ret = fsnotify_add_inode_mark(&watch->mark, inode, 0);
+	if (ret == -EEXIST) {
+		/*
+		 * A mark already exists for this inode from another
+		 * file handle.  Piggyback on the existing mark.
+		 */
+		fsnotify_put_mark(&watch->mark);
+
+		if (cancel_argv)
+			cancel_argv[0] = NULL;
+
+		spin_lock(&fp->f_lock);
+		list_add(&work->fp_entry, &fp->blocked_works);
+		spin_unlock(&fp->f_lock);
+
+		return 0;
+	} else if (ret) {
+		pr_err_ratelimited(
+			"ksmbd: failed to add fsnotify mark: %d\n",
+			ret);
+		fsnotify_put_mark(&watch->mark);
+		return ret;
+	}
+
+	/* Attach watch to the file handle for persistence */
+	fp->notify_watch = watch;
+
+	if (cancel_argv)
+		cancel_argv[0] = watch;
+
+	spin_lock(&fp->f_lock);
+	list_add(&work->fp_entry, &fp->blocked_works);
+	spin_unlock(&fp->f_lock);
+
+	return 0;
+}
+
+void ksmbd_notify_cancel(void **argv)
+{
+	struct ksmbd_notify_watch *watch;
+	struct ksmbd_work *work;
+	struct smb2_hdr *rsp_hdr;
+
+	if (!argv)
+		return;
+
+	watch = argv[0];
+	if (!watch) {
+		/*
+		 * Piggyback watch (no fsnotify mark of its own).
+		 * argv[1] = work, argv[2] = fp.
+		 * Remove from fp->blocked_works and send STATUS_CANCELLED.
+		 */
+		struct ksmbd_file *fp;
+
+		work = argv[1];
+		fp = argv[2];
+		if (!work)
+			return;
+
+		/* Remove from fp->blocked_works if still linked */
+		if (fp) {
+			spin_lock(&fp->f_lock);
+			if (!list_empty(&work->fp_entry))
+				list_del_init(&work->fp_entry);
+			spin_unlock(&fp->f_lock);
+		}
+
+		/* Build STATUS_CANCELLED response */
+		kfree(work->tr_buf);
+		work->tr_buf = NULL;
+		work->iov_idx = 0;
+		work->iov_cnt = 0;
+		work->send_no_response = 0;
+
+		smb2_set_err_rsp(work);
+
+		rsp_hdr = smb2_get_msg(work->response_buf);
+		rsp_hdr->Flags |= SMB2_FLAGS_ASYNC_COMMAND;
+		rsp_hdr->Id.AsyncId = cpu_to_le64(work->async_id);
+		rsp_hdr->Status = STATUS_CANCELLED;
+
+		/* Sign if required (before encryption) */
+		if (work->sess &&
+		    (work->sess->sign ||
+		     work->conn->ops->is_sign_req(work, SMB2_CHANGE_NOTIFY_HE)))
+			work->conn->ops->set_sign_rsp(work);
+
+		if (work->sess && work->sess->enc && work->encrypted &&
+		    work->conn->ops->encrypt_resp) {
+			int rc = work->conn->ops->encrypt_resp(work);
+
+			if (rc < 0)
+				pr_err_ratelimited(
+					"ksmbd: piggyback cancel encrypt failed: %d\n",
+					rc);
+		}
+
+		ksmbd_conn_write(work);
+
+		/* Remove from async_requests list before freeing */
+		spin_lock(&work->conn->request_lock);
+		list_del_init(&work->async_request_entry);
+		spin_unlock(&work->conn->request_lock);
+
+		ksmbd_conn_try_dequeue_request(work);
+
+		atomic_dec(&notify_watch_count);
+		if (work->conn)
+			atomic_dec(&work->conn->notify_watch_count);
+
+		/* Decrement outstanding async count */
+		if (READ_ONCE(server_conf.max_async_credits))
+			atomic_dec(&work->conn->outstanding_async);
+
+		/* Drop the extra session reference taken in smb2_notify */
+		if (work->sess)
+			ksmbd_user_session_put(work->sess);
+
+		ksmbd_free_work_struct(work);
+		return;
+	}
+
+	spin_lock(&watch->lock);
+	work = watch->pending_work;
+	if (!work || watch->completed) {
+		spin_unlock(&watch->lock);
+		return;
+	}
+	/*
+	 * Do NOT set completed = true.  The watch persists for the
+	 * lifetime of the file handle.  Clear pending_work so the
+	 * event handler knows no request is waiting, and reset
+	 * completed so the watch can accept a new NOTIFY request.
+	 */
+	watch->pending_work = NULL;
+	watch->completed = false;
+	spin_unlock(&watch->lock);
+
+	/*
+	 * Build a proper SMB2 error response with STATUS_CANCELLED.
+	 * Use smb2_set_err_rsp() to format the error body correctly
+	 * (StructureSize=9, ErrorContextCount, Reserved, ByteCount)
+	 * and pin the response with the proper wire size (73 bytes).
+	 *
+	 * The main dispatch loop may have already called
+	 * encrypt_resp() and set work->tr_buf.  Free it first
+	 * so we start with a clean IOV state.
+	 */
+	kfree(work->tr_buf);
+	work->tr_buf = NULL;
+	work->iov_idx = 0;
+	work->iov_cnt = 0;
+
+	/*
+	 * smb2_set_err_rsp uses send_no_response on pin failure,
+	 * so clear it first.  We will set it properly below.
+	 */
+	work->send_no_response = 0;
+
+	smb2_set_err_rsp(work);
+
+	/*
+	 * Now set the async flags and STATUS_CANCELLED on the
+	 * response header.  smb2_set_err_rsp left the status
+	 * as whatever it was before (from init_smb2_rsp_hdr).
+	 */
+	rsp_hdr = smb2_get_msg(work->response_buf);
+	rsp_hdr->Flags |= SMB2_FLAGS_ASYNC_COMMAND;
+	rsp_hdr->Id.AsyncId = cpu_to_le64(work->async_id);
+	rsp_hdr->Status = STATUS_CANCELLED;
+
+	ksmbd_debug(SMB,
+		    "notify_cancel: flags=0x%x async_id=%llu mid=%llu cmd=0x%x iov_idx=%d iov_cnt=%d rfc1002=%u\n",
+		    le32_to_cpu(rsp_hdr->Flags),
+		    le64_to_cpu(rsp_hdr->Id.AsyncId),
+		    le64_to_cpu(rsp_hdr->MessageId),
+		    le16_to_cpu(rsp_hdr->Command),
+		    work->iov_idx, work->iov_cnt,
+		    get_rfc1002_len(work->iov[0].iov_base));
+
+	/*
+	 * Sign the response if the session requires signing.
+	 * Per MS-SMB2 3.3.4.4, the final async response SHOULD
+	 * be signed.  Signing must happen before encryption.
+	 */
+	if (work->sess &&
+	    (work->sess->sign || work->conn->ops->is_sign_req(work, SMB2_CHANGE_NOTIFY_HE)))
+		work->conn->ops->set_sign_rsp(work);
+
+	/* Encrypt if the session requires it */
+	if (work->sess && work->sess->enc && work->encrypted &&
+	    work->conn->ops->encrypt_resp) {
+		int rc = work->conn->ops->encrypt_resp(work);
+
+		if (rc < 0)
+			pr_err_ratelimited(
+				"ksmbd: notify cancel encrypt failed: %d\n",
+				rc);
+	}
+
+	ksmbd_conn_write(work);
+
+	if (watch->fp) {
+		spin_lock(&watch->fp->f_lock);
+		list_del_init(&work->fp_entry);
+		spin_unlock(&watch->fp->f_lock);
+	}
+
+	/* Remove from async_requests list before freeing */
+	spin_lock(&work->conn->request_lock);
+	list_del_init(&work->async_request_entry);
+	spin_unlock(&work->conn->request_lock);
+
+	ksmbd_conn_try_dequeue_request(work);
+
+	/* Decrement outstanding async count */
+	if (READ_ONCE(server_conf.max_async_credits))
+		atomic_dec(&work->conn->outstanding_async);
+
+	/* Drop the extra session reference taken in smb2_notify */
+	if (work->sess)
+		ksmbd_user_session_put(work->sess);
+
+	ksmbd_free_work_struct(work);
+
+	/*
+	 * Do NOT destroy the mark or NULL out fp.  The watch
+	 * persists for the lifetime of the file handle so that
+	 * events occurring after this cancel (and before the next
+	 * NOTIFY request) are buffered and can be delivered
+	 * immediately (MS-SMB2 3.3.1.6).
+	 */
+}
+
+/*
+ * Helper: send STATUS_NOTIFY_CLEANUP for a single async work item
+ * and free it.  Used during file close to terminate any outstanding
+ * async CHANGE_NOTIFY requests.
+ */
+static void ksmbd_notify_send_cleanup(struct ksmbd_work *work)
+{
+	struct smb2_hdr *hdr;
+
+	work->send_no_response = 0;
+	kfree(work->tr_buf);
+	work->tr_buf = NULL;
+	work->iov_idx = 0;
+	work->iov_cnt = 0;
+
+	smb2_set_err_rsp(work);
+	hdr = smb2_get_msg(work->response_buf);
+	hdr->Flags |= SMB2_FLAGS_ASYNC_COMMAND;
+	hdr->Id.AsyncId = cpu_to_le64(work->async_id);
+	hdr->Status = STATUS_NOTIFY_CLEANUP;
+
+	/* Sign if required (before encryption) */
+	if (work->sess &&
+	    (work->sess->sign ||
+	     work->conn->ops->is_sign_req(work, SMB2_CHANGE_NOTIFY_HE)))
+		work->conn->ops->set_sign_rsp(work);
+
+	if (work->sess && work->sess->enc &&
+	    work->encrypted && work->conn->ops->encrypt_resp)
+		work->conn->ops->encrypt_resp(work);
+
+	ksmbd_conn_write(work);
+
+	spin_lock(&work->conn->request_lock);
+	list_del_init(&work->async_request_entry);
+	spin_unlock(&work->conn->request_lock);
+
+	ksmbd_conn_try_dequeue_request(work);
+
+	if (READ_ONCE(server_conf.max_async_credits))
+		atomic_dec(&work->conn->outstanding_async);
+
+	if (work->sess)
+		ksmbd_user_session_put(work->sess);
+
+	ksmbd_free_work_struct(work);
+}
+
+void ksmbd_notify_cleanup_file(struct ksmbd_file *fp)
+{
+	struct ksmbd_notify_watch *watch;
+	struct ksmbd_work *work, *tmp;
+	struct smb2_hdr *hdr;
+	LIST_HEAD(cleanup_list);
+
+	if (!fp || !ksmbd_notify_group)
+		return;
+
+	/*
+	 * Handle the persistent per-handle watch first.
+	 * If there is a pending async work on the watch, complete
+	 * it with STATUS_NOTIFY_CLEANUP.  Then destroy the mark.
+	 */
+	watch = fp->notify_watch;
+	if (watch) {
+		fp->notify_watch = NULL;
+
+		spin_lock(&watch->lock);
+		work = watch->pending_work;
+		watch->pending_work = NULL;
+		watch->completed = true;
+		watch->fp = NULL;
+		spin_unlock(&watch->lock);
+
+		if (work) {
+			/* Remove from blocked_works if still linked */
+			spin_lock(&fp->f_lock);
+			if (!list_empty(&work->fp_entry))
+				list_del_init(&work->fp_entry);
+			spin_unlock(&fp->f_lock);
+
+			ksmbd_notify_send_cleanup(work);
+		}
+
+		fsnotify_destroy_mark(&watch->mark,
+				      ksmbd_notify_group);
+	}
+
+	/*
+	 * Clean up any piggyback watches (works on fp->blocked_works
+	 * that piggybacked on another handle's fsnotify mark).
+	 */
+	spin_lock(&fp->f_lock);
+	list_for_each_entry_safe(work, tmp,
+				 &fp->blocked_works, fp_entry) {
+		hdr = smb2_get_msg(work->request_buf);
+		if (hdr->Command != SMB2_CHANGE_NOTIFY)
+			continue;
+
+		list_del_init(&work->fp_entry);
+		list_add(&work->fp_entry, &cleanup_list);
+	}
+	spin_unlock(&fp->f_lock);
+
+	list_for_each_entry_safe(work, tmp, &cleanup_list, fp_entry) {
+		list_del_init(&work->fp_entry);
+		atomic_dec(&notify_watch_count);
+		if (work->conn)
+			atomic_dec(&work->conn->notify_watch_count);
+		ksmbd_notify_send_cleanup(work);
+	}
+}
+
+/* ------------------------------------------------------------------ */
+/*  Module lifecycle                                                   */
+/* ------------------------------------------------------------------ */
+
+bool ksmbd_notify_enabled(void)
+{
+	return ksmbd_notify_group != NULL;
+}
+
+int ksmbd_notify_init(void)
+{
+	/*
+	 * Disabled: kernel 6.18.x fsnotify mark lifecycle causes panics
+	 * when marks are detached during module unload or file close.
+	 * Return success with NULL group so ksmbd_notify_enabled() = false.
+	 */
+	ksmbd_notify_group = NULL;
+	pr_info("ksmbd: CHANGE_NOTIFY subsystem disabled (fsnotify compat)\n");
+	return 0;
+}
+
+void ksmbd_notify_exit(void)
+{
+	if (ksmbd_notify_group) {
+		/*
+		 * Drop the group reference.  fsnotify_put_group will
+		 * internally call fsnotify_clear_marks_by_group to
+		 * detach all marks.  Then wait for pending mark
+		 * destruction to complete before returning to the
+		 * caller (module unload), preventing use-after-free
+		 * in fsnotify event delivery paths on kernel 6.18+.
+		 */
+		fsnotify_put_group(ksmbd_notify_group);
+		fsnotify_wait_marks_destroyed();
+		ksmbd_notify_group = NULL;
+	}
+}

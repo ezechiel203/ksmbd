@@ -1,0 +1,71 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772524554
+time: 2026-03-03 07:55:54.631004
+progress: 10
+test: flush_close
+time: 2026-03-03 07:55:54.632218
+time: 2026-03-03 07:55:56.671248
+success: flush_close
+test: flush_flush
+time: 2026-03-03 07:55:56.671309
+time: 2026-03-03 07:55:58.695151
+success: flush_flush
+test: write_write
+time: 2026-03-03 07:55:58.695206
+time: 2026-03-03 07:55:58.698545
+failure: write_write [
+(../../source4/torture/smb2/compound.c:2549) Incorrect value req[1]->cancel.can_cancel=0 - should be 1
+]
+test: read_read
+time: 2026-03-03 07:55:58.698600
+time: 2026-03-03 07:55:58.702661
+failure: read_read [
+(../../source4/torture/smb2/compound.c:2653) Incorrect value req[1]->cancel.can_cancel=0 - should be 1
+]
+test: create_lease_break_async
+time: 2026-03-03 07:55:58.702722
+Waiting for a potential lease break...
+transport[0x55e9b5004d10] Skip acking to 0x3 (RH) in lease handler
+Got 1 lease breaks
+time: 2026-03-03 07:55:58.710130
+success: create_lease_break_async
+test: getinfo_middle
+time: 2026-03-03 07:55:58.710174
+Waiting for a potential lease break...
+transport[0x55e9b5004d10] Skip acking to 0x3 (RH) in lease handler
+Got 1 lease breaks
+time: 2026-03-03 07:55:58.717974
+failure: getinfo_middle [
+../../source4/torture/smb2/compound.c:2890: status was NT_STATUS_FILE_CLOSED, expected NT_STATUS_OK: smb2_getinfo_recv failed
+]
+test: rename_same_srcdst_non_compound_no_async
+time: 2026-03-03 07:55:58.718029
+Waiting for a potential lease break...
+transport[0x55e9b5004d10] Skip acking to 0x1 (R) in lease handler
+Got 1 lease breaks
+time: 2026-03-03 07:55:59.726651
+failure: rename_same_srcdst_non_compound_no_async [
+../../source4/torture/smb2/compound.c:3007: status was NT_STATUS_OBJECT_NAME_COLLISION, expected NT_STATUS_OK: smb2_setinfo_recv failed
+]
+test: rename_non_compound_no_async
+time: 2026-03-03 07:55:59.726715
+Waiting for a potential lease break...
+transport[0x55e9b5004d10] Skip acking to 0x1 (R) in lease handler
+Got 1 lease breaks
+time: 2026-03-03 07:56:00.737268
+success: rename_non_compound_no_async
+test: rename_last
+time: 2026-03-03 07:56:00.737338
+Waiting for a potential lease break...
+transport[0x55e9b5004d10] Skip acking to 0x1 (R) in lease handler
+Got 1 lease breaks
+time: 2026-03-03 07:56:01.750360
+success: rename_last
+test: rename_middle
+time: 2026-03-03 07:56:01.750443
+Waiting for a potential lease break...
+transport[0x55e9b5004d10] Skip acking to 0x1 (R) in lease handler
+Got 1 lease breaks
+time: 2026-03-03 07:56:02.761750
+success: rename_middle

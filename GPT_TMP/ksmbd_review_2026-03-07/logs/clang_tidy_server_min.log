@@ -1,0 +1,215 @@
+21258 warnings generated.
+/home/ezechiel203/ksmbd/src/core/server.c:67:12: warning: declaration uses identifier '___server_conf_set', which is a reserved identifier [bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp]
+   67 | static int ___server_conf_set(int idx, char *val)
+      |            ^~~~~~~~~~~~~~~~~~
+      |            server_conf_set
+/home/ezechiel203/ksmbd/src/core/server.c:69:10: warning: comparison of integers of different signs: 'int' and 'unsigned long' [clang-diagnostic-sign-compare]
+   69 |         if (idx >= ARRAY_SIZE(server_conf.conf))
+      |             ~~~ ^
+/home/ezechiel203/ksmbd/src/core/server.c:135:12: warning: declaration uses identifier '__process_request', which is a reserved identifier [bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp]
+  135 | static int __process_request(struct ksmbd_work *work, struct ksmbd_conn *conn,
+      |            ^~~~~~~~~~~~~~~~~
+      |            process_request
+/home/ezechiel203/ksmbd/src/core/server.c:217:39: warning: performing an implicit widening conversion to type 'unsigned long' of a multiplication performed in type 'int' [bugprone-implicit-widening-of-multiplication-result]
+  217 |                 if (time_after(jiffies, cmd_start + 10 * HZ))
+      |                                                     ^
+/home/ezechiel203/ksmbd/src/core/server.c:217:39: note: make conversion explicit to silence this warning
+  217 |                 if (time_after(jiffies, cmd_start + 10 * HZ))
+      |                                                     ^
+      |                                                     (unsigned long)(
+/usr/lib/modules/6.18.13-arch1-1/build/include/linux/jiffies.h:129:28: note: expanded from macro 'time_after'
+  129 |          typecheck(unsigned long, b) && \
+      |          ~~~~~~~~~~~~~~~~~~~~~~~~~^~
+/usr/lib/modules/6.18.13-arch1-1/build/include/linux/typecheck.h:11:9: note: expanded from macro 'typecheck'
+   11 |         typeof(x) __dummy2; \
+      |                ^
+/home/ezechiel203/ksmbd/src/core/server.c:217:39: note: perform multiplication in a wider type
+  217 |                 if (time_after(jiffies, cmd_start + 10 * HZ))
+      |                                                     ^
+      |                                                     (long)
+/usr/lib/modules/6.18.13-arch1-1/build/include/linux/jiffies.h:129:28: note: expanded from macro 'time_after'
+  129 |          typecheck(unsigned long, b) && \
+      |                                   ^
+/usr/lib/modules/6.18.13-arch1-1/build/include/linux/typecheck.h:11:9: note: expanded from macro 'typecheck'
+   11 |         typeof(x) __dummy2; \
+      |                ^
+/home/ezechiel203/ksmbd/src/core/server.c:238:13: warning: declaration uses identifier '__handle_ksmbd_work', which is a reserved identifier [bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp]
+  238 | static bool __handle_ksmbd_work(struct ksmbd_work *work,
+      |             ^~~~~~~~~~~~~~~~~~~
+      |             handle_ksmbd_work
+/home/ezechiel203/ksmbd/src/core/server.c:604:42: warning: performing an implicit widening conversion to type 'unsigned long' of a multiplication performed in type 'int' [bugprone-implicit-widening-of-multiplication-result]
+  604 |         if (time_after(jiffies, start_jiffies + 30 * HZ))
+      |                                                 ^
+/home/ezechiel203/ksmbd/src/core/server.c:604:42: note: make conversion explicit to silence this warning
+  604 |         if (time_after(jiffies, start_jiffies + 30 * HZ))
+      |                                                 ^
+      |                                                 (unsigned long)(
+/usr/lib/modules/6.18.13-arch1-1/build/include/linux/jiffies.h:129:28: note: expanded from macro 'time_after'
+  129 |          typecheck(unsigned long, b) && \
+      |          ~~~~~~~~~~~~~~~~~~~~~~~~~^~
+/usr/lib/modules/6.18.13-arch1-1/build/include/linux/typecheck.h:11:9: note: expanded from macro 'typecheck'
+   11 |         typeof(x) __dummy2; \
+      |                ^
+/home/ezechiel203/ksmbd/src/core/server.c:604:42: note: perform multiplication in a wider type
+  604 |         if (time_after(jiffies, start_jiffies + 30 * HZ))
+      |                                                 ^
+      |                                                 (long)
+/usr/lib/modules/6.18.13-arch1-1/build/include/linux/jiffies.h:129:28: note: expanded from macro 'time_after'
+  129 |          typecheck(unsigned long, b) && \
+      |                                   ^
+/usr/lib/modules/6.18.13-arch1-1/build/include/linux/typecheck.h:11:9: note: expanded from macro 'typecheck'
+   11 |         typeof(x) __dummy2; \
+      |                ^
+/home/ezechiel203/ksmbd/src/core/server.c:719:16: warning: comparison of integers of different signs: 'int' and 'unsigned long' [clang-diagnostic-sign-compare]
+  719 |         for (i = 0; i < ARRAY_SIZE(server_conf.conf); i++) {
+      |                     ~ ^
+/home/ezechiel203/ksmbd/src/core/server.c:728:29: warning: narrowing conversion from 'int' to signed type 'short' is implementation-defined [bugprone-narrowing-conversions]
+  728 |         server_conf.min_protocol = ksmbd_min_protocol();
+      |                                    ^
+/home/ezechiel203/ksmbd/src/core/server.c:729:29: warning: narrowing conversion from 'int' to signed type 'short' is implementation-defined [bugprone-narrowing-conversions]
+  729 |         server_conf.max_protocol = ksmbd_max_protocol();
+      |                                    ^
+/home/ezechiel203/ksmbd/src/core/server.c:738:64: warning: unused parameter 'ctrl' [clang-diagnostic-unused-parameter]
+  738 | static void server_ctrl_handle_init(struct server_ctrl_struct *ctrl)
+      |                                                                ^
+/home/ezechiel203/ksmbd/src/core/server.c:767:65: warning: unused parameter 'ctrl' [clang-diagnostic-unused-parameter]
+  767 | static void server_ctrl_handle_reset(struct server_ctrl_struct *ctrl)
+      |                                                                 ^
+/home/ezechiel203/ksmbd/src/core/server.c:817:12: warning: declaration uses identifier '__queue_ctrl_work', which is a reserved identifier [bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp]
+  817 | static int __queue_ctrl_work(int type)
+      |            ^~~~~~~~~~~~~~~~~
+      |            queue_ctrl_work
+/home/ezechiel203/ksmbd/src/core/server.c:843:47: warning: unused parameter 'class' [clang-diagnostic-unused-parameter]
+  843 | static ssize_t stats_show(const struct class *class, const struct class_attribute *attr,
+      |                                               ^
+/home/ezechiel203/ksmbd/src/core/server.c:843:84: warning: unused parameter 'attr' [clang-diagnostic-unused-parameter]
+  843 | static ssize_t stats_show(const struct class *class, const struct class_attribute *attr,
+      |                                                                                    ^
+/home/ezechiel203/ksmbd/src/core/server.c:865:6: warning: Out of bound access to memory after the end of 'state' [clang-analyzer-security.ArrayBound]
+  865 |                           state[cur_state],
+      |                           ^~~~~~~~~~~~~~~~
+/home/ezechiel203/ksmbd/src/core/server.c:860:27: note: Left side of '||' is false
+  860 |         unsigned int cur_state = READ_ONCE(server_conf.state);
+      |                                  ^
+/usr/lib/modules/6.18.13-arch1-1/build/include/asm-generic/rwonce.h:49:2: note: expanded from macro 'READ_ONCE'
+   49 |         compiletime_assert_rwonce_type(x);                              \
+      |         ^
+/usr/lib/modules/6.18.13-arch1-1/build/include/asm-generic/rwonce.h:36:21: note: expanded from macro 'compiletime_assert_rwonce_type'
+   36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
+      |                            ^
+/usr/lib/modules/6.18.13-arch1-1/build/include/linux/compiler_types.h:576:3: note: expanded from macro '__native_word'
+  576 |         (sizeof(t) == sizeof(char) || sizeof(t) == sizeof(short) || \
+      |          ^
+/home/ezechiel203/ksmbd/src/core/server.c:860:27: note: Left side of '||' is false
+  860 |         unsigned int cur_state = READ_ONCE(server_conf.state);
+      |                                  ^
+/usr/lib/modules/6.18.13-arch1-1/build/include/asm-generic/rwonce.h:49:2: note: expanded from macro 'READ_ONCE'
+   49 |         compiletime_assert_rwonce_type(x);                              \
+      |         ^
+/usr/lib/modules/6.18.13-arch1-1/build/include/asm-generic/rwonce.h:36:21: note: expanded from macro 'compiletime_assert_rwonce_type'
+   36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
+      |                            ^
+/usr/lib/modules/6.18.13-arch1-1/build/include/linux/compiler_types.h:576:3: note: expanded from macro '__native_word'
+  576 |         (sizeof(t) == sizeof(char) || sizeof(t) == sizeof(short) || \
+      |          ^
+/home/ezechiel203/ksmbd/src/core/server.c:860:27: note: Left side of '||' is true
+  860 |         unsigned int cur_state = READ_ONCE(server_conf.state);
+      |                                  ^
+/usr/lib/modules/6.18.13-arch1-1/build/include/asm-generic/rwonce.h:49:2: note: expanded from macro 'READ_ONCE'
+   49 |         compiletime_assert_rwonce_type(x);                              \
+      |         ^
+/usr/lib/modules/6.18.13-arch1-1/build/include/asm-generic/rwonce.h:36:21: note: expanded from macro 'compiletime_assert_rwonce_type'
+   36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
+      |                            ^
+/usr/lib/modules/6.18.13-arch1-1/build/include/linux/compiler_types.h:577:28: note: expanded from macro '__native_word'
+  577 |          sizeof(t) == sizeof(int) || sizeof(t) == sizeof(long))
+      |                                   ^
+/home/ezechiel203/ksmbd/src/core/server.c:860:27: note: Taking false branch
+  860 |         unsigned int cur_state = READ_ONCE(server_conf.state);
+      |                                  ^
+/usr/lib/modules/6.18.13-arch1-1/build/include/asm-generic/rwonce.h:49:2: note: expanded from macro 'READ_ONCE'
+   49 |         compiletime_assert_rwonce_type(x);                              \
+      |         ^
+/usr/lib/modules/6.18.13-arch1-1/build/include/asm-generic/rwonce.h:36:2: note: expanded from macro 'compiletime_assert_rwonce_type'
+   36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
+      |         ^
+/usr/lib/modules/6.18.13-arch1-1/build/include/linux/compiler_types.h:615:2: note: expanded from macro 'compiletime_assert'
+  615 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+      |         ^
+/usr/lib/modules/6.18.13-arch1-1/build/include/linux/compiler_types.h:603:2: note: expanded from macro '_compiletime_assert'
+  603 |         __compiletime_assert(condition, msg, prefix, suffix)
+      |         ^
+/usr/lib/modules/6.18.13-arch1-1/build/include/linux/compiler_types.h:595:3: note: expanded from macro '__compiletime_assert'
+  595 |                 if (!(condition))                                       \
+      |                 ^
+/home/ezechiel203/ksmbd/src/core/server.c:860:27: note: Loop condition is false.  Exiting loop
+  860 |         unsigned int cur_state = READ_ONCE(server_conf.state);
+      |                                  ^
+/usr/lib/modules/6.18.13-arch1-1/build/include/asm-generic/rwonce.h:49:2: note: expanded from macro 'READ_ONCE'
+   49 |         compiletime_assert_rwonce_type(x);                              \
+      |         ^
+/usr/lib/modules/6.18.13-arch1-1/build/include/asm-generic/rwonce.h:36:2: note: expanded from macro 'compiletime_assert_rwonce_type'
+   36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
+      |         ^
+/usr/lib/modules/6.18.13-arch1-1/build/include/linux/compiler_types.h:615:2: note: expanded from macro 'compiletime_assert'
+  615 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+      |         ^
+/usr/lib/modules/6.18.13-arch1-1/build/include/linux/compiler_types.h:603:2: note: expanded from macro '_compiletime_assert'
+  603 |         __compiletime_assert(condition, msg, prefix, suffix)
+      |         ^
+/usr/lib/modules/6.18.13-arch1-1/build/include/linux/compiler_types.h:587:2: note: expanded from macro '__compiletime_assert'
+  587 |         do {                                                            \
+      |         ^
+/home/ezechiel203/ksmbd/src/core/server.c:862:6: note: Assuming the condition is true
+  862 |         if (cur_state >= ARRAY_SIZE(state))
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/ezechiel203/ksmbd/src/core/server.c:862:2: note: Taking true branch
+  862 |         if (cur_state >= ARRAY_SIZE(state))
+      |         ^
+/home/ezechiel203/ksmbd/src/core/server.c:865:6: note: Access of 'state' at index 4, while it holds only 4 'const char *' elements
+  865 |                           state[cur_state],
+      |                           ^~~~~~~~~~~~~~~~
+/home/ezechiel203/ksmbd/src/core/server.c:871:54: warning: unused parameter 'class' [clang-diagnostic-unused-parameter]
+  871 | static ssize_t kill_server_store(const struct class *class,
+      |                                                      ^
+/home/ezechiel203/ksmbd/src/core/server.c:872:36: warning: unused parameter 'attr' [clang-diagnostic-unused-parameter]
+  872 |                                  const struct class_attribute *attr, const char *buf,
+      |                                                                ^
+/home/ezechiel203/ksmbd/src/core/server.c:880:10: warning: narrowing conversion from 'size_t' (aka 'unsigned long') to signed type 'ssize_t' (aka 'long') is implementation-defined [bugprone-narrowing-conversions]
+  880 |                 return len;
+      |                        ^
+/home/ezechiel203/ksmbd/src/core/server.c:888:9: warning: narrowing conversion from 'size_t' (aka 'unsigned long') to signed type 'ssize_t' (aka 'long') is implementation-defined [bugprone-narrowing-conversions]
+  888 |         return len;
+      |                ^
+/home/ezechiel203/ksmbd/src/core/server.c:896:47: warning: unused parameter 'class' [clang-diagnostic-unused-parameter]
+  896 | static ssize_t debug_show(const struct class *class, const struct class_attribute *attr,
+      |                                               ^
+/home/ezechiel203/ksmbd/src/core/server.c:896:84: warning: unused parameter 'attr' [clang-diagnostic-unused-parameter]
+  896 | static ssize_t debug_show(const struct class *class, const struct class_attribute *attr,
+      |                                                                                    ^
+/home/ezechiel203/ksmbd/src/core/server.c:905:16: warning: comparison of integers of different signs: 'int' and 'unsigned long' [clang-diagnostic-sign-compare]
+  905 |         for (i = 0; i < ARRAY_SIZE(debug_type_strings); i++) {
+      |                     ~ ^
+/home/ezechiel203/ksmbd/src/core/server.c:907:29: warning: narrowing conversion from 'ssize_t' (aka 'long') to signed type 'int' is implementation-defined [bugprone-narrowing-conversions]
+  907 |                         pos = sysfs_emit_at(buf, sz, "[%s] ", debug_type_strings[i]);
+      |                                                  ^
+/home/ezechiel203/ksmbd/src/core/server.c:909:29: warning: narrowing conversion from 'ssize_t' (aka 'long') to signed type 'int' is implementation-defined [bugprone-narrowing-conversions]
+  909 |                         pos = sysfs_emit_at(buf, sz, "%s ", debug_type_strings[i]);
+      |                                                  ^
+/home/ezechiel203/ksmbd/src/core/server.c:913:27: warning: narrowing conversion from 'ssize_t' (aka 'long') to signed type 'int' is implementation-defined [bugprone-narrowing-conversions]
+  913 |         sz += sysfs_emit_at(buf, sz, "\n");
+      |                                  ^
+/home/ezechiel203/ksmbd/src/core/server.c:918:48: warning: unused parameter 'class' [clang-diagnostic-unused-parameter]
+  918 | static ssize_t debug_store(const struct class *class, const struct class_attribute *attr,
+      |                                                ^
+/home/ezechiel203/ksmbd/src/core/server.c:918:85: warning: unused parameter 'attr' [clang-diagnostic-unused-parameter]
+  918 | static ssize_t debug_store(const struct class *class, const struct class_attribute *attr,
+      |                                                                                     ^
+/home/ezechiel203/ksmbd/src/core/server.c:926:16: warning: comparison of integers of different signs: 'int' and 'unsigned long' [clang-diagnostic-sign-compare]
+  926 |         for (i = 0; i < ARRAY_SIZE(debug_type_strings); i++) {
+      |                     ~ ^
+/home/ezechiel203/ksmbd/src/core/server.c:944:9: warning: narrowing conversion from 'size_t' (aka 'unsigned long') to signed type 'ssize_t' (aka 'long') is implementation-defined [bugprone-narrowing-conversions]
+  944 |         return len;
+      |                ^
+Suppressed 21219 warnings (21219 in non-user code).
+Use -header-filter=.* to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.

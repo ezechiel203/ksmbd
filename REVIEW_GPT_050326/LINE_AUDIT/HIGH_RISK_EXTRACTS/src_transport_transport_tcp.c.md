@@ -1,0 +1,48 @@
+# src/transport/transport_tcp.c
+
+Risk-tagged lines (LOCK/LIFETIME/WAIT_LOOP/ERROR_PATH/MEM_BOUNDS/PROTO_GATE):
+
+- L00033 [LIFETIME|] `static atomic_t active_num_conn;`
+- L00117 [MEM_BOUNDS|] `	t = kzalloc(sizeof(*t), KSMBD_DEFAULT_GFP);`
+- L00130 [MEM_BOUNDS|] `		memcpy(&conn->inet6_addr, &client_sk->sk->sk_v6_daddr, 16);`
+- L00191 [MEM_BOUNDS|] `	memcpy(new, iov, sizeof(*iov) * nr_segs);`
+- L00215 [ERROR_PATH|] `		return -ENOMEM;`
+- L00227 [ERROR_PATH|] `		pr_err("cannot start conn thread\n");`
+- L00268 [ERROR_PATH|] `			goto skip_max_ip_conns_limit;`
+- L00284 [LOCK|] `		spin_lock(&conn_hash[bkt].lock);`
+- L00323 [LOCK|] `		spin_unlock(&conn_hash[bkt].lock);`
+- L00332 [LIFETIME|] `		    atomic_inc_return(&active_num_conn) > server_conf.max_connections) {`
+- L00334 [LIFETIME|] `					    atomic_read(&active_num_conn));`
+- L00335 [LIFETIME|] `			atomic_dec(&active_num_conn);`
+- L00347 [LIFETIME|] `				atomic_dec(&active_num_conn);`
+- L00405 [ERROR_PATH|] `		return -ENOMEM;`
+- L00444 [WAIT_LOOP|] `			usleep_range(1000, 2000);`
+- L00491 [ERROR_PATH|] `		return -ENOMEM;`
+- L00496 [ERROR_PATH|] `			goto out;`
+- L00502 [ERROR_PATH|] `			goto out;`
+- L00509 [ERROR_PATH|] `			goto out;`
+- L00639 [LIFETIME|] `		atomic_dec(&active_num_conn);`
+- L00661 [ERROR_PATH|] `		pr_err("Failed to shutdown socket: %d\n", ret);`
+- L00683 [ERROR_PATH|] `			pr_err("Can't create socket for ipv6, fallback to ipv4: %d\n", ret);`
+- L00687 [ERROR_PATH|] `			pr_err("Can't create socket for ipv4: %d\n", ret);`
+- L00688 [ERROR_PATH|] `			goto out_clear;`
+- L00726 [ERROR_PATH|] `		pr_err("Failed to set SO_BINDTODEVICE: %d\n", ret);`
+- L00727 [ERROR_PATH|] `		goto out_error;`
+- L00745 [ERROR_PATH|] `		pr_err("Failed to bind socket: %d\n", ret);`
+- L00746 [ERROR_PATH|] `		goto out_error;`
+- L00751 [ERROR_PATH|] `		pr_err("Port listen() error: %d\n", ret);`
+- L00752 [ERROR_PATH|] `		goto out_error;`
+- L00758 [ERROR_PATH|] `		pr_err("Can't start ksmbd main kthread: %d\n", ret);`
+- L00759 [ERROR_PATH|] `		goto out_error;`
+- L00776 [LOCK|] `	mutex_lock(&iface_list_lock);`
+- L00779 [LOCK|] `			mutex_unlock(&iface_list_lock);`
+- L00783 [LOCK|] `	mutex_unlock(&iface_list_lock);`
+- L00858 [ERROR_PATH|] `		pr_err("failed to stop forker thread\n");`
+- L00867 [LOCK|] `	mutex_lock(&iface_list_lock);`
+- L00882 [LOCK|] `	mutex_unlock(&iface_list_lock);`
+- L00892 [MEM_BOUNDS|] `	iface = kzalloc(sizeof(struct interface), KSMBD_DEFAULT_GFP);`
+- L00900 [LOCK|] `	mutex_lock(&iface_list_lock);`
+- L00902 [LOCK|] `	mutex_unlock(&iface_list_lock);`
+- L00918 [LOCK|] `			mutex_lock(&iface_list_lock);`
+- L00925 [LOCK|] `			mutex_unlock(&iface_list_lock);`
+- L00926 [ERROR_PATH|] `			return -ENOMEM;`

@@ -1,0 +1,16 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772499898
+time: 2026-03-03 01:04:58.017964
+progress: 2
+test: maximum_allowed
+time: 2026-03-03 01:04:58.021834
+Checked SEC_PRIV_RESTORE for S-1-5-21-832487465-288393751-518940937-65535 - No
+Checked SEC_PRIV_BACKUP for S-1-5-21-832487465-288393751-518940937-65535 - No
+Checked SEC_PRIV_SECURITY for S-1-5-21-832487465-288393751-518940937-65535 - No
+time: 2026-03-03 01:05:01.179140
+success: maximum_allowed
+test: read_only
+time: 2026-03-03 01:05:01.179195
+time: 2026-03-03 01:05:01.531147
+success: read_only

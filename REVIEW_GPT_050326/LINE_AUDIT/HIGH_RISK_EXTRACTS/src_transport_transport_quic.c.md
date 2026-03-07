@@ -1,0 +1,162 @@
+# src/transport/transport_quic.c
+
+Risk-tagged lines (LOCK/LIFETIME/WAIT_LOOP/ERROR_PATH/MEM_BOUNDS/PROTO_GATE):
+
+- L00333 [LIFETIME|] `static atomic_t			 quic_active_conns;`
+- L00369 [ERROR_PATH|] `		return -ERANGE;`
+- L00391 [ERROR_PATH|] `		return -EINVAL;`
+- L00401 [ERROR_PATH|] `			return -EINVAL;`
+- L00407 [ERROR_PATH|] `			return -EINVAL;`
+- L00417 [ERROR_PATH|] `			return -EINVAL;`
+- L00431 [ERROR_PATH|] `	return -EINVAL; /* unreachable */`
+- L00480 [ERROR_PATH|] `		return -EINVAL;`
+- L00489 [MEM_BOUNDS|] `	memcpy(p, QUIC_HKDF_LABEL_PREFIX, strlen(QUIC_HKDF_LABEL_PREFIX));`
+- L00491 [MEM_BOUNDS|] `	memcpy(p, label, strlen(label));`
+- L00497 [MEM_BOUNDS|] `		memcpy(p, context, ctx_len);`
+- L00511 [ERROR_PATH|] `		goto out_free;`
+- L00663 [ERROR_PATH|] `		pr_warn_ratelimited("QUIC: cannot allocate AES cipher for HP: %ld\n",`
+- L00669 [ERROR_PATH|] `		pr_warn_ratelimited("QUIC: AES HP key setup failed\n");`
+- L00725 [MEM_BOUNDS|] `	memcpy(nonce, iv, QUIC_AEAD_IV_SIZE);`
+- L00735 [ERROR_PATH|] `		goto free_tfm;`
+- L00739 [ERROR_PATH|] `		goto free_tfm;`
+- L00744 [ERROR_PATH|] `		goto free_tfm;`
+- L00751 [ERROR_PATH|] `		goto free_req;`
+- L00762 [MEM_BOUNDS|] `	work_buf = kmalloc(work_len, GFP_KERNEL);`
+- L00765 [ERROR_PATH|] `		goto free_aad;`
+- L00769 [MEM_BOUNDS|] `		memcpy(work_buf, in, in_len);`
+- L00771 [MEM_BOUNDS|] `		memcpy(work_buf, in, in_len);`
+- L00795 [MEM_BOUNDS|] `			memcpy(out, work_buf, copy_len);`
+- L00859 [MEM_BOUNDS|] `	memcpy(tx_info.key,  write_key,  TLS_CIPHER_AES_GCM_128_KEY_SIZE);`
+- L00860 [MEM_BOUNDS|] `	memcpy(tx_info.iv,   write_iv,   TLS_CIPHER_AES_GCM_128_IV_SIZE);`
+- L00861 [MEM_BOUNDS|] `	memcpy(tx_info.salt, write_salt, TLS_CIPHER_AES_GCM_128_SALT_SIZE);`
+- L00867 [ERROR_PATH|] `		pr_warn_ratelimited("QUIC: kTLS TLS_TX setup failed: %d\n", ret);`
+- L00874 [MEM_BOUNDS|] `	memcpy(rx_info.key,  read_key,  TLS_CIPHER_AES_GCM_128_KEY_SIZE);`
+- L00875 [MEM_BOUNDS|] `	memcpy(rx_info.iv,   read_iv,   TLS_CIPHER_AES_GCM_128_IV_SIZE);`
+- L00876 [MEM_BOUNDS|] `	memcpy(rx_info.salt, read_salt, TLS_CIPHER_AES_GCM_128_SALT_SIZE);`
+- L00881 [ERROR_PATH|] `		pr_warn_ratelimited("QUIC: kTLS TLS_RX setup failed: %d\n", ret);`
+- L01007 [ERROR_PATH|] `		return -EPERM;`
+- L01009 [LOCK|] `	spin_lock(&quic_tools_pid_lock);`
+- L01011 [LOCK|] `	spin_unlock(&quic_tools_pid_lock);`
+- L01036 [ERROR_PATH|] `		return -EPERM;`
+- L01040 [ERROR_PATH|] `		return -EINVAL;`
+- L01043 [ERROR_PATH|] `		return -EINVAL;`
+- L01049 [ERROR_PATH|] `		return -EINVAL;`
+- L01062 [ERROR_PATH|] `		pr_warn_ratelimited("QUIC IPC: RSP for unknown handle %u\n",`
+- L01064 [ERROR_PATH|] `		return -ENOENT;`
+- L01075 [MEM_BOUNDS|] `		memcpy(qconn->app_crypto.write_key, rsp->write_key, key_len);`
+- L01076 [MEM_BOUNDS|] `		memcpy(qconn->app_crypto.write_iv, rsp->write_iv,`
+- L01078 [MEM_BOUNDS|] `		memcpy(qconn->app_crypto.read_key, rsp->read_key, key_len);`
+- L01079 [MEM_BOUNDS|] `		memcpy(qconn->app_crypto.read_iv, rsp->read_iv,`
+- L01147 [LOCK|] `	spin_lock(&quic_tools_pid_lock);`
+- L01149 [LOCK|] `	spin_unlock(&quic_tools_pid_lock);`
+- L01152 [ERROR_PATH|] `		pr_warn_ratelimited("QUIC: no userspace handshake daemon registered\n");`
+- L01153 [ERROR_PATH|] `		return -ENOENT;`
+- L01158 [ERROR_PATH|] `		return -ENOMEM;`
+- L01164 [ERROR_PATH|] `		return -ENOMEM;`
+- L01167 [MEM_BOUNDS|] `	req = kzalloc(sizeof(*req), GFP_KERNEL);`
+- L01171 [ERROR_PATH|] `		return -ENOMEM;`
+- L01189 [MEM_BOUNDS|] `		memcpy(req->peer_addr, &sin6->sin6_addr, 16);`
+- L01196 [MEM_BOUNDS|] `		memcpy(req->peer_addr + 12, &sin->sin_addr, 4);`
+- L01203 [MEM_BOUNDS|] `	memcpy(req->client_hello, qconn->crypto_buf, req->client_hello_len);`
+- L01236 [ERROR_PATH|] `		pr_warn_ratelimited("QUIC IPC: handle allocation failed\n");`
+- L01255 [ERROR_PATH|] `		pr_warn_ratelimited("QUIC IPC: send REQ failed: %d\n", ret);`
+- L01256 [ERROR_PATH|] `		goto out_remove;`
+- L01263 [ERROR_PATH|] `		pr_warn_ratelimited("QUIC IPC: handshake timeout (handle=%u)\n",`
+- L01265 [ERROR_PATH|] `		goto out_remove;`
+- L01359 [MEM_BOUNDS|] `		memcpy(fp, reason, reason_len);`
+- L01371 [MEM_BOUNDS|] `	memcpy(p, qconn->scid, qconn->scid_len);`
+- L01376 [MEM_BOUNDS|] `	memcpy(p, qconn->dcid, qconn->dcid_len);`
+- L01400 [MEM_BOUNDS|] `	memcpy(p, frame, frame_len);`
+- L01503 [ERROR_PATH|] `					goto done_ack;`
+- L01507 [ERROR_PATH|] `					goto done_ack;`
+- L01543 [MEM_BOUNDS|] `					memcpy(qconn->crypto_buf +`
+- L01633 [MEM_BOUNDS|] `		memcpy(p, qconn->scid, qconn->scid_len);`
+- L01638 [MEM_BOUNDS|] `		memcpy(p, qconn->dcid, qconn->dcid_len);`
+- L01680 [MEM_BOUNDS|] `		memcpy(p, data, chunk);`
+- L01727 [LOCK|] `	spin_lock(&quic_conn_table_lock);`
+- L01729 [LOCK|] `	spin_unlock(&quic_conn_table_lock);`
+- L01734 [LOCK|] `	spin_lock(&quic_conn_table_lock);`
+- L01736 [LOCK|] `	spin_unlock(&quic_conn_table_lock);`
+- L01749 [MEM_BOUNDS|] `	qconn = kzalloc(sizeof(*qconn), KSMBD_DEFAULT_GFP);`
+- L01753 [MEM_BOUNDS|] `	qconn->stream_buf = kvmalloc(QUIC_STREAM_BUF_SIZE, KSMBD_DEFAULT_GFP);`
+- L01814 [ERROR_PATH|] `		return -EINVAL;`
+- L01821 [ERROR_PATH|] `		return -EINVAL;`
+- L01823 [ERROR_PATH|] `		return -EINVAL;`
+- L01825 [ERROR_PATH|] `		return -EINVAL;`
+- L01829 [ERROR_PATH|] `		return -EINVAL;`
+- L01837 [ERROR_PATH|] `		return -EINVAL;`
+- L01842 [ERROR_PATH|] `		return -EINVAL;`
+- L01846 [ERROR_PATH|] `		return -EINVAL;`
+- L01848 [ERROR_PATH|] `		return -EINVAL;`
+- L01849 [MEM_BOUNDS|] `	memcpy(dcid_out, p, dcid_len);`
+- L01856 [ERROR_PATH|] `		return -EINVAL;`
+- L01860 [ERROR_PATH|] `		return -EINVAL;`
+- L01862 [ERROR_PATH|] `		return -EINVAL;`
+- L01863 [MEM_BOUNDS|] `	memcpy(scid_out, p, scid_len);`
+- L01877 [ERROR_PATH|] `		return -EINVAL;`
+- L01925 [ERROR_PATH|] `		return -ENOMEM;`
+- L01928 [MEM_BOUNDS|] `	memcpy(qconn->stream_buf + qconn->stream_len, data, len);`
+- L01970 [ERROR_PATH|] `			return -ESHUTDOWN;`
+- L01973 [ERROR_PATH|] `			return -EAGAIN;`
+- L01982 [MEM_BOUNDS|] `			memcpy(buf, qconn->stream_buf, to_read);`
+- L01984 [MEM_BOUNDS|] `			memmove(qconn->stream_buf,`
+- L01993 [ERROR_PATH|] `			return -EAGAIN;`
+- L01996 [ERROR_PATH|] `				return -EAGAIN;`
+- L02000 [WAIT_LOOP|] `		wait_event_interruptible_timeout(qconn->wait,`
+- L02021 [ERROR_PATH|] ` * and return -ENOTCONN.  Full 1-RTT encryption is the production path;`
+- L02058 [ERROR_PATH|] `		return -ENOTCONN;`
+- L02064 [MEM_BOUNDS|] `	memcpy(p, qconn->scid, qconn->scid_len);`
+- L02111 [ERROR_PATH|] `			return -ESHUTDOWN;`
+- L02116 [WAIT_LOOP|] `			usleep_range(1000, 2000);`
+- L02211 [LIFETIME|] `		atomic_dec(&quic_active_conns);`
+- L02230 [MEM_BOUNDS|] `	t = kzalloc(sizeof(*t), KSMBD_DEFAULT_GFP);`
+- L02257 [MEM_BOUNDS|] `		memcpy(&conn->inet6_addr, &sin6->sin6_addr, 16);`
+- L02261 [MEM_BOUNDS|] `		memcpy(&conn->inet_addr,`
+- L02295 [ERROR_PATH|] `		return -ENOMEM;`
+- L02307 [LOCK|] `		spin_lock(&conn_hash[bkt].lock);`
+- L02317 [LOCK|] `		spin_unlock(&conn_hash[bkt].lock);`
+- L02325 [ERROR_PATH|] `			return -EAGAIN;`
+- L02349 [ERROR_PATH|] `		pr_err("QUIC: cannot start connection handler: %ld\n",`
+- L02356 [LIFETIME|] `	atomic_inc(&quic_active_conns);`
+- L02408 [MEM_BOUNDS|] `	memcpy(p, scid, scid_len);`
+- L02413 [MEM_BOUNDS|] `	memcpy(p, dcid, dcid_len);`
+- L02459 [ERROR_PATH|] `		return -EINVAL;`
+- L02469 [ERROR_PATH|] `		return -EINVAL;`
+- L02473 [ERROR_PATH|] `	if (!remaining) return -EINVAL;`
+- L02476 [ERROR_PATH|] `		return -EINVAL;`
+- L02481 [ERROR_PATH|] `		return -EINVAL;`
+- L02484 [ERROR_PATH|] `		return -EINVAL;`
+- L02489 [ERROR_PATH|] `		return -EINVAL;`
+- L02496 [ERROR_PATH|] `			return -EINVAL;`
+- L02562 [LIFETIME|] `	rcu_read_lock();`
+- L02564 [LIFETIME|] `	rcu_read_unlock();`
+- L02585 [LIFETIME|] `	    atomic_read(&quic_active_conns) >= (int)server_conf.max_connections) {`
+- L02592 [ERROR_PATH|] `		pr_warn_ratelimited("QUIC: cannot allocate connection\n");`
+- L02597 [MEM_BOUNDS|] `	memcpy(qconn->dcid, dcid, dcid_len);`
+- L02601 [MEM_BOUNDS|] `	memcpy(qconn->scid, scid, scid_len);`
+- L02604 [MEM_BOUNDS|] `	memcpy(&qconn->peer, peer, peer_len);`
+- L02611 [ERROR_PATH|] `		pr_warn_ratelimited("QUIC: Initial secret derivation failed: %d\n",`
+- L02649 [LOCK|] `		spin_lock(&quic_tools_pid_lock);`
+- L02651 [LOCK|] `		spin_unlock(&quic_tools_pid_lock);`
+- L02670 [ERROR_PATH|] `				pr_warn_ratelimited(`
+- L02700 [ERROR_PATH|] `					pr_warn_ratelimited(`
+- L02721 [ERROR_PATH|] `				pr_warn_ratelimited(`
+- L02777 [LOCK|] `	spin_lock(&quic_conn_table_lock);`
+- L02787 [LOCK|] `	spin_unlock(&quic_conn_table_lock);`
+- L02903 [MEM_BOUNDS|] `	pkt_buf = kmalloc(QUIC_MAX_PKT_SIZE, KSMBD_DEFAULT_GFP);`
+- L02905 [ERROR_PATH|] `		pr_err("QUIC: RX thread: cannot allocate packet buffer\n");`
+- L02906 [ERROR_PATH|] `		return -ENOMEM;`
+- L02931 [WAIT_LOOP|] `			wait_event_interruptible_timeout(`
+- L02943 [ERROR_PATH|] `				pr_warn_ratelimited("QUIC: recvmsg error: %d\n", ret);`
+- L02974 [MEM_BOUNDS|] `							memcpy(dcid, pkt_buf + 6, dl);`
+- L02979 [MEM_BOUNDS|] `								memcpy(scid,`
+- L03041 [ERROR_PATH|] `			pr_err("QUIC: cannot create IPv6 UDP socket: %d, trying IPv4\n",`
+- L03046 [ERROR_PATH|] `			pr_err("QUIC: cannot create IPv4 UDP socket: %d\n", ret);`
+- L03087 [ERROR_PATH|] `		pr_err("QUIC: cannot bind UDP socket to port %u: %d\n",`
+- L03116 [LIFETIME|] `	atomic_set(&quic_active_conns, 0);`
+- L03121 [ERROR_PATH|] `		pr_err("QUIC: cannot register handshake genl family: %d\n", ret);`
+- L03136 [ERROR_PATH|] `		pr_err("QUIC: cannot start RX thread: %d\n", ret);`
+- L03176 [LOCK|] `	spin_lock(&quic_conn_table_lock);`
+- L03181 [LOCK|] `	spin_unlock(&quic_conn_table_lock);`
+- L03187 [LOCK|] `	spin_lock(&quic_tools_pid_lock);`
+- L03189 [LOCK|] `	spin_unlock(&quic_tools_pid_lock);`

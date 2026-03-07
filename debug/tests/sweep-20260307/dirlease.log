@@ -1,0 +1,426 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772889377
+time: 2026-03-07 13:16:17.772504
+progress: 18
+test: v2_request_parent
+time: 2026-03-07 13:16:17.773434
+time: 2026-03-07 13:16:17.785712
+success: v2_request_parent
+test: v2_request
+time: 2026-03-07 13:16:17.785751
+transport[0x55b2a6186d20] acking to 0x1 (R) in lease handler
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+transport[0x55b2a6186d20] Skip acking to 0x1 (R) in lease handler
+Got 1 lease breaks
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+transport[0x55b2a6186d20] acking to 0x0 () in lease handler
+Got 1 lease breaks
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+transport[0x55b2a6186d20] acking to 0x0 () in lease handler
+Got 1 lease breaks
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+time: 2026-03-07 13:16:33.827074
+success: v2_request
+test: oplocks
+time: 2026-03-07 13:16:33.827124
+time: 2026-03-07 13:16:33.844444
+success: oplocks
+test: leases
+time: 2026-03-07 13:16:33.844486
+time: 2026-03-07 13:16:33.856446
+success: leases
+test: seteof
+time: 2026-03-07 13:16:33.856486
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+transport[0x55b2a6186d20] acking to 0x0 () in lease handler
+Got 1 lease breaks
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+transport[0x55b2a6186d20] acking to 0x0 () in lease handler
+Got 1 lease breaks
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+transport[0x55b2a6186d20] acking to 0x0 () in lease handler
+Got 1 lease breaks
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+transport[0x55b2a6186d20] acking to 0x0 () in lease handler
+Got 1 lease breaks
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+time: 2026-03-07 13:16:39.886994
+success: seteof
+test: setdos
+time: 2026-03-07 13:16:39.887035
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+transport[0x55b2a6186d20] acking to 0x0 () in lease handler
+Got 1 lease breaks
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+transport[0x55b2a6186d20] acking to 0x0 () in lease handler
+Got 1 lease breaks
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+transport[0x55b2a6186d20] acking to 0x0 () in lease handler
+Got 1 lease breaks
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+transport[0x55b2a6186d20] acking to 0x0 () in lease handler
+Got 1 lease breaks
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+time: 2026-03-07 13:16:45.918306
+success: setdos
+test: setbtime
+time: 2026-03-07 13:16:45.918353
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+transport[0x55b2a6450180] acking to 0x0 () in lease handler
+Got 1 lease breaks
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+transport[0x55b2a6450180] acking to 0x0 () in lease handler
+Got 1 lease breaks
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+transport[0x55b2a6450180] acking to 0x0 () in lease handler
+Got 1 lease breaks
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+transport[0x55b2a6450180] acking to 0x0 () in lease handler
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+time: 2026-03-07 13:16:52.956542
+success: setbtime
+test: setmtime
+time: 2026-03-07 13:16:52.956580
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+transport[0x55b2a648daa0] acking to 0x0 () in lease handler
+Got 1 lease breaks
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+transport[0x55b2a648daa0] acking to 0x0 () in lease handler
+Got 1 lease breaks
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+transport[0x55b2a648daa0] acking to 0x0 () in lease handler
+Got 1 lease breaks
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+transport[0x55b2a648daa0] acking to 0x0 () in lease handler
+Got 1 lease breaks
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+time: 2026-03-07 13:16:58.988773
+success: setmtime
+test: setctime
+time: 2026-03-07 13:16:58.988815
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+transport[0x55b2a64939f0] acking to 0x0 () in lease handler
+Got 1 lease breaks
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+transport[0x55b2a64939f0] acking to 0x0 () in lease handler
+Got 1 lease breaks
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+transport[0x55b2a64939f0] acking to 0x0 () in lease handler
+Got 1 lease breaks
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+transport[0x55b2a64939f0] acking to 0x0 () in lease handler
+Got 1 lease breaks
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+time: 2026-03-07 13:17:05.019696
+success: setctime
+test: setatime
+time: 2026-03-07 13:17:05.019738
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+transport[0x55b2a64959f0] acking to 0x0 () in lease handler
+Got 1 lease breaks
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+transport[0x55b2a64959f0] acking to 0x0 () in lease handler
+Got 1 lease breaks
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+transport[0x55b2a64959f0] acking to 0x0 () in lease handler
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+transport[0x55b2a64959f0] acking to 0x0 () in lease handler
+Got 1 lease breaks
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+time: 2026-03-07 13:17:12.050302
+success: setatime
+test: rename
+time: 2026-03-07 13:17:12.050341
+
+Rename subtest: samedir-correct-parent-leaskey
+==================================
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+
+Rename subtest: samedir-wrong-parent-leaskey
+==================================
+Waiting for a potential lease break...
+transport[0x55b2a6499d30] Skip acking to 0x0 () in lease handler
+Got 1 lease breaks
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+
+Rename subtest: samedir-no-parent-leaskey
+==================================
+Waiting for a potential lease break...
+transport[0x55b2a6499d30] Skip acking to 0x0 () in lease handler
+Got 1 lease breaks
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+
+Rename subtest: otherdir-correct-srcparent-leaskey
+==================================
+Waiting for a potential lease break...
+transport[0x55b2a6499d30] acking to 0x0 () in lease handler
+Got 1 lease breaks
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+
+Rename subtest: otherdir-correct-dstparent-leaskey
+==================================
+Waiting for a potential lease break...
+transport[0x55b2a6499d30] Skip acking to 0x0 () in lease handler
+Got 1 lease breaks
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+
+Rename subtest: otherdir-wrong-parent-leaskey
+==================================
+Waiting for a potential lease break...
+transport[0x55b2a6499d30] Skip acking to 0x0 () in lease handler
+Got 1 lease breaks
+Waiting for a potential lease break...
+transport[0x55b2a6499d30] acking to 0x0 () in lease handler
+Got 1 lease breaks
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+
+Rename subtest: otherdir-no-parent-leaskey
+==================================
+Waiting for a potential lease break...
+transport[0x55b2a6499d30] Skip acking to 0x0 () in lease handler
+Got 1 lease breaks
+Waiting for a potential lease break...
+transport[0x55b2a6499d30] acking to 0x0 () in lease handler
+Got 1 lease breaks
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+time: 2026-03-07 13:17:20.117879
+success: rename
+test: rename_dst_parent
+time: 2026-03-07 13:17:20.117936
+transport[0x55b2a6499d30] acking to 0x1 (R) in lease handler
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+transport[0x55b2a6499d30] closing handle
+time: 2026-03-07 13:17:22.135165
+success: rename_dst_parent
+test: overwrite
+time: 2026-03-07 13:17:22.135204
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+transport[0x55b2a6499d30] Skip acking to 0x0 () in lease handler
+Got 1 lease breaks
+transport[0x55b2a6499d30] Skip acking to 0x0 () in lease handler
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+time: 2026-03-07 13:17:24.156332
+success: overwrite
+test: hardlink
+time: 2026-03-07 13:17:24.156368
+
+Hardlink subtest: samedir-correct-parent-leaskey
+==================================
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+
+Hardlink subtest: samedir-wrong-parent-leaskey
+==================================
+Waiting for a potential lease break...
+transport[0x55b2a6499d30] Skip acking to 0x0 () in lease handler
+Got 1 lease breaks
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+
+Hardlink subtest: samedir-no-parent-leaskey
+==================================
+Waiting for a potential lease break...
+transport[0x55b2a6499d30] Skip acking to 0x0 () in lease handler
+Got 1 lease breaks
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+
+Hardlink subtest: otherdir-correct-srcparent-leaskey
+==================================
+Waiting for a potential lease break...
+transport[0x55b2a6499d30] acking to 0x0 () in lease handler
+Got 1 lease breaks
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+
+Hardlink subtest: otherdir-correct-dstparent-leaskey
+==================================
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+
+Hardlink subtest: otherdir-wrong-parent-leaskey
+==================================
+Waiting for a potential lease break...
+transport[0x55b2a6499d30] acking to 0x0 () in lease handler
+Got 1 lease breaks
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+
+Hardlink subtest: otherdir-no-parent-leaskey
+==================================
+Waiting for a potential lease break...
+transport[0x55b2a6499d30] acking to 0x0 () in lease handler
+Got 1 lease breaks
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+time: 2026-03-07 13:17:34.236839
+success: hardlink
+test: unlink_same_set_and_close
+time: 2026-03-07 13:17:34.236894
+First open test directory with RH-dirlease
+Second open test directory with RH-dirlease
+First open test file
+Second open test file
+Sets delete on close on open 2
+Closing first handle that has not set delete-on-close, this should not trigger a break
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Closing second and last handle will remove the file, trigger a break on first directory with different parent lease key
+Waiting for a potential lease break...
+transport[0x55b2a6499d30] acking to 0x0 () in lease handler
+Got 1 lease breaks
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+time: 2026-03-07 13:17:36.266716
+success: unlink_same_set_and_close
+test: unlink_different_set_and_close
+time: 2026-03-07 13:17:36.266759
+First open test directory with RH-dirlease
+Second open test directory with RH-dirlease
+First open test file
+Second open test file
+Client 1 sets delete on close
+Closing first handle that has set delete-on-close, will not delete the file and not trigger a break
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Closing second and last handle will remove the file, and trigger a break as the parent lease keys don't match
+Waiting for a potential lease break...
+transport[0x55b2a6499280] Skip acking to 0x0 () in lease handler
+Got 1 lease breaks
+transport[0x55b2a6499280] Skip acking to 0x0 () in lease handler
+time: 2026-03-07 13:17:37.283669
+success: unlink_different_set_and_close
+test: unlink_same_initial_and_close
+time: 2026-03-07 13:17:37.283706
+First open test directory with RH-dirlease
+Second open test directory with RH-dirlease
+First open test file with initial delete-on-close
+Second open test file
+Closing second handle should not trigger a lease break
+Closing first handle that had initial delete-on-close, must trigger single break on directory handle 2
+Waiting for a potential lease break...
+transport[0x55b2a6499280] Skip acking to 0x0 () in lease handler
+Got 1 lease breaks
+time: 2026-03-07 13:17:37.295655
+success: unlink_same_initial_and_close
+test: unlink_different_initial_and_close
+time: 2026-03-07 13:17:37.295739
+First open test directory with RH-dirlease
+Second open test directory with RH-dirlease
+First open test file
+Second open test file
+Closing first handle that requested initial delete-on-close, will not delete the file and not trigger a break
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Closing second and last handle will remove the file, and trigger a break as the parent lease keys don't match
+Waiting for a potential lease break...
+transport[0x55b2a6499280] Skip acking to 0x0 () in lease handler
+Got 1 lease breaks
+transport[0x55b2a6499280] Skip acking to 0x0 () in lease handler
+time: 2026-03-07 13:17:38.308180
+success: unlink_different_initial_and_close

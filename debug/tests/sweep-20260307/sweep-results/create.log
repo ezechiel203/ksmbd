@@ -1,0 +1,152 @@
+smbtorture 4.23.6
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772856503
+time: 2026-03-07 04:08:23.885508
+progress: 18
+test: gentest
+time: 2026-03-07 04:08:23.885832
+time: 2026-03-07 04:08:26.423830
+failure: gentest [
+(../../source4/torture/smb2/create.c:253) Incorrect value for access_mask 0x0de0fe00 - should be 0x0df0fe00
+]
+test: blob
+time: 2026-03-07 04:08:26.423883
+Testing alloc size
+Testing durable open
+Testing query maximal access
+Testing timewarp
+Testing query_on_disk
+Testing unknown tag
+Testing bad tag length 0
+Testing bad tag length 1
+Testing bad tag length 2
+Testing bad tag length 3
+Testing tag length 4
+Testing tag length 5
+Testing tag length 6
+Testing tag length 7
+Testing tag length 8
+Testing tag length 16
+Testing tag length 17
+Testing tag length 34
+time: 2026-03-07 04:08:27.342894
+success: blob
+test: open
+time: 2026-03-07 04:08:27.342944
+Checking SMB2 Open
+time: 2026-03-07 04:08:30.191291
+success: open
+test: brlocked
+time: 2026-03-07 04:08:30.191356
+Testing SMB2 open with a byte range locked file
+time: 2026-03-07 04:08:30.736408
+success: brlocked
+test: multi
+time: 2026-03-07 04:08:30.736455
+Testing SMB2 Open with multiple connections
+waiting for replies
+File 0 returned status NT_STATUS_OK
+File 1 returned status NT_STATUS_OBJECT_NAME_COLLISION
+File 2 returned status NT_STATUS_OBJECT_NAME_COLLISION
+time: 2026-03-07 04:08:31.361969
+success: multi
+test: delete
+time: 2026-03-07 04:08:31.362067
+Checking SMB2_OPEN for delete on a readonly file.
+time: 2026-03-07 04:08:31.932937
+success: delete
+test: leading-slash
+time: 2026-03-07 04:08:31.932998
+Trying to create a directory with leading slash on path
+time: 2026-03-07 04:08:32.128202
+success: leading-slash
+test: impersonation
+time: 2026-03-07 04:08:32.128251
+Testing SMB2 open with an invalid impersonation level.
+time: 2026-03-07 04:08:32.561949
+success: impersonation
+test: aclfile
+time: 2026-03-07 04:08:32.562015
+Testing nttrans create with sec_desc on files
+basic create
+adding a new ACE
+creating a file with an initial ACL
+WARNING!: ../../source4/torture/smb2/util.c:761: security descriptors don't match!
+
+WARNING!: got:
+
+WARNING!: expected:
+
+time: 2026-03-07 04:08:32.922398
+failure: aclfile [
+../../source4/torture/smb2/create.c:637) condition violated: smb2_util_verify_sd(tctx, tree, io.out.file.handle, sd)
+]
+test: acldir
+time: 2026-03-07 04:08:32.922446
+Testing nttrans create with sec_desc on directories
+basic create
+adding a new ACE
+creating a file with an initial ACL
+WARNING!: ../../source4/torture/smb2/util.c:761: security descriptors don't match!
+
+WARNING!: got:
+
+WARNING!: expected:
+
+time: 2026-03-07 04:08:33.295233
+failure: acldir [
+../../source4/torture/smb2/create.c:637) condition violated: smb2_util_verify_sd(tctx, tree, io.out.file.handle, sd)
+]
+test: nulldacl
+time: 2026-03-07 04:08:33.295284
+TESTING SEC_DESC WITH A NULL DACL
+creating a file with a empty sd
+get the original sd
+set NULL DACL
+get the sd
+time: 2026-03-07 04:08:33.620300
+failure: nulldacl [
+../../source4/torture/smb2/create.c:1353: DACL has been created on the server!
+]
+test: mkdir-dup
+time: 2026-03-07 04:08:33.620409
+Testing SMB2 Create Directory with multiple connections
+waiting for replies
+time: 2026-03-07 04:08:34.470441
+success: mkdir-dup
+test: mkdir-visible
+time: 2026-03-07 04:08:34.471475
+Testing SMB2 Create Directory is visible with multiple connections
+time: 2026-03-07 04:08:35.131709
+failure: mkdir-visible [
+../../source4/torture/smb2/create.c:1901: status was NT_STATUS_OK, expected NT_STATUS_ACCESS_DENIED: torture_smb2_testfile(file_ok)
+]
+test: dir-alloc-size
+time: 2026-03-07 04:08:35.131755
+Checking initial allocation size on directories
+Got directory alloc size: 0
+time: 2026-03-07 04:08:35.786935
+success: dir-alloc-size
+test: dosattr_tmp_dir
+time: 2026-03-07 04:08:35.786982
+time: 2026-03-07 04:08:36.258855
+success: dosattr_tmp_dir
+test: quota-fake-file
+time: 2026-03-07 04:08:36.258902
+time: 2026-03-07 04:08:36.431984
+success: quota-fake-file
+test: path-length
+time: 2026-03-07 04:08:36.432030
+time: 2026-03-07 04:08:36.552834
+skip: path-length [
+Interactive Test: Skipping... (enable with --interactive)
+]
+test: bench-path-contention-shared
+time: 2026-03-07 04:08:36.552892
+Opening 4 connections
+Opened 4 connections with qdepth=1 => 4 loops
+Running for 10 seconds
+1.00 second: open[num/s=21,avslat=0.026085,minlat=0.000000,maxlat=0.049571] close[num/s=21,avslat=0.020842,minlat=0.000000,maxlat=0.033009]     2.00 second: open[num/s=23,avslat=0.023845,minlat=0.000000,maxlat=0.028580] close[num/s=23,avslat=0.020126,minlat=0.000000,maxlat=0.023867]     3.00 second: open[num/s=23,avslat=0.024154,minlat=0.000000,maxlat=0.026346] close[num/s=22,avslat=0.020350,minlat=0.000000,maxlat=0.022329]     4.00 second: open[num/s=6,avslat=0.024249,minlat=0.000000,maxlat=0.030669] close[num/s=6,avslat=0.020588,minlat=0.000000,maxlat=0.023437]     5.01 second: open[num/s=3,avslat=0.063236,minlat=0.000000,maxlat=0.090076] close[num/s=4,avslat=0.383232,minlat=0.000000,maxlat=1.386669]     6.06 second: open[num/s=2,avslat=0.061433,minlat=0.000000,maxlat=0.072145] close[num/s=1,avslat=0.054879,minlat=0.000000,maxlat=0.054879]     7.06 second: open[num/s=21,avslat=0.023553,minlat=0.000000,maxlat=0.026372] close[num/s=22,avslat=0.062940,minlat=0.000000,maxlat=0.974256]     8.06 second: open[num/s=23,avslat=0.023325,minlat=0.000000,maxlat=0.025710] close[num/s=23,avslat=0.020221,minlat=0.000000,maxlat=0.033579]     9.06 second: open[num/s=20,avslat=0.027818,minlat=0.000000,maxlat=0.064438] close[num/s=19,avslat=0.023225,minlat=0.000000,maxlat=0.048571]     10.06 second: open[num/s=16,avslat=0.026015,minlat=0.000000,maxlat=0.090076] close[num/s=16,avslat=0.035774,minlat=0.000000,maxlat=1.386669]
+10.06 seconds
+time: 2026-03-07 04:08:47.323929
+success: bench-path-contention-shared

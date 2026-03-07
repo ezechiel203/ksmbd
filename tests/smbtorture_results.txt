@@ -1,0 +1,413 @@
+========================================
+ KSMBD smbtorture Full Suite
+ Target: //127.0.0.1:445/test
+ User:   root
+ Date:   Mon Mar  2 15:18:02 UTC 2026
+========================================
+
+--- smb2.create ---
+FAIL: smb2.create.gentest
+    failure: gentest [
+PASS: smb2.create.blob
+PASS: smb2.create.open
+PASS: smb2.create.brlocked
+PASS: smb2.create.multi
+PASS: smb2.create.delete
+PASS: smb2.create.leading-slash
+PASS: smb2.create.aclfile
+PASS: smb2.create.acldir
+FAIL: smb2.create.nulldacl
+    failure: nulldacl [
+
+--- smb2.getinfo ---
+PASS: smb2.getinfo.complex.complex
+PASS: smb2.getinfo.fsinfo.fsinfo
+PASS: smb2.getinfo.qfs_buffercheck.qfs_buffercheck
+PASS: smb2.getinfo.qfile_buffercheck.qfile_buffercheck
+PASS: smb2.getinfo.qsec_buffercheck.qsec_buffercheck
+PASS: smb2.getinfo.granted.granted
+
+--- smb2.setinfo ---
+PASS: smb2.setinfo.setinfo
+
+--- smb2.dir ---
+PASS: smb2.dir.find.find
+PASS: smb2.dir.one.one
+PASS: smb2.dir.sorted.sorted
+PASS: smb2.dir.fixed.fixed
+PASS: smb2.dir.many.many
+PASS: smb2.dir.modify.modify
+PASS: smb2.dir.file-index.file-index
+
+--- smb2.read ---
+PASS: smb2.read.eof.eof
+PASS: smb2.read.position.position
+PASS: smb2.read.dir.dir
+PASS: smb2.read.access.access
+
+--- smb2.lock ---
+PASS: smb2.lock.valid-request.valid-request
+SKIP: smb2.lock.rw-none.rw-none
+PASS: smb2.lock.rw-shared.rw-shared
+PASS: smb2.lock.rw-exclusive.rw-exclusive
+PASS: smb2.lock.auto-unlock.auto-unlock
+PASS: smb2.lock.lock.lock
+PASS: smb2.lock.async.async
+PASS: smb2.lock.cancel.cancel
+PASS: smb2.lock.unlock.unlock
+PASS: smb2.lock.multiple-unlock.multiple-unlock
+PASS: smb2.lock.stacking.stacking
+PASS: smb2.lock.contend.contend
+PASS: smb2.lock.context.context
+PASS: smb2.lock.range.range
+PASS: smb2.lock.overlap.overlap
+PASS: smb2.lock.truncate.truncate
+PASS: smb2.lock.errorcode.errorcode
+PASS: smb2.lock.zerobytelength.zerobytelength
+PASS: smb2.lock.zerobyteread.zerobyteread
+
+--- smb2.ioctl ---
+PASS: smb2.ioctl.req_resume_key.req_resume_key
+PASS: smb2.ioctl.req_two_resume_keys.req_two_resume_keys
+PASS: smb2.ioctl.copy_chunk_simple.copy_chunk_simple
+PASS: smb2.ioctl.copy_chunk_multi.copy_chunk_multi
+PASS: smb2.ioctl.copy_chunk_tiny.copy_chunk_tiny
+PASS: smb2.ioctl.copy_chunk_overwrite.copy_chunk_overwrite
+PASS: smb2.ioctl.copy_chunk_append.copy_chunk_append
+PASS: smb2.ioctl.copy_chunk_limits.copy_chunk_limits
+PASS: smb2.ioctl.copy_chunk_bad_key.copy_chunk_bad_key
+PASS: smb2.ioctl.copy_chunk_src_exceed.copy_chunk_src_exceed
+PASS: smb2.ioctl.copy_chunk_zero_length.copy_chunk_zero_length
+SKIP: smb2.ioctl.network_interface_info.network_interface_info
+PASS: smb2.ioctl.sparse_file_flag.sparse_file_flag
+PASS: smb2.ioctl.sparse_qar.sparse_qar
+SKIP: smb2.ioctl.trim_simple.trim_simple
+
+--- smb2.oplock ---
+PASS: smb2.oplock.exclusive1.exclusive1
+PASS: smb2.oplock.exclusive2.exclusive2
+PASS: smb2.oplock.exclusive3.exclusive3
+PASS: smb2.oplock.exclusive4.exclusive4
+PASS: smb2.oplock.exclusive5.exclusive5
+FAIL: smb2.oplock.exclusive6.exclusive6
+    failure: exclusive6 [
+PASS: smb2.oplock.batch1.batch1
+PASS: smb2.oplock.batch2.batch2
+PASS: smb2.oplock.batch3.batch3
+PASS: smb2.oplock.batch4.batch4
+PASS: smb2.oplock.batch5.batch5
+PASS: smb2.oplock.batch6.batch6
+PASS: smb2.oplock.batch7.batch7
+PASS: smb2.oplock.batch8.batch8
+PASS: smb2.oplock.batch9.batch9
+PASS: smb2.oplock.batch10.batch10
+PASS: smb2.oplock.batch11.batch11
+PASS: smb2.oplock.batch12.batch12
+PASS: smb2.oplock.batch13.batch13
+PASS: smb2.oplock.batch14.batch14
+PASS: smb2.oplock.batch15.batch15
+FAIL: smb2.oplock.batch19.batch19
+    failure: batch19 [
+FAIL: smb2.oplock.batch20.batch20
+    failure: batch20 [
+PASS: smb2.oplock.doc.doc
+
+--- smb2.lease ---
+PASS: smb2.lease.request.request
+PASS: smb2.lease.upgrade.upgrade
+PASS: smb2.lease.upgrade2.upgrade2
+PASS: smb2.lease.upgrade3.upgrade3
+PASS: smb2.lease.break.break
+FAIL: smb2.lease.break_twice.break_twice
+    failure: break_twice [
+FAIL: smb2.lease.oplock.oplock
+    failure: oplock [
+PASS: smb2.lease.lock1.lock1
+FAIL: smb2.lease.timeout.timeout
+    failure: timeout [
+FAIL: smb2.lease.unlink.unlink
+    failure: unlink [
+PASS: smb2.lease.multibreak.multibreak
+PASS: smb2.lease.nobreakself.nobreakself
+PASS: smb2.lease.v2_epoch1.v2_epoch1
+PASS: smb2.lease.v2_epoch2.v2_epoch2
+PASS: smb2.lease.v2_epoch3.v2_epoch3
+FAIL: smb2.lease.v2_rename.v2_rename
+    failure: v2_rename [
+FAIL: smb2.lease.v2_complex1.v2_complex1
+    failure: v2_complex1 [
+PASS: smb2.lease.v2_complex2.v2_complex2
+PASS: smb2.lease.complex1.complex1
+PASS: smb2.lease.statopen.statopen
+PASS: smb2.lease.statopen2.statopen2
+
+--- smb2.notify ---
+FAIL: smb2.notify.valid-req.valid-req
+    failure: valid-req [
+FAIL: smb2.notify.dir.dir
+    failure: dir [
+PASS: smb2.notify.file.file
+PASS: smb2.notify.mask.mask
+FAIL: smb2.notify.mask-change.mask-change
+    failure: mask-change [
+PASS: smb2.notify.overflow.overflow
+FAIL: smb2.notify.rec.rec
+    failure: rec [
+PASS: smb2.notify.double.double
+FAIL: smb2.notify.tree.tree
+    failure: tree [
+PASS: smb2.notify.close.close
+PASS: smb2.notify.basedir.basedir
+
+--- smb2.compound ---
+FAIL: smb2.compound.related1.related1
+     #14 /usr/lib/libc.so.6(__libc_start_main+0x89) [0x7f84f680e7f9]
+     #15 smbtorture(_start+0x25) [0x561711af5d55]
+    timeout: the monitored command dumped core
+FAIL: smb2.compound.related2.related2
+    failure: related2 [
+FAIL: smb2.compound.related3.related3
+    failure: related3 [
+FAIL: smb2.compound.related4.related4
+    failure: related4 [
+FAIL: smb2.compound.related5.related5
+    failure: related5 [
+FAIL: smb2.compound.related6.related6
+    failure: related6 [
+FAIL: smb2.compound.related7.related7
+    failure: related7 [
+FAIL: smb2.compound.related8.related8
+    failure: related8 [
+FAIL: smb2.compound.related9.related9
+    failure: related9 [
+FAIL: smb2.compound.unrelated1.unrelated1
+    failure: unrelated1 [
+FAIL: smb2.compound.invalid1.invalid1
+    failure: invalid1 [
+FAIL: smb2.compound.invalid2.invalid2
+    failure: invalid2 [
+FAIL: smb2.compound.invalid3.invalid3
+    failure: invalid3 [
+FAIL: smb2.compound.invalid4.invalid4
+    failure: invalid4 [
+FAIL: smb2.compound.interim1.interim1
+    failure: interim1 [
+FAIL: smb2.compound.interim2.interim2
+    failure: interim2 [
+FAIL: smb2.compound.interim3.interim3
+    failure: interim3 [
+
+--- smb2.durable-open ---
+FAIL: smb2.durable-open.open-oplock.open-oplock
+    failure: open-oplock [
+FAIL: smb2.durable-open.open-lease.open-lease
+    failure: open-lease [
+FAIL: smb2.durable-open.reopen1.reopen1
+    failure: reopen1 [
+FAIL: smb2.durable-open.reopen1a.reopen1a
+    failure: reopen1a [
+FAIL: smb2.durable-open.reopen2.reopen2
+    failure: reopen2 [
+FAIL: smb2.durable-open.reopen2a.reopen2a
+    failure: reopen2a [
+FAIL: smb2.durable-open.reopen3.reopen3
+    failure: reopen3 [
+FAIL: smb2.durable-open.reopen4.reopen4
+    failure: reopen4 [
+FAIL: smb2.durable-open.reopen5.reopen5
+    failure: reopen5 [
+FAIL: smb2.durable-open.reopen6.reopen6
+    failure: reopen6 [
+FAIL: smb2.durable-open.delete_on_close1.delete_on_close1
+    failure: delete_on_close1 [
+FAIL: smb2.durable-open.delete_on_close2.delete_on_close2
+    failure: delete_on_close2 [
+FAIL: smb2.durable-open.oplock.oplock
+    failure: oplock [
+FAIL: smb2.durable-open.lease.lease
+    failure: lease [
+FAIL: smb2.durable-open.lock-oplock.lock-oplock
+    failure: lock-oplock [
+
+--- smb2.durable-v2-open ---
+FAIL: smb2.durable-v2-open.open-oplock.open-oplock
+    failure: open-oplock [
+FAIL: smb2.durable-v2-open.open-lease.open-lease
+    failure: open-lease [
+FAIL: smb2.durable-v2-open.reopen1.reopen1
+    failure: reopen1 [
+FAIL: smb2.durable-v2-open.reopen1a.reopen1a
+    failure: reopen1a [
+FAIL: smb2.durable-v2-open.reopen2.reopen2
+    failure: reopen2 [
+FAIL: smb2.durable-v2-open.reopen2b.reopen2b
+    failure: reopen2b [
+FAIL: smb2.durable-v2-open.reopen2c.reopen2c
+    failure: reopen2c [
+FAIL: smb2.durable-v2-open.lock-oplock.lock-oplock
+    failure: lock-oplock [
+FAIL: smb2.durable-v2-open.lock-lease.lock-lease
+    failure: lock-lease [
+
+--- smb2.streams ---
+FAIL: smb2.streams.io.io
+    failure: io [
+FAIL: smb2.streams.names.names
+    failure: names [
+FAIL: smb2.streams.names2.names2
+    failure: names2 [
+FAIL: smb2.streams.names3.names3
+    failure: names3 [
+FAIL: smb2.streams.rename.rename
+    failure: rename [
+FAIL: smb2.streams.rename2.rename2
+    failure: rename2 [
+FAIL: smb2.streams.delete.delete
+    failure: delete [
+FAIL: smb2.streams.dir.dir
+    failure: dir [
+FAIL: smb2.streams.sharemodes.sharemodes
+    failure: sharemodes [
+FAIL: smb2.streams.attributes1.attributes1
+    failure: attributes1 [
+FAIL: smb2.streams.attributes2.attributes2
+    failure: attributes2 [
+FAIL: smb2.streams.zero-byte.zero-byte
+    failure: zero-byte [
+FAIL: smb2.streams.create-disposition.create-disposition
+    failure: create-disposition [
+
+--- smb2.ea ---
+FAIL: smb2.ea.acl_xattr.acl_xattr
+    failure: acl_xattr [
+
+--- smb2.session ---
+FAIL: smb2.session.reconnect1.reconnect1
+    failure: reconnect1 [
+FAIL: smb2.session.reconnect2.reconnect2
+    failure: reconnect2 [
+FAIL: smb2.session.reauth1.reauth1
+    failure: reauth1 [
+FAIL: smb2.session.reauth2.reauth2
+    failure: reauth2 [
+FAIL: smb2.session.reauth3.reauth3
+    failure: reauth3 [
+FAIL: smb2.session.reauth4.reauth4
+    failure: reauth4 [
+FAIL: smb2.session.reauth6.reauth6
+    failure: reauth6 [
+FAIL: smb2.session.two_logoff.two_logoff
+    failure: two_logoff [
+FAIL: smb2.session.signing-aes-128-cmac.signing-aes-128-cmac
+    failure: signing-aes-128-cmac [
+FAIL: smb2.session.signing-aes-128-gmac.signing-aes-128-gmac
+    failure: signing-aes-128-gmac [
+FAIL: smb2.session.encryption-aes-128-ccm.encryption-aes-128-ccm
+    failure: encryption-aes-128-ccm [
+FAIL: smb2.session.encryption-aes-128-gcm.encryption-aes-128-gcm
+    failure: encryption-aes-128-gcm [
+FAIL: smb2.session.encryption-aes-256-ccm.encryption-aes-256-ccm
+    failure: encryption-aes-256-ccm [
+FAIL: smb2.session.encryption-aes-256-gcm.encryption-aes-256-gcm
+    failure: encryption-aes-256-gcm [
+
+--- smb2.dir large-files ---
+FAIL: smb2.dir.large-files.large-files
+    failure: large-files [
+
+========================================
+ smbtorture Full Suite Results
+========================================
+ PASS: 99
+ FAIL: 86
+ SKIP/TIMEOUT: 3
+ TOTAL: 188
+
+Failed tests:
+  - smb2.create.gentest
+  - smb2.create.nulldacl
+  - smb2.oplock.exclusive6.exclusive6
+  - smb2.oplock.batch19.batch19
+  - smb2.oplock.batch20.batch20
+  - smb2.lease.break_twice.break_twice
+  - smb2.lease.oplock.oplock
+  - smb2.lease.timeout.timeout
+  - smb2.lease.unlink.unlink
+  - smb2.lease.v2_rename.v2_rename
+  - smb2.lease.v2_complex1.v2_complex1
+  - smb2.notify.valid-req.valid-req
+  - smb2.notify.dir.dir
+  - smb2.notify.mask-change.mask-change
+  - smb2.notify.rec.rec
+  - smb2.notify.tree.tree
+  - smb2.compound.related1.related1
+  - smb2.compound.related2.related2
+  - smb2.compound.related3.related3
+  - smb2.compound.related4.related4
+  - smb2.compound.related5.related5
+  - smb2.compound.related6.related6
+  - smb2.compound.related7.related7
+  - smb2.compound.related8.related8
+  - smb2.compound.related9.related9
+  - smb2.compound.unrelated1.unrelated1
+  - smb2.compound.invalid1.invalid1
+  - smb2.compound.invalid2.invalid2
+  - smb2.compound.invalid3.invalid3
+  - smb2.compound.invalid4.invalid4
+  - smb2.compound.interim1.interim1
+  - smb2.compound.interim2.interim2
+  - smb2.compound.interim3.interim3
+  - smb2.durable-open.open-oplock.open-oplock
+  - smb2.durable-open.open-lease.open-lease
+  - smb2.durable-open.reopen1.reopen1
+  - smb2.durable-open.reopen1a.reopen1a
+  - smb2.durable-open.reopen2.reopen2
+  - smb2.durable-open.reopen2a.reopen2a
+  - smb2.durable-open.reopen3.reopen3
+  - smb2.durable-open.reopen4.reopen4
+  - smb2.durable-open.reopen5.reopen5
+  - smb2.durable-open.reopen6.reopen6
+  - smb2.durable-open.delete_on_close1.delete_on_close1
+  - smb2.durable-open.delete_on_close2.delete_on_close2
+  - smb2.durable-open.oplock.oplock
+  - smb2.durable-open.lease.lease
+  - smb2.durable-open.lock-oplock.lock-oplock
+  - smb2.durable-v2-open.open-oplock.open-oplock
+  - smb2.durable-v2-open.open-lease.open-lease
+  - smb2.durable-v2-open.reopen1.reopen1
+  - smb2.durable-v2-open.reopen1a.reopen1a
+  - smb2.durable-v2-open.reopen2.reopen2
+  - smb2.durable-v2-open.reopen2b.reopen2b
+  - smb2.durable-v2-open.reopen2c.reopen2c
+  - smb2.durable-v2-open.lock-oplock.lock-oplock
+  - smb2.durable-v2-open.lock-lease.lock-lease
+  - smb2.streams.io.io
+  - smb2.streams.names.names
+  - smb2.streams.names2.names2
+  - smb2.streams.names3.names3
+  - smb2.streams.rename.rename
+  - smb2.streams.rename2.rename2
+  - smb2.streams.delete.delete
+  - smb2.streams.dir.dir
+  - smb2.streams.sharemodes.sharemodes
+  - smb2.streams.attributes1.attributes1
+  - smb2.streams.attributes2.attributes2
+  - smb2.streams.zero-byte.zero-byte
+  - smb2.streams.create-disposition.create-disposition
+  - smb2.ea.acl_xattr.acl_xattr
+  - smb2.session.reconnect1.reconnect1
+  - smb2.session.reconnect2.reconnect2
+  - smb2.session.reauth1.reauth1
+  - smb2.session.reauth2.reauth2
+  - smb2.session.reauth3.reauth3
+  - smb2.session.reauth4.reauth4
+  - smb2.session.reauth6.reauth6
+  - smb2.session.two_logoff.two_logoff
+  - smb2.session.signing-aes-128-cmac.signing-aes-128-cmac
+  - smb2.session.signing-aes-128-gmac.signing-aes-128-gmac
+  - smb2.session.encryption-aes-128-ccm.encryption-aes-128-ccm
+  - smb2.session.encryption-aes-128-gcm.encryption-aes-128-gcm
+  - smb2.session.encryption-aes-256-ccm.encryption-aes-256-ccm
+  - smb2.session.encryption-aes-256-gcm.encryption-aes-256-gcm
+  - smb2.dir.large-files.large-files
+========================================

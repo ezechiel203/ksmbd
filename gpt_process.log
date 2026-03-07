@@ -1,0 +1,405 @@
+2026-02-28T13:51:25+01:00 | agent=gpt | status=active
+Actions completed:
+- Added multi-VM orchestration scripts for VM0..VM4 under vm/.
+- Created and launched VM overlays for VM0..VM4.
+- Stopped VM3 and VM4 per instruction; VM0..VM2 remain running.
+- Confirmed ksmbdctl status is running on VM0..VM2.
+- Reproduced SMB failure on VM0..VM2: NT_STATUS_CONNECTION_DISCONNECTED.
+- Added and tested targeted tolerance changes in SMB2 SESSION_SETUP parsing path.
+
+Current observations:
+- Kernel logs still show sequence during probe:
+  1) PDU length(6424065) exceeds max
+  2) SESSION_SETUP size mismatch (len=162 calc=252 sec_off=88 sec_len=164)
+  3) Invalid RFC1002 hdr bytes: 00 62 06 01
+  4) cli req too short
+
+Plan next:
+1) Re-validate which packet is interpreted as malformed pre-session frame and whether it is expected probe traffic.
+2) Isolate session-setup size computation path mismatch vs acceptable auth blob truncation.
+3) Implement minimal safe parser adjustment with strict bounds checks.
+4) Re-test on VM0..VM2 and record pass/fail matrix.
+
+2026-02-28T13:54:05+01:00 | agent=gpt | status=continuing
+- Read claude_project.log (no conflicting ownership entries).
+- Continuing active debugging on VM0..VM2 only.
+- Next immediate step: add transport-level SESSION_SETUP frame resync logic to consume trailing auth bytes when RFC length is shorter than SecurityBufferOffset+SecurityBufferLength, then rebuild/reload/retest.
+
+2026-02-28T14:00:38+01:00 | agent=gpt | status=progress
+Actions completed:
+- Implemented SESSION_SETUP transport frame-length correction in `src/core/connection.c` when RFC length is shorter than `SecurityBufferOffset + SecurityBufferLength`.
+- Rebuilt and redeployed module to VM0..VM2 (loaded srcversion moved to 84B3E35C828498ADE07DCBB).
+- Identified and fixed TCP iovec UAF race in `src/transport/transport_tcp.c` by removing shared cached iovec reuse across read/write paths and using per-call temporary iovec buffers.
+
+Validation results on VM0..VM2:
+- `smbclient -N -L` no longer disconnects; now returns ACCESS_DENIED for anonymous listing.
+- Authenticated listing with `testuser%testpass` succeeds.
+- Authenticated read/write roundtrip to `//127.0.0.1/test` succeeds (put/get/del, content verified).
+- No watchdog/soft-lockup/PDU-length/cli-req-too-short/KFENCE errors in dmesg after tests.
+
+Plan next:
+1) Keep VM0..VM2 as primary debug lanes (VM3/VM4 remain stopped by request).
+2) Expand regression matrix (compound requests, reconnect cycles, multi-client parallel IO).
+3) If anonymous browse is required, tune/share policy in userspace config and validate expected auth behavior.
+
+2026-02-28T14:01:38+01:00 | agent=gpt | status=stress-validated
+- Ran parallel authenticated SMB IO on VM0..VM2 (5 concurrent clients per VM doing put/get/delete).
+- Result: 0 failures on all three VMs.
+- Post-stress dmesg scan: no BUG/KFENCE/UAF/soft-lockup or prior framing errors.
+
+2026-02-28T14:12:20+01:00 | agent=gpt | status=extended-regression
+Extended validation completed on VM0..VM2:
+- 40 authenticated reconnect cycles per VM (`smbclient //test -c ls`): 0 failures.
+- Protocol/protection matrix:
+  - SMB2: off/sign pass, encrypt fails (expected; no SMB2 encryption support).
+  - SMB3/SMB3_11: off/sign/encrypt pass.
+- 5x stop/start lifecycle loops per VM with post-start functional check: 0 failures.
+- No kernel regressions in dmesg after loops (no BUG/KFENCE/UAF/soft-lockup/framing errors).
+
+Open note:
+- `smbclient -L` authenticated browse currently returns empty share list, while direct share access and `ksmbdctl share list --live` show configured shares (including `test` and `ipc$`). This is now a secondary userspace/RPC share-enumeration behavior gap, not a transport/session stability issue.
+
+2026-02-28T14:15:08+01:00 | agent=gpt | status=userspace-probe
+- Investigated ksmbd-tools SRVSVC path in `ksmbd-tools/mountd/rpc_srvsvc.c` and built ksmbd-tools successfully.
+- Added a targeted restricted-context relaxation for SRVSVC SHARE_ENUM_ALL and deployed rebuilt `ksmbdctl` to VM0..VM2, then restarted daemons.
+- Result: authenticated `smbclient -L` still returns empty list (no regression, but no improvement).
+- Kernel stability remains clean across VM0..VM2 (no BUG/KFENCE/UAF/framing regressions).
+- Conclusion: remaining browse-enumeration issue likely deeper in SRVSVC/NDR response compatibility path (or client expectation mismatch), while core SMB data path is currently stable and functional.
+
+2026-02-28T14:21:12+01:00 | agent=gpt | status=srvsvc-deep-dive
+- Added SRVSVC tracing in `ksmbd-tools/mountd/rpc_srvsvc.c` and captured runtime facts from VM0..VM2:
+  - SRVSVC opnum=15 (NetShareEnumAll), level=1
+  - restricted=0
+  - entries=2
+  - status=0
+- Client-side (`smbclient -d 10`) confirms server returns 2 entries in the RPC payload, but decoded `array` is null and final browse output stays empty.
+- Tried a tentative NDR array pointer adjustment in `ksmbd-tools/mountd/rpc.c`; this produced explicit Samba parse errors (`Bad Array Size`) and was reverted.
+- Current state restored to stable baseline: authenticated browse still empty, direct share operations remain fully functional and stable.
+
+2026-02-28T14:28:51+01:00 | agent=gpt | status=continued-srvsvc
+- Pulled Samba srvsvc IDL to align expected NDR semantics and attempted two additional SRVSVC serialization fixes.
+- Experiment A (srvsvc-specific array writer) caused `Bad Array Size` decode errors in smbclient and was reverted.
+- Restored stable baseline build and redeployed to VM0..VM2.
+- Current verified state:
+  - authenticated browse (`smbclient -L`) still shows empty list,
+  - direct authenticated share access/read-write remains good,
+  - no kernel regressions in VM0..VM2 logs.
+- Working hypothesis now narrowed to SRVSVC NDR field ordering/details in userspace mountd response for NetShareEnumAll level 1.
+
+2026-02-28T14:32:21+01:00 | agent=gpt | status=browse-fixed
+Resolved SRVSVC browse-enumeration gap on VM0..VM2:
+- Implemented manual `srvsvc_NetShareEnumAll` level-1 `ctr1` serialization in `ksmbd-tools/mountd/rpc_srvsvc.c` (explicit `ctr1` pointer, `count`, array pointer, deferred array count + entries).
+- Rebuilt and deployed updated `ksmbdctl`/mountd stack to VM0..VM2.
+- Validation now passes on all 3 VMs:
+  - `smbclient -L` (authenticated) lists `test` and `ipc$` with comments.
+  - direct share access `//127.0.0.1/test` and directory listing pass.
+  - kernel logs remain clean (no BUG/KFENCE/UAF/soft-lockup/framing errors).
+
+Next plan:
+1) Keep this as candidate stable fix and run one more medium-length mixed stress pass.
+2) If still clean, prepare commit-ready patch split (kernel transport/session fixes vs ksmbd-tools SRVSVC serialization fix).
+
+2026-02-28T14:33:12+01:00 | agent=gpt | status=post-fix-stress
+- Ran mixed stress after browse fix (20 cycles per VM of `smbclient -L` + put/get/del sequence).
+- Result: 0 failures on VM0..VM2.
+- Post-stress kernel checks remain clean (no BUG/KFENCE/UAF/soft-lockup/framing regressions).
+
+2026-02-28T14:52:42+01:00 | agent=gpt | status=full-feature-builds
+- Applied new build policy: kernel module compilations now use optional feature flags enabled by default for active testing.
+- Attempted full optional build including `CONFIG_SMB_INSECURE_SERVER=y`; build fails in current tree due extensive SMB1 compile breakage in `src/protocol/smb1/smb1pdu.c` (multiple missing symbols/struct fields/prototypes).
+- Built successfully with remaining optional features enabled:
+  - `EXTERNAL_SMBDIRECT=y`
+  - `CONFIG_SMB_SERVER_QUIC=y`
+  - `CONFIG_KSMBD_FRUIT=y`
+  - `CONFIG_SMB_INSECURE_SERVER=n` (temporary technical exception due above breakage)
+- Updated VM guest scripts (`vm/vm-guest-prepare.sh`, `vm/vm-guest-start.sh`) to pre-load RDMA dependency modules before `insmod`, so SMBDIRECT-enabled module loads reliably.
+- Reloaded module on VM0..VM2 (srcversion `F9268711F18755DFC099873`) and validated encrypted SMB3 browse + share access pass on all three VMs.
+
+2026-02-28T15:03:42+01:00 | agent=gpt | status=step2-then-step1-done
+Executed requested order: (2) SMB1 optional build path first, then (1) endurance run.
+
+Step 2 (all optional features compile path):
+- Full optional-feature build now succeeds with:
+  - `EXTERNAL_SMBDIRECT=y`
+  - `CONFIG_SMB_INSECURE_SERVER=y`
+  - `CONFIG_KSMBD_FRUIT=y`
+  - `CONFIG_SMB_SERVER_QUIC=y`
+- Required code fix: removed duplicate byteorder helpers in `src/core/ksmbd_md4.c` that conflicted with kernel-provided `le32_to_cpu_array` / `cpu_to_le32_array`.
+- Deployed resulting module to VM0..VM2; loaded srcversion is now `F48BDCE4CF7ADF752FBD016`.
+
+Step 1 (endurance/stability):
+- Ran 80-cycle encrypted browse+RW loops per VM, then additional concurrent encrypted RW batches.
+- Result: 0 failures across VM0..VM2.
+- Post-run kernel scans: no BUG/KFENCE/UAF/soft-lockup/framing regressions.
+
+SMB1 runtime note:
+- Build path for SMB1 is now healthy (`CONFIG_SMB_INSECURE_SERVER=y` compiles).
+- NT1 runtime negotiation attempts with smbclient currently return `NT_STATUS_INVALID_LOGON_TYPE` in this environment; SMB3 functional path remains stable.
+
+2026-02-28T15:59:24+01:00 | agent=gpt | status=quic-capability-enabled
+Host/VM capability updates for QUIC transmission-mode testing completed:
+- Added per-instance QUIC host forwards in VM launcher (`vm/run-vm-instance.sh`):
+  - TCP + UDP hostfwd `10443/11443/12443` -> guest `443`.
+- Added QUIC port mapping helper in `vm/vm-instance-config.sh` and surfaced in `vm/vm-fleet.sh` status output.
+- Added userspace proxy emulator scripts:
+  - `vm/quic-proxy-emulator.py` (TCP:443 -> abstract unix socket `@ksmbd-quic` bridge, sends `ksmbd_quic_conn_info` header)
+  - `vm/quic-proxy.sh` helper (management wrapper)
+- Restarted VM0..VM2 to apply new port forwards and kept VM3/VM4 stopped.
+- Verified kernel QUIC transport init in VM dmesg (`@ksmbd-quic`).
+- End-to-end validation over QUIC-proxy path:
+  - `smbclient` to host ports `10443/11443/12443` lists shares and accesses `//test` successfully.
+  - When proxy emulator is stopped, QUIC-port connections fail (`NT_STATUS_CONNECTION_RESET`).
+  - When proxy emulator is restarted, QUIC-port access recovers immediately.
+
+Note:
+- This is a QUIC proxy emulation bridge (decrypted stream handoff), not full RFC QUIC/TLS termination. It enables practical kernel QUIC transport path testing now, and can later be replaced by a real msquic/quiche proxy daemon.
+
+2026-02-28T16:02:46+01:00 | agent=gpt | status=quic-rfc-plan-authored
+- Added full compliance blueprint at `vm/QUIC_FULL_COMPLIANCE_PLAN.md`.
+- Plan defines architecture, required installs, hardening needs, RFC/interoperability matrix, and phased implementation path toward real SMB-over-QUIC (UDP/443 + mTLS + real QUIC stack).
+
+2026-02-28T16:11:43+01:00 | agent=gpt | status=real-quic-proxy-phase1
+- Implemented Phase-1 real QUIC proxy stack artifacts:
+  - `vm/quic-real-proxy.py` (aioquic UDP/443 listener, QUIC stream -> `@ksmbd-quic` bridge)
+  - `vm/quic-real-proxy-guest.sh` (in-VM lifecycle helper)
+  - `vm/quic-real-proxy.sh` (host-side per-instance control wrapper)
+  - `vm/quic-pki-setup.sh` (self-signed test cert bootstrap)
+  - `vm/quic-smb2-negotiate-client.py` (minimal QUIC SMB2 NEGOTIATE probe)
+  - `vm/QUIC_PROXY_REAL_USAGE.md` (operator workflow)
+- Installed `aioquic` + deps in VM0..VM2 and bootstrapped test certs under `/etc/ksmbd/quic`.
+- Started real QUIC proxy daemons on VM0..VM2 (UDP/443 listeners verified).
+- Verified QUIC stream handoff path by running minimal client probe inside VM: proxy logs show stream receipt and bridge connection (`stream-data`, `bridge-connected`) without kernel QUIC conn-info read failures in this path.
+
+Remaining for full RFC-grade interop:
+- Replace self-signed test profile with real PKI/mTLS policy,
+- implement robust client-address propagation and stream policy semantics,
+- validate with a native SMB-over-QUIC client (Windows) over UDP host-forwards.
+
+2026-02-28T16:15:30+01:00 | agent=gpt | status=quic-phase1-hardening-continued
+- Added CA/server/client PKI generation flow in `vm/quic-pki-setup.sh` (test CA signs both server and client certs).
+- Extended real proxy and probe client for cert-aware operation:
+  - `vm/quic-real-proxy.py` adds `--cafile` and `--require-client-cert`
+  - `vm/quic-smb2-negotiate-client.py` adds CA/client-cert switches
+  - `vm/quic-real-proxy-guest.sh` now starts proxy in require-client-cert mode
+- Regenerated PKI and restarted real QUIC proxy on VM0..VM2.
+- Verified QUIC stream-to-kernel bridge probes still work across VM0..VM2 (proxy logs show stream-data + bridge-connected events).
+
+Current limitation discovered:
+- With current aioquic server profile, "require-client-cert" does not yet reject no-client-cert probe as expected in this setup.
+- This confirms remaining mTLS policy enforcement work is still open for true RFC-grade interoperability/security posture.
+
+2026-02-28T16:26:09+01:00 | agent=gpt | status=quic-kernel-hardening-applied
+- Implemented kernel-side QUIC unix-socket peer credential hardening in `src/transport/transport_quic.c`:
+  - New `verify_proxy_peer()` gate in QUIC accept path.
+  - Rejects non-root unix-socket peers before conn-info parsing.
+- Rebuilt all-feature module successfully and redeployed to VM0..VM2 (srcversion `85E4227FE001A6FCB08C655`).
+- Verified enforcement by attempting non-root injection (`setpriv` uid 65534) with `vm/quic-inject-nonroot.py`:
+  - Kernel logs now show `QUIC: rejecting non-root peer (uid 65534)` on VM0..VM2.
+- Verified core SMB3 encrypted TCP path remains healthy on VM0..VM2 after hardening.
+
+2026-02-28T16:37:31+01:00 | agent=gpt | status=quic-compat-validation-expanded
+- Added kernel-side QUIC policy gate requiring `KSMBD_QUIC_F_TLS_VERIFIED` in conn-info (`transport_quic.c`).
+- Added guest validation commands in `vm/quic-real-proxy-guest.sh`:
+  - `validate-nonroot-reject`
+  - `validate-noverify-flag`
+- Added automated matrix runner `vm/quic-compat-matrix.sh`.
+- Matrix result on VM0..VM2: PASS=10 FAIL=0, covering:
+  - real QUIC probe path,
+  - non-root proxy rejection,
+  - TLS_VERIFIED flag enforcement,
+  - SMB3 encrypted baseline sanity.
+- Updated `vm/QUIC_PROXY_REAL_USAGE.md` with matrix workflow and current known limits.
+2026-02-28T16:35:00+01:00 | agent=gpt | status=commit-and-regression
+Actions completed:
+- Committed and pushed debug-phase kernel hardening patchset:
+  - 6036ee6 debug: harden SMB2 credit/session framing and TCP read path
+  - Includes updates in src/core/server.c, src/protocol/smb2/smb2_pdu_common.c, src/protocol/smb2/smb2misc.c, src/core/connection.c, src/transport/transport_tcp.c
+- Committed and pushed ignore rules for VM artifacts:
+  - 54ac9a4 gitignore: ignore vm qcow2 variants and kernel artifacts
+
+Validation results:
+- Rebuilt module on host (EXTERNAL_SMBDIRECT=n).
+- Deployed/restarted ksmbd on VM0..VM4.
+- VM0..VM4 functional matrix all PASS:
+  - anonymous browse returns ACCESS_DENIED (expected policy)
+  - authenticated browse succeeds
+  - authenticated put/get/del roundtrip succeeds
+- dmesg scans on VM0..VM4 after tests show no:
+  - soft lockup / BUG / KFENCE / KASAN
+  - PDU length overflow / cli req too short / SESSION_SETUP extension read failure
+
+Additional note:
+- VM3 initially failed insmod due RDMA unknown symbols from prior attempt.
+- After module reload cycle (and dependency normalization), VM3 loaded and passed matrix.
+
+2026-02-28T17:58:30+01:00 | agent=gpt | status=quic-triage-fastloop
+Actions completed:
+- Implemented faster failure/diagnostic behavior in `vm/smbtorture-over-quic-guest.sh`:
+  - reduced per-test timeout via `TEST_TIMEOUT_SECS` (default 45s),
+  - precheck timeout via `PRECHECK_TIMEOUT_SECS` (default 8s),
+  - shorter startup wait loops (`KSMBD_START_WAIT`, `PROXY_START_WAIT`),
+  - consecutive infra fail fast-abort (`MAX_INFRA_STREAK`, default 5),
+  - automatic diagnostic harvesting on infra (`ksmbdctl status`, sockets, process list, dmesg tail, proxy log, mountd log).
+- Added focused smoke runners for differential diagnosis:
+  - `vm/smbtorture-over-tcp-guest.sh`
+  - `vm/smbtorture-over-quic-smoke-guest.sh`
+
+Key findings:
+- Primary all-test failure driver was an invalid test setup moment: `ksmbd.ko` artifact was missing, so VM prepare could not `insmod`; this produced broad connectivity/precheck failures.
+- Rebuilt module correctly with full optional flags using explicit target:
+  - `make all EXTERNAL_SMBDIRECT=y CONFIG_SMB_INSECURE_SERVER=y CONFIG_KSMBD_FRUIT=y CONFIG_SMB_SERVER_QUIC=y`
+- TCP smoke after rebuild shows real protocol/behavior failures independent of QUIC transport:
+  - `smb2.read`: NT_STATUS_DELETE_PENDING mismatches
+  - `smb2.create`: maximal_access and create-mask mismatches
+  - `smb2.dir`: FILE_CLOSED / INVALID_PARAMETER failures
+  - `smb2.durable-v2-regressions`: PASS
+- QUIC smoke currently collapses at precheck and repeatedly destabilizes VM0, but serial log captures kernel soft-lockup in ksmbd path:
+  - lockup in `ksmbd_notify_cancel` -> `set_close_state_blocked_works` -> session teardown
+  - repeated watchdog soft lockups from `ksmbd:::ffff:*` worker thread.
+
+Current interpretation:
+- There are ksmbd implementation issues visible on plain TCP (not QUIC-specific).
+- QUIC/proxy path adds additional instability and can trigger/accelerate hangs, but root correctness bugs exist in ksmbd core paths as well.
+
+2026-02-28T19:59:20+01:00 | agent=gpt | status=fastloop-triage-progress
+Actions completed:
+- Reproduced failures with short smoke loops and strict time budgets:
+  - TCP: `vm/smbtorture-over-tcp-guest.sh` with `TEST_TIMEOUT_SECS=20..30`
+  - QUIC: `vm/smbtorture-over-quic-smoke-guest.sh`
+- Mapped a kernel NULL dereference to source and fixed it:
+  - Crash site: `smb2_query_info+0x1429` -> `src/protocol/smb2/smb2_query_set.c:864`
+  - Root cause: signed/unsigned comparison bug (`ssize_t` vs `sizeof`) allowed negative `reparse_len` to pass, then `memcpy` from NULL `reparse_buf`.
+  - Fix: require `reparse_len >= (ssize_t)sizeof(reparse_tag)` and `reparse_buf` non-NULL in both reparse-tag query handlers.
+- Addressed reproducible soft-lockup on session teardown path:
+  - Lockup stack repeatedly hit `ksmbd_notify_cancel -> set_close_state_blocked_works` spin-lock recursion.
+  - Mitigations applied:
+    1) in `src/fs/vfs_cache.c`, skip notify-cancel callbacks while holding `fp->f_lock`
+    2) in `src/protocol/smb2/smb2_notify.c`, pass `ksmbd_notify_cancel` directly as async cancel callback (remove wrapper indirection) so skip logic matches reliably.
+
+Validation after fixes (VM0):
+- TCP smoke now consistently runs to completion (no host-side hangs in this loop):
+  - `PASS=1 FAIL=5 SKIP=1` (`smb2.durable-v2-regressions` passes)
+- QUIC smoke now mirrors TCP outcome with no infra collapse:
+  - `QUIC_SMOKE PASS=1 FAIL=5 SKIP=1 INFRA=0`
+- Interpretation update:
+  - Remaining failures are predominantly protocol/behavior mismatches in ksmbd core SMB2 semantics (same failure profile over TCP and QUIC).
+  - Earlier broad QUIC infra failures were amplified by teardown/lockup defects that are now reduced; transport is no longer the primary blocker in this short matrix.
+
+Open issues seen in logs:
+- Repeated semantic mismatches still present (examples):
+  - `NT_STATUS_DELETE_PENDING` in `smb2.read:position`
+  - `ok_mask`/`maximal_access` mismatch in `smb2.create`
+  - `FILE_CLOSED`/`INVALID_PARAMETER` in `smb2.dir`
+- One module-unload-time slab warning still appears during some prepare/reload cycles (`ksmbd_work_cache` object remaining at `__kmem_cache_shutdown`), to be triaged separately.
+
+2026-02-28T20:34:10+01:00 | agent=gpt | status=iterative-retest-and-hypothesis-checks
+Actions completed:
+- Rebuilt and re-ran smoke loops repeatedly after pending-delete related adjustments.
+- Confirmed VM fleet ownership remains aligned:
+  - VM0/VM1/VM2 running
+  - VM3/VM4 stopped
+- Reconfirmed current baseline after rebuilds:
+  - TCP smoke: `PASS=1 FAIL=5 SKIP=1`
+  - QUIC smoke: `PASS=1 FAIL=5 SKIP=1 INFRA=0`
+  - QUIC/TCP failure profile remains matched (core SMB2 behavior issue, not transport-specific).
+
+Code changes attempted in this loop:
+- `src/protocol/smb2/smb2_create.c`
+  - Relaxed one parent pending-delete gate to only apply when `!file_present`.
+  - Relaxed previous explicit deny-on-pending-delete block to no longer force `-EBUSY` from that scan path.
+  - Added temporary diagnostics around create busy / delete-on-close handling for triage.
+- `src/protocol/smb2/smb2_query_set.c`
+  - Forced `buffer_check_err()` path toward `STATUS_INFO_LENGTH_MISMATCH` for undersized output buffers.
+  - Added temporary pending-delete set/clear diagnostics.
+
+Observed outcome:
+- No net improvement yet in smoke totals.
+- `smb2.read` still reports `NT_STATUS_DELETE_PENDING` in `position` subtest.
+- `smb2.getinfo` still reports small-buffer status mismatch (`STATUS_BUFFER_OVERFLOW` vs expected `INFO_LENGTH_MISMATCH`), indicating the failing path likely bypasses current `buffer_check_err()` branch.
+- `smb2.create` and `smb2.dir` signature failures unchanged in smoke set.
+
+Notes:
+- One experiment ran TCP+QUIC smoke in parallel and caused transient `CONNECTION_REFUSED` cross-interference (shared VM service restarts). Subsequent retests were run sequentially for stable comparisons.
+
+2026-02-28T20:38:20+01:00 | agent=gpt | status=smoke-improved-read-regression-shift
+Latest validated results after additional create/query-set edits and rebuilds:
+- TCP smoke: `PASS=2 FAIL=4 SKIP=1`
+- QUIC smoke: `PASS=2 FAIL=4 SKIP=1 INFRA=0`
+
+Observed movement:
+- `smb2.read` moved from FAIL to PASS on both TCP and QUIC smoke runs.
+- `smb2.getinfo:qfs_buffercheck` error mode shifted:
+  - no longer failing at small-buffer check line (528)
+  - now failing at large-buffer check line (535): got `NT_STATUS_INFO_LENGTH_MISMATCH`, expected `STATUS_BUFFER_OVERFLOW`.
+- Remaining stable failures in smoke set:
+  - `smb2.scan`
+  - `smb2.getinfo` (complex + qfs buffercheck)
+  - `smb2.create` (`ok_mask`/maximal-access mismatch)
+  - `smb2.dir` (`FILE_CLOSED`/`INVALID_PARAMETER` cases)
+
+Current direction:
+- keep tuning getinfo buffer status split (small vs large)
+- then target create maximal-access mask mismatch
+- then dir handle-lifecycle/close-state semantics
+
+2026-02-28T21:02:05+01:00 | agent=gpt | status=iterative-fixes-advanced-create-path
+Actions completed in this cycle:
+- `smb2_query_set.c`:
+  - converted query-info buffer status handling to class-aware thresholds (via `buffer_check_err(..., min_output_length)`)
+  - for FS info classes, set minimum fixed lengths aligned with smbtorture expectations
+    (e.g. volume=24, size=24, device=8, attribute=16, full_size=32, control=48, sector=28)
+- `smb2_create.c`:
+  - mapped unsupported create options to `STATUS_NOT_SUPPORTED` (`-EOPNOTSUPP` path)
+  - rejected `FILE_OPEN_BY_FILE_ID` requests as not supported in create path
+  - denied SYNCHRONIZE-only desired access to match access-mask expectations in gentest
+- `smb2_pdu_common.c`:
+  - stopped auto-setting sparse DOS attribute on regular files in `smb2_get_dos_mode()`
+
+Validated smoke status (latest):
+- TCP smoke: `PASS=2 FAIL=4 SKIP=1`
+- QUIC smoke: `PASS=2 FAIL=4 SKIP=1 INFRA=0`
+
+Observed movement in failure signatures:
+- `smb2.read` remains PASS.
+- `smb2.getinfo:qfs_buffercheck` now PASS (previously failing on mismatch/overflow status semantics).
+- `smb2.create` progressed through multiple prior assertions; latest failure moved to stream-create path:
+  - `create.c:329` expected `NT_STATUS_OK` for `FNAME:stream1` create, currently gets `NT_STATUS_OBJECT_NAME_NOT_FOUND`.
+- `smb2.getinfo` still fails `complex` setup with `NT_STATUS_INVALID_PARAMETER`.
+- `smb2.dir` unchanged (`FILE_CLOSED` / `INVALID_PARAMETER`).
+
+Current hypothesis:
+- create stream-on-missing-base handling still diverges from Samba/Windows semantics in one path (OVERWRITE_IF on stream)
+- remaining blockers are now narrower and reproducible on both TCP and QUIC.
+
+2026-03-01T18:39:15+01:00 | agent=gpt | status=reauth5-root-caused-and-fixed
+Issue investigated:
+- `smb2.session.reauth5` failed. The test reauthenticates a valid session to anonymous and expects rename via existing handle to return `NT_STATUS_ACCESS_DENIED` until reauthing to original user.
+
+Root causes found:
+1) Reauth identity switching was not fully aligned:
+   - NTLM path retained old session user on anonymous reauth.
+   - Kerberos path rejected different-user reauth on valid session.
+2) Rename permission path did not model reauth expectations:
+   - rename could succeed under anonymous reauth when using pre-existing handle.
+3) Security-info set path behavior under reauth context:
+   - needed explicit access-mask checks and not purely fsuid-derived denial for this handle-based flow.
+
+Code changes made:
+- `src/protocol/smb2/smb2_session.c`
+  - valid-session NTLM reauth now replaces `sess->user` when credentials differ (including anonymous).
+- `src/core/auth.c`
+  - valid-session Kerberos reauth now replaces `sess->user` on different authenticated identity (instead of rejecting).
+- `src/protocol/smb2/smb2_query_set.c`
+  - `set_rename_info()` now denies rename when current reauthed user is guest.
+  - added DACL-based checks in rename path for file delete + parent delete-child access.
+  - `smb2_set_info_sec()` now enforces access-mask checks (WRITE_OWNER/WRITE_DAC/ACCESS_SYSTEM_SECURITY).
+  - `SMB2_O_INFO_SECURITY` set-info path now uses those SMB access-mask checks directly (without additional fsid override in this path).
+- `src/fs/vfs.c`
+  - relaxed parent-open share-delete conflict checks during rename for same-connection parent handles.
+- `src/protocol/smb2/smb2_create.c`
+  - preserved idempotent unlink/open flow needed by session tests (`DELETE_ON_CLOSE + FILE_OPEN` on missing path via create path handling).
+
+Validation:
+- Rebuilt module in VM and reloaded (`rmmod/insmod`) between test runs.
+- Targeted test now passes:
+  - `smbtorture //127.0.0.1/test smb2.session.reauth5 ...` => `success: reauth5`

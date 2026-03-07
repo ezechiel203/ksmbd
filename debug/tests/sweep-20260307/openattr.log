@@ -1,0 +1,10 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772890017
+time: 2026-03-07 13:26:57.629276
+test: openattr
+time: 2026-03-07 13:26:57.630863
+time: 2026-03-07 13:26:57.645358
+failure: openattr [
+../../source4/torture/smb2/attr.c:212: [2] getatr check failed. [0x80] trunc [0x1] got attr 0x20, should be 0x21
+]

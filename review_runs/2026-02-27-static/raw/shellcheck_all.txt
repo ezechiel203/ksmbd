@@ -1,0 +1,243 @@
+
+In setup_arm64_build.sh line 134:
+    local kernel_major=$(echo "$KERNEL_VERSION" | cut -d. -f1,2)
+          ^----------^ SC2155 (warning): Declare and assign separately to avoid masking return values.
+
+
+In run_tests.sh line 29:
+WHITE='\033[0;37m'
+^---^ SC2034 (warning): WHITE appears unused. Verify use (or export if used externally).
+
+
+In run_tests.sh line 35:
+BUILD_ONLY=false
+^--------^ SC2034 (warning): BUILD_ONLY appears unused. Verify use (or export if used externally).
+
+
+In run_tests.sh line 50:
+EXIT_RUNTIME_ERROR=4
+^----------------^ SC2034 (warning): EXIT_RUNTIME_ERROR appears unused. Verify use (or export if used externally).
+
+
+In run_tests.sh line 315:
+    local build_start=$(date +%s)
+          ^---------^ SC2155 (warning): Declare and assign separately to avoid masking return values.
+
+
+In run_tests.sh line 323:
+    local build_end=$(date +%s)
+          ^-------^ SC2155 (warning): Declare and assign separately to avoid masking return values.
+
+
+In run_tests.sh line 333:
+    local extra_args=()
+          ^--------^ SC2034 (warning): extra_args appears unused. Verify use (or export if used externally).
+
+
+In run_tests.sh line 339:
+    local cmd_desc=""
+          ^------^ SC2034 (warning): cmd_desc appears unused. Verify use (or export if used externally).
+
+
+In run_tests.sh line 432:
+    local test_start=$(date +%s)
+          ^--------^ SC2155 (warning): Declare and assign separately to avoid masking return values.
+
+
+In run_tests.sh line 447:
+    local test_end=$(date +%s)
+          ^------^ SC2155 (warning): Declare and assign separately to avoid masking return values.
+
+
+In run_tests.sh line 504:
+    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+          ^-------^ SC2155 (warning): Declare and assign separately to avoid masking return values.
+
+
+In run_tests.sh line 505:
+    local git_commit=$(git rev-parse HEAD 2>/dev/null || echo "unknown")
+          ^--------^ SC2155 (warning): Declare and assign separately to avoid masking return values.
+
+
+In run_tests.sh line 506:
+    local git_branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "unknown")
+          ^--------^ SC2155 (warning): Declare and assign separately to avoid masking return values.
+
+
+In run_tests.sh line 575:
+        local file_size=$(stat -c%s "$file" 2>/dev/null || echo "unknown")
+              ^-------^ SC2155 (warning): Declare and assign separately to avoid masking return values.
+
+
+In run_tests.sh line 585:
+    local start_time=$(date +%s)
+          ^--------^ SC2155 (warning): Declare and assign separately to avoid masking return values.
+
+
+In run_tests.sh line 628:
+    local end_time=$(date +%s)
+          ^------^ SC2155 (warning): Declare and assign separately to avoid masking return values.
+
+
+In run_tests.sh line 641:
+    exit $EXIT_CODE
+         ^--------^ SC2086 (info): Double quote to prevent globbing and word splitting.
+
+Did you mean:
+    exit "$EXIT_CODE"
+
+
+In build_arm64.sh line 59:
+        source "$PROJECT_ROOT/build.env"
+               ^-----------------------^ SC1091 (info): Not following: ./build.env was not specified as input (see shellcheck -x).
+
+
+In build_arm64.sh line 189:
+    make ARCH=$ARCH CROSS_COMPILE=$CROSS_COMPILE olddefconfig
+                                  ^------------^ SC2086 (info): Double quote to prevent globbing and word splitting.
+
+Did you mean:
+    make ARCH=$ARCH CROSS_COMPILE="$CROSS_COMPILE" olddefconfig
+
+
+In build_arm64.sh line 238:
+        local module_size=$(ls -lh "$PROJECT_ROOT/ksmbd.ko" | awk '{print $5}')
+              ^---------^ SC2155 (warning): Declare and assign separately to avoid masking return values.
+                            ^-----------------------------^ SC2012 (info): Use find instead of ls to better handle non-alphanumeric filenames.
+
+
+In build_arm64.sh line 244:
+        ${CROSS_COMPILE}objdump -h "$PROJECT_ROOT/ksmbd.ko" | head -10 || true
+        ^--------------^ SC2086 (info): Double quote to prevent globbing and word splitting.
+
+Did you mean:
+        "${CROSS_COMPILE}"objdump -h "$PROJECT_ROOT/ksmbd.ko" | head -10 || true
+
+
+In build_arm64.sh line 265:
+    local module_arch=$(file "$module_file")
+          ^---------^ SC2155 (warning): Declare and assign separately to avoid masking return values.
+
+
+In build_arm64.sh line 273:
+        local missing_symbols=$("${CROSS_COMPILE}nm" "$module_file" | grep -E " U " | wc -l)
+              ^-------------^ SC2155 (warning): Declare and assign separately to avoid masking return values.
+                                                                      ^-----------^ SC2126 (style): Consider using 'grep -c' instead of 'grep|wc -l'.
+
+
+In test_arm64_setup.sh line 26:
+print_warning() {
+^-- SC2329 (info): This function is never invoked. Check usage (or ignored if invoked indirectly).
+
+
+In tests/run_integration.sh line 201:
+	local daemon_pid=$!
+              ^--------^ SC2034 (warning): daemon_pid appears unused. Verify use (or export if used externally).
+
+
+In build_ksmbd.sh line 49:
+	KERNEL_SRC="${cwd%/fs/$MODULE_DIR}"
+                              ^---------^ SC2295 (info): Expansions inside ${..} need to be quoted separately, otherwise they match as patterns.
+
+Did you mean:
+	KERNEL_SRC="${cwd%/fs/"$MODULE_DIR"}"
+
+
+In build_ksmbd.sh line 55:
+		echo "obj-\$(CONFIG_SMB_SERVER)\t+= $MODULE_DIR/" >> "$KERNEL_SRC/fs/Makefile"
+                     ^-- SC2028 (info): echo may not expand escape sequences. Use printf.
+
+
+In ksmbd-tools/tests/test_ipc_compat.sh line 8:
+SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+                    ^-- SC1007 (warning): Remove space after = if trying to assign a value (for empty string, use var='' ... ).
+
+
+In ksmbd-tools/tests/test_ipc_compat.sh line 9:
+TOOLS_ROOT=${KSMBD_TOOLS_SOURCE_ROOT:-$(CDPATH= cd -- "$SCRIPT_DIR/.." && pwd)}
+                                               ^-- SC1007 (warning): Remove space after = if trying to assign a value (for empty string, use var='' ... ).
+
+
+In ksmbd-tools/tests/test_ipc_compat.sh line 10:
+KERNEL_ROOT=$(CDPATH= cd -- "$TOOLS_ROOT/.." && pwd)
+                     ^-- SC1007 (warning): Remove space after = if trying to assign a value (for empty string, use var='' ... ).
+
+
+In ksmbd-tools/tests/test_integration.sh line 76:
+trap "rm -rf $TMPDIR" EXIT
+             ^-----^ SC2064 (warning): Use single quotes, otherwise this expands now rather than when signalled.
+
+
+In ksmbd-tools/tests/test_integration.sh line 130:
+    && pass "ksmbdctl user add testuser" || fail "ksmbdctl user add testuser"
+    ^-- SC2015 (info): Note that A && B || C is not if-then-else. C may run when A is true.
+
+
+In ksmbd-tools/tests/test_integration.sh line 143:
+    && pass "ksmbdctl user update testuser" || fail "ksmbdctl user update testuser"
+    ^-- SC2015 (info): Note that A && B || C is not if-then-else. C may run when A is true.
+
+
+In ksmbd-tools/tests/test_integration.sh line 147:
+    && pass "ksmbdctl user set adds missing user" || fail "ksmbdctl user set adds missing user"
+    ^-- SC2015 (info): Note that A && B || C is not if-then-else. C may run when A is true.
+
+
+In ksmbd-tools/tests/test_integration.sh line 151:
+    && pass "ksmbdctl user set updates existing user" || fail "ksmbdctl user set updates existing user"
+    ^-- SC2015 (info): Note that A && B || C is not if-then-else. C may run when A is true.
+
+
+In ksmbd-tools/tests/test_integration.sh line 161:
+    && pass "ksmbdctl user delete testuser" || fail "ksmbdctl user delete testuser"
+    ^-- SC2015 (info): Note that A && B || C is not if-then-else. C may run when A is true.
+
+
+In ksmbd-tools/tests/test_integration.sh line 163:
+    && pass "ksmbdctl user delete upsertuser" || fail "ksmbdctl user delete upsertuser"
+    ^-- SC2015 (info): Note that A && B || C is not if-then-else. C may run when A is true.
+
+
+In ksmbd-tools/tests/test_integration.sh line 174:
+    && pass "ksmbdctl share add newshare" || fail "ksmbdctl share add newshare"
+    ^-- SC2015 (info): Note that A && B || C is not if-then-else. C may run when A is true.
+
+
+In ksmbd-tools/tests/test_integration.sh line 190:
+    && pass "ksmbdctl share update newshare" || fail "ksmbdctl share update newshare"
+    ^-- SC2015 (info): Note that A && B || C is not if-then-else. C may run when A is true.
+
+
+In ksmbd-tools/tests/test_integration.sh line 200:
+    && pass "ksmbdctl share set adds missing share" || fail "ksmbdctl share set adds missing share"
+    ^-- SC2015 (info): Note that A && B || C is not if-then-else. C may run when A is true.
+
+
+In ksmbd-tools/tests/test_integration.sh line 202:
+    && pass "ksmbdctl share set updates existing share" || fail "ksmbdctl share set updates existing share"
+    ^-- SC2015 (info): Note that A && B || C is not if-then-else. C may run when A is true.
+
+
+In ksmbd-tools/tests/test_integration.sh line 211:
+    && pass "ksmbdctl share delete newshare" || fail "ksmbdctl share delete newshare"
+    ^-- SC2015 (info): Note that A && B || C is not if-then-else. C may run when A is true.
+
+
+In ksmbd-tools/tests/test_integration.sh line 213:
+    && pass "ksmbdctl share delete upshare" || fail "ksmbdctl share delete upshare"
+    ^-- SC2015 (info): Note that A && B || C is not if-then-else. C may run when A is true.
+
+
+In ksmbd-tools/scripts/install_ksmbd_tools_optusr.sh line 14:
+SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+                     ^-- SC1007 (warning): Remove space after = if trying to assign a value (for empty string, use var='' ... ).
+
+
+In ksmbd-tools/scripts/install_ksmbd_tools_optusr.sh line 15:
+SOURCE_ROOT="$(CDPATH= cd -- "$SCRIPT_DIR/.." && pwd)"
+                      ^-- SC1007 (warning): Remove space after = if trying to assign a value (for empty string, use var='' ... ).
+
+For more information:
+  https://www.shellcheck.net/wiki/SC1007 -- Remove space after = if trying to...
+  https://www.shellcheck.net/wiki/SC2034 -- BUILD_ONLY appears unused. Verify...
+  https://www.shellcheck.net/wiki/SC2064 -- Use single quotes, otherwise this...

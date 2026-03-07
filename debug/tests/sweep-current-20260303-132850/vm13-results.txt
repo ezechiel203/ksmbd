@@ -1,0 +1,52 @@
+[ksmbdctl(start)/3185]: INFO: Started manager
+ioctl: PASS=45 FAIL=15 SKIP=15
+[ksmbdctl(start)/3366]: INFO: Started manager
+streams: PASS=9 FAIL=5 SKIP=0
+0
+[ksmbdctl(start)/3424]: INFO: Started manager
+getinfo: PASS=8 FAIL=0
+0 SKIP=0
+0
+[ksmbdctl(start)/3468]: INFO: Started manager
+create: PASS=14 FAIL=3 SKIP=1
+[ksmbdctl(start)/3595]: INFO: Started manager
+compound_find: PASS=3 FAIL=0
+0 SKIP=0
+0
+[ksmbdctl(start)/3628]: INFO: Started manager
+compound_async: PASS=6 FAIL=4 SKIP=0
+0
+[ksmbdctl(start)/3688]: INFO: Started manager
+compound: PASS=20 FAIL=0
+0 SKIP=0
+0
+[ksmbdctl(start)/3755]: INFO: Started manager
+lock: PASS=22 FAIL=0
+0 SKIP=4
+[ksmbdctl(start)/3837]: INFO: Started manager
+rw: PASS=4 FAIL=0
+0 SKIP=0
+0
+[ksmbdctl(start)/3876]: INFO: Started manager
+dir: PASS=6 FAIL=3 SKIP=0
+0
+[ksmbdctl(start)/3920]: INFO: Started manager
+read: PASS=3 FAIL=1 SKIP=1
+[ksmbdctl(start)/3956]: INFO: Started manager
+delete-on-close-perms: PASS=8 FAIL=1 SKIP=0
+0
+[ksmbdctl(start)/4001]: INFO: Started manager
+credits: PASS=5 FAIL=5 SKIP=0
+0
+[ksmbdctl(start)/4066]: INFO: Started manager
+secleak: PASS=0
+0 FAIL=1 SKIP=0
+0
+[ksmbdctl(start)/4094]: INFO: Started manager
+dosmode: PASS=0
+0 FAIL=1 SKIP=0
+0
+[ksmbdctl(start)/4122]: INFO: Started manager
+zero-data-ioctl: PASS=0
+0 FAIL=1 SKIP=0
+0

@@ -1,0 +1,169 @@
+# src/fs/ksmbd_notify.c
+
+Risk-tagged lines (LOCK/LIFETIME/WAIT_LOOP/ERROR_PATH/MEM_BOUNDS/PROTO_GATE):
+
+- L00060 [LIFETIME|] `static atomic_t notify_watch_count = ATOMIC_INIT(0);`
+- L00157 [LOCK|] `	spin_lock(&watch->lock);`
+- L00160 [LOCK|] `		spin_unlock(&watch->lock);`
+- L00164 [LOCK|] `	spin_unlock(&watch->lock);`
+- L00178 [PROTO_GATE|] `	rsp->hdr.Flags |= SMB2_FLAGS_ASYNC_COMMAND;`
+- L00186 [PROTO_GATE|] `		rsp->hdr.Status = STATUS_NOTIFY_ENUM_DIR;`
+- L00191 [PROTO_GATE|] `			__SMB2_HEADER_STRUCTURE_SIZE +`
+- L00192 [PROTO_GATE|] `			SMB2_ERROR_STRUCTURE_SIZE2;`
+- L00193 [ERROR_PATH|] `		goto send;`
+- L00196 [PROTO_GATE|] `	out = (u8 *)rsp + __SMB2_HEADER_STRUCTURE_SIZE +`
+- L00212 [PROTO_GATE|] `		rsp->hdr.Status = STATUS_NOTIFY_ENUM_DIR;`
+- L00217 [PROTO_GATE|] `			__SMB2_HEADER_STRUCTURE_SIZE +`
+- L00218 [PROTO_GATE|] `			SMB2_ERROR_STRUCTURE_SIZE2;`
+- L00219 [ERROR_PATH|] `		goto send;`
+- L00226 [PROTO_GATE|] `	rsp->hdr.Status = STATUS_SUCCESS;`
+- L00236 [PROTO_GATE|] `		__SMB2_HEADER_STRUCTURE_SIZE +`
+- L00243 [PROTO_GATE|] `		rsp->hdr.Status = STATUS_INSUFFICIENT_RESOURCES;`
+- L00253 [PROTO_GATE|] `	      work->conn->ops->is_sign_req(work, SMB2_CHANGE_NOTIFY_HE))))`
+- L00261 [ERROR_PATH|] `			pr_err_ratelimited(`
+- L00264 [PROTO_GATE|] `			rsp->hdr.Status = STATUS_DATA_ERROR;`
+- L00277 [LOCK|] `		spin_lock(&watch->fp->f_lock);`
+- L00279 [LOCK|] `		spin_unlock(&watch->fp->f_lock);`
+- L00283 [LOCK|] `	spin_lock(&work->conn->request_lock);`
+- L00285 [LOCK|] `	spin_unlock(&work->conn->request_lock);`
+- L00297 [LIFETIME|] `		atomic_dec(&work->conn->outstanding_async);`
+- L00306 [LOCK|] `	spin_lock(&watch->lock);`
+- L00309 [LOCK|] `	spin_unlock(&watch->lock);`
+- L00346 [PROTO_GATE|] `	rsp->hdr.Flags |= SMB2_FLAGS_ASYNC_COMMAND;`
+- L00353 [PROTO_GATE|] `		rsp->hdr.Status = STATUS_NOTIFY_ENUM_DIR;`
+- L00358 [PROTO_GATE|] `			__SMB2_HEADER_STRUCTURE_SIZE +`
+- L00359 [PROTO_GATE|] `			SMB2_ERROR_STRUCTURE_SIZE2;`
+- L00360 [ERROR_PATH|] `		goto send;`
+- L00363 [PROTO_GATE|] `	out = (u8 *)rsp + __SMB2_HEADER_STRUCTURE_SIZE +`
+- L00379 [PROTO_GATE|] `		rsp->hdr.Status = STATUS_NOTIFY_ENUM_DIR;`
+- L00384 [PROTO_GATE|] `			__SMB2_HEADER_STRUCTURE_SIZE +`
+- L00385 [PROTO_GATE|] `			SMB2_ERROR_STRUCTURE_SIZE2;`
+- L00386 [ERROR_PATH|] `		goto send;`
+- L00393 [PROTO_GATE|] `	rsp->hdr.Status = STATUS_SUCCESS;`
+- L00403 [PROTO_GATE|] `		__SMB2_HEADER_STRUCTURE_SIZE +`
+- L00410 [PROTO_GATE|] `		rsp->hdr.Status = STATUS_INSUFFICIENT_RESOURCES;`
+- L00416 [PROTO_GATE|] `	      work->conn->ops->is_sign_req(work, SMB2_CHANGE_NOTIFY_HE))))`
+- L00424 [PROTO_GATE|] `			rsp->hdr.Status = STATUS_DATA_ERROR;`
+- L00432 [LOCK|] `	spin_lock(&work->conn->request_lock);`
+- L00434 [LOCK|] `	spin_unlock(&work->conn->request_lock);`
+- L00446 [LIFETIME|] `		atomic_dec(&work->conn->outstanding_async);`
+- L00496 [PROTO_GATE|] `	 * Complete any pending NOTIFY with STATUS_DELETE_PENDING.`
+- L00501 [LOCK|] `		spin_lock(&watch->lock);`
+- L00504 [LOCK|] `			spin_unlock(&watch->lock);`
+- L00509 [LOCK|] `		spin_unlock(&watch->lock);`
+- L00512 [LOCK|] `			spin_lock(&watch->fp->f_lock);`
+- L00514 [LOCK|] `			spin_unlock(&watch->fp->f_lock);`
+- L00521 [LOCK|] `	spin_lock(&watch->lock);`
+- L00523 [LOCK|] `		spin_unlock(&watch->lock);`
+- L00528 [LOCK|] `		spin_unlock(&watch->lock);`
+- L00543 [LOCK|] `			spin_unlock(&watch->lock);`
+- L00550 [LOCK|] `		spin_unlock(&watch->lock);`
+- L00563 [LOCK|] `			spin_unlock(&watch->lock);`
+- L00596 [MEM_BOUNDS|] `					chg = kzalloc(sizeof(*chg),`
+- L00617 [LOCK|] `			spin_unlock(&watch->lock);`
+- L00620 [LOCK|] `		spin_unlock(&watch->lock);`
+- L00628 [LOCK|] `	spin_lock(&watch->lock);`
+- L00630 [LOCK|] `	spin_unlock(&watch->lock);`
+- L00635 [LOCK|] `	spin_lock(&fp->f_lock);`
+- L00643 [PROTO_GATE|] `		if (hdr->Command != SMB2_CHANGE_NOTIFY)`
+- L00654 [LOCK|] `	spin_unlock(&fp->f_lock);`
+- L00658 [LIFETIME|] `		atomic_dec(&notify_watch_count);`
+- L00660 [LIFETIME|] `			atomic_dec(&work->conn->notify_watch_count);`
+- L00683 [LIFETIME|] `	atomic_dec(&notify_watch_count);`
+- L00685 [LIFETIME|] `		atomic_dec(&watch->conn->notify_watch_count);`
+- L00711 [ERROR_PATH|] `		return -EINVAL;`
+- L00715 [ERROR_PATH|] `		return -ENOTDIR;`
+- L00718 [ERROR_PATH|] `		return -ENODEV;`
+- L00728 [LOCK|] `		spin_lock(&watch->lock);`
+- L00743 [PROTO_GATE|] `		 * server returns STATUS_NOTIFY_ENUM_DIR.`
+- L00770 [LOCK|] `				spin_unlock(&watch->lock);`
+- L00773 [PROTO_GATE|] `				rsp->hdr.Status = STATUS_NOTIFY_ENUM_DIR;`
+- L00778 [PROTO_GATE|] `					__SMB2_HEADER_STRUCTURE_SIZE +`
+- L00779 [PROTO_GATE|] `					SMB2_ERROR_STRUCTURE_SIZE2);`
+- L00783 [ERROR_PATH|] `				return -EIOCBQUEUED;`
+- L00804 [LOCK|] `			spin_unlock(&watch->lock);`
+- L00807 [PROTO_GATE|] `			rsp->hdr.Status = STATUS_SUCCESS;`
+- L00810 [PROTO_GATE|] `			      __SMB2_HEADER_STRUCTURE_SIZE +`
+- L00862 [PROTO_GATE|] `				__SMB2_HEADER_STRUCTURE_SIZE +`
+- L00872 [ERROR_PATH|] `			return -EIOCBQUEUED;`
+- L00874 [LOCK|] `		spin_unlock(&watch->lock);`
+- L00881 [LOCK|] `		spin_lock(&fp->f_lock);`
+- L00883 [LOCK|] `		spin_unlock(&fp->f_lock);`
+- L00889 [LIFETIME|] `	if (atomic_inc_return(&notify_watch_count) >`
+- L00891 [LIFETIME|] `		atomic_dec(&notify_watch_count);`
+- L00892 [ERROR_PATH|] `		return -ENOSPC;`
+- L00896 [LIFETIME|] `	    atomic_inc_return(&work->conn->notify_watch_count) >`
+- L00898 [LIFETIME|] `		atomic_dec(&work->conn->notify_watch_count);`
+- L00899 [LIFETIME|] `		atomic_dec(&notify_watch_count);`
+- L00900 [ERROR_PATH|] `		return -ENOSPC;`
+- L00903 [MEM_BOUNDS|] `	watch = kzalloc(sizeof(*watch), KSMBD_DEFAULT_GFP);`
+- L00906 [LIFETIME|] `			atomic_dec(&work->conn->notify_watch_count);`
+- L00907 [LIFETIME|] `		atomic_dec(&notify_watch_count);`
+- L00908 [ERROR_PATH|] `		return -ENOMEM;`
+- L00937 [PROTO_GATE|] `		 * H.6: SMB2_WATCH_TREE — recursive monitoring.`
+- L00975 [LOCK|] `		spin_lock(&fp->f_lock);`
+- L00977 [LOCK|] `		spin_unlock(&fp->f_lock);`
+- L00981 [ERROR_PATH|] `		pr_err_ratelimited(`
+- L00994 [LOCK|] `	spin_lock(&fp->f_lock);`
+- L00996 [LOCK|] `	spin_unlock(&fp->f_lock);`
+- L01015 [PROTO_GATE|] `		 * Remove from fp->blocked_works and send STATUS_CANCELLED.`
+- L01026 [LOCK|] `			spin_lock(&fp->f_lock);`
+- L01029 [LOCK|] `			spin_unlock(&fp->f_lock);`
+- L01032 [PROTO_GATE|] `		/* Build STATUS_CANCELLED response */`
+- L01042 [PROTO_GATE|] `		rsp_hdr->Flags |= SMB2_FLAGS_ASYNC_COMMAND;`
+- L01044 [PROTO_GATE|] `		rsp_hdr->Status = STATUS_CANCELLED;`
+- L01050 [PROTO_GATE|] `		      work->conn->ops->is_sign_req(work, SMB2_CHANGE_NOTIFY_HE))))`
+- L01058 [ERROR_PATH|] `				pr_err_ratelimited(`
+- L01066 [LOCK|] `		spin_lock(&work->conn->request_lock);`
+- L01068 [LOCK|] `		spin_unlock(&work->conn->request_lock);`
+- L01078 [LIFETIME|] `		atomic_dec(&notify_watch_count);`
+- L01080 [LIFETIME|] `			atomic_dec(&work->conn->notify_watch_count);`
+- L01084 [LIFETIME|] `			atomic_dec(&work->conn->outstanding_async);`
+- L01094 [LOCK|] `	spin_lock(&watch->lock);`
+- L01097 [LOCK|] `		spin_unlock(&watch->lock);`
+- L01108 [LOCK|] `	spin_unlock(&watch->lock);`
+- L01111 [PROTO_GATE|] `	 * Build a proper SMB2 error response with STATUS_CANCELLED.`
+- L01134 [PROTO_GATE|] `	 * Now set the async flags and STATUS_CANCELLED on the`
+- L01139 [PROTO_GATE|] `	rsp_hdr->Flags |= SMB2_FLAGS_ASYNC_COMMAND;`
+- L01141 [PROTO_GATE|] `	rsp_hdr->Status = STATUS_CANCELLED;`
+- L01160 [PROTO_GATE|] `	      work->conn->ops->is_sign_req(work, SMB2_CHANGE_NOTIFY_HE))))`
+- L01169 [ERROR_PATH|] `			pr_err_ratelimited(`
+- L01177 [LOCK|] `		spin_lock(&watch->fp->f_lock);`
+- L01179 [LOCK|] `		spin_unlock(&watch->fp->f_lock);`
+- L01183 [LOCK|] `	spin_lock(&work->conn->request_lock);`
+- L01185 [LOCK|] `	spin_unlock(&work->conn->request_lock);`
+- L01197 [LIFETIME|] `		atomic_dec(&work->conn->outstanding_async);`
+- L01215 [PROTO_GATE|] ` * Helper: send STATUS_NOTIFY_CLEANUP for a single async work item`
+- L01231 [PROTO_GATE|] `	hdr->Flags |= SMB2_FLAGS_ASYNC_COMMAND;`
+- L01233 [PROTO_GATE|] `	hdr->Status = STATUS_NOTIFY_CLEANUP;`
+- L01239 [PROTO_GATE|] `	      work->conn->ops->is_sign_req(work, SMB2_CHANGE_NOTIFY_HE))))`
+- L01248 [LOCK|] `	spin_lock(&work->conn->request_lock);`
+- L01250 [LOCK|] `	spin_unlock(&work->conn->request_lock);`
+- L01261 [LIFETIME|] `		atomic_dec(&work->conn->outstanding_async);`
+- L01282 [PROTO_GATE|] `	 * it with STATUS_NOTIFY_CLEANUP.  Then destroy the mark.`
+- L01288 [LOCK|] `		spin_lock(&watch->lock);`
+- L01293 [LOCK|] `		spin_unlock(&watch->lock);`
+- L01297 [LOCK|] `			spin_lock(&fp->f_lock);`
+- L01300 [LOCK|] `			spin_unlock(&fp->f_lock);`
+- L01313 [LOCK|] `	spin_lock(&fp->f_lock);`
+- L01317 [PROTO_GATE|] `		if (hdr->Command != SMB2_CHANGE_NOTIFY)`
+- L01323 [LOCK|] `	spin_unlock(&fp->f_lock);`
+- L01327 [LIFETIME|] `		atomic_dec(&notify_watch_count);`
+- L01329 [LIFETIME|] `			atomic_dec(&work->conn->notify_watch_count);`
+- L01339 [PROTO_GATE|] ` * Helper: send STATUS_DELETE_PENDING for a single async NOTIFY work`
+- L01341 [PROTO_GATE|] ` * uses STATUS_DELETE_PENDING instead of STATUS_NOTIFY_CLEANUP.`
+- L01355 [PROTO_GATE|] `	hdr->Flags |= SMB2_FLAGS_ASYNC_COMMAND;`
+- L01357 [PROTO_GATE|] `	hdr->Status = STATUS_DELETE_PENDING;`
+- L01363 [PROTO_GATE|] `	      work->conn->ops->is_sign_req(work, SMB2_CHANGE_NOTIFY_HE))))`
+- L01372 [LOCK|] `	spin_lock(&work->conn->request_lock);`
+- L01374 [LOCK|] `	spin_unlock(&work->conn->request_lock);`
+- L01385 [LIFETIME|] `		atomic_dec(&work->conn->outstanding_async);`
+- L01401 [PROTO_GATE|] ` * pending CHANGE_NOTIFY requests with STATUS_DELETE_PENDING.`
+- L01404 [PROTO_GATE|] ` * with STATUS_DELETE_PENDING as soon as the directory becomes`
+- L01424 [LOCK|] `	down_read(&ci->m_lock);`
+- L01430 [LOCK|] `		spin_lock(&watch->lock);`
+- L01433 [LOCK|] `			spin_unlock(&watch->lock);`
+- L01442 [LOCK|] `		spin_unlock(&watch->lock);`
+- L01445 [LOCK|] `		spin_lock(&fp->f_lock);`
+- L01448 [LOCK|] `		spin_unlock(&fp->f_lock);`
+- L01472 [ERROR_PATH|] `		pr_err("ksmbd: failed to create fsnotify group: %d\n", err);`

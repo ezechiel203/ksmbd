@@ -1,0 +1,157 @@
+name: Static Analysis (sparse + W=1/W=2)
+
+on:
+  push:
+    branches:
+      - master
+      - next
+  pull_request:
+    branches:
+      - master
+      - next
+
+jobs:
+  sparse-check:
+    name: Sparse endianness check (C=2)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential libelf-dev bc flex bison \
+            libssl-dev sparse wget
+
+      - name: Download kernel source
+        run: |
+          KVER="6.6.70"
+          wget -q "https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-${KVER}.tar.xz"
+          tar xf "linux-${KVER}.tar.xz"
+          mv "linux-${KVER}" linux-src
+
+      - name: Prepare kernel tree with ksmbd
+        run: |
+          cd linux-src
+          yes "" | make oldconfig > /dev/null 2>&1
+
+          mkdir -p fs/ksmbd
+          cp -ar "$GITHUB_WORKSPACE"/*.c "$GITHUB_WORKSPACE"/*.h fs/ksmbd/ 2>/dev/null || true
+          cp -ar "$GITHUB_WORKSPACE"/mgmt fs/ksmbd/ 2>/dev/null || true
+          cp -ar "$GITHUB_WORKSPACE"/Kconfig fs/ksmbd/
+          cp -ar "$GITHUB_WORKSPACE"/Makefile.ksmbd fs/ksmbd/Makefile 2>/dev/null || true
+
+          echo 'source "fs/ksmbd/Kconfig"' >> fs/Kconfig
+          echo 'obj-$(CONFIG_SMB_SERVER) += ksmbd/' >> fs/Makefile
+
+          echo 'CONFIG_SMB_SERVER=m' >> .config
+          echo 'CONFIG_SMB_INSECURE_SERVER=y' >> .config
+          echo '# CONFIG_SMB_SERVER_SMBDIRECT is not set' >> .config
+          echo '# CONFIG_SMB_SERVER_CHECK_CAP_NET_ADMIN is not set' >> .config
+          yes "" | make oldconfig > /dev/null 2>&1
+
+      - name: Run sparse (C=2) with endianness checks
+        continue-on-error: true
+        run: |
+          cd linux-src
+          make C=2 CF="-D__CHECK_ENDIAN__" -j$(nproc) fs/ksmbd/ 2>&1 | tee sparse-output.log
+          # Extract only sparse warnings (lines containing "sparse:")
+          grep -E "warning:|error:" sparse-output.log > sparse-warnings.log 2>/dev/null || true
+          if [ -s sparse-warnings.log ]; then
+            echo "::warning::Sparse found $(wc -l < sparse-warnings.log) warning(s)"
+            cat sparse-warnings.log
+          else
+            echo "No sparse warnings found."
+          fi
+
+      - name: Upload sparse report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sparse-report
+          path: |
+            linux-src/sparse-output.log
+            linux-src/sparse-warnings.log
+          retention-days: 14
+
+  w1-w2-build:
+    name: Build with W=1 and W=2 extra warnings
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential libelf-dev bc flex bison \
+            libssl-dev wget
+
+      - name: Download kernel source
+        run: |
+          KVER="6.6.70"
+          wget -q "https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-${KVER}.tar.xz"
+          tar xf "linux-${KVER}.tar.xz"
+          mv "linux-${KVER}" linux-src
+
+      - name: Prepare kernel tree with ksmbd
+        run: |
+          cd linux-src
+          yes "" | make oldconfig > /dev/null 2>&1
+
+          mkdir -p fs/ksmbd
+          cp -ar "$GITHUB_WORKSPACE"/*.c "$GITHUB_WORKSPACE"/*.h fs/ksmbd/ 2>/dev/null || true
+          cp -ar "$GITHUB_WORKSPACE"/mgmt fs/ksmbd/ 2>/dev/null || true
+          cp -ar "$GITHUB_WORKSPACE"/Kconfig fs/ksmbd/
+          cp -ar "$GITHUB_WORKSPACE"/Makefile.ksmbd fs/ksmbd/Makefile 2>/dev/null || true
+
+          echo 'source "fs/ksmbd/Kconfig"' >> fs/Kconfig
+          echo 'obj-$(CONFIG_SMB_SERVER) += ksmbd/' >> fs/Makefile
+
+          echo 'CONFIG_SMB_SERVER=m' >> .config
+          echo 'CONFIG_SMB_INSECURE_SERVER=y' >> .config
+          echo '# CONFIG_SMB_SERVER_SMBDIRECT is not set' >> .config
+          echo '# CONFIG_SMB_SERVER_CHECK_CAP_NET_ADMIN is not set' >> .config
+          yes "" | make oldconfig > /dev/null 2>&1
+
+      - name: Build with W=1
+        continue-on-error: true
+        run: |
+          cd linux-src
+          make W=1 -j$(nproc) fs/ksmbd/ 2>&1 | tee w1-output.log
+          grep -E "warning:" w1-output.log > w1-warnings.log 2>/dev/null || true
+          if [ -s w1-warnings.log ]; then
+            echo "::warning::W=1 build found $(wc -l < w1-warnings.log) warning(s)"
+          else
+            echo "W=1 build clean - no warnings."
+          fi
+
+      - name: Build with W=2
+        continue-on-error: true
+        run: |
+          cd linux-src
+          make clean > /dev/null 2>&1
+          make W=2 -j$(nproc) fs/ksmbd/ 2>&1 | tee w2-output.log
+          grep -E "warning:" w2-output.log > w2-warnings.log 2>/dev/null || true
+          if [ -s w2-warnings.log ]; then
+            echo "::warning::W=2 build found $(wc -l < w2-warnings.log) warning(s)"
+          else
+            echo "W=2 build clean - no warnings."
+          fi
+
+      - name: Upload warning reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: extra-warnings-report
+          path: |
+            linux-src/w1-output.log
+            linux-src/w1-warnings.log
+            linux-src/w2-output.log
+            linux-src/w2-warnings.log
+          retention-days: 14

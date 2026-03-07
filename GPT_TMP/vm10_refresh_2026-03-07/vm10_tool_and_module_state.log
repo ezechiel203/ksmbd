@@ -1,0 +1,26 @@
+ksmbd.mountd missing
+ksmbd.control missing
+ksmbd.adduser missing
+ksmbdctl /usr/bin/ksmbdctl
+2026-03-07 11:25:14.653000000 +0000 /usr/bin/ksmbdctl
+module:
+filename:       /lib/modules/6.18.13-arch1-1/kernel/fs/smb/server/ksmbd.ko.zst
+softdep:        pre: gcm
+softdep:        pre: ccm
+softdep:        pre: aead2
+softdep:        pre: sha512
+softdep:        pre: sha256
+softdep:        pre: cmac
+softdep:        pre: aes
+softdep:        pre: nls
+softdep:        pre: md5
+softdep:        pre: hmac
+softdep:        pre: ecb
+license:        GPL
+description:    Linux kernel CIFS/SMB SERVER
+author:         Namjae Jeon <linkinjeon@kernel.org>
+srcversion:     8BD83F5CA7EA6FD459E1C33
+depends:        ib_core,rdma_cm,libarc4,nls_ucs2_utils
+intree:         Y
+name:           ksmbd
+retpoline:      Y

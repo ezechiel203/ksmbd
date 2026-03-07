@@ -1,0 +1,5 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772499902
+time: 2026-03-03 01:05:02.917955
+Unknown torture operation 'smb2.mux'

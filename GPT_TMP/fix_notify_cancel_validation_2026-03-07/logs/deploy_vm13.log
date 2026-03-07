@@ -1,0 +1,10 @@
+Deploying ksmbd to: VM13
+
+==> Deploying to VM13 (SSH 23022)...
+[ksmbd.control/6316]: INFO: Terminated mountd
+[ksmbd.control/6316]: INFO: Killed ksmbd
+[ksmbd.adduser/6344]: ERROR: User `testuser' already exists
+[ksmbd.mountd/6345]: INFO: Started manager
+  OK: VM13 ksmbd running on port 445
+
+Done. 1 VMs targeted, 0 failed.

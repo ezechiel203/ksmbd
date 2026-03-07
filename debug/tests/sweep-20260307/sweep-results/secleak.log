@@ -1,0 +1,8 @@
+smbtorture 4.23.6
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772858670
+time: 2026-03-07 04:44:30.011446
+test: secleak
+time: 2026-03-07 04:44:30.013205
+time: 2026-03-07 04:44:49.824745
+success: secleak

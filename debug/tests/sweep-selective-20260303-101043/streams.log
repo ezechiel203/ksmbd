@@ -1,0 +1,103 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772529435
+time: 2026-03-03 09:17:15.730430
+progress: 14
+test: dir
+time: 2026-03-03 09:17:15.731025
+teststreams\stream.txt:Stream One
+(../../source4/torture/smb2/streams.c:214) opening non-existent directory stream
+time: 2026-03-03 09:17:15.738268
+failure: dir [
+../../source4/torture/smb2/streams.c:227: status was NT_STATUS_OBJECT_NAME_NOT_FOUND, expected NT_STATUS_NOT_A_DIRECTORY: CHECK_STATUS
+]
+test: io
+time: 2026-03-03 09:17:15.738351
+(../../source4/torture/smb2/streams.c:301) creating a stream on a non-existent file
+time: 2026-03-03 09:17:15.743702
+failure: io [
+../../source4/torture/smb2/streams.c:315: status was NT_STATUS_OBJECT_NAME_NOT_FOUND, expected NT_STATUS_OK: CHECK_STATUS
+]
+test: sharemodes
+time: 2026-03-03 09:17:15.743753
+(../../source4/torture/smb2/streams.c:570) Testing stream share mode conflicts
+time: 2026-03-03 09:17:15.750307
+failure: sharemodes [
+../../source4/torture/smb2/streams.c:585: status was NT_STATUS_OBJECT_NAME_NOT_FOUND, expected NT_STATUS_OK: CHECK_STATUS
+]
+test: names
+time: 2026-03-03 09:17:15.750360
+(../../source4/torture/smb2/streams.c:847) testing stream names
+time: 2026-03-03 09:17:15.756107
+failure: names [
+../../source4/torture/smb2/streams.c:861: status was NT_STATUS_OBJECT_NAME_NOT_FOUND, expected NT_STATUS_OK: CHECK_STATUS
+]
+test: names2
+time: 2026-03-03 09:17:15.756159
+(../../source4/torture/smb2/streams.c:1141) testing stream names
+(../../source4/torture/smb2/streams.c:1180) teststreams\stream_names2.txt:Stream/0x2F:$DATA => expected[NT_STATUS_OBJECT_NAME_INVALID]
+time: 2026-03-03 09:17:15.769478
+failure: names2 [
+../../source4/torture/smb2/streams.c:1184: status was NT_STATUS_OBJECT_NAME_NOT_FOUND, expected NT_STATUS_OBJECT_NAME_INVALID: CHECK_STATUS
+]
+test: names3
+time: 2026-03-03 09:17:15.769530
+(../../source4/torture/smb2/streams.c:1269) testing case insensitive stream names
+time: 2026-03-03 09:17:15.776968
+failure: names3 [
+../../source4/torture/smb2/streams.c:1273: status was NT_STATUS_OBJECT_NAME_NOT_FOUND, expected NT_STATUS_OK: CHECK_STATUS
+]
+test: rename
+time: 2026-03-03 09:17:15.777021
+(../../source4/torture/smb2/streams.c:1350) testing stream renames
+time: 2026-03-03 09:17:15.782910
+failure: rename [
+../../source4/torture/smb2/streams.c:1369: status was NT_STATUS_OBJECT_NAME_NOT_FOUND, expected NT_STATUS_OK: CHECK_STATUS
+]
+test: rename2
+time: 2026-03-03 09:17:15.782965
+time: 2026-03-03 09:17:15.789082
+failure: rename2 [
+../../source4/torture/smb2/streams.c:1458: status was NT_STATUS_OBJECT_NAME_NOT_FOUND, expected NT_STATUS_OK: CHECK_STATUS
+]
+test: create-disposition
+time: 2026-03-03 09:17:15.789140
+time: 2026-03-03 09:17:15.794444
+failure: create-disposition [
+../../source4/torture/smb2/streams.c:1574: status was NT_STATUS_OBJECT_NAME_NOT_FOUND, expected NT_STATUS_OK: CHECK_STATUS
+]
+test: attributes1
+time: 2026-03-03 09:17:15.794499
+(../../source4/torture/smb2/streams.c:1779) testing attribute setting on stream
+time: 2026-03-03 09:17:15.799727
+failure: attributes1 [
+../../source4/torture/smb2/streams.c:1574: status was NT_STATUS_OBJECT_NAME_NOT_FOUND, expected NT_STATUS_OK: CHECK_STATUS
+]
+test: attributes2
+time: 2026-03-03 09:17:15.799778
+Let's dance!
+time: 2026-03-03 09:17:15.809297
+failure: attributes2 [
+../../source4/torture/smb2/streams.c:2079: status was NT_STATUS_OBJECT_NAME_NOT_FOUND, expected NT_STATUS_OK: smb2_create failed
+]
+test: delete
+time: 2026-03-03 09:17:15.809356
+(../../source4/torture/smb2/streams.c:679) opening non-existent file stream
+time: 2026-03-03 09:17:15.815826
+failure: delete [
+../../source4/torture/smb2/streams.c:693: status was NT_STATUS_OBJECT_NAME_NOT_FOUND, expected NT_STATUS_OK: CHECK_STATUS
+]
+test: zero-byte
+time: 2026-03-03 09:17:15.815888
+(../../source4/torture/smb2/streams.c:490) Check 0 byte named stream
+time: 2026-03-03 09:17:15.822914
+failure: zero-byte [
+../../source4/torture/smb2/streams.c:513: status was NT_STATUS_OBJECT_NAME_NOT_FOUND, expected NT_STATUS_OK: create
+]
+test: basefile-rename-with-open-stream
+time: 2026-03-03 09:17:15.822975
+Creating file with stream
+time: 2026-03-03 09:17:15.828654
+failure: basefile-rename-with-open-stream [
+../../source4/torture/smb2/streams.c:2298: status was NT_STATUS_OBJECT_NAME_NOT_FOUND, expected NT_STATUS_OK: smb2_create failed
+]

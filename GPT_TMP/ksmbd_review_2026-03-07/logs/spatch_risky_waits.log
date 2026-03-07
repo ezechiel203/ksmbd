@@ -1,0 +1,187 @@
+warning: Can't find macro file: /usr/lib/coccinelle/standard.h
+warning: Can't find default iso file: /usr/lib/coccinelle/standard.iso
+HANDLING: src/core/ksmbd_feature.c
+HANDLING: src/core/compat.c
+HANDLING: src/core/ksmbd_buffer.c
+SPECIAL NAMES: adding list_for_each_entry_safe as a iterator
+HANDLING: src/core/ksmbd_hooks.c
+SPECIAL NAMES: adding DEFINE_MUTEX as a declarer
+SPECIAL NAMES: adding list_for_each_entry as a iterator
+SPECIAL NAMES: adding list_for_each_entry_rcu as a iterator
+HANDLING: src/core/ksmbd_debugfs.c
+SPECIAL NAMES: adding hlist_for_each_entry as a iterator
+HANDLING: src/core/ksmbd_config.c
+SPECIAL NAMES: adding DEFINE_RWLOCK as a declarer
+HANDLING: src/core/ksmbd_md4.c
+HANDLING: src/core/smb2_compress.c
+HANDLING: src/core/crypto_ctx.c
+HANDLING: src/core/ksmbd_work.c
+HANDLING: src/core/misc.c
+HANDLING: src/core/server.c
+SPECIAL NAMES: adding CLASS_ATTR_RO as a declarer
+SPECIAL NAMES: adding CLASS_ATTR_WO as a declarer
+SPECIAL NAMES: adding CLASS_ATTR_RW as a declarer
+HANDLING: src/core/auth.c
+HANDLING: src/core/connection.c
+diff = 
+diff -u -p src/core/connection.c /tmp/nothing/core/connection.c
+--- src/core/connection.c
++++ /tmp/nothing/core/connection.c
+@@ -744,7 +744,6 @@ out:
+ 	ksmbd_conn_set_releasing(conn);
+ 	/* Wait till all reference dropped to the Server object*/
+ 	ksmbd_debug(CONN, "Wait for all pending requests(%d)\n", atomic_read(&conn->r_count));
+-	wait_event(conn->r_count_q, atomic_read(&conn->r_count) == 0);
+ 
+ 	if (IS_ENABLED(CONFIG_UNICODE))
+ 		utf8_unload(conn->um);
+HANDLING: src/encoding/unicode.c
+HANDLING: src/encoding/asn1.c
+HANDLING: src/encoding/ndr.c
+HANDLING: src/encoding/ksmbd_spnego_negtokeninit.asn1.c
+HANDLING: src/encoding/ksmbd_spnego_negtokentarg.asn1.c
+HANDLING: src/fs/ksmbd_resilient.c
+HANDLING: src/fs/ksmbd_branchcache.c
+HANDLING: src/fs/ksmbd_rsvd.c
+HANDLING: src/fs/ksmbd_create_ctx.c
+SPECIAL NAMES: adding LIST_HEAD as a declarer
+SPECIAL NAMES: adding DEFINE_SPINLOCK as a declarer
+HANDLING: src/fs/ksmbd_app_instance.c
+HANDLING: src/fs/ksmbd_snapshot.c
+HANDLING: src/fs/ksmbd_reparse.c
+HANDLING: src/fs/ksmbd_fsctl_extra.c
+HANDLING: src/fs/ksmbd_dfs.c
+HANDLING: src/fs/ksmbd_vss.c
+HANDLING: src/fs/smbacl.c
+HANDLING: src/fs/ksmbd_notify.c
+HANDLING: src/fs/oplock.c
+HANDLING: src/fs/ksmbd_info.c
+SPECIAL NAMES: adding DEFINE_HASHTABLE as a declarer
+SPECIAL NAMES: adding hash_for_each_possible_rcu as a iterator
+HANDLING: src/fs/ksmbd_quota.c
+HANDLING: src/fs/vfs.c
+SPECIAL NAMES: adding for_each_file_lock as a iterator
+diff = 
+diff -u -p src/fs/vfs.c /tmp/nothing/fs/vfs.c
+--- src/fs/vfs.c
++++ /tmp/nothing/fs/vfs.c
+@@ -4236,9 +4236,7 @@ void ksmbd_vfs_posix_lock_wait(struct fi
+ 	 * on signal/timeout.
+ 	 */
+ #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 9, 0)
+-	wait_event_interruptible(flock->c.flc_wait, !flock->c.flc_blocker);
+ #else
+-	wait_event_interruptible(flock->fl_wait, !flock->fl_blocker);
+ #endif
+ }
+ 
+HANDLING: src/fs/vfs_cache.c
+SPECIAL NAMES: adding idr_for_each_entry as a iterator
+HANDLING: src/fs/ksmbd_fsctl.c
+SPECIAL NAMES: adding DECLARE_DELAYED_WORK as a declarer
+SPECIAL NAMES: adding in_dev_for_each_ifa_rcu as a iterator
+SPECIAL NAMES: adding for_each_netdev as a iterator
+SPECIAL NAMES: adding hash_for_each_safe as a iterator
+SPECIAL NAMES: adding hash_for_each_possible_safe as a iterator
+HANDLING: src/mgmt/ksmbd_ida.c
+HANDLING: src/mgmt/user_config.c
+HANDLING: src/mgmt/tree_connect.c
+SPECIAL NAMES: adding xa_for_each as a iterator
+HANDLING: src/mgmt/ksmbd_witness.c
+SPECIAL NAMES: adding DECLARE_RWSEM as a declarer
+SPECIAL NAMES: adding DEFINE_IDA as a declarer
+HANDLING: src/mgmt/user_session.c
+SPECIAL NAMES: adding hlist_for_each_entry_safe as a iterator
+HANDLING: src/mgmt/share_config.c
+HANDLING: src/protocol/common/netmisc.c
+HANDLING: src/protocol/common/smb_common.c
+HANDLING: src/protocol/smb1/smb1misc.c
+HANDLING: src/protocol/smb1/smb1ops.c
+HANDLING: src/protocol/smb1/smb1pdu.c
+HANDLING: src/protocol/smb2/smb2_ioctl.c
+HANDLING: src/protocol/smb2/smb2_misc_cmds.c
+HANDLING: src/protocol/smb2/smb2misc.c
+HANDLING: src/protocol/smb2/smb2_negotiate.c
+HANDLING: src/protocol/smb2/smb2fruit.c
+HANDLING: src/protocol/smb2/smb2_tree.c
+HANDLING: src/protocol/smb2/smb2_pdu_common.c
+HANDLING: src/protocol/smb2/smb2_dir.c
+HANDLING: src/protocol/smb2/smb2_session.c
+HANDLING: src/protocol/smb2/smb2_lock.c
+HANDLING: src/protocol/smb2/smb2_notify.c
+HANDLING: src/protocol/smb2/smb2_ph.c
+HANDLING: src/protocol/smb2/smb2ops.c
+HANDLING: src/protocol/smb2/smb2_create.c
+HANDLING: src/protocol/smb2/smb2_read_write.c
+HANDLING: src/protocol/smb2/smb2_query_set.c
+HANDLING: src/transport/transport_tcp.c
+HANDLING: src/transport/transport_ipc.c
+SPECIAL NAMES: adding hash_for_each_possible as a iterator
+SPECIAL NAMES: adding for_each_netdev_rcu as a iterator
+HANDLING: src/transport/transport_quic.c
+SPECIAL NAMES: adding hash_for_each as a iterator
+HANDLING: src/transport/transport_rdma.c
+SPECIAL NAMES: adding DECLARE_COMPLETION_ONSTACK as a declarer
+SPECIAL NAMES: adding list_for_each_entry_reverse as a iterator
+SPECIAL NAMES: adding netdev_for_each_lower_dev as a iterator
+diff = 
+diff -u -p src/transport/transport_rdma.c /tmp/nothing/transport/transport_rdma.c
+--- src/transport/transport_rdma.c
++++ /tmp/nothing/transport/transport_rdma.c
+@@ -404,8 +404,6 @@ static void free_transport(struct smb_di
+ 	wake_up_interruptible(&t->wait_send_credits);
+ 
+ 	ksmbd_debug(RDMA, "wait for all send posted to IB to finish\n");
+-	wait_event(t->wait_send_pending,
+-		   atomic_read(&t->send_pending) == 0);
+ 
+ 	disable_work_sync(&t->disconnect_work);
+ 	disable_work_sync(&t->post_recv_credits_work);
+@@ -801,9 +799,6 @@ read_rfc1002_done:
+ 	}
+ 
+ 	ksmbd_debug(RDMA, "wait_event on more data\n");
+-	rc = wait_event_interruptible(st->wait_reassembly_queue,
+-				      st->reassembly_data_length >= size ||
+-				       st->status != SMB_DIRECT_CS_CONNECTED);
+ 	if (rc)
+ 		return -EINTR;
+ 
+@@ -980,9 +975,6 @@ static int wait_for_credits(struct smb_d
+ 			return 0;
+ 
+ 		atomic_add(needed, total_credits);
+-		ret = wait_event_interruptible(*waitq,
+-					       atomic_read(total_credits) >= needed ||
+-					       t->status != SMB_DIRECT_CS_CONNECTED);
+ 
+ 		if (t->status != SMB_DIRECT_CS_CONNECTED)
+ 			return -ENOTCONN;
+@@ -1363,8 +1355,6 @@ done:
+ 	 * that means all the I/Os have been out and we are good to return
+ 	 */
+ 
+-	wait_event(st->wait_send_pending,
+-		   atomic_read(&st->send_pending) == 0);
+ 	return ret;
+ }
+ 
+@@ -1986,8 +1976,6 @@ static void smb_direct_disconnect(struct
+ 	ksmbd_debug(RDMA, "Disconnecting cm_id=%p\n", st->cm_id);
+ 
+ 	smb_direct_disconnect_rdma_work(&st->disconnect_work);
+-	wait_event_interruptible(st->wait_status,
+-				 st->status == SMB_DIRECT_CS_DISCONNECTED);
+ 	free_transport(st);
+ }
+ 
+@@ -2107,8 +2095,6 @@ static int smb_direct_send_negotiate_res
+ 		return ret;
+ 	}
+ 
+-	wait_event(t->wait_send_pending,
+-		   atomic_read(&t->send_pending) == 0);
+ 	return 0;
+ }
+ 
+HANDLING: src/tools/memory_usage_validator.c

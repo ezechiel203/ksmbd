@@ -1,0 +1,63 @@
+smbtorture 4.23.6
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772858458
+time: 2026-03-07 04:40:58.652221
+progress: 10
+test: session_setup_credits_granted
+time: 2026-03-07 04:40:58.653670
+time: 2026-03-07 04:40:58.883808
+failure: session_setup_credits_granted [
+Server only granted 1 credits
+]
+test: single_req_credits_granted
+time: 2026-03-07 04:40:58.883881
+time: 2026-03-07 04:40:59.225743
+failure: single_req_credits_granted [
+Server only granted 1 credits
+]
+test: skipped_mid
+time: 2026-03-07 04:40:59.225789
+time: 2026-03-07 04:44:04.432415
+success: skipped_mid
+test: ipc_max_data_zero
+time: 2026-03-07 04:44:04.433517
+time: 2026-03-07 04:44:04.702104
+failure: ipc_max_data_zero [
+../../source4/torture/smb2/credits.c:570: status was NT_STATUS_OBJECT_NAME_NOT_FOUND, expected NT_STATUS_OK: FSCTL_NAMED_PIPE_READ_WRITE failed
+]
+test: 1conn_ipc_max_async_credits
+time: 2026-03-07 04:44:04.702159
+time: 2026-03-07 04:44:04.976245
+failure: 1conn_ipc_max_async_credits [
+../../source4/torture/smb2/credits.c:570: status was NT_STATUS_OBJECT_NAME_NOT_FOUND, expected NT_STATUS_OK: FSCTL_NAMED_PIPE_READ_WRITE failed
+]
+test: 2conn_ipc_max_async_credits
+time: 2026-03-07 04:44:04.976303
+time: 2026-03-07 04:44:05.359442
+failure: 2conn_ipc_max_async_credits [
+../../source4/torture/smb2/credits.c:570: status was NT_STATUS_OBJECT_NAME_NOT_FOUND, expected NT_STATUS_OK: FSCTL_NAMED_PIPE_READ_WRITE failed
+]
+test: multichannel_ipc_max_async_credits
+time: 2026-03-07 04:44:05.359537
+time: 2026-03-07 04:44:05.678393
+failure: multichannel_ipc_max_async_credits [
+../../source4/torture/smb2/credits.c:983: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: smb2_session_setup_spnego failed
+]
+test: 1conn_notify_max_async_credits
+time: 2026-03-07 04:44:05.678464
+time: 2026-03-07 04:44:29.257891
+failure: 1conn_notify_max_async_credits [
+../../source4/torture/smb2/credits.c:1314: Expression `ok' failed: timeout_req
+]
+test: 2conn_notify_max_async_credits
+time: 2026-03-07 04:44:29.257946
+time: 2026-03-07 04:44:29.661828
+failure: 2conn_notify_max_async_credits [
+../../source4/torture/smb2/credits.c:1483: status was NT_STATUS_DELETE_PENDING, expected NT_STATUS_OK: smb2_create failed
+]
+test: multichannel_max_async_credits
+time: 2026-03-07 04:44:29.661905
+time: 2026-03-07 04:44:29.906704
+failure: multichannel_max_async_credits [
+../../source4/torture/smb2/credits.c:1534: status was NT_STATUS_DELETE_PENDING, expected NT_STATUS_OK: smb2_create failed
+]

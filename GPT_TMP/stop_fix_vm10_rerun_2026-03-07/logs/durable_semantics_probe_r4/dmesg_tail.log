@@ -1,0 +1,187 @@
+[ 2448.991857] ksmbd: durable reconnect v2: client GUID mismatch
+[ 2448.995508] ksmbd: durable reconnect v2: client GUID mismatch
+[ 2449.013753] ------------[ cut here ]------------
+[ 2449.014871] refcount_t: underflow; use-after-free.
+[ 2449.016354] WARNING: CPU: 1 PID: 1206 at lib/refcount.c:28 refcount_warn_saturate+0xbe/0x110
+[ 2449.018530] Modules linked in: ksmbd(OE) nls_utf8 tcp_diag inet_diag md4 rdma_ucm rdma_cm iw_cm ib_cm ib_umad ib_uverbs ib_core hkdf crypto_user lz4_compress libdes intel_rapl_msr intel_rapl_common intel_uncore_frequency_common intel_pmc_core pmt_telemetry pmt_discovery pmt_class intel_pmc_ssram_telemetry intel_vsec kvm_intel kvm irqbypass polyval_clmulni ghash_clmulni_intel joydev aesni_intel ppdev rapl mousedev psmouse i2c_piix4 pcspkr i2c_smbus parport_pc parport mac_hid cfg80211 rfkill nfnetlink vsock_loopback vmw_vsock_virtio_transport_common vmw_vsock_vmci_transport vsock vmw_vmci qemu_fw_cfg sr_mod cdrom ata_generic pata_acpi floppy intel_agp bochs ata_piix intel_gtt serio_raw 9p 9pnet_virtio 9pnet virtio_net netfs net_failover failover
+[ 2449.018595] Unloaded tainted modules: ksmbd(OE):6 [last unloaded: ksmbd(OE)]
+[ 2449.035579] CPU: 1 UID: 0 PID: 1206 Comm: kworker/1:0 Tainted: G           OE       6.18.13-arch1-1 #1 PREEMPT(full)  37d84e5c59d38b1e3c61214631c6e0356ae9b977
+[ 2449.039002] Tainted: [O]=OOT_MODULE, [E]=UNSIGNED_MODULE
+[ 2449.040216] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Arch Linux 1.17.0-2-2 04/01/2014
+[ 2449.042950] Workqueue: ksmbd-io handle_ksmbd_work [ksmbd]
+[ 2449.044302] RIP: 0010:refcount_warn_saturate+0xbe/0x110
+[ 2449.045514] Code: 01 01 e8 45 53 7b ff 0f 0b c3 cc cc cc cc 80 3d 8a a8 ae 01 00 75 85 48 c7 c7 18 1c dd 99 c6 05 7a a8 ae 01 01 e8 22 53 7b ff <0f> 0b c3 cc cc cc cc 80 3d 68 a8 ae 01 00 0f 85 5e ff ff ff 48 c7
+[ 2449.049659] RSP: 0018:ffffd3fa426b7cc0 EFLAGS: 00010246
+[ 2449.050924] RAX: 0000000000000000 RBX: ffff8d708c782780 RCX: 0000000000000000
+[ 2449.052543] RDX: ffff8d70fd32b000 RSI: 0000000000000001 RDI: ffff8d70fd31d000
+[ 2449.054155] RBP: ffff8d708f014500 R08: 0000000000000000 R09: 00000000ffffefff
+[ 2449.055809] R10: ffffffff9a661440 R11: ffffd3fa426b7b58 R12: ffff8d708c777c00
+[ 2449.057412] R13: 0000000000000006 R14: 0000000000000001 R15: 000000010020c967
+[ 2449.059003] FS:  0000000000000000(0000) GS:ffff8d7161fee000(0000) knlGS:0000000000000000
+[ 2449.060959] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[ 2449.062262] CR2: 00007fe914001d58 CR3: 0000000013202005 CR4: 0000000000372ef0
+[ 2449.063865] Call Trace:
+[ 2449.064558]  <TASK>
+[ 2449.065019]  ksmbd_close_fd+0xae/0x110 [ksmbd c51cade1e70b9de9bc76d91123e6668d069bd2d9]
+[ 2449.066871]  smb2_close+0x1c3/0x400 [ksmbd c51cade1e70b9de9bc76d91123e6668d069bd2d9]
+[ 2449.068682]  ? xas_load+0xd/0xd0
+[ 2449.069596]  ? xa_load+0x76/0xb0
+[ 2449.070320]  ? xas_load+0xd/0xd0
+[ 2449.071566]  ? xa_load+0x76/0xb0
+[ 2449.072383]  ? _raw_spin_unlock+0xe/0x30
+[ 2449.073378]  ? ksmbd_smb2_check_message+0x747/0x7d0 [ksmbd c51cade1e70b9de9bc76d91123e6668d069bd2d9]
+[ 2449.075632]  ? ksmbd_tree_conn_lookup+0x47/0x80 [ksmbd c51cade1e70b9de9bc76d91123e6668d069bd2d9]
+[ 2449.077763]  handle_ksmbd_work+0x46c/0x9b0 [ksmbd c51cade1e70b9de9bc76d91123e6668d069bd2d9]
+[ 2449.080068]  process_one_work+0x193/0x350
+[ 2449.081174]  worker_thread+0x2d7/0x410
+[ 2449.082171]  ? __pfx_worker_thread+0x10/0x10
+[ 2449.083279]  kthread+0xfc/0x240
+[ 2449.084154]  ? __pfx_kthread+0x10/0x10
+[ 2449.085271]  ? __pfx_kthread+0x10/0x10
+[ 2449.086262]  ret_from_fork+0x1c2/0x1f0
+[ 2449.087190]  ? __pfx_kthread+0x10/0x10
+[ 2449.088213]  ret_from_fork_asm+0x1a/0x30
+[ 2449.089199]  </TASK>
+[ 2449.089810] ---[ end trace 0000000000000000 ]---
+[ 2449.094164] ------------[ cut here ]------------
+[ 2449.095258] refcount_t: saturated; leaking memory.
+[ 2449.096271] WARNING: CPU: 1 PID: 1778 at lib/refcount.c:19 refcount_warn_saturate+0x9b/0x110
+[ 2449.099088] Modules linked in: ksmbd(OE) nls_utf8 tcp_diag inet_diag md4 rdma_ucm rdma_cm iw_cm ib_cm ib_umad ib_uverbs ib_core hkdf crypto_user lz4_compress libdes intel_rapl_msr intel_rapl_common intel_uncore_frequency_common intel_pmc_core pmt_telemetry pmt_discovery pmt_class intel_pmc_ssram_telemetry intel_vsec kvm_intel kvm irqbypass polyval_clmulni ghash_clmulni_intel joydev aesni_intel ppdev rapl mousedev psmouse i2c_piix4 pcspkr i2c_smbus parport_pc parport mac_hid cfg80211 rfkill nfnetlink vsock_loopback vmw_vsock_virtio_transport_common vmw_vsock_vmci_transport vsock vmw_vmci qemu_fw_cfg sr_mod cdrom ata_generic pata_acpi floppy intel_agp bochs ata_piix intel_gtt serio_raw 9p 9pnet_virtio 9pnet virtio_net netfs net_failover failover
+[ 2449.099162] Unloaded tainted modules: ksmbd(OE):6 [last unloaded: ksmbd(OE)]
+[ 2449.115487] CPU: 1 UID: 0 PID: 1778 Comm: ksmbd:::ffff:10 Tainted: G        W  OE       6.18.13-arch1-1 #1 PREEMPT(full)  37d84e5c59d38b1e3c61214631c6e0356ae9b977
+[ 2449.118944] Tainted: [W]=WARN, [O]=OOT_MODULE, [E]=UNSIGNED_MODULE
+[ 2449.120485] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Arch Linux 1.17.0-2-2 04/01/2014
+[ 2449.122667] RIP: 0010:refcount_warn_saturate+0x9b/0x110
+[ 2449.123940] Code: 01 01 e8 68 53 7b ff 0f 0b c3 cc cc cc cc 80 3d b0 a8 ae 01 00 75 a8 48 c7 c7 c0 1b dd 99 c6 05 a0 a8 ae 01 01 e8 45 53 7b ff <0f> 0b c3 cc cc cc cc 80 3d 8a a8 ae 01 00 75 85 48 c7 c7 18 1c dd
+[ 2449.128072] RSP: 0018:ffffd3fa42383d48 EFLAGS: 00010246
+[ 2449.129181] RAX: 0000000000000000 RBX: ffff8d708c777d38 RCX: 0000000000000000
+[ 2449.130628] RDX: ffff8d70fd32b000 RSI: 0000000000000001 RDI: ffff8d70fd31d000
+[ 2449.132772] RBP: 0000000000000001 R08: 0000000000000000 R09: 00000000ffffefff
+[ 2449.134408] R10: ffffffff9a661440 R11: ffffd3fa42383be0 R12: ffff8d708c777cd8
+[ 2449.136449] R13: ffff8d708c7827d0 R14: 0000000000000000 R15: ffff8d708c782780
+[ 2449.138610] FS:  0000000000000000(0000) GS:ffff8d7161fee000(0000) knlGS:0000000000000000
+[ 2449.140523] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[ 2449.141717] CR2: 00007fe914001d58 CR3: 0000000013202005 CR4: 0000000000372ef0
+[ 2449.143442] Call Trace:
+[ 2449.143970]  <TASK>
+[ 2449.144602]  __close_file_table_ids+0x13d/0x280 [ksmbd c51cade1e70b9de9bc76d91123e6668d069bd2d9]
+[ 2449.146583]  ? __pfx_session_fd_check+0x10/0x10 [ksmbd c51cade1e70b9de9bc76d91123e6668d069bd2d9]
+[ 2449.151023]  ksmbd_destroy_file_table+0x22/0x50 [ksmbd c51cade1e70b9de9bc76d91123e6668d069bd2d9]
+[ 2449.153415]  ksmbd_session_destroy.part.0+0x50/0x280 [ksmbd c51cade1e70b9de9bc76d91123e6668d069bd2d9]
+[ 2449.155641]  ksmbd_sessions_deregister+0x1a2/0x3b0 [ksmbd c51cade1e70b9de9bc76d91123e6668d069bd2d9]
+[ 2449.160226]  ksmbd_server_terminate_conn+0x16/0x30 [ksmbd c51cade1e70b9de9bc76d91123e6668d069bd2d9]
+[ 2449.162846]  ksmbd_conn_handler_loop+0x1c1/0x5b0 [ksmbd c51cade1e70b9de9bc76d91123e6668d069bd2d9]
+[ 2449.165194]  ? __pfx_ksmbd_conn_handler_loop+0x10/0x10 [ksmbd c51cade1e70b9de9bc76d91123e6668d069bd2d9]
+[ 2449.167365]  kthread+0xfc/0x240
+[ 2449.168393]  ? __pfx_kthread+0x10/0x10
+[ 2449.170042]  ret_from_fork+0x1c2/0x1f0
+[ 2449.170862]  ? __pfx_kthread+0x10/0x10
+[ 2449.171663]  ret_from_fork_asm+0x1a/0x30
+[ 2449.172499]  </TASK>
+[ 2449.172996] ---[ end trace 0000000000000000 ]---
+[ 2449.174585] ksmbd: inherit ACL overflow
+[ 2449.180933] ------------[ cut here ]------------
+[ 2449.180934] refcount_t: decrement hit 0; leaking memory.
+[ 2449.180951] WARNING: CPU: 1 PID: 1778 at lib/refcount.c:31 refcount_warn_saturate+0xff/0x110
+[ 2449.180958] Modules linked in: ksmbd(OE) nls_utf8 tcp_diag inet_diag md4 rdma_ucm rdma_cm iw_cm ib_cm ib_umad ib_uverbs ib_core hkdf crypto_user lz4_compress libdes intel_rapl_msr intel_rapl_common intel_uncore_frequency_common intel_pmc_core pmt_telemetry pmt_discovery pmt_class intel_pmc_ssram_telemetry intel_vsec kvm_intel kvm irqbypass polyval_clmulni ghash_clmulni_intel joydev aesni_intel ppdev rapl mousedev psmouse i2c_piix4 pcspkr i2c_smbus parport_pc parport mac_hid cfg80211 rfkill nfnetlink vsock_loopback vmw_vsock_virtio_transport_common vmw_vsock_vmci_transport vsock vmw_vmci qemu_fw_cfg sr_mod cdrom ata_generic pata_acpi floppy intel_agp bochs ata_piix intel_gtt serio_raw 9p 9pnet_virtio 9pnet virtio_net netfs net_failover failover
+[ 2449.181001] Unloaded tainted modules: ksmbd(OE):6 [last unloaded: ksmbd(OE)]
+[ 2449.181006] CPU: 1 UID: 0 PID: 1778 Comm: ksmbd:::ffff:10 Tainted: G        W  OE       6.18.13-arch1-1 #1 PREEMPT(full)  37d84e5c59d38b1e3c61214631c6e0356ae9b977
+[ 2449.181011] Tainted: [W]=WARN, [O]=OOT_MODULE, [E]=UNSIGNED_MODULE
+[ 2449.181012] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Arch Linux 1.17.0-2-2 04/01/2014
+[ 2449.181014] RIP: 0010:refcount_warn_saturate+0xff/0x110
+[ 2449.181017] Code: e8 1b dd 99 c6 05 54 a8 ae 01 01 e8 fb 52 7b ff 0f 0b c3 cc cc cc cc 48 c7 c7 40 1c dd 99 c6 05 38 a8 ae 01 01 e8 e1 52 7b ff <0f> 0b c3 cc cc cc cc 66 2e 0f 1f 84 00 00 00 00 00 90 90 90 90 90
+[ 2449.181019] RSP: 0018:ffffd3fa42383d48 EFLAGS: 00010246
+[ 2449.181021] RAX: 0000000000000000 RBX: ffff8d708c777d38 RCX: 0000000000000027
+[ 2449.201275] ksmbd: inherit ACL overflow
+[ 2449.218313] RDX: ffff8d70fd31d008 RSI: 0000000000000001 RDI: ffff8d70fd31d000
+[ 2449.246249] RBP: 0000000000000001 R08: 0000000000000000 R09: 00000000ffffefff
+[ 2449.247933] R10: ffffffff9a661440 R11: ffffd3fa42383b18 R12: ffff8d708c777cd8
+[ 2449.249578] R13: ffff8d708c7827d0 R14: 0000000000000000 R15: ffff8d708c782780
+[ 2449.251313] FS:  0000000000000000(0000) GS:ffff8d7161fee000(0000) knlGS:0000000000000000
+[ 2449.253260] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[ 2449.254752] CR2: 00007fed2744368c CR3: 0000000003d8e006 CR4: 0000000000372ef0
+[ 2449.257689] Call Trace:
+[ 2449.258578]  <TASK>
+[ 2449.259693]  __close_file_table_ids+0x269/0x280 [ksmbd c51cade1e70b9de9bc76d91123e6668d069bd2d9]
+[ 2449.261986]  ? __pfx_session_fd_check+0x10/0x10 [ksmbd c51cade1e70b9de9bc76d91123e6668d069bd2d9]
+[ 2449.264129]  ksmbd_destroy_file_table+0x22/0x50 [ksmbd c51cade1e70b9de9bc76d91123e6668d069bd2d9]
+[ 2449.266432]  ksmbd_session_destroy.part.0+0x50/0x280 [ksmbd c51cade1e70b9de9bc76d91123e6668d069bd2d9]
+[ 2449.269769]  ksmbd_sessions_deregister+0x1a2/0x3b0 [ksmbd c51cade1e70b9de9bc76d91123e6668d069bd2d9]
+[ 2449.271660]  ksmbd_server_terminate_conn+0x16/0x30 [ksmbd c51cade1e70b9de9bc76d91123e6668d069bd2d9]
+[ 2449.273694] ksmbd: inherit ACL overflow
+[ 2449.274270]  ksmbd_conn_handler_loop+0x1c1/0x5b0 [ksmbd c51cade1e70b9de9bc76d91123e6668d069bd2d9]
+[ 2449.274330]  ? __pfx_ksmbd_conn_handler_loop+0x10/0x10 [ksmbd c51cade1e70b9de9bc76d91123e6668d069bd2d9]
+[ 2449.274380]  kthread+0xfc/0x240
+[ 2449.274385]  ? __pfx_kthread+0x10/0x10
+[ 2449.274388]  ret_from_fork+0x1c2/0x1f0
+[ 2449.274391]  ? __pfx_kthread+0x10/0x10
+[ 2449.274393]  ret_from_fork_asm+0x1a/0x30
+[ 2449.274398]  </TASK>
+[ 2449.274399] ---[ end trace 0000000000000000 ]---
+[ 2449.285725] BUG: kernel NULL pointer dereference, address: 0000000000000104
+[ 2449.287664] #PF: supervisor read access in kernel mode
+[ 2449.288793] #PF: error_code(0x0000) - not-present page
+[ 2449.289957] PGD 0 P4D 0 
+[ 2449.290610] Oops: Oops: 0000 [#1] SMP PTI
+[ 2449.291524] CPU: 0 UID: 0 PID: 118 Comm: kworker/0:2 Tainted: G        W  OE       6.18.13-arch1-1 #1 PREEMPT(full)  37d84e5c59d38b1e3c61214631c6e0356ae9b977
+[ 2449.294544] Tainted: [W]=WARN, [O]=OOT_MODULE, [E]=UNSIGNED_MODULE
+[ 2449.295835] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Arch Linux 1.17.0-2-2 04/01/2014
+[ 2449.297857] Workqueue: ksmbd-io handle_ksmbd_work [ksmbd]
+[ 2449.299089] RIP: 0010:rwsem_down_write_slowpath+0x665/0x750
+[ 2449.300275] Code: ff ff ff e8 2d fb ec fe e9 4f ff ff ff 48 8b 43 08 31 f6 a8 02 0f 84 af fa ff ff f0 48 83 63 08 fd e9 a4 fa ff ff 48 83 e0 fc <8b> 50 34 85 d2 0f 84 04 fa ff ff 8b 78 14 e8 58 36 f5 fe 90 84 c0
+[ 2449.304230] RSP: 0018:ffffd3fa40587a90 EFLAGS: 00010202
+[ 2449.305362] RAX: 00000000000000d0 RBX: ffff8d7083beb6c0 RCX: 0000000000000000
+[ 2449.306894] RDX: 0000000000000001 RSI: 0000000000000002 RDI: ffffd3fa40587b00
+[ 2449.308445] RBP: ffffd3fa40587b38 R08: 0000000000000000 R09: ffffffffc0ab4083
+[ 2449.309956] R10: ffff8d708c7d3200 R11: ffff8d708132af00 R12: ffff8d7085160000
+[ 2449.311524] R13: 0000000000000002 R14: ffffd3fa40587ad0 R15: 0000000000000000
+[ 2449.313058] FS:  0000000000000000(0000) GS:ffff8d7161eee000(0000) knlGS:0000000000000000
+[ 2449.314777] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[ 2449.316021] CR2: 0000000000000104 CR3: 0000000013202003 CR4: 0000000000372ef0
+[ 2449.317589] Call Trace:
+[ 2449.318155]  <TASK>
+[ 2449.318639]  down_write+0x5a/0x60
+[ 2449.319368]  smb2_open+0x24d2/0x43f0 [ksmbd c51cade1e70b9de9bc76d91123e6668d069bd2d9]
+[ 2449.321223]  ? ksmbd_tcp_writev+0xb1/0x160 [ksmbd c51cade1e70b9de9bc76d91123e6668d069bd2d9]
+[ 2449.323095]  ? ksmbd_tree_conn_lookup+0x47/0x80 [ksmbd c51cade1e70b9de9bc76d91123e6668d069bd2d9]
+[ 2449.325115]  handle_ksmbd_work+0x46c/0x9b0 [ksmbd c51cade1e70b9de9bc76d91123e6668d069bd2d9]
+[ 2449.326964]  process_one_work+0x193/0x350
+[ 2449.327855]  worker_thread+0x2d7/0x410
+[ 2449.328703]  ? __pfx_worker_thread+0x10/0x10
+[ 2449.329645]  kthread+0xfc/0x240
+[ 2449.330337]  ? __pfx_kthread+0x10/0x10
+[ 2449.331173]  ? __pfx_kthread+0x10/0x10
+[ 2449.331978]  ret_from_fork+0x1c2/0x1f0
+[ 2449.332828]  ? __pfx_kthread+0x10/0x10
+[ 2449.333660]  ret_from_fork_asm+0x1a/0x30
+[ 2449.334540]  </TASK>
+[ 2449.335009] Modules linked in: ksmbd(OE) nls_utf8 tcp_diag inet_diag md4 rdma_ucm rdma_cm iw_cm ib_cm ib_umad ib_uverbs ib_core hkdf crypto_user lz4_compress libdes intel_rapl_msr intel_rapl_common intel_uncore_frequency_common intel_pmc_core pmt_telemetry pmt_discovery pmt_class intel_pmc_ssram_telemetry intel_vsec kvm_intel kvm irqbypass polyval_clmulni ghash_clmulni_intel joydev aesni_intel ppdev rapl mousedev psmouse i2c_piix4 pcspkr i2c_smbus parport_pc parport mac_hid cfg80211 rfkill nfnetlink vsock_loopback vmw_vsock_virtio_transport_common vmw_vsock_vmci_transport vsock vmw_vmci qemu_fw_cfg sr_mod cdrom ata_generic pata_acpi floppy intel_agp bochs ata_piix intel_gtt serio_raw 9p 9pnet_virtio 9pnet virtio_net netfs net_failover failover
+[ 2449.335107] Unloaded tainted modules: ksmbd(OE):6 [last unloaded: ksmbd(OE)]
+[ 2449.350468] CR2: 0000000000000104
+[ 2449.351199] ---[ end trace 0000000000000000 ]---
+[ 2449.352214] RIP: 0010:rwsem_down_write_slowpath+0x665/0x750
+[ 2449.353391] Code: ff ff ff e8 2d fb ec fe e9 4f ff ff ff 48 8b 43 08 31 f6 a8 02 0f 84 af fa ff ff f0 48 83 63 08 fd e9 a4 fa ff ff 48 83 e0 fc <8b> 50 34 85 d2 0f 84 04 fa ff ff 8b 78 14 e8 58 36 f5 fe 90 84 c0
+[ 2449.357332] RSP: 0018:ffffd3fa40587a90 EFLAGS: 00010202
+[ 2449.358503] RAX: 00000000000000d0 RBX: ffff8d7083beb6c0 RCX: 0000000000000000
+[ 2449.360013] RDX: 0000000000000001 RSI: 0000000000000002 RDI: ffffd3fa40587b00
+[ 2449.361558] RBP: ffffd3fa40587b38 R08: 0000000000000000 R09: ffffffffc0ab4083
+[ 2449.363114] R10: ffff8d708c7d3200 R11: ffff8d708132af00 R12: ffff8d7085160000
+[ 2449.364642] R13: 0000000000000002 R14: ffffd3fa40587ad0 R15: 0000000000000000
+[ 2449.366169] FS:  0000000000000000(0000) GS:ffff8d7161eee000(0000) knlGS:0000000000000000
+[ 2449.367847] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[ 2449.369128] CR2: 0000000000000104 CR3: 0000000013202003 CR4: 0000000000372ef0
+[ 2449.370679] note: kworker/0:2[118] exited with irqs disabled
+[ 2449.372001] note: kworker/0:2[118] exited with preempt_count 1
+[ 2509.396938] ksmbd: inherit ACL overflow
+[ 2509.406826] ksmbd: inherit ACL overflow
+[ 2509.418377] ksmbd: inherit ACL overflow
+[ 2509.429611] ksmbd: inherit ACL overflow
+[ 2509.454792] ksmbd: inherit ACL overflow
+[ 2513.473055] ksmbd: inherit ACL overflow
+[ 2517.489694] ksmbd: inherit ACL overflow
+[ 2521.540237] ksmbd: inherit ACL overflow
+[ 2525.557996] ksmbd: inherit ACL overflow
+[ 2529.590192] ksmbd: inherit ACL overflow
+[ 2533.610332] ksmbd: inherit ACL overflow
+[ 2537.629530] ksmbd: inherit ACL overflow
+[ 2541.646560] ksmbd: inherit ACL overflow

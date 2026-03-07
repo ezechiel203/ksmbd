@@ -1,0 +1,18 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772889826
+time: 2026-03-07 13:23:46.872163
+progress: 2
+test: maximum_allowed
+time: 2026-03-07 13:23:46.873659
+Checked SEC_PRIV_RESTORE for S-1-5-21-1685530655-1107808616-2606932764-65535 - No
+Checked SEC_PRIV_BACKUP for S-1-5-21-1685530655-1107808616-2606932764-65535 - No
+Checked SEC_PRIV_SECURITY for S-1-5-21-1685530655-1107808616-2606932764-65535 - No
+time: 2026-03-07 13:23:46.894907
+failure: maximum_allowed [
+../../source4/torture/smb2/max_allowed.c:162: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: Incorrect status NT_STATUS_ACCESS_DENIED - should be NT_STATUS_OK
+]
+test: read_only
+time: 2026-03-07 13:23:46.894947
+time: 2026-03-07 13:23:46.902399
+success: read_only

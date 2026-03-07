@@ -1,0 +1,33 @@
+ITER:1:BEGIN
+[ksmbd.control/3350]: INFO: Terminated mountd
+[ksmbd.control/3350]: INFO: Killed ksmbd
+ITER:1:STOP_OK
+ITER:1:RMMOD_OK
+ITER:1:INSMOD_OK
+[ksmbd.mountd/3355]: INFO: Started manager
+ITER:1:START_OK
+3356 ksmbdctl start
+3357 ksmbdctl start
+ITER:1:END
+ITER:2:BEGIN
+[ksmbd.control/3364]: INFO: Terminated mountd
+[ksmbd.control/3364]: INFO: Killed ksmbd
+ITER:2:STOP_OK
+ITER:2:RMMOD_OK
+ITER:2:INSMOD_OK
+[ksmbd.mountd/3368]: INFO: Started manager
+ITER:2:START_OK
+3369 ksmbdctl start
+3371 ksmbdctl start
+ITER:2:END
+ITER:3:BEGIN
+[ksmbd.control/3377]: INFO: Terminated mountd
+[ksmbd.control/3377]: INFO: Killed ksmbd
+ITER:3:STOP_OK
+ITER:3:RMMOD_OK
+ITER:3:INSMOD_OK
+[ksmbd.mountd/3381]: INFO: Started manager
+ITER:3:START_OK
+3382 ksmbdctl start
+3383 ksmbdctl start
+ITER:3:END

@@ -1,0 +1,245 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772541263
+time: 2026-03-03 12:34:23.897563
+progress: 33
+test: create-blob
+time: 2026-03-03 12:34:23.898389
+time: 2026-03-03 12:34:23.915297
+success: create-blob
+test: open-oplock
+time: 2026-03-03 12:34:23.915353
+time: 2026-03-03 12:34:23.977208
+success: open-oplock
+test: open-lease
+time: 2026-03-03 12:34:23.977268
+time: 2026-03-03 12:34:24.041377
+success: open-lease
+test: reopen1
+time: 2026-03-03 12:34:24.041435
+time: 2026-03-03 12:34:24.045034
+success: reopen1
+test: reopen1a
+time: 2026-03-03 12:34:24.045088
+time: 2026-03-03 12:34:24.053492
+failure: reopen1a [
+../../source4/torture/smb2/durable_v2_open.c:679: status was NT_STATUS_OBJECT_NAME_NOT_FOUND, expected NT_STATUS_OK: ../../source4/torture/smb2/durable_v2_open.c:679
+]
+test: reopen1a-lease
+time: 2026-03-03 12:34:24.053549
+time: 2026-03-03 12:34:24.068462
+failure: reopen1a-lease [
+../../source4/torture/smb2/durable_v2_open.c:902: io.out.durable_open_v2 was 1 (0x1), expected 0 (0x0): ../../source4/torture/smb2/durable_v2_open.c:902
+]
+test: reopen2
+time: 2026-03-03 12:34:24.068517
+time: 2026-03-03 12:34:24.075312
+failure: reopen2 [
+../../source4/torture/smb2/durable_v2_open.c:1033: status was NT_STATUS_OBJECT_NAME_NOT_FOUND, expected NT_STATUS_OK: ../../source4/torture/smb2/durable_v2_open.c:1033
+]
+test: reopen2b
+time: 2026-03-03 12:34:24.075374
+time: 2026-03-03 12:34:24.082256
+failure: reopen2b [
+../../source4/torture/smb2/durable_v2_open.c:1165: status was NT_STATUS_OBJECT_NAME_NOT_FOUND, expected NT_STATUS_OK: ../../source4/torture/smb2/durable_v2_open.c:1165
+]
+test: reopen2c
+time: 2026-03-03 12:34:24.082347
+time: 2026-03-03 12:34:24.088888
+success: reopen2c
+test: reopen2-lease
+time: 2026-03-03 12:34:24.088948
+time: 2026-03-03 12:34:24.096342
+failure: reopen2-lease [
+../../source4/torture/smb2/durable_v2_open.c:1392: status was NT_STATUS_OBJECT_NAME_NOT_FOUND, expected NT_STATUS_INVALID_PARAMETER: ../../source4/torture/smb2/durable_v2_open.c:1392
+]
+test: reopen2-lease-v2
+time: 2026-03-03 12:34:24.096405
+time: 2026-03-03 12:34:24.105161
+failure: reopen2-lease-v2 [
+../../source4/torture/smb2/durable_v2_open.c:1666: io.out.durable_open_v2 was 1 (0x1), expected 0 (0x0): ../../source4/torture/smb2/durable_v2_open.c:1666
+]
+test: durable-v2-setinfo
+time: 2026-03-03 12:34:24.105233
+time: 2026-03-03 12:34:24.113308
+failure: durable-v2-setinfo [
+../../source4/torture/smb2/durable_v2_open.c:5064: status was NT_STATUS_OBJECT_NAME_NOT_FOUND, expected NT_STATUS_OK: ../../source4/torture/smb2/durable_v2_open.c:5064
+]
+test: lock-oplock
+time: 2026-03-03 12:34:24.113374
+time: 2026-03-03 12:34:24.119940
+failure: lock-oplock [
+../../source4/torture/smb2/durable_v2_open.c:1833: status was NT_STATUS_OBJECT_NAME_NOT_FOUND, expected NT_STATUS_OK: ../../source4/torture/smb2/durable_v2_open.c:1833
+]
+test: lock-lease
+time: 2026-03-03 12:34:24.120001
+time: 2026-03-03 12:34:24.126451
+failure: lock-lease [
+../../source4/torture/smb2/durable_v2_open.c:1945: status was NT_STATUS_OBJECT_NAME_NOT_FOUND, expected NT_STATUS_OK: ../../source4/torture/smb2/durable_v2_open.c:1945
+]
+test: lock-noW-lease
+time: 2026-03-03 12:34:24.126512
+time: 2026-03-03 12:34:24.133028
+success: lock-noW-lease
+test: stat-and-lease
+time: 2026-03-03 12:34:24.133082
+time: 2026-03-03 12:34:24.139795
+failure: stat-and-lease [
+../../source4/torture/smb2/durable_v2_open.c:2149: (&io)->out.lease_response_v2.lease_state was 0 (0x0), expected 7 (0x7): ../../source4/torture/smb2/durable_v2_open.c:2149
+]
+test: nonstat-and-lease
+time: 2026-03-03 12:34:24.139855
+time: 2026-03-03 12:34:24.146820
+failure: nonstat-and-lease [
+../../source4/torture/smb2/durable_v2_open.c:2295: (&io)->out.lease_response_v2.lease_state was 0 (0x0), expected 3 (0x3): ../../source4/torture/smb2/durable_v2_open.c:2295
+]
+test: statRH-and-lease
+time: 2026-03-03 12:34:24.146882
+time: 2026-03-03 12:34:24.156773
+failure: statRH-and-lease [
+../../source4/torture/smb2/durable_v2_open.c:2468: io.out.durable_open_v2 was 1 (0x1), expected 0 (0x0): ../../source4/torture/smb2/durable_v2_open.c:2468
+]
+test: two-same-lease
+time: 2026-03-03 12:34:24.156854
+time: 2026-03-03 12:34:24.163899
+failure: two-same-lease [
+../../source4/torture/smb2/durable_v2_open.c:2590: (&io)->out.lease_response_v2.lease_epoch was 2 (0x2), expected 1 (0x1): ../../source4/torture/smb2/durable_v2_open.c:2590
+]
+test: two-different-lease
+time: 2026-03-03 12:34:24.163965
+time: 2026-03-03 12:34:24.174761
+failure: two-different-lease [
+../../source4/torture/smb2/durable_v2_open.c:2785: status was NT_STATUS_OBJECT_NAME_NOT_FOUND, expected NT_STATUS_OK: ../../source4/torture/smb2/durable_v2_open.c:2785
+]
+test: keep-disconnected-rh-with-stat-open
+time: 2026-03-03 12:34:24.174828
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+time: 2026-03-03 12:34:27.198000
+failure: keep-disconnected-rh-with-stat-open [
+../../source4/torture/smb2/durable_v2_open.c:2994: io.out.durable_open_v2 was 1 (0x1), expected 0 (0x0): ../../source4/torture/smb2/durable_v2_open.c:2994
+]
+test: keep-disconnected-rh-with-rh-open
+time: 2026-03-03 12:34:27.198055
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+time: 2026-03-03 12:34:30.217414
+failure: keep-disconnected-rh-with-rh-open [
+../../source4/torture/smb2/durable_v2_open.c:3225: io.out.durable_open_v2 was 1 (0x1), expected 0 (0x0): ../../source4/torture/smb2/durable_v2_open.c:3225
+]
+test: keep-disconnected-rh-with-rwh-open
+time: 2026-03-03 12:34:30.217471
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+time: 2026-03-03 12:34:32.229115
+failure: keep-disconnected-rh-with-rwh-open [
+../../source4/torture/smb2/durable_v2_open.c:3431: (&io)->out.lease_response_v2.lease_state was 7 (0x7), expected 3 (0x3): ../../source4/torture/smb2/durable_v2_open.c:3431
+]
+test: keep-disconnected-rwh-with-stat-open
+time: 2026-03-03 12:34:32.229181
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+time: 2026-03-03 12:34:35.267931
+failure: keep-disconnected-rwh-with-stat-open [
+../../source4/torture/smb2/durable_v2_open.c:3644: io.out.durable_open_v2 was 1 (0x1), expected 0 (0x0): ../../source4/torture/smb2/durable_v2_open.c:3644
+]
+test: purge-disconnected-rwh-with-rwh-open
+time: 2026-03-03 12:34:35.267989
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+time: 2026-03-03 12:34:38.291032
+failure: purge-disconnected-rwh-with-rwh-open [
+../../source4/torture/smb2/durable_v2_open.c:3815: status was NT_STATUS_OK, expected NT_STATUS_OBJECT_NAME_NOT_FOUND: ../../source4/torture/smb2/durable_v2_open.c:3815
+]
+test: purge-disconnected-rwh-with-rh-open
+time: 2026-03-03 12:34:38.291105
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+time: 2026-03-03 12:34:41.316426
+failure: purge-disconnected-rwh-with-rh-open [
+../../source4/torture/smb2/durable_v2_open.c:3979: status was NT_STATUS_OK, expected NT_STATUS_OBJECT_NAME_NOT_FOUND: ../../source4/torture/smb2/durable_v2_open.c:3979
+]
+test: purge-disconnected-rh-with-share-none-open
+time: 2026-03-03 12:34:41.316477
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+time: 2026-03-03 12:34:44.339780
+failure: purge-disconnected-rh-with-share-none-open [
+../../source4/torture/smb2/durable_v2_open.c:4171: status was NT_STATUS_OK, expected NT_STATUS_OBJECT_NAME_NOT_FOUND: ../../source4/torture/smb2/durable_v2_open.c:4171
+]
+test: purge-disconnected-rh-with-write
+time: 2026-03-03 12:34:44.339845
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+transport[0x55767ac3f1e0] Skip acking to 0x0 () in lease handler
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+time: 2026-03-03 12:35:26.026374
+failure: purge-disconnected-rh-with-write [
+../../source4/torture/smb2/durable_v2_open.c:4387: status was NT_STATUS_OK, expected NT_STATUS_OBJECT_NAME_NOT_FOUND: ../../source4/torture/smb2/durable_v2_open.c:4387
+]
+test: purge-disconnected-rh-with-rename
+time: 2026-03-03 12:35:26.026441
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+transport[0x55767ac4f0c0] acking to 0x1 (R) in lease handler
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+time: 2026-03-03 12:35:31.043296
+failure: purge-disconnected-rh-with-rename [
+../../source4/torture/smb2/durable_v2_open.c:4643: status was NT_STATUS_INVALID_PARAMETER, expected NT_STATUS_OBJECT_NAME_NOT_FOUND: ../../source4/torture/smb2/durable_v2_open.c:4643
+]
+test: app-instance
+time: 2026-03-03 12:35:31.043358
+time: 2026-03-03 12:35:31.052992
+failure: app-instance [
+../../source4/torture/smb2/durable_v2_open.c:4764: break_info.count was 1 (0x1), expected 0 (0x0): ../../source4/torture/smb2/durable_v2_open.c:4764
+]
+test: persistent-open-oplock
+time: 2026-03-03 12:35:31.053055
+time: 2026-03-03 12:35:31.090977
+success: persistent-open-oplock
+test: persistent-open-lease
+time: 2026-03-03 12:35:31.091038
+time: 2026-03-03 12:35:31.136302
+success: persistent-open-lease
+test: reconnect-twice
+time: 2026-03-03 12:35:31.136358
+time: 2026-03-03 12:35:37.156592
+success: reconnect-twice

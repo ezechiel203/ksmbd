@@ -1,0 +1,8 @@
+make: Entering directory '/usr/lib/modules/6.18.13-arch1-1/build'
+make[1] : on entre dans le répertoire « /home/ezechiel203/ksmbd »
+  CC [M]  src/fs/vfs_cache.o
+  CHECK   src/fs/vfs_cache.c
+  CC [M]  src/transport/transport_tcp.o
+  CHECK   src/transport/transport_tcp.c
+make[1] : on quitte le répertoire « /home/ezechiel203/ksmbd »
+make: Leaving directory '/usr/lib/modules/6.18.13-arch1-1/build'

@@ -1,0 +1,55 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772529428
+time: 2026-03-03 09:17:08.065121
+progress: 10
+test: session_setup_credits_granted
+time: 2026-03-03 09:17:08.066706
+time: 2026-03-03 09:17:08.075767
+success: session_setup_credits_granted
+test: single_req_credits_granted
+time: 2026-03-03 09:17:08.075821
+time: 2026-03-03 09:17:08.081295
+success: single_req_credits_granted
+test: skipped_mid
+time: 2026-03-03 09:17:08.081350
+time: 2026-03-03 09:17:10.001369
+success: skipped_mid
+test: ipc_max_data_zero
+time: 2026-03-03 09:17:10.001429
+time: 2026-03-03 09:17:10.006971
+failure: ipc_max_data_zero [
+../../source4/torture/smb2/credits.c:570: status was NT_STATUS_OBJECT_NAME_NOT_FOUND, expected NT_STATUS_OK: FSCTL_NAMED_PIPE_READ_WRITE failed
+]
+test: 1conn_ipc_max_async_credits
+time: 2026-03-03 09:17:10.007034
+time: 2026-03-03 09:17:10.012913
+failure: 1conn_ipc_max_async_credits [
+../../source4/torture/smb2/credits.c:570: status was NT_STATUS_OBJECT_NAME_NOT_FOUND, expected NT_STATUS_OK: FSCTL_NAMED_PIPE_READ_WRITE failed
+]
+test: 2conn_ipc_max_async_credits
+time: 2026-03-03 09:17:10.013008
+time: 2026-03-03 09:17:10.021518
+failure: 2conn_ipc_max_async_credits [
+../../source4/torture/smb2/credits.c:570: status was NT_STATUS_OBJECT_NAME_NOT_FOUND, expected NT_STATUS_OK: FSCTL_NAMED_PIPE_READ_WRITE failed
+]
+test: multichannel_ipc_max_async_credits
+time: 2026-03-03 09:17:10.021591
+time: 2026-03-03 09:17:10.029394
+failure: multichannel_ipc_max_async_credits [
+../../source4/torture/smb2/credits.c:983: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: smb2_session_setup_spnego failed
+]
+test: 1conn_notify_max_async_credits
+time: 2026-03-03 09:17:10.029464
+time: 2026-03-03 09:17:12.155832
+success: 1conn_notify_max_async_credits
+test: 2conn_notify_max_async_credits
+time: 2026-03-03 09:17:12.155889
+time: 2026-03-03 09:17:16.997230
+success: 2conn_notify_max_async_credits
+test: multichannel_max_async_credits
+time: 2026-03-03 09:17:16.997288
+time: 2026-03-03 09:17:17.003531
+failure: multichannel_max_async_credits [
+../../source4/torture/smb2/credits.c:1571: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: smb2_session_setup_spnego failed
+]

@@ -1,0 +1,212 @@
+make -C /lib/modules/6.18.9-arch1-2/build M=/home/ezechiel203/ksmbd ARCH=x86_64 modules
+make[1]: Entering directory '/usr/lib/modules/6.18.9-arch1-2/build'
+make[2]: Entering directory '/home/ezechiel203/ksmbd'
+  CC [M]  src/encoding/unicode.o
+  CC [M]  src/core/auth.o
+Warning: src/core/auth.c:327 function parameter 'cryptkey' not described in 'ksmbd_auth_ntlm'
+Warning: src/core/auth.c:464 function parameter 'cryptkey' not described in '__ksmbd_auth_ntlmv2'
+  CC [M]  src/fs/vfs.o
+Warning: src/fs/vfs.c:250 function parameter 'idmap' not described in 'ksmbd_vfs_lock_parent'
+Warning: src/fs/vfs.c:250 function parameter 'parent' not described in 'ksmbd_vfs_lock_parent'
+Warning: src/fs/vfs.c:250 function parameter 'child' not described in 'ksmbd_vfs_lock_parent'
+Warning: src/fs/vfs.c:1219 function parameter 'work' not described in 'ksmbd_vfs_symlink'
+Warning: src/fs/vfs.c:1383 function parameter 'fullsync' not described in 'ksmbd_vfs_fsync'
+Warning: src/fs/vfs.c:1467 function parameter 'work' not described in 'ksmbd_vfs_remove_file'
+Warning: src/fs/vfs.c:2234 bad line: #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+Warning: src/fs/vfs.c:2235 bad line: +  @idmap:      idmap
+Warning: src/fs/vfs.c:2236 bad line: #else
+Warning: src/fs/vfs.c:2237 bad line: +  @user_ns:    user namespace
+Warning: src/fs/vfs.c:2238 bad line: #endif
+Warning: src/fs/vfs.c:2252 function parameter 'idmap' not described in 'ksmbd_vfs_getxattr'
+Warning: src/fs/vfs.c:2288 bad line: #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+Warning: src/fs/vfs.c:2290 bad line: #else
+Warning: src/fs/vfs.c:2292 bad line: #endif
+Warning: src/fs/vfs.c:3360 function parameter 'work' not described in 'ksmbd_vfs_kern_path'
+  CC [M]  src/fs/vfs_cache.o
+  CC [M]  src/core/connection.o
+  CC [M]  src/core/crypto_ctx.o
+  CC [M]  src/core/server.o
+  CC [M]  src/core/misc.o
+Warning: src/core/misc.c:280 function parameter 'um' not described in 'ksmbd_extract_sharename'
+  CC [M]  src/fs/oplock.o
+  CC [M]  src/core/ksmbd_work.o
+  CC [M]  src/fs/smbacl.o
+  CC [M]  src/encoding/ndr.o
+  CC [M]  src/core/ksmbd_buffer.o
+  CC [M]  src/core/smb2_compress.o
+  CC [M]  src/mgmt/ksmbd_ida.o
+  CC [M]  src/mgmt/user_config.o
+  CC [M]  src/mgmt/share_config.o
+  CC [M]  src/mgmt/tree_connect.o
+  CC [M]  src/mgmt/user_session.o
+  CC [M]  src/mgmt/ksmbd_witness.o
+Warning: src/mgmt/ksmbd_witness.c:175 function parameter 'session_id' not described in 'ksmbd_witness_register'
+Warning: src/mgmt/ksmbd_witness.c:478 function parameter 'nb' not described in 'witness_netdev_event'
+Warning: src/mgmt/ksmbd_witness.c:478 function parameter 'event' not described in 'witness_netdev_event'
+Warning: src/mgmt/ksmbd_witness.c:478 function parameter 'ptr' not described in 'witness_netdev_event'
+  CC [M]  src/protocol/common/smb_common.o
+  CC [M]  src/transport/transport_tcp.o
+  CC [M]  src/transport/transport_ipc.o
+Warning: src/transport/transport_ipc.c:1103 function parameter 'skb' not described in 'handle_witness_register_event'
+Warning: src/transport/transport_ipc.c:1103 function parameter 'info' not described in 'handle_witness_register_event'
+Warning: src/transport/transport_ipc.c:1148 function parameter 'skb' not described in 'handle_witness_unregister_event'
+Warning: src/transport/transport_ipc.c:1148 function parameter 'info' not described in 'handle_witness_unregister_event'
+Warning: src/transport/transport_ipc.c:1190 function parameter 'skb' not described in 'handle_witness_iface_list_event'
+Warning: src/transport/transport_ipc.c:1190 function parameter 'info' not described in 'handle_witness_iface_list_event'
+  CC [M]  src/core/ksmbd_debugfs.o
+  CC [M]  src/core/ksmbd_config.o
+  CC [M]  src/core/ksmbd_feature.o
+  CC [M]  src/protocol/smb2/smb2_pdu_common.o
+  CC [M]  src/protocol/smb2/smb2_negotiate.o
+  CC [M]  src/protocol/smb2/smb2_session.o
+  CC [M]  src/protocol/smb2/smb2_tree.o
+  CC [M]  src/protocol/smb2/smb2_create.o
+Warning: src/protocol/smb2/smb2_create.c:81 function parameter 'coptions' not described in 'smb2_create_open_flags'
+Warning: src/protocol/smb2/smb2_create.c:81 function parameter 'mode' not described in 'smb2_create_open_flags'
+  CC [M]  src/protocol/smb2/smb2_dir.o
+  CC [M]  src/protocol/smb2/smb2_query_set.o
+  CC [M]  src/protocol/smb2/smb2_read_write.o
+  CC [M]  src/protocol/smb2/smb2_lock.o
+  CC [M]  src/protocol/smb2/smb2_ioctl.o
+  CC [M]  src/protocol/smb2/smb2_notify.o
+  CC [M]  src/protocol/smb2/smb2_misc_cmds.o
+  CC [M]  src/protocol/smb2/smb2ops.o
+  CC [M]  src/protocol/smb2/smb2misc.o
+  ASN.1   src/encoding/ksmbd_spnego_negtokeninit.asn1.[ch]
+  CC [M]  src/encoding/ksmbd_spnego_negtokeninit.asn1.o
+  ASN.1   src/encoding/ksmbd_spnego_negtokentarg.asn1.[ch]
+  CC [M]  src/encoding/ksmbd_spnego_negtokentarg.asn1.o
+  CC [M]  src/encoding/asn1.o
+  CC [M]  src/core/compat.o
+  CC [M]  src/fs/ksmbd_fsctl.o
+Warning: src/fs/ksmbd_fsctl.c:300 function parameter 'work' not described in 'fsctl_create_or_get_object_id_handler'
+Warning: src/fs/ksmbd_fsctl.c:300 function parameter 'id' not described in 'fsctl_create_or_get_object_id_handler'
+Warning: src/fs/ksmbd_fsctl.c:300 function parameter 'in_buf' not described in 'fsctl_create_or_get_object_id_handler'
+Warning: src/fs/ksmbd_fsctl.c:300 function parameter 'in_buf_len' not described in 'fsctl_create_or_get_object_id_handler'
+Warning: src/fs/ksmbd_fsctl.c:300 function parameter 'max_out_len' not described in 'fsctl_create_or_get_object_id_handler'
+Warning: src/fs/ksmbd_fsctl.c:300 function parameter 'rsp' not described in 'fsctl_create_or_get_object_id_handler'
+Warning: src/fs/ksmbd_fsctl.c:300 function parameter 'out_len' not described in 'fsctl_create_or_get_object_id_handler'
+Warning: src/fs/ksmbd_fsctl.c:599 function parameter 'work' not described in 'fsctl_not_supported_handler'
+Warning: src/fs/ksmbd_fsctl.c:599 function parameter 'id' not described in 'fsctl_not_supported_handler'
+Warning: src/fs/ksmbd_fsctl.c:599 function parameter 'in_buf' not described in 'fsctl_not_supported_handler'
+Warning: src/fs/ksmbd_fsctl.c:599 function parameter 'in_buf_len' not described in 'fsctl_not_supported_handler'
+Warning: src/fs/ksmbd_fsctl.c:599 function parameter 'max_out_len' not described in 'fsctl_not_supported_handler'
+Warning: src/fs/ksmbd_fsctl.c:599 function parameter 'rsp' not described in 'fsctl_not_supported_handler'
+Warning: src/fs/ksmbd_fsctl.c:599 function parameter 'out_len' not described in 'fsctl_not_supported_handler'
+Warning: src/fs/ksmbd_fsctl.c:1319 function parameter 'work' not described in 'fsctl_mark_handle_handler'
+Warning: src/fs/ksmbd_fsctl.c:1319 function parameter 'id' not described in 'fsctl_mark_handle_handler'
+Warning: src/fs/ksmbd_fsctl.c:1319 function parameter 'in_buf' not described in 'fsctl_mark_handle_handler'
+Warning: src/fs/ksmbd_fsctl.c:1319 function parameter 'in_buf_len' not described in 'fsctl_mark_handle_handler'
+Warning: src/fs/ksmbd_fsctl.c:1319 function parameter 'max_out_len' not described in 'fsctl_mark_handle_handler'
+Warning: src/fs/ksmbd_fsctl.c:1319 function parameter 'rsp' not described in 'fsctl_mark_handle_handler'
+Warning: src/fs/ksmbd_fsctl.c:1319 function parameter 'out_len' not described in 'fsctl_mark_handle_handler'
+Warning: src/fs/ksmbd_fsctl.c:1487 function parameter 'work' not described in 'fsctl_validate_negotiate_info_handler'
+Warning: src/fs/ksmbd_fsctl.c:1487 function parameter 'id' not described in 'fsctl_validate_negotiate_info_handler'
+Warning: src/fs/ksmbd_fsctl.c:1487 function parameter 'in_buf' not described in 'fsctl_validate_negotiate_info_handler'
+Warning: src/fs/ksmbd_fsctl.c:1487 function parameter 'in_buf_len' not described in 'fsctl_validate_negotiate_info_handler'
+Warning: src/fs/ksmbd_fsctl.c:1487 function parameter 'max_out_len' not described in 'fsctl_validate_negotiate_info_handler'
+Warning: src/fs/ksmbd_fsctl.c:1487 function parameter 'rsp' not described in 'fsctl_validate_negotiate_info_handler'
+Warning: src/fs/ksmbd_fsctl.c:1487 function parameter 'out_len' not described in 'fsctl_validate_negotiate_info_handler'
+Warning: src/fs/ksmbd_fsctl.c:1547 function parameter 'work' not described in 'fsctl_pipe_transceive_handler'
+Warning: src/fs/ksmbd_fsctl.c:1547 function parameter 'id' not described in 'fsctl_pipe_transceive_handler'
+Warning: src/fs/ksmbd_fsctl.c:1547 function parameter 'in_buf' not described in 'fsctl_pipe_transceive_handler'
+Warning: src/fs/ksmbd_fsctl.c:1547 function parameter 'in_buf_len' not described in 'fsctl_pipe_transceive_handler'
+Warning: src/fs/ksmbd_fsctl.c:1547 function parameter 'max_out_len' not described in 'fsctl_pipe_transceive_handler'
+Warning: src/fs/ksmbd_fsctl.c:1547 function parameter 'rsp' not described in 'fsctl_pipe_transceive_handler'
+Warning: src/fs/ksmbd_fsctl.c:1547 function parameter 'out_len' not described in 'fsctl_pipe_transceive_handler'
+Warning: src/fs/ksmbd_fsctl.c:1659 function parameter 'work' not described in 'fsctl_set_zero_on_dealloc_handler'
+Warning: src/fs/ksmbd_fsctl.c:1659 function parameter 'id' not described in 'fsctl_set_zero_on_dealloc_handler'
+Warning: src/fs/ksmbd_fsctl.c:1659 function parameter 'in_buf' not described in 'fsctl_set_zero_on_dealloc_handler'
+Warning: src/fs/ksmbd_fsctl.c:1659 function parameter 'in_buf_len' not described in 'fsctl_set_zero_on_dealloc_handler'
+Warning: src/fs/ksmbd_fsctl.c:1659 function parameter 'max_out_len' not described in 'fsctl_set_zero_on_dealloc_handler'
+Warning: src/fs/ksmbd_fsctl.c:1659 function parameter 'rsp' not described in 'fsctl_set_zero_on_dealloc_handler'
+Warning: src/fs/ksmbd_fsctl.c:1659 function parameter 'out_len' not described in 'fsctl_set_zero_on_dealloc_handler'
+Warning: src/fs/ksmbd_fsctl.c:1685 function parameter 'work' not described in 'fsctl_set_encryption_handler'
+Warning: src/fs/ksmbd_fsctl.c:1685 function parameter 'id' not described in 'fsctl_set_encryption_handler'
+Warning: src/fs/ksmbd_fsctl.c:1685 function parameter 'in_buf' not described in 'fsctl_set_encryption_handler'
+Warning: src/fs/ksmbd_fsctl.c:1685 function parameter 'in_buf_len' not described in 'fsctl_set_encryption_handler'
+Warning: src/fs/ksmbd_fsctl.c:1685 function parameter 'max_out_len' not described in 'fsctl_set_encryption_handler'
+Warning: src/fs/ksmbd_fsctl.c:1685 function parameter 'rsp' not described in 'fsctl_set_encryption_handler'
+Warning: src/fs/ksmbd_fsctl.c:1685 function parameter 'out_len' not described in 'fsctl_set_encryption_handler'
+Warning: src/fs/ksmbd_fsctl.c:1842 function parameter 'work' not described in 'fsctl_set_integrity_info_handler'
+Warning: src/fs/ksmbd_fsctl.c:1842 function parameter 'id' not described in 'fsctl_set_integrity_info_handler'
+Warning: src/fs/ksmbd_fsctl.c:1842 function parameter 'in_buf' not described in 'fsctl_set_integrity_info_handler'
+Warning: src/fs/ksmbd_fsctl.c:1842 function parameter 'in_buf_len' not described in 'fsctl_set_integrity_info_handler'
+Warning: src/fs/ksmbd_fsctl.c:1842 function parameter 'max_out_len' not described in 'fsctl_set_integrity_info_handler'
+Warning: src/fs/ksmbd_fsctl.c:1842 function parameter 'rsp' not described in 'fsctl_set_integrity_info_handler'
+Warning: src/fs/ksmbd_fsctl.c:1842 function parameter 'out_len' not described in 'fsctl_set_integrity_info_handler'
+Warning: src/fs/ksmbd_fsctl.c:2092 function parameter 'work' not described in 'fsctl_offload_write_handler'
+Warning: src/fs/ksmbd_fsctl.c:2092 function parameter 'id' not described in 'fsctl_offload_write_handler'
+Warning: src/fs/ksmbd_fsctl.c:2092 function parameter 'in_buf' not described in 'fsctl_offload_write_handler'
+Warning: src/fs/ksmbd_fsctl.c:2092 function parameter 'in_buf_len' not described in 'fsctl_offload_write_handler'
+Warning: src/fs/ksmbd_fsctl.c:2092 function parameter 'max_out_len' not described in 'fsctl_offload_write_handler'
+Warning: src/fs/ksmbd_fsctl.c:2092 function parameter 'rsp' not described in 'fsctl_offload_write_handler'
+Warning: src/fs/ksmbd_fsctl.c:2092 function parameter 'out_len' not described in 'fsctl_offload_write_handler'
+Warning: src/fs/ksmbd_fsctl.c:2293 function parameter 'work' not described in 'fsctl_srv_read_hash_handler'
+Warning: src/fs/ksmbd_fsctl.c:2293 function parameter 'id' not described in 'fsctl_srv_read_hash_handler'
+Warning: src/fs/ksmbd_fsctl.c:2293 function parameter 'in_buf' not described in 'fsctl_srv_read_hash_handler'
+Warning: src/fs/ksmbd_fsctl.c:2293 function parameter 'in_buf_len' not described in 'fsctl_srv_read_hash_handler'
+Warning: src/fs/ksmbd_fsctl.c:2293 function parameter 'max_out_len' not described in 'fsctl_srv_read_hash_handler'
+Warning: src/fs/ksmbd_fsctl.c:2293 function parameter 'rsp' not described in 'fsctl_srv_read_hash_handler'
+Warning: src/fs/ksmbd_fsctl.c:2293 function parameter 'out_len' not described in 'fsctl_srv_read_hash_handler'
+  CC [M]  src/fs/ksmbd_create_ctx.o
+Warning: src/fs/ksmbd_create_ctx.c:116 function parameter 'work' not described in 'mxac_on_request'
+Warning: src/fs/ksmbd_create_ctx.c:116 function parameter 'fp' not described in 'mxac_on_request'
+Warning: src/fs/ksmbd_create_ctx.c:116 function parameter 'ctx_data' not described in 'mxac_on_request'
+Warning: src/fs/ksmbd_create_ctx.c:116 function parameter 'ctx_len' not described in 'mxac_on_request'
+Warning: src/fs/ksmbd_create_ctx.c:138 function parameter 'work' not described in 'mxac_on_response'
+Warning: src/fs/ksmbd_create_ctx.c:138 function parameter 'fp' not described in 'mxac_on_response'
+Warning: src/fs/ksmbd_create_ctx.c:138 function parameter 'rsp_buf' not described in 'mxac_on_response'
+Warning: src/fs/ksmbd_create_ctx.c:138 function parameter 'max_len' not described in 'mxac_on_response'
+Warning: src/fs/ksmbd_create_ctx.c:138 function parameter 'rsp_len' not described in 'mxac_on_response'
+Warning: src/fs/ksmbd_create_ctx.c:154 function parameter 'work' not described in 'qfid_on_request'
+Warning: src/fs/ksmbd_create_ctx.c:154 function parameter 'fp' not described in 'qfid_on_request'
+Warning: src/fs/ksmbd_create_ctx.c:154 function parameter 'ctx_data' not described in 'qfid_on_request'
+Warning: src/fs/ksmbd_create_ctx.c:154 function parameter 'ctx_len' not described in 'qfid_on_request'
+Warning: src/fs/ksmbd_create_ctx.c:173 function parameter 'work' not described in 'qfid_on_response'
+Warning: src/fs/ksmbd_create_ctx.c:173 function parameter 'fp' not described in 'qfid_on_response'
+Warning: src/fs/ksmbd_create_ctx.c:173 function parameter 'rsp_buf' not described in 'qfid_on_response'
+Warning: src/fs/ksmbd_create_ctx.c:173 function parameter 'max_len' not described in 'qfid_on_response'
+Warning: src/fs/ksmbd_create_ctx.c:173 function parameter 'rsp_len' not described in 'qfid_on_response'
+  CC [M]  src/fs/ksmbd_info.o
+  CC [M]  src/fs/ksmbd_dfs.o
+  CC [M]  src/fs/ksmbd_vss.o
+  CC [M]  src/fs/ksmbd_notify.o
+  CC [M]  src/fs/ksmbd_reparse.o
+  CC [M]  src/fs/ksmbd_resilient.o
+  CC [M]  src/fs/ksmbd_quota.o
+  CC [M]  src/fs/ksmbd_app_instance.o
+  CC [M]  src/fs/ksmbd_fsctl_extra.o
+  CC [M]  src/fs/ksmbd_rsvd.o
+Warning: src/fs/ksmbd_rsvd.c:516 function parameter 'work' not described in 'fsctl_query_shared_virtual_disk_support_handler'
+Warning: src/fs/ksmbd_rsvd.c:516 function parameter 'id' not described in 'fsctl_query_shared_virtual_disk_support_handler'
+Warning: src/fs/ksmbd_rsvd.c:516 function parameter 'in_buf' not described in 'fsctl_query_shared_virtual_disk_support_handler'
+Warning: src/fs/ksmbd_rsvd.c:516 function parameter 'in_buf_len' not described in 'fsctl_query_shared_virtual_disk_support_handler'
+Warning: src/fs/ksmbd_rsvd.c:516 function parameter 'max_out_len' not described in 'fsctl_query_shared_virtual_disk_support_handler'
+Warning: src/fs/ksmbd_rsvd.c:516 function parameter 'rsp' not described in 'fsctl_query_shared_virtual_disk_support_handler'
+Warning: src/fs/ksmbd_rsvd.c:516 function parameter 'out_len' not described in 'fsctl_query_shared_virtual_disk_support_handler'
+Warning: src/fs/ksmbd_rsvd.c:549 function parameter 'work' not described in 'fsctl_svhdx_sync_tunnel_handler'
+Warning: src/fs/ksmbd_rsvd.c:549 function parameter 'id' not described in 'fsctl_svhdx_sync_tunnel_handler'
+Warning: src/fs/ksmbd_rsvd.c:549 function parameter 'in_buf' not described in 'fsctl_svhdx_sync_tunnel_handler'
+Warning: src/fs/ksmbd_rsvd.c:549 function parameter 'in_buf_len' not described in 'fsctl_svhdx_sync_tunnel_handler'
+Warning: src/fs/ksmbd_rsvd.c:549 function parameter 'max_out_len' not described in 'fsctl_svhdx_sync_tunnel_handler'
+Warning: src/fs/ksmbd_rsvd.c:549 function parameter 'rsp' not described in 'fsctl_svhdx_sync_tunnel_handler'
+Warning: src/fs/ksmbd_rsvd.c:549 function parameter 'out_len' not described in 'fsctl_svhdx_sync_tunnel_handler'
+Warning: src/fs/ksmbd_rsvd.c:571 function parameter 'work' not described in 'fsctl_svhdx_async_tunnel_handler'
+Warning: src/fs/ksmbd_rsvd.c:571 function parameter 'id' not described in 'fsctl_svhdx_async_tunnel_handler'
+Warning: src/fs/ksmbd_rsvd.c:571 function parameter 'in_buf' not described in 'fsctl_svhdx_async_tunnel_handler'
+Warning: src/fs/ksmbd_rsvd.c:571 function parameter 'in_buf_len' not described in 'fsctl_svhdx_async_tunnel_handler'
+Warning: src/fs/ksmbd_rsvd.c:571 function parameter 'max_out_len' not described in 'fsctl_svhdx_async_tunnel_handler'
+Warning: src/fs/ksmbd_rsvd.c:571 function parameter 'rsp' not described in 'fsctl_svhdx_async_tunnel_handler'
+Warning: src/fs/ksmbd_rsvd.c:571 function parameter 'out_len' not described in 'fsctl_svhdx_async_tunnel_handler'
+  CC [M]  src/fs/ksmbd_branchcache.o
+  CC [M]  src/core/ksmbd_hooks.o
+  CC [M]  src/transport/transport_rdma.o
+  LD [M]  ksmbd.o
+  MODPOST Module.symvers
+  CC [M]  ksmbd.mod.o
+  CC [M]  .module-common.o
+  LD [M]  ksmbd.ko
+  BTF [M] ksmbd.ko
+make[2]: Leaving directory '/home/ezechiel203/ksmbd'
+make[1]: Leaving directory '/usr/lib/modules/6.18.9-arch1-2/build'

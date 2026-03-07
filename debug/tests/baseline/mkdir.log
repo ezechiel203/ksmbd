@@ -1,0 +1,13 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772499901
+time: 2026-03-03 01:05:01.712813
+test: mkdir
+time: 2026-03-03 01:05:01.713735
+Testing mkdir collision
+Testing mkdir collision with file
+Testing rmdir with file
+Testing invalid dir
+Testing t2mkdir bad path
+time: 2026-03-03 01:05:02.739393
+success: mkdir

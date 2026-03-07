@@ -1,0 +1,19 @@
+=== SMB2 Sweep: Sat Mar  7 12:34:14 CET 2026 ===
+SSH=20022  SMB=20445
+Output: /tmp/sweep-20260307-123414
+Reset mode: full guest factory reset before every suite
+
+Restarting ksmbd...
+  smb2.compound ... P=20 F=0 S=0 E=0
+  smb2.compound_async ... P=7 F=3 S=0 E=0
+  smb2.compound_find ... P=3 F=0 S=0 E=0
+  smb2.connect ... P=1 F=0 S=0 E=0
+  smb2.create ... P=15 F=2 S=1 E=0
+  smb2.credits ... P=5 F=5 S=0 E=0
+  smb2.delete-on-close-perms ... P=6 F=3 S=0 E=0
+  smb2.dir ... P=7 F=2 S=0 E=0
+  smb2.dirlease ... P=18 F=0 S=0 E=0
+  smb2.dosmode ... P=0 F=1 S=0 E=0
+  smb2.durable-open ... P=16 F=9 S=1 E=0
+  smb2.durable-v2-open ... P=20 F=13 S=0 E=0
+  smb2.getinfo ... 

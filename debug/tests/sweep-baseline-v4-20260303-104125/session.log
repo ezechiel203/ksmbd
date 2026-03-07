@@ -1,0 +1,455 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772531349
+time: 2026-03-03 09:49:09.484516
+progress: 71
+test: reconnect1
+time: 2026-03-03 09:49:09.485964
+time: 2026-03-03 09:49:09.501334
+success: reconnect1
+test: reconnect2
+time: 2026-03-03 09:49:09.501442
+time: 2026-03-03 09:49:09.516744
+success: reconnect2
+test: reauth1
+time: 2026-03-03 09:49:09.516803
+Bad SMB2 (sign_algo_id=1) signature for message
+[0000] 12 CA 16 FC 4B 29 FC BF   55 74 2C BB A9 B5 2F 91   ....K).. Ut,.../.
+[0000] 7D DD 3F 77 A6 CF 64 0B   5D 6A D5 BC A1 F5 3D F5   }.?w..d. ]j....=.
+time: 2026-03-03 09:49:09.521152
+failure: reauth1 [
+../../source4/torture/smb2/session.c:280: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: smb2_session_setup_spnego failed
+]
+test: reauth2
+time: 2026-03-03 09:49:09.521206
+Bad SMB2 (sign_algo_id=1) signature for message
+[0000] 50 9B AE 1A 2B 1C 62 68   0C 3C 9D AF 8A 84 83 00   P...+.bh .<......
+[0000] D2 63 A4 9B 07 ED 4C EE   D6 90 37 D9 35 78 9C 1C   .c....L. ..7.5x..
+time: 2026-03-03 09:49:09.527565
+failure: reauth2 [
+../../source4/torture/smb2/session.c:378: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: smb2_session_setup_spnego failed
+]
+test: reauth3
+time: 2026-03-03 09:49:09.527613
+Bad SMB2 (sign_algo_id=1) signature for message
+[0000] D0 BE 00 B0 5E 8C 66 E9   11 F0 D5 B8 04 D1 F0 CC   ....^.f. ........
+[0000] 4F 53 F4 D5 C4 74 EC 2A   0B 08 57 BC 3B 64 CE FD   OS...t.* ..W.;d..
+time: 2026-03-03 09:49:09.533081
+failure: reauth3 [
+../../source4/torture/smb2/session.c:484: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: smb2_session_setup_spnego failed
+]
+test: reauth4
+time: 2026-03-03 09:49:09.533151
+Bad SMB2 (sign_algo_id=1) signature for message
+[0000] 69 A0 DE A5 0D C7 FD 3A   A0 92 14 84 00 A5 68 A3   i......: ......h.
+[0000] 56 0B 68 5E 77 DF 66 0F   E8 2F 54 7F 84 CE E8 69   V.h^w.f. ./T....i
+time: 2026-03-03 09:49:09.539151
+failure: reauth4 [
+../../source4/torture/smb2/session.c:611: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: smb2_session_setup_spnego failed
+]
+test: reauth5
+time: 2026-03-03 09:49:09.539200
+time: 2026-03-03 09:49:09.547779
+failure: reauth5 [
+../../source4/torture/smb2/session.c:730: status was NT_STATUS_OBJECT_NAME_NOT_FOUND, expected NT_STATUS_OK: smb2_util_unlink failed
+]
+test: reauth6
+time: 2026-03-03 09:49:09.547842
+did failed reauth
+time: 2026-03-03 09:49:09.552937
+success: reauth6
+test: expire1n
+time: 2026-03-03 09:49:09.552986
+WARNING!: smb2.session.expire1 requires --use-kerberos=required!
+time: 2026-03-03 09:49:09.552998
+skip: expire1n [
+../../source4/torture/smb2/session.c:1106: smb2.session.expire1 requires --use-kerberos=required!
+]
+test: expire1s
+time: 2026-03-03 09:49:09.553033
+WARNING!: smb2.session.expire1 requires --use-kerberos=required!
+time: 2026-03-03 09:49:09.553043
+skip: expire1s [
+../../source4/torture/smb2/session.c:1106: smb2.session.expire1 requires --use-kerberos=required!
+]
+test: expire1e
+time: 2026-03-03 09:49:09.553075
+WARNING!: smb2.session.expire1 requires --use-kerberos=required!
+time: 2026-03-03 09:49:09.553089
+skip: expire1e [
+../../source4/torture/smb2/session.c:1106: smb2.session.expire1 requires --use-kerberos=required!
+]
+test: expire2s
+time: 2026-03-03 09:49:09.553123
+WARNING!: smb2.session.expire1 requires --use-kerberos=required!
+time: 2026-03-03 09:49:09.553134
+skip: expire2s [
+../../source4/torture/smb2/session.c:1350: smb2.session.expire1 requires --use-kerberos=required!
+]
+test: expire2e
+time: 2026-03-03 09:49:09.553165
+WARNING!: smb2.session.expire1 requires --use-kerberos=required!
+time: 2026-03-03 09:49:09.553175
+skip: expire2e [
+../../source4/torture/smb2/session.c:1350: smb2.session.expire1 requires --use-kerberos=required!
+]
+test: expire_disconnect
+time: 2026-03-03 09:49:09.553210
+WARNING!: smb2.session.expire1 requires --use-kerberos=required!
+time: 2026-03-03 09:49:09.553220
+skip: expire_disconnect [
+../../source4/torture/smb2/session.c:1778: smb2.session.expire1 requires --use-kerberos=required!
+]
+test: bind1
+time: 2026-03-03 09:49:09.553250
+time: 2026-03-03 09:49:09.556641
+skip: bind1 [
+../../source4/torture/smb2/session.c:1900: server doesn't support SMB2_CAP_MULTI_CHANNEL
+]
+test: bind2
+time: 2026-03-03 09:49:09.556714
+time: 2026-03-03 09:49:09.559737
+skip: bind2 [
+../../source4/torture/smb2/session.c:2061: server doesn't support SMB2_CAP_MULTI_CHANNEL
+]
+test: bind_invalid_auth
+time: 2026-03-03 09:49:09.559793
+time: 2026-03-03 09:49:09.562166
+skip: bind_invalid_auth [
+../../source4/torture/smb2/session.c:2363: server doesn't support SMB2_CAP_MULTI_CHANNEL
+]
+test: bind_different_user
+time: 2026-03-03 09:49:09.562225
+Fallback to anonymous for 'torture:user2name'=NULL 'torture:user2domain'='WORKGROUP' 'torture:user2password'='REDACTED'time: 2026-03-03 09:49:09.564813
+skip: bind_different_user [
+../../source4/torture/smb2/session.c:2652: valid user2 credentials are required
+]
+test: bind_negative_smb202
+time: 2026-03-03 09:49:09.564861
+time: 2026-03-03 09:49:09.568931
+failure: bind_negative_smb202 [
+../../source4/torture/smb2/session.c:2703: status was NT_STATUS_NOT_SUPPORTED, expected NT_STATUS_OK: smb2_connect options1 failed
+]
+test: bind_negative_smb210s
+time: 2026-03-03 09:49:09.568994
+time: 2026-03-03 09:49:09.577157
+failure: bind_negative_smb210s [
+../../source4/torture/smb2/session.c:2721: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: smb2_create failed
+]
+test: bind_negative_smb210d
+time: 2026-03-03 09:49:09.577215
+time: 2026-03-03 09:49:09.586674
+failure: bind_negative_smb210d [
+../../source4/torture/smb2/session.c:2721: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: smb2_create failed
+]
+test: bind_negative_smb2to3s
+time: 2026-03-03 09:49:09.586730
+time: 2026-03-03 09:49:09.598594
+failure: bind_negative_smb2to3s [
+../../source4/torture/smb2/session.c:2721: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: smb2_create failed
+]
+test: bind_negative_smb2to3d
+time: 2026-03-03 09:49:09.598652
+time: 2026-03-03 09:49:09.616339
+failure: bind_negative_smb2to3d [
+../../source4/torture/smb2/session.c:2721: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: smb2_create failed
+]
+test: bind_negative_smb3to2s
+time: 2026-03-03 09:49:09.616557
+time: 2026-03-03 09:49:09.624910
+failure: bind_negative_smb3to2s [
+../../source4/torture/smb2/session.c:2758: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_REQUEST_NOT_ACCEPTED: smb2_session_setup_spnego failed
+]
+test: bind_negative_smb3to2d
+time: 2026-03-03 09:49:09.624972
+time: 2026-03-03 09:49:09.633801
+failure: bind_negative_smb3to2d [
+../../source4/torture/smb2/session.c:2758: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_REQUEST_NOT_ACCEPTED: smb2_session_setup_spnego failed
+]
+test: bind_negative_smb3to3s
+time: 2026-03-03 09:49:09.633864
+time: 2026-03-03 09:49:09.642549
+failure: bind_negative_smb3to3s [
+../../source4/torture/smb2/session.c:2758: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_INVALID_PARAMETER: smb2_session_setup_spnego failed
+]
+test: bind_negative_smb3to3d
+time: 2026-03-03 09:49:09.642609
+time: 2026-03-03 09:49:09.649954
+failure: bind_negative_smb3to3d [
+../../source4/torture/smb2/session.c:2758: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_INVALID_PARAMETER: smb2_session_setup_spnego failed
+]
+test: bind_negative_smb3encGtoCs
+time: 2026-03-03 09:49:09.650016
+time: 2026-03-03 09:49:09.659922
+failure: bind_negative_smb3encGtoCs [
+../../source4/torture/smb2/session.c:2758: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_INVALID_PARAMETER: smb2_session_setup_spnego failed
+]
+test: bind_negative_smb3encGtoCd
+time: 2026-03-03 09:49:09.659974
+time: 2026-03-03 09:49:09.666801
+failure: bind_negative_smb3encGtoCd [
+../../source4/torture/smb2/session.c:2758: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_INVALID_PARAMETER: smb2_session_setup_spnego failed
+]
+test: bind_negative_smb3signCtoHs
+time: 2026-03-03 09:49:09.666927
+time: 2026-03-03 09:49:09.669534
+skip: bind_negative_smb3signCtoHs [
+../../source4/torture/smb2/session.c:3364: Can't test without SMB 3.1.1 signing negotiation support
+]
+test: bind_negative_smb3signCtoHd
+time: 2026-03-03 09:49:09.669590
+time: 2026-03-03 09:49:09.672688
+skip: bind_negative_smb3signCtoHd [
+../../source4/torture/smb2/session.c:3421: Can't test without SMB 3.1.1 signing negotiation support
+]
+test: bind_negative_smb3signCtoGs
+time: 2026-03-03 09:49:09.672744
+time: 2026-03-03 09:49:09.676011
+skip: bind_negative_smb3signCtoGs [
+../../source4/torture/smb2/session.c:3709: Can't test without SMB 3.1.1 signing negotiation support
+]
+test: bind_negative_smb3signCtoGd
+time: 2026-03-03 09:49:09.676077
+time: 2026-03-03 09:49:09.679669
+skip: bind_negative_smb3signCtoGd [
+../../source4/torture/smb2/session.c:3766: Can't test without SMB 3.1.1 signing negotiation support
+]
+test: bind_negative_smb3signHtoCs
+time: 2026-03-03 09:49:09.679729
+time: 2026-03-03 09:49:09.683361
+skip: bind_negative_smb3signHtoCs [
+../../source4/torture/smb2/session.c:3479: Can't test without SMB 3.1.1 signing negotiation support
+]
+test: bind_negative_smb3signHtoCd
+time: 2026-03-03 09:49:09.683485
+time: 2026-03-03 09:49:09.686033
+skip: bind_negative_smb3signHtoCd [
+../../source4/torture/smb2/session.c:3536: Can't test without SMB 3.1.1 signing negotiation support
+]
+test: bind_negative_smb3signHtoGs
+time: 2026-03-03 09:49:09.686082
+time: 2026-03-03 09:49:09.690239
+skip: bind_negative_smb3signHtoGs [
+../../source4/torture/smb2/session.c:3594: Can't test without SMB 3.1.1 signing negotiation support
+]
+test: bind_negative_smb3signHtoGd
+time: 2026-03-03 09:49:09.690287
+time: 2026-03-03 09:49:09.692306
+skip: bind_negative_smb3signHtoGd [
+../../source4/torture/smb2/session.c:3651: Can't test without SMB 3.1.1 signing negotiation support
+]
+test: bind_negative_smb3signGtoCs
+time: 2026-03-03 09:49:09.692365
+time: 2026-03-03 09:49:09.694542
+skip: bind_negative_smb3signGtoCs [
+../../source4/torture/smb2/session.c:3824: Can't test without SMB 3.1.1 signing negotiation support
+]
+test: bind_negative_smb3signGtoCd
+time: 2026-03-03 09:49:09.694594
+time: 2026-03-03 09:49:09.696946
+skip: bind_negative_smb3signGtoCd [
+../../source4/torture/smb2/session.c:3881: Can't test without SMB 3.1.1 signing negotiation support
+]
+test: bind_negative_smb3signGtoHs
+time: 2026-03-03 09:49:09.696994
+time: 2026-03-03 09:49:09.698786
+skip: bind_negative_smb3signGtoHs [
+../../source4/torture/smb2/session.c:3939: Can't test without SMB 3.1.1 signing negotiation support
+]
+test: bind_negative_smb3signGtoHd
+time: 2026-03-03 09:49:09.698832
+time: 2026-03-03 09:49:09.701370
+skip: bind_negative_smb3signGtoHd [
+../../source4/torture/smb2/session.c:3996: Can't test without SMB 3.1.1 signing negotiation support
+]
+test: bind_negative_smb3sneGtoCs
+time: 2026-03-03 09:49:09.701429
+time: 2026-03-03 09:49:09.704354
+skip: bind_negative_smb3sneGtoCs [
+../../source4/torture/smb2/session.c:4054: Can't test without SMB 3.1.1 signing negotiation support
+]
+test: bind_negative_smb3sneGtoCd
+time: 2026-03-03 09:49:09.704411
+time: 2026-03-03 09:49:09.709173
+skip: bind_negative_smb3sneGtoCd [
+../../source4/torture/smb2/session.c:4123: Can't test without SMB 3.1.1 signing negotiation support
+]
+test: bind_negative_smb3sneGtoHs
+time: 2026-03-03 09:49:09.709271
+time: 2026-03-03 09:49:09.711831
+skip: bind_negative_smb3sneGtoHs [
+../../source4/torture/smb2/session.c:4193: Can't test without SMB 3.1.1 signing negotiation support
+]
+test: bind_negative_smb3sneGtoHd
+time: 2026-03-03 09:49:09.711891
+time: 2026-03-03 09:49:09.714439
+skip: bind_negative_smb3sneGtoHd [
+../../source4/torture/smb2/session.c:4262: Can't test without SMB 3.1.1 signing negotiation support
+]
+test: bind_negative_smb3sneCtoGs
+time: 2026-03-03 09:49:09.714491
+time: 2026-03-03 09:49:09.716876
+skip: bind_negative_smb3sneCtoGs [
+../../source4/torture/smb2/session.c:4332: Can't test without SMB 3.1.1 signing negotiation support
+]
+test: bind_negative_smb3sneCtoGd
+time: 2026-03-03 09:49:09.716934
+time: 2026-03-03 09:49:09.720632
+skip: bind_negative_smb3sneCtoGd [
+../../source4/torture/smb2/session.c:4401: Can't test without SMB 3.1.1 signing negotiation support
+]
+test: bind_negative_smb3sneHtoGs
+time: 2026-03-03 09:49:09.720693
+time: 2026-03-03 09:49:09.723169
+skip: bind_negative_smb3sneHtoGs [
+../../source4/torture/smb2/session.c:4471: Can't test without SMB 3.1.1 signing negotiation support
+]
+test: bind_negative_smb3sneHtoGd
+time: 2026-03-03 09:49:09.723613
+time: 2026-03-03 09:49:09.726132
+skip: bind_negative_smb3sneHtoGd [
+../../source4/torture/smb2/session.c:4540: Can't test without SMB 3.1.1 signing negotiation support
+]
+test: bind_negative_smb3signC30toGs
+time: 2026-03-03 09:49:09.726201
+time: 2026-03-03 09:49:09.728603
+skip: bind_negative_smb3signC30toGs [
+../../source4/torture/smb2/session.c:4610: Can't test without SMB 3.1.1 signing negotiation support
+]
+test: bind_negative_smb3signC30toGd
+time: 2026-03-03 09:49:09.728661
+time: 2026-03-03 09:49:09.731642
+skip: bind_negative_smb3signC30toGd [
+../../source4/torture/smb2/session.c:4663: Can't test without SMB 3.1.1 signing negotiation support
+]
+test: bind_negative_smb3signH2XtoGs
+time: 2026-03-03 09:49:09.731702
+time: 2026-03-03 09:49:09.734051
+skip: bind_negative_smb3signH2XtoGs [
+../../source4/torture/smb2/session.c:4724: Can't test without SMB 3.1.1 signing negotiation support
+]
+test: bind_negative_smb3signH2XtoGd
+time: 2026-03-03 09:49:09.734129
+time: 2026-03-03 09:49:09.736827
+skip: bind_negative_smb3signH2XtoGd [
+../../source4/torture/smb2/session.c:4784: Can't test without SMB 3.1.1 signing negotiation support
+]
+test: bind_negative_smb3signGtoC30s
+time: 2026-03-03 09:49:09.736881
+time: 2026-03-03 09:49:09.739474
+skip: bind_negative_smb3signGtoC30s [
+../../source4/torture/smb2/session.c:4838: Can't test without SMB 3.1.1 signing negotiation support
+]
+test: bind_negative_smb3signGtoC30d
+time: 2026-03-03 09:49:09.739531
+time: 2026-03-03 09:49:09.742535
+skip: bind_negative_smb3signGtoC30d [
+../../source4/torture/smb2/session.c:4897: Can't test without SMB 3.1.1 signing negotiation support
+]
+test: bind_negative_smb3signGtoH2Xs
+time: 2026-03-03 09:49:09.742591
+time: 2026-03-03 09:49:09.744880
+skip: bind_negative_smb3signGtoH2Xs [
+../../source4/torture/smb2/session.c:4964: Can't test without SMB 3.1.1 signing negotiation support
+]
+test: bind_negative_smb3signGtoH2Xd
+time: 2026-03-03 09:49:09.744935
+time: 2026-03-03 09:49:09.747657
+skip: bind_negative_smb3signGtoH2Xd [
+../../source4/torture/smb2/session.c:5030: Can't test without SMB 3.1.1 signing negotiation support
+]
+test: two_logoff
+time: 2026-03-03 09:49:09.747708
+connect tree2 with the same client_guid
+session2: logoff
+transport2: keepalive
+transport2: disconnect
+session1: logoff
+transport1: keepalive
+transport1: disconnect
+time: 2026-03-03 09:49:09.754578
+success: two_logoff
+test: signing-hmac-sha-256
+time: 2026-03-03 09:49:09.754621
+time: 2026-03-03 09:49:09.756595
+skip: signing-hmac-sha-256 [
+../../source4/torture/smb2/session.c:5242: Can't test without SMB 3.1.1 signing negotiation support
+]
+test: signing-aes-128-cmac
+time: 2026-03-03 09:49:09.756643
+time: 2026-03-03 09:49:09.760063
+skip: signing-aes-128-cmac [
+../../source4/torture/smb2/session.c:5286: Can't test without SMB 3.1.1 signing negotiation support
+]
+test: signing-aes-128-gmac
+time: 2026-03-03 09:49:09.760187
+time: 2026-03-03 09:49:09.763028
+skip: signing-aes-128-gmac [
+../../source4/torture/smb2/session.c:5330: Can't test without SMB 3.1.1 signing negotiation support
+]
+test: encryption-aes-128-ccm
+time: 2026-03-03 09:49:09.763151
+time: 2026-03-03 09:49:09.765968
+skip: encryption-aes-128-ccm [
+../../source4/torture/smb2/session.c:5369: Can't test without SMB 3.1.1 signing negotiation support
+]
+test: encryption-aes-128-gcm
+time: 2026-03-03 09:49:09.766026
+time: 2026-03-03 09:49:09.768657
+skip: encryption-aes-128-gcm [
+../../source4/torture/smb2/session.c:5415: Can't test without SMB 3.1.1 signing negotiation support
+]
+test: encryption-aes-256-ccm
+time: 2026-03-03 09:49:09.768713
+time: 2026-03-03 09:49:09.771342
+skip: encryption-aes-256-ccm [
+../../source4/torture/smb2/session.c:5461: Can't test without SMB 3.1.1 signing negotiation support
+]
+test: encryption-aes-256-gcm
+time: 2026-03-03 09:49:09.771398
+time: 2026-03-03 09:49:09.773358
+skip: encryption-aes-256-gcm [
+../../source4/torture/smb2/session.c:5507: Can't test without SMB 3.1.1 signing negotiation support
+]
+test: ntlmssp_bug14932
+time: 2026-03-03 09:49:09.773423
+time: 2026-03-03 09:49:09.776015
+failure: ntlmssp_bug14932 [
+../../source4/torture/smb2/session.c:5582: status was NT_STATUS_LOGON_FAILURE, expected NT_STATUS_INVALID_PARAMETER: smb2_session_setup_spnego failed
+]
+test: anon-encryption1
+time: 2026-03-03 09:49:09.776074
+time: 2026-03-03 09:50:09.839822
+failure: anon-encryption1 [
+../../source4/torture/smb2/session.c:5676: status was NT_STATUS_IO_TIMEOUT, expected NT_STATUS_CONNECTION_RESET: smb2cli_tcon_recv
+]
+test: anon-encryption2
+time: 2026-03-03 09:50:09.840077
+time: 2026-03-03 09:51:09.905164
+failure: anon-encryption2 [
+../../source4/torture/smb2/session.c:5816: status was NT_STATUS_IO_TIMEOUT, expected NT_STATUS_OK: smb2cli_tcon_recv(anon)
+]
+test: anon-encryption3
+time: 2026-03-03 09:51:09.905263
+time: 2026-03-03 09:52:09.975161
+failure: anon-encryption3 [
+../../source4/torture/smb2/session.c:5969: status was NT_STATUS_IO_TIMEOUT, expected NT_STATUS_CONNECTION_RESET: smb2cli_tcon_recv
+]
+test: anon-signing1
+time: 2026-03-03 09:52:09.975463
+Bad SMB2 (sign_algo_id=1) signature for message
+[0000] EB 83 18 03 4A 74 DF CE   E7 C8 46 70 47 C2 10 70   ....Jt.. ..FpG..p
+[0000] 43 B5 77 3C 9C BB 51 51   CB C0 34 7F 7B DD C8 0D   C.w<..QQ ..4.{...
+time: 2026-03-03 09:52:09.991114
+failure: anon-signing1 [
+../../source4/torture/smb2/session.c:6068: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: smb2cli_tcon_recv
+]
+test: anon-signing2
+time: 2026-03-03 09:52:09.991179
+Bad SMB2 (sign_algo_id=1) signature for message
+[0000] 0E C5 2B 83 DD D7 4F B1   64 4E B6 85 86 2A 9F 0A   ..+...O. dN...*..
+[0000] B5 7F 83 B7 BC 16 9C 2E   3F 23 76 5F 1B E6 C3 CC   ........ ?#v_....
+time: 2026-03-03 09:52:09.997604
+failure: anon-signing2 [
+../../source4/torture/smb2/session.c:6207: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: smb2cli_tcon_recv
+]

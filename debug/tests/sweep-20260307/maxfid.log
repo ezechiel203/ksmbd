@@ -1,0 +1,12 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772889804
+time: 2026-03-07 13:23:24.268429
+test: maxfid
+time: 2026-03-07 13:23:24.269513
+Creating subdirectories
+Testing maximum number of open files
+create of smb2_maxfid\10\10000 failed: NT_STATUS_INSUFFICIENT_RESOURCES
+Cleanup open files
+time: 2026-03-07 13:23:36.872060
+success: maxfid

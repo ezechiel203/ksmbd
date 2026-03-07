@@ -1,0 +1,942 @@
+[ 1518.667862] ksmbd: connect success: accepted new connection
+[ 1518.684129] ksmbd: RFC1002 hdr=00 00 00 e2 len=226 status=0
+[ 1518.686300] ksmbd: PDU sig=fe 53 4d 42 pdu=226 req_running=0
+[ 1518.687593] ksmbd: got SMB2 command
+[ 1518.689034] ksmbd: no length check for command
+[ 1518.691209] ksmbd: SMB2 data length 0 offset 0
+[ 1518.692890] ksmbd: SMB2 len 100
+[ 1518.695783] ksmbd: Unknown command 0 in credit charge validation, defaulting to 1
+[ 1518.699015] ksmbd: credit_check: cmd=0 charge=1 calc=1 req_len=1 resp_len=0 total=1 out=0
+[ 1518.703048] ksmbd: credit_check: lock_enter cmd=0 charge=1 total=1 out=0
+[ 1518.706052] ksmbd: credit_check: lock_exit cmd=0 ret=0 total=1 out=1
+[ 1518.707623] ksmbd: client requested dialect 0x311
+[ 1518.708869] ksmbd: selected \x02SMB 3.1.1 dialect
+[ 1518.710129] ksmbd: conn->dialect 0x311
+[ 1518.711149] ksmbd: Received negotiate request
+[ 1518.713252] ksmbd: decoding 4 negotiate contexts
+[ 1518.714403] ksmbd: deassemble SMB2_PREAUTH_INTEGRITY_CAPABILITIES context
+[ 1518.716095] ksmbd: deassemble SMB2_ENCRYPTION_CAPABILITIES context
+[ 1518.717671] ksmbd: Cipher ID = 0x4
+[ 1518.719858] ksmbd: deassemble SMB2_SIGNING_CAPABILITIES context
+[ 1518.721403] ksmbd: Signing Algorithm ID = 0x2
+[ 1518.723199] ksmbd: deassemble SMB2_NETNAME_NEGOTIATE_CONTEXT_ID context
+[ 1518.725453] ksmbd: NETNAME context name '127.0.0.1' != server name 'KSMBD-VM'
+[ 1518.728182] ksmbd: assemble SMB2_PREAUTH_INTEGRITY_CAPABILITIES context
+[ 1518.730789] ksmbd: assemble SMB2_ENCRYPTION_CAPABILITIES context
+[ 1518.732918] ksmbd: assemble SMB2_SIGNING_CAPABILITIES context
+[ 1518.734471] ksmbd: negotiate context offset 224, count 3
+[ 1518.736440] ksmbd: credit_rsp: dispatch cmd=0 total=1 out=1 granted_total=0
+[ 1518.738907] ksmbd: credit_rsp: lock_enter cmd=0 charge=1 req=31 total=1 out=1 granted_total=0
+[ 1518.741936] ksmbd: credit_rsp: lock_exit cmd=0 charge=1 req=31 granted=1 total=1 out=0 granted_total=1
+[ 1518.745177] ksmbd: credits: requested[31] granted[1] total_granted[1]
+[ 1518.751094] ksmbd: RFC1002 hdr=00 00 00 a2 len=162 status=5
+[ 1518.752390] ksmbd: PDU sig=fe 53 4d 42 pdu=162 req_running=0
+[ 1518.754311] ksmbd: got SMB2 command
+[ 1518.755136] ksmbd: SMB2 data length 74 offset 88
+[ 1518.758840] ksmbd: SMB2 len 162
+[ 1518.760748] ksmbd: Unknown command 1 in credit charge validation, defaulting to 1
+[ 1518.762662] ksmbd: credit_check: cmd=1 charge=1 calc=1 req_len=1 resp_len=0 total=1 out=0
+[ 1518.766833] ksmbd: credit_check: lock_enter cmd=1 charge=1 total=1 out=0
+[ 1518.768494] ksmbd: credit_check: lock_exit cmd=1 ret=0 total=1 out=1
+[ 1518.772802] ksmbd: Received smb2 session setup request
+[ 1518.775763] ksmbd: negotiate phase
+[ 1518.776673] ksmbd: NTLMSSP SecurityBufferLength 148
+[ 1518.778234] ksmbd: credit_rsp: dispatch cmd=1 total=1 out=1 granted_total=0
+[ 1518.781751] ksmbd: credit_rsp: lock_enter cmd=1 charge=1 req=31 total=1 out=1 granted_total=0
+[ 1518.784131] ksmbd: credit_rsp: lock_exit cmd=1 charge=1 req=31 granted=31 total=31 out=0 granted_total=31
+[ 1518.787837] ksmbd: credits: requested[31] granted[31] total_granted[31]
+[ 1518.790575] ksmbd: RFC1002 hdr=00 00 02 02 len=514 status=5
+[ 1518.792756] ksmbd: PDU sig=fe 53 4d 42 pdu=514 req_running=0
+[ 1518.794389] ksmbd: got SMB2 command
+[ 1518.795640] ksmbd: SMB2 data length 426 offset 88
+[ 1518.797582] ksmbd: SMB2 len 514
+[ 1518.801313] ksmbd: Unknown command 1 in credit charge validation, defaulting to 1
+[ 1518.803270] ksmbd: credit_check: cmd=1 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 1518.805371] ksmbd: credit_check: lock_enter cmd=1 charge=1 total=31 out=0
+[ 1518.807086] ksmbd: credit_check: lock_exit cmd=1 ret=0 total=31 out=1
+[ 1518.808684] ksmbd: Received smb2 session setup request
+[ 1518.811821] ksmbd: authenticate phase
+[ 1518.813015] ksmbd: session setup request for user testuser
+[ 1518.817253] ksmbd: decode_ntlmssp_authenticate_blob dnameWORKGROUP
+[ 1518.818626] ksmbd: generated encryption keys for session 1, cipher type 4
+[ 1518.821758] ksmbd: generated signing key for session 1
+[ 1518.823740] ksmbd: credit_rsp: dispatch cmd=1 total=31 out=1 granted_total=0
+[ 1518.825457] ksmbd: credit_rsp: lock_enter cmd=1 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1518.829122] ksmbd: credit_rsp: lock_exit cmd=1 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1518.832784] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1518.836217] ksmbd: RFC1002 hdr=00 00 00 68 len=104 status=1
+[ 1518.837825] ksmbd: PDU sig=fe 53 4d 42 pdu=104 req_running=0
+[ 1518.839587] ksmbd: skip to check tree connect request
+[ 1518.842174] ksmbd: got SMB2 command
+[ 1518.842862] ksmbd: SMB2 data length 32 offset 72
+[ 1518.845301] ksmbd: SMB2 len 104
+[ 1518.846310] ksmbd: Unknown command 3 in credit charge validation, defaulting to 1
+[ 1518.848065] ksmbd: credit_check: cmd=3 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 1518.850289] ksmbd: credit_check: lock_enter cmd=3 charge=1 total=31 out=0
+[ 1518.851871] ksmbd: credit_check: lock_exit cmd=3 ret=0 total=31 out=1
+[ 1518.853456] ksmbd: Received smb2 tree connect request
+[ 1518.854789] ksmbd: tree connect request for tree test treename \\127.0.0.1\test
+[ 1518.856722] ksmbd: MaximalAccess: perm_r=0 perm_w=0 perm_x=0 access=0x001f01ff
+[ 1518.858573] ksmbd: credit_rsp: dispatch cmd=3 total=31 out=1 granted_total=0
+[ 1518.860273] ksmbd: credit_rsp: lock_enter cmd=3 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1518.862361] ksmbd: credit_rsp: lock_exit cmd=3 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1518.864599] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1518.866889] ksmbd: connect success: accepted new connection
+[ 1518.873698] ksmbd: RFC1002 hdr=00 00 00 e2 len=226 status=0
+[ 1518.875132] ksmbd: PDU sig=fe 53 4d 42 pdu=226 req_running=0
+[ 1518.876534] ksmbd: got SMB2 command
+[ 1518.877629] ksmbd: no length check for command
+[ 1518.878789] ksmbd: SMB2 data length 0 offset 0
+[ 1518.879975] ksmbd: SMB2 len 100
+[ 1518.880801] ksmbd: Unknown command 0 in credit charge validation, defaulting to 1
+[ 1518.882683] ksmbd: credit_check: cmd=0 charge=1 calc=1 req_len=1 resp_len=0 total=1 out=0
+[ 1518.884750] ksmbd: credit_check: lock_enter cmd=0 charge=1 total=1 out=0
+[ 1518.886403] ksmbd: credit_check: lock_exit cmd=0 ret=0 total=1 out=1
+[ 1518.887982] ksmbd: client requested dialect 0x311
+[ 1518.889189] ksmbd: selected \x02SMB 3.1.1 dialect
+[ 1518.891773] ksmbd: conn->dialect 0x311
+[ 1518.893089] ksmbd: Received negotiate request
+[ 1518.896191] ksmbd: decoding 4 negotiate contexts
+[ 1518.898748] ksmbd: deassemble SMB2_PREAUTH_INTEGRITY_CAPABILITIES context
+[ 1518.900400] ksmbd: deassemble SMB2_ENCRYPTION_CAPABILITIES context
+[ 1518.902449] ksmbd: Cipher ID = 0x4
+[ 1518.903781] ksmbd: deassemble SMB2_SIGNING_CAPABILITIES context
+[ 1518.906749] ksmbd: Signing Algorithm ID = 0x2
+[ 1518.907870] ksmbd: deassemble SMB2_NETNAME_NEGOTIATE_CONTEXT_ID context
+[ 1518.910419] ksmbd: NETNAME context name '127.0.0.1' != server name 'KSMBD-VM'
+[ 1518.912214] ksmbd: assemble SMB2_PREAUTH_INTEGRITY_CAPABILITIES context
+[ 1518.914189] ksmbd: assemble SMB2_ENCRYPTION_CAPABILITIES context
+[ 1518.917067] ksmbd: assemble SMB2_SIGNING_CAPABILITIES context
+[ 1518.919765] ksmbd: negotiate context offset 224, count 3
+[ 1518.921786] ksmbd: credit_rsp: dispatch cmd=0 total=1 out=1 granted_total=0
+[ 1518.924883] ksmbd: credit_rsp: lock_enter cmd=0 charge=1 req=31 total=1 out=1 granted_total=0
+[ 1518.927497] ksmbd: credit_rsp: lock_exit cmd=0 charge=1 req=31 granted=1 total=1 out=0 granted_total=1
+[ 1518.930137] ksmbd: credits: requested[31] granted[1] total_granted[1]
+[ 1518.933237] ksmbd: RFC1002 hdr=00 00 00 a2 len=162 status=5
+[ 1518.934381] ksmbd: PDU sig=fe 53 4d 42 pdu=162 req_running=1
+[ 1518.937459] ksmbd: got SMB2 command
+[ 1518.940209] ksmbd: SMB2 data length 74 offset 88
+[ 1518.941455] ksmbd: SMB2 len 162
+[ 1518.942329] ksmbd: Unknown command 1 in credit charge validation, defaulting to 1
+[ 1518.945708] ksmbd: credit_check: cmd=1 charge=1 calc=1 req_len=1 resp_len=0 total=1 out=0
+[ 1518.948769] ksmbd: credit_check: lock_enter cmd=1 charge=1 total=1 out=0
+[ 1518.951534] ksmbd: credit_check: lock_exit cmd=1 ret=0 total=1 out=1
+[ 1518.953667] ksmbd: Received smb2 session setup request
+[ 1518.956773] ksmbd: negotiate phase
+[ 1518.957915] ksmbd: NTLMSSP SecurityBufferLength 148
+[ 1518.961018] ksmbd: credit_rsp: dispatch cmd=1 total=1 out=1 granted_total=0
+[ 1518.964002] ksmbd: credit_rsp: lock_enter cmd=1 charge=1 req=31 total=1 out=1 granted_total=0
+[ 1518.966504] ksmbd: credit_rsp: lock_exit cmd=1 charge=1 req=31 granted=31 total=31 out=0 granted_total=31
+[ 1518.973418] ksmbd: credits: requested[31] granted[31] total_granted[31]
+[ 1518.975518] ksmbd: RFC1002 hdr=00 00 02 02 len=514 status=5
+[ 1518.976869] ksmbd: PDU sig=fe 53 4d 42 pdu=514 req_running=0
+[ 1518.978554] ksmbd: got SMB2 command
+[ 1518.979372] ksmbd: SMB2 data length 426 offset 88
+[ 1518.980556] ksmbd: SMB2 len 514
+[ 1518.981354] ksmbd: Unknown command 1 in credit charge validation, defaulting to 1
+[ 1518.984344] ksmbd: credit_check: cmd=1 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 1518.987759] ksmbd: credit_check: lock_enter cmd=1 charge=1 total=31 out=0
+[ 1518.989902] ksmbd: credit_check: lock_exit cmd=1 ret=0 total=31 out=1
+[ 1518.993198] ksmbd: Received smb2 session setup request
+[ 1518.995762] ksmbd: authenticate phase
+[ 1518.997486] ksmbd: session setup request for user testuser
+[ 1518.999742] ksmbd: decode_ntlmssp_authenticate_blob dnameWORKGROUP
+[ 1519.002542] ksmbd: generated encryption keys for session 2, cipher type 4
+[ 1519.004784] ksmbd: generated signing key for session 2
+[ 1519.006467] ksmbd: credit_rsp: dispatch cmd=1 total=31 out=1 granted_total=0
+[ 1519.010012] ksmbd: credit_rsp: lock_enter cmd=1 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1519.012762] ksmbd: credit_rsp: lock_exit cmd=1 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1519.015395] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1519.019034] ksmbd: RFC1002 hdr=00 00 00 68 len=104 status=1
+[ 1519.021752] ksmbd: PDU sig=fe 53 4d 42 pdu=104 req_running=1
+[ 1519.023474] ksmbd: skip to check tree connect request
+[ 1519.026753] ksmbd: got SMB2 command
+[ 1519.027748] ksmbd: SMB2 data length 32 offset 72
+[ 1519.030791] ksmbd: SMB2 len 104
+[ 1519.031778] ksmbd: Unknown command 3 in credit charge validation, defaulting to 1
+[ 1519.033574] ksmbd: credit_check: cmd=3 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 1519.040754] ksmbd: credit_check: lock_enter cmd=3 charge=1 total=31 out=0
+[ 1519.042548] ksmbd: credit_check: lock_exit cmd=3 ret=0 total=31 out=1
+[ 1519.045211] ksmbd: Received smb2 tree connect request
+[ 1519.046556] ksmbd: tree connect request for tree test treename \\127.0.0.1\test
+[ 1519.049231] ksmbd: MaximalAccess: perm_r=0 perm_w=0 perm_x=0 access=0x001f01ff
+[ 1519.051848] ksmbd: credit_rsp: dispatch cmd=3 total=31 out=1 granted_total=0
+[ 1519.054194] ksmbd: credit_rsp: lock_enter cmd=3 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1519.057192] ksmbd: credit_rsp: lock_exit cmd=3 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1519.060753] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1519.063777] ksmbd: RFC1002 hdr=00 00 00 e2 len=226 status=1
+[ 1519.065215] ksmbd: PDU sig=fe 53 4d 42 pdu=226 req_running=0
+[ 1519.067036] ksmbd: got SMB2 command
+[ 1519.068071] ksmbd: SMB2 data length 106 offset 120
+[ 1519.069206] ksmbd: SMB2 len 226
+[ 1519.070019] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 1519.071657] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 1519.073642] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 1519.076569] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 1519.078920] ksmbd: Received smb2 create request
+[ 1519.080057] ksmbd: converted name = test_durable_v2_open_purge_disconnected_rh_with_write
+[ 1519.082481] ksmbd: can not get linux path for test_durable_v2_open_purge_disconnected_rh_with_write, rc = -2
+[ 1519.086057] ksmbd: Error response: c0000034
+[ 1519.090209] ksmbd: Failed to process 5 [-9]
+[ 1519.091344] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 1519.093327] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1519.096996] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1519.100975] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1519.105161] ksmbd: RFC1002 hdr=00 00 00 e2 len=226 status=1
+[ 1519.108092] ksmbd: PDU sig=fe 53 4d 42 pdu=226 req_running=1
+[ 1519.110322] ksmbd: got SMB2 command
+[ 1519.111094] ksmbd: SMB2 data length 106 offset 120
+[ 1519.112989] ksmbd: SMB2 len 226
+[ 1519.114167] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 1519.116556] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 1519.119397] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 1519.121430] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 1519.124374] ksmbd: Received smb2 create request
+[ 1519.126170] ksmbd: converted name = test_durable_v2_open_purge_disconnected_rh_with_write
+[ 1519.128469] ksmbd: can not get linux path for test_durable_v2_open_purge_disconnected_rh_with_write, rc = -2
+[ 1519.130630] ksmbd: Discard write access to a directory
+[ 1519.131982] ksmbd: file does not exist, so creating
+[ 1519.134747] ksmbd: creating directory
+[ 1519.135786] ksmbd: inherit posix acl failed : -2
+[ 1519.137093] ksmbd: Set posix acls
+[ 1519.139431] ksmbd: mode: 7, access flags now 0x1f01bf
+[ 1519.142395] ksmbd: mode: 7, access flags now 0x1f01bf
+[ 1519.144773] ksmbd: mode: 7, access flags now 0x1f01bf
+[ 1519.146307] ksmbd: mode: 7, access flags now 0x1f01bf
+[ 1519.148798] ksmbd: mode: 7, access flags now 0x1f01bf
+[ 1519.150524] ksmbd: mode: 7, access flags now 0x1f01bf
+[ 1519.152007] ksmbd: mode: 7, access flags now 0x1f01bf
+[ 1519.154406] ksmbd: purge check: ci=00000000b7e9c3ca m_count=1
+[ 1519.156009] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 1519.158883] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1519.162004] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1519.165622] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1519.169558] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 1519.172428] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+[ 1519.173876] ksmbd: got SMB2 command
+[ 1519.174835] ksmbd: SMB2 len 88
+[ 1519.175679] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 1519.178744] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 1519.181231] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 1519.184474] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 1519.186014] ksmbd: Received smb2 close request
+[ 1519.188398] ksmbd: volatile_id = 0
+[ 1519.190755] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 1519.193122] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1519.195652] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1519.199402] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1519.202611] ksmbd: RFC1002 hdr=00 00 01 06 len=262 status=1
+[ 1519.204034] ksmbd: PDU sig=fe 53 4d 42 pdu=262 req_running=0
+[ 1519.205544] ksmbd: got SMB2 command
+[ 1519.208795] ksmbd: SMB2 data length 142 offset 120
+[ 1519.211311] ksmbd: SMB2 len 262
+[ 1519.212045] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 1519.213901] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 1519.217992] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 1519.219570] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 1519.221849] ksmbd: Received smb2 create request
+[ 1519.223757] ksmbd: converted name = test_durable_v2_open_purge_disconnected_rh_with_write/file_yQaGhEv-.dat
+[ 1519.226223] ksmbd: can not get linux path for test_durable_v2_open_purge_disconnected_rh_with_write/file_yQaGhEv-.dat, rc = -2
+[ 1519.230686] ksmbd: Error response: c0000034
+[ 1519.232432] ksmbd: Failed to process 5 [-9]
+[ 1519.233690] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 1519.237015] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1519.240182] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1519.243404] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1519.246046] ksmbd: RFC1002 hdr=00 00 01 8c len=396 status=1
+[ 1519.247760] ksmbd: PDU sig=fe 53 4d 42 pdu=396 req_running=0
+[ 1519.249816] ksmbd: got SMB2 command
+[ 1519.250840] ksmbd: SMB2 data length 132 offset 264
+[ 1519.253171] ksmbd: SMB2 len 396
+[ 1519.254370] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 1519.256679] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 1519.259937] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 1519.264542] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 1519.267771] ksmbd: Received smb2 create request
+[ 1519.269862] ksmbd: converted name = test_durable_v2_open_purge_disconnected_rh_with_write/file_yQaGhEv-.dat
+[ 1519.273433] ksmbd: Request for durable v2 open
+[ 1519.274640] ksmbd: can not get linux path for test_durable_v2_open_purge_disconnected_rh_with_write/file_yQaGhEv-.dat, rc = -2
+[ 1519.277433] ksmbd: file does not exist, so creating
+[ 1519.278543] ksmbd: creating regular file
+[ 1519.279840] ksmbd: purge check: ci=00000000c9983eb9 m_count=1
+[ 1519.281256] ksmbd: lease req for(test_durable_v2_open_purge_disconnected_rh_with_write/file_yQaGhEv-.dat) req oplock state 0x1, lease state 0x3
+[ 1519.284455] ksmbd: lease granted on(test_durable_v2_open_purge_disconnected_rh_with_write/file_yQaGhEv-.dat) lease state 0x3
+[ 1519.287055] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 1519.288818] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1519.290855] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1519.295024] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1519.298063] ksmbd: RFC1002 hdr=00 00 01 8c len=396 status=1
+[ 1519.299719] ksmbd: PDU sig=fe 53 4d 42 pdu=396 req_running=1
+[ 1519.303031] ksmbd: got SMB2 command
+[ 1519.305565] ksmbd: SMB2 data length 132 offset 264
+[ 1519.306971] ksmbd: SMB2 len 396
+[ 1519.309370] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 1519.312169] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 1519.315167] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 1519.317901] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 1519.320746] ksmbd: Received smb2 create request
+[ 1519.322211] ksmbd: converted name = test_durable_v2_open_purge_disconnected_rh_with_write/file_yQaGhEv-.dat
+[ 1519.326782] ksmbd: Request for durable v2 open
+[ 1519.328774] ksmbd: check permission using windows acl
+[ 1519.330747] ksmbd: purge check: ci=00000000c9983eb9 m_count=2
+[ 1519.332805] ksmbd: lease req for(test_durable_v2_open_purge_disconnected_rh_with_write/file_yQaGhEv-.dat) req oplock state 0x1, lease state 0x3
+[ 1519.336802] ksmbd: lease granted on(test_durable_v2_open_purge_disconnected_rh_with_write/file_yQaGhEv-.dat) lease state 0x3
+[ 1519.340813] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 1519.343745] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1519.346390] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1519.348747] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1519.350561] ksmbd: RFC1002 hdr=00 00 01 8c len=396 status=1
+[ 1519.351985] ksmbd: PDU sig=fe 53 4d 42 pdu=396 req_running=0
+[ 1519.353455] ksmbd: got SMB2 command
+[ 1519.354401] ksmbd: SMB2 data length 132 offset 264
+[ 1519.355579] ksmbd: SMB2 len 396
+[ 1519.356483] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 1519.360499] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 1519.364008] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 1519.366988] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 1519.369057] ksmbd: Received smb2 create request
+[ 1519.370498] ksmbd: converted name = test_durable_v2_open_purge_disconnected_rh_with_write/file_yQaGhEv-.dat
+[ 1519.374008] ksmbd: Request for durable v2 open
+[ 1519.376398] ksmbd: check permission using windows acl
+[ 1519.378261] ksmbd: purge check: ci=00000000c9983eb9 m_count=3
+[ 1519.379947] ksmbd: lease req for(test_durable_v2_open_purge_disconnected_rh_with_write/file_yQaGhEv-.dat) req oplock state 0x1, lease state 0x3
+[ 1519.384025] ksmbd: lease granted on(test_durable_v2_open_purge_disconnected_rh_with_write/file_yQaGhEv-.dat) lease state 0x3
+[ 1519.388775] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 1519.391417] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1519.394513] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1519.397510] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1520.402059] ksmbd: Wait for all pending requests(0)
+[ 1521.404599] ksmbd: RFC1002 hdr=00 00 00 74 len=116 status=1
+[ 1521.405783] ksmbd: PDU sig=fe 53 4d 42 pdu=116 req_running=0
+[ 1521.406966] ksmbd: got SMB2 command
+[ 1521.407682] ksmbd: SMB2 data length 4 offset 112
+[ 1521.411748] ksmbd: SMB2 len 116
+[ 1521.413482] ksmbd: credit_check: cmd=9 charge=1 calc=1 req_len=4 resp_len=0 total=31 out=0
+[ 1521.417287] ksmbd: credit_check: lock_enter cmd=9 charge=1 total=31 out=0
+[ 1521.419882] ksmbd: credit_check: lock_exit cmd=9 ret=0 total=31 out=1
+[ 1521.422512] ksmbd: Received smb2 write request
+[ 1521.424663] ksmbd: flags 0
+[ 1521.426360] ksmbd: filename file_yQaGhEv-.dat, offset 0, len 4
+[ 1521.428499] ksmbd: request to send oplock(level : 0x1) break notification
+[ 1557.879286] ksmbd: oplock granted = 0
+[ 1558.904337] ksmbd: ksmbd: cmd 0x9 handler took 37482 ms (pid=1717)
+[ 1558.905754] ksmbd: credit_rsp: dispatch cmd=9 total=31 out=1 granted_total=0
+[ 1558.910226] ksmbd: credit_rsp: lock_enter cmd=9 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1558.912331] ksmbd: credit_rsp: lock_exit cmd=9 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1558.915598] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1558.923101] ksmbd: ksmbd: handle_ksmbd_work took 37516 ms
+[ 1560.930076] ksmbd: connect success: accepted new connection
+[ 1560.942373] ksmbd: RFC1002 hdr=00 00 00 e2 len=226 status=0
+[ 1560.943719] ksmbd: PDU sig=fe 53 4d 42 pdu=226 req_running=0
+[ 1560.945211] ksmbd: got SMB2 command
+[ 1560.945967] ksmbd: no length check for command
+[ 1560.947267] ksmbd: SMB2 data length 0 offset 0
+[ 1560.948407] ksmbd: SMB2 len 100
+[ 1560.949211] ksmbd: Unknown command 0 in credit charge validation, defaulting to 1
+[ 1560.951373] ksmbd: credit_check: cmd=0 charge=1 calc=1 req_len=1 resp_len=0 total=1 out=0
+[ 1560.953303] ksmbd: credit_check: lock_enter cmd=0 charge=1 total=1 out=0
+[ 1560.954894] ksmbd: credit_check: lock_exit cmd=0 ret=0 total=1 out=1
+[ 1560.956303] ksmbd: client requested dialect 0x311
+[ 1560.961108] ksmbd: selected \x02SMB 3.1.1 dialect
+[ 1560.962322] ksmbd: conn->dialect 0x311
+[ 1560.963652] ksmbd: Received negotiate request
+[ 1560.965682] ksmbd: decoding 4 negotiate contexts
+[ 1560.967975] ksmbd: deassemble SMB2_PREAUTH_INTEGRITY_CAPABILITIES context
+[ 1560.970183] ksmbd: deassemble SMB2_ENCRYPTION_CAPABILITIES context
+[ 1560.971490] ksmbd: Cipher ID = 0x4
+[ 1560.972689] ksmbd: deassemble SMB2_SIGNING_CAPABILITIES context
+[ 1560.974173] ksmbd: Signing Algorithm ID = 0x2
+[ 1560.978425] ksmbd: deassemble SMB2_NETNAME_NEGOTIATE_CONTEXT_ID context
+[ 1560.980147] ksmbd: NETNAME context name '127.0.0.1' != server name 'KSMBD-VM'
+[ 1560.981822] ksmbd: assemble SMB2_PREAUTH_INTEGRITY_CAPABILITIES context
+[ 1560.983489] ksmbd: assemble SMB2_ENCRYPTION_CAPABILITIES context
+[ 1560.984853] ksmbd: assemble SMB2_SIGNING_CAPABILITIES context
+[ 1560.986324] ksmbd: negotiate context offset 224, count 3
+[ 1560.987492] ksmbd: credit_rsp: dispatch cmd=0 total=1 out=1 granted_total=0
+[ 1560.992616] ksmbd: credit_rsp: lock_enter cmd=0 charge=1 req=31 total=1 out=1 granted_total=0
+[ 1560.994728] ksmbd: credit_rsp: lock_exit cmd=0 charge=1 req=31 granted=1 total=1 out=0 granted_total=1
+[ 1560.996861] ksmbd: credits: requested[31] granted[1] total_granted[1]
+[ 1560.999819] ksmbd: RFC1002 hdr=00 00 00 a2 len=162 status=5
+[ 1561.002728] ksmbd: PDU sig=fe 53 4d 42 pdu=162 req_running=0
+[ 1561.004453] ksmbd: got SMB2 command
+[ 1561.006024] ksmbd: SMB2 data length 74 offset 88
+[ 1561.007216] ksmbd: SMB2 len 162
+[ 1561.007904] ksmbd: Unknown command 1 in credit charge validation, defaulting to 1
+[ 1561.010676] ksmbd: credit_check: cmd=1 charge=1 calc=1 req_len=1 resp_len=0 total=1 out=0
+[ 1561.012581] ksmbd: credit_check: lock_enter cmd=1 charge=1 total=1 out=0
+[ 1561.014182] ksmbd: credit_check: lock_exit cmd=1 ret=0 total=1 out=1
+[ 1561.017125] ksmbd: Received smb2 session setup request
+[ 1561.019643] ksmbd: negotiate phase
+[ 1561.020517] ksmbd: NTLMSSP SecurityBufferLength 148
+[ 1561.021727] ksmbd: credit_rsp: dispatch cmd=1 total=1 out=1 granted_total=0
+[ 1561.024734] ksmbd: credit_rsp: lock_enter cmd=1 charge=1 req=31 total=1 out=1 granted_total=0
+[ 1561.028648] ksmbd: credit_rsp: lock_exit cmd=1 charge=1 req=31 granted=31 total=31 out=0 granted_total=31
+[ 1561.030903] ksmbd: credits: requested[31] granted[31] total_granted[31]
+[ 1561.032833] ksmbd: RFC1002 hdr=00 00 02 02 len=514 status=5
+[ 1561.036065] ksmbd: PDU sig=fe 53 4d 42 pdu=514 req_running=0
+[ 1561.037303] ksmbd: got SMB2 command
+[ 1561.039118] ksmbd: SMB2 data length 426 offset 88
+[ 1561.040529] ksmbd: SMB2 len 514
+[ 1561.041850] ksmbd: Unknown command 1 in credit charge validation, defaulting to 1
+[ 1561.043889] ksmbd: credit_check: cmd=1 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 1561.045787] ksmbd: credit_check: lock_enter cmd=1 charge=1 total=31 out=0
+[ 1561.047372] ksmbd: credit_check: lock_exit cmd=1 ret=0 total=31 out=1
+[ 1561.052429] ksmbd: Received smb2 session setup request
+[ 1561.053716] ksmbd: authenticate phase
+[ 1561.054744] ksmbd: session setup request for user testuser
+[ 1561.056232] ksmbd: decode_ntlmssp_authenticate_blob dnameWORKGROUP
+[ 1561.057555] ksmbd: generated encryption keys for session 2, cipher type 4
+[ 1561.059306] ksmbd: generated signing key for session 2
+[ 1561.061636] ksmbd: credit_rsp: dispatch cmd=1 total=31 out=1 granted_total=0
+[ 1561.063825] ksmbd: credit_rsp: lock_enter cmd=1 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1561.066882] ksmbd: credit_rsp: lock_exit cmd=1 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1561.069421] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1561.071757] ksmbd: RFC1002 hdr=00 00 00 68 len=104 status=1
+[ 1561.072981] ksmbd: PDU sig=fe 53 4d 42 pdu=104 req_running=0
+[ 1561.077645] ksmbd: skip to check tree connect request
+[ 1561.078857] ksmbd: got SMB2 command
+[ 1561.079614] ksmbd: SMB2 data length 32 offset 72
+[ 1561.080565] ksmbd: SMB2 len 104
+[ 1561.081425] ksmbd: Unknown command 3 in credit charge validation, defaulting to 1
+[ 1561.083079] ksmbd: credit_check: cmd=3 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 1561.084769] ksmbd: credit_check: lock_enter cmd=3 charge=1 total=31 out=0
+[ 1561.089580] ksmbd: credit_check: lock_exit cmd=3 ret=0 total=31 out=1
+[ 1561.090889] ksmbd: Received smb2 tree connect request
+[ 1561.091910] ksmbd: tree connect request for tree test treename \\127.0.0.1\test
+[ 1561.093774] ksmbd: MaximalAccess: perm_r=0 perm_w=0 perm_x=0 access=0x001f01ff
+[ 1561.095389] ksmbd: credit_rsp: dispatch cmd=3 total=31 out=1 granted_total=0
+[ 1561.096932] ksmbd: credit_rsp: lock_enter cmd=3 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1561.098810] ksmbd: credit_rsp: lock_exit cmd=3 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1561.100935] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1561.102696] ksmbd: RFC1002 hdr=00 00 01 94 len=404 status=1
+[ 1561.103917] ksmbd: PDU sig=fe 53 4d 42 pdu=404 req_running=0
+[ 1561.105363] ksmbd: got SMB2 command
+[ 1561.106242] ksmbd: SMB2 data length 140 offset 264
+[ 1561.107364] ksmbd: SMB2 len 404
+[ 1561.108134] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 1561.111770] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 1561.113627] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 1561.115179] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 1561.116617] ksmbd: Received smb2 create request
+[ 1561.117735] ksmbd: converted name = test_durable_v2_open_purge_disconnected_rh_with_write/file_yQaGhEv-.dat
+[ 1561.119776] ksmbd: reconnect v2 Persistent-id from reconnect = 3
+[ 1561.121270] ksmbd: lease granted on(test_durable_v2_open_purge_disconnected_rh_with_write/file_yQaGhEv-.dat) lease state 0x3
+[ 1561.123819] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 1561.125358] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1561.127347] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1561.129367] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1561.131018] ksmbd: RFC1002 hdr=00 00 00 44 len=68 status=1
+[ 1561.132220] ksmbd: PDU sig=fe 53 4d 42 pdu=68 req_running=0
+[ 1561.133654] ksmbd: got SMB2 command
+[ 1561.134653] ksmbd: SMB2 len 68
+[ 1561.135507] ksmbd: Unknown command 13 in credit charge validation, defaulting to 1
+[ 1561.137293] ksmbd: credit_check: cmd=13 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 1561.139141] ksmbd: credit_check: lock_enter cmd=13 charge=1 total=31 out=0
+[ 1561.140582] ksmbd: credit_check: lock_exit cmd=13 ret=0 total=31 out=1
+[ 1561.142195] ksmbd: Received smb2 echo request
+[ 1561.143127] ksmbd: credit_rsp: dispatch cmd=13 total=31 out=1 granted_total=0
+[ 1561.144764] ksmbd: credit_rsp: lock_enter cmd=13 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1561.146657] ksmbd: credit_rsp: lock_exit cmd=13 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1561.148660] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1561.150406] ksmbd: RFC1002 hdr=00 00 00 44 len=68 status=1
+[ 1561.151563] ksmbd: PDU sig=fe 53 4d 42 pdu=68 req_running=0
+[ 1561.152790] ksmbd: got SMB2 command
+[ 1561.153793] ksmbd: SMB2 len 68
+[ 1561.154670] ksmbd: Unknown command 13 in credit charge validation, defaulting to 1
+[ 1561.156446] ksmbd: credit_check: cmd=13 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 1561.158377] ksmbd: credit_check: lock_enter cmd=13 charge=1 total=31 out=0
+[ 1561.159939] ksmbd: credit_check: lock_exit cmd=13 ret=0 total=31 out=1
+[ 1561.161459] ksmbd: Received smb2 echo request
+[ 1561.162381] ksmbd: credit_rsp: dispatch cmd=13 total=31 out=1 granted_total=0
+[ 1561.163978] ksmbd: credit_rsp: lock_enter cmd=13 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1561.165870] ksmbd: credit_rsp: lock_exit cmd=13 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1561.167901] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1561.169509] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 1561.170666] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+[ 1561.171976] ksmbd: got SMB2 command
+[ 1561.172730] ksmbd: SMB2 len 88
+[ 1561.173527] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 1561.175282] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 1561.177097] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 1561.178507] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 1561.180060] ksmbd: Received smb2 close request
+[ 1561.181136] ksmbd: volatile_id = 1
+[ 1561.181869] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 1561.183600] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1561.185617] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1561.187663] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1561.189226] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 1561.190334] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+[ 1561.191521] ksmbd: got SMB2 command
+[ 1561.192491] ksmbd: SMB2 len 88
+[ 1561.193334] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 1561.195108] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 1561.196950] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 1561.198455] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 1561.199953] ksmbd: Received smb2 close request
+[ 1561.201057] ksmbd: volatile_id = 2
+[ 1561.201794] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 1561.203529] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1561.205485] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1561.207585] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1561.209369] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 1561.210527] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+[ 1561.211912] ksmbd: got SMB2 command
+[ 1561.212724] ksmbd: SMB2 len 88
+[ 1561.213537] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 1561.215237] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 1561.216960] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 1561.218430] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 1561.219822] ksmbd: Received smb2 close request
+[ 1561.220831] ksmbd: volatile_id = 0
+[ 1561.221702] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 1561.223254] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1561.225226] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1561.227252] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1561.228825] ksmbd: RFC1002 hdr=00 00 01 06 len=262 status=1
+[ 1561.230176] ksmbd: PDU sig=fe 53 4d 42 pdu=262 req_running=0
+[ 1561.231499] ksmbd: got SMB2 command
+[ 1561.232349] ksmbd: SMB2 data length 142 offset 120
+[ 1561.233618] ksmbd: SMB2 len 262
+[ 1561.234485] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 1561.236276] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 1561.238183] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 1561.239644] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 1561.241240] ksmbd: Received smb2 create request
+[ 1561.242272] ksmbd: converted name = test_durable_v2_open_purge_disconnected_rh_with_write/file_yQaGhEv-.dat
+[ 1561.244494] ksmbd: purge check: ci=0000000077daf1d1 m_count=1
+[ 1561.245697] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 1561.247235] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1561.248907] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1561.250943] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1561.252659] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 1561.253914] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+[ 1561.255409] ksmbd: got SMB2 command
+[ 1561.256187] ksmbd: SMB2 len 88
+[ 1561.256817] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 1561.258597] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 1561.260486] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 1561.261895] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 1561.263386] ksmbd: Received smb2 close request
+[ 1561.264475] ksmbd: volatile_id = 3
+[ 1561.265376] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 1561.266933] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1561.268894] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1561.271028] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1561.272768] ksmbd: RFC1002 hdr=00 00 00 e2 len=226 status=1
+[ 1561.274045] ksmbd: PDU sig=fe 53 4d 42 pdu=226 req_running=0
+[ 1561.275454] ksmbd: got SMB2 command
+[ 1561.276345] ksmbd: SMB2 data length 106 offset 120
+[ 1561.277534] ksmbd: SMB2 len 226
+[ 1561.278361] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 1561.280038] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 1561.281881] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 1561.283432] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 1561.284880] ksmbd: Received smb2 create request
+[ 1561.285976] ksmbd: converted name = test_durable_v2_open_purge_disconnected_rh_with_write
+[ 1561.287830] ksmbd: open() argument is a directory: test_durable_v2_open_purge_disconnected_rh_with_write, 1040
+[ 1561.290076] ksmbd: Error response: c00000ba
+[ 1561.291096] ksmbd: Failed to process 5 [-5]
+[ 1561.292186] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 1561.293681] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1561.295621] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1561.297775] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1561.299413] ksmbd: RFC1002 hdr=00 00 00 e2 len=226 status=1
+[ 1561.300603] ksmbd: PDU sig=fe 53 4d 42 pdu=226 req_running=0
+[ 1561.301831] ksmbd: got SMB2 command
+[ 1561.302849] ksmbd: SMB2 data length 106 offset 120
+[ 1561.303957] ksmbd: SMB2 len 226
+[ 1561.304650] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 1561.306367] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 1561.308208] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 1561.309718] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 1561.311179] ksmbd: Received smb2 create request
+[ 1561.312317] ksmbd: converted name = test_durable_v2_open_purge_disconnected_rh_with_write
+[ 1561.314138] ksmbd: check permission using windows acl
+[ 1561.315319] ksmbd: Discard write access to a directory
+[ 1561.316506] ksmbd: purge check: ci=0000000077daf1d1 m_count=1
+[ 1561.317863] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 1561.319528] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1561.321433] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1561.323495] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1561.325202] ksmbd: RFC1002 hdr=00 00 00 69 len=105 status=1
+[ 1561.326374] ksmbd: PDU sig=fe 53 4d 42 pdu=105 req_running=0
+[ 1561.327744] ksmbd: got SMB2 command
+[ 1561.328646] ksmbd: SMB2 data length 0 offset 104
+[ 1561.329741] ksmbd: SMB2 len 105
+[ 1561.330534] ksmbd: credit_check: cmd=16 charge=1 calc=1 req_len=65536 resp_len=0 total=31 out=0
+[ 1561.332633] ksmbd: credit_check: lock_enter cmd=16 charge=1 total=31 out=0
+[ 1561.334173] ksmbd: credit_check: lock_exit cmd=16 ret=0 total=31 out=1
+[ 1561.335646] ksmbd: Received request smb2 query info request
+[ 1561.336918] ksmbd: GOT SMB2_O_INFO_FILE
+[ 1561.337753] ksmbd: system.posix_acl_access, len 23
+[ 1561.338784] ksmbd: user.DOSATTRIB, len 14
+[ 1561.339871] ksmbd: system.posix_acl_default, len 24
+[ 1561.341068] ksmbd: security.NTACL, len 14
+[ 1561.341922] ksmbd: credit_rsp: dispatch cmd=16 total=31 out=1 granted_total=0
+[ 1561.343613] ksmbd: credit_rsp: lock_enter cmd=16 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1561.345645] ksmbd: credit_rsp: lock_exit cmd=16 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1561.347497] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1561.349116] ksmbd: RFC1002 hdr=00 00 00 62 len=98 status=1
+[ 1561.350305] ksmbd: PDU sig=fe 53 4d 42 pdu=98 req_running=0
+[ 1561.352589] ksmbd: got SMB2 command
+[ 1561.353433] ksmbd: SMB2 data length 2 offset 96
+[ 1561.354434] ksmbd: SMB2 len 98
+[ 1561.355110] ksmbd: credit_check: cmd=14 charge=1 calc=1 req_len=65536 resp_len=0 total=31 out=0
+[ 1561.357156] ksmbd: credit_check: lock_enter cmd=14 charge=1 total=31 out=0
+[ 1561.358682] ksmbd: credit_check: lock_exit cmd=14 ret=0 total=31 out=1
+[ 1561.360136] ksmbd: Received smb2 query directory request
+[ 1561.361446] ksmbd: Search pattern is *
+[ 1561.362362] ksmbd: info_level : 12, buf_len :65520, next_offset : 16, data_count : 16
+[ 1561.364111] ksmbd: failed to load dos attribute in xattr
+[ 1561.365255] ksmbd: fail to load dos attribute.
+[ 1561.366351] ksmbd: info_level : 12, buf_len :65504, next_offset : 16, data_count : 32
+[ 1561.368157] ksmbd: credit_rsp: dispatch cmd=14 total=31 out=1 granted_total=0
+[ 1561.369751] ksmbd: credit_rsp: lock_enter cmd=14 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1561.371665] ksmbd: credit_rsp: lock_exit cmd=14 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1561.373742] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1561.375660] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 1561.376856] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+[ 1561.378035] ksmbd: got SMB2 command
+[ 1561.378753] ksmbd: SMB2 len 88
+[ 1561.379621] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 1561.381275] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 1561.383113] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 1561.384527] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 1561.385954] ksmbd: Received smb2 close request
+[ 1561.387026] ksmbd: volatile_id = 4
+[ 1561.387841] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 1561.389427] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1561.391383] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1561.393448] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1561.395135] ksmbd: RFC1002 hdr=00 00 00 e2 len=226 status=1
+[ 1561.396417] ksmbd: PDU sig=fe 53 4d 42 pdu=226 req_running=0
+[ 1561.397871] ksmbd: got SMB2 command
+[ 1561.398777] ksmbd: SMB2 data length 106 offset 120
+[ 1561.399944] ksmbd: SMB2 len 226
+[ 1561.400765] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+[ 1561.402485] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 1561.404424] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+[ 1561.406016] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+[ 1561.407497] ksmbd: Received smb2 create request
+[ 1561.408502] ksmbd: converted name = test_durable_v2_open_purge_disconnected_rh_with_write
+[ 1561.410376] ksmbd: Discard write access to a directory
+[ 1561.411642] ksmbd: purge check: ci=0000000077daf1d1 m_count=1
+[ 1561.412941] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+[ 1561.414538] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1561.416446] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1561.418526] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1561.420197] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+[ 1561.421364] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+[ 1561.422681] ksmbd: got SMB2 command
+[ 1561.423524] ksmbd: SMB2 len 88
+[ 1561.424316] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+[ 1561.425971] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+[ 1561.427844] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+[ 1561.429382] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+[ 1561.430863] ksmbd: Received smb2 close request
+[ 1561.431929] ksmbd: volatile_id = 5
+[ 1561.432735] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+[ 1561.434472] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+[ 1561.436395] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+[ 1561.438476] ksmbd: credits: requested[1] granted[1] total_granted[31]
+[ 1561.440128] ksmbd: Wait for all pending requests(0)
+[ 1561.441343] ksmbd: Wait for all pending requests(0)
+[12777.485859] ksmbd: netdev-down event: netdev(lo) is going down
+[12777.487186] ksmbd: releasing socket
+[12777.489979] ksmbd: netdev-down event: netdev(ens4) is going down
+[12777.492584] ksmbd: releasing socket
+[12779.525350] ksmbd: ksmbd: witness protocol support removed
+[12779.730213] ksmbd: VSS backend 'generic' unregistered
+[12779.731323] ksmbd: VSS backend 'zfs' unregistered
+[12779.732300] ksmbd: VSS backend 'btrfs' unregistered
+[12780.041192] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[12780.952996] ksmbd: Configuration subsystem initialized with 12 parameters
+[12780.958710] ksmbd: ksmbd: registered built-in md4 (md4-ksmbd) for NTLMv1 support
+[12780.963893] ksmbd: ksmbd: Fruit SMB extensions loaded
+[12780.964970] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[12780.966215] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[12780.967740] ksmbd: ksmbd: witness protocol support initialised
+[12831.099747] ksmbd: ksmbd: cmd 0x9 handler took 39867 ms (pid=1969)
+[12831.101932] ksmbd: ksmbd: handle_ksmbd_work took 39869 ms
+[13696.240248] ksmbd: ksmbd: witness protocol support removed
+[13696.722366] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[13697.828556] ksmbd: Configuration subsystem initialized with 12 parameters
+[13697.835948] ksmbd: ksmbd: registered built-in md4 (md4-ksmbd) for NTLMv1 support
+[13697.839391] ksmbd: ksmbd: Fruit SMB extensions loaded
+[13697.841372] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[13697.842596] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[13697.844385] ksmbd: ksmbd: witness protocol support initialised
+[13744.503271] ksmbd: ksmbd: cmd 0x9 handler took 37606 ms (pid=1969)
+[13744.504520] ksmbd: ksmbd: handle_ksmbd_work took 37607 ms
+[13752.420759] ksmbd: durable reconnect v2: client GUID mismatch
+[13752.428797] ksmbd: durable reconnect v2: client GUID mismatch
+[13752.478715] Modules linked in: ksmbd(OE) libdes aesni_intel sr_mod cdrom ata_generic 9pnet_virtio pata_acpi 9p intel_agp virtio_net 9pnet floppy bochs intel_gtt ata_piix serio_raw net_failover netfs failover
+[13752.478735] Unloaded tainted modules: ksmbd(OE):5 [last unloaded: ksmbd(OE)]
+[13752.484922] CPU: 0 UID: 0 PID: 2268 Comm: ksmbd:::ffff:12 Tainted: G    B   W  OE       6.18.13-arch1-1 #1 PREEMPT(full)  37d84e5c59d38b1e3c61214631c6e0356ae9b977
+[13752.516946]  __close_file_table_ids+0x15c/0x170 [ksmbd 990e355da52f8f949f4986752b2cad1747f61452]
+[13752.518847]  ? ksmbd_tree_conn_session_logoff+0x19e/0x1d0 [ksmbd 990e355da52f8f949f4986752b2cad1747f61452]
+[13752.523141]  ksmbd_destroy_file_table+0x22/0x50 [ksmbd 990e355da52f8f949f4986752b2cad1747f61452]
+[13752.525043]  ksmbd_session_destroy.part.0+0x50/0x280 [ksmbd 990e355da52f8f949f4986752b2cad1747f61452]
+[13752.528957]  ksmbd_sessions_deregister+0x18d/0x390 [ksmbd 990e355da52f8f949f4986752b2cad1747f61452]
+[13752.530989]  ksmbd_server_terminate_conn+0x16/0x30 [ksmbd 990e355da52f8f949f4986752b2cad1747f61452]
+[13752.532875]  ksmbd_conn_handler_loop+0x1c1/0x5a0 [ksmbd 990e355da52f8f949f4986752b2cad1747f61452]
+[13752.534790]  ? __pfx_ksmbd_conn_handler_loop+0x10/0x10 [ksmbd 990e355da52f8f949f4986752b2cad1747f61452]
+[13752.540733]  ? __pfx_ksmbd_conn_handler_loop+0x10/0x10 [ksmbd 990e355da52f8f949f4986752b2cad1747f61452]
+[13814.137476] ksmbd: ksmbd: cmd 0x9 handler took 36040 ms (pid=1403)
+[13814.140183] ksmbd: ksmbd: handle_ksmbd_work took 36043 ms
+[13832.777189] ksmbd: durable reconnect v2: client GUID mismatch
+[13832.790576] ksmbd: durable reconnect v2: client GUID mismatch
+[13896.056870] ksmbd: ksmbd: cmd 0x9 handler took 37640 ms (pid=1403)
+[13896.058195] ksmbd: ksmbd: handle_ksmbd_work took 37642 ms
+[13914.749251] ksmbd: durable reconnect v2: client GUID mismatch
+[13914.758242] ksmbd: durable reconnect v2: client GUID mismatch
+[13977.976447] ksmbd: ksmbd: cmd 0x9 handler took 37592 ms (pid=1969)
+[13977.978451] ksmbd: ksmbd: handle_ksmbd_work took 37594 ms
+[14004.519201] ksmbd: durable reconnect v2: client GUID mismatch
+[14004.529378] ksmbd: durable reconnect v2: client GUID mismatch
+[14068.087289] ksmbd: ksmbd: cmd 0x9 handler took 38038 ms (pid=3340)
+[14068.088606] ksmbd: ksmbd: handle_ksmbd_work took 38039 ms
+[14199.159298] ksmbd: ksmbd: cmd 0x5 handler took 37844 ms (pid=1969)
+[14199.160650] ksmbd: ksmbd: handle_ksmbd_work took 37845 ms
+[14211.449965] ksmbd: ksmbd: cmd 0x5 handler took 40070 ms (pid=3566)
+[14211.452358] ksmbd: ksmbd: handle_ksmbd_work took 40073 ms
+[14248.311261] ksmbd: ksmbd: cmd 0x5 handler took 38592 ms (pid=3505)
+[14248.313326] ksmbd: ksmbd: handle_ksmbd_work took 38594 ms
+[14399.863275] ksmbd: ksmbd: cmd 0x5 handler took 37187 ms (pid=1969)
+[14399.865570] ksmbd: ksmbd: handle_ksmbd_work took 37189 ms
+[14440.824332] ksmbd: ksmbd: cmd 0x5 handler took 39718 ms (pid=3505)
+[14440.825652] ksmbd: ksmbd: handle_ksmbd_work took 39719 ms
+[14592.375287] ksmbd: ksmbd: cmd 0x5 handler took 37607 ms (pid=3566)
+[14592.376610] ksmbd: ksmbd: handle_ksmbd_work took 37608 ms
+[14629.239292] ksmbd: ksmbd: cmd 0x5 handler took 36073 ms (pid=3505)
+[14629.241625] ksmbd: ksmbd: handle_ksmbd_work took 36075 ms
+[14775.671279] ksmbd: ksmbd: cmd 0x5 handler took 38143 ms (pid=4290)
+[14775.672405] ksmbd: ksmbd: handle_ksmbd_work took 38144 ms
+[14780.791291] ksmbd: ksmbd: cmd 0x5 handler took 39229 ms (pid=3566)
+[14780.793040] ksmbd: ksmbd: handle_ksmbd_work took 39230 ms
+[14817.655957] ksmbd: ksmbd: cmd 0x5 handler took 37812 ms (pid=4290)
+[14817.658328] ksmbd: ksmbd: handle_ksmbd_work took 37815 ms
+[14848.039155] ksmbd: durable reconnect: client GUID mismatch
+[14848.048032] ksmbd: durable reconnect: client GUID mismatch
+[14890.359280] ksmbd: ksmbd: cmd 0x5 handler took 38499 ms (pid=4352)
+[14890.359913] ksmbd: ksmbd: cmd 0x5 handler took 38887 ms (pid=1969)
+[14890.360511] ksmbd: ksmbd: handle_ksmbd_work took 38500 ms
+[14890.361803] ksmbd: ksmbd: handle_ksmbd_work took 38889 ms
+[14927.223262] ksmbd: ksmbd: cmd 0x5 handler took 35838 ms (pid=4352)
+[14927.224645] ksmbd: ksmbd: handle_ksmbd_work took 35839 ms
+[14976.375259] ksmbd: ksmbd: cmd 0x5 handler took 36068 ms (pid=4104)
+[14976.379238] ksmbd: ksmbd: handle_ksmbd_work took 36072 ms
+[15013.239613] ksmbd: ksmbd: cmd 0x5 handler took 35836 ms (pid=4104)
+[15013.240867] ksmbd: ksmbd: handle_ksmbd_work took 35837 ms
+[15062.391272] ksmbd: ksmbd: cmd 0x5 handler took 36046 ms (pid=1969)
+[15062.392495] ksmbd: ksmbd: handle_ksmbd_work took 36047 ms
+[15099.255282] ksmbd: ksmbd: cmd 0x5 handler took 35823 ms (pid=1969)
+[15099.256619] ksmbd: ksmbd: handle_ksmbd_work took 35824 ms
+[15112.363108] ksmbd: Failed to send message: -32
+[15112.802190] ksmbd: ChannelSequence stale: req=32768 open=0
+[15120.833677] ksmbd: durable reconnect: client GUID mismatch
+[15120.845371] ksmbd: durable reconnect: client GUID mismatch
+[15160.695261] ksmbd: ksmbd: cmd 0x5 handler took 36099 ms (pid=4290)
+[15160.696498] ksmbd: ksmbd: handle_ksmbd_work took 36100 ms
+[15160.697022] ksmbd: ksmbd: cmd 0x5 handler took 36386 ms (pid=1969)
+[15160.700880] ksmbd: ksmbd: handle_ksmbd_work took 36390 ms
+[15197.561213] ksmbd: ksmbd: cmd 0x5 handler took 35824 ms (pid=1969)
+[15197.565721] ksmbd: ksmbd: handle_ksmbd_work took 35830 ms
+[15246.711382] ksmbd: ksmbd: cmd 0x5 handler took 36032 ms (pid=4825)
+[15246.712615] ksmbd: ksmbd: handle_ksmbd_work took 36033 ms
+[15283.575262] ksmbd: ksmbd: cmd 0x5 handler took 35843 ms (pid=4825)
+[15283.576528] ksmbd: ksmbd: handle_ksmbd_work took 35844 ms
+[15332.727565] ksmbd: ksmbd: cmd 0x5 handler took 36045 ms (pid=4290)
+[15332.729590] ksmbd: ksmbd: handle_ksmbd_work took 36047 ms
+[15369.591364] ksmbd: ksmbd: cmd 0x5 handler took 35834 ms (pid=4290)
+[15369.592542] ksmbd: ksmbd: handle_ksmbd_work took 35835 ms
+[15382.659001] ksmbd: Failed to send message: -32
+[15383.970246] ksmbd: ChannelSequence stale: req=32768 open=0
+[15394.246890] ksmbd: durable reconnect v2: client GUID mismatch
+[15394.254047] ksmbd: durable reconnect v2: client GUID mismatch
+[15456.631304] ksmbd: ksmbd: cmd 0x9 handler took 36801 ms (pid=4825)
+[15456.632721] ksmbd: ksmbd: handle_ksmbd_work took 36802 ms
+[15476.829574] ksmbd: durable reconnect v2: client GUID mismatch
+[15476.837391] ksmbd: durable reconnect v2: client GUID mismatch
+[15538.555052] ksmbd: ksmbd: cmd 0x9 handler took 36177 ms (pid=4290)
+[15538.556493] ksmbd: ksmbd: handle_ksmbd_work took 36179 ms
+[15754.664249] ksmbd: ksmbd: witness protocol support removed
+[15755.160138] BUG ksmbd_file_cache (Tainted: G    B   W  OE      ): Objects remaining on __kmem_cache_shutdown()
+[15755.181611] Modules linked in: ksmbd(OE-) libdes aesni_intel sr_mod cdrom ata_generic 9pnet_virtio pata_acpi 9p intel_agp virtio_net 9pnet floppy bochs intel_gtt ata_piix serio_raw net_failover netfs failover
+[15755.181634] Unloaded tainted modules: ksmbd(OE):5 [last unloaded: ksmbd(OE)]
+[15755.220860]  ksmbd_exit_file_cache+0x15/0x30 [ksmbd 990e355da52f8f949f4986752b2cad1747f61452]
+[15755.222674]  ksmbd_server_exit+0xa6/0xe10 [ksmbd 990e355da52f8f949f4986752b2cad1747f61452]
+[15755.261557] BUG ksmbd_file_cache (Tainted: G    B   W  OE      ): Objects remaining on __kmem_cache_shutdown()
+[15755.280267] Modules linked in: ksmbd(OE-) libdes aesni_intel sr_mod cdrom ata_generic 9pnet_virtio pata_acpi 9p intel_agp virtio_net 9pnet floppy bochs intel_gtt ata_piix serio_raw net_failover netfs failover
+[15755.280289] Unloaded tainted modules: ksmbd(OE):5 [last unloaded: ksmbd(OE)]
+[15755.323549]  ksmbd_exit_file_cache+0x15/0x30 [ksmbd 990e355da52f8f949f4986752b2cad1747f61452]
+[15755.325396]  ksmbd_server_exit+0xa6/0xe10 [ksmbd 990e355da52f8f949f4986752b2cad1747f61452]
+[15755.353061] kmem_cache_destroy ksmbd_file_cache: Slab cache still has objects when called from ksmbd_exit_file_cache+0x15/0x30 [ksmbd]
+[15755.361250] Modules linked in: ksmbd(OE-) libdes aesni_intel sr_mod cdrom ata_generic 9pnet_virtio pata_acpi 9p intel_agp virtio_net 9pnet floppy bochs intel_gtt ata_piix serio_raw net_failover netfs failover
+[15755.361273] Unloaded tainted modules: ksmbd(OE):5 [last unloaded: ksmbd(OE)]
+[15755.394011]  ksmbd_exit_file_cache+0x15/0x30 [ksmbd 990e355da52f8f949f4986752b2cad1747f61452]
+[15755.395901]  ksmbd_server_exit+0xa6/0xe10 [ksmbd 990e355da52f8f949f4986752b2cad1747f61452]
+[15755.434212] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[15756.499438] ksmbd: Configuration subsystem initialized with 12 parameters
+[15756.505688] ksmbd: ksmbd: registered built-in md4 (md4-ksmbd) for NTLMv1 support
+[15756.507940] ksmbd: ksmbd: Fruit SMB extensions loaded
+[15756.509059] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[15756.511294] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[15756.512821] ksmbd: ksmbd: witness protocol support initialised
+[15808.887346] ksmbd: ksmbd: cmd 0x9 handler took 36543 ms (pid=5378)
+[15808.890913] ksmbd: ksmbd: handle_ksmbd_work took 36546 ms
+[15904.940242] ksmbd: ksmbd: witness protocol support removed
+[15905.410199] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[15906.482834] ksmbd: Configuration subsystem initialized with 12 parameters
+[15906.490880] ksmbd: ksmbd: registered built-in md4 (md4-ksmbd) for NTLMv1 support
+[15906.494197] ksmbd: ksmbd: Fruit SMB extensions loaded
+[15906.495329] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[15906.496800] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[15906.500397] ksmbd: ksmbd: witness protocol support initialised
+[16098.679239] INFO: task ksmbd-durable-s:6545 blocked for more than 122 seconds.
+[16098.683752] task:ksmbd-durable-s state:D stack:0     pid:6545  tgid:6545  ppid:2      task_flags:0x200040 flags:0x00080000
+[16098.698258]  ksmbd_durable_scavenger+0x37b/0x3e0 [ksmbd 707b8396e72bc5aa2bea6b99845859c4467ca61a]
+[16098.701384]  ? __pfx_ksmbd_durable_scavenger+0x10/0x10 [ksmbd 707b8396e72bc5aa2bea6b99845859c4467ca61a]
+[16113.488247] ksmbd: ksmbd: witness protocol support removed
+[16113.938193] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[16114.996684] ksmbd: Configuration subsystem initialized with 12 parameters
+[16115.002802] ksmbd: ksmbd: registered built-in md4 (md4-ksmbd) for NTLMv1 support
+[16115.005013] ksmbd: ksmbd: Fruit SMB extensions loaded
+[16115.007014] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[16115.008410] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[16115.009865] ksmbd: ksmbd: witness protocol support initialised
+[16185.719297] ksmbd: ksmbd: cmd 0x9 handler took 37683 ms (pid=6393)
+[16185.720691] ksmbd: ksmbd: handle_ksmbd_work took 37684 ms
+[16285.904530] ksmbd: Failed to send message: -104
+[16285.905630] ksmbd: Failed to send message: -32
+[16333.175298] ksmbd: ksmbd: cmd 0x5 handler took 37215 ms (pid=4352)
+[16333.176537] ksmbd: ksmbd: handle_ksmbd_work took 37216 ms
+[16374.135300] ksmbd: ksmbd: cmd 0x5 handler took 39863 ms (pid=6599)
+[16374.136605] ksmbd: ksmbd: handle_ksmbd_work took 39864 ms
+[16513.399331] ksmbd: ksmbd: cmd 0x5 handler took 39065 ms (pid=6393)
+[16513.400520] ksmbd: ksmbd: handle_ksmbd_work took 39066 ms
+[16521.591276] ksmbd: ksmbd: cmd 0x5 handler took 37186 ms (pid=6599)
+[16521.595750] ksmbd: ksmbd: handle_ksmbd_work took 37190 ms
+[16562.551259] ksmbd: ksmbd: cmd 0x5 handler took 39770 ms (pid=6599)
+[16562.552733] ksmbd: ksmbd: handle_ksmbd_work took 39771 ms
+[16670.768151] ksmbd: Failed to send message: -32
+[16718.200228] ksmbd: ksmbd: cmd 0x5 handler took 38356 ms (pid=6393)
+[16718.201539] ksmbd: ksmbd: handle_ksmbd_work took 38356 ms
+[16755.063306] ksmbd: ksmbd: cmd 0x5 handler took 36877 ms (pid=7175)
+[16755.064815] ksmbd: ksmbd: handle_ksmbd_work took 36878 ms
+[17397.756266] ksmbd: ksmbd: witness protocol support removed
+[17398.242081] BUG ksmbd_file_cache (Tainted: G    B   W  OE      ): Objects remaining on __kmem_cache_shutdown()
+[17398.256919] Modules linked in: ksmbd(OE-) libdes aesni_intel sr_mod cdrom ata_generic 9pnet_virtio pata_acpi 9p intel_agp virtio_net 9pnet floppy bochs intel_gtt ata_piix serio_raw net_failover netfs failover
+[17398.256941] Unloaded tainted modules: ksmbd(OE):8 [last unloaded: ksmbd(OE)]
+[17398.298472]  ksmbd_exit_file_cache+0x15/0x30 [ksmbd a03ffc65ebf65b5748d3f8bba95a76b83cd07264]
+[17398.301340]  ksmbd_server_exit+0xa6/0x940 [ksmbd a03ffc65ebf65b5748d3f8bba95a76b83cd07264]
+[17398.328704] kmem_cache_destroy ksmbd_file_cache: Slab cache still has objects when called from ksmbd_exit_file_cache+0x15/0x30 [ksmbd]
+[17398.337350] Modules linked in: ksmbd(OE-) libdes aesni_intel sr_mod cdrom ata_generic 9pnet_virtio pata_acpi 9p intel_agp virtio_net 9pnet floppy bochs intel_gtt ata_piix serio_raw net_failover netfs failover
+[17398.337373] Unloaded tainted modules: ksmbd(OE):8 [last unloaded: ksmbd(OE)]
+[17398.386480]  ksmbd_exit_file_cache+0x15/0x30 [ksmbd a03ffc65ebf65b5748d3f8bba95a76b83cd07264]
+[17398.388507]  ksmbd_server_exit+0xa6/0x940 [ksmbd a03ffc65ebf65b5748d3f8bba95a76b83cd07264]
+[17398.432205] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[17404.564371] ksmbd: Configuration subsystem initialized with 12 parameters
+[17404.570668] ksmbd: ksmbd: registered built-in md4 (md4-ksmbd) for NTLMv1 support
+[17404.573003] ksmbd: ksmbd: Fruit SMB extensions loaded
+[17404.577686] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[17404.578884] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[17404.583602] ksmbd: ksmbd: witness protocol support initialised
+[17414.603561] ksmbd: durable reconnect v2: client GUID mismatch
+[17414.615353] ksmbd: durable reconnect v2: client GUID mismatch
+[17475.959303] ksmbd: ksmbd: cmd 0x5 handler took 39811 ms (pid=7175)
+[17475.960606] ksmbd: ksmbd: handle_ksmbd_work took 39812 ms
+[17480.055365] ksmbd: ksmbd: cmd 0x9 handler took 39861 ms (pid=7571)
+[17480.056708] ksmbd: ksmbd: handle_ksmbd_work took 39862 ms
+[17545.591291] ksmbd: ksmbd: cmd 0x5 handler took 38401 ms (pid=7571)
+[17545.592692] ksmbd: ksmbd: handle_ksmbd_work took 38402 ms
+[17696.119267] INFO: task ksmbd-durable-s:7703 blocked for more than 122 seconds.
+[17696.128875] task:ksmbd-durable-s state:D stack:0     pid:7703  tgid:7703  ppid:2      task_flags:0x200040 flags:0x00080000
+[17696.145915]  ksmbd_durable_scavenger+0x37b/0x3e0 [ksmbd 2f527d3790835e5814840c7bfff8c8e6d5ca3a66]
+[17696.152329]  ? __pfx_ksmbd_durable_scavenger+0x10/0x10 [ksmbd 2f527d3790835e5814840c7bfff8c8e6d5ca3a66]
+[18004.330333] ksmbd: ksmbd: witness protocol support removed
+[18004.805120] BUG ksmbd_file_cache (Tainted: G    B   W  OE      ): Objects remaining on __kmem_cache_shutdown()
+[18004.825305] Modules linked in: ksmbd(OE-) libdes aesni_intel sr_mod cdrom ata_generic 9pnet_virtio pata_acpi 9p intel_agp virtio_net 9pnet floppy bochs intel_gtt ata_piix serio_raw net_failover netfs failover
+[18004.825329] Unloaded tainted modules: ksmbd(OE):9 [last unloaded: ksmbd(OE)]
+[18004.866144]  ksmbd_exit_file_cache+0x15/0x30 [ksmbd 2f527d3790835e5814840c7bfff8c8e6d5ca3a66]
+[18004.871192]  ksmbd_server_exit+0xa6/0x810 [ksmbd 2f527d3790835e5814840c7bfff8c8e6d5ca3a66]
+[18004.904932] BUG ksmbd_file_cache (Tainted: G    B   W  OE      ): Objects remaining on __kmem_cache_shutdown()
+[18004.923892] Modules linked in: ksmbd(OE-) libdes aesni_intel sr_mod cdrom ata_generic 9pnet_virtio pata_acpi 9p intel_agp virtio_net 9pnet floppy bochs intel_gtt ata_piix serio_raw net_failover netfs failover
+[18004.923916] Unloaded tainted modules: ksmbd(OE):9 [last unloaded: ksmbd(OE)]
+[18004.964171]  ksmbd_exit_file_cache+0x15/0x30 [ksmbd 2f527d3790835e5814840c7bfff8c8e6d5ca3a66]
+[18004.966020]  ksmbd_server_exit+0xa6/0x810 [ksmbd 2f527d3790835e5814840c7bfff8c8e6d5ca3a66]
+[18005.002764] kmem_cache_destroy ksmbd_file_cache: Slab cache still has objects when called from ksmbd_exit_file_cache+0x15/0x30 [ksmbd]
+[18005.012477] Modules linked in: ksmbd(OE-) libdes aesni_intel sr_mod cdrom ata_generic 9pnet_virtio pata_acpi 9p intel_agp virtio_net 9pnet floppy bochs intel_gtt ata_piix serio_raw net_failover netfs failover
+[18005.012500] Unloaded tainted modules: ksmbd(OE):9 [last unloaded: ksmbd(OE)]
+[18005.055440]  ksmbd_exit_file_cache+0x15/0x30 [ksmbd 2f527d3790835e5814840c7bfff8c8e6d5ca3a66]
+[18005.057305]  ksmbd_server_exit+0xa6/0x810 [ksmbd 2f527d3790835e5814840c7bfff8c8e6d5ca3a66]
+[18005.093198] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[18009.658579] ksmbd: Configuration subsystem initialized with 12 parameters
+[18009.666447] ksmbd: ksmbd: registered built-in md4 (md4-ksmbd) for NTLMv1 support
+[18009.668657] ksmbd: ksmbd: Fruit SMB extensions loaded
+[18009.669960] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[18009.674458] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[18009.675767] ksmbd: ksmbd: witness protocol support initialised
+[18016.410154] ksmbd: durable reconnect v2: client GUID mismatch
+[18016.418151] ksmbd: durable reconnect v2: client GUID mismatch
+[18086.263382] ksmbd: ksmbd: cmd 0x9 handler took 39221 ms (pid=6599)
+[18086.264716] ksmbd: ksmbd: handle_ksmbd_work took 39222 ms
+[18112.140154] ksmbd: durable reconnect v2: client GUID mismatch
+[18112.147738] ksmbd: durable reconnect v2: client GUID mismatch
+[18180.471375] ksmbd: ksmbd: cmd 0x9 handler took 37765 ms (pid=8034)
+[18180.472686] ksmbd: ksmbd: handle_ksmbd_work took 37766 ms
+[18196.178500] ksmbd: durable reconnect v2: client GUID mismatch
+[18196.186599] ksmbd: durable reconnect v2: client GUID mismatch
+[18266.487287] ksmbd: ksmbd: cmd 0x9 handler took 39701 ms (pid=6599)
+[18266.488554] ksmbd: ksmbd: handle_ksmbd_work took 39702 ms
+[18285.594155] ksmbd: durable reconnect v2: client GUID mismatch
+[18285.601913] ksmbd: durable reconnect v2: client GUID mismatch
+[18352.503270] ksmbd: ksmbd: cmd 0x9 handler took 36374 ms (pid=8034)
+[18352.504708] ksmbd: ksmbd: handle_ksmbd_work took 36375 ms
+[18495.863274] ksmbd: ksmbd: cmd 0x5 handler took 37547 ms (pid=8034)
+[18495.865011] ksmbd: ksmbd: handle_ksmbd_work took 37548 ms
+[18508.151343] ksmbd: ksmbd: cmd 0x5 handler took 38753 ms (pid=7571)
+[18508.155425] ksmbd: ksmbd: handle_ksmbd_work took 38757 ms
+[18545.015323] ksmbd: ksmbd: cmd 0x5 handler took 39215 ms (pid=8034)
+[18545.016571] ksmbd: ksmbd: handle_ksmbd_work took 39216 ms
+[18585.365260] ksmbd: ksmbd: witness protocol support removed
+[18585.824698] BUG ksmbd_file_cache (Tainted: G    B   W  OE      ): Objects remaining on __kmem_cache_shutdown()
+[18585.840491] Modules linked in: ksmbd(OE-) libdes aesni_intel sr_mod cdrom ata_generic 9pnet_virtio pata_acpi 9p intel_agp virtio_net 9pnet floppy bochs intel_gtt ata_piix serio_raw net_failover netfs failover
+[18585.840513] Unloaded tainted modules: ksmbd(OE):10 [last unloaded: ksmbd(OE)]
+[18585.882042]  ksmbd_exit_file_cache+0x15/0x30 [ksmbd 5440c2b61b1f5858fa1f0af63d396f969d24d2e8]
+[18585.884524]  ksmbd_server_exit+0xa6/0x720 [ksmbd 5440c2b61b1f5858fa1f0af63d396f969d24d2e8]
+[18585.914666] BUG ksmbd_file_cache (Tainted: G    B   W  OE      ): Objects remaining on __kmem_cache_shutdown()
+[18585.933129] Modules linked in: ksmbd(OE-) libdes aesni_intel sr_mod cdrom ata_generic 9pnet_virtio pata_acpi 9p intel_agp virtio_net 9pnet floppy bochs intel_gtt ata_piix serio_raw net_failover netfs failover
+[18585.933167] Unloaded tainted modules: ksmbd(OE):10 [last unloaded: ksmbd(OE)]
+[18585.973115]  ksmbd_exit_file_cache+0x15/0x30 [ksmbd 5440c2b61b1f5858fa1f0af63d396f969d24d2e8]
+[18585.974964]  ksmbd_server_exit+0xa6/0x720 [ksmbd 5440c2b61b1f5858fa1f0af63d396f969d24d2e8]
+[18586.004279] kmem_cache_destroy ksmbd_file_cache: Slab cache still has objects when called from ksmbd_exit_file_cache+0x15/0x30 [ksmbd]
+[18586.009336] Modules linked in: ksmbd(OE-) libdes aesni_intel sr_mod cdrom ata_generic 9pnet_virtio pata_acpi 9p intel_agp virtio_net 9pnet floppy bochs intel_gtt ata_piix serio_raw net_failover netfs failover
+[18586.009357] Unloaded tainted modules: ksmbd(OE):10 [last unloaded: ksmbd(OE)]
+[18586.051845]  ksmbd_exit_file_cache+0x15/0x30 [ksmbd 5440c2b61b1f5858fa1f0af63d396f969d24d2e8]
+[18586.054047]  ksmbd_server_exit+0xa6/0x720 [ksmbd 5440c2b61b1f5858fa1f0af63d396f969d24d2e8]
+[18586.096214] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[18586.181480] ksmbd: Configuration subsystem initialized with 12 parameters
+[18586.189205] ksmbd: ksmbd: registered built-in md4 (md4-ksmbd) for NTLMv1 support
+[18586.192773] ksmbd: ksmbd: Fruit SMB extensions loaded
+[18586.195226] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[18586.196520] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[18586.201158] ksmbd: ksmbd: witness protocol support initialised
+[21172.241136] ksmbd: netdev-down event: netdev(lo) is going down
+[21172.242556] ksmbd: releasing socket
+[21172.246359] ksmbd: netdev-down event: netdev(ens4) is going down
+[21172.248655] ksmbd: releasing socket
+[21175.307252] ksmbd: ksmbd: witness protocol support removed
+[21175.505016] ksmbd: VSS backend 'generic' unregistered
+[21175.506110] ksmbd: VSS backend 'zfs' unregistered
+[21175.507145] ksmbd: VSS backend 'btrfs' unregistered
+[21175.783191] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[21175.873522] ksmbd: Configuration subsystem initialized with 12 parameters
+[21175.885111] ksmbd: ksmbd: registered built-in md4 (md4-ksmbd) for NTLMv1 support
+[21175.888291] ksmbd: ksmbd: Fruit SMB extensions loaded
+[21175.890507] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[21175.893445] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[21175.895264] ksmbd: ksmbd: witness protocol support initialised
+[21179.944123] ksmbd: Not permitted to write : 0x1
+[21180.018642] ksmbd: Outstanding credits underflow: charge 1, outstanding 0

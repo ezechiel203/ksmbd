@@ -1,0 +1,5 @@
+[ksmbd.control/5894]: INFO: Terminated mountd
+[ksmbd.control/5894]: INFO: Killed ksmbd
+[ksmbd.adduser/5921]: ERROR: User `testuser' already exists
+[ksmbd.mountd/5922]: INFO: Started manager
+PREPARE_RC:0

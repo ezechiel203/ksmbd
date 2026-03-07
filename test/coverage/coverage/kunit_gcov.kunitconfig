@@ -1,0 +1,89 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+#
+# KUnit + gcov configuration for ksmbd code coverage.
+#
+# This file extends the base kunit.kunitconfig with gcov-related symbols
+# needed to instrument ksmbd and collect coverage data.
+#
+# Usage with kunit.py:
+#
+#   ./tools/testing/kunit/kunit.py run \
+#       --kunitconfig=fs/ksmbd/test/coverage/kunit_gcov.kunitconfig \
+#       --arch=um
+#
+# After the run, gcov data (.gcda/.gcno files) will be in the .kunit/
+# build directory. Use test/coverage/collect_coverage.sh to process them.
+#
+# NOTE: CONFIG_GCOV_PROFILE_ALL=y instruments the entire kernel, which
+# increases build time and memory usage. For targeted coverage of just
+# ksmbd, set GCOV_PROFILE := y in the ksmbd Makefile instead (done
+# automatically by the coverage-build target).
+
+# ---- KUnit framework ----
+CONFIG_KUNIT=y
+
+# ---- gcov instrumentation ----
+CONFIG_GCOV_KERNEL=y
+# Do NOT enable GCOV_PROFILE_ALL -- we only want ksmbd instrumented.
+# The coverage Makefile injects GCOV_PROFILE := y into fs/ksmbd/Makefile
+# to enable per-directory gcov profiling.
+# CONFIG_GCOV_PROFILE_ALL is not set
+
+# gcov format: gcc emits gcov data that lcov can parse
+CONFIG_GCOV_FORMAT_AUTODETECT=y
+
+# debugfs is needed for sysfs-based gcov on real hardware,
+# but for UML/kunit.py the .gcda files are in the build tree
+CONFIG_DEBUG_FS=y
+
+# ---- ksmbd and all optional features ----
+CONFIG_SMB_SERVER=y
+CONFIG_SMB_INSECURE_SERVER=y
+# SMB_SERVER_SMBDIRECT requires InfiniBand; skip in UML CI.
+# CONFIG_SMB_SERVER_SMBDIRECT is not set
+
+# ---- ksmbd KUnit test suite ----
+CONFIG_KSMBD_KUNIT_TEST=y
+
+# ---- Crypto algorithms used by ksmbd ----
+CONFIG_CRYPTO=y
+CONFIG_CRYPTO_MD4=y
+CONFIG_CRYPTO_MD5=y
+CONFIG_CRYPTO_HMAC=y
+CONFIG_CRYPTO_ECB=y
+CONFIG_CRYPTO_LIB_DES=y
+CONFIG_CRYPTO_DES=y
+CONFIG_CRYPTO_AES=y
+CONFIG_CRYPTO_CCM=y
+CONFIG_CRYPTO_GCM=y
+CONFIG_CRYPTO_SHA256=y
+CONFIG_CRYPTO_SHA512=y
+CONFIG_CRYPTO_CMAC=y
+CONFIG_CRYPTO_LZ4=y
+
+# ---- ASN.1 / OID support ----
+CONFIG_ASN1=y
+CONFIG_OID_REGISTRY=y
+
+# ---- NLS (National Language Support) ----
+CONFIG_NLS=y
+CONFIG_NLS_UTF8=y
+
+# ---- Networking ----
+CONFIG_NET=y
+CONFIG_INET=y
+CONFIG_NETWORK_FILESYSTEMS=y
+
+# ---- VFS requirements ----
+CONFIG_MULTIUSER=y
+CONFIG_FILE_LOCKING=y
+
+# ---- CRC32 ----
+CONFIG_CRC32=y
+
+# ---- Debug options useful for coverage analysis ----
+# CONFIG_KASAN=y and CONFIG_UBSAN=y can be enabled for additional
+# coverage-adjacent analysis, but they significantly slow down
+# UML execution. Uncomment if needed:
+# CONFIG_KASAN=y
+# CONFIG_UBSAN=y

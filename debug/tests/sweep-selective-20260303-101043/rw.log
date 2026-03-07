@@ -1,0 +1,28 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772529062
+time: 2026-03-03 09:11:02.992637
+progress: 4
+test: rw1
+time: 2026-03-03 09:11:02.994490
+Checking data integrity over 10 ops
+0time: 2026-03-03 09:11:03.041918
+success: rw1
+test: rw2
+time: 2026-03-03 09:11:03.042071
+Checking data integrity over 10 ops
+0time: 2026-03-03 09:11:03.079957
+success: rw2
+test: invalid
+time: 2026-03-03 09:11:03.080150
+time: 2026-03-03 09:11:03.091816
+failure: invalid [
+../../source4/torture/smb2/read_write.c:271: status was NT_STATUS_OK, expected NT_STATUS_INVALID_PARAMETER: Incorrect status
+]
+test: append
+time: 2026-03-03 09:11:03.091880
+Create file with 1 byte
+time: 2026-03-03 09:11:03.095314
+failure: append [
+../../source4/torture/smb2/read_write.c:367: status was NT_STATUS_DELETE_PENDING, expected NT_STATUS_OK: Incorrect status
+]

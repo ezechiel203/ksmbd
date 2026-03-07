@@ -1,0 +1,402 @@
+# src/fs/oplock.c
+
+Risk-tagged lines (LOCK/LIFETIME/WAIT_LOOP/ERROR_PATH/MEM_BOUNDS/PROTO_GATE):
+
+- L00055 [PROTO_GATE|] `	opinfo->level = SMB2_OPLOCK_LEVEL_NONE;`
+- L00066 [LIFETIME|] `	refcount_set(&opinfo->refcount, 1);`
+- L00067 [LIFETIME|] `	atomic_set(&opinfo->breaking_cnt, 0);`
+- L00069 [LIFETIME|] `	 * Use refcount_inc_not_zero() to guard against a race where the`
+- L00071 [LIFETIME|] `	 * reached 0.  An unconditional refcount_inc() on a freed object`
+- L00074 [LIFETIME|] `	if (!refcount_inc_not_zero(&opinfo->conn->refcnt)) {`
+- L00086 [LOCK|] `	spin_lock(&lb->lb_lock);`
+- L00088 [LOCK|] `	spin_unlock(&lb->lb_lock);`
+- L00098 [LOCK|] `	spin_lock(&lb->lb_lock);`
+- L00100 [LOCK|] `		spin_unlock(&lb->lb_lock);`
+- L00106 [LOCK|] `	spin_unlock(&lb->lb_lock);`
+- L00121 [MEM_BOUNDS|] `	lease = kmalloc(sizeof(struct lease), KSMBD_DEFAULT_GFP);`
+- L00123 [ERROR_PATH|] `		return -ENOMEM;`
+- L00125 [MEM_BOUNDS|PROTO_GATE|] `	memcpy(lease->lease_key, lctx->lease_key, SMB2_LEASE_KEY_SIZE);`
+- L00131 [MEM_BOUNDS|PROTO_GATE|] `	memcpy(lease->parent_lease_key, lctx->parent_lease_key, SMB2_LEASE_KEY_SIZE);`
+- L00164 [LIFETIME|] `	rcu_read_lock();`
+- L00165 [LIFETIME|] `	opinfo = rcu_dereference(fp->f_opinfo);`
+- L00166 [LIFETIME|] `	if (opinfo && !refcount_inc_not_zero(&opinfo->refcount))`
+- L00168 [LIFETIME|] `	rcu_read_unlock();`
+- L00177 [LOCK|] `	down_read(&ci->m_lock);`
+- L00182 [LIFETIME|] `		    !refcount_inc_not_zero(&opinfo->refcount))`
+- L00186 [LIFETIME|] `				refcount_dec(&opinfo->refcount);`
+- L00201 [LIFETIME|] `	if (!refcount_dec_and_test(&opinfo->refcount))`
+- L00211 [LOCK|] `	down_write(&ci->m_lock);`
+- L00213 [LOCK|] `	up_write(&ci->m_lock);`
+- L00223 [LOCK|] `	down_write(&ci->m_lock);`
+- L00225 [LOCK|] `	up_write(&ci->m_lock);`
+- L00231 [LIFETIME|] `		return atomic_read(&fp->f_ci->sop_count);`
+- L00233 [LIFETIME|] `		return atomic_read(&fp->f_ci->op_count);`
+- L00239 [LIFETIME|] `		return atomic_inc(&fp->f_ci->sop_count);`
+- L00241 [LIFETIME|] `		return atomic_inc(&fp->f_ci->op_count);`
+- L00247 [LIFETIME|] `		return atomic_dec(&fp->f_ci->sop_count);`
+- L00249 [LIFETIME|] `		return atomic_dec(&fp->f_ci->op_count);`
+- L00264 [PROTO_GATE|] `		if (!(opinfo->level == SMB2_OPLOCK_LEVEL_BATCH ||`
+- L00265 [PROTO_GATE|] `		      opinfo->level == SMB2_OPLOCK_LEVEL_EXCLUSIVE)) {`
+- L00266 [ERROR_PATH|] `			pr_err("bad oplock(0x%x)\n", opinfo->level);`
+- L00268 [ERROR_PATH|] `				pr_err("lease state(0x%x)\n", lease->state);`
+- L00269 [ERROR_PATH|] `			return -EINVAL;`
+- L00271 [PROTO_GATE|] `		opinfo->level = SMB2_OPLOCK_LEVEL_II;`
+- L00278 [ERROR_PATH|] `			pr_err("bad oplock(0x%x)\n", opinfo->level);`
+- L00279 [ERROR_PATH|] `			return -EINVAL;`
+- L00284 [PROTO_GATE|] `	if (!(opinfo->level == SMB2_OPLOCK_LEVEL_BATCH ||`
+- L00285 [PROTO_GATE|] `	      opinfo->level == SMB2_OPLOCK_LEVEL_EXCLUSIVE)) {`
+- L00286 [ERROR_PATH|] `		pr_err("bad oplock(0x%x)\n", opinfo->level);`
+- L00288 [ERROR_PATH|] `			pr_err("lease state(0x%x)\n", lease->state);`
+- L00289 [ERROR_PATH|] `		return -EINVAL;`
+- L00291 [PROTO_GATE|] `	opinfo->level = SMB2_OPLOCK_LEVEL_II;`
+- L00310 [ERROR_PATH|] `		return -EINVAL;`
+- L00314 [PROTO_GATE|] `	opinfo->level = SMB2_OPLOCK_LEVEL_II;`
+- L00332 [ERROR_PATH|] `		return -EINVAL;`
+- L00335 [PROTO_GATE|] `	if (!(lease->state & SMB2_LEASE_WRITE_CACHING_LE) ||`
+- L00336 [PROTO_GATE|] `	    !(lease->state & SMB2_LEASE_HANDLE_CACHING_LE)) {`
+- L00337 [ERROR_PATH|] `		pr_err("bad lease state(0x%x) for write_handle_to_write\n",`
+- L00339 [ERROR_PATH|] `		return -EINVAL;`
+- L00360 [PROTO_GATE|] `		if (!(opinfo->level == SMB2_OPLOCK_LEVEL_BATCH ||`
+- L00361 [PROTO_GATE|] `		      opinfo->level == SMB2_OPLOCK_LEVEL_EXCLUSIVE)) {`
+- L00362 [ERROR_PATH|] `			pr_err("bad oplock(0x%x)\n", opinfo->level);`
+- L00364 [ERROR_PATH|] `				pr_err("lease state(0x%x)\n", lease->state);`
+- L00365 [ERROR_PATH|] `			return -EINVAL;`
+- L00367 [PROTO_GATE|] `		opinfo->level = SMB2_OPLOCK_LEVEL_NONE;`
+- L00373 [ERROR_PATH|] `			pr_err("bad oplock(0x%x)\n", opinfo->level);`
+- L00374 [ERROR_PATH|] `			return -EINVAL;`
+- L00379 [PROTO_GATE|] `	if (!(opinfo->level == SMB2_OPLOCK_LEVEL_BATCH ||`
+- L00380 [PROTO_GATE|] `	      opinfo->level == SMB2_OPLOCK_LEVEL_EXCLUSIVE)) {`
+- L00381 [ERROR_PATH|] `		pr_err("bad oplock(0x%x)\n", opinfo->level);`
+- L00383 [ERROR_PATH|] `			pr_err("lease state(0x%x)\n", lease->state);`
+- L00384 [ERROR_PATH|] `		return -EINVAL;`
+- L00386 [PROTO_GATE|] `	opinfo->level = SMB2_OPLOCK_LEVEL_NONE;`
+- L00405 [PROTO_GATE|] `		if (opinfo->level != SMB2_OPLOCK_LEVEL_II) {`
+- L00406 [ERROR_PATH|] `			pr_err("bad oplock(0x%x)\n", opinfo->level);`
+- L00408 [ERROR_PATH|] `				pr_err("lease state(0x%x)\n", lease->state);`
+- L00409 [ERROR_PATH|] `			return -EINVAL;`
+- L00411 [PROTO_GATE|] `		opinfo->level = SMB2_OPLOCK_LEVEL_NONE;`
+- L00416 [ERROR_PATH|] `			pr_err("bad oplock(0x%x)\n", opinfo->level);`
+- L00417 [ERROR_PATH|] `			return -EINVAL;`
+- L00422 [PROTO_GATE|] `	if (opinfo->level != SMB2_OPLOCK_LEVEL_II) {`
+- L00423 [ERROR_PATH|] `		pr_err("bad oplock(0x%x)\n", opinfo->level);`
+- L00425 [ERROR_PATH|] `			pr_err("lease state(0x%x)\n", lease->state);`
+- L00426 [ERROR_PATH|] `		return -EINVAL;`
+- L00428 [PROTO_GATE|] `	opinfo->level = SMB2_OPLOCK_LEVEL_NONE;`
+- L00445 [PROTO_GATE|] `	if (!(lease->state & SMB2_LEASE_READ_CACHING_LE)) {`
+- L00447 [ERROR_PATH|] `		return -EINVAL;`
+- L00450 [PROTO_GATE|] `	lease->new_state = SMB2_LEASE_NONE_LE;`
+- L00451 [PROTO_GATE|] `	lease->state |= SMB2_LEASE_WRITE_CACHING_LE;`
+- L00452 [PROTO_GATE|] `	if (lease->state & SMB2_LEASE_HANDLE_CACHING_LE)`
+- L00453 [PROTO_GATE|] `		opinfo->level = SMB2_OPLOCK_LEVEL_BATCH;`
+- L00455 [PROTO_GATE|] `		opinfo->level = SMB2_OPLOCK_LEVEL_EXCLUSIVE;`
+- L00471 [PROTO_GATE|] `	if (!(lease->state == SMB2_LEASE_NONE_LE)) {`
+- L00473 [ERROR_PATH|] `		return -EINVAL;`
+- L00476 [PROTO_GATE|] `	lease->new_state = SMB2_LEASE_NONE_LE;`
+- L00478 [PROTO_GATE|] `	if (lease->state & SMB2_LEASE_HANDLE_CACHING_LE)`
+- L00479 [PROTO_GATE|] `		if (lease->state & SMB2_LEASE_WRITE_CACHING_LE)`
+- L00480 [PROTO_GATE|] `			opinfo->level = SMB2_OPLOCK_LEVEL_BATCH;`
+- L00482 [PROTO_GATE|] `			opinfo->level = SMB2_OPLOCK_LEVEL_II;`
+- L00483 [PROTO_GATE|] `	else if (lease->state & SMB2_LEASE_WRITE_CACHING_LE)`
+- L00484 [PROTO_GATE|] `		opinfo->level = SMB2_OPLOCK_LEVEL_EXCLUSIVE;`
+- L00485 [PROTO_GATE|] `	else if (lease->state & SMB2_LEASE_READ_CACHING_LE)`
+- L00486 [PROTO_GATE|] `		opinfo->level = SMB2_OPLOCK_LEVEL_II;`
+- L00488 [PROTO_GATE|] `	if (new_state != SMB2_LEASE_NONE_LE)`
+- L00512 [LIFETIME|] `	rcu_assign_pointer(fp->f_opinfo, NULL);`
+- L00517 [LIFETIME|] `			atomic_set(&opinfo->breaking_cnt, 0);`
+- L00543 [PROTO_GATE|] `		if (req_oplock == SMB2_OPLOCK_LEVEL_BATCH)`
+- L00544 [PROTO_GATE|] `			opinfo_new->level = SMB2_OPLOCK_LEVEL_BATCH;`
+- L00546 [PROTO_GATE|] `			opinfo_new->level = SMB2_OPLOCK_LEVEL_EXCLUSIVE;`
+- L00554 [PROTO_GATE|] `	if (req_oplock == SMB2_OPLOCK_LEVEL_BATCH)`
+- L00555 [PROTO_GATE|] `		opinfo_new->level = SMB2_OPLOCK_LEVEL_BATCH;`
+- L00557 [PROTO_GATE|] `		opinfo_new->level = SMB2_OPLOCK_LEVEL_EXCLUSIVE;`
+- L00562 [MEM_BOUNDS|PROTO_GATE|] `		memcpy(lease->lease_key, lctx->lease_key, SMB2_LEASE_KEY_SIZE);`
+- L00583 [PROTO_GATE|] `		opinfo_new->level = SMB2_OPLOCK_LEVEL_II;`
+- L00587 [PROTO_GATE|] `	opinfo_new->level = SMB2_OPLOCK_LEVEL_II;`
+- L00591 [PROTO_GATE|] `		lease->state = SMB2_LEASE_READ_CACHING_LE;`
+- L00592 [PROTO_GATE|] `		if (lctx->req_state & SMB2_LEASE_HANDLE_CACHING_LE)`
+- L00593 [PROTO_GATE|] `			lease->state |= SMB2_LEASE_HANDLE_CACHING_LE;`
+- L00594 [MEM_BOUNDS|PROTO_GATE|] `		memcpy(lease->lease_key, lctx->lease_key, SMB2_LEASE_KEY_SIZE);`
+- L00615 [PROTO_GATE|] `		opinfo_new->level = SMB2_OPLOCK_LEVEL_NONE;`
+- L00619 [PROTO_GATE|] `	opinfo_new->level = SMB2_OPLOCK_LEVEL_NONE;`
+- L00624 [MEM_BOUNDS|PROTO_GATE|] `		memcpy(lease->lease_key, lctx->lease_key, SMB2_LEASE_KEY_SIZE);`
+- L00637 [PROTO_GATE|] `	if (!memcmp(guid1, guid2, SMB2_CLIENT_GUID_SIZE) &&`
+- L00638 [PROTO_GATE|] `	    !memcmp(key1, key2, SMB2_LEASE_KEY_SIZE))`
+- L00671 [LOCK|] `	down_read(&ci->m_lock);`
+- L00681 [LIFETIME|] `			if (atomic_read(&opinfo->breaking_cnt))`
+- L00685 [LIFETIME|] `			if ((atomic_read(&ci->op_count) +`
+- L00686 [LIFETIME|] `			     atomic_read(&ci->sop_count)) == 1) {`
+- L00687 [PROTO_GATE|] `				if (lease->state != SMB2_LEASE_NONE_LE &&`
+- L00692 [PROTO_GATE|] `						SMB2_LEASE_WRITE_CACHING_LE)`
+- L00696 [LIFETIME|] `			} else if ((atomic_read(&ci->op_count) +`
+- L00697 [LIFETIME|] `				    atomic_read(&ci->sop_count)) > 1) {`
+- L00699 [PROTO_GATE|] `				    (SMB2_LEASE_READ_CACHING_LE |`
+- L00700 [PROTO_GATE|] `				     SMB2_LEASE_HANDLE_CACHING_LE)) {`
+- L00707 [PROTO_GATE|] `			    SMB2_LEASE_NONE_LE) {`
+- L00726 [WAIT_LOOP|] `	 * wakes TASK_INTERRUPTIBLE waiters.  Using wait_event_timeout`
+- L00732 [WAIT_LOOP|] `	rc = wait_event_interruptible_timeout(opinfo->oplock_q,`
+- L00740 [PROTO_GATE|] `			opinfo->o_lease->state = SMB2_LEASE_NONE_LE;`
+- L00741 [PROTO_GATE|] `		opinfo->level = SMB2_OPLOCK_LEVEL_NONE;`
+- L00765 [ERROR_PATH|] `				return -ETIMEDOUT;`
+- L00773 [ERROR_PATH|] `			return -ENOENT;`
+- L00784 [PROTO_GATE|] `				      SMB2_LEASE_HANDLE_CACHING_LE))`
+- L00788 [PROTO_GATE|] `				   (SMB2_LEASE_HANDLE_CACHING_LE |`
+- L00789 [PROTO_GATE|] `				    SMB2_LEASE_READ_CACHING_LE)) {`
+- L00800 [PROTO_GATE|] `			      SMB2_LEASE_HANDLE_CACHING_LE)) {`
+- L00806 [PROTO_GATE|] `			   (SMB2_LEASE_HANDLE_CACHING_LE |`
+- L00807 [PROTO_GATE|] `			    SMB2_LEASE_READ_CACHING_LE)) {`
+- L00839 [ERROR_PATH|] `		pr_err("smb_allocate_rsp_buf failed! ");`
+- L00840 [ERROR_PATH|] `		goto out;`
+- L00854 [PROTO_GATE|] `	rsp_hdr->Command = SMB_COM_LOCKING_ANDX;`
+- L00904 [ERROR_PATH|] `		return -ENOMEM;`
+- L00945 [ERROR_PATH|] `		goto out;`
+- L00948 [ERROR_PATH|] `		pr_err("smb2_allocate_rsp_buf failed! ");`
+- L00950 [ERROR_PATH|] `		goto out;`
+- L00955 [PROTO_GATE|] `	rsp_hdr->ProtocolId = SMB2_PROTO_NUMBER;`
+- L00956 [PROTO_GATE|] `	rsp_hdr->StructureSize = SMB2_HEADER_STRUCTURE_SIZE;`
+- L00958 [PROTO_GATE|] `	rsp_hdr->Command = SMB2_OPLOCK_BREAK;`
+- L00959 [PROTO_GATE|] `	rsp_hdr->Flags = (SMB2_FLAGS_SERVER_TO_REDIR);`
+- L00960 [PROTO_GATE|] `	rsp_hdr->NextCommand = 0;`
+- L00971 [PROTO_GATE|] `	    (br_info->level == SMB2_OPLOCK_LEVEL_BATCH ||`
+- L00972 [PROTO_GATE|] `	     br_info->level == SMB2_OPLOCK_LEVEL_EXCLUSIVE))`
+- L00973 [PROTO_GATE|] `		rsp->OplockLevel = SMB2_OPLOCK_LEVEL_II;`
+- L00975 [PROTO_GATE|] `		rsp->OplockLevel = SMB2_OPLOCK_LEVEL_NONE;`
+- L00984 [ERROR_PATH|] `		goto out;`
+- L01012 [ERROR_PATH|] `		return -ENOMEM;`
+- L01014 [MEM_BOUNDS|] `	br_info = kmalloc(sizeof(struct oplock_break_info), KSMBD_DEFAULT_GFP);`
+- L01017 [ERROR_PATH|] `		return -ENOMEM;`
+- L01036 [PROTO_GATE|] `		if (opinfo->level == SMB2_OPLOCK_LEVEL_II)`
+- L01037 [PROTO_GATE|] `			opinfo->level = SMB2_OPLOCK_LEVEL_NONE;`
+- L01057 [ERROR_PATH|] `		goto out;`
+- L01062 [PROTO_GATE|] `	rsp_hdr->ProtocolId = SMB2_PROTO_NUMBER;`
+- L01063 [PROTO_GATE|] `	rsp_hdr->StructureSize = SMB2_HEADER_STRUCTURE_SIZE;`
+- L01065 [PROTO_GATE|] `	rsp_hdr->Command = SMB2_OPLOCK_BREAK;`
+- L01066 [PROTO_GATE|] `	rsp_hdr->Flags = (SMB2_FLAGS_SERVER_TO_REDIR);`
+- L01067 [PROTO_GATE|] `	rsp_hdr->NextCommand = 0;`
+- L01079 [PROTO_GATE|] `	if (br_info->curr_state & (SMB2_LEASE_WRITE_CACHING_LE |`
+- L01080 [PROTO_GATE|] `			SMB2_LEASE_HANDLE_CACHING_LE))`
+- L01081 [PROTO_GATE|] `		rsp->Flags = SMB2_NOTIFY_BREAK_LEASE_FLAG_ACK_REQUIRED;`
+- L01083 [MEM_BOUNDS|PROTO_GATE|] `	memcpy(rsp->LeaseKey, br_info->lease_key, SMB2_LEASE_KEY_SIZE);`
+- L01092 [ERROR_PATH|] `		goto out;`
+- L01117 [ERROR_PATH|] `		return -ENOMEM;`
+- L01119 [MEM_BOUNDS|] `	br_info = kmalloc(sizeof(struct lease_break_info), KSMBD_DEFAULT_GFP);`
+- L01122 [ERROR_PATH|] `		return -ENOMEM;`
+- L01131 [MEM_BOUNDS|PROTO_GATE|] `	memcpy(br_info->lease_key, lease->lease_key, SMB2_LEASE_KEY_SIZE);`
+- L01145 [PROTO_GATE|] `		if (opinfo->o_lease->new_state == SMB2_LEASE_NONE_LE) {`
+- L01146 [PROTO_GATE|] `			opinfo->level = SMB2_OPLOCK_LEVEL_NONE;`
+- L01147 [PROTO_GATE|] `			opinfo->o_lease->state = SMB2_LEASE_NONE_LE;`
+- L01159 [LIFETIME|] `	if (atomic_read(&opinfo->breaking_cnt)) {`
+- L01165 [WAIT_LOOP|] `		 * wait_event_timeout (TASK_UNINTERRUPTIBLE) would not be`
+- L01168 [WAIT_LOOP|] `		ret = wait_event_interruptible_timeout(opinfo->oplock_brk,`
+- L01169 [LIFETIME|] `					 atomic_read(&opinfo->breaking_cnt) == 0,`
+- L01172 [LIFETIME|] `			atomic_set(&opinfo->breaking_cnt, 0);`
+- L01191 [LIFETIME|] `		atomic_inc(&brk_opinfo->breaking_cnt);`
+- L01194 [LIFETIME|] `			atomic_dec(&brk_opinfo->breaking_cnt);`
+- L01203 [PROTO_GATE|] `			lease->new_state = SMB2_LEASE_NONE_LE;`
+- L01207 [PROTO_GATE|] `					   ~SMB2_LEASE_HANDLE_CACHING_LE;`
+- L01209 [PROTO_GATE|] `				lease->new_state = SMB2_LEASE_NONE_LE;`
+- L01210 [PROTO_GATE|] `		} else if (req_op_level == SMB2_OPLOCK_LEVEL_NONE) {`
+- L01211 [PROTO_GATE|] `			lease->new_state = SMB2_LEASE_NONE_LE;`
+- L01218 [PROTO_GATE|] `			if (lease->state & SMB2_LEASE_WRITE_CACHING_LE) {`
+- L01220 [PROTO_GATE|] `					~SMB2_LEASE_WRITE_CACHING_LE;`
+- L01222 [PROTO_GATE|] `				   SMB2_LEASE_HANDLE_CACHING_LE) {`
+- L01224 [PROTO_GATE|] `					SMB2_LEASE_READ_CACHING_LE;`
+- L01226 [PROTO_GATE|] `				lease->new_state = SMB2_LEASE_NONE_LE;`
+- L01230 [PROTO_GATE|] `		if (lease->state & (SMB2_LEASE_WRITE_CACHING_LE |`
+- L01231 [PROTO_GATE|] `				SMB2_LEASE_HANDLE_CACHING_LE)) {`
+- L01234 [PROTO_GATE|] `				smb2_send_interim_resp(in_work, STATUS_PENDING);`
+- L01253 [LIFETIME|] `			atomic_dec(&brk_opinfo->breaking_cnt);`
+- L01259 [PROTO_GATE|] `		if (brk_opinfo->level == SMB2_OPLOCK_LEVEL_BATCH ||`
+- L01260 [PROTO_GATE|] `		    brk_opinfo->level == SMB2_OPLOCK_LEVEL_EXCLUSIVE)`
+- L01303 [PROTO_GATE|] `				   SMB2_CLIENT_GUID_SIZE))`
+- L01306 [LIFETIME|] `		rcu_read_lock();`
+- L01309 [LIFETIME|] `			rcu_read_unlock();`
+- L01311 [ERROR_PATH|] `			goto again;`
+- L01313 [LIFETIME|] `		rcu_read_unlock();`
+- L01315 [LIFETIME|] `		kfree_rcu(lb, rcu_head);`
+- L01330 [LIFETIME|] `	rcu_read_lock();`
+- L01332 [LIFETIME|] `		rcu_read_unlock();`
+- L01338 [PROTO_GATE|] `			    SMB2_CLIENT_GUID_SIZE))`
+- L01339 [ERROR_PATH|] `			goto found;`
+- L01341 [LIFETIME|] `	rcu_read_unlock();`
+- L01347 [LIFETIME|] `		if (!refcount_inc_not_zero(&opinfo->refcount))`
+- L01349 [LIFETIME|] `		rcu_read_unlock();`
+- L01351 [ERROR_PATH|] `			goto op_next;`
+- L01363 [LIFETIME|] `		rcu_read_lock();`
+- L01365 [LIFETIME|] `	rcu_read_unlock();`
+- L01378 [MEM_BOUNDS|] `	memcpy(lease2->lease_key, lease1->lease_key,`
+- L01379 [PROTO_GATE|] `	       SMB2_LEASE_KEY_SIZE);`
+- L01393 [LIFETIME|] `	rcu_read_lock();`
+- L01396 [PROTO_GATE|] `			    SMB2_CLIENT_GUID_SIZE)) {`
+- L01399 [LIFETIME|] `			rcu_read_unlock();`
+- L01403 [LIFETIME|] `	rcu_read_unlock();`
+- L01405 [MEM_BOUNDS|] `	lb = kmalloc(sizeof(struct lease_table), KSMBD_DEFAULT_GFP);`
+- L01407 [ERROR_PATH|] `		return -ENOMEM;`
+- L01409 [MEM_BOUNDS|] `	memcpy(lb->client_guid, opinfo->conn->ClientGUID,`
+- L01410 [PROTO_GATE|] `	       SMB2_CLIENT_GUID_SIZE);`
+- L01429 [PROTO_GATE|] `	case SMB2_OPLOCK_LEVEL_BATCH:`
+- L01430 [PROTO_GATE|] `	case SMB2_OPLOCK_LEVEL_EXCLUSIVE:`
+- L01433 [PROTO_GATE|] `	case SMB2_OPLOCK_LEVEL_II:`
+- L01456 [LOCK|] `	down_read(&p_ci->m_lock);`
+- L01461 [PROTO_GATE|] `		if (opinfo->o_lease->state != SMB2_OPLOCK_LEVEL_NONE &&`
+- L01462 [PROTO_GATE|] `		    (!(lctx->flags & SMB2_LEASE_FLAG_PARENT_LEASE_KEY_SET_LE) ||`
+- L01465 [PROTO_GATE|] `			    SMB2_LEASE_KEY_SIZE))) {`
+- L01466 [LIFETIME|] `			if (!refcount_inc_not_zero(&opinfo->refcount))`
+- L01474 [PROTO_GATE|] `			oplock_break(opinfo, SMB2_OPLOCK_LEVEL_NONE, NULL);`
+- L01489 [PROTO_GATE|] `	__u8 parent_lease_key[SMB2_LEASE_KEY_SIZE];`
+- L01506 [PROTO_GATE|] `	    SMB2_LEASE_FLAG_PARENT_LEASE_KEY_SET_LE) {`
+- L01508 [MEM_BOUNDS|] `		memcpy(parent_lease_key,`
+- L01510 [PROTO_GATE|] `		       SMB2_LEASE_KEY_SIZE);`
+- L01521 [LOCK|] `	down_read(&p_ci->m_lock);`
+- L01526 [PROTO_GATE|] `		if (opinfo->o_lease->state == SMB2_LEASE_NONE_LE)`
+- L01536 [PROTO_GATE|] `			    SMB2_LEASE_KEY_SIZE))`
+- L01539 [LIFETIME|] `		if (!refcount_inc_not_zero(&opinfo->refcount))`
+- L01547 [PROTO_GATE|] `		oplock_break(opinfo, SMB2_OPLOCK_LEVEL_NONE, NULL);`
+- L01562 [PROTO_GATE|] ` * key (SMB2_LEASE_FLAG_PARENT_LEASE_KEY_SET) are exempt because they`
+- L01571 [PROTO_GATE|] `	__u8 parent_lease_key[SMB2_LEASE_KEY_SIZE];`
+- L01586 [PROTO_GATE|] `		     SMB2_LEASE_FLAG_PARENT_LEASE_KEY_SET_LE)) {`
+- L01588 [MEM_BOUNDS|] `			memcpy(parent_lease_key,`
+- L01590 [PROTO_GATE|] `			       SMB2_LEASE_KEY_SIZE);`
+- L01599 [LOCK|] `	down_read(&p_ci->m_lock);`
+- L01604 [PROTO_GATE|] `		if (opinfo->o_lease->state == SMB2_LEASE_NONE_LE)`
+- L01617 [PROTO_GATE|] `			    SMB2_LEASE_KEY_SIZE))`
+- L01620 [LIFETIME|] `		if (!refcount_inc_not_zero(&opinfo->refcount))`
+- L01628 [PROTO_GATE|] `		oplock_break(opinfo, SMB2_OPLOCK_LEVEL_NONE, NULL);`
+- L01652 [PROTO_GATE|] `	__u8 parent_lease_key[SMB2_LEASE_KEY_SIZE];`
+- L01663 [PROTO_GATE|] `			     SMB2_LEASE_FLAG_PARENT_LEASE_KEY_SET_LE)) {`
+- L01665 [MEM_BOUNDS|] `				memcpy(parent_lease_key,`
+- L01667 [PROTO_GATE|] `				       SMB2_LEASE_KEY_SIZE);`
+- L01677 [LOCK|] `	down_read(&ci->m_lock);`
+- L01682 [PROTO_GATE|] `		if (opinfo->o_lease->state == SMB2_LEASE_NONE_LE)`
+- L01688 [PROTO_GATE|] `			    SMB2_LEASE_KEY_SIZE))`
+- L01691 [LIFETIME|] `		if (!refcount_inc_not_zero(&opinfo->refcount))`
+- L01699 [PROTO_GATE|] `		oplock_break(opinfo, SMB2_OPLOCK_LEVEL_NONE, NULL);`
+- L01738 [ERROR_PATH|] `		return -ENOMEM;`
+- L01743 [ERROR_PATH|] `			goto err_out;`
+- L01751 [ERROR_PATH|] `			goto err_out;`
+- L01753 [ERROR_PATH|] `		goto set_lev;`
+- L01760 [PROTO_GATE|] `		req_op_level = SMB2_OPLOCK_LEVEL_NONE;`
+- L01761 [ERROR_PATH|] `		goto set_lev;`
+- L01779 [LIFETIME|] `			if (atomic_read(&m_opinfo->breaking_cnt))`
+- L01781 [PROTO_GATE|] `					SMB2_LEASE_FLAG_BREAK_IN_PROGRESS_LE;`
+- L01782 [ERROR_PATH|] `			goto out;`
+- L01787 [PROTO_GATE|] `	    (prev_opinfo->level == SMB2_OPLOCK_LEVEL_NONE &&`
+- L01790 [ERROR_PATH|] `		goto set_lev;`
+- L01798 [PROTO_GATE|] `	if (prev_opinfo->level == SMB2_OPLOCK_LEVEL_NONE &&`
+- L01801 [PROTO_GATE|] `		req_op_level = SMB2_OPLOCK_LEVEL_NONE;`
+- L01802 [ERROR_PATH|] `		goto set_lev;`
+- L01809 [PROTO_GATE|] `	    prev_opinfo->level == SMB2_OPLOCK_LEVEL_EXCLUSIVE) {`
+- L01812 [ERROR_PATH|] `		goto err_out;`
+- L01815 [PROTO_GATE|] `	if (prev_opinfo->level != SMB2_OPLOCK_LEVEL_BATCH &&`
+- L01816 [PROTO_GATE|] `	    prev_opinfo->level != SMB2_OPLOCK_LEVEL_EXCLUSIVE) {`
+- L01825 [PROTO_GATE|] `		    (prev_op_state & SMB2_LEASE_HANDLE_CACHING_LE)) {`
+- L01831 [ERROR_PATH|] `				goto set_lev;`
+- L01833 [ERROR_PATH|] `				goto err_out;`
+- L01834 [ERROR_PATH|] `			goto op_break_not_needed;`
+- L01837 [ERROR_PATH|] `		goto op_break_not_needed;`
+- L01845 [PROTO_GATE|] `			 * STATUS_SHARING_VIOLATION after the break.`
+- L01851 [ERROR_PATH|] `				goto set_lev;`
+- L01853 [ERROR_PATH|] `				goto err_out;`
+- L01854 [ERROR_PATH|] `			goto op_break_not_needed;`
+- L01863 [PROTO_GATE|] `				   SMB2_OPLOCK_LEVEL_II, work);`
+- L01866 [ERROR_PATH|] `			goto set_lev;`
+- L01868 [ERROR_PATH|] `			goto err_out;`
+- L01871 [PROTO_GATE|] `				   SMB2_OPLOCK_LEVEL_II, work);`
+- L01874 [ERROR_PATH|] `			goto set_lev;`
+- L01876 [ERROR_PATH|] `			goto err_out;`
+- L01882 [ERROR_PATH|] `		goto err_out;`
+- L01885 [PROTO_GATE|] `	if (req_op_level != SMB2_OPLOCK_LEVEL_NONE)`
+- L01886 [PROTO_GATE|] `		req_op_level = SMB2_OPLOCK_LEVEL_II;`
+- L01890 [PROTO_GATE|] `		if (prev_op_state & SMB2_LEASE_HANDLE_CACHING_LE)`
+- L01891 [PROTO_GATE|] `			req_op_level = SMB2_OPLOCK_LEVEL_NONE;`
+- L01894 [PROTO_GATE|] `		req_op_level = SMB2_OPLOCK_LEVEL_II;`
+- L01895 [PROTO_GATE|] `		lctx->req_state = SMB2_LEASE_READ_CACHING_LE;`
+- L01902 [LIFETIME|] `	rcu_assign_pointer(fp->f_opinfo, opinfo);`
+- L01910 [ERROR_PATH|] `			goto err_out_registered;`
+- L01920 [LIFETIME|] `	 * refcount_t underflow ("decrement hit 0; leaking memory")`
+- L01924 [LIFETIME|] `	rcu_assign_pointer(fp->f_opinfo, NULL);`
+- L01945 [PROTO_GATE|] `	if (brk_opinfo->level != SMB2_OPLOCK_LEVEL_BATCH &&`
+- L01946 [PROTO_GATE|] `	    brk_opinfo->level != SMB2_OPLOCK_LEVEL_EXCLUSIVE) {`
+- L01952 [PROTO_GATE|] `	oplock_break(brk_opinfo, SMB2_OPLOCK_LEVEL_II, work);`
+- L01983 [LIFETIME|] `	 * Each collected entry holds a reference from refcount_inc_not_zero.`
+- L01986 [LOCK|] `	down_read(&ci->m_lock);`
+- L01991 [LIFETIME|] `		if (!refcount_inc_not_zero(&brk_op->refcount))`
+- L02011 [ERROR_PATH|] `				goto next;`
+- L02013 [PROTO_GATE|] `					SMB2_OPLOCK_LEVEL_II) {`
+- L02016 [ERROR_PATH|] `				goto next;`
+- L02021 [PROTO_GATE|] `			    brk_op->o_lease->new_state == SMB2_LEASE_NONE_LE &&`
+- L02022 [LIFETIME|] `			    atomic_read(&brk_op->breaking_cnt))`
+- L02023 [ERROR_PATH|] `				goto next;`
+- L02028 [ERROR_PATH|] `				goto next;`
+- L02042 [ERROR_PATH|] `			goto next;`
+- L02043 [PROTO_GATE|] `		} else if (brk_op->level != SMB2_OPLOCK_LEVEL_II) {`
+- L02046 [ERROR_PATH|] `			goto next;`
+- L02051 [PROTO_GATE|] `		    brk_op->o_lease->new_state == SMB2_LEASE_NONE_LE &&`
+- L02052 [LIFETIME|] `		    atomic_read(&brk_op->breaking_cnt))`
+- L02053 [ERROR_PATH|] `			goto next;`
+- L02058 [PROTO_GATE|] `			    SMB2_CLIENT_GUID_SIZE) &&`
+- L02060 [PROTO_GATE|] `			    SMB2_LEASE_KEY_SIZE))`
+- L02061 [ERROR_PATH|] `			goto next;`
+- L02078 [PROTO_GATE|] `		oplock_break(brk_batch[i], SMB2_OPLOCK_LEVEL_NONE, NULL);`
+- L02124 [LOCK|] `	down_read(&ci->m_lock);`
+- L02133 [PROTO_GATE|] `		if (!(brk_op->o_lease->state & SMB2_LEASE_HANDLE_CACHING_LE))`
+- L02135 [LIFETIME|] `		if (!refcount_inc_not_zero(&brk_op->refcount))`
+- L02177 [PROTO_GATE|] `	if (lease_state == (SMB2_LEASE_HANDLE_CACHING_LE |`
+- L02178 [PROTO_GATE|] `			    SMB2_LEASE_READ_CACHING_LE |`
+- L02179 [PROTO_GATE|] `			    SMB2_LEASE_WRITE_CACHING_LE)) {`
+- L02180 [PROTO_GATE|] `		return SMB2_OPLOCK_LEVEL_BATCH;`
+- L02181 [PROTO_GATE|] `	} else if (lease_state != SMB2_LEASE_WRITE_CACHING_LE &&`
+- L02182 [PROTO_GATE|] `		 lease_state & SMB2_LEASE_WRITE_CACHING_LE) {`
+- L02183 [PROTO_GATE|] `		if (!(lease_state & SMB2_LEASE_HANDLE_CACHING_LE))`
+- L02184 [PROTO_GATE|] `			return SMB2_OPLOCK_LEVEL_EXCLUSIVE;`
+- L02185 [PROTO_GATE|] `	} else if (lease_state & SMB2_LEASE_READ_CACHING_LE) {`
+- L02186 [PROTO_GATE|] `		return SMB2_OPLOCK_LEVEL_II;`
+- L02202 [MEM_BOUNDS|] `		memcpy(buf->lcontext.LeaseKey, lease->lease_key,`
+- L02203 [PROTO_GATE|] `		       SMB2_LEASE_KEY_SIZE);`
+- L02207 [PROTO_GATE|] `		if (lease->flags == SMB2_LEASE_FLAG_PARENT_LEASE_KEY_SET_LE)`
+- L02208 [MEM_BOUNDS|] `			memcpy(buf->lcontext.ParentLeaseKey, lease->parent_lease_key,`
+- L02209 [PROTO_GATE|] `			       SMB2_LEASE_KEY_SIZE);`
+- L02224 [MEM_BOUNDS|PROTO_GATE|] `		memcpy(buf->lcontext.LeaseKey, lease->lease_key, SMB2_LEASE_KEY_SIZE);`
+- L02253 [PROTO_GATE|] `	cc = smb2_find_context_vals(req, SMB2_CREATE_REQUEST_LEASE, 4);`
+- L02257 [MEM_BOUNDS|] `	lreq = kzalloc(sizeof(struct lease_ctx_info), KSMBD_DEFAULT_GFP);`
+- L02266 [ERROR_PATH|] `			goto err_out;`
+- L02268 [MEM_BOUNDS|PROTO_GATE|] `		memcpy(lreq->lease_key, lc->lcontext.LeaseKey, SMB2_LEASE_KEY_SIZE);`
+- L02273 [PROTO_GATE|] `		if (lreq->flags == SMB2_LEASE_FLAG_PARENT_LEASE_KEY_SET_LE)`
+- L02274 [MEM_BOUNDS|] `			memcpy(lreq->parent_lease_key, lc->lcontext.ParentLeaseKey,`
+- L02275 [PROTO_GATE|] `			       SMB2_LEASE_KEY_SIZE);`
+- L02282 [ERROR_PATH|] `			goto err_out;`
+- L02284 [MEM_BOUNDS|PROTO_GATE|] `		memcpy(lreq->lease_key, lc->lcontext.LeaseKey, SMB2_LEASE_KEY_SIZE);`
+- L02369 [PROTO_GATE|] `	/* SMB2_CREATE_DURABLE_HANDLE_RESPONSE is "DHnQ" */`
+- L02393 [PROTO_GATE|] `	/* SMB2_CREATE_DURABLE_HANDLE_RESPONSE_V2 is "DH2Q" */`
+- L02401 [PROTO_GATE|] `		buf->Flags = cpu_to_le32(SMB2_DHANDLE_FLAG_PERSISTENT);`
+- L02421 [PROTO_GATE|] `	/* SMB2_CREATE_QUERY_MAXIMAL_ACCESS_RESPONSE is "MxAc" */`
+- L02427 [PROTO_GATE|] `	buf->QueryStatus = STATUS_SUCCESS;`
+- L02443 [PROTO_GATE|] `	/* SMB2_CREATE_QUERY_ON_DISK_ID_RESPONSE is "QFid" */`
+- L02488 [PROTO_GATE|] `	/* SMB2_CREATE_TAG_POSIX is "0x93AD25509CB411E7B42383DE968BCD7C" */`
+- L02634 [LIFETIME|] `	rcu_read_lock();`
+- L02637 [PROTO_GATE|] `			    SMB2_CLIENT_GUID_SIZE))`
+- L02638 [ERROR_PATH|] `			goto found;`
+- L02641 [LIFETIME|] `	rcu_read_unlock();`
+- L02646 [LIFETIME|] `		if (!refcount_inc_not_zero(&opinfo->refcount))`
+- L02648 [LIFETIME|] `		rcu_read_unlock();`
+- L02650 [ERROR_PATH|] `			goto op_next;`
+- L02652 [PROTO_GATE|] `		      (SMB2_LEASE_HANDLE_CACHING_LE |`
+- L02653 [PROTO_GATE|] `		       SMB2_LEASE_WRITE_CACHING_LE)))`
+- L02654 [ERROR_PATH|] `			goto op_next;`
+- L02664 [LIFETIME|] `		rcu_read_lock();`
+- L02666 [LIFETIME|] `	rcu_read_unlock();`
+- L02689 [ERROR_PATH|] `			return -EBADF;`
+- L02695 [ERROR_PATH|] `			pr_err("create context include lease\n");`
+- L02697 [ERROR_PATH|] `			goto out;`
+- L02700 [PROTO_GATE|] `		if (opinfo->level != SMB2_OPLOCK_LEVEL_BATCH) {`
+- L02701 [ERROR_PATH|PROTO_GATE|] `			pr_err("oplock level is not equal to SMB2_OPLOCK_LEVEL_BATCH\n");`
+- L02705 [ERROR_PATH|] `		goto out;`
+- L02709 [PROTO_GATE|] `				SMB2_CLIENT_GUID_SIZE)) {`
+- L02712 [ERROR_PATH|] `		goto out;`
+- L02718 [ERROR_PATH|] `		goto out;`
+- L02722 [PROTO_GATE|] `				SMB2_LEASE_KEY_SIZE)) {`
+- L02726 [ERROR_PATH|] `		goto out;`
+- L02729 [PROTO_GATE|] `	if (!(opinfo->o_lease->state & SMB2_LEASE_HANDLE_CACHING_LE)) {`
+- L02730 [PROTO_GATE|] `		ksmbd_debug(SMB, "lease state does not contain SMB2_LEASE_HANDLE_CACHING\n");`
+- L02732 [ERROR_PATH|] `		goto out;`
+- L02739 [ERROR_PATH|] `		goto out;`
+- L02761 [ERROR_PATH|] `		return -ENOMEM;`

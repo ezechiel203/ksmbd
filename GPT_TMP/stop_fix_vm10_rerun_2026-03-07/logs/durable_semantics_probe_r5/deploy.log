@@ -1,0 +1,7 @@
+Deploying ksmbd to: VM10
+
+==> Deploying to VM10 (SSH 20022)...
+  WARN: VM10 port 445 not listening, retrying...
+  FAIL: VM10 ksmbd NOT running
+
+Done. 1 VMs targeted, 1 failed.

@@ -1,0 +1,29 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772585259
+time: 2026-03-04 00:47:39.470986
+progress: 4
+test: write
+time: 2026-03-04 00:47:39.471629
+time: 2026-03-04 00:47:39.519716
+skip: write [
+../../source4/torture/smb2/create.c:2152: missing 'twrp_file' option
+]
+test: stream
+time: 2026-03-04 00:47:39.519793
+time: 2026-03-04 00:47:39.527065
+skip: stream [
+../../source4/torture/smb2/create.c:2466: missing 'twrp_file' option
+]
+test: openroot
+time: 2026-03-04 00:47:39.527130
+time: 2026-03-04 00:47:39.534042
+skip: openroot [
+../../source4/torture/smb2/create.c:2549: missing 'twrp_snapshot' option
+]
+test: listdir
+time: 2026-03-04 00:47:39.534111
+time: 2026-03-04 00:47:39.540911
+failure: listdir [
+../../source4/torture/smb2/create.c:2608: missing 'twrp_snapshot' option
+]

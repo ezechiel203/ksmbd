@@ -1,0 +1,2 @@
+/lib/modules/7.0.0-070000rc1-generic/build/include/linux/compiler_types.h:37:error:syntaxError:failed to evaluate #if condition, undefined function-like macro invocation: __has_attribute( ... )
+/lib/modules/7.0.0-070000rc1-generic/build/include/linux/buildid.h:17:error:syntaxError:failed to evaluate #if condition, undefined function-like macro invocation: IS_ENABLED( ... )

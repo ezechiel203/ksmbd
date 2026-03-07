@@ -1,0 +1,125 @@
+make -C /lib/modules/6.17.0-14-generic/build M=/home/ezechiel203/ksmbd modules
+make[1]: Entering directory '/usr/src/linux-headers-6.17.0-14-generic'
+make[2]: Entering directory '/home/ezechiel203/ksmbd'
+warning: the compiler differs from the one used to build the kernel
+  The kernel was built by: x86_64-linux-gnu-gcc (Ubuntu 15.2.0-4ubuntu4) 15.2.0
+  You are using:           gcc (Ubuntu 15.2.0-4ubuntu4) 15.2.0
+  CC [M]  unicode.o
+  CC [M]  auth.o
+  CC [M]  vfs.o
+  CC [M]  vfs_cache.o
+  CC [M]  connection.o
+  CC [M]  crypto_ctx.o
+  CC [M]  server.o
+  CC [M]  misc.o
+  CHECK   unicode.c
+  CHECK   crypto_ctx.c
+  CC [M]  oplock.o
+  CC [M]  ksmbd_work.o
+  CHECK   misc.c
+  CHECK   server.c
+  CHECK   connection.c
+  CC [M]  smbacl.o
+  CHECK   auth.c
+  CHECK   vfs_cache.c
+  CC [M]  ndr.o
+  CHECK   vfs.c
+  CC [M]  ksmbd_buffer.o
+  CC [M]  mgmt/ksmbd_ida.o
+  CC [M]  mgmt/user_config.o
+  CHECK   ksmbd_work.c
+  CC [M]  mgmt/share_config.o
+  CHECK   mgmt/ksmbd_ida.c
+  CHECK   ndr.c
+  CC [M]  mgmt/tree_connect.o
+  CHECK   ksmbd_buffer.c
+  CHECK   oplock.c
+  CC [M]  mgmt/user_session.o
+  CHECK   mgmt/user_config.c
+  CC [M]  smb_common.o
+  CC [M]  transport_tcp.o
+  CHECK   smbacl.c
+  CC [M]  transport_ipc.o
+  CC [M]  ksmbd_debugfs.o
+  CC [M]  ksmbd_config.o
+  CHECK   mgmt/share_config.c
+  CHECK   ksmbd_config.c
+  CC [M]  ksmbd_feature.o
+  CC [M]  smb2_pdu_common.o
+  CHECK   mgmt/tree_connect.c
+  CHECK   mgmt/user_session.c
+  CHECK   ksmbd_debugfs.c
+  CHECK   smb_common.c
+  CC [M]  smb2_negotiate.o
+  CHECK   transport_tcp.c
+  CC [M]  smb2_session.o
+  CHECK   transport_ipc.c
+  CC [M]  smb2_tree.o
+  CC [M]  smb2_create.o
+  CC [M]  smb2_dir.o
+  CC [M]  smb2_query_set.o
+  CHECK   ksmbd_feature.c
+  CC [M]  smb2_read_write.o
+  CHECK   smb2_pdu_common.c
+  CHECK   smb2_negotiate.c
+  CHECK   smb2_tree.c
+  CHECK   smb2_session.c
+  CC [M]  smb2_lock.o
+  CC [M]  smb2_ioctl.o
+  CC [M]  smb2_notify.o
+  CC [M]  smb2_misc_cmds.o
+  CHECK   smb2_dir.c
+  CHECK   smb2_create.c
+  CHECK   smb2_query_set.c
+  CC [M]  smb2ops.o
+  CHECK   smb2_read_write.c
+  CC [M]  smb2misc.o
+  CC [M]  ksmbd_spnego_negtokeninit.asn1.o
+  CHECK   ksmbd_spnego_negtokeninit.asn1.c
+  CC [M]  ksmbd_spnego_negtokentarg.asn1.o
+  CHECK   ksmbd_spnego_negtokentarg.asn1.c
+  CC [M]  asn1.o
+  CC [M]  compat.o
+  CHECK   smb2_notify.c
+  CHECK   smb2_ioctl.c
+  CHECK   smb2_lock.c
+  CHECK   smb2_misc_cmds.c
+  CC [M]  ksmbd_fsctl.o
+  CC [M]  ksmbd_create_ctx.o
+  CHECK   compat.c
+  CC [M]  ksmbd_info.o
+  CC [M]  ksmbd_dfs.o
+  CC [M]  ksmbd_vss.o
+  CHECK   smb2ops.c
+  CHECK   smb2misc.c
+  CC [M]  ksmbd_notify.o
+  CHECK   ksmbd_create_ctx.c
+  CHECK   asn1.c
+  CHECK   ksmbd_dfs.c
+  CC [M]  ksmbd_reparse.o
+  CC [M]  ksmbd_resilient.o
+  CC [M]  ksmbd_quota.o
+  CC [M]  ksmbd_app_instance.o
+  CHECK   ksmbd_fsctl.c
+  CHECK   ksmbd_info.c
+  CHECK   ksmbd_resilient.c
+  CHECK   ksmbd_vss.c
+  CC [M]  ksmbd_fsctl_extra.o
+  CHECK   ksmbd_app_instance.c
+  CC [M]  ksmbd_hooks.o
+  CC [M]  transport_rdma.o
+  CHECK   ksmbd_notify.c
+  CHECK   ksmbd_reparse.c
+  CHECK   ksmbd_quota.c
+  CHECK   ksmbd_hooks.c
+  CHECK   ksmbd_fsctl_extra.c
+  CHECK   transport_rdma.c
+  LD [M]  ksmbd.o
+  MODPOST Module.symvers
+  CC [M]  ksmbd.mod.o
+  CC [M]  .module-common.o
+  LD [M]  ksmbd.ko
+  BTF [M] ksmbd.ko
+Skipping BTF generation for ksmbd.ko due to unavailability of vmlinux
+make[2]: Leaving directory '/home/ezechiel203/ksmbd'
+make[1]: Leaving directory '/usr/src/linux-headers-6.17.0-14-generic'

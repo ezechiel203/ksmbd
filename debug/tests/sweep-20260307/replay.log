@@ -1,0 +1,200 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772890251
+time: 2026-03-07 13:30:51.360190
+progress: 60
+test: replay-commands
+time: 2026-03-07 13:30:51.360910
+Try Commands with Replay Flags Enabled
+Trying create
+Trying write
+Trying flush
+Trying read
+Trying setinfo
+Trying getinfo
+Trying ioctl
+Trying lock
+time: 2026-03-07 13:30:51.421194
+success: replay-commands
+test: replay-regular
+time: 2026-03-07 13:30:51.421233
+No replay detection for regular create
+time: 2026-03-07 13:30:51.451211
+success: replay-regular
+test: replay-dhv2-oplock1
+time: 2026-03-07 13:30:51.451250
+Replay of DurableHandleReqV2 on Single Channel
+time: 2026-03-07 13:30:51.471166
+success: replay-dhv2-oplock1
+test: replay-dhv2-oplock2
+time: 2026-03-07 13:30:51.471205
+Replay of DurableHandleReqV2 on Single Channel
+transport[0x563ce78dad20] Acking to level II [0x01] in oplock handler
+time: 2026-03-07 13:30:51.484170
+success: replay-dhv2-oplock2
+test: replay-dhv2-oplock3
+time: 2026-03-07 13:30:51.484210
+Replay of DurableHandleReqV2 on Single Channel
+transport[0x563ce78dad20] Acking to level II [0x01] in oplock handler
+time: 2026-03-07 13:30:51.496625
+success: replay-dhv2-oplock3
+test: replay-dhv2-oplock-lease
+time: 2026-03-07 13:30:51.496664
+Replay of DurableHandleReqV2 on Single Channel
+time: 2026-03-07 13:30:51.509485
+success: replay-dhv2-oplock-lease
+test: replay-dhv2-lease1
+time: 2026-03-07 13:30:51.509524
+Replay of DurableHandleReqV2 with Lease on Single Channel
+time: 2026-03-07 13:30:51.531005
+success: replay-dhv2-lease1
+test: replay-dhv2-lease2
+time: 2026-03-07 13:30:51.531045
+Replay of DurableHandleReqV2 with Lease on Single Channel
+time: 2026-03-07 13:30:51.544354
+success: replay-dhv2-lease2
+test: replay-dhv2-lease3
+time: 2026-03-07 13:30:51.544394
+Replay of DurableHandleReqV2 with Lease on Single Channel
+time: 2026-03-07 13:30:51.567410
+success: replay-dhv2-lease3
+test: replay-dhv2-lease-oplock
+time: 2026-03-07 13:30:51.567448
+Replay of DurableHandleReqV2 with Lease on Single Channel
+time: 2026-03-07 13:30:51.586351
+success: replay-dhv2-lease-oplock
+test: dhv2-pending1n-vs-violation-lease-close-sane
+time: 2026-03-07 13:30:51.586394
+Waiting for a potential lease break...
+transport[0x563ce78dad20] Skip acking to 0x5 (RW) in lease handler
+Got 1 lease breaks
+Waiting for async response: req21
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+SYNC Replay io22 expecting NT_STATUS_FILE_NOT_AVAILABLE
+time: 2026-03-07 13:30:57.634477
+failure: dhv2-pending1n-vs-violation-lease-close-sane [
+../../source4/torture/smb2/replay.c:1632: Incorrect status NT_STATUS_IO_TIMEOUT - should be NT_STATUS_FILE_NOT_AVAILABLE
+]
+test: dhv2-pending1n-vs-violation-lease-ack-sane
+time: 2026-03-07 13:30:57.634517
+Waiting for a potential lease break...
+transport[0x563ce7bedfb0] Skip acking to 0x5 (RW) in lease handler
+Got 1 lease breaks
+Waiting for async response: req21
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+SYNC Replay io22 expecting NT_STATUS_FILE_NOT_AVAILABLE
+time: 2026-03-07 13:31:03.684985
+failure: dhv2-pending1n-vs-violation-lease-ack-sane [
+../../source4/torture/smb2/replay.c:1632: Incorrect status NT_STATUS_IO_TIMEOUT - should be NT_STATUS_FILE_NOT_AVAILABLE
+]
+test: dhv2-pending1n-vs-violation-lease-close-windows
+time: 2026-03-07 13:31:03.685027
+Waiting for a potential lease break...
+transport[0x563ce78dad20] Skip acking to 0x5 (RW) in lease handler
+Got 1 lease breaks
+Waiting for async response: req21
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Starting ASYNC Replay req22 expecting NT_STATUS_SHARING_VIOLATION
+Waiting for async response: req22
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Closing h1
+Checking req21 expecting NT_STATUS_OK
+Checking req22 expecting NT_STATUS_SHARING_VIOLATION
+time: 2026-03-07 13:31:24.765789
+failure: dhv2-pending1n-vs-violation-lease-close-windows [
+../../source4/torture/smb2/replay.c:1722: Incorrect status NT_STATUS_IO_TIMEOUT - should be NT_STATUS_SHARING_VIOLATION
+]
+test: dhv2-pending1n-vs-violation-lease-ack-windows
+time: 2026-03-07 13:31:24.765834
+Waiting for a potential lease break...
+transport[0x563ce7bedfb0] Skip acking to 0x5 (RW) in lease handler
+Got 1 lease breaks
+Waiting for async response: req21
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Starting ASYNC Replay req22 expecting NT_STATUS_SHARING_VIOLATION
+Waiting for async response: req22
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+Acking lease_key1
+Checking req21 expecting NT_STATUS_SHARING_VIOLATION
+time: 2026-03-07 13:31:45.809737
+failure: dhv2-pending1n-vs-violation-lease-ack-windows [
+../../source4/torture/smb2/replay.c:1690: Incorrect status NT_STATUS_INVALID_NETWORK_RESPONSE - should be NT_STATUS_SHARING_VIOLATION
+]
+test: dhv2-pending1n-vs-oplock-sane
+time: 2026-03-07 13:31:45.809779
+Waiting for a potential oplock break...
+transport[0x563ce7bb8cd0] skip acking to level II [0x01] in oplock handler
+Got 1 oplock breaks
+Waiting for async response: req21
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+time: 2026-03-07 13:32:25.365142
+failure: dhv2-pending1n-vs-oplock-sane [
+../../source4/torture/smb2/replay.c:2228: Incorrect status NT_STATUS_OK - should be NT_STATUS_FILE_NOT_AVAILABLE
+]
+test: dhv2-pending1n-vs-oplock-windows
+time: 2026-03-07 13:32:25.365191
+Waiting for a potential oplock break...
+transport[0x563ce7c02660] skip acking to level II [0x01] in oplock handler
+Got 1 oplock breaks
+Waiting for async response: req21
+Waiting for a potential oplock break...
+... waiting for an oplock break timed out
+time: 2026-03-07 13:33:02.222257
+failure: dhv2-pending1n-vs-oplock-windows [
+../../source4/torture/smb2/replay.c:2228: Incorrect status NT_STATUS_OK - should be NT_STATUS_ACCESS_DENIED
+]
+test: dhv2-pending1n-vs-lease-sane
+time: 2026-03-07 13:33:02.222300
+Waiting for a potential lease break...
+transport[0x563ce7bedfb0] Skip acking to 0x3 (RH) in lease handler
+Got 1 lease breaks
+Waiting for async response: req21
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+time: 2026-03-07 13:33:08.255295
+failure: dhv2-pending1n-vs-lease-sane [
+../../source4/torture/smb2/replay.c:2228: Incorrect status NT_STATUS_IO_TIMEOUT - should be NT_STATUS_FILE_NOT_AVAILABLE
+]
+test: dhv2-pending1n-vs-lease-windows
+time: 2026-03-07 13:33:08.255339
+Waiting for a potential lease break...
+transport[0x563ce7c02660] Skip acking to 0x3 (RH) in lease handler
+Got 1 lease breaks
+Waiting for async response: req21
+Waiting for a potential lease break...
+... waiting for a lease break timed out
+time: 2026-03-07 13:33:14.281025
+failure: dhv2-pending1n-vs-lease-windows [
+../../source4/torture/smb2/replay.c:2228: Incorrect status NT_STATUS_IO_TIMEOUT - should be NT_STATUS_ACCESS_DENIED
+]
+test: dhv2-pending1l-vs-oplock-sane
+time: 2026-03-07 13:33:14.281072
+Waiting for a potential oplock break...
+transport[0x563ce7bedfb0] skip acking to level II [0x01] in oplock handler
+Got 1 oplock breaks
+Waiting for async response: req21
+Waiting for a potential oplock break...
+TIMEOUT

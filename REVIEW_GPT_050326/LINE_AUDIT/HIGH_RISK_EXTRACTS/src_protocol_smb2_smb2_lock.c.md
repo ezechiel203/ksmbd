@@ -1,0 +1,130 @@
+# src/protocol/smb2/smb2_lock.c
+
+Risk-tagged lines (LOCK/LIFETIME/WAIT_LOOP/ERROR_PATH/MEM_BOUNDS/PROTO_GATE):
+
+- L00006 [PROTO_GATE|] ` *   smb2_lock.c - SMB2_LOCK + SMB2_CANCEL handlers`
+- L00084 [PROTO_GATE|] `	if (hdr->Flags & SMB2_FLAGS_ASYNC_COMMAND) {`
+- L00087 [LOCK|] `		spin_lock(&conn->request_lock);`
+- L00123 [LOCK|] `		spin_unlock(&conn->request_lock);`
+- L00130 [LOCK|] `		spin_lock(&conn->request_lock);`
+- L00155 [PROTO_GATE|] `		 * (without SMB2_FLAGS_ASYNC_COMMAND) before it`
+- L00156 [PROTO_GATE|] `		 * receives the interim STATUS_PENDING response that`
+- L00222 [LOCK|] `		spin_unlock(&conn->request_lock);`
+- L00230 [PROTO_GATE|] `	/* For SMB2_CANCEL command itself send no response*/`
+- L00241 [ERROR_PATH|] `		goto out;`
+- L00275 [WAIT_LOOP|] `	for (;;) {`
+- L00285 [ERROR_PATH|] `			return -EINTR;`
+- L00291 [PROTO_GATE|] `		 * retry and instead sends STATUS_CANCELLED to the client.`
+- L00296 [ERROR_PATH|] `			return -EINTR;`
+- L00307 [PROTO_GATE|] `	case SMB2_LOCKFLAG_SHARED:`
+- L00318 [PROTO_GATE|] `	case SMB2_LOCKFLAG_EXCLUSIVE:`
+- L00329 [PROTO_GATE|] `	case SMB2_LOCKFLAG_SHARED | SMB2_LOCKFLAG_FAIL_IMMEDIATELY:`
+- L00339 [PROTO_GATE|] `	case SMB2_LOCKFLAG_EXCLUSIVE | SMB2_LOCKFLAG_FAIL_IMMEDIATELY:`
+- L00349 [PROTO_GATE|] `	case SMB2_LOCKFLAG_UNLOCK:`
+- L00372 [MEM_BOUNDS|] `	lock = kzalloc(sizeof(struct ksmbd_lock), KSMBD_DEFAULT_GFP);`
+- L00432 [PROTO_GATE|] ` * return 1 to signal the caller to return STATUS_OK immediately.`
+- L00456 [LOCK|] `	spin_lock(&fp->lock_seq_lock);`
+- L00460 [LOCK|] `		spin_unlock(&fp->lock_seq_lock);`
+- L00465 [LOCK|] `	spin_unlock(&fp->lock_seq_lock);`
+- L00487 [LOCK|] `	spin_lock(&fp->lock_seq_lock);`
+- L00489 [LOCK|] `	spin_unlock(&fp->lock_seq_lock);`
+- L00526 [ERROR_PATH|] `		goto out2;`
+- L00534 [PROTO_GATE|] `		rsp->hdr.Status = STATUS_SUCCESS;`
+- L00539 [ERROR_PATH|] `			goto out2;`
+- L00546 [PROTO_GATE|] `		rsp->hdr.Status = STATUS_FILE_NOT_AVAILABLE;`
+- L00548 [ERROR_PATH|] `		goto out2;`
+- L00557 [ERROR_PATH|] `		pr_err_ratelimited("Invalid lock count: %d\n", lock_count);`
+- L00559 [ERROR_PATH|] `		goto out2;`
+- L00574 [ERROR_PATH|] `			pr_err_ratelimited("lock elements exceed request buffer\n");`
+- L00576 [ERROR_PATH|] `			goto out2;`
+- L00588 [ERROR_PATH|] `			goto out;`
+- L00604 [ERROR_PATH|] `			pr_err_ratelimited("Invalid lock range requested\n");`
+- L00605 [PROTO_GATE|] `			rsp->hdr.Status = STATUS_INVALID_LOCK_RANGE;`
+- L00607 [ERROR_PATH|] `			goto out;`
+- L00637 [PROTO_GATE|] `			rsp->hdr.Status = STATUS_INVALID_LOCK_RANGE;`
+- L00639 [ERROR_PATH|] `			goto out;`
+- L00653 [ERROR_PATH|] `					pr_err_ratelimited("conflict two locks in one request\n");`
+- L00656 [ERROR_PATH|] `					goto out;`
+- L00667 [ERROR_PATH|] `			goto out;`
+- L00674 [ERROR_PATH|] `			goto out;`
+- L00677 [PROTO_GATE|] `		if (!(smb_lock->flags & SMB2_LOCKFLAG_MASK)) {`
+- L00679 [ERROR_PATH|] `			goto out;`
+- L00682 [PROTO_GATE|] `		if ((prior_lock & (SMB2_LOCKFLAG_EXCLUSIVE | SMB2_LOCKFLAG_SHARED) &&`
+- L00683 [PROTO_GATE|] `		     smb_lock->flags & SMB2_LOCKFLAG_UNLOCK) ||`
+- L00684 [PROTO_GATE|] `		    (prior_lock == SMB2_LOCKFLAG_UNLOCK &&`
+- L00685 [PROTO_GATE|] `		     !(smb_lock->flags & SMB2_LOCKFLAG_UNLOCK))) {`
+- L00687 [ERROR_PATH|] `			goto out;`
+- L00692 [PROTO_GATE|] `		if (!(smb_lock->flags & SMB2_LOCKFLAG_UNLOCK) &&`
+- L00693 [PROTO_GATE|] `		    !(smb_lock->flags & SMB2_LOCKFLAG_FAIL_IMMEDIATELY)) {`
+- L00702 [PROTO_GATE|] `			if (!(smb_lock->flags & SMB2_LOCKFLAG_SHARED)) {`
+- L00704 [LOCK|] `				spin_lock(&conn_hash[bkt].lock);`
+- L00708 [LOCK|] `					spin_lock(&conn->llist_lock);`
+- L00732 [LOCK|] `							spin_unlock(&conn->llist_lock);`
+- L00733 [LOCK|] `							spin_unlock(&conn_hash[bkt].lock);`
+- L00734 [ERROR_PATH|] `							pr_err_ratelimited("Same-handle lock conflict (NT byte range)\n");`
+- L00736 [PROTO_GATE|] `								STATUS_LOCK_NOT_GRANTED;`
+- L00737 [ERROR_PATH|] `							goto out;`
+- L00741 [LOCK|] `					spin_unlock(&conn->llist_lock);`
+- L00743 [LOCK|] `				spin_unlock(&conn_hash[bkt].lock);`
+- L00746 [ERROR_PATH|] `			goto no_check_cl;`
+- L00752 [LOCK|] `		spin_lock(&conn_hash[bkt].lock);`
+- L00755 [LOCK|] `			spin_lock(&conn->llist_lock);`
+- L00782 [LOCK|] `						spin_unlock(&conn->llist_lock);`
+- L00783 [LOCK|] `						spin_unlock(&conn_hash[bkt].lock);`
+- L00787 [ERROR_PATH|] `						goto out_check_cl;`
+- L00797 [PROTO_GATE|] `					if (smb_lock->flags & SMB2_LOCKFLAG_SHARED)`
+- L00800 [PROTO_GATE|] `					if (cmp_lock->flags & SMB2_LOCKFLAG_SHARED)`
+- L00808 [LOCK|] `					spin_unlock(&conn->llist_lock);`
+- L00809 [LOCK|] `					spin_unlock(&conn_hash[bkt].lock);`
+- L00810 [ERROR_PATH|] `					pr_err_ratelimited("previous lock conflict with zero byte lock range\n");`
+- L00811 [PROTO_GATE|] `					rsp->hdr.Status = STATUS_LOCK_NOT_GRANTED;`
+- L00812 [ERROR_PATH|] `					goto out;`
+- L00818 [LOCK|] `					spin_unlock(&conn->llist_lock);`
+- L00819 [LOCK|] `					spin_unlock(&conn_hash[bkt].lock);`
+- L00820 [ERROR_PATH|] `					pr_err_ratelimited("current lock conflict with zero byte lock range\n");`
+- L00821 [PROTO_GATE|] `					rsp->hdr.Status = STATUS_LOCK_NOT_GRANTED;`
+- L00822 [ERROR_PATH|] `					goto out;`
+- L00839 [LOCK|] `					spin_unlock(&conn->llist_lock);`
+- L00840 [LOCK|] `					spin_unlock(&conn_hash[bkt].lock);`
+- L00841 [ERROR_PATH|] `					pr_err_ratelimited("Not allow lock operation on exclusive lock range\n");`
+- L00842 [PROTO_GATE|] `					rsp->hdr.Status = STATUS_LOCK_NOT_GRANTED;`
+- L00843 [ERROR_PATH|] `					goto out;`
+- L00847 [LOCK|] `			spin_unlock(&conn->llist_lock);`
+- L00849 [LOCK|] `		spin_unlock(&conn_hash[bkt].lock);`
+- L00857 [ERROR_PATH|] `			pr_err_ratelimited("Try to unlock nolocked range\n");`
+- L00858 [PROTO_GATE|] `			rsp->hdr.Status = STATUS_RANGE_NOT_LOCKED;`
+- L00859 [ERROR_PATH|] `			goto out;`
+- L00873 [PROTO_GATE|] `			 * return STATUS_SUCCESS.`
+- L00877 [ERROR_PATH|] `			goto skip;`
+- L00891 [ERROR_PATH|] `			goto skip;`
+- L00896 [PROTO_GATE|] `		if (smb_lock->flags & SMB2_LOCKFLAG_UNLOCK) {`
+- L00900 [PROTO_GATE|] `				rsp->hdr.Status = STATUS_NOT_LOCKED;`
+- L00901 [ERROR_PATH|] `				goto out;`
+- L00913 [MEM_BOUNDS|] `				argv = kmalloc(sizeof(void *), KSMBD_DEFAULT_GFP);`
+- L00916 [ERROR_PATH|] `					goto out;`
+- L00926 [ERROR_PATH|] `					goto out;`
+- L00928 [LOCK|] `				spin_lock(&fp->f_lock);`
+- L00930 [LOCK|] `				spin_unlock(&fp->f_lock);`
+- L00932 [PROTO_GATE|] `				smb2_send_interim_resp(work, STATUS_PENDING);`
+- L00936 [LOCK|] `				spin_lock(&fp->f_lock);`
+- L00938 [LOCK|] `				spin_unlock(&fp->f_lock);`
+- L00948 [PROTO_GATE|] `						 * with STATUS_CANCELLED.  Do NOT`
+- L00958 [PROTO_GATE|] `							STATUS_CANCELLED;`
+- L00960 [ERROR_PATH|] `						goto out2;`
+- L00964 [PROTO_GATE|] `						STATUS_RANGE_NOT_LOCKED;`
+- L00966 [ERROR_PATH|] `					goto out2;`
+- L00971 [ERROR_PATH|] `				goto retry;`
+- L00974 [LOCK|] `				spin_lock(&work->conn->llist_lock);`
+- L00979 [LOCK|] `				spin_unlock(&work->conn->llist_lock);`
+- L00982 [PROTO_GATE|] `				rsp->hdr.Status = STATUS_LOCK_NOT_GRANTED;`
+- L00984 [ERROR_PATH|] `				goto out;`
+- L00989 [LIFETIME|] `	if (atomic_read(&fp->f_ci->op_count) > 1)`
+- L00997 [PROTO_GATE|] `	rsp->hdr.Status = STATUS_SUCCESS;`
+- L01001 [ERROR_PATH|] `		goto out;`
+- L01032 [ERROR_PATH|] `			pr_err("rollback unlock fail : %d\n", rc);`
+- L01035 [LOCK|] `		spin_lock(&work->conn->llist_lock);`
+- L01038 [LOCK|] `		spin_unlock(&work->conn->llist_lock);`
+- L01049 [PROTO_GATE|] `			rsp->hdr.Status = STATUS_INVALID_PARAMETER;`
+- L01051 [PROTO_GATE|] `			rsp->hdr.Status = STATUS_INSUFFICIENT_RESOURCES;`
+- L01053 [PROTO_GATE|] `			rsp->hdr.Status = STATUS_FILE_CLOSED;`
+- L01055 [PROTO_GATE|] `			rsp->hdr.Status = STATUS_LOCK_NOT_GRANTED;`

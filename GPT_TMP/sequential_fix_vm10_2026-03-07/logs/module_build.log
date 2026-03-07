@@ -1,0 +1,29 @@
+make -C /usr/lib/modules/6.18.13-arch1-1/build M=/home/ezechiel203/ksmbd ARCH=x86_64 \
+	CONFIG_SMB_SERVER_SMBDIRECT=n \
+	CONFIG_SMB_INSECURE_SERVER=y \
+	CONFIG_KSMBD_FRUIT=y \
+	CONFIG_SMB_SERVER_QUIC=y \
+	CONFIG_KSMBD_KUNIT_TEST=n \
+	modules
+make[1]: Entering directory '/usr/lib/modules/6.18.13-arch1-1/build'
+make[2] : on entre dans le répertoire « /home/ezechiel203/ksmbd »
+  CC [M]  src/encoding/unicode.o
+  CC [M]  src/core/auth.o
+  CC [M]  src/fs/vfs.o
+src/fs/vfs.c: Dans la fonction « ksmbd_vfs_get_ea_size »:
+src/fs/vfs.c:2568:21: attention: variable inutilisée « entry_size » [-Wunused-variable]
+ 2568 |                 u32 entry_size;
+      |                     ^~~~~~~~~~
+src/fs/vfs.c: Dans la fonction « ksmbd_vfs_posix_lock_wait »:
+src/fs/vfs.c:4262:13: erreur: « ret » non déclaré (première utilisation dans cette fonction); vouliez-vous utiliser « net » ?
+ 4262 |         if (ret == 0) {
+      |             ^~~
+      |             net
+src/fs/vfs.c:4262:13: note: chaque identificateur non déclaré est rapporté une seule fois pour chaque fonction dans laquelle il apparaît
+make[4]: *** [/usr/lib/modules/6.18.13-arch1-1/build/scripts/Makefile.build:287: src/fs/vfs.o] Error 1
+make[3]: *** [/usr/lib/modules/6.18.13-arch1-1/build/Makefile:2011: .] Error 2
+make[2]: *** [/usr/lib/modules/6.18.13-arch1-1/build/Makefile:248: __sub-make] Error 2
+make[2] : on quitte le répertoire « /home/ezechiel203/ksmbd »
+make[1]: *** [Makefile:248: __sub-make] Error 2
+make[1]: Leaving directory '/usr/lib/modules/6.18.13-arch1-1/build'
+make: *** [Makefile:169: all] Error 2

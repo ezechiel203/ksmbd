@@ -1,0 +1,140 @@
+make -C /lib/modules/6.18.9-arch1-2/build M=/home/ezechiel203/ksmbd ARCH=x86_64 modules
+make[1]: Entering directory '/usr/lib/modules/6.18.9-arch1-2/build'
+make[2]: Entering directory '/home/ezechiel203/ksmbd'
+  CC [M]  src/encoding/unicode.o
+  CHECK   src/encoding/unicode.c
+  CC [M]  src/core/auth.o
+  CHECK   src/core/auth.c
+  CC [M]  src/fs/vfs.o
+  CHECK   src/fs/vfs.c
+  CC [M]  src/fs/vfs_cache.o
+  CHECK   src/fs/vfs_cache.c
+  CC [M]  src/core/connection.o
+  CHECK   src/core/connection.c
+  CC [M]  src/core/crypto_ctx.o
+  CHECK   src/core/crypto_ctx.c
+  CC [M]  src/core/server.o
+  CHECK   src/core/server.c
+  CC [M]  src/core/misc.o
+  CHECK   src/core/misc.c
+  CC [M]  src/fs/oplock.o
+  CHECK   src/fs/oplock.c
+  CC [M]  src/core/ksmbd_work.o
+  CHECK   src/core/ksmbd_work.c
+  CC [M]  src/fs/smbacl.o
+  CHECK   src/fs/smbacl.c
+  CC [M]  src/encoding/ndr.o
+  CHECK   src/encoding/ndr.c
+  CC [M]  src/core/ksmbd_buffer.o
+  CHECK   src/core/ksmbd_buffer.c
+  CC [M]  src/core/smb2_compress.o
+  CHECK   src/core/smb2_compress.c
+  CC [M]  src/mgmt/ksmbd_ida.o
+  CHECK   src/mgmt/ksmbd_ida.c
+  CC [M]  src/mgmt/user_config.o
+  CHECK   src/mgmt/user_config.c
+  CC [M]  src/mgmt/share_config.o
+  CHECK   src/mgmt/share_config.c
+  CC [M]  src/mgmt/tree_connect.o
+  CHECK   src/mgmt/tree_connect.c
+  CC [M]  src/mgmt/user_session.o
+  CHECK   src/mgmt/user_session.c
+  CC [M]  src/mgmt/ksmbd_witness.o
+  CHECK   src/mgmt/ksmbd_witness.c
+  CC [M]  src/protocol/common/smb_common.o
+  CHECK   src/protocol/common/smb_common.c
+  CC [M]  src/transport/transport_tcp.o
+  CHECK   src/transport/transport_tcp.c
+  CC [M]  src/transport/transport_ipc.o
+  CHECK   src/transport/transport_ipc.c
+  CC [M]  src/core/ksmbd_debugfs.o
+  CHECK   src/core/ksmbd_debugfs.c
+  CC [M]  src/core/ksmbd_config.o
+  CHECK   src/core/ksmbd_config.c
+  CC [M]  src/core/ksmbd_feature.o
+  CHECK   src/core/ksmbd_feature.c
+  CC [M]  src/protocol/smb2/smb2_pdu_common.o
+  CHECK   src/protocol/smb2/smb2_pdu_common.c
+  CC [M]  src/protocol/smb2/smb2_negotiate.o
+  CHECK   src/protocol/smb2/smb2_negotiate.c
+  CC [M]  src/protocol/smb2/smb2_session.o
+  CHECK   src/protocol/smb2/smb2_session.c
+  CC [M]  src/protocol/smb2/smb2_tree.o
+  CHECK   src/protocol/smb2/smb2_tree.c
+  CC [M]  src/protocol/smb2/smb2_create.o
+  CHECK   src/protocol/smb2/smb2_create.c
+  CC [M]  src/protocol/smb2/smb2_dir.o
+  CHECK   src/protocol/smb2/smb2_dir.c
+  CC [M]  src/protocol/smb2/smb2_query_set.o
+  CHECK   src/protocol/smb2/smb2_query_set.c
+src/protocol/smb2/smb2_query_set.c:802:46: warning: incorrect type in assignment (different base types)
+src/protocol/smb2/smb2_query_set.c:802:46:    expected restricted __le16 [usertype] CompressionFormat
+src/protocol/smb2/smb2_query_set.c:802:46:    got int
+  CC [M]  src/protocol/smb2/smb2_read_write.o
+  CHECK   src/protocol/smb2/smb2_read_write.c
+  CC [M]  src/protocol/smb2/smb2_lock.o
+  CHECK   src/protocol/smb2/smb2_lock.c
+  CC [M]  src/protocol/smb2/smb2_ioctl.o
+  CHECK   src/protocol/smb2/smb2_ioctl.c
+  CC [M]  src/protocol/smb2/smb2_notify.o
+  CHECK   src/protocol/smb2/smb2_notify.c
+  CC [M]  src/protocol/smb2/smb2_misc_cmds.o
+  CHECK   src/protocol/smb2/smb2_misc_cmds.c
+  CC [M]  src/protocol/smb2/smb2ops.o
+  CHECK   src/protocol/smb2/smb2ops.c
+  CC [M]  src/protocol/smb2/smb2misc.o
+  CHECK   src/protocol/smb2/smb2misc.c
+  ASN.1   src/encoding/ksmbd_spnego_negtokeninit.asn1.[ch]
+  CC [M]  src/encoding/ksmbd_spnego_negtokeninit.asn1.o
+  CHECK   src/encoding/ksmbd_spnego_negtokeninit.asn1.c
+  ASN.1   src/encoding/ksmbd_spnego_negtokentarg.asn1.[ch]
+  CC [M]  src/encoding/ksmbd_spnego_negtokentarg.asn1.o
+  CHECK   src/encoding/ksmbd_spnego_negtokentarg.asn1.c
+  CC [M]  src/encoding/asn1.o
+  CHECK   src/encoding/asn1.c
+  CC [M]  src/core/compat.o
+  CHECK   src/core/compat.c
+  CC [M]  src/fs/ksmbd_fsctl.o
+  CHECK   src/fs/ksmbd_fsctl.c
+src/fs/ksmbd_fsctl.c:956:31: warning: incorrect type in assignment (different base types)
+src/fs/ksmbd_fsctl.c:956:31:    expected unsigned long long
+src/fs/ksmbd_fsctl.c:956:31:    got restricted __le64 [usertype]
+src/fs/ksmbd_fsctl.c:957:31: warning: incorrect type in assignment (different base types)
+src/fs/ksmbd_fsctl.c:957:31:    expected unsigned long long
+src/fs/ksmbd_fsctl.c:957:31:    got restricted __le64 [usertype]
+  CC [M]  src/fs/ksmbd_create_ctx.o
+  CHECK   src/fs/ksmbd_create_ctx.c
+  CC [M]  src/fs/ksmbd_info.o
+  CHECK   src/fs/ksmbd_info.c
+  CC [M]  src/fs/ksmbd_dfs.o
+  CHECK   src/fs/ksmbd_dfs.c
+  CC [M]  src/fs/ksmbd_vss.o
+  CHECK   src/fs/ksmbd_vss.c
+  CC [M]  src/fs/ksmbd_notify.o
+  CHECK   src/fs/ksmbd_notify.c
+  CC [M]  src/fs/ksmbd_reparse.o
+  CHECK   src/fs/ksmbd_reparse.c
+  CC [M]  src/fs/ksmbd_resilient.o
+  CHECK   src/fs/ksmbd_resilient.c
+  CC [M]  src/fs/ksmbd_quota.o
+  CHECK   src/fs/ksmbd_quota.c
+  CC [M]  src/fs/ksmbd_app_instance.o
+  CHECK   src/fs/ksmbd_app_instance.c
+  CC [M]  src/fs/ksmbd_fsctl_extra.o
+  CHECK   src/fs/ksmbd_fsctl_extra.c
+  CC [M]  src/fs/ksmbd_rsvd.o
+  CHECK   src/fs/ksmbd_rsvd.c
+  CC [M]  src/fs/ksmbd_branchcache.o
+  CHECK   src/fs/ksmbd_branchcache.c
+  CC [M]  src/core/ksmbd_hooks.o
+  CHECK   src/core/ksmbd_hooks.c
+  CC [M]  src/transport/transport_rdma.o
+  CHECK   src/transport/transport_rdma.c
+  LD [M]  ksmbd.o
+  MODPOST Module.symvers
+  CC [M]  ksmbd.mod.o
+  CC [M]  .module-common.o
+  LD [M]  ksmbd.ko
+  BTF [M] ksmbd.ko
+make[2]: Leaving directory '/home/ezechiel203/ksmbd'
+make[1]: Leaving directory '/usr/lib/modules/6.18.9-arch1-2/build'

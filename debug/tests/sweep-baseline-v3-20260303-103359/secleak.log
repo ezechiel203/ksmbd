@@ -1,0 +1,12 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772530568
+time: 2026-03-03 09:36:08.714510
+test: secleak
+time: 2026-03-03 09:36:08.716228
+WARNING!: ../../source4/torture/smb2/secleak.c:62: status was NT_STATUS_OK, expected NT_STATUS_LOGON_FAILURE: Allowed session setup with invalid credentials?!
+
+time: 2026-03-03 09:36:08.724906
+failure: secleak [
+../../source4/torture/smb2/secleak.c:85: Expression `result' failed: Invalid credentials should have failed
+]

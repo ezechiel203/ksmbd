@@ -1,0 +1,44 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772532112
+time: 2026-03-03 10:01:52.658097
+progress: 23
+test: valid-req
+time: 2026-03-03 10:01:52.658751
+TESTING VALIDITY OF CHANGE NOTIFY REQUEST
+time: 2026-03-03 10:01:52.667868
+failure: valid-req [
+(../../source4/torture/smb2/notify.c:163) wrong value for n.out.num_changes  0x1 should be 0x3
+]
+test: tcon
+time: 2026-03-03 10:01:52.667927
+TESTING SIMPLE CHANGE NOTIFY
+Testing notify mkdir
+Testing notify rmdir
+SIMPLE CHANGE NOTIFY OK
+TESTING WITH SECONDARY TCON
+tid1=1 tid2=2
+Testing notify mkdir
+Testing notify rmdir
+CHANGE NOTIFY WITH TCON OK
+Disconnecting secondary tree
+Testing notify mkdir
+Testing notify rmdir
+CHANGE NOTIFY WITH TDIS OK
+time: 2026-03-03 10:01:52.678184
+success: tcon
+test: dir
+time: 2026-03-03 10:01:52.678231
+TESTING CHANGE NOTIFY ON DIRECTORIES
+Testing notify cancel
+Testing notify mkdir
+Testing notify rmdir
+Testing notify mkdir - rmdir - mkdir - rmdir
+time: 2026-03-03 10:01:52.891376
+failure: dir [
+(../../source4/torture/smb2/notify.c:327) wrong value for notify.smb2.out.num_changes  0x1 should be 0x4
+]
+test: mask
+time: 2026-03-03 10:01:52.891512
+TESTING CHANGE NOTIFY COMPLETION FILTERS
+Testing mkdir

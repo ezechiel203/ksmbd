@@ -1,0 +1,106 @@
+# src/transport/transport_ipc.c
+
+Risk-tagged lines (LOCK/LIFETIME/WAIT_LOOP/ERROR_PATH/MEM_BOUNDS/PROTO_GATE):
+
+- L00048 [ERROR_PATH|] `		pr_err("%s. ksmbd: %d, kernel module: %d. %s.\n",`
+- L00333 [MEM_BOUNDS|] `	if (check_add_overflow(sz, sizeof(struct ksmbd_ipc_msg), &msg_sz))`
+- L00336 [MEM_BOUNDS|] `	msg = kvzalloc(msg_sz, KSMBD_DEFAULT_GFP);`
+- L00361 [ERROR_PATH|] `		return -EINVAL;`
+- L00370 [LOCK|] `	down_write(&ipc_msg_table_lock);`
+- L00380 [ERROR_PATH|] `			pr_err("Waiting for IPC type %d, got %d. Ignore.\n",`
+- L00387 [ERROR_PATH|] `			pr_warn_ratelimited("Duplicate IPC response for handle %u type %d ignored\n",`
+- L00393 [MEM_BOUNDS|] `		entry->response = kvzalloc(sz, KSMBD_DEFAULT_GFP);`
+- L00399 [MEM_BOUNDS|] `		memcpy(entry->response, payload, sz);`
+- L00405 [LOCK|] `	up_write(&ipc_msg_table_lock);`
+- L00422 [ERROR_PATH|] `		goto out;`
+- L00451 [MEM_BOUNDS|] `	strscpy(server_conf.fruit_model, req->fruit_model,`
+- L00457 [ERROR_PATH|] `		pr_err("Server configuration error: %s %s %s\n",`
+- L00484 [ERROR_PATH|] `		return -EPERM;`
+- L00487 [ERROR_PATH|] `		return -EINVAL;`
+- L00490 [ERROR_PATH|] `		return -EINVAL;`
+- L00492 [LOCK|] `	mutex_lock(&startup_lock);`
+- L00494 [LOCK|] `		mutex_unlock(&startup_lock);`
+- L00495 [ERROR_PATH|] `		pr_err("Server reset is in progress, can't start daemon\n");`
+- L00496 [ERROR_PATH|] `		return -EINVAL;`
+- L00502 [ERROR_PATH|] `			goto out;`
+- L00505 [ERROR_PATH|] `		pr_err("Reconnect to a new user space daemon\n");`
+- L00512 [ERROR_PATH|] `			goto out;`
+- L00520 [LOCK|] `	mutex_unlock(&startup_lock);`
+- L00526 [ERROR_PATH|] `	pr_err("Unknown IPC event: %d, ignore.\n", info->genlhdr->cmd);`
+- L00527 [ERROR_PATH|] `	return -EINVAL;`
+- L00537 [ERROR_PATH|] `		return -EPERM;`
+- L00540 [ERROR_PATH|] `		pr_warn_ratelimited("Unknown IPC event: %d\n", type);`
+- L00541 [ERROR_PATH|] `		return -EINVAL;`
+- L00545 [ERROR_PATH|] `		return -EINVAL;`
+- L00548 [ERROR_PATH|] `		return -EINVAL;`
+- L00566 [ERROR_PATH|] `		return -ENOMEM;`
+- L00570 [ERROR_PATH|] `		goto out;`
+- L00575 [ERROR_PATH|] `		goto out;`
+- L00594 [ERROR_PATH|] `		return -EINVAL;`
+- L00602 [MEM_BOUNDS|] `		if (check_add_overflow(msg_sz, resp->payload_sz, &msg_sz))`
+- L00603 [ERROR_PATH|] `			return -EINVAL;`
+- L00612 [MEM_BOUNDS|] `		if (check_add_overflow(resp->session_key_len,`
+- L00614 [ERROR_PATH|] `			return -EINVAL;`
+- L00615 [MEM_BOUNDS|] `		if (check_add_overflow(msg_sz, payload_sz, &msg_sz))`
+- L00616 [ERROR_PATH|] `			return -EINVAL;`
+- L00625 [ERROR_PATH|] `			return -EINVAL;`
+- L00627 [ERROR_PATH|] `			return -EINVAL;`
+- L00629 [MEM_BOUNDS|] `		if (check_add_overflow(msg_sz, resp->payload_sz, &msg_sz))`
+- L00630 [ERROR_PATH|] `			return -EINVAL;`
+- L00644 [ERROR_PATH|] `				return -EINVAL;`
+- L00645 [MEM_BOUNDS|] `			if (check_add_overflow(msg_sz, groups_sz, &msg_sz))`
+- L00646 [ERROR_PATH|] `				return -EINVAL;`
+- L00669 [LOCK|] `	down_write(&ipc_msg_table_lock);`
+- L00672 [LOCK|] `	up_write(&ipc_msg_table_lock);`
+- L00676 [LOCK|] `		down_write(&ipc_msg_table_lock);`
+- L00677 [ERROR_PATH|] `		goto out;`
+- L00680 [WAIT_LOOP|] `	ret = wait_event_interruptible_timeout(entry.wait,`
+- L00684 [LOCK|] `	down_write(&ipc_msg_table_lock);`
+- L00694 [LOCK|] `	up_write(&ipc_msg_table_lock);`
+- L00705 [ERROR_PATH|] `		return -EINVAL;`
+- L00729 [MEM_BOUNDS|] `	strscpy(req->account, account, KSMBD_REQ_MAX_ACCOUNT_NAME_SZ);`
+- L00752 [MEM_BOUNDS|] `	strscpy(req->account, account, KSMBD_REQ_MAX_ACCOUNT_NAME_SZ);`
+- L00778 [MEM_BOUNDS|] `	memcpy(req->spnego_blob, spnego_blob, blob_len);`
+- L00813 [MEM_BOUNDS|] `	strscpy(req->account, user_name(sess->user), KSMBD_REQ_MAX_ACCOUNT_NAME_SZ);`
+- L00814 [MEM_BOUNDS|] `	strscpy(req->share, share->name, KSMBD_REQ_MAX_SHARE_NAME);`
+- L00815 [MEM_BOUNDS|] `	snprintf(req->peer_addr, sizeof(req->peer_addr), "%pIS", peer_addr);`
+- L00837 [ERROR_PATH|] `		return -ENOMEM;`
+- L00856 [ERROR_PATH|] `		return -EINVAL;`
+- L00860 [ERROR_PATH|] `		return -ENOMEM;`
+- L00865 [MEM_BOUNDS|] `	strscpy(req->account, account, KSMBD_REQ_MAX_ACCOUNT_NAME_SZ);`
+- L00889 [MEM_BOUNDS|] `	strscpy(req->share_name, name, KSMBD_REQ_MAX_SHARE_NAME);`
+- L00957 [LOCK|] `	down_read(&sess->rpc_lock);`
+- L00965 [MEM_BOUNDS|] `	memcpy(req->payload, payload, payload_sz);`
+- L00985 [LOCK|] `	down_read(&sess->rpc_lock);`
+- L01016 [LOCK|] `	down_read(&sess->rpc_lock);`
+- L01024 [MEM_BOUNDS|] `	memcpy(req->payload, payload, payload_sz);`
+- L01052 [MEM_BOUNDS|] `	memcpy(req->payload, payload, payload_sz);`
+- L01088 [LOCK|] `	mutex_lock(&startup_lock);`
+- L01092 [ERROR_PATH|] `	pr_err("No IPC daemon response for %lus\n", delta / HZ);`
+- L01093 [LOCK|] `	mutex_unlock(&startup_lock);`
+- L01094 [ERROR_PATH|] `	return -EINVAL;`
+- L01123 [ERROR_PATH|] `		return -EPERM;`
+- L01126 [ERROR_PATH|] `		return -EINVAL;`
+- L01129 [ERROR_PATH|] `		return -EINVAL;`
+- L01146 [ERROR_PATH|] `		return -ENOMEM;`
+- L01149 [MEM_BOUNDS|] `	memcpy(msg->payload, &resp, sizeof(resp));`
+- L01167 [ERROR_PATH|] `		return -EPERM;`
+- L01170 [ERROR_PATH|] `		return -EINVAL;`
+- L01173 [ERROR_PATH|] `		return -EINVAL;`
+- L01185 [ERROR_PATH|] `		return -ENOMEM;`
+- L01188 [MEM_BOUNDS|] `	memcpy(msg->payload, &resp, sizeof(resp));`
+- L01214 [ERROR_PATH|] `		return -EPERM;`
+- L01217 [ERROR_PATH|] `		return -EINVAL;`
+- L01220 [ERROR_PATH|] `		return -EINVAL;`
+- L01225 [LIFETIME|] `	rcu_read_lock();`
+- L01231 [LIFETIME|] `	rcu_read_unlock();`
+- L01241 [ERROR_PATH|] `		return -ENOMEM;`
+- L01252 [LIFETIME|] `	rcu_read_lock();`
+- L01267 [MEM_BOUNDS|] `		strscpy(entry->if_name, dev->name, sizeof(entry->if_name));`
+- L01275 [MEM_BOUNDS|] `				snprintf(entry->ipv4_addr,`
+- L01287 [LIFETIME|] `	rcu_read_unlock();`
+- L01316 [ERROR_PATH|] `		return -ENOMEM;`
+- L01323 [MEM_BOUNDS|] `	strscpy(notify->resource_name, resource_name,`
+- L01362 [LOCK|] `	mutex_lock(&startup_lock);`
+- L01365 [LOCK|] `	mutex_unlock(&startup_lock);`
+- L01377 [ERROR_PATH|] `		pr_err("Failed to register KSMBD netlink interface %d\n", ret);`

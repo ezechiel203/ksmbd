@@ -1,0 +1,34 @@
+=== SMB2 Sweep: ven. 06 mars 2026 02:04:33 CET ===
+SSH=13022  SMB=13445
+Output: /tmp/sweep-20260306-020433
+
+Restarting ksmbd...
+[ksmbd.control/1575]: INFO: Terminated mountd
+[ksmbd.control/1575]: INFO: Killed ksmbd
+[ksmbd.mountd/1600]: INFO: Started manager
+  smb2.compound ... P=18 F=2 S=0 E=0
+  smb2.compound_async ... P=4 F=6 S=0 E=0
+  smb2.compound_find ... P=0 F=3 S=0 E=0
+  smb2.connect ... P=0 F=1 S=0 E=0
+  smb2.create ... [ksmbd.control/1991]: ERROR: Invalid lock entry `1601'
+[ksmbd.control/1991]: INFO: Killed ksmbd
+[ksmbd.mountd/2089]: INFO: Started manager
+P=0 F=18 S=0 E=0
+  smb2.credits ... [ksmbd.control/2377]: INFO: Terminated mountd
+[ksmbd.control/2377]: INFO: Killed ksmbd
+[ksmbd.mountd/2409]: INFO: Started manager
+P=3 F=7 S=0 E=0
+  smb2.delete-on-close-perms ... [ksmbd.control/2531]: INFO: Terminated mountd
+[ksmbd.control/2531]: INFO: Killed ksmbd
+[ksmbd.mountd/2556]: INFO: Started manager
+P=8 F=1 S=0 E=0
+  smb2.dir ... [ksmbd.control/2676]: INFO: Terminated mountd
+[ksmbd.control/2676]: INFO: Killed ksmbd
+[ksmbd.mountd/2701]: INFO: Started manager
+P=8 F=1 S=0 E=0
+  smb2.dirlease ... [ksmbd.control/2995]: INFO: Terminated mountd
+[ksmbd.control/2995]: INFO: Killed ksmbd
+[ksmbd.mountd/3022]: INFO: Started manager
+P=3 F=15 S=0 E=0
+  smb2.dosmode ... P=0 F=1 S=0 E=0
+  smb2.durable-open ... 

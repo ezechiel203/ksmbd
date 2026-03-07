@@ -1,0 +1,94 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772587132
+time: 2026-03-04 01:18:52.230912
+progress: 8
+test: complex
+time: 2026-03-04 01:18:52.231398
+Testing file info levels
+all_info for '\testsmb2_file.dat'
+	create_time:    Sun Nov 29 02:18:52 2026 CET
+	access_time:    Mon Aug 31 03:18:52 2026 CEST
+	write_time:     Tue Jun  2 03:18:52 2026 CEST
+	change_time:    Fri Apr  3 03:18:52 2026 CEST
+	attrib:         0x80
+	unknown1:       0x0
+	alloc_size:     8192
+	size:           7
+	nlink:          1
+	delete_pending: 0
+	directory:      0
+	file_id:        416085
+	ea_size:        0
+	access_mask:    0x001f01ff
+	position:       0x0
+	mode:           0x0
+	short name:     'TESTS~#A.DAT'
+	EA[0] flags=0 len=6 'EAONE'
+	EA[1] flags=0 len=8 'SECONDEA'
+	stream 0:
+		size       7
+		alloc size 4096
+		name       :streamtwo:$DATA
+	stream 1:
+		size       7
+		alloc size 8192
+		name       ::$DATA
+all_info for '\testsmb2_dir'
+	create_time:    Sun Nov 29 02:18:52 2026 CET
+	access_time:    Mon Aug 31 03:18:52 2026 CEST
+	write_time:     Tue Jun  2 03:18:52 2026 CEST
+	change_time:    Fri Apr  3 03:18:52 2026 CEST
+	attrib:         0x10
+	unknown1:       0x0
+	alloc_size:     8192
+	size:           0
+	nlink:          1
+	delete_pending: 0
+	directory:      1
+	file_id:        416100
+	ea_size:        0
+	access_mask:    0x001f01ff
+	position:       0x0
+	mode:           0x1
+	short name:     'TESTS~TG.'
+	EA[0] flags=0 len=6 'EAONE'
+	EA[1] flags=0 len=8 'SECONDEA'
+	stream 0:
+		size       7
+		alloc size 4096
+		name       :streamtwo:$DATA
+time: 2026-03-04 01:18:55.081702
+success: complex
+test: fsinfo
+time: 2026-03-04 01:18:55.081837
+Testing fsinfo levels
+time: 2026-03-04 01:18:55.511581
+success: fsinfo
+test: qfs_buffercheck
+time: 2026-03-04 01:18:55.511661
+Testing SMB2_GETINFO_FS buffer sizes
+time: 2026-03-04 01:19:02.555830
+success: qfs_buffercheck
+test: qfile_buffercheck
+time: 2026-03-04 01:19:02.555966
+Testing SMB2_GETINFO_FILE buffer sizes
+time: 2026-03-04 01:19:15.356322
+success: qfile_buffercheck
+test: qsec_buffercheck
+time: 2026-03-04 01:19:15.356416
+Testing SMB2_GETINFO_SECURITY buffer sizes
+time: 2026-03-04 01:19:15.603379
+success: qsec_buffercheck
+test: granted
+time: 2026-03-04 01:19:15.603515
+time: 2026-03-04 01:19:16.035095
+success: granted
+test: normalized
+time: 2026-03-04 01:19:16.035176
+time: 2026-03-04 01:19:18.557411
+success: normalized
+test: getinfo_access
+time: 2026-03-04 01:19:18.557514
+time: 2026-03-04 01:19:22.602561
+success: getinfo_access

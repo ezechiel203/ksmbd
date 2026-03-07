@@ -1,0 +1,36 @@
+
+=== ss ===
+LISTEN 0      64            *%ens4:445             *:*                                             
+LISTEN 0      64              *%lo:445             *:*                                             
+
+=== dmesg tail ===
+[   41.815848] ksmbd: durable reconnect v2: client GUID mismatch
+[   41.819922] ksmbd: durable reconnect v2: client GUID mismatch
+[   41.851791] ksmbd: inherit ACL overflow
+[   41.867055] ksmbd: inherit ACL overflow
+[   41.903874] ksmbd: inherit ACL overflow
+[   41.913804] ksmbd: inherit ACL overflow
+[   41.921260] ksmbd: inherit ACL overflow
+[   41.930336] ksmbd: inherit ACL overflow
+[   41.940610] ksmbd: inherit ACL overflow
+[   41.953122] ksmbd: inherit ACL overflow
+[   45.980310] ksmbd: inherit ACL overflow
+[   47.989173] ksmbd: inherit ACL overflow
+[   49.998765] ksmbd: inherit ACL overflow
+[   54.015643] ksmbd: inherit ACL overflow
+[   58.039355] ksmbd: inherit ACL overflow
+[   62.054681] ksmbd: inherit ACL overflow
+[   66.071547] ksmbd: inherit ACL overflow
+[   70.089308] ksmbd: inherit ACL overflow
+[   82.466683] ksmbd: ksmbd: witness protocol support removed
+[   82.947442] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[   82.972887] ksmbd: module uses symbol (crypto_cipher_setkey) from namespace CRYPTO_INTERNAL, but does not import it.
+[   82.975212] ksmbd: module uses symbol (crypto_cipher_encrypt_one) from namespace CRYPTO_INTERNAL, but does not import it.
+[   83.018319] ksmbd: Configuration subsystem initialized with 12 parameters
+[   83.019778] ksmbd: ksmbd: kernel provides md4, skipping built-in registration
+[   83.024495] ksmbd: ksmbd: Fruit SMB extensions loaded
+[   83.025552] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[   83.027208] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[   83.028815] ksmbd: ksmbd: witness protocol support initialised
+[   83.041957] ksmbd: smb_quic: QUIC: cannot register handshake genl family: -22
+[   83.043514] ksmbd: QUIC subsystem unavailable (-22), continuing without QUIC

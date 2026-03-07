@@ -1,0 +1,24 @@
+ksmbd module:   loaded (version 4.2.18)
+ksmbd.mountd:   running (PID 1191)
+Debug:          smb auth vfs oplock ipc conn rdma 
+[  282.922514] ksmbd: durable reconnect v2: client GUID mismatch
+[  282.925557] ksmbd: durable reconnect v2: client GUID mismatch
+[  282.958501] ksmbd: inherit ACL overflow
+[  282.967930] ksmbd: inherit ACL overflow
+[  282.992688] ksmbd: inherit ACL overflow
+[  283.000268] ksmbd: inherit ACL overflow
+[  283.007434] ksmbd: inherit ACL overflow
+[  283.015512] ksmbd: inherit ACL overflow
+[  283.023410] ksmbd: inherit ACL overflow
+[  283.034974] ksmbd: inherit ACL overflow
+[  287.051153] ksmbd: inherit ACL overflow
+[  289.062116] ksmbd: inherit ACL overflow
+[  291.072388] ksmbd: inherit ACL overflow
+[  295.087136] ksmbd: inherit ACL overflow
+[  299.105606] ksmbd: inherit ACL overflow
+[  303.128141] ksmbd: inherit ACL overflow
+[  307.157655] ksmbd: inherit ACL overflow
+[  311.186146] ksmbd: inherit ACL overflow
+[  355.032935] ksmbd: stop_sessions: giving up after 301 retries - 6 connections leaked, forcing cleanup
+[  355.240032] ksmbd: smb_quic: QUIC: cannot register handshake genl family: -22
+[  355.242187] ksmbd: QUIC subsystem unavailable (-22), continuing without QUIC

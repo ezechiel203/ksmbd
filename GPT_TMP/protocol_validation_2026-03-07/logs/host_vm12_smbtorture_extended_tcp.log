@@ -1,0 +1,316 @@
+=== smb2.scan ===
+RESULT smb2.scan: PASS
+=== smb2.connect ===
+RESULT smb2.connect: PASS
+=== smb2.tcon ===
+RESULT smb2.tcon: PASS
+=== smb2.getinfo ===
+RESULT smb2.getinfo: PASS
+=== smb2.setinfo ===
+RESULT smb2.setinfo: FAIL(rc=1)
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772878596
+time: 2026-03-07 10:16:36.842595
+test: setinfo
+time: 2026-03-07 10:16:36.844136
+all_info for '\fnum_test_96.txt'
+	create_time:    Wed Dec  2 11:16:36 2026 CET
+	access_time:    Thu Sep  3 12:16:36 2026 CEST
+	write_time:     Fri Jun  5 12:16:36 2026 CEST
+	change_time:    Mon Apr  6 12:16:36 2026 CEST
+	attrib:         0x80
+	unknown1:       0x0
+	alloc_size:     8192
+	size:           7
+	nlink:          1
+	delete_pending: 0
+	directory:      0
+	file_id:        441201
+	ea_size:        45
+	access_mask:    0x001f01ff
+	position:       0x7
+	mode:           0x0
+	short name:     'FNUM_T~2.TXT'
+	EA[0] flags=0 len=6 'EAONE'
+=== smb2.read ===
+RESULT smb2.read: PASS
+=== smb2.rw ===
+RESULT smb2.rw: FAIL(rc=1)
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772878597
+time: 2026-03-07 10:16:37.322332
+progress: 4
+test: rw1
+time: 2026-03-07 10:16:37.323999
+Checking data integrity over 10 ops
+0time: 2026-03-07 10:16:37.400943
+success: rw1
+test: rw2
+time: 2026-03-07 10:16:37.401104
+Checking data integrity over 10 ops
+0time: 2026-03-07 10:16:37.434064
+success: rw2
+test: invalid
+time: 2026-03-07 10:16:37.434213
+time: 2026-03-07 10:16:37.452433
+success: invalid
+test: append
+time: 2026-03-07 10:16:37.452470
+Create file with 1 byte
+time: 2026-03-07 10:16:37.454975
+failure: append [
+../../source4/torture/smb2/read_write.c:367: status was NT_STATUS_DELETE_PENDING, expected NT_STATUS_OK: Incorrect status
+=== smb2.rename ===
+RESULT smb2.rename: PASS
+=== smb2.create ===
+RESULT smb2.create: FAIL(rc=1)
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772878606
+time: 2026-03-07 10:16:46.470079
+progress: 18
+test: gentest
+time: 2026-03-07 10:16:46.470622
+time: 2026-03-07 10:16:46.561628
+failure: gentest [
+(../../source4/torture/smb2/create.c:253) Incorrect value for access_mask 0x0de0fe00 - should be 0x0df0fe00
+]
+test: blob
+time: 2026-03-07 10:16:46.561669
+Testing alloc size
+Testing durable open
+Testing query maximal access
+Testing timewarp
+Testing query_on_disk
+Testing unknown tag
+Testing bad tag length 0
+Testing bad tag length 1
+Testing bad tag length 2
+Testing bad tag length 3
+Testing tag length 4
+Testing tag length 5
+=== smb2.dir ===
+RESULT smb2.dir: FAIL(rc=1)
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772878617
+time: 2026-03-07 10:16:57.036282
+progress: 9
+test: find
+time: 2026-03-07 10:16:57.037003
+time: 2026-03-07 10:16:57.344150
+success: find
+test: fixed
+time: 2026-03-07 10:16:57.344198
+time: 2026-03-07 10:16:57.503788
+success: fixed
+test: one
+time: 2026-03-07 10:16:57.503835
+Testing SMB2_FIND_DIRECTORY_INFO 1
+Testing SMB2_FIND_FULL_DIRECTORY_INFO 2
+Testing SMB2_FIND_NAME_INFO 12
+Testing SMB2_FIND_BOTH_DIRECTORY_INFO 3
+Testing SMB2_FIND_ID_FULL_DIRECTORY_INFO 38
+Testing SMB2_FIND_ID_BOTH_DIRECTORY_INFO 37
+time: 2026-03-07 10:16:57.524637
+success: one
+test: many
+time: 2026-03-07 10:16:57.524680
+=== smb2.mkdir ===
+RESULT smb2.mkdir: FAIL(rc=1)
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772878630
+time: 2026-03-07 10:17:10.291576
+test: mkdir
+time: 2026-03-07 10:17:10.293297
+Testing mkdir collision
+Testing mkdir collision with file
+Testing rmdir with file
+Testing invalid dir
+time: 2026-03-07 10:17:10.324558
+failure: mkdir [
+../../source4/torture/smb2/mkdir.c:92: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OBJECT_PATH_SYNTAX_BAD: Incorrect status
+]
+=== smb2.dosmode ===
+RESULT smb2.dosmode: FAIL(rc=1)
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772878630
+time: 2026-03-07 10:17:10.494247
+test: dosmode
+time: 2026-03-07 10:17:10.495908
+Checking dosmode with "hide files" and "hide dot files"
+time: 2026-03-07 10:17:10.505852
+failure: dosmode [
+../../source4/torture/smb2/dosmode.c:121: finfo2.all_info2.out.attrib & FILE_ATTRIBUTE_HIDDEN was 0 (0x0), expected 2 (0x2): FILE_ATTRIBUTE_HIDDEN is not set
+]
+=== smb2.timestamps ===
+RESULT smb2.timestamps: FAIL(rc=1)
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772878630
+time: 2026-03-07 10:17:10.681608
+progress: 17
+test: test_close_not_attrib
+time: 2026-03-07 10:17:10.683164
+time: 2026-03-07 10:17:10.691826
+success: test_close_not_attrib
+test: time_t_15032385535
+time: 2026-03-07 10:17:10.691863
+Got: create: Fri May 11 00:38:55 2446 CEST, write: Fri May 11 00:38:55 2446 CEST, change: Sat Mar  7 11:17:10 2026 CET
+Got: create: Fri May 11 00:38:55 2446 CEST, write: Fri May 11 00:38:55 2446 CEST, change: Sat Mar  7 11:17:10 2026 CET
+time: 2026-03-07 10:17:10.699043
+success: time_t_15032385535
+test: time_t_10000000000
+time: 2026-03-07 10:17:10.699081
+Got: create: Sat Nov 20 18:46:40 2286 CET, write: Sat Nov 20 18:46:40 2286 CET, change: Sat Mar  7 11:17:10 2026 CET
+Got: create: Sat Nov 20 18:46:40 2286 CET, write: Sat Nov 20 18:46:40 2286 CET, change: Sat Mar  7 11:17:10 2026 CET
+time: 2026-03-07 10:17:10.706334
+success: time_t_10000000000
+test: time_t_4294967295
+time: 2026-03-07 10:17:10.706373
+Got: create: Sun Feb  7 07:28:15 2106 CET, write: Sun Feb  7 07:28:15 2106 CET, change: Sat Mar  7 11:17:10 2026 CET
+Got: create: Sun Feb  7 07:28:15 2106 CET, write: Sun Feb  7 07:28:15 2106 CET, change: Sat Mar  7 11:17:10 2026 CET
+=== smb2.ea ===
+RESULT smb2.ea: FAIL(rc=1)
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772878647
+time: 2026-03-07 10:17:27.761114
+progress: 1
+test: acl_xattr
+time: 2026-03-07 10:17:27.762786
+Verify NTACL xattr can't be accessed
+time: 2026-03-07 10:17:27.772714
+failure: acl_xattr [
+../../source4/torture/smb2/ea.c:65: xattr_name was NULL, expected != NULL: Missing acl_xattr_name option
+]
+=== smb2.winattr ===
+RESULT smb2.winattr: PASS
+=== smb2.streams ===
+RESULT smb2.streams: FAIL(rc=1)
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772878648
+time: 2026-03-07 10:17:28.328350
+progress: 14
+test: dir
+time: 2026-03-07 10:17:28.329608
+teststreams\stream.txt:Stream One
+(../../source4/torture/smb2/streams.c:214) opening non-existent directory stream
+(../../source4/torture/smb2/streams.c:229) opening basedir  stream
+(../../source4/torture/smb2/streams.c:245) opening basedir ::$DATA stream
+(../../source4/torture/smb2/streams.c:261) list the streams on the basedir
+time: 2026-03-07 10:17:28.338893
+success: dir
+test: io
+time: 2026-03-07 10:17:28.338936
+time: 2026-03-07 10:17:28.342917
+failure: io [
+../../source4/torture/smb2/streams.c:298: status was NT_STATUS_DELETE_PENDING, expected NT_STATUS_OK: CHECK_STATUS
+]
+test: sharemodes
+time: 2026-03-07 10:17:28.342955
+(../../source4/torture/smb2/streams.c:570) Testing stream share mode conflicts
+time: 2026-03-07 10:17:28.350499
+success: sharemodes
+=== smb2.lock ===
+RESULT smb2.lock: PASS
+=== smb2.sharemode ===
+RESULT smb2.sharemode: PASS
+=== smb2.deny ===
+RESULT smb2.deny: PASS
+=== smb2.delete-on-close-perms ===
+RESULT smb2.delete-on-close-perms: FAIL(rc=1)
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772878651
+time: 2026-03-07 10:17:31.991061
+progress: 9
+test: OVERWRITE_IF
+time: 2026-03-07 10:17:31.992573
+Opening Directory for setting new SD: test_dir
+get the original sd
+Setting permissions on dir to 0x1f01ff
+Creating Directory for testing: test_dir
+get the original sd
+Setting permissions on dir to 0x1e01bf
+Create file with DeleteOnClose on non-existent file (OVERWRITE_IF)
+We expect NT_STATUS_OK
+Testing if the file was deleted when closed
+We expect NT_STATUS_OBJECT_NAME_NOT_FOUND
+time: 2026-03-07 10:17:32.111199
+success: OVERWRITE_IF
+test: OVERWRITE_IF Existing
+time: 2026-03-07 10:17:32.111234
+Opening Directory for setting new SD: test_dir
+get the original sd
+Setting permissions on dir to 0x1f01ff
+Creating Directory for testing: test_dir
+=== smb2.openattr ===
+RESULT smb2.openattr: FAIL(rc=1)
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772878653
+time: 2026-03-07 10:17:33.241532
+test: openattr
+time: 2026-03-07 10:17:33.243063
+time: 2026-03-07 10:17:33.275139
+failure: openattr [
+../../source4/torture/smb2/attr.c:212: [2] getatr check failed. [0x80] trunc [0x1] got attr 0x20, should be 0x21
+]
+=== smb2.maximum_allowed ===
+RESULT smb2.maximum_allowed: FAIL(rc=1)
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772878653
+time: 2026-03-07 10:17:33.457140
+progress: 2
+test: maximum_allowed
+time: 2026-03-07 10:17:33.458147
+Checked SEC_PRIV_RESTORE for S-1-5-21-832487465-288393751-518940937-65535 - No
+Checked SEC_PRIV_BACKUP for S-1-5-21-832487465-288393751-518940937-65535 - No
+Checked SEC_PRIV_SECURITY for S-1-5-21-832487465-288393751-518940937-65535 - No
+WARNING!: ../../source4/torture/smb2/max_allowed.c:175: status was NT_STATUS_OK, expected NT_STATUS_ACCESS_DENIED: Incorrect status NT_STATUS_OK - should be NT_STATUS_ACCESS_DENIED
+
+time: 2026-03-07 10:17:33.469495
+failure: maximum_allowed [
+../../source4/torture/smb2/max_allowed.c:197: status was NT_STATUS_SHARING_VIOLATION, expected NT_STATUS_OK: Incorrect status NT_STATUS_SHARING_VIOLATION - should be NT_STATUS_OK
+]
+test: read_only
+time: 2026-03-07 10:17:33.469531
+time: 2026-03-07 10:17:33.493510
+success: read_only
+=== smb2.ioctl ===
+RESULT smb2.ioctl: FAIL(rc=1)
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772878653
+time: 2026-03-07 10:17:33.677082
+progress: 74
+test: shadow_copy
+time: 2026-03-07 10:17:33.678201
+time: 2026-03-07 10:17:33.687726
+success: shadow_copy
+test: req_resume_key
+time: 2026-03-07 10:17:33.687766
+time: 2026-03-07 10:17:33.691012
+success: req_resume_key
+test: req_two_resume_keys
+time: 2026-03-07 10:17:33.691051
+time: 2026-03-07 10:17:33.693451
+failure: req_two_resume_keys [
+../../source4/torture/smb2/ioctl.c:138: status was NT_STATUS_DELETE_PENDING, expected NT_STATUS_OK: create write
+]
+test: copy_chunk_simple
+time: 2026-03-07 10:17:33.693485
+time: 2026-03-07 10:17:33.708033
+success: copy_chunk_simple
+test: copy_chunk_multi
+time: 2026-03-07 10:17:33.708073
+=== smb2.notify ===
+RESULT smb2.notify: SKIP(timeout 180s)
+=== smb2.compound ===

@@ -1,0 +1,398 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772529428
+time: 2026-03-03 09:17:08.501951
+progress: 74
+test: shadow_copy
+time: 2026-03-03 09:17:08.502691
+time: 2026-03-03 09:17:08.512262
+success: shadow_copy
+test: req_resume_key
+time: 2026-03-03 09:17:08.512314
+time: 2026-03-03 09:17:08.520652
+success: req_resume_key
+test: req_two_resume_keys
+time: 2026-03-03 09:17:08.520697
+time: 2026-03-03 09:17:08.529004
+success: req_two_resume_keys
+test: copy_chunk_simple
+time: 2026-03-03 09:17:08.529063
+time: 2026-03-03 09:17:08.535587
+success: copy_chunk_simple
+test: copy_chunk_multi
+time: 2026-03-03 09:17:08.535641
+time: 2026-03-03 09:17:08.541714
+success: copy_chunk_multi
+test: copy_chunk_tiny
+time: 2026-03-03 09:17:08.541872
+time: 2026-03-03 09:17:08.548256
+success: copy_chunk_tiny
+test: copy_chunk_overwrite
+time: 2026-03-03 09:17:08.548315
+time: 2026-03-03 09:17:08.555300
+success: copy_chunk_overwrite
+test: copy_chunk_append
+time: 2026-03-03 09:17:08.555357
+time: 2026-03-03 09:17:08.562233
+success: copy_chunk_append
+test: copy_chunk_limits
+time: 2026-03-03 09:17:08.562288
+limit max chunks, got 256
+limit max chunk len, got 1048576
+limit max total bytes, got 16777216
+time: 2026-03-03 09:17:08.568233
+success: copy_chunk_limits
+test: copy_chunk_src_lock
+time: 2026-03-03 09:17:08.568280
+time: 2026-03-03 09:17:08.577216
+success: copy_chunk_src_lock
+test: copy_chunk_dest_lock
+time: 2026-03-03 09:17:08.577270
+time: 2026-03-03 09:17:08.586002
+success: copy_chunk_dest_lock
+test: copy_chunk_bad_key
+time: 2026-03-03 09:17:08.586053
+time: 2026-03-03 09:17:08.591398
+success: copy_chunk_bad_key
+test: copy_chunk_bug15644
+time: 2026-03-03 09:17:08.591454
+time: 2026-03-03 09:17:08.595702
+success: copy_chunk_bug15644
+test: copy_chunk_src_is_dest
+time: 2026-03-03 09:17:08.595760
+time: 2026-03-03 09:17:08.602065
+success: copy_chunk_src_is_dest
+test: copy_chunk_src_is_dest_overlap
+time: 2026-03-03 09:17:08.602130
+time: 2026-03-03 09:17:08.608759
+success: copy_chunk_src_is_dest_overlap
+test: copy_chunk_bad_access
+time: 2026-03-03 09:17:08.608815
+time: 2026-03-03 09:17:08.627445
+success: copy_chunk_bad_access
+test: copy_chunk_write_access
+time: 2026-03-03 09:17:08.627500
+time: 2026-03-03 09:17:08.632803
+success: copy_chunk_write_access
+test: copy_chunk_src_exceed
+time: 2026-03-03 09:17:08.632858
+time: 2026-03-03 09:17:08.639996
+success: copy_chunk_src_exceed
+test: copy_chunk_src_exceed_multi
+time: 2026-03-03 09:17:08.640051
+time: 2026-03-03 09:17:08.646527
+success: copy_chunk_src_exceed_multi
+test: copy_chunk_sparse_dest
+time: 2026-03-03 09:17:08.646582
+time: 2026-03-03 09:17:08.652831
+success: copy_chunk_sparse_dest
+test: copy_chunk_max_output_sz
+time: 2026-03-03 09:17:08.652915
+time: 2026-03-03 09:17:08.658830
+success: copy_chunk_max_output_sz
+test: copy_chunk_zero_length
+time: 2026-03-03 09:17:08.658915
+time: 2026-03-03 09:17:08.664162
+success: copy_chunk_zero_length
+test: copy-chunk streams
+time: 2026-03-03 09:17:08.664218
+WARNING!: ../../source4/torture/smb2/ioctl.c:325: status was NT_STATUS_OBJECT_NAME_NOT_FOUND, expected NT_STATUS_OK: file create
+WARNING!: ../../source4/torture/smb2/ioctl.c:354: Expression `ok' failed: file create
+WARNING!: ../../source4/torture/smb2/ioctl.c:398: Expression `ok' failed: src file create fill
+WARNING!: ../../source4/torture/smb2/ioctl.c:1929: Expression `ok == (1)' failed: setup copy chunk error
+
+time: 2026-03-03 09:17:08.670186
+failure: copy-chunk streams [
+../../source4/torture/smb2/ioctl.c:2041: Expression `ok == (1)' failed: copy_one_stream failed
+]
+test: copy_chunk_across_shares
+time: 2026-03-03 09:17:08.670240
+time: 2026-03-03 09:17:08.677784
+success: copy_chunk_across_shares
+test: copy_chunk_across_shares2
+time: 2026-03-03 09:17:08.677864
+time: 2026-03-03 09:17:08.684386
+success: copy_chunk_across_shares2
+test: copy_chunk_across_shares3
+time: 2026-03-03 09:17:08.684474
+time: 2026-03-03 09:17:08.691924
+success: copy_chunk_across_shares3
+test: compress_file_flag
+time: 2026-03-03 09:17:08.692009
+time: 2026-03-03 09:17:08.695604
+skip: compress_file_flag [
+../../source4/torture/smb2/ioctl.c:2406: FS compression not supported
+]
+test: compress_dir_inherit
+time: 2026-03-03 09:17:08.695678
+time: 2026-03-03 09:17:08.702195
+skip: compress_dir_inherit [
+../../source4/torture/smb2/ioctl.c:2455: FS compression not supported
+]
+test: compress_invalid_format
+time: 2026-03-03 09:17:08.702260
+time: 2026-03-03 09:17:08.706219
+skip: compress_invalid_format [
+../../source4/torture/smb2/ioctl.c:2539: FS compression not supported
+]
+test: compress_invalid_buf
+time: 2026-03-03 09:17:08.706279
+time: 2026-03-03 09:17:08.711076
+skip: compress_invalid_buf [
+../../source4/torture/smb2/ioctl.c:2579: FS compression not supported
+]
+test: compress_query_file_attr
+time: 2026-03-03 09:17:08.711154
+time: 2026-03-03 09:17:08.715022
+skip: compress_query_file_attr [
+../../source4/torture/smb2/ioctl.c:2621: FS compression not supported
+]
+test: compress_create_with_attr
+time: 2026-03-03 09:17:08.715074
+time: 2026-03-03 09:17:08.718623
+skip: compress_create_with_attr [
+../../source4/torture/smb2/ioctl.c:2677: FS compression not supported
+]
+test: compress_inherit_disable
+time: 2026-03-03 09:17:08.718676
+time: 2026-03-03 09:17:08.723887
+skip: compress_inherit_disable [
+../../source4/torture/smb2/ioctl.c:2727: FS compression not supported
+]
+test: compress_set_file_attr
+time: 2026-03-03 09:17:08.723955
+time: 2026-03-03 09:17:08.728283
+skip: compress_set_file_attr [
+../../source4/torture/smb2/ioctl.c:2839: FS compression not supported
+]
+test: compress_perms
+time: 2026-03-03 09:17:08.728365
+time: 2026-03-03 09:17:08.732634
+skip: compress_perms [
+../../source4/torture/smb2/ioctl.c:2935: FS compression not supported
+]
+test: compress_notsup_get
+time: 2026-03-03 09:17:08.732695
+time: 2026-03-03 09:17:08.737379
+success: compress_notsup_get
+test: compress_notsup_set
+time: 2026-03-03 09:17:08.737435
+time: 2026-03-03 09:17:08.741549
+failure: compress_notsup_set [
+../../source4/torture/smb2/ioctl.c:3105: status was NT_STATUS_INVALID_PARAMETER, expected NT_STATUS_NOT_SUPPORTED: FSCTL_SET_COMPRESSION default
+]
+test: network_interface_info
+time: 2026-03-03 09:17:08.741611
+time: 2026-03-03 09:17:08.744797
+skip: network_interface_info [
+../../source4/torture/smb2/ioctl.c:3139: server doesn't support SMB2_CAP_MULTI_CHANNEL
+]
+test: sparse_file_flag
+time: 2026-03-03 09:17:08.744857
+time: 2026-03-03 09:17:08.749960
+success: sparse_file_flag
+test: sparse_file_attr
+time: 2026-03-03 09:17:08.750018
+time: 2026-03-03 09:17:08.754223
+success: sparse_file_attr
+test: sparse_dir_flag
+time: 2026-03-03 09:17:08.754276
+time: 2026-03-03 09:17:08.758551
+failure: sparse_dir_flag [
+../../source4/torture/smb2/ioctl.c:3398: status was NT_STATUS_OK, expected NT_STATUS_INVALID_PARAMETER: dir FSCTL_SET_SPARSE status
+]
+test: sparse_set_nobuf
+time: 2026-03-03 09:17:08.758615
+time: 2026-03-03 09:17:08.764384
+success: sparse_set_nobuf
+test: sparse_set_oversize
+time: 2026-03-03 09:17:08.764441
+time: 2026-03-03 09:17:08.769407
+success: sparse_set_oversize
+test: sparse_qar
+time: 2026-03-03 09:17:08.769462
+FS deallocated 4K chunk
+time: 2026-03-03 09:17:08.781179
+success: sparse_qar
+test: sparse_qar_malformed
+time: 2026-03-03 09:17:08.781233
+time: 2026-03-03 09:17:08.785044
+failure: sparse_qar_malformed [
+../../source4/torture/smb2/ioctl.c:3807: status was NT_STATUS_BUFFER_TOO_SMALL, expected NT_STATUS_OK: FSCTL_QUERY_ALLOCATED_RANGES
+]
+test: sparse_qar_truncated
+time: 2026-03-03 09:17:08.785148
+time: 2026-03-03 09:17:08.789555
+failure: sparse_qar_truncated [
+../../source4/torture/smb2/ioctl.c:3903: status was NT_STATUS_OK, expected STATUS_BUFFER_OVERFLOW: qar truncated
+]
+test: sparse_punch
+time: 2026-03-03 09:17:08.789619
+time: 2026-03-03 09:17:08.795171
+failure: sparse_punch [
+../../source4/torture/smb2/ioctl.c:4224: far_count was 0 (0x0), expected 1 (0x1): unexpected response len
+]
+test: sparse_hole_dealloc
+time: 2026-03-03 09:17:08.795231
+hole punch 4096@0 resulted in deallocation of 4096@0
+holes not merged for deallocation
+unwritten range not allocated
+time: 2026-03-03 09:17:08.906253
+failure: sparse_hole_dealloc [
+../../source4/torture/smb2/ioctl.c:4568: far_rsp[0].file_off was 4096 (0x1000), expected 0 (0x0): unexpected deallocation
+]
+test: sparse_compressed
+time: 2026-03-03 09:17:08.906324
+time: 2026-03-03 09:17:08.910656
+skip: sparse_compressed [
+../../source4/torture/smb2/ioctl.c:4610: FS compression not supported
+]
+test: sparse_copy_chunk
+time: 2026-03-03 09:17:08.910719
+FS doesn't deallocate file on full-range punch
+time: 2026-03-03 09:17:08.929624
+success: sparse_copy_chunk
+test: sparse_punch_invalid
+time: 2026-03-03 09:17:08.929680
+time: 2026-03-03 09:17:08.937997
+success: sparse_punch_invalid
+test: sparse_perms
+time: 2026-03-03 09:17:08.938056
+time: 2026-03-03 09:17:08.950748
+failure: sparse_perms [
+../../source4/torture/smb2/ioctl.c:5116: status was NT_STATUS_OK, expected NT_STATUS_ACCESS_DENIED: FSCTL_SET_SPARSE permission
+]
+test: sparse_lock
+time: 2026-03-03 09:17:08.950823
+time: 2026-03-03 09:17:08.956270
+failure: sparse_lock [
+../../source4/torture/smb2/ioctl.c:5294: status was NT_STATUS_OK, expected NT_STATUS_FILE_LOCK_CONFLICT: zero_data locked
+]
+test: sparse_qar_ob1
+time: 2026-03-03 09:17:08.956332
+time: 2026-03-03 09:17:08.966024
+success: sparse_qar_ob1
+test: sparse_qar_multi
+time: 2026-03-03 09:17:08.966082
+time: 2026-03-03 09:17:08.990112
+success: sparse_qar_multi
+test: sparse_qar_overflow
+time: 2026-03-03 09:17:08.990168
+time: 2026-03-03 09:17:08.994060
+success: sparse_qar_overflow
+test: trim_simple
+time: 2026-03-03 09:17:08.994123
+sector size info: lb/s=4096, pb/sA=4096, pb/sP=4096, fse/sA=4096, flags=0x3, bosa=0, bopa=0
+time: 2026-03-03 09:17:09.000724
+skip: trim_simple [
+../../source4/torture/smb2/ioctl.c:5734: trim not supported
+]
+test: dup_extents_simple
+time: 2026-03-03 09:17:09.000804
+time: 2026-03-03 09:17:09.006524
+failure: dup_extents_simple [
+../../source4/torture/smb2/ioctl.c:5858: status was NT_STATUS_NOT_SUPPORTED, expected NT_STATUS_OK: FSCTL_DUP_EXTENTS_TO_FILE
+]
+test: dup_extents_len_beyond_dest
+time: 2026-03-03 09:17:09.006592
+time: 2026-03-03 09:17:09.014153
+failure: dup_extents_len_beyond_dest [
+../../source4/torture/smb2/ioctl.c:5993: status was NT_STATUS_NOT_SUPPORTED, expected NT_STATUS_OK: FSCTL_DUP_EXTENTS_TO_FILE
+]
+test: dup_extents_len_beyond_src
+time: 2026-03-03 09:17:09.014221
+time: 2026-03-03 09:17:09.021264
+success: dup_extents_len_beyond_src
+test: dup_extents_len_zero
+time: 2026-03-03 09:17:09.021320
+time: 2026-03-03 09:17:09.029172
+failure: dup_extents_len_zero [
+../../source4/torture/smb2/ioctl.c:6140: status was NT_STATUS_NOT_SUPPORTED, expected NT_STATUS_OK: FSCTL_DUP_EXTENTS_TO_FILE
+]
+test: dup_extents_sparse_src
+time: 2026-03-03 09:17:09.029242
+time: 2026-03-03 09:17:09.041093
+success: dup_extents_sparse_src
+test: dup_extents_sparse_dest
+time: 2026-03-03 09:17:09.041152
+time: 2026-03-03 09:17:09.047242
+failure: dup_extents_sparse_dest [
+../../source4/torture/smb2/ioctl.c:6307: status was NT_STATUS_NOT_SUPPORTED, expected NT_STATUS_OK: FSCTL_DUP_EXTENTS_TO_FILE
+]
+test: dup_extents_sparse_both
+time: 2026-03-03 09:17:09.047311
+time: 2026-03-03 09:17:09.053729
+failure: dup_extents_sparse_both [
+../../source4/torture/smb2/ioctl.c:6380: status was NT_STATUS_NOT_SUPPORTED, expected NT_STATUS_OK: FSCTL_DUP_EXTENTS_TO_FILE
+]
+test: dup_extents_src_is_dest
+time: 2026-03-03 09:17:09.053863
+time: 2026-03-03 09:17:09.060118
+failure: dup_extents_src_is_dest [
+../../source4/torture/smb2/ioctl.c:6450: status was NT_STATUS_NOT_SUPPORTED, expected NT_STATUS_OK: FSCTL_DUP_EXTENTS_TO_FILE
+]
+test: dup_extents_src_is_dest_overlap
+time: 2026-03-03 09:17:09.060190
+time: 2026-03-03 09:17:09.068509
+success: dup_extents_src_is_dest_overlap
+test: dup_extents_compressed_src
+time: 2026-03-03 09:17:09.068563
+time: 2026-03-03 09:17:09.072963
+skip: dup_extents_compressed_src [
+../../source4/torture/smb2/ioctl.c:6588: block refcounting and compressed files not supported
+]
+test: dup_extents_compressed_dest
+time: 2026-03-03 09:17:09.073021
+time: 2026-03-03 09:17:09.077448
+skip: dup_extents_compressed_dest [
+../../source4/torture/smb2/ioctl.c:6666: block refcounting and compressed files not supported
+]
+test: dup_extents_bad_handle
+time: 2026-03-03 09:17:09.077509
+time: 2026-03-03 09:17:09.086315
+failure: dup_extents_bad_handle [
+../../source4/torture/smb2/ioctl.c:6764: status was NT_STATUS_OBJECT_NAME_NOT_FOUND, expected NT_STATUS_FILE_CLOSED: FSCTL_DUP_EXTENTS_TO_FILE
+]
+test: dup_extents_src_lock
+time: 2026-03-03 09:17:09.086394
+time: 2026-03-03 09:17:09.096632
+failure: dup_extents_src_lock [
+../../source4/torture/smb2/ioctl.c:6882: status was NT_STATUS_NOT_SUPPORTED, expected NT_STATUS_OK: FSCTL_DUP_EXTENTS_TO_FILE
+]
+test: dup_extents_dest_lock
+time: 2026-03-03 09:17:09.096689
+time: 2026-03-03 09:17:09.107376
+failure: dup_extents_dest_lock [
+../../source4/torture/smb2/ioctl.c:6993: status was NT_STATUS_NOT_SUPPORTED, expected NT_STATUS_OK: FSCTL_DUP_EXTENTS_TO_FILE
+]
+test: bug14607
+time: 2026-03-03 09:17:09.107447
+FSCTL_SMBTORTURE_IOCTL_RESPONSE_BODY_PADDING8: NT_STATUS_INVALID_DEVICE_REQUEST
+time: 2026-03-03 09:17:09.110503
+skip: bug14607 [
+../../source4/torture/smb2/ioctl.c:7060: server doesn't support FSCTL_SMBTORTURE_IOCTL_RESPONSE_BODY_PADDING8
+]
+test: bug14769
+time: 2026-03-03 09:17:09.110549
+time: 2026-03-03 09:17:09.116238
+failure: bug14769 [
+../../source4/torture/smb2/ioctl.c:7131: status was NT_STATUS_INVALID_DEVICE_REQUEST, expected NT_STATUS_OK: smb2_ioctl_recv failed
+]
+progress: push
+progress: 2
+test: bug14788.VALIDATE_NEGOTIATE
+time: 2026-03-03 09:17:09.116312
+Bad SMB2 (sign_algo_id=1) signature for message
+[0000] 20 48 0D 89 C5 FA D4 65   01 06 70 83 58 86 65 D4    H.....e ..p.X.e.
+[0000] E6 80 A8 FA C7 A7 96 F2   84 90 12 1F 20 02 50 0E   ........ .... .P.
+time: 2026-03-03 09:17:09.122674
+failure: bug14788.VALIDATE_NEGOTIATE [
+../../source4/torture/smb2/ioctl.c:7233: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: smb2cli_tcon(\\127.0.0.1\noperm)
+]
+test: bug14788.NETWORK_INTERFACE
+time: 2026-03-03 09:17:09.122728
+time: 2026-03-03 09:17:09.128445
+failure: bug14788.NETWORK_INTERFACE [
+../../source4/torture/smb2/ioctl.c:7323: status was NT_STATUS_INVALID_DEVICE_REQUEST, expected NT_STATUS_OK: FSCTL_QUERY_NETWORK_INTERFACE_INFO
+]
+progress: pop

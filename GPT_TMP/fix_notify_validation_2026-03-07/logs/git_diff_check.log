@@ -1,0 +1,2488 @@
+vm/qemu-serial-VM3.log:19: trailing whitespace.
++[    0.000001] kvm-clock: using sched offset of 728154175 cycles
+vm/qemu-serial-VM3.log:20: trailing whitespace.
++[    0.000004] clocksource: kvm-clock: mask: 0xffffffffffffffff max_cycles: 0x1cd42e4dffb, max_idle_ns: 881590591483 ns
+vm/qemu-serial-VM3.log:21: trailing whitespace.
++[    0.000008] tsc: Detected 3600.000 MHz processor
+vm/qemu-serial-VM3.log:22: trailing whitespace.
++[    0.001484] last_pfn = 0x7ffdd max_arch_pfn = 0x400000000
+vm/qemu-serial-VM3.log:23: trailing whitespace.
++[    0.001520] MTRR map: 4 entries (3 fixed + 1 variable; max 19), built from 8 variable MTRRs
+vm/qemu-serial-VM3.log:24: trailing whitespace.
++[    0.001523] x86/PAT: Configuration [0-7]: WB  WC  UC- UC  WB  WP  UC- WT  
+vm/qemu-serial-VM3.log:25: trailing whitespace.
++[    0.011247] found SMP MP-table at [mem 0x000f66b0-0x000f66bf]
+vm/qemu-serial-VM3.log:26: trailing whitespace.
++[    0.011281] Using GB pages for direct mapping
+vm/qemu-serial-VM3.log:27: trailing whitespace.
++[    0.011488] RAMDISK: [mem 0x7f508000-0x7ffcffff]
+vm/qemu-serial-VM3.log:28: trailing whitespace.
++[    0.011571] ACPI: Early table checksum verification disabled
+vm/qemu-serial-VM3.log:29: trailing whitespace.
++[    0.011575] ACPI: RSDP 0x00000000000F64E0 000014 (v00 BOCHS )
+vm/qemu-serial-VM3.log:30: trailing whitespace.
++[    0.011582] ACPI: RSDT 0x000000007FFE239C 000034 (v01 BOCHS  BXPC     00000001 BXPC 00000001)
+vm/qemu-serial-VM3.log:31: trailing whitespace.
++[    0.011589] ACPI: FACP 0x000000007FFE2248 000074 (v01 BOCHS  BXPC     00000001 BXPC 00000001)
+vm/qemu-serial-VM3.log:32: trailing whitespace.
++[    0.011599] ACPI: DSDT 0x000000007FFE0040 002208 (v01 BOCHS  BXPC     00000001 BXPC 00000001)
+vm/qemu-serial-VM3.log:33: trailing whitespace.
++[    0.011605] ACPI: FACS 0x000000007FFE0000 000040
+vm/qemu-serial-VM3.log:34: trailing whitespace.
++[    0.011609] ACPI: APIC 0x000000007FFE22BC 000080 (v03 BOCHS  BXPC     00000001 BXPC 00000001)
+vm/qemu-serial-VM3.log:35: trailing whitespace.
++[    0.011615] ACPI: HPET 0x000000007FFE233C 000038 (v01 BOCHS  BXPC     00000001 BXPC 00000001)
+vm/qemu-serial-VM3.log:36: trailing whitespace.
++[    0.011620] ACPI: WAET 0x000000007FFE2374 000028 (v01 BOCHS  BXPC     00000001 BXPC 00000001)
+vm/qemu-serial-VM3.log:37: trailing whitespace.
++[    0.011623] ACPI: Reserving FACP table memory at [mem 0x7ffe2248-0x7ffe22bb]
+vm/qemu-serial-VM3.log:38: trailing whitespace.
++[    0.011625] ACPI: Reserving DSDT table memory at [mem 0x7ffe0040-0x7ffe2247]
+vm/qemu-serial-VM3.log:39: trailing whitespace.
++[    0.011626] ACPI: Reserving FACS table memory at [mem 0x7ffe0000-0x7ffe003f]
+vm/qemu-serial-VM3.log:40: trailing whitespace.
++[    0.011627] ACPI: Reserving APIC table memory at [mem 0x7ffe22bc-0x7ffe233b]
+vm/qemu-serial-VM3.log:41: trailing whitespace.
++[    0.011628] ACPI: Reserving HPET table memory at [mem 0x7ffe233c-0x7ffe2373]
+vm/qemu-serial-VM3.log:42: trailing whitespace.
++[    0.011629] ACPI: Reserving WAET table memory at [mem 0x7ffe2374-0x7ffe239b]
+vm/qemu-serial-VM3.log:43: trailing whitespace.
++[    0.012122] No NUMA configuration found
+vm/qemu-serial-VM3.log:44: trailing whitespace.
++[    0.012124] Faking a node at [mem 0x0000000000000000-0x000000007ffdcfff]
+vm/qemu-serial-VM3.log:45: trailing whitespace.
++[    0.012133] NODE_DATA(0) allocated [mem 0x7f4dd280-0x7f507fff]
+vm/qemu-serial-VM3.log:46: trailing whitespace.
++[    0.012614] Zone ranges:
+vm/qemu-serial-VM3.log:47: trailing whitespace.
++[    0.012616]   DMA      [mem 0x0000000000001000-0x0000000000ffffff]
+vm/qemu-serial-VM3.log:48: trailing whitespace.
++[    0.012618]   DMA32    [mem 0x0000000001000000-0x000000007ffdcfff]
+vm/qemu-serial-VM3.log:49: trailing whitespace.
++[    0.012621]   Normal   empty
+vm/qemu-serial-VM3.log:50: trailing whitespace.
++[    0.012622]   Device   empty
+vm/qemu-serial-VM3.log:51: trailing whitespace.
++[    0.012623] Movable zone start for each node
+vm/qemu-serial-VM3.log:52: trailing whitespace.
++[    0.012627] Early memory node ranges
+vm/qemu-serial-VM3.log:53: trailing whitespace.
++[    0.012627]   node   0: [mem 0x0000000000001000-0x000000000009efff]
+vm/qemu-serial-VM3.log:54: trailing whitespace.
++[    0.012629]   node   0: [mem 0x0000000000100000-0x000000007ffdcfff]
+vm/qemu-serial-VM3.log:55: trailing whitespace.
++[    0.012631] Initmem setup node 0 [mem 0x0000000000001000-0x000000007ffdcfff]
+vm/qemu-serial-VM3.log:56: trailing whitespace.
++[    0.012647] On node 0, zone DMA: 1 pages in unavailable ranges
+vm/qemu-serial-VM3.log:57: trailing whitespace.
++[    0.012832] On node 0, zone DMA: 97 pages in unavailable ranges
+vm/qemu-serial-VM3.log:58: trailing whitespace.
++[    0.036900] On node 0, zone DMA32: 35 pages in unavailable ranges
+vm/qemu-serial-VM3.log:59: trailing whitespace.
++[    0.037633] ACPI: PM-Timer IO Port: 0x608
+vm/qemu-serial-VM3.log:60: trailing whitespace.
++[    0.037656] ACPI: LAPIC_NMI (acpi_id[0xff] dfl dfl lint[0x1])
+vm/qemu-serial-VM3.log:61: trailing whitespace.
++[    0.037697] IOAPIC[0]: apic_id 0, version 17, address 0xfec00000, GSI 0-23
+vm/qemu-serial-VM3.log:62: trailing whitespace.
++[    0.037702] ACPI: INT_SRC_OVR (bus 0 bus_irq 0 global_irq 2 dfl dfl)
+vm/qemu-serial-VM3.log:63: trailing whitespace.
++[    0.037704] ACPI: INT_SRC_OVR (bus 0 bus_irq 5 global_irq 5 high level)
+vm/qemu-serial-VM3.log:64: trailing whitespace.
++[    0.037706] ACPI: INT_SRC_OVR (bus 0 bus_irq 9 global_irq 9 high level)
+vm/qemu-serial-VM3.log:65: trailing whitespace.
++[    0.037707] ACPI: INT_SRC_OVR (bus 0 bus_irq 10 global_irq 10 high level)
+vm/qemu-serial-VM3.log:66: trailing whitespace.
++[    0.037709] ACPI: INT_SRC_OVR (bus 0 bus_irq 11 global_irq 11 high level)
+vm/qemu-serial-VM3.log:67: trailing whitespace.
++[    0.037715] ACPI: Using ACPI (MADT) for SMP configuration information
+vm/qemu-serial-VM3.log:68: trailing whitespace.
++[    0.037717] ACPI: HPET id: 0x8086a201 base: 0xfed00000
+vm/qemu-serial-VM3.log:69: trailing whitespace.
++[    0.037723] TSC deadline timer available
+vm/qemu-serial-VM3.log:70: trailing whitespace.
++[    0.037732] CPU topo: Max. logical packages:   1
+vm/qemu-serial-VM3.log:71: trailing whitespace.
++[    0.037733] CPU topo: Max. logical dies:       1
+vm/qemu-serial-VM3.log:72: trailing whitespace.
++[    0.037733] CPU topo: Max. dies per package:   1
+vm/qemu-serial-VM3.log:73: trailing whitespace.
++[    0.037742] CPU topo: Max. threads per core:   1
+vm/qemu-serial-VM3.log:74: trailing whitespace.
++[    0.037743] CPU topo: Num. cores per package:     2
+vm/qemu-serial-VM3.log:75: trailing whitespace.
++[    0.037744] CPU topo: Num. threads per package:   2
+vm/qemu-serial-VM3.log:76: trailing whitespace.
++[    0.037745] CPU topo: Allowing 2 present CPUs plus 0 hotplug CPUs
+vm/qemu-serial-VM3.log:77: trailing whitespace.
++[    0.037767] kvm-guest: APIC: eoi() replaced with kvm_guest_apic_eoi_write()
+vm/qemu-serial-VM3.log:78: trailing whitespace.
++[    0.037787] kvm-guest: KVM setup pv remote TLB flush
+vm/qemu-serial-VM3.log:79: trailing whitespace.
++[    0.037791] kvm-guest: setup PV sched yield
+vm/qemu-serial-VM3.log:80: trailing whitespace.
++[    0.037800] PM: hibernation: Registered nosave memory: [mem 0x00000000-0x00000fff]
+vm/qemu-serial-VM3.log:81: trailing whitespace.
++[    0.037802] PM: hibernation: Registered nosave memory: [mem 0x0009f000-0x000fffff]
+vm/qemu-serial-VM3.log:82: trailing whitespace.
++[    0.037804] [mem 0x80000000-0xfeffbfff] available for PCI devices
+vm/qemu-serial-VM3.log:83: trailing whitespace.
++[    0.037806] Booting paravirtualized kernel on KVM
+vm/qemu-serial-VM3.log:84: trailing whitespace.
++[    0.037808] clocksource: refined-jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 1910969940391419 ns
+vm/qemu-serial-VM3.log:85: trailing whitespace.
++[    0.044325] setup_percpu: NR_CPUS:8192 nr_cpumask_bits:2 nr_cpu_ids:2 nr_node_ids:1
+vm/qemu-serial-VM3.log:86: trailing whitespace.
++[    0.045842] percpu: Embedded 62 pages/cpu s217088 r8192 d28672 u1048576
+vm/qemu-serial-VM3.log:87: trailing whitespace.
++[    0.045897] kvm-guest: PV spinlocks enabled
+vm/qemu-serial-VM3.log:88: trailing whitespace.
++[    0.045900] PV qspinlock hash table entries: 256 (order: 0, 4096 bytes, linear)
+vm/qemu-serial-VM3.log:89: trailing whitespace.
++[    0.045904] Kernel command line: root=/dev/vda1 rw console=ttyS0,115200 loglevel=7
+vm/qemu-serial-VM3.log:90: trailing whitespace.
++[    0.045975] random: crng init done
+vm/qemu-serial-VM3.log:91: trailing whitespace.
++[    0.045976] printk: log buffer data + meta data: 131072 + 458752 = 589824 bytes
+vm/qemu-serial-VM3.log:92: trailing whitespace.
++[    0.047594] Dentry cache hash table entries: 262144 (order: 9, 2097152 bytes, linear)
+vm/qemu-serial-VM3.log:93: trailing whitespace.
++[    0.048352] Inode-cache hash table entries: 131072 (order: 8, 1048576 bytes, linear)
+vm/qemu-serial-VM3.log:94: trailing whitespace.
++[    0.048456] Fallback order for Node 0: 0 
+vm/qemu-serial-VM3.log:95: trailing whitespace.
++[    0.048460] Built 1 zonelists, mobility grouping on.  Total pages: 524155
+vm/qemu-serial-VM3.log:96: trailing whitespace.
++[    0.048462] Policy zone: DMA32
+vm/qemu-serial-VM3.log:97: trailing whitespace.
++[    0.050140] mem auto-init: stack:all(zero), heap alloc:on, heap free:off
+vm/qemu-serial-VM3.log:98: trailing whitespace.
++[    0.055736] SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=2, Nodes=1
+vm/qemu-serial-VM3.log:99: trailing whitespace.
++[    0.055769] Kernel/User page tables isolation: enabled
+vm/qemu-serial-VM3.log:100: trailing whitespace.
++[    0.066905] ftrace: allocating 57060 entries in 224 pages
+vm/qemu-serial-VM3.log:101: trailing whitespace.
++[    0.066909] ftrace: allocated 224 pages with 3 groups
+vm/qemu-serial-VM3.log:102: trailing whitespace.
++[    0.067187] Dynamic Preempt: full
+vm/qemu-serial-VM3.log:103: trailing whitespace.
++[    0.067246] rcu: Preemptible hierarchical RCU implementation.
+vm/qemu-serial-VM3.log:104: trailing whitespace.
++[    0.067247] rcu: 	RCU restricting CPUs from NR_CPUS=8192 to nr_cpu_ids=2.
+vm/qemu-serial-VM3.log:105: trailing whitespace.
++[    0.067249] rcu: 	RCU priority boosting: priority 1 delay 500 ms.
+vm/qemu-serial-VM3.log:106: trailing whitespace.
++[    0.067250] 	Trampoline variant of Tasks RCU enabled.
+vm/qemu-serial-VM3.log:107: trailing whitespace.
++[    0.067251] 	Rude variant of Tasks RCU enabled.
+vm/qemu-serial-VM3.log:108: trailing whitespace.
++[    0.067251] 	Tracing variant of Tasks RCU enabled.
+vm/qemu-serial-VM3.log:109: trailing whitespace.
++[    0.067252] rcu: RCU calculated value of scheduler-enlistment delay is 100 jiffies.
+vm/qemu-serial-VM3.log:110: trailing whitespace.
++[    0.067253] rcu: Adjusting geometry for rcu_fanout_leaf=16, nr_cpu_ids=2
+vm/qemu-serial-VM3.log:111: trailing whitespace.
++[    0.067260] RCU Tasks: Setting shift to 1 and lim to 1 rcu_task_cb_adjust=1 rcu_task_cpu_ids=2.
+vm/qemu-serial-VM3.log:112: trailing whitespace.
++[    0.067262] RCU Tasks Rude: Setting shift to 1 and lim to 1 rcu_task_cb_adjust=1 rcu_task_cpu_ids=2.
+vm/qemu-serial-VM3.log:113: trailing whitespace.
++[    0.067263] RCU Tasks Trace: Setting shift to 1 and lim to 1 rcu_task_cb_adjust=1 rcu_task_cpu_ids=2.
+vm/qemu-serial-VM3.log:114: trailing whitespace.
++[    0.075678] NR_IRQS: 524544, nr_irqs: 440, preallocated irqs: 16
+vm/qemu-serial-VM3.log:115: trailing whitespace.
++[    0.075975] rcu: srcu_init: Setting srcu_struct sizes based on contention.
+vm/qemu-serial-VM3.log:116: trailing whitespace.
++[    0.076218] kfence: initialized - using 2097152 bytes for 255 objects at 0x(____ptrval____)-0x(____ptrval____)
+vm/qemu-serial-VM3.log:117: trailing whitespace.
++[    0.095367] Console: colour VGA+ 80x25
+vm/qemu-serial-VM3.log:118: trailing whitespace.
++[    0.095432] printk: legacy console [ttyS0] enabled
+vm/qemu-serial-VM3.log:119: trailing whitespace.
++[    0.288318] ACPI: Core revision 20250807
+vm/qemu-serial-VM3.log:120: trailing whitespace.
++[    0.289589] clocksource: hpet: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 19112604467 ns
+vm/qemu-serial-VM3.log:121: trailing whitespace.
++[    0.292190] APIC: Switch to symmetric I/O mode setup
+vm/qemu-serial-VM3.log:122: trailing whitespace.
++[    0.293832] x2apic enabled
+vm/qemu-serial-VM3.log:123: trailing whitespace.
++[    0.294936] APIC: Switched APIC routing to: physical x2apic
+vm/qemu-serial-VM3.log:124: trailing whitespace.
++[    0.296488] kvm-guest: APIC: send_IPI_mask() replaced with kvm_send_ipi_mask()
+vm/qemu-serial-VM3.log:125: trailing whitespace.
++[    0.298476] kvm-guest: APIC: send_IPI_mask_allbutself() replaced with kvm_send_ipi_mask_allbutself()
+vm/qemu-serial-VM3.log:126: trailing whitespace.
++[    0.300958] kvm-guest: setup PV IPIs
+vm/qemu-serial-VM3.log:127: trailing whitespace.
++[    0.303195] ..TIMER: vector=0x30 apic1=0 pin1=2 apic2=-1 pin2=-1
+vm/qemu-serial-VM3.log:128: trailing whitespace.
++[    0.304855] clocksource: tsc-early: mask: 0xffffffffffffffff max_cycles: 0x33e452fbb2f, max_idle_ns: 440795236593 ns
+vm/qemu-serial-VM3.log:129: trailing whitespace.
++[    0.307733] Calibrating delay loop (skipped) preset value.. 7200.00 BogoMIPS (lpj=3600000)
+vm/qemu-serial-VM3.log:130: trailing whitespace.
++[    0.308860] x86/cpu: User Mode Instruction Prevention (UMIP) activated
+vm/qemu-serial-VM3.log:131: trailing whitespace.
++[    0.309831] Last level iTLB entries: 4KB 0, 2MB 0, 4MB 0
+vm/qemu-serial-VM3.log:132: trailing whitespace.
++[    0.310733] Last level dTLB entries: 4KB 0, 2MB 0, 4MB 0, 1GB 0
+vm/qemu-serial-VM3.log:133: trailing whitespace.
++[    0.311745] mitigations: Enabled attack vectors: user_kernel, user_user, guest_host, guest_guest, SMT mitigations: auto
+vm/qemu-serial-VM3.log:134: trailing whitespace.
++[    0.312733] Speculative Store Bypass: Mitigation: Speculative Store Bypass disabled via prctl
+vm/qemu-serial-VM3.log:135: trailing whitespace.
++[    0.313732] SRBDS: Unknown: Dependent on hypervisor status
+vm/qemu-serial-VM3.log:136: trailing whitespace.
++[    0.314733] Spectre V2 : Mitigation: IBRS
+vm/qemu-serial-VM3.log:137: trailing whitespace.
++[    0.315732] RETBleed: Mitigation: IBRS
+vm/qemu-serial-VM3.log:138: trailing whitespace.
++[    0.316733] MDS: Mitigation: Clear CPU buffers
+vm/qemu-serial-VM3.log:139: trailing whitespace.
++[    0.317732] TAA: Mitigation: Clear CPU buffers
+vm/qemu-serial-VM3.log:140: trailing whitespace.
++[    0.318732] MMIO Stale Data: Mitigation: Clear CPU buffers
+vm/qemu-serial-VM3.log:141: trailing whitespace.
++[    0.319732] Spectre V1 : Mitigation: usercopy/swapgs barriers and __user pointer sanitization
+vm/qemu-serial-VM3.log:142: trailing whitespace.
++[    0.320734] Spectre V2 : Spectre v2 / SpectreRSB: Filling RSB on context switch and VMEXIT
+vm/qemu-serial-VM3.log:143: trailing whitespace.
++[    0.321735] Spectre V2 : mitigation: Enabling conditional Indirect Branch Prediction Barrier
+vm/qemu-serial-VM3.log:144: trailing whitespace.
++[    0.322739] GDS: Unknown: Dependent on hypervisor status
+vm/qemu-serial-VM3.log:145: trailing whitespace.
++[    0.323732] Spectre V2 : Spectre BHI mitigation: SW BHB clearing on syscall and VM exit
+vm/qemu-serial-VM3.log:146: trailing whitespace.
++[    0.324753] x86/fpu: Supporting XSAVE feature 0x001: 'x87 floating point registers'
+vm/qemu-serial-VM3.log:147: trailing whitespace.
++[    0.325732] x86/fpu: Supporting XSAVE feature 0x002: 'SSE registers'
+vm/qemu-serial-VM3.log:148: trailing whitespace.
++[    0.326732] x86/fpu: Supporting XSAVE feature 0x004: 'AVX registers'
+vm/qemu-serial-VM3.log:149: trailing whitespace.
++[    0.327732] x86/fpu: Supporting XSAVE feature 0x008: 'MPX bounds registers'
+vm/qemu-serial-VM3.log:150: trailing whitespace.
++[    0.328732] x86/fpu: Supporting XSAVE feature 0x010: 'MPX CSR'
+vm/qemu-serial-VM3.log:151: trailing whitespace.
++[    0.329733] x86/fpu: xstate_offset[2]:  576, xstate_sizes[2]:  256
+vm/qemu-serial-VM3.log:152: trailing whitespace.
++[    0.330732] x86/fpu: xstate_offset[3]:  832, xstate_sizes[3]:   64
+vm/qemu-serial-VM3.log:153: trailing whitespace.
++[    0.331732] x86/fpu: xstate_offset[4]:  896, xstate_sizes[4]:   64
+vm/qemu-serial-VM3.log:154: trailing whitespace.
++[    0.332732] x86/fpu: Enabled xstate features 0x1f, context size is 960 bytes, using 'compacted' format.
+vm/qemu-serial-VM3.log:155: trailing whitespace.
++[    0.370239] Freeing SMP alternatives memory: 56K
+vm/qemu-serial-VM3.log:156: trailing whitespace.
++[    0.370736] pid_max: default: 32768 minimum: 301
+vm/qemu-serial-VM3.log:157: trailing whitespace.
++[    0.371794] LSM: initializing lsm=capability,landlock,lockdown,yama,bpf
+vm/qemu-serial-VM3.log:158: trailing whitespace.
++[    0.373801] landlock: Up and running.
+vm/qemu-serial-VM3.log:159: trailing whitespace.
++[    0.374734] Yama: becoming mindful.
+vm/qemu-serial-VM3.log:160: trailing whitespace.
++[    0.375929] LSM support for eBPF active
+vm/qemu-serial-VM3.log:161: trailing whitespace.
++[    0.376782] Mount-cache hash table entries: 4096 (order: 3, 32768 bytes, linear)
+vm/qemu-serial-VM3.log:162: trailing whitespace.
++[    0.377765] Mountpoint-cache hash table entries: 4096 (order: 3, 32768 bytes, linear)
+vm/qemu-serial-VM3.log:163: trailing whitespace.
++[    0.379994] smpboot: CPU0: Intel(R) Core(TM) i7-7700 CPU @ 3.60GHz (family: 0x6, model: 0x9e, stepping: 0x9)
+vm/qemu-serial-VM3.log:164: trailing whitespace.
++[    0.381228] Performance Events: Skylake events, full-width counters, Intel PMU driver.
+vm/qemu-serial-VM3.log:165: trailing whitespace.
++[    0.381736] ... version:                   2
+vm/qemu-serial-VM3.log:166: trailing whitespace.
++[    0.382733] ... bit width:                 48
+vm/qemu-serial-VM3.log:167: trailing whitespace.
++[    0.383733] ... generic counters:          4
+vm/qemu-serial-VM3.log:168: trailing whitespace.
++[    0.384733] ... generic bitmap:            000000000000000f
+vm/qemu-serial-VM3.log:169: trailing whitespace.
++[    0.385733] ... fixed-purpose counters:    3
+vm/qemu-serial-VM3.log:170: trailing whitespace.
++[    0.386733] ... fixed-purpose bitmap:      0000000000000007
+vm/qemu-serial-VM3.log:171: trailing whitespace.
++[    0.387733] ... value mask:                0000ffffffffffff
+vm/qemu-serial-VM3.log:172: trailing whitespace.
++[    0.388733] ... max period:                00007fffffffffff
+vm/qemu-serial-VM3.log:173: trailing whitespace.
++[    0.389733] ... global_ctrl mask:          000000070000000f
+vm/qemu-serial-VM3.log:174: trailing whitespace.
++[    0.390965] signal: max sigframe size: 2032
+vm/qemu-serial-VM3.log:175: trailing whitespace.
++[    0.391801] rcu: Hierarchical SRCU implementation.
+vm/qemu-serial-VM3.log:176: trailing whitespace.
++[    0.392733] rcu: 	Max phase no-delay instances is 400.
+vm/qemu-serial-VM3.log:177: trailing whitespace.
++[    0.393920] Timer migration: 1 hierarchy levels; 8 children per group; 1 crossnode level
+vm/qemu-serial-VM3.log:178: trailing whitespace.
++[    0.395218] smp: Bringing up secondary CPUs ...
+vm/qemu-serial-VM3.log:179: trailing whitespace.
++[    0.396025] smpboot: x86: Booting SMP configuration:
+vm/qemu-serial-VM3.log:180: trailing whitespace.
++[    0.396739] .... node  #0, CPUs:      #1
+vm/qemu-serial-VM3.log:181: trailing whitespace.
++[    0.396866] smp: Brought up 1 node, 2 CPUs
+vm/qemu-serial-VM3.log:182: trailing whitespace.
++[    0.398737] smpboot: Total of 2 processors activated (14400.00 BogoMIPS)
+vm/qemu-serial-VM3.log:183: trailing whitespace.
++[    0.399915] Memory: 1985448K/2096620K available (20319K kernel code, 2939K rwdata, 16368K rodata, 4736K init, 4772K bss, 105896K reserved, 0K cma-reserved)
+vm/qemu-serial-VM3.log:184: trailing whitespace.
++[    0.400934] devtmpfs: initialized
+vm/qemu-serial-VM3.log:185: trailing whitespace.
++[    0.401788] x86/mm: Memory block size: 128MB
+vm/qemu-serial-VM3.log:186: trailing whitespace.
++[    0.403734] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 1911260446275000 ns
+vm/qemu-serial-VM3.log:187: trailing whitespace.
++[    0.404760] posixtimers hash table entries: 1024 (order: 2, 16384 bytes, linear)
+vm/qemu-serial-VM3.log:188: trailing whitespace.
++[    0.405793] futex hash table entries: 512 (32768 bytes on 1 NUMA nodes, total 32 KiB, linear).
+vm/qemu-serial-VM3.log:189: trailing whitespace.
++[    0.406817] pinctrl core: initialized pinctrl subsystem
+vm/qemu-serial-VM3.log:190: trailing whitespace.
++[    0.407981] PM: RTC time: 10:33:19, date: 2026-03-07
+vm/qemu-serial-VM3.log:191: trailing whitespace.
++[    0.410755] NET: Registered PF_NETLINK/PF_ROUTE protocol family
+vm/qemu-serial-VM3.log:192: trailing whitespace.
++[    0.412069] DMA: preallocated 256 KiB GFP_KERNEL pool for atomic allocations
+vm/qemu-serial-VM3.log:193: trailing whitespace.
++[    0.412756] DMA: preallocated 256 KiB GFP_KERNEL|GFP_DMA pool for atomic allocations
+vm/qemu-serial-VM3.log:194: trailing whitespace.
++[    0.413939] DMA: preallocated 256 KiB GFP_KERNEL|GFP_DMA32 pool for atomic allocations
+vm/qemu-serial-VM3.log:195: trailing whitespace.
++[    0.414743] audit: initializing netlink subsys (disabled)
+vm/qemu-serial-VM3.log:196: trailing whitespace.
++[    0.415803] audit: type=2000 audit(1772879599.396:1): state=initialized audit_enabled=0 res=1
+vm/qemu-serial-VM3.log:197: trailing whitespace.
++[    0.416027] thermal_sys: Registered thermal governor 'fair_share'
+vm/qemu-serial-VM3.log:198: trailing whitespace.
++[    0.416735] thermal_sys: Registered thermal governor 'bang_bang'
+vm/qemu-serial-VM3.log:199: trailing whitespace.
++[    0.417734] thermal_sys: Registered thermal governor 'step_wise'
+vm/qemu-serial-VM3.log:200: trailing whitespace.
++[    0.418733] thermal_sys: Registered thermal governor 'user_space'
+vm/qemu-serial-VM3.log:201: trailing whitespace.
++[    0.419733] thermal_sys: Registered thermal governor 'power_allocator'
+vm/qemu-serial-VM3.log:202: trailing whitespace.
++[    0.420749] cpuidle: using governor ladder
+vm/qemu-serial-VM3.log:203: trailing whitespace.
++[    0.422739] cpuidle: using governor menu
+vm/qemu-serial-VM3.log:204: trailing whitespace.
++[    0.423936] acpiphp: ACPI Hot Plug PCI Controller Driver version: 0.5
+vm/qemu-serial-VM3.log:205: trailing whitespace.
++[    0.424988] PCI: Using configuration type 1 for base access
+vm/qemu-serial-VM3.log:206: trailing whitespace.
++[    0.425900] kprobes: kprobe jump-optimization is enabled. All kprobes are optimized if possible.
+vm/qemu-serial-VM3.log:207: trailing whitespace.
++[    0.436735] HugeTLB: registered 1.00 GiB page size, pre-allocated 0 pages
+vm/qemu-serial-VM3.log:208: trailing whitespace.
++[    0.437734] HugeTLB: 16380 KiB vmemmap can be freed for a 1.00 GiB page
+vm/qemu-serial-VM3.log:209: trailing whitespace.
++[    0.438736] HugeTLB: registered 2.00 MiB page size, pre-allocated 0 pages
+vm/qemu-serial-VM3.log:210: trailing whitespace.
++[    0.442735] HugeTLB: 28 KiB vmemmap can be freed for a 2.00 MiB page
+vm/qemu-serial-VM3.log:211: trailing whitespace.
++[    0.464066] raid6: skipped pq benchmark and selected avx2x4
+vm/qemu-serial-VM3.log:212: trailing whitespace.
++[    0.464754] raid6: using avx2x2 recovery algorithm
+vm/qemu-serial-VM3.log:213: trailing whitespace.
++[    0.465889] ACPI: Added _OSI(Module Device)
+vm/qemu-serial-VM3.log:214: trailing whitespace.
++[    0.466734] ACPI: Added _OSI(Processor Device)
+vm/qemu-serial-VM3.log:215: trailing whitespace.
++[    0.467734] ACPI: Added _OSI(Processor Aggregator Device)
+vm/qemu-serial-VM3.log:216: trailing whitespace.
++[    0.470776] ACPI: 1 ACPI AML tables successfully acquired and loaded
+vm/qemu-serial-VM3.log:217: trailing whitespace.
++[    0.473851] ACPI: Interpreter enabled
+vm/qemu-serial-VM3.log:218: trailing whitespace.
++[    0.474750] ACPI: PM: (supports S0 S3 S4 S5)
+vm/qemu-serial-VM3.log:219: trailing whitespace.
++[    0.475734] ACPI: Using IOAPIC for interrupt routing
+vm/qemu-serial-VM3.log:220: trailing whitespace.
++[    0.476884] PCI: Using host bridge windows from ACPI; if necessary, use "pci=nocrs" and report a bug
+vm/qemu-serial-VM3.log:221: trailing whitespace.
++[    0.477734] PCI: Using E820 reservations for host bridge windows
+vm/qemu-serial-VM3.log:222: trailing whitespace.
++[    0.478875] ACPI: Enabled 2 GPEs in block 00 to 0F
+vm/qemu-serial-VM3.log:223: trailing whitespace.
++[    0.483560] ACPI: PCI Root Bridge [PCI0] (domain 0000 [bus 00-ff])
+vm/qemu-serial-VM3.log:224: trailing whitespace.
++[    0.483744] acpi PNP0A03:00: _OSC: OS supports [ASPM ClockPM Segments MSI EDR HPX-Type3]
+vm/qemu-serial-VM3.log:225: trailing whitespace.
++[    0.484736] acpi PNP0A03:00: _OSC: not requesting OS control; OS requires [ExtendedConfig ASPM ClockPM MSI]
+vm/qemu-serial-VM3.log:226: trailing whitespace.
++[    0.485762] acpi PNP0A03:00: fail to add MMCONFIG information, can't access extended configuration space under this bridge
+vm/qemu-serial-VM3.log:227: trailing whitespace.
++[    0.487220] acpiphp: Slot [3] registered
+vm/qemu-serial-VM3.log:228: trailing whitespace.
++[    0.487771] acpiphp: Slot [4] registered
+vm/qemu-serial-VM3.log:229: trailing whitespace.
++[    0.488779] acpiphp: Slot [5] registered
+vm/qemu-serial-VM3.log:230: trailing whitespace.
++[    0.489763] acpiphp: Slot [6] registered
+vm/qemu-serial-VM3.log:231: trailing whitespace.
++[    0.490762] acpiphp: Slot [7] registered
+vm/qemu-serial-VM3.log:232: trailing whitespace.
++[    0.491762] acpiphp: Slot [8] registered
+vm/qemu-serial-VM3.log:233: trailing whitespace.
++[    0.492762] acpiphp: Slot [9] registered
+vm/qemu-serial-VM3.log:234: trailing whitespace.
++[    0.493762] acpiphp: Slot [10] registered
+vm/qemu-serial-VM3.log:235: trailing whitespace.
++[    0.494762] acpiphp: Slot [11] registered
+vm/qemu-serial-VM3.log:236: trailing whitespace.
++[    0.495771] acpiphp: Slot [12] registered
+vm/qemu-serial-VM3.log:237: trailing whitespace.
++[    0.496762] acpiphp: Slot [13] registered
+vm/qemu-serial-VM3.log:238: trailing whitespace.
++[    0.497761] acpiphp: Slot [14] registered
+vm/qemu-serial-VM3.log:239: trailing whitespace.
++[    0.498772] acpiphp: Slot [15] registered
+vm/qemu-serial-VM3.log:240: trailing whitespace.
++[    0.499762] acpiphp: Slot [16] registered
+vm/qemu-serial-VM3.log:241: trailing whitespace.
++[    0.500762] acpiphp: Slot [17] registered
+vm/qemu-serial-VM3.log:242: trailing whitespace.
++[    0.501762] acpiphp: Slot [18] registered
+vm/qemu-serial-VM3.log:243: trailing whitespace.
++[    0.502769] acpiphp: Slot [19] registered
+vm/qemu-serial-VM3.log:244: trailing whitespace.
++[    0.503762] acpiphp: Slot [20] registered
+vm/qemu-serial-VM3.log:245: trailing whitespace.
++[    0.504762] acpiphp: Slot [21] registered
+vm/qemu-serial-VM3.log:246: trailing whitespace.
++[    0.505760] acpiphp: Slot [22] registered
+vm/qemu-serial-VM3.log:247: trailing whitespace.
++[    0.506762] acpiphp: Slot [23] registered
+vm/qemu-serial-VM3.log:248: trailing whitespace.
++[    0.507761] acpiphp: Slot [24] registered
+vm/qemu-serial-VM3.log:249: trailing whitespace.
++[    0.508760] acpiphp: Slot [25] registered
+vm/qemu-serial-VM3.log:250: trailing whitespace.
++[    0.509761] acpiphp: Slot [26] registered
+vm/qemu-serial-VM3.log:251: trailing whitespace.
++[    0.510777] acpiphp: Slot [27] registered
+vm/qemu-serial-VM3.log:252: trailing whitespace.
++[    0.511762] acpiphp: Slot [28] registered
+vm/qemu-serial-VM3.log:253: trailing whitespace.
++[    0.512762] acpiphp: Slot [29] registered
+vm/qemu-serial-VM3.log:254: trailing whitespace.
++[    0.513761] acpiphp: Slot [30] registered
+vm/qemu-serial-VM3.log:255: trailing whitespace.
++[    0.514784] acpiphp: Slot [31] registered
+vm/qemu-serial-VM3.log:256: trailing whitespace.
++[    0.515785] PCI host bridge to bus 0000:00
+vm/qemu-serial-VM3.log:257: trailing whitespace.
++[    0.516739] pci_bus 0000:00: root bus resource [io  0x0000-0x0cf7 window]
+vm/qemu-serial-VM3.log:258: trailing whitespace.
++[    0.517734] pci_bus 0000:00: root bus resource [io  0x0d00-0xffff window]
+vm/qemu-serial-VM3.log:259: trailing whitespace.
++[    0.518735] pci_bus 0000:00: root bus resource [mem 0x000a0000-0x000bffff window]
+vm/qemu-serial-VM3.log:260: trailing whitespace.
++[    0.519734] pci_bus 0000:00: root bus resource [mem 0x80000000-0xfebfffff window]
+vm/qemu-serial-VM3.log:261: trailing whitespace.
++[    0.520734] pci_bus 0000:00: root bus resource [mem 0x100000000-0x17fffffff window]
+vm/qemu-serial-VM3.log:262: trailing whitespace.
++[    0.521734] pci_bus 0000:00: root bus resource [bus 00-ff]
+vm/qemu-serial-VM3.log:263: trailing whitespace.
++[    0.522822] pci 0000:00:00.0: [8086:1237] type 00 class 0x060000 conventional PCI endpoint
+vm/qemu-serial-VM3.log:264: trailing whitespace.
++[    0.524644] pci 0000:00:01.0: [8086:7000] type 00 class 0x060100 conventional PCI endpoint
+vm/qemu-serial-VM3.log:265: trailing whitespace.
++[    0.525671] pci 0000:00:01.1: [8086:7010] type 00 class 0x010180 conventional PCI endpoint
+vm/qemu-serial-VM3.log:266: trailing whitespace.
++[    0.526801] pci 0000:00:01.1: BAR 4 [io  0xc0e0-0xc0ef]
+vm/qemu-serial-VM3.log:267: trailing whitespace.
++[    0.527825] pci 0000:00:01.1: BAR 0 [io  0x01f0-0x01f7]: legacy IDE quirk
+vm/qemu-serial-VM3.log:268: trailing whitespace.
++[    0.528734] pci 0000:00:01.1: BAR 1 [io  0x03f6]: legacy IDE quirk
+vm/qemu-serial-VM3.log:269: trailing whitespace.
++[    0.529734] pci 0000:00:01.1: BAR 2 [io  0x0170-0x0177]: legacy IDE quirk
+vm/qemu-serial-VM3.log:270: trailing whitespace.
++[    0.530734] pci 0000:00:01.1: BAR 3 [io  0x0376]: legacy IDE quirk
+vm/qemu-serial-VM3.log:271: trailing whitespace.
++[    0.532071] pci 0000:00:01.3: [8086:7113] type 00 class 0x068000 conventional PCI endpoint
+vm/qemu-serial-VM3.log:272: trailing whitespace.
++[    0.533388] pci 0000:00:01.3: quirk: [io  0x0600-0x063f] claimed by PIIX4 ACPI
+vm/qemu-serial-VM3.log:273: trailing whitespace.
++[    0.533749] pci 0000:00:01.3: quirk: [io  0x0700-0x070f] claimed by PIIX4 SMB
+vm/qemu-serial-VM3.log:274: trailing whitespace.
++[    0.535162] pci 0000:00:02.0: [1234:1111] type 00 class 0x030000 conventional PCI endpoint
+vm/qemu-serial-VM3.log:275: trailing whitespace.
++[    0.537820] pci 0000:00:02.0: BAR 0 [mem 0xfd000000-0xfdffffff pref]
+vm/qemu-serial-VM3.log:276: trailing whitespace.
++[    0.538768] pci 0000:00:02.0: BAR 2 [mem 0xfebd0000-0xfebd0fff]
+vm/qemu-serial-VM3.log:277: trailing whitespace.
++[    0.539788] pci 0000:00:02.0: ROM [mem 0xfebc0000-0xfebcffff pref]
+vm/qemu-serial-VM3.log:278: trailing whitespace.
++[    0.540972] pci 0000:00:02.0: Video device with shadowed ROM at [mem 0x000c0000-0x000dffff]
+vm/qemu-serial-VM3.log:279: trailing whitespace.
++[    0.542642] pci 0000:00:03.0: [1af4:1009] type 00 class 0x000200 conventional PCI endpoint
+vm/qemu-serial-VM3.log:280: trailing whitespace.
++[    0.544750] pci 0000:00:03.0: BAR 0 [io  0xc080-0xc0bf]
+vm/qemu-serial-VM3.log:281: trailing whitespace.
++[    0.545757] pci 0000:00:03.0: BAR 1 [mem 0xfebd1000-0xfebd1fff]
+vm/qemu-serial-VM3.log:282: trailing whitespace.
++[    0.546788] pci 0000:00:03.0: BAR 4 [mem 0xfe000000-0xfe003fff 64bit pref]
+vm/qemu-serial-VM3.log:283: trailing whitespace.
++[    0.550035] pci 0000:00:04.0: [1af4:1000] type 00 class 0x020000 conventional PCI endpoint
+vm/qemu-serial-VM3.log:284: trailing whitespace.
++[    0.552593] pci 0000:00:04.0: BAR 0 [io  0xc0c0-0xc0df]
+vm/qemu-serial-VM3.log:285: trailing whitespace.
++[    0.552750] pci 0000:00:04.0: BAR 1 [mem 0xfebd2000-0xfebd2fff]
+vm/qemu-serial-VM3.log:286: trailing whitespace.
++[    0.554052] pci 0000:00:04.0: BAR 4 [mem 0xfe004000-0xfe007fff 64bit pref]
+vm/qemu-serial-VM3.log:287: trailing whitespace.
++[    0.554749] pci 0000:00:04.0: ROM [mem 0xfeb80000-0xfebbffff pref]
+vm/qemu-serial-VM3.log:288: trailing whitespace.
++[    0.557874] pci 0000:00:05.0: [1af4:1001] type 00 class 0x010000 conventional PCI endpoint
+vm/qemu-serial-VM3.log:289: trailing whitespace.
++[    0.560752] pci 0000:00:05.0: BAR 0 [io  0xc000-0xc07f]
+vm/qemu-serial-VM3.log:290: trailing whitespace.
++[    0.561750] pci 0000:00:05.0: BAR 1 [mem 0xfebd3000-0xfebd3fff]
+vm/qemu-serial-VM3.log:291: trailing whitespace.
++[    0.562788] pci 0000:00:05.0: BAR 4 [mem 0xfe008000-0xfe00bfff 64bit pref]
+vm/qemu-serial-VM3.log:292: trailing whitespace.
++[    0.575960] ACPI: PCI: Interrupt link LNKA configured for IRQ 10
+vm/qemu-serial-VM3.log:293: trailing whitespace.
++[    0.576922] ACPI: PCI: Interrupt link LNKB configured for IRQ 10
+vm/qemu-serial-VM3.log:294: trailing whitespace.
++[    0.577910] ACPI: PCI: Interrupt link LNKC configured for IRQ 11
+vm/qemu-serial-VM3.log:295: trailing whitespace.
++[    0.578907] ACPI: PCI: Interrupt link LNKD configured for IRQ 11
+vm/qemu-serial-VM3.log:296: trailing whitespace.
++[    0.579865] ACPI: PCI: Interrupt link LNKS configured for IRQ 9
+vm/qemu-serial-VM3.log:297: trailing whitespace.
++[    0.581960] iommu: Default domain type: Translated
+vm/qemu-serial-VM3.log:298: trailing whitespace.
++[    0.582735] iommu: DMA domain TLB invalidation policy: lazy mode
+vm/qemu-serial-VM3.log:299: trailing whitespace.
++[    0.585169] SCSI subsystem initialized
+vm/qemu-serial-VM3.log:300: trailing whitespace.
++[    0.586815] ACPI: bus type USB registered
+vm/qemu-serial-VM3.log:301: trailing whitespace.
++[    0.587788] usbcore: registered new interface driver usbfs
+vm/qemu-serial-VM3.log:302: trailing whitespace.
++[    0.588761] usbcore: registered new interface driver hub
+vm/qemu-serial-VM3.log:303: trailing whitespace.
++[    0.589845] usbcore: registered new device driver usb
+vm/qemu-serial-VM3.log:304: trailing whitespace.
++[    0.590812] EDAC MC: Ver: 3.0.0
+vm/qemu-serial-VM3.log:305: trailing whitespace.
++[    0.593356] NetLabel: Initializing
+vm/qemu-serial-VM3.log:306: trailing whitespace.
++[    0.593735] NetLabel:  domain hash size = 128
+vm/qemu-serial-VM3.log:307: trailing whitespace.
++[    0.594734] NetLabel:  protocols = UNLABELED CIPSOv4 CALIPSO
+vm/qemu-serial-VM3.log:308: trailing whitespace.
++[    0.595773] NetLabel:  unlabeled traffic allowed by default
+vm/qemu-serial-VM3.log:309: trailing whitespace.
++[    0.596745] mctp: management component transport protocol core
+vm/qemu-serial-VM3.log:310: trailing whitespace.
++[    0.597741] NET: Registered PF_MCTP protocol family
+vm/qemu-serial-VM3.log:311: trailing whitespace.
++[    0.598769] PCI: Using ACPI for IRQ routing
+vm/qemu-serial-VM3.log:312: trailing whitespace.
++[    0.600033] pci 0000:00:02.0: vgaarb: setting as boot VGA device
+vm/qemu-serial-VM3.log:313: trailing whitespace.
++[    0.600729] pci 0000:00:02.0: vgaarb: bridge control possible
+vm/qemu-serial-VM3.log:314: trailing whitespace.
++[    0.600729] pci 0000:00:02.0: vgaarb: VGA device added: decodes=io+mem,owns=io+mem,locks=none
+vm/qemu-serial-VM3.log:315: trailing whitespace.
++[    0.600736] vgaarb: loaded
+vm/qemu-serial-VM3.log:316: trailing whitespace.
++[    0.601505] hpet0: at MMIO 0xfed00000, IRQs 2, 8, 0
+vm/qemu-serial-VM3.log:317: trailing whitespace.
++[    0.601729] hpet0: 3 comparators, 64-bit 100.000000 MHz counter
+vm/qemu-serial-VM3.log:318: trailing whitespace.
++[    0.608040] clocksource: Switched to clocksource kvm-clock
+vm/qemu-serial-VM3.log:319: trailing whitespace.
++[    0.611174] VFS: Disk quotas dquot_6.6.0
+vm/qemu-serial-VM3.log:320: trailing whitespace.
++[    0.612304] VFS: Dquot-cache hash table entries: 512 (order 0, 4096 bytes)
+vm/qemu-serial-VM3.log:321: trailing whitespace.
++[    0.614562] pnp: PnP ACPI init
+vm/qemu-serial-VM3.log:322: trailing whitespace.
++[    0.615980] pnp: PnP ACPI: found 6 devices
+vm/qemu-serial-VM3.log:323: trailing whitespace.
++[    0.629503] clocksource: acpi_pm: mask: 0xffffff max_cycles: 0xffffff, max_idle_ns: 2085701024 ns
+vm/qemu-serial-VM3.log:324: trailing whitespace.
++[    0.632072] NET: Registered PF_INET protocol family
+vm/qemu-serial-VM3.log:325: trailing whitespace.
++[    0.633736] IP idents hash table entries: 32768 (order: 6, 262144 bytes, linear)
+vm/qemu-serial-VM3.log:326: trailing whitespace.
++[    0.660512] tcp_listen_portaddr_hash hash table entries: 1024 (order: 2, 16384 bytes, linear)
+vm/qemu-serial-VM3.log:327: trailing whitespace.
++[    0.662843] Table-perturb hash table entries: 65536 (order: 6, 262144 bytes, linear)
+vm/qemu-serial-VM3.log:328: trailing whitespace.
++[    0.665015] TCP established hash table entries: 16384 (order: 5, 131072 bytes, linear)
+vm/qemu-serial-VM3.log:329: trailing whitespace.
++[    0.667265] TCP bind hash table entries: 16384 (order: 7, 524288 bytes, linear)
+vm/qemu-serial-VM3.log:330: trailing whitespace.
++[    0.669332] TCP: Hash tables configured (established 16384 bind 16384)
+vm/qemu-serial-VM3.log:331: trailing whitespace.
++[    0.671271] MPTCP token hash table entries: 2048 (order: 4, 49152 bytes, linear)
+vm/qemu-serial-VM3.log:332: trailing whitespace.
++[    0.673397] UDP hash table entries: 1024 (order: 4, 65536 bytes, linear)
+vm/qemu-serial-VM3.log:333: trailing whitespace.
++[    0.675542] UDP-Lite hash table entries: 1024 (order: 4, 65536 bytes, linear)
+vm/qemu-serial-VM3.log:334: trailing whitespace.
++[    0.677615] NET: Registered PF_UNIX/PF_LOCAL protocol family
+vm/qemu-serial-VM3.log:335: trailing whitespace.
++[    0.679222] NET: Registered PF_XDP protocol family
+vm/qemu-serial-VM3.log:336: trailing whitespace.
++[    0.680593] pci_bus 0000:00: resource 4 [io  0x0000-0x0cf7 window]
+vm/qemu-serial-VM3.log:337: trailing whitespace.
++[    0.682315] pci_bus 0000:00: resource 5 [io  0x0d00-0xffff window]
+vm/qemu-serial-VM3.log:338: trailing whitespace.
++[    0.684042] pci_bus 0000:00: resource 6 [mem 0x000a0000-0x000bffff window]
+vm/qemu-serial-VM3.log:339: trailing whitespace.
++[    0.685971] pci_bus 0000:00: resource 7 [mem 0x80000000-0xfebfffff window]
+vm/qemu-serial-VM3.log:340: trailing whitespace.
++[    0.687890] pci_bus 0000:00: resource 8 [mem 0x100000000-0x17fffffff window]
+vm/qemu-serial-VM3.log:341: trailing whitespace.
++[    0.689922] pci 0000:00:01.0: PIIX3: Enabling Passive Release
+vm/qemu-serial-VM3.log:342: trailing whitespace.
++[    0.691571] pci 0000:00:00.0: Limiting direct PCI/PCI transfers
+vm/qemu-serial-VM3.log:343: trailing whitespace.
++[    0.693455] PCI: CLS 0 bytes, default 64
+vm/qemu-serial-VM3.log:344: trailing whitespace.
++[    0.694812] clocksource: tsc: mask: 0xffffffffffffffff max_cycles: 0x33e452fbb2f, max_idle_ns: 440795236593 ns
+vm/qemu-serial-VM3.log:345: trailing whitespace.
++[    0.694858] Trying to unpack rootfs image as initramfs...
+vm/qemu-serial-VM3.log:346: trailing whitespace.
++[    0.758353] Initialise system trusted keyrings
+vm/qemu-serial-VM3.log:347: trailing whitespace.
++[    0.760706] Key type blacklist registered
+vm/qemu-serial-VM3.log:348: trailing whitespace.
++[    0.763519] workingset: timestamp_bits=36 max_order=19 bucket_order=0
+vm/qemu-serial-VM3.log:349: trailing whitespace.
++[    0.767763] fuse: init (API version 7.45)
+vm/qemu-serial-VM3.log:350: trailing whitespace.
++[    0.771082] integrity: Platform Keyring initialized
+vm/qemu-serial-VM3.log:351: trailing whitespace.
++[    0.773487] integrity: Machine keyring initialized
+vm/qemu-serial-VM3.log:352: trailing whitespace.
++[    0.797314] xor: automatically using best checksumming function   avx       
+vm/qemu-serial-VM3.log:353: trailing whitespace.
++[    0.799792] Key type asymmetric registered
+vm/qemu-serial-VM3.log:354: trailing whitespace.
++[    0.800943] Asymmetric key parser 'x509' registered
+vm/qemu-serial-VM3.log:355: trailing whitespace.
++[    0.804163] Block layer SCSI generic (bsg) driver version 0.4 loaded (major 245)
+vm/qemu-serial-VM3.log:356: trailing whitespace.
++[    0.808911] io scheduler mq-deadline registered
+vm/qemu-serial-VM3.log:357: trailing whitespace.
++[    0.811402] io scheduler kyber registered
+vm/qemu-serial-VM3.log:358: trailing whitespace.
++[    0.813583] io scheduler bfq registered
+vm/qemu-serial-VM3.log:359: trailing whitespace.
++[    0.818094] ledtrig-cpu: registered to indicate activity on CPUs
+vm/qemu-serial-VM3.log:360: trailing whitespace.
++[    0.820153] input: Power Button as /devices/LNXSYSTM:00/LNXPWRBN:00/input/input0
+vm/qemu-serial-VM3.log:361: trailing whitespace.
++[    0.825833] ACPI: button: Power Button [PWRF]
+vm/qemu-serial-VM3.log:362: trailing whitespace.
++[    0.828859] ACPI: \_SB_.LNKC: Enabled at IRQ 11
+vm/qemu-serial-VM3.log:363: trailing whitespace.
++[    0.833373] ACPI: \_SB_.LNKD: Enabled at IRQ 10
+vm/qemu-serial-VM3.log:364: trailing whitespace.
++[    0.837757] ACPI: \_SB_.LNKA: Enabled at IRQ 10
+vm/qemu-serial-VM3.log:365: trailing whitespace.
++[    0.865422] Serial: 8250/16550 driver, 32 ports, IRQ sharing enabled
+vm/qemu-serial-VM3.log:366: trailing whitespace.
++[    0.867084] Freeing initrd memory: 11040K
+vm/qemu-serial-VM3.log:367: trailing whitespace.
++[    0.869410] 00:04: ttyS0 at I/O 0x3f8 (irq = 4, base_baud = 115200) is a 16550A
+vm/qemu-serial-VM3.log:368: trailing whitespace.
++[    0.875831] Non-volatile memory driver v1.3
+vm/qemu-serial-VM3.log:369: trailing whitespace.
++[    0.877043] Linux agpgart interface v0.103
+vm/qemu-serial-VM3.log:370: trailing whitespace.
++[    0.878392] ACPI: bus type drm_connector registered
+vm/qemu-serial-VM3.log:371: trailing whitespace.
++[    0.880368] virtio_blk virtio2: 2/0/0 default/read/poll queues
+vm/qemu-serial-VM3.log:372: trailing whitespace.
++[    0.883933] virtio_blk virtio2: [vda] 25165824 512-byte logical blocks (12.9 GB/12.0 GiB)
+vm/qemu-serial-VM3.log:373: trailing whitespace.
++[    0.914691]  vda: vda1
+vm/qemu-serial-VM3.log:374: trailing whitespace.
++[    0.915992] usbcore: registered new interface driver usbserial_generic
+vm/qemu-serial-VM3.log:375: trailing whitespace.
++[    0.917885] usbserial: USB Serial support registered for generic
+vm/qemu-serial-VM3.log:376: trailing whitespace.
++[    0.920314] i8042: PNP: PS/2 Controller [PNP0303:KBD,PNP0f13:MOU] at 0x60,0x64 irq 1,12
+vm/qemu-serial-VM3.log:377: trailing whitespace.
++[    0.924788] serio: i8042 KBD port at 0x60,0x64 irq 1
+vm/qemu-serial-VM3.log:378: trailing whitespace.
++[    0.927317] serio: i8042 AUX port at 0x60,0x64 irq 12
+vm/qemu-serial-VM3.log:379: trailing whitespace.
++[    0.928937] rtc_cmos 00:05: RTC can wake from S4
+vm/qemu-serial-VM3.log:380: trailing whitespace.
++[    0.931437] input: AT Translated Set 2 keyboard as /devices/platform/i8042/serio0/input/input1
+vm/qemu-serial-VM3.log:381: trailing whitespace.
++[    0.934032] rtc_cmos 00:05: registered as rtc0
+vm/qemu-serial-VM3.log:382: trailing whitespace.
++[    0.935442] rtc_cmos 00:05: setting system clock to 2026-03-07T10:33:19 UTC (1772879599)
+vm/qemu-serial-VM3.log:383: trailing whitespace.
++[    0.938233] rtc_cmos 00:05: alarms up to one day, y3k, 242 bytes nvram, hpet irqs
+vm/qemu-serial-VM3.log:384: trailing whitespace.
++[    0.940439] intel_pstate: CPU model not supported
+vm/qemu-serial-VM3.log:385: trailing whitespace.
++[    0.941995] hid: raw HID events driver (C) Jiri Kosina
+vm/qemu-serial-VM3.log:386: trailing whitespace.
++[    0.943636] usbcore: registered new interface driver usbhid
+vm/qemu-serial-VM3.log:387: trailing whitespace.
++[    0.945254] usbhid: USB HID core driver
+vm/qemu-serial-VM3.log:388: trailing whitespace.
++[    0.946560] rust_binder: Loaded Rust Binder.
+vm/qemu-serial-VM3.log:389: trailing whitespace.
++[    0.946625] drop_monitor: Initializing network drop monitor service
+vm/qemu-serial-VM3.log:390: trailing whitespace.
++[    0.949930] NET: Registered PF_INET6 protocol family
+vm/qemu-serial-VM3.log:391: trailing whitespace.
++[    0.952065] Segment Routing with IPv6
+vm/qemu-serial-VM3.log:392: trailing whitespace.
++[    0.953209] RPL Segment Routing with IPv6
+vm/qemu-serial-VM3.log:393: trailing whitespace.
++[    0.954353] In-situ OAM (IOAM) with IPv6
+vm/qemu-serial-VM3.log:394: trailing whitespace.
++[    0.955618] NET: Registered PF_PACKET protocol family
+vm/qemu-serial-VM3.log:395: trailing whitespace.
++[    0.957520] IPI shorthand broadcast: enabled
+vm/qemu-serial-VM3.log:396: trailing whitespace.
++[    0.963784] sched_clock: Marking stable (740004896, 223748593)->(1181472727, -217719238)
+vm/qemu-serial-VM3.log:397: trailing whitespace.
++[    0.966511] registered taskstats version 1
+vm/qemu-serial-VM3.log:398: trailing whitespace.
++[    0.968222] Loading compiled-in X.509 certificates
+vm/qemu-serial-VM3.log:399: trailing whitespace.
++[    0.979387] Loaded X.509 cert 'Build time autogenerated kernel key: 4f282eb87851fdb04b530c5e67453df628afff93'
+vm/qemu-serial-VM3.log:400: trailing whitespace.
++[    0.986346] zswap: loaded using pool zstd
+vm/qemu-serial-VM3.log:401: trailing whitespace.
++[    0.987796] Demotion targets for Node 0: null
+vm/qemu-serial-VM3.log:402: trailing whitespace.
++[    0.989475] Key type .fscrypt registered
+vm/qemu-serial-VM3.log:403: trailing whitespace.
++[    0.990564] Key type fscrypt-provisioning registered
+vm/qemu-serial-VM3.log:404: trailing whitespace.
++[    0.992399] Btrfs loaded, zoned=yes, fsverity=yes
+vm/qemu-serial-VM3.log:405: trailing whitespace.
++[    0.993828] Key type big_key registered
+vm/qemu-serial-VM3.log:406: trailing whitespace.
++[    0.995566] PM:   Magic number: 2:595:577
+vm/qemu-serial-VM3.log:407: trailing whitespace.
++[    0.998394] RAS: Correctable Errors collector initialized.
+vm/qemu-serial-VM3.log:408: trailing whitespace.
++[    1.007127] clk: Disabling unused clocks
+vm/qemu-serial-VM3.log:409: trailing whitespace.
++[    1.008359] PM: genpd: Disabling unused power domains
+vm/qemu-serial-VM3.log:410: trailing whitespace.
++[    1.013001] Freeing unused decrypted memory: 2028K
+vm/qemu-serial-VM3.log:411: trailing whitespace.
++[    1.016489] Freeing unused kernel image (initmem) memory: 4736K
+vm/qemu-serial-VM3.log:412: trailing whitespace.
++[    1.018013] Write protecting the kernel read-only data: 36864k
+vm/qemu-serial-VM3.log:413: trailing whitespace.
++[    1.019745] Freeing unused kernel image (text/rodata gap) memory: 160K
+vm/qemu-serial-VM3.log:414: trailing whitespace.
++[    1.021304] Freeing unused kernel image (rodata/data gap) memory: 16K
+vm/qemu-serial-VM3.log:415: trailing whitespace.
++[    1.072694] x86/mm: Checked W+X mappings: passed, no W+X pages found.
+vm/qemu-serial-VM3.log:416: trailing whitespace.
++[    1.074067] rodata_test: all tests were successful
+vm/qemu-serial-VM3.log:417: trailing whitespace.
++[    1.075091] x86/mm: Checking user space page tables
+vm/qemu-serial-VM3.log:418: trailing whitespace.
++[    1.122077] x86/mm: Checked W+X mappings: passed, no W+X pages found.
+vm/qemu-serial-VM3.log:419: trailing whitespace.
++[    1.123989] Run /init as init process
+vm/qemu-serial-VM3.log:420: trailing whitespace.
++P+q6E616D65\[    1.483651] systemd[1]: Successfully made /usr/ read-only.
+vm/qemu-serial-VM3.log:421: trailing whitespace.
++[6n[32766;32766H[6n[!p]104\[0m[?7h[1G[0J[    1.820398] systemd[1]: systemd 259.2-1-arch running in system mode (+PAM +AUDIT -SELINUX +APPARMOR -IMA +IPE +SMACK +SECCOMP +GCRYPT +GNUTLS +OPENSSL +ACL +BLKID +CURL +ELFUTILS +FIDO2 +IDN2 -IDN +KMOD +LIBCRYPTSETUP +LIBCRYPTSETUP_PLUGINS +LIBFDISK +PCRE2 +PWQUALITY +P11KIT +QRENCODE +TPM2 +BZIP2 +LZ4 +XZ +ZLIB +ZSTD +BPF_FRAMEWORK +BTF +XKBCOMMON +UTMP -SYSVINIT +LIBARCHIVE)
+vm/qemu-serial-VM3.log:422: trailing whitespace.
++[    1.827567] systemd[1]: Detected virtualization kvm.
+vm/qemu-serial-VM3.log:423: trailing whitespace.
++[    1.828646] systemd[1]: Detected architecture x86-64.
+vm/qemu-serial-VM3.log:424: trailing whitespace.
++[    1.829781] systemd[1]: Running in initrd.
+vm/qemu-serial-VM3.log:426: trailing whitespace.
++[    1.833543] systemd[1]: Initializing machine ID from random generator.
+vm/qemu-serial-VM3.log:427: trailing whitespace.
++]3008;start=2f1462033fe843e8b2b1e52fbfc81bae;user=root;hostname=archlinux;machineid=1398d0af7dd4470880394faa8cd593fd;bootid=091cb3c3eafb42a2aa4c82fe81c744f9;pid=1;pidfdid=2;comm=systemd;type=boot\[    1.903817] systemd[1]: Queued start job for default target Initrd Default Target.
+vm/qemu-serial-VM3.log:428: trailing whitespace.
++[    1.970964] systemd[1]: Expecting device /dev/vda1...
+vm/qemu-serial-VM3.log:430: trailing whitespace.
++[    1.973347] systemd[1]: Reached target Path Units.
+vm/qemu-serial-VM3.log:432: trailing whitespace.
++[    1.977071] systemd[1]: Reached target Slice Units.
+vm/qemu-serial-VM3.log:434: trailing whitespace.
++[    1.980372] systemd[1]: Reached target Swaps.
+vm/qemu-serial-VM3.log:436: trailing whitespace.
++[    1.982618] systemd[1]: Reached target Timer Units.
+vm/qemu-serial-VM3.log:438: trailing whitespace.
++[    1.985105] systemd[1]: Listening on Journal Socket (/dev/log).
+vm/qemu-serial-VM3.log:440: trailing whitespace.
++[    1.987989] systemd[1]: Listening on Journal Sockets.
+vm/qemu-serial-VM3.log:442: trailing whitespace.
++[    1.990560] systemd[1]: Listening on udev Control Socket.
+vm/qemu-serial-VM3.log:444: trailing whitespace.
++[    1.993199] systemd[1]: Listening on udev Kernel Socket.
+vm/qemu-serial-VM3.log:446: trailing whitespace.
++[    1.995721] systemd[1]: Reached target Socket Units.
+vm/qemu-serial-VM3.log:448: trailing whitespace.
++[    1.998099] systemd[1]: Create List of Static Device Nodes skipped, unmet condition check ConditionFileNotEmpty=/lib/modules/6.18.13-arch1-1/modules.devname
+vm/qemu-serial-VM3.log:449: trailing whitespace.
++[    2.001012] systemd[1]: Early Battery Level Check skipped, unmet condition check ConditionDirectoryNotEmpty=/sys/class/power_supply
+vm/qemu-serial-VM3.log:450: trailing whitespace.
++[    2.003531] systemd[1]: Display Boot-Time Emergency Messages In Full Screen skipped, unmet condition check ConditionVirtualization=no
+vm/qemu-serial-VM3.log:451: trailing whitespace.
++[    2.012618] systemd[1]: Starting Journal Service...
+vm/qemu-serial-VM3.log:453: trailing whitespace.
++[    2.018228] systemd[1]: Starting Load Kernel Modules...
+vm/qemu-serial-VM3.log:455: trailing whitespace.
++[    2.023285] systemd[1]: TPM PCR Barrier (initrd) skipped, unmet condition check ConditionSecurity=measured-uki
+vm/qemu-serial-VM3.log:456: trailing whitespace.
++[    2.029853] systemd[1]: Starting Create Static Device Nodes in /dev...
+vm/qemu-serial-VM3.log:458: trailing whitespace.
++[    2.040314] systemd[1]: Starting Coldplug All udev Devices...
+vm/qemu-serial-VM3.log:460: trailing whitespace.
++[    2.063310] systemd-journald[104]: Collecting audit messages is disabled.
+vm/qemu-serial-VM3.log:461: trailing whitespace.
++[    2.066844] systemd[1]: Finished Create Static Device Nodes in /dev.
+vm/qemu-serial-VM3.log:463: trailing whitespace.
++[    2.075985] systemd[1]: Reached target Preparation for Local File Systems.
+vm/qemu-serial-VM3.log:465: trailing whitespace.
++[    2.080898] systemd[1]: Reached target Local File Systems.
+vm/qemu-serial-VM3.log:467: trailing whitespace.
++[    2.095860] systemd[1]: Starting Rule-based Manager for Device Events and Files...
+vm/qemu-serial-VM3.log:469: trailing whitespace.
++[    2.127686] systemd[1]: Started Journal Service.
+vm/qemu-serial-VM3.log:470: trailing whitespace.
++[[0;32m  OK  [0m] Started [0;1;39mJournal Service[0m.
+vm/qemu-serial-VM3.log:471: trailing whitespace.
++[    2.144379] netfs: FS-Cache loaded
+vm/qemu-serial-VM3.log:472: trailing whitespace.
++         Starting [0;1;39mCreate System Files and Directories[0m...
+vm/qemu-serial-VM3.log:473: trailing whitespace.
++[    2.173153] 9pnet: Installing 9P2000 support
+vm/qemu-serial-VM3.log:475: trailing whitespace.
++[    2.191320] 9p: Installing v9fs 9p2000 file system support
+vm/qemu-serial-VM3.log:484: trailing whitespace.
++[    2.517397] bochs-drm 0000:00:02.0: vgaarb: deactivate vga console
+vm/qemu-serial-VM3.log:485: trailing whitespace.
++[    2.525234] Console: switching to colour dummy device 80x25
+vm/qemu-serial-VM3.log:486: trailing whitespace.
++[    2.527954] [drm] Found bochs VGA, ID 0xb0c5.
+vm/qemu-serial-VM3.log:487: trailing whitespace.
++[    2.527956] [drm] Framebuffer size 16384 kB @ 0xfd000000, mmio @ 0xfebd0000.
+vm/qemu-serial-VM3.log:488: trailing whitespace.
++[    2.529223] bochs-drm 0000:00:02.0: [drm] Registered 1 planes with drm panic
+vm/qemu-serial-VM3.log:489: trailing whitespace.
++[    2.529231] [drm] Initialized bochs-drm 1.0.0 for 0000:00:02.0 on minor 0
+vm/qemu-serial-VM3.log:490: trailing whitespace.
++[    2.556811] fbcon: bochs-drmdrmfb (fb0) is primary device
+vm/qemu-serial-VM3.log:491: trailing whitespace.
++[    2.568257] scsi host0: ata_piix
+vm/qemu-serial-VM3.log:492: trailing whitespace.
++[    2.575164] Floppy drive(s): fd0 is 2.88M AMI BIOS
+vm/qemu-serial-VM3.log:493: trailing whitespace.
++[    2.585582] scsi host1: ata_piix
+vm/qemu-serial-VM3.log:494: trailing whitespace.
++[    2.585651] ata1: PATA max MWDMA2 cmd 0x1f0 ctl 0x3f6 bmdma 0xc0e0 irq 14 lpm-pol 0
+vm/qemu-serial-VM3.log:495: trailing whitespace.
++[    2.585654] ata2: PATA max MWDMA2 cmd 0x170 ctl 0x376 bmdma 0xc0e8 irq 15 lpm-pol 0
+vm/qemu-serial-VM3.log:496: trailing whitespace.
++[    2.588328] FDC 0 is a S82078B
+vm/qemu-serial-VM3.log:497: trailing whitespace.
++[    2.600065] Console: switching to colour frame buffer device 160x50
+vm/qemu-serial-VM3.log:498: trailing whitespace.
++[    2.611862] bochs-drm 0000:00:02.0: [drm] fb0: bochs-drmdrmfb frame buffer device
+vm/qemu-serial-VM3.log:503: trailing whitespace.
++[[0;32m  OK  [0m] Finished [0;1;39mVirtual Console Setup[0m.
+vm/qemu-serial-VM3.log:504: trailing whitespace.
++[    2.740411] ata2: found unknown device (class 0)
+vm/qemu-serial-VM3.log:505: trailing whitespace.
++[    2.742675] ata2.00: ATAPI: QEMU DVD-ROM, 2.5+, max UDMA/100
+vm/qemu-serial-VM3.log:506: trailing whitespace.
++[    2.751574] scsi 1:0:0:0: CD-ROM            QEMU     QEMU DVD-ROM     2.5+ PQ: 0 ANSI: 5
+vm/qemu-serial-VM3.log:507: trailing whitespace.
++[    2.823818] sr 1:0:0:0: [sr0] scsi3-mmc drive: 4x/4x cd/rw xa/form2 tray
+vm/qemu-serial-VM3.log:508: trailing whitespace.
++[    2.825326] cdrom: Uniform CD-ROM driver Revision: 3.20
+vm/qemu-serial-VM3.log:510: trailing whitespace.
++[    3.126188] EXT4-fs (vda1): mounted filesystem ddfae1cc-629e-47f4-9008-261996ba3811 r/w with ordered data mode. Quota mode: none.
+vm/qemu-serial-VM3.log:542: trailing whitespace.
++[    3.530608] systemd-journald[104]: Received SIGTERM from PID 1 (systemd).
+vm/qemu-serial-VM3.log:543: trailing whitespace.
++P+q6E616D65\[6n[32766;32766H[6n[!p]104\[0m[?7h[1G[0J[    4.257104] systemd[1]: systemd 259.1-1-arch running in system mode (+PAM +AUDIT -SELINUX +APPARMOR -IMA +IPE +SMACK +SECCOMP +GCRYPT +GNUTLS +OPENSSL +ACL +BLKID +CURL +ELFUTILS +FIDO2 +IDN2 -IDN +KMOD +LIBCRYPTSETUP +LIBCRYPTSETUP_PLUGINS +LIBFDISK +PCRE2 +PWQUALITY +P11KIT +QRENCODE +TPM2 +BZIP2 +LZ4 +XZ +ZLIB +ZSTD +BPF_FRAMEWORK +BTF +XKBCOMMON +UTMP -SYSVINIT +LIBARCHIVE)
+vm/qemu-serial-VM3.log:544: trailing whitespace.
++[    4.263825] systemd[1]: Detected virtualization kvm.
+vm/qemu-serial-VM3.log:545: trailing whitespace.
++[    4.264877] systemd[1]: Detected architecture x86-64.
+vm/qemu-serial-VM3.log:549: trailing whitespace.
++[    4.270604] systemd[1]: Hostname set to <ksmbd-vm>.
+vm/qemu-serial-VM3.log:550: trailing whitespace.
++]3008;start=3dd7aabd7f8d4fb2aef509272559e48b;user=root;hostname=ksmbd-vm;machineid=0ab76daf18ce42b0b036a81eb53bdd79;bootid=091cb3c3eafb42a2aa4c82fe81c744f9;pid=1;pidfdid=2;comm=systemd;type=boot\[    4.436200] systemd[1]: bpf-restrict-fs: LSM BPF program attached
+vm/qemu-serial-VM3.log:551: trailing whitespace.
++[    5.147025] systemd[1]: initrd-switch-root.service: Deactivated successfully.
+vm/qemu-serial-VM3.log:552: trailing whitespace.
++[    5.151195] systemd[1]: Stopped Switch Root.
+vm/qemu-serial-VM3.log:554: trailing whitespace.
++[    5.159845] systemd[1]: systemd-journald.service: Scheduled restart job, restart counter is at 1.
+vm/qemu-serial-VM3.log:555: trailing whitespace.
++[    5.164716] systemd[1]: Created slice Slice /system/dirmngr.
+vm/qemu-serial-VM3.log:557: trailing whitespace.
++[    5.170647] systemd[1]: Created slice Slice /system/getty.
+vm/qemu-serial-VM3.log:559: trailing whitespace.
++[    5.176383] systemd[1]: Created slice Slice /system/gpg-agent.
+vm/qemu-serial-VM3.log:561: trailing whitespace.
++[    5.183145] systemd[1]: Created slice Slice /system/gpg-agent-browser.
+vm/qemu-serial-VM3.log:563: trailing whitespace.
++[    5.189267] systemd[1]: Created slice Slice /system/gpg-agent-extra.
+vm/qemu-serial-VM3.log:565: trailing whitespace.
++[    5.196264] systemd[1]: Created slice Slice /system/gpg-agent-ssh.
+vm/qemu-serial-VM3.log:567: trailing whitespace.
++[    5.202356] systemd[1]: Created slice Slice /system/keyboxd.
+vm/qemu-serial-VM3.log:569: trailing whitespace.
++[    5.208189] systemd[1]: Created slice Slice /system/modprobe.
+vm/qemu-serial-VM3.log:571: trailing whitespace.
++[    5.213867] systemd[1]: Created slice Slice /system/serial-getty.
+vm/qemu-serial-VM3.log:573: trailing whitespace.
++[    5.219572] systemd[1]: Created slice User and Session Slice.
+vm/qemu-serial-VM3.log:575: trailing whitespace.
++[    5.222709] systemd[1]: Started Dispatch Password Requests to Console Directory Watch.
+vm/qemu-serial-VM3.log:577: trailing whitespace.
++[    5.226576] systemd[1]: Started Forward Password Requests to Wall Directory Watch.
+vm/qemu-serial-VM3.log:579: trailing whitespace.
++[    5.230485] systemd[1]: Set up automount Arbitrary Executable File Formats File System Automount Point.
+vm/qemu-serial-VM3.log:581: trailing whitespace.
++[    5.235280] systemd[1]: Expecting device /dev/ttyS0...
+vm/qemu-serial-VM3.log:583: trailing whitespace.
++[    5.237604] systemd[1]: Reached target Local Encrypted Volumes.
+vm/qemu-serial-VM3.log:585: trailing whitespace.
++[    5.240555] systemd[1]: Reached target Image Downloads.
+vm/qemu-serial-VM3.log:587: trailing whitespace.
++[    5.243157] systemd[1]: Stopped target Switch Root.
+vm/qemu-serial-VM3.log:589: trailing whitespace.
++[    5.245661] systemd[1]: Stopped target Initrd File Systems.
+vm/qemu-serial-VM3.log:591: trailing whitespace.
++[    5.248468] systemd[1]: Stopped target Initrd Root File System.
+vm/qemu-serial-VM3.log:593: trailing whitespace.
++[    5.251326] systemd[1]: Reached target Local Integrity Protected Volumes.
+vm/qemu-serial-VM3.log:595: trailing whitespace.
++[    5.254727] systemd[1]: Reached target Path Units.
+vm/qemu-serial-VM3.log:597: trailing whitespace.
++[    5.257173] systemd[1]: Reached target Remote File Systems.
+vm/qemu-serial-VM3.log:599: trailing whitespace.
++[    5.260107] systemd[1]: Reached target Slice Units.
+vm/qemu-serial-VM3.log:601: trailing whitespace.
++[    5.262481] systemd[1]: Reached target Swaps.
+vm/qemu-serial-VM3.log:603: trailing whitespace.
++[    5.264687] systemd[1]: Reached target Local Verity Protected Volumes.
+vm/qemu-serial-VM3.log:605: trailing whitespace.
++[    5.267897] systemd[1]: Listening on Device-mapper event daemon FIFOs.
+vm/qemu-serial-VM3.log:607: trailing whitespace.
++[    5.273296] systemd[1]: Listening on Query the User Interactively for a Password.
+vm/qemu-serial-VM3.log:609: trailing whitespace.
++[    5.279213] systemd[1]: Listening on Process Core Dump Socket.
+vm/qemu-serial-VM3.log:611: trailing whitespace.
++[    5.283125] systemd[1]: Listening on Credential Encryption/Decryption.
+vm/qemu-serial-VM3.log:613: trailing whitespace.
++[    5.288068] systemd[1]: Listening on Factory Reset Management.
+vm/qemu-serial-VM3.log:615: trailing whitespace.
++[    5.294172] systemd[1]: Listening on Console Output Muting Service Socket.
+vm/qemu-serial-VM3.log:617: trailing whitespace.
++[    5.299003] systemd[1]: Listening on Network Management Resolve Hook Socket.
+vm/qemu-serial-VM3.log:619: trailing whitespace.
++[    5.303933] systemd[1]: Listening on Network Management Varlink Socket.
+vm/qemu-serial-VM3.log:621: trailing whitespace.
++[    5.308727] systemd[1]: Listening on Network Management Netlink Socket.
+vm/qemu-serial-VM3.log:623: trailing whitespace.
++[    5.312567] systemd[1]: TPM PCR Measurements skipped, unmet condition check ConditionSecurity=measured-uki
+vm/qemu-serial-VM3.log:624: trailing whitespace.
++[    5.314576] systemd[1]: Make TPM PCR Policy skipped, unmet condition check ConditionSecurity=measured-uki
+vm/qemu-serial-VM3.log:625: trailing whitespace.
++[    5.318339] systemd[1]: Listening on Disk Repartitioning Service Socket.
+vm/qemu-serial-VM3.log:627: trailing whitespace.
++[    5.322459] systemd[1]: Listening on Resolve Monitor Varlink Socket.
+vm/qemu-serial-VM3.log:629: trailing whitespace.
++[    5.325825] systemd[1]: Listening on Resolve Service Varlink Socket.
+vm/qemu-serial-VM3.log:631: trailing whitespace.
++[    5.329710] systemd[1]: Listening on udev Control Socket.
+vm/qemu-serial-VM3.log:633: trailing whitespace.
++[    5.334218] systemd[1]: Listening on udev Varlink Socket.
+vm/qemu-serial-VM3.log:635: trailing whitespace.
++[    5.338320] systemd[1]: Listening on User Database Manager Socket.
+vm/qemu-serial-VM3.log:637: trailing whitespace.
++[    5.347569] systemd[1]: Mounting Huge Pages File System...
+vm/qemu-serial-VM3.log:639: trailing whitespace.
++[    5.363196] systemd[1]: Mounting POSIX Message Queue File System...
+vm/qemu-serial-VM3.log:641: trailing whitespace.
++[    5.380238] systemd[1]: Mounting Kernel Debug File System...
+vm/qemu-serial-VM3.log:643: trailing whitespace.
++[    5.398273] systemd[1]: Mounting Kernel Trace File System...
+vm/qemu-serial-VM3.log:645: trailing whitespace.
++[    5.419169] systemd[1]: Mounting Temporary Directory /tmp...
+vm/qemu-serial-VM3.log:647: trailing whitespace.
++[    5.424212] systemd[1]: Create List of Static Device Nodes skipped, unmet condition check ConditionFileNotEmpty=/lib/modules/6.18.13-arch1-1/modules.devname
+vm/qemu-serial-VM3.log:648: trailing whitespace.
++[    5.430150] systemd[1]: Load Kernel Module configfs skipped, unmet condition check ConditionKernelModuleLoaded=!configfs
+vm/qemu-serial-VM3.log:649: trailing whitespace.
++[    5.445223] systemd[1]: Mounting Kernel Configuration File System...
+vm/qemu-serial-VM3.log:651: trailing whitespace.
++[    5.449851] systemd[1]: Load Kernel Module drm skipped, unmet condition check ConditionKernelModuleLoaded=!drm
+vm/qemu-serial-VM3.log:652: trailing whitespace.
++[    5.451762] systemd[1]: Load Kernel Module fuse skipped, unmet condition check ConditionKernelModuleLoaded=!fuse
+vm/qemu-serial-VM3.log:653: trailing whitespace.
++[    5.465160] systemd[1]: Mounting FUSE Control File System...
+vm/qemu-serial-VM3.log:655: trailing whitespace.
++[    5.471300] systemd[1]: Clear Stale Hibernate Storage Info skipped, unmet condition check ConditionPathExists=/sys/firmware/efi/efivars/HibernateLocation-8cf2644b-4b0b-428f-9387-6d876050dc67
+vm/qemu-serial-VM3.log:656: trailing whitespace.
++[    5.484262] systemd[1]: Starting Journal Service...
+vm/qemu-serial-VM3.log:658: trailing whitespace.
++[    5.488334] systemd[1]: Load Kernel Modules skipped, no trigger condition checks were met.
+vm/qemu-serial-VM3.log:659: trailing whitespace.
++[    5.498887] systemd[1]: Starting Generate Network Units from Kernel Command Line...
+vm/qemu-serial-VM3.log:661: trailing whitespace.
++[    5.503804] systemd[1]: TPM PCR Machine ID Measurement skipped, unmet condition check ConditionSecurity=measured-uki
+vm/qemu-serial-VM3.log:662: trailing whitespace.
++[    5.508580] systemd[1]: TPM NvPCR Product ID Measurement skipped, unmet condition check ConditionSecurity=measured-uki
+vm/qemu-serial-VM3.log:663: trailing whitespace.
++[    5.519842] systemd[1]: Starting Remount Root and Kernel File Systems...
+vm/qemu-serial-VM3.log:665: trailing whitespace.
++[    5.549811] systemd-journald[548]: Collecting audit messages is disabled.
+vm/qemu-serial-VM3.log:666: trailing whitespace.
++[    5.555222] systemd[1]: Starting Apply Kernel Variables...
+vm/qemu-serial-VM3.log:668: trailing whitespace.
++[    5.575619] systemd[1]: Starting Create Static Device Nodes in /dev gracefully...
+vm/qemu-serial-VM3.log:669: trailing whitespace.
++[    5.578155] EXT4-fs (vda1): re-mounted ddfae1cc-629e-47f4-9008-261996ba3811.
+vm/qemu-serial-VM3.log:671: trailing whitespace.
++[    5.588255] systemd[1]: Early TPM SRK Setup skipped, unmet condition check ConditionSecurity=measured-uki
+vm/qemu-serial-VM3.log:672: trailing whitespace.
++[    5.603525] systemd[1]: Starting Load udev Rules from Credentials...
+vm/qemu-serial-VM3.log:674: trailing whitespace.
++[    5.629325] systemd[1]: Starting Coldplug All udev Devices...
+vm/qemu-serial-VM3.log:676: trailing whitespace.
++[    5.804783] systemd[1]: Started Journal Service.
+vm/qemu-serial-VM3.log:692: trailing whitespace.
++[    5.966620] systemd-journald[548]: Received client request to flush runtime journal.
+vm/qemu-serial-VM3.log:694: trailing whitespace.
++[    6.006810] systemd-journald[548]: File /var/log/journal/0ab76daf18ce42b0b036a81eb53bdd79/system.journal corrupted or uncleanly shut down, renaming and replacing.
+vm/qemu-serial-VM3.log:695: trailing whitespace.
++[[0;32m  OK  [0m] Finished [0;1;39mColdplug All udev Devices[0m.
+vm/qemu-serial-VM3.log:699: trailing whitespace.
++[[0;32m  OK  [0m] Finished [0;1;39mFlush Journal to Persistent Storage[0m.
+vm/qemu-serial-VM3.log:709: trailing whitespace.
++[    6.358718] 9pnet: Limiting 'msize' to 512000 as this is the maximum supported by transport virtio
+vm/qemu-serial-VM3.log:710: trailing whitespace.
++         Starting [0;1;39mCreate System Files and Directories[0m...
+vm/qemu-serial-VM3.log:711: trailing whitespace.
++         Starting [0;1;39mRule-based Manager for Device Events and Files[0m...
+vm/qemu-serial-VM3.log:713: trailing whitespace.
++[[0;32m  OK  [0m] Started [0;1;39mNetwork Name Resolution[0m.
+vm/qemu-serial-VM3.log:716: trailing whitespace.
++[[0;32m  OK  [0m] Reached target [0;1;39mHost and Network Name Lookups[0m.
+vm/qemu-serial-VM3.log:719: trailing whitespace.
++[    6.962504] virtio_net virtio1 ens4: renamed from eth0
+vm/qemu-serial-VM3.log:741: trailing whitespace.
++[[0;32m  OK  [0m] Started [0;1;39mNetwork Management[0m.
+vm/qemu-serial-VM3.log:742: trailing whitespace.
++[[0;32m  OK  [0m] Reached target [0;1;39mNetwork[0m.
+vm/qemu-serial-VM3.log:743: trailing whitespace.
++         Starting [0;1;39mEnable Persistent Storage in systemd-networkd[0m...
+vm/qemu-serial-VM3.log:744: trailing whitespace.
++         Starting [0;1;39mVirtual Console Setup[0m...
+vm/qemu-serial-VM3.log:751: trailing whitespace.
++[[0;32m  OK  [0m] Finished [0;1;39mEnable Persistent Storage in systemd-networkd[0m.
+vm/qemu-serial-VM3.log:752: trailing whitespace.
++[[0;32m  OK  [0m] Finished [0;1;39mVirtual Console Setup[0m.
+vm/qemu-serial-VM3.log:754: trailing whitespace.
++[[0;32m  OK  [0m] Reached target [0;1;39mSSH Access Available[0m.
+vm/qemu-serial-VM3.log:761: trailing whitespace.
++[!p]104\[0m[?7h[1G[0J[6n[32766;32766H[6n[!p]104\[0m[?7h[1G[0J[6n[32766;32766H[6n]3008;start=4a4ee54d721f4f669b37a2f5744c12ed;user=root;hostname=ksmbd-vm;machineid=0ab76daf18ce42b0b036a81eb53bdd79;bootid=091cb3c3eafb42a2aa4c82fe81c744f9;pid=734;pidfdid=735;comm=(agetty);servicename=serial-getty@ttyS0.service;invocationid=80a91a19b5be4cc3ae2eed2167ed130d;type=service\P+q6E616D65\
+vm/qemu-serial-VM3.log:766: trailing whitespace.
++]3008;start=eb167162766b41e8aa1d1a05a8cbcf99;user=root;hostname=ksmbd-vm;machineid=0ab76daf18ce42b0b036a81eb53bdd79;bootid=091cb3c3eafb42a2aa4c82fe81c744f9;pid=734;pidfdid=735;comm=login;targetuser=root;sessionid=1;type=session\
+vm/qemu-serial-VM3.log:777: trailing whitespace.
++]3008;start=be83c723-6359-4f66-a453-a1b59f983c07;machineid=0ab76daf18ce42b0b036a81eb53bdd79;user=root;hostname=ksmbd-vm;bootid=091cb3c3-eafb-42a2-aa4c-82fe81c744f9;pid=780;type=shell;cwd=/root\[?2004h[root@ksmbd-vm ~]# [   17.806946] ksmbd: loading out-of-tree module taints kernel.
+vm/qemu-serial-VM3.log:778: trailing whitespace.
++[   17.808141] ksmbd: module verification failed: signature and/or required key missing - tainting kernel
+vm/qemu-serial-VM3.log:779: trailing whitespace.
++[   17.848786] ksmbd: Configuration subsystem initialized with 12 parameters
+vm/qemu-serial-VM3.log:780: trailing whitespace.
++[   17.854788] ksmbd: ksmbd: registered built-in md4 (md4-ksmbd) for NTLMv1 support
+vm/qemu-serial-VM3.log:781: trailing whitespace.
++[   17.859102] ksmbd: ksmbd: Fruit SMB extensions loaded
+vm/qemu-serial-VM3.log:782: trailing whitespace.
++[   17.861216] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+vm/qemu-serial-VM3.log:783: trailing whitespace.
++[   17.862514] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+vm/qemu-serial-VM3.log:784: trailing whitespace.
++[   17.864098] ksmbd: ksmbd: witness protocol support initialised
+vm/qemu-serial-VM3.log:785: trailing whitespace.
++[   19.106850] ksmbd: Invalid create options : 0xf0000000
+vm/qemu-serial-VM3.log:786: trailing whitespace.
++[   19.108135] ksmbd: Invalid file attribute : 0x40
+vm/qemu-serial-VM3.log:787: trailing whitespace.
++[   19.109465] ksmbd: Invalid file attribute : 0x8
+vm/qemu-serial-VM3.log:788: trailing whitespace.
++[   19.110646] ksmbd: Invalid file attribute : 0x8
+vm/qemu-serial-VM3.log:789: trailing whitespace.
++[   19.111883] ksmbd: Invalid desired access : 0x8000000
+vm/qemu-serial-VM3.log:790: trailing whitespace.
++[   19.113076] ksmbd: Invalid desired access : 0x4000000
+vm/qemu-serial-VM3.log:791: trailing whitespace.
++[   19.120944] ksmbd: Invalid create options : 0x1000000
+vm/qemu-serial-VM3.log:792: trailing whitespace.
++[   19.122219] ksmbd: Invalid create options : 0x2000000
+vm/qemu-serial-VM3.log:793: trailing whitespace.
++[   19.123561] ksmbd: Invalid create options : 0x4000000
+vm/qemu-serial-VM3.log:794: trailing whitespace.
++[   19.124857] ksmbd: Invalid create options : 0x8000000
+vm/qemu-serial-VM3.log:795: trailing whitespace.
++[   19.126094] ksmbd: Invalid create options : 0x10000000
+vm/qemu-serial-VM3.log:796: trailing whitespace.
++[   19.127381] ksmbd: Invalid create options : 0x20000000
+vm/qemu-serial-VM3.log:797: trailing whitespace.
++[   19.128667] ksmbd: Invalid create options : 0x40000000
+vm/qemu-serial-VM3.log:798: trailing whitespace.
++[   19.129930] ksmbd: Invalid create options : 0x80000000
+vm/qemu-serial-VM3.log:799: trailing whitespace.
++[   19.133999] ksmbd: Invalid desired access : 0x200
+vm/qemu-serial-VM3.log:800: trailing whitespace.
++[   19.135183] ksmbd: Invalid desired access : 0x400
+vm/qemu-serial-VM3.log:801: trailing whitespace.
++[   19.136321] ksmbd: Invalid desired access : 0x800
+vm/qemu-serial-VM3.log:802: trailing whitespace.
++[   19.137702] ksmbd: Invalid desired access : 0x1000
+vm/qemu-serial-VM3.log:803: trailing whitespace.
++[   19.138875] ksmbd: Invalid desired access : 0x2000
+vm/qemu-serial-VM3.log:804: trailing whitespace.
++[   19.140115] ksmbd: Invalid desired access : 0x4000
+vm/qemu-serial-VM3.log:805: trailing whitespace.
++[   19.141312] ksmbd: Invalid desired access : 0x8000
+vm/qemu-serial-VM3.log:806: trailing whitespace.
++[   19.143296] ksmbd: Invalid desired access : 0x200000
+vm/qemu-serial-VM3.log:807: trailing whitespace.
++[   19.165377] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:808: trailing whitespace.
++[   19.166928] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:809: trailing whitespace.
++[   19.168181] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:810: trailing whitespace.
++[   19.170058] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:811: trailing whitespace.
++[   19.171480] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:812: trailing whitespace.
++[   19.172942] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:813: trailing whitespace.
++[   19.174289] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:814: trailing whitespace.
++[   19.175672] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:815: trailing whitespace.
++[   19.177283] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:816: trailing whitespace.
++[   19.178690] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:817: trailing whitespace.
++[   19.180350] ksmbd: Invalid create disposition : 0x6
+vm/qemu-serial-VM3.log:818: trailing whitespace.
++[   19.181728] ksmbd: Invalid create disposition : 0x6
+vm/qemu-serial-VM3.log:819: trailing whitespace.
++[   19.238653] ksmbd: not allow directory name included leading slash
+vm/qemu-serial-VM3.log:820: trailing whitespace.
++[   19.246660] ksmbd: Invalid impersonationlevel : 0x12345678
+vm/qemu-serial-VM3.log:821: trailing whitespace.
++[   19.259686] ksmbd: parse_sec_desc: Error -5 mapping Owner SID to uid
+vm/qemu-serial-VM3.log:822: trailing whitespace.
++[   19.273275] ksmbd: parse_sec_desc: Error -5 mapping Owner SID to uid
+vm/qemu-serial-VM3.log:823: trailing whitespace.
++[   19.646482] ksmbd: can't set temporary attribute on a directory
+vm/qemu-serial-VM3.log:824: trailing whitespace.
++[   29.810440] smb_inherit_dacl: 9 callbacks suppressed
+vm/qemu-serial-VM3.log:825: trailing whitespace.
++[   29.810443] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:826: trailing whitespace.
++[   29.818765] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:827: trailing whitespace.
++[   29.828082] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:828: trailing whitespace.
++[   29.837033] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:829: trailing whitespace.
++[   29.848937] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:830: trailing whitespace.
++[   29.855209] ksmbd: Stream name validation failed: /
+vm/qemu-serial-VM3.log:831: trailing whitespace.
++[   29.860436] ksmbd: Stream name validation failed: /
+vm/qemu-serial-VM3.log:832: trailing whitespace.
++[   29.871032] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:833: trailing whitespace.
++[   29.882362] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:834: trailing whitespace.
++[   29.893903] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:835: trailing whitespace.
++[   29.896117] ksmbd: not allow base filename in rename
+vm/qemu-serial-VM3.log:836: trailing whitespace.
++[   29.905926] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:837: trailing whitespace.
++[   29.908136] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:838: trailing whitespace.
++[   29.921186] ksmbd: no right to read the attributes : 0x1
+vm/qemu-serial-VM3.log:839: trailing whitespace.
++[   29.963450] ksmbd: no right to delete : 0x1ff
+vm/qemu-serial-VM3.log:840: trailing whitespace.
++[   36.408814] smb_inherit_dacl: 6 callbacks suppressed
+vm/qemu-serial-VM3.log:841: trailing whitespace.
++[   36.408825] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:842: trailing whitespace.
++[   48.167740] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:843: trailing whitespace.
++[   58.813509] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:844: trailing whitespace.
++[   60.832593] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:845: trailing whitespace.
++[   62.851032] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:846: trailing whitespace.
++[   63.870189] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:847: trailing whitespace.
++[   64.888163] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:848: trailing whitespace.
++[   65.907229] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:849: trailing whitespace.
++[   67.925571] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:850: trailing whitespace.
++[   67.942915] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:851: trailing whitespace.
++[   70.964132] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:852: trailing whitespace.
++[   73.996071] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:853: trailing whitespace.
++[  111.884807] ksmbd: ksmbd: oplock break ACK timeout on fid 39560
+vm/qemu-serial-VM3.log:854: trailing whitespace.
++[  111.886042] ksmbd: ksmbd: cmd 0x5 handler took 37889 ms (pid=117)
+vm/qemu-serial-VM3.log:855: trailing whitespace.
++[  111.890708] ksmbd: ksmbd: handle_ksmbd_work took 37893 ms
+vm/qemu-serial-VM3.log:856: trailing whitespace.
++[  111.914248] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:857: trailing whitespace.
++[  112.951348] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:858: trailing whitespace.
++[  113.981334] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:859: trailing whitespace.
++[  117.002984] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:860: trailing whitespace.
++[  152.846678] ksmbd: ksmbd: oplock break ACK timeout on fid 39581
+vm/qemu-serial-VM3.log:861: trailing whitespace.
++[  152.847912] ksmbd: ksmbd: cmd 0x5 handler took 35844 ms (pid=124)
+vm/qemu-serial-VM3.log:862: trailing whitespace.
++[  152.849186] ksmbd: ksmbd: handle_ksmbd_work took 35845 ms
+vm/qemu-serial-VM3.log:863: trailing whitespace.
++[  152.861860] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:864: trailing whitespace.
++[  153.878967] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:865: trailing whitespace.
++[  157.903597] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:866: trailing whitespace.
++[  162.932590] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:867: trailing whitespace.
++[  165.996395] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:868: trailing whitespace.
++[  169.038256] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:869: trailing whitespace.
++[  172.081355] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:870: trailing whitespace.
++[  173.115149] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:871: trailing whitespace.
++[  174.135204] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:872: trailing whitespace.
++[  176.156976] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:873: trailing whitespace.
++[  177.167566] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:874: trailing whitespace.
++[  178.183646] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:875: trailing whitespace.
++[  181.197218] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:876: trailing whitespace.
++[  182.212006] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:877: trailing whitespace.
++[  218.379860] ksmbd: ksmbd: oplock break ACK timeout on fid 39659
+vm/qemu-serial-VM3.log:878: trailing whitespace.
++[  218.381097] ksmbd: ksmbd: cmd 0x5 handler took 36168 ms (pid=124)
+vm/qemu-serial-VM3.log:879: trailing whitespace.
++[  218.382429] ksmbd: ksmbd: handle_ksmbd_work took 36169 ms
+vm/qemu-serial-VM3.log:880: trailing whitespace.
++[  219.398394] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:881: trailing whitespace.
++[  219.417493] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:882: trailing whitespace.
++[  221.441911] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:883: trailing whitespace.
++[  222.452905] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:884: trailing whitespace.
++[  222.461114] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:885: trailing whitespace.
++[  222.477514] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:886: trailing whitespace.
++[  224.498588] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:887: trailing whitespace.
++[  224.513344] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:888: trailing whitespace.
++[  226.517370] ksmbd: Not allow lock operation on exclusive lock range
+vm/qemu-serial-VM3.log:889: trailing whitespace.
++[  227.530111] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:890: trailing whitespace.
++[  227.531266] ksmbd: Not allow lock operation on exclusive lock range
+vm/qemu-serial-VM3.log:891: trailing whitespace.
++[  228.540277] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:892: trailing whitespace.
++[  229.543440] ksmbd: Not allow lock operation on exclusive lock range
+vm/qemu-serial-VM3.log:893: trailing whitespace.
++[  230.555511] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:894: trailing whitespace.
++[  234.580614] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:895: trailing whitespace.
++[  236.599060] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:896: trailing whitespace.
++[  340.157160] ksmbd: lease break ack: lookup FAILED
+vm/qemu-serial-VM3.log:897: trailing whitespace.
++[  358.210524] ksmbd: lease break ack: lookup FAILED
+vm/qemu-serial-VM3.log:898: trailing whitespace.
++[  423.179801] ksmbd: ksmbd: oplock break ACK timeout on fid 40229
+vm/qemu-serial-VM3.log:899: trailing whitespace.
++[  424.203851] ksmbd: ksmbd: cmd 0x5 handler took 37516 ms (pid=10)
+vm/qemu-serial-VM3.log:900: trailing whitespace.
++[  424.205105] ksmbd: ksmbd: handle_ksmbd_work took 37517 ms
+vm/qemu-serial-VM3.log:901: trailing whitespace.
++[  424.206222] ksmbd: lease break ack: lookup FAILED
+vm/qemu-serial-VM3.log:902: trailing whitespace.
++[  451.417804] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:903: trailing whitespace.
++[  451.418723] ksmbd: inherit ACL overflow
+vm/qemu-serial-VM3.log:904: trailing whitespace.
++[  665.889447] clocksource: Long readout interval, skipping watchdog check: cs_nsec: 2077669396 wd_nsec: 2077669625
+vm/qemu-serial-VM3.log:905: trailing whitespace.
++[ 1060.994923] ksmbd: ksmbd: witness protocol support removed
+vm/qemu-serial-VM3.log:906: trailing whitespace.
++[ 1061.470828] ksmbd: ksmbd: Fruit SMB extensions unloaded
+vm/qemu-serial-VM3.log:907: trailing whitespace.
++[ 1062.555476] ksmbd: Configuration subsystem initialized with 12 parameters
+vm/qemu-serial-VM3.log:908: trailing whitespace.
++[ 1062.561015] ksmbd: ksmbd: registered built-in md4 (md4-ksmbd) for NTLMv1 support
+vm/qemu-serial-VM3.log:909: trailing whitespace.
++[ 1062.567958] ksmbd: ksmbd: Fruit SMB extensions loaded
+vm/qemu-serial-VM3.log:910: trailing whitespace.
++[ 1062.569068] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+vm/qemu-serial-VM3.log:911: trailing whitespace.
++[ 1062.570272] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+vm/qemu-serial-VM3.log:912: trailing whitespace.
++[ 1062.571602] ksmbd: ksmbd: witness protocol support initialised
+vm/qemu-serial-VM3.log:913: trailing whitespace.
++[ 1090.504142] ksmbd: connect success: accepted new connection
+vm/qemu-serial-VM3.log:914: trailing whitespace.
++[ 1090.511499] ksmbd: RFC1002 hdr=00 00 00 e2 len=226 status=0
+vm/qemu-serial-VM3.log:915: trailing whitespace.
++[ 1090.512676] ksmbd: PDU sig=fe 53 4d 42 pdu=226 req_running=0
+vm/qemu-serial-VM3.log:916: trailing whitespace.
++[ 1090.513856] ksmbd: got SMB2 command
+vm/qemu-serial-VM3.log:917: trailing whitespace.
++[ 1090.514689] ksmbd: no length check for command
+vm/qemu-serial-VM3.log:918: trailing whitespace.
++[ 1090.515647] ksmbd: SMB2 data length 0 offset 0
+vm/qemu-serial-VM3.log:919: trailing whitespace.
++[ 1090.516609] ksmbd: SMB2 len 100
+vm/qemu-serial-VM3.log:920: trailing whitespace.
++[ 1090.517272] ksmbd: Unknown command 0 in credit charge validation, defaulting to 1
+vm/qemu-serial-VM3.log:921: trailing whitespace.
++[ 1090.518806] ksmbd: credit_check: cmd=0 charge=1 calc=1 req_len=1 resp_len=0 total=1 out=0
+vm/qemu-serial-VM3.log:922: trailing whitespace.
++[ 1090.520451] ksmbd: credit_check: lock_enter cmd=0 charge=1 total=1 out=0
+vm/qemu-serial-VM3.log:923: trailing whitespace.
++[ 1090.521850] ksmbd: credit_check: lock_exit cmd=0 ret=0 total=1 out=1
+vm/qemu-serial-VM3.log:924: trailing whitespace.
++[ 1090.523133] ksmbd: client requested dialect 0x311
+vm/qemu-serial-VM3.log:925: trailing whitespace.
++[ 1090.524134] ksmbd: selected SMB 3.1.1 dialect
+vm/qemu-serial-VM3.log:926: trailing whitespace.
++[ 1090.525081] ksmbd: conn->dialect 0x311
+vm/qemu-serial-VM3.log:927: trailing whitespace.
++[ 1090.526284] ksmbd: Received negotiate request
+vm/qemu-serial-VM3.log:928: trailing whitespace.
++[ 1090.527188] ksmbd: decoding 4 negotiate contexts
+vm/qemu-serial-VM3.log:929: trailing whitespace.
++[ 1090.528737] ksmbd: deassemble SMB2_PREAUTH_INTEGRITY_CAPABILITIES context
+vm/qemu-serial-VM3.log:930: trailing whitespace.
++[ 1090.530068] ksmbd: deassemble SMB2_ENCRYPTION_CAPABILITIES context
+vm/qemu-serial-VM3.log:931: trailing whitespace.
++[ 1090.532316] ksmbd: Cipher ID = 0x4
+vm/qemu-serial-VM3.log:932: trailing whitespace.
++[ 1090.532998] ksmbd: deassemble SMB2_SIGNING_CAPABILITIES context
+vm/qemu-serial-VM3.log:933: trailing whitespace.
++[ 1090.535197] ksmbd: Signing Algorithm ID = 0x2 (mutually agreed)
+vm/qemu-serial-VM3.log:934: trailing whitespace.
++[ 1090.536389] ksmbd: deassemble SMB2_NETNAME_NEGOTIATE_CONTEXT_ID context
+vm/qemu-serial-VM3.log:935: trailing whitespace.
++[ 1090.537743] ksmbd: NETNAME context name '127.0.0.1' != server name 'KSMBD-VM'
+vm/qemu-serial-VM3.log:936: trailing whitespace.
++[ 1090.539238] ksmbd: assemble SMB2_PREAUTH_INTEGRITY_CAPABILITIES context
+vm/qemu-serial-VM3.log:937: trailing whitespace.
++[ 1090.540594] ksmbd: assemble SMB2_ENCRYPTION_CAPABILITIES context
+vm/qemu-serial-VM3.log:938: trailing whitespace.
++[ 1090.541823] ksmbd: assemble SMB2_SIGNING_CAPABILITIES context
+vm/qemu-serial-VM3.log:939: trailing whitespace.
++[ 1090.542981] ksmbd: negotiate context offset 224, count 3
+vm/qemu-serial-VM3.log:940: trailing whitespace.
++[ 1090.544083] ksmbd: credit_rsp: dispatch cmd=0 total=1 out=1 granted_total=0
+vm/qemu-serial-VM3.log:941: trailing whitespace.
++[ 1090.545472] ksmbd: credit_rsp: lock_enter cmd=0 charge=1 req=31 total=1 out=1 granted_total=0
+vm/qemu-serial-VM3.log:942: trailing whitespace.
++[ 1090.547190] ksmbd: credit_rsp: lock_exit cmd=0 charge=1 req=31 granted=1 total=1 out=0 granted_total=1
+vm/qemu-serial-VM3.log:943: trailing whitespace.
++[ 1090.549119] ksmbd: credits: requested[31] granted[1] total_granted[1]
+vm/qemu-serial-VM3.log:944: trailing whitespace.
++[ 1090.554820] ksmbd: RFC1002 hdr=00 00 00 a2 len=162 status=5
+vm/qemu-serial-VM3.log:945: trailing whitespace.
++[ 1090.556022] ksmbd: PDU sig=fe 53 4d 42 pdu=162 req_running=0
+vm/qemu-serial-VM3.log:946: trailing whitespace.
++[ 1090.557221] ksmbd: got SMB2 command
+vm/qemu-serial-VM3.log:947: trailing whitespace.
++[ 1090.557971] ksmbd: SMB2 data length 74 offset 88
+vm/qemu-serial-VM3.log:948: trailing whitespace.
++[ 1090.558958] ksmbd: SMB2 len 162
+vm/qemu-serial-VM3.log:949: trailing whitespace.
++[ 1090.559635] ksmbd: Unknown command 1 in credit charge validation, defaulting to 1
+vm/qemu-serial-VM3.log:950: trailing whitespace.
++[ 1090.561149] ksmbd: credit_check: cmd=1 charge=1 calc=1 req_len=1 resp_len=0 total=1 out=0
+vm/qemu-serial-VM3.log:951: trailing whitespace.
++[ 1090.562808] ksmbd: credit_check: lock_enter cmd=1 charge=1 total=1 out=0
+vm/qemu-serial-VM3.log:952: trailing whitespace.
++[ 1090.564152] ksmbd: credit_check: lock_exit cmd=1 ret=0 total=1 out=1
+vm/qemu-serial-VM3.log:953: trailing whitespace.
++[ 1090.565452] ksmbd: Received smb2 session setup request
+vm/qemu-serial-VM3.log:954: trailing whitespace.
++[ 1090.566536] ksmbd: negotiate phase
+vm/qemu-serial-VM3.log:955: trailing whitespace.
++[ 1090.567264] ksmbd: NTLMSSP SecurityBufferLength 152
+vm/qemu-serial-VM3.log:956: trailing whitespace.
++[ 1090.568266] ksmbd: credit_rsp: dispatch cmd=1 total=1 out=1 granted_total=0
+vm/qemu-serial-VM3.log:957: trailing whitespace.
++[ 1090.569697] ksmbd: credit_rsp: lock_enter cmd=1 charge=1 req=31 total=1 out=1 granted_total=0
+vm/qemu-serial-VM3.log:958: trailing whitespace.
++[ 1090.571847] ksmbd: credit_rsp: lock_exit cmd=1 charge=1 req=31 granted=31 total=31 out=0 granted_total=31
+vm/qemu-serial-VM3.log:959: trailing whitespace.
++[ 1090.574265] ksmbd: credits: requested[31] granted[31] total_granted[31]
+vm/qemu-serial-VM3.log:960: trailing whitespace.
++[ 1090.577004] ksmbd: RFC1002 hdr=00 00 02 06 len=518 status=5
+vm/qemu-serial-VM3.log:961: trailing whitespace.
++[ 1090.578125] ksmbd: PDU sig=fe 53 4d 42 pdu=518 req_running=0
+vm/qemu-serial-VM3.log:962: trailing whitespace.
++[ 1090.580320] ksmbd: got SMB2 command
+vm/qemu-serial-VM3.log:963: trailing whitespace.
++[ 1090.581098] ksmbd: SMB2 data length 430 offset 88
+vm/qemu-serial-VM3.log:964: trailing whitespace.
++[ 1090.582055] ksmbd: SMB2 len 518
+vm/qemu-serial-VM3.log:965: trailing whitespace.
++[ 1090.582714] ksmbd: Unknown command 1 in credit charge validation, defaulting to 1
+vm/qemu-serial-VM3.log:966: trailing whitespace.
++[ 1090.584308] ksmbd: credit_check: cmd=1 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+vm/qemu-serial-VM3.log:967: trailing whitespace.
++[ 1090.587164] ksmbd: credit_check: lock_enter cmd=1 charge=1 total=31 out=0
+vm/qemu-serial-VM3.log:968: trailing whitespace.
++[ 1090.588549] ksmbd: credit_check: lock_exit cmd=1 ret=0 total=31 out=1
+vm/qemu-serial-VM3.log:969: trailing whitespace.
++[ 1090.589851] ksmbd: Received smb2 session setup request
+vm/qemu-serial-VM3.log:970: trailing whitespace.
++[ 1090.590918] ksmbd: authenticate phase
+vm/qemu-serial-VM3.log:971: trailing whitespace.
++[ 1090.591675] ksmbd: session setup request for user testuser
+vm/qemu-serial-VM3.log:972: trailing whitespace.
++[ 1090.593521] ksmbd: decode_ntlmssp_authenticate_blob dnameWORKGROUP
+vm/qemu-serial-VM3.log:973: trailing whitespace.
++[ 1090.594818] ksmbd: generated encryption keys for session 1, cipher type 4
+vm/qemu-serial-VM3.log:974: trailing whitespace.
++[ 1090.596340] ksmbd: generated signing key for session 1
+vm/qemu-serial-VM3.log:975: trailing whitespace.
++[ 1090.597494] ksmbd: credit_rsp: dispatch cmd=1 total=31 out=1 granted_total=0
+vm/qemu-serial-VM3.log:976: trailing whitespace.
++[ 1090.601045] ksmbd: credit_rsp: lock_enter cmd=1 charge=1 req=1 total=31 out=1 granted_total=0
+vm/qemu-serial-VM3.log:977: trailing whitespace.
++[ 1090.602846] ksmbd: credit_rsp: lock_exit cmd=1 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+vm/qemu-serial-VM3.log:978: trailing whitespace.
++[ 1090.604781] ksmbd: credits: requested[1] granted[1] total_granted[31]
+vm/qemu-serial-VM3.log:979: trailing whitespace.
++[ 1090.606272] ksmbd: RFC1002 hdr=00 00 00 68 len=104 status=1
+vm/qemu-serial-VM3.log:980: trailing whitespace.
++[ 1090.607385] ksmbd: PDU sig=fe 53 4d 42 pdu=104 req_running=1
+vm/qemu-serial-VM3.log:981: trailing whitespace.
++[ 1090.608723] ksmbd: skip to check tree connect request
+vm/qemu-serial-VM3.log:982: trailing whitespace.
++[ 1090.609854] ksmbd: got SMB2 command
+vm/qemu-serial-VM3.log:983: trailing whitespace.
++[ 1090.610584] ksmbd: SMB2 data length 32 offset 72
+vm/qemu-serial-VM3.log:984: trailing whitespace.
++[ 1090.611655] ksmbd: SMB2 len 104
+vm/qemu-serial-VM3.log:985: trailing whitespace.
++[ 1090.612408] ksmbd: Unknown command 3 in credit charge validation, defaulting to 1
+vm/qemu-serial-VM3.log:986: trailing whitespace.
++[ 1090.614025] ksmbd: credit_check: cmd=3 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+vm/qemu-serial-VM3.log:987: trailing whitespace.
++[ 1090.615666] ksmbd: credit_check: lock_enter cmd=3 charge=1 total=31 out=0
+vm/qemu-serial-VM3.log:988: trailing whitespace.
++[ 1090.617151] ksmbd: credit_check: lock_exit cmd=3 ret=0 total=31 out=1
+vm/qemu-serial-VM3.log:989: trailing whitespace.
++[ 1090.618546] ksmbd: Received smb2 tree connect request
+vm/qemu-serial-VM3.log:990: trailing whitespace.
++[ 1090.619674] ksmbd: tree connect request for tree test treename \\127.0.0.1\test
+vm/qemu-serial-VM3.log:991: trailing whitespace.
++[ 1090.621344] ksmbd: MaximalAccess: perm_r=0 perm_w=0 perm_x=0 access=0x001f01ff
+vm/qemu-serial-VM3.log:992: trailing whitespace.
++[ 1090.622850] ksmbd: credit_rsp: dispatch cmd=3 total=31 out=1 granted_total=0
+vm/qemu-serial-VM3.log:993: trailing whitespace.
++[ 1090.624248] ksmbd: credit_rsp: lock_enter cmd=3 charge=1 req=1 total=31 out=1 granted_total=0
+vm/qemu-serial-VM3.log:994: trailing whitespace.
++[ 1090.626089] ksmbd: credit_rsp: lock_exit cmd=3 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+vm/qemu-serial-VM3.log:995: trailing whitespace.
++[ 1090.627954] ksmbd: credits: requested[1] granted[1] total_granted[31]
+vm/qemu-serial-VM3.log:996: trailing whitespace.
++[ 1090.629380] ksmbd: RFC1002 hdr=00 00 00 ba len=186 status=1
+vm/qemu-serial-VM3.log:997: trailing whitespace.
++[ 1090.630699] ksmbd: PDU sig=fe 53 4d 42 pdu=186 req_running=1
+vm/qemu-serial-VM3.log:998: trailing whitespace.
++[ 1090.631960] ksmbd: got SMB2 command
+vm/qemu-serial-VM3.log:999: trailing whitespace.
++[ 1090.632741] ksmbd: SMB2 data length 66 offset 120
+vm/qemu-serial-VM3.log:1000: trailing whitespace.
++[ 1090.633698] ksmbd: SMB2 len 186
+vm/qemu-serial-VM3.log:1001: trailing whitespace.
++[ 1090.634473] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+vm/qemu-serial-VM3.log:1002: trailing whitespace.
++[ 1090.636083] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+vm/qemu-serial-VM3.log:1003: trailing whitespace.
++[ 1090.637846] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+vm/qemu-serial-VM3.log:1004: trailing whitespace.
++[ 1090.639312] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+vm/qemu-serial-VM3.log:1005: trailing whitespace.
++[ 1090.640730] ksmbd: Received smb2 create request
+vm/qemu-serial-VM3.log:1006: trailing whitespace.
++[ 1090.641759] ksmbd: converted name = lease_v2_rename_overwrite_src.dat
+vm/qemu-serial-VM3.log:1007: trailing whitespace.
++[ 1090.643162] ksmbd: can not get linux path for lease_v2_rename_overwrite_src.dat, rc = -2
+vm/qemu-serial-VM3.log:1008: trailing whitespace.
++[ 1090.644965] ksmbd: Error response: c0000034
+vm/qemu-serial-VM3.log:1009: trailing whitespace.
++[ 1090.645965] ksmbd: Failed to process 5 [-9]
+vm/qemu-serial-VM3.log:1010: trailing whitespace.
++[ 1090.646946] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+vm/qemu-serial-VM3.log:1011: trailing whitespace.
++[ 1090.648532] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+vm/qemu-serial-VM3.log:1012: trailing whitespace.
++[ 1090.650330] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+vm/qemu-serial-VM3.log:1013: trailing whitespace.
++[ 1090.652304] ksmbd: credits: requested[1] granted[1] total_granted[31]
+vm/qemu-serial-VM3.log:1014: trailing whitespace.
++[ 1090.653892] ksmbd: RFC1002 hdr=00 00 00 ba len=186 status=1
+vm/qemu-serial-VM3.log:1015: trailing whitespace.
++[ 1090.655028] ksmbd: PDU sig=fe 53 4d 42 pdu=186 req_running=1
+vm/qemu-serial-VM3.log:1016: trailing whitespace.
++[ 1090.656330] ksmbd: got SMB2 command
+vm/qemu-serial-VM3.log:1017: trailing whitespace.
++[ 1090.657171] ksmbd: SMB2 data length 66 offset 120
+vm/qemu-serial-VM3.log:1018: trailing whitespace.
++[ 1090.658242] ksmbd: SMB2 len 186
+vm/qemu-serial-VM3.log:1019: trailing whitespace.
++[ 1090.659004] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+vm/qemu-serial-VM3.log:1020: trailing whitespace.
++[ 1090.660633] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+vm/qemu-serial-VM3.log:1021: trailing whitespace.
++[ 1090.662369] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+vm/qemu-serial-VM3.log:1022: trailing whitespace.
++[ 1090.663856] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+vm/qemu-serial-VM3.log:1023: trailing whitespace.
++[ 1090.665266] ksmbd: Received smb2 create request
+vm/qemu-serial-VM3.log:1024: trailing whitespace.
++[ 1090.666317] ksmbd: converted name = lease_v2_rename_overwrite_dst.dat
+vm/qemu-serial-VM3.log:1025: trailing whitespace.
++[ 1090.667829] ksmbd: can not get linux path for lease_v2_rename_overwrite_dst.dat, rc = -2
+vm/qemu-serial-VM3.log:1026: trailing whitespace.
++[ 1090.669436] ksmbd: Error response: c0000034
+vm/qemu-serial-VM3.log:1027: trailing whitespace.
++[ 1090.670410] ksmbd: Failed to process 5 [-9]
+vm/qemu-serial-VM3.log:1028: trailing whitespace.
++[ 1090.671393] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+vm/qemu-serial-VM3.log:1029: trailing whitespace.
++[ 1090.672926] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+vm/qemu-serial-VM3.log:1030: trailing whitespace.
++[ 1090.674741] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+vm/qemu-serial-VM3.log:1031: trailing whitespace.
++[ 1090.676759] ksmbd: credits: requested[1] granted[1] total_granted[31]
+vm/qemu-serial-VM3.log:1032: trailing whitespace.
++[ 1090.678289] ksmbd: RFC1002 hdr=00 00 01 0c len=268 status=1
+vm/qemu-serial-VM3.log:1033: trailing whitespace.
++[ 1090.679594] ksmbd: PDU sig=fe 53 4d 42 pdu=268 req_running=1
+vm/qemu-serial-VM3.log:1034: trailing whitespace.
++[ 1090.680868] ksmbd: got SMB2 command
+vm/qemu-serial-VM3.log:1035: trailing whitespace.
++[ 1090.681601] ksmbd: SMB2 data length 76 offset 192
+vm/qemu-serial-VM3.log:1036: trailing whitespace.
++[ 1090.682689] ksmbd: SMB2 len 268
+vm/qemu-serial-VM3.log:1037: trailing whitespace.
++[ 1090.683458] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+vm/qemu-serial-VM3.log:1038: trailing whitespace.
++[ 1090.685081] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+vm/qemu-serial-VM3.log:1039: trailing whitespace.
++[ 1090.686859] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+vm/qemu-serial-VM3.log:1040: trailing whitespace.
++[ 1090.688318] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+vm/qemu-serial-VM3.log:1041: trailing whitespace.
++[ 1090.689742] ksmbd: Received smb2 create request
+vm/qemu-serial-VM3.log:1042: trailing whitespace.
++[ 1090.690788] ksmbd: converted name = lease_v2_rename_overwrite_src.dat
+vm/qemu-serial-VM3.log:1043: trailing whitespace.
++[ 1090.692209] ksmbd: can not get linux path for lease_v2_rename_overwrite_src.dat, rc = -2
+vm/qemu-serial-VM3.log:1044: trailing whitespace.
++[ 1090.693980] ksmbd: file does not exist, so creating
+vm/qemu-serial-VM3.log:1045: trailing whitespace.
++[ 1090.695100] ksmbd: creating regular file
+vm/qemu-serial-VM3.log:1046: trailing whitespace.
++[ 1090.696056] ksmbd: inherit posix acl failed : -2
+vm/qemu-serial-VM3.log:1047: trailing whitespace.
++[ 1090.697124] ksmbd: Set posix acls
+vm/qemu-serial-VM3.log:1048: trailing whitespace.
++[ 1090.697936] ksmbd: mode: 7, access flags now 0x1f01bf
+vm/qemu-serial-VM3.log:1049: trailing whitespace.
++[ 1090.699083] ksmbd: mode: 7, access flags now 0x1f01bf
+vm/qemu-serial-VM3.log:1050: trailing whitespace.
++[ 1090.700219] ksmbd: mode: 7, access flags now 0x1f01bf
+vm/qemu-serial-VM3.log:1051: trailing whitespace.
++[ 1090.701392] ksmbd: lease req for(lease_v2_rename_overwrite_src.dat) req oplock state 0x9, lease state 0x7
+vm/qemu-serial-VM3.log:1052: trailing whitespace.
++[ 1090.703429] ksmbd: lease granted on(lease_v2_rename_overwrite_src.dat) lease state 0x7
+vm/qemu-serial-VM3.log:1053: trailing whitespace.
++[ 1090.705154] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+vm/qemu-serial-VM3.log:1054: trailing whitespace.
++[ 1090.706664] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+vm/qemu-serial-VM3.log:1055: trailing whitespace.
++[ 1090.708444] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+vm/qemu-serial-VM3.log:1056: trailing whitespace.
++[ 1090.710414] ksmbd: credits: requested[1] granted[1] total_granted[31]
+vm/qemu-serial-VM3.log:1057: trailing whitespace.
++[ 1090.711882] ksmbd: RFC1002 hdr=00 00 01 0c len=268 status=1
+vm/qemu-serial-VM3.log:1058: trailing whitespace.
++[ 1090.712987] ksmbd: PDU sig=fe 53 4d 42 pdu=268 req_running=0
+vm/qemu-serial-VM3.log:1059: trailing whitespace.
++[ 1090.714109] ksmbd: got SMB2 command
+vm/qemu-serial-VM3.log:1060: trailing whitespace.
++[ 1090.714806] ksmbd: SMB2 data length 76 offset 192
+vm/qemu-serial-VM3.log:1061: trailing whitespace.
++[ 1090.715712] ksmbd: SMB2 len 268
+vm/qemu-serial-VM3.log:1062: trailing whitespace.
++[ 1090.716331] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+vm/qemu-serial-VM3.log:1063: trailing whitespace.
++[ 1090.717771] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+vm/qemu-serial-VM3.log:1064: trailing whitespace.
++[ 1090.719404] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+vm/qemu-serial-VM3.log:1065: trailing whitespace.
++[ 1090.720764] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+vm/qemu-serial-VM3.log:1066: trailing whitespace.
++[ 1090.722013] ksmbd: Received smb2 create request
+vm/qemu-serial-VM3.log:1067: trailing whitespace.
++[ 1090.722904] ksmbd: converted name = lease_v2_rename_overwrite_dst.dat
+vm/qemu-serial-VM3.log:1068: trailing whitespace.
++[ 1090.724152] ksmbd: can not get linux path for lease_v2_rename_overwrite_dst.dat, rc = -2
+vm/qemu-serial-VM3.log:1069: trailing whitespace.
++[ 1090.725765] ksmbd: file does not exist, so creating
+vm/qemu-serial-VM3.log:1070: trailing whitespace.
++[ 1090.726703] ksmbd: creating regular file
+vm/qemu-serial-VM3.log:1071: trailing whitespace.
++[ 1090.727523] ksmbd: inherit posix acl failed : -2
+vm/qemu-serial-VM3.log:1072: trailing whitespace.
++[ 1090.728419] ksmbd: Set posix acls
+vm/qemu-serial-VM3.log:1073: trailing whitespace.
++[ 1090.729110] ksmbd: mode: 7, access flags now 0x1f01bf
+vm/qemu-serial-VM3.log:1074: trailing whitespace.
++[ 1090.730157] ksmbd: mode: 7, access flags now 0x1f01bf
+vm/qemu-serial-VM3.log:1075: trailing whitespace.
++[ 1090.731247] ksmbd: mode: 7, access flags now 0x1f01bf
+vm/qemu-serial-VM3.log:1076: trailing whitespace.
++[ 1090.732297] ksmbd: lease req for(lease_v2_rename_overwrite_dst.dat) req oplock state 0x9, lease state 0x7
+vm/qemu-serial-VM3.log:1077: trailing whitespace.
++[ 1090.734180] ksmbd: lease granted on(lease_v2_rename_overwrite_dst.dat) lease state 0x7
+vm/qemu-serial-VM3.log:1078: trailing whitespace.
++[ 1090.735702] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+vm/qemu-serial-VM3.log:1079: trailing whitespace.
++[ 1090.737142] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+vm/qemu-serial-VM3.log:1080: trailing whitespace.
++[ 1090.738823] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+vm/qemu-serial-VM3.log:1081: trailing whitespace.
++[ 1090.740662] ksmbd: credits: requested[1] granted[1] total_granted[31]
+vm/qemu-serial-VM3.log:1082: trailing whitespace.
++[ 1090.742117] ksmbd: RFC1002 hdr=00 00 00 b8 len=184 status=1
+vm/qemu-serial-VM3.log:1083: trailing whitespace.
++[ 1090.743287] ksmbd: PDU sig=fe 53 4d 42 pdu=184 req_running=0
+vm/qemu-serial-VM3.log:1084: trailing whitespace.
++[ 1090.744452] ksmbd: got SMB2 command
+vm/qemu-serial-VM3.log:1085: trailing whitespace.
++[ 1090.745199] ksmbd: SMB2 data length 88 offset 96
+vm/qemu-serial-VM3.log:1086: trailing whitespace.
++[ 1090.746162] ksmbd: SMB2 len 184
+vm/qemu-serial-VM3.log:1087: trailing whitespace.
++[ 1090.746840] ksmbd: credit_check: cmd=17 charge=1 calc=1 req_len=88 resp_len=0 total=31 out=0
+vm/qemu-serial-VM3.log:1088: trailing whitespace.
++[ 1090.748562] ksmbd: credit_check: lock_enter cmd=17 charge=1 total=31 out=0
+vm/qemu-serial-VM3.log:1089: trailing whitespace.
++[ 1090.749950] ksmbd: credit_check: lock_exit cmd=17 ret=0 total=31 out=1
+vm/qemu-serial-VM3.log:1090: trailing whitespace.
++[ 1090.751298] ksmbd: Received smb2 set info request
+vm/qemu-serial-VM3.log:1091: trailing whitespace.
++[ 1090.752301] ksmbd: GOT SMB2_O_INFO_FILE
+vm/qemu-serial-VM3.log:1092: trailing whitespace.
++[ 1090.753129] ksmbd: check permission using windows acl
+vm/qemu-serial-VM3.log:1093: trailing whitespace.
++[ 1090.754210] ksmbd: check permission using windows acl
+vm/qemu-serial-VM3.log:1094: trailing whitespace.
++[ 1090.755255] ksmbd: setting FILE_RENAME_INFO
+vm/qemu-serial-VM3.log:1095: trailing whitespace.
++[ 1090.756140] ksmbd: new name lease_v2_rename_overwrite_dst.dat
+vm/qemu-serial-VM3.log:1096: trailing whitespace.
++[ 1090.757317] ksmbd: handle lease break: scanning inode 00000000dd2417d7 op_list
+vm/qemu-serial-VM3.log:1097: trailing whitespace.
++[ 1090.758800] ksmbd:   op_entry: conn=000000008e71b7b2 is_lease=1 state=0x7
+vm/qemu-serial-VM3.log:1098: trailing whitespace.
++[ 1090.760204] ksmbd: handle lease break: found 0 leases to break
+vm/qemu-serial-VM3.log:1099: trailing whitespace.
++[ 1090.761442] ksmbd: credit_rsp: dispatch cmd=17 total=31 out=1 granted_total=0
+vm/qemu-serial-VM3.log:1100: trailing whitespace.
++[ 1090.762946] ksmbd: credit_rsp: lock_enter cmd=17 charge=1 req=1 total=31 out=1 granted_total=0
+vm/qemu-serial-VM3.log:1101: trailing whitespace.
++[ 1090.764720] ksmbd: credit_rsp: lock_exit cmd=17 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+vm/qemu-serial-VM3.log:1102: trailing whitespace.
++[ 1090.766635] ksmbd: credits: requested[1] granted[1] total_granted[31]
+vm/qemu-serial-VM3.log:1103: trailing whitespace.
++[ 1090.768501] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+vm/qemu-serial-VM3.log:1104: trailing whitespace.
++[ 1090.769659] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+vm/qemu-serial-VM3.log:1105: trailing whitespace.
++[ 1090.771414] ksmbd: got SMB2 command
+vm/qemu-serial-VM3.log:1106: trailing whitespace.
++[ 1090.772612] ksmbd: SMB2 len 88
+vm/qemu-serial-VM3.log:1107: trailing whitespace.
++[ 1090.773276] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+vm/qemu-serial-VM3.log:1108: trailing whitespace.
++[ 1090.775078] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+vm/qemu-serial-VM3.log:1109: trailing whitespace.
++[ 1090.776818] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+vm/qemu-serial-VM3.log:1110: trailing whitespace.
++[ 1090.778219] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+vm/qemu-serial-VM3.log:1111: trailing whitespace.
++[ 1090.779549] ksmbd: Received smb2 close request
+vm/qemu-serial-VM3.log:1112: trailing whitespace.
++[ 1090.780500] ksmbd: volatile_id = 0
+vm/qemu-serial-VM3.log:1113: trailing whitespace.
++[ 1090.781217] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+vm/qemu-serial-VM3.log:1114: trailing whitespace.
++[ 1090.782694] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+vm/qemu-serial-VM3.log:1115: trailing whitespace.
++[ 1090.784439] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+vm/qemu-serial-VM3.log:1116: trailing whitespace.
++[ 1090.786353] ksmbd: credits: requested[1] granted[1] total_granted[31]
+vm/qemu-serial-VM3.log:1117: trailing whitespace.
++[ 1090.788501] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+vm/qemu-serial-VM3.log:1118: trailing whitespace.
++[ 1090.789679] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+vm/qemu-serial-VM3.log:1119: trailing whitespace.
++[ 1090.790847] ksmbd: got SMB2 command
+vm/qemu-serial-VM3.log:1120: trailing whitespace.
++[ 1090.791588] ksmbd: SMB2 len 88
+vm/qemu-serial-VM3.log:1121: trailing whitespace.
++[ 1090.792247] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+vm/qemu-serial-VM3.log:1122: trailing whitespace.
++[ 1090.793806] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+vm/qemu-serial-VM3.log:1123: trailing whitespace.
++[ 1090.795520] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+vm/qemu-serial-VM3.log:1124: trailing whitespace.
++[ 1090.796920] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+vm/qemu-serial-VM3.log:1125: trailing whitespace.
++[ 1090.798254] ksmbd: Received smb2 close request
+vm/qemu-serial-VM3.log:1126: trailing whitespace.
++[ 1090.799213] ksmbd: volatile_id = 1
+vm/qemu-serial-VM3.log:1127: trailing whitespace.
++[ 1090.799969] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+vm/qemu-serial-VM3.log:1128: trailing whitespace.
++[ 1090.801415] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+vm/qemu-serial-VM3.log:1129: trailing whitespace.
++[ 1090.803212] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+vm/qemu-serial-VM3.log:1130: trailing whitespace.
++[ 1090.805138] ksmbd: credits: requested[1] granted[1] total_granted[31]
+vm/qemu-serial-VM3.log:1131: trailing whitespace.
++[ 1090.807519] ksmbd: RFC1002 hdr=00 00 00 ba len=186 status=1
+vm/qemu-serial-VM3.log:1132: trailing whitespace.
++[ 1090.808688] ksmbd: PDU sig=fe 53 4d 42 pdu=186 req_running=0
+vm/qemu-serial-VM3.log:1133: trailing whitespace.
++[ 1090.809868] ksmbd: got SMB2 command
+vm/qemu-serial-VM3.log:1134: trailing whitespace.
++[ 1090.810608] ksmbd: SMB2 data length 66 offset 120
+vm/qemu-serial-VM3.log:1135: trailing whitespace.
++[ 1090.811601] ksmbd: SMB2 len 186
+vm/qemu-serial-VM3.log:1136: trailing whitespace.
++[ 1090.812269] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+vm/qemu-serial-VM3.log:1137: trailing whitespace.
++[ 1090.813825] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+vm/qemu-serial-VM3.log:1138: trailing whitespace.
++[ 1090.815528] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+vm/qemu-serial-VM3.log:1139: trailing whitespace.
++[ 1090.816920] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+vm/qemu-serial-VM3.log:1140: trailing whitespace.
++[ 1090.818240] ksmbd: Received smb2 create request
+vm/qemu-serial-VM3.log:1141: trailing whitespace.
++[ 1090.819193] ksmbd: converted name = lease_v2_rename_overwrite_src.dat
+vm/qemu-serial-VM3.log:1142: trailing whitespace.
++[ 1090.820567] ksmbd: can not get linux path for lease_v2_rename_overwrite_src.dat, rc = -2
+vm/qemu-serial-VM3.log:1143: trailing whitespace.
++[ 1090.822251] ksmbd: Error response: c0000034
+vm/qemu-serial-VM3.log:1144: trailing whitespace.
++[ 1090.823147] ksmbd: Failed to process 5 [-9]
+vm/qemu-serial-VM3.log:1145: trailing whitespace.
++[ 1090.824062] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+vm/qemu-serial-VM3.log:1146: trailing whitespace.
++[ 1090.825541] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+vm/qemu-serial-VM3.log:1147: trailing whitespace.
++[ 1090.827267] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+vm/qemu-serial-VM3.log:1148: trailing whitespace.
++[ 1090.829199] ksmbd: credits: requested[1] granted[1] total_granted[31]
+vm/qemu-serial-VM3.log:1149: trailing whitespace.
++[ 1090.831108] ksmbd: RFC1002 hdr=00 00 00 ba len=186 status=1
+vm/qemu-serial-VM3.log:1150: trailing whitespace.
++[ 1090.832264] ksmbd: PDU sig=fe 53 4d 42 pdu=186 req_running=0
+vm/qemu-serial-VM3.log:1151: trailing whitespace.
++[ 1090.834125] ksmbd: got SMB2 command
+vm/qemu-serial-VM3.log:1152: trailing whitespace.
++[ 1090.834862] ksmbd: SMB2 data length 66 offset 120
+vm/qemu-serial-VM3.log:1153: trailing whitespace.
++[ 1090.835912] ksmbd: SMB2 len 186
+vm/qemu-serial-VM3.log:1154: trailing whitespace.
++[ 1090.836592] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+vm/qemu-serial-VM3.log:1155: trailing whitespace.
++[ 1090.838125] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+vm/qemu-serial-VM3.log:1156: trailing whitespace.
++[ 1090.839823] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+vm/qemu-serial-VM3.log:1157: trailing whitespace.
++[ 1090.841212] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+vm/qemu-serial-VM3.log:1158: trailing whitespace.
++[ 1090.842567] ksmbd: Received smb2 create request
+vm/qemu-serial-VM3.log:1159: trailing whitespace.
++[ 1090.843530] ksmbd: converted name = lease_v2_rename_overwrite_dst.dat
+vm/qemu-serial-VM3.log:1160: trailing whitespace.
++[ 1090.844887] ksmbd: handle lease break: scanning inode 00000000d9f1585e op_list
+vm/qemu-serial-VM3.log:1161: trailing whitespace.
++[ 1090.846352] ksmbd:   op_entry: conn=000000008e71b7b2 is_lease=0 state=0x0
+vm/qemu-serial-VM3.log:1162: trailing whitespace.
++[ 1090.847769] ksmbd: handle lease break: found 0 leases to break
+vm/qemu-serial-VM3.log:1163: trailing whitespace.
++[ 1090.848994] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+vm/qemu-serial-VM3.log:1164: trailing whitespace.
++[ 1090.850438] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+vm/qemu-serial-VM3.log:1165: trailing whitespace.
++[ 1090.852191] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+vm/qemu-serial-VM3.log:1166: trailing whitespace.
++[ 1090.854091] ksmbd: credits: requested[1] granted[1] total_granted[31]
+vm/qemu-serial-VM3.log:1167: trailing whitespace.
++[ 1090.856493] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+vm/qemu-serial-VM3.log:1168: trailing whitespace.
++[ 1090.857618] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+vm/qemu-serial-VM3.log:1169: trailing whitespace.
++[ 1090.858753] ksmbd: got SMB2 command
+vm/qemu-serial-VM3.log:1170: trailing whitespace.
++[ 1090.859466] ksmbd: SMB2 len 88
+vm/qemu-serial-VM3.log:1171: trailing whitespace.
++[ 1090.860148] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+vm/qemu-serial-VM3.log:1172: trailing whitespace.
++[ 1090.862113] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+vm/qemu-serial-VM3.log:1173: trailing whitespace.
++[ 1090.863817] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+vm/qemu-serial-VM3.log:1174: trailing whitespace.
++[ 1090.865212] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+vm/qemu-serial-VM3.log:1175: trailing whitespace.
++[ 1090.868168] ksmbd: Received smb2 close request
+vm/qemu-serial-VM3.log:1176: trailing whitespace.
++[ 1090.869130] ksmbd: volatile_id = 2
+vm/qemu-serial-VM3.log:1177: trailing whitespace.
++[ 1090.869889] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+vm/qemu-serial-VM3.log:1178: trailing whitespace.
++[ 1090.871340] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+vm/qemu-serial-VM3.log:1179: trailing whitespace.
++[ 1090.873154] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+vm/qemu-serial-VM3.log:1180: trailing whitespace.
++[ 1090.875068] ksmbd: credits: requested[1] granted[1] total_granted[31]
+vm/qemu-serial-VM3.log:1181: trailing whitespace.
++[ 1090.876518] ksmbd: Wait for all pending requests(0)
+vm/qemu-serial-VM3.log:1182: trailing whitespace.
++[ 1161.087918] ksmbd: ksmbd: witness protocol support removed
+vm/qemu-serial-VM3.log:1183: trailing whitespace.
++[ 1161.316797] ksmbd: VSS backend 'generic' unregistered
+vm/qemu-serial-VM3.log:1184: trailing whitespace.
++[ 1161.317861] ksmbd: VSS backend 'zfs' unregistered
+vm/qemu-serial-VM3.log:1185: trailing whitespace.
++[ 1161.318873] ksmbd: VSS backend 'btrfs' unregistered
+vm/qemu-serial-VM3.log:1186: trailing whitespace.
++[ 1161.559872] ksmbd: netdev-down event: netdev(lo) is going down
+vm/qemu-serial-VM3.log:1187: trailing whitespace.
++[ 1161.561099] ksmbd: releasing socket
+vm/qemu-serial-VM3.log:1188: trailing whitespace.
++[ 1161.561847] ksmbd: netdev-down event: netdev(ens4) is going down
+vm/qemu-serial-VM3.log:1189: trailing whitespace.
++[ 1161.563101] ksmbd: releasing socket
+vm/qemu-serial-VM3.log:1190: trailing whitespace.
++[ 1161.581788] ksmbd: ksmbd: Fruit SMB extensions unloaded
+vm/qemu-serial-VM3.log:1191: trailing whitespace.
++[ 1162.648230] ksmbd: Configuration subsystem initialized with 12 parameters
+vm/qemu-serial-VM3.log:1192: trailing whitespace.
++[ 1162.653823] ksmbd: ksmbd: registered built-in md4 (md4-ksmbd) for NTLMv1 support
+vm/qemu-serial-VM3.log:1193: trailing whitespace.
++[ 1162.656692] ksmbd: ksmbd: Fruit SMB extensions loaded
+vm/qemu-serial-VM3.log:1194: trailing whitespace.
++[ 1162.657794] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+vm/qemu-serial-VM3.log:1195: trailing whitespace.
++[ 1162.659200] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+vm/qemu-serial-VM3.log:1196: trailing whitespace.
++[ 1162.660675] ksmbd: ksmbd: witness protocol support initialised
+vm/qemu-serial-VM3.log:1197: trailing whitespace.
++[ 1164.773635] ksmbd: connect success: accepted new connection
+vm/qemu-serial-VM3.log:1198: trailing whitespace.
++[ 1164.779471] ksmbd: RFC1002 hdr=00 00 00 e2 len=226 status=0
+vm/qemu-serial-VM3.log:1199: trailing whitespace.
++[ 1164.780646] ksmbd: PDU sig=fe 53 4d 42 pdu=226 req_running=0
+vm/qemu-serial-VM3.log:1200: trailing whitespace.
++[ 1164.781888] ksmbd: got SMB2 command
+vm/qemu-serial-VM3.log:1201: trailing whitespace.
++[ 1164.782592] ksmbd: no length check for command
+vm/qemu-serial-VM3.log:1202: trailing whitespace.
++[ 1164.783771] ksmbd: SMB2 data length 0 offset 0
+vm/qemu-serial-VM3.log:1203: trailing whitespace.
++[ 1164.784651] ksmbd: SMB2 len 100
+vm/qemu-serial-VM3.log:1204: trailing whitespace.
++[ 1164.785392] ksmbd: Unknown command 0 in credit charge validation, defaulting to 1
+vm/qemu-serial-VM3.log:1205: trailing whitespace.
++[ 1164.786953] ksmbd: credit_check: cmd=0 charge=1 calc=1 req_len=1 resp_len=0 total=1 out=0
+vm/qemu-serial-VM3.log:1206: trailing whitespace.
++[ 1164.788595] ksmbd: credit_check: lock_enter cmd=0 charge=1 total=1 out=0
+vm/qemu-serial-VM3.log:1207: trailing whitespace.
++[ 1164.790128] ksmbd: credit_check: lock_exit cmd=0 ret=0 total=1 out=1
+vm/qemu-serial-VM3.log:1208: trailing whitespace.
++[ 1164.791504] ksmbd: client requested dialect 0x311
+vm/qemu-serial-VM3.log:1209: trailing whitespace.
++[ 1164.792582] ksmbd: selected SMB 3.1.1 dialect
+vm/qemu-serial-VM3.log:1210: trailing whitespace.
++[ 1164.793583] ksmbd: conn->dialect 0x311
+vm/qemu-serial-VM3.log:1211: trailing whitespace.
++[ 1164.794490] ksmbd: Received negotiate request
+vm/qemu-serial-VM3.log:1212: trailing whitespace.
++[ 1164.795489] ksmbd: decoding 4 negotiate contexts
+vm/qemu-serial-VM3.log:1213: trailing whitespace.
++[ 1164.796545] ksmbd: deassemble SMB2_PREAUTH_INTEGRITY_CAPABILITIES context
+vm/qemu-serial-VM3.log:1214: trailing whitespace.
++[ 1164.797907] ksmbd: deassemble SMB2_ENCRYPTION_CAPABILITIES context
+vm/qemu-serial-VM3.log:1215: trailing whitespace.
++[ 1164.799162] ksmbd: Cipher ID = 0x4
+vm/qemu-serial-VM3.log:1216: trailing whitespace.
++[ 1164.799970] ksmbd: deassemble SMB2_SIGNING_CAPABILITIES context
+vm/qemu-serial-VM3.log:1217: trailing whitespace.
++[ 1164.801255] ksmbd: Signing Algorithm ID = 0x2 (mutually agreed)
+vm/qemu-serial-VM3.log:1218: trailing whitespace.
++[ 1164.802595] ksmbd: deassemble SMB2_NETNAME_NEGOTIATE_CONTEXT_ID context
+vm/qemu-serial-VM3.log:1219: trailing whitespace.
++[ 1164.803978] ksmbd: NETNAME context name '127.0.0.1' != server name 'KSMBD-VM'
+vm/qemu-serial-VM3.log:1220: trailing whitespace.
++[ 1164.805418] ksmbd: assemble SMB2_PREAUTH_INTEGRITY_CAPABILITIES context
+vm/qemu-serial-VM3.log:1221: trailing whitespace.
++[ 1164.806814] ksmbd: assemble SMB2_ENCRYPTION_CAPABILITIES context
+vm/qemu-serial-VM3.log:1222: trailing whitespace.
++[ 1164.808126] ksmbd: assemble SMB2_SIGNING_CAPABILITIES context
+vm/qemu-serial-VM3.log:1223: trailing whitespace.
++[ 1164.809385] ksmbd: negotiate context offset 224, count 3
+vm/qemu-serial-VM3.log:1224: trailing whitespace.
++[ 1164.810499] ksmbd: credit_rsp: dispatch cmd=0 total=1 out=1 granted_total=0
+vm/qemu-serial-VM3.log:1225: trailing whitespace.
++[ 1164.811981] ksmbd: credit_rsp: lock_enter cmd=0 charge=1 req=31 total=1 out=1 granted_total=0
+vm/qemu-serial-VM3.log:1226: trailing whitespace.
++[ 1164.813768] ksmbd: credit_rsp: lock_exit cmd=0 charge=1 req=31 granted=1 total=1 out=0 granted_total=1
+vm/qemu-serial-VM3.log:1227: trailing whitespace.
++[ 1164.815727] ksmbd: credits: requested[31] granted[1] total_granted[1]
+vm/qemu-serial-VM3.log:1228: trailing whitespace.
++[ 1164.819937] ksmbd: RFC1002 hdr=00 00 00 a2 len=162 status=5
+vm/qemu-serial-VM3.log:1229: trailing whitespace.
++[ 1164.821140] ksmbd: PDU sig=fe 53 4d 42 pdu=162 req_running=0
+vm/qemu-serial-VM3.log:1230: trailing whitespace.
++[ 1164.822328] ksmbd: got SMB2 command
+vm/qemu-serial-VM3.log:1231: trailing whitespace.
++[ 1164.823207] ksmbd: SMB2 data length 74 offset 88
+vm/qemu-serial-VM3.log:1232: trailing whitespace.
++[ 1164.824254] ksmbd: SMB2 len 162
+vm/qemu-serial-VM3.log:1233: trailing whitespace.
++[ 1164.825021] ksmbd: Unknown command 1 in credit charge validation, defaulting to 1
+vm/qemu-serial-VM3.log:1234: trailing whitespace.
++[ 1164.826584] ksmbd: credit_check: cmd=1 charge=1 calc=1 req_len=1 resp_len=0 total=1 out=0
+vm/qemu-serial-VM3.log:1235: trailing whitespace.
++[ 1164.828298] ksmbd: credit_check: lock_enter cmd=1 charge=1 total=1 out=0
+vm/qemu-serial-VM3.log:1236: trailing whitespace.
++[ 1164.829702] ksmbd: credit_check: lock_exit cmd=1 ret=0 total=1 out=1
+vm/qemu-serial-VM3.log:1237: trailing whitespace.
++[ 1164.831054] ksmbd: Received smb2 session setup request
+vm/qemu-serial-VM3.log:1238: trailing whitespace.
++[ 1164.832199] ksmbd: negotiate phase
+vm/qemu-serial-VM3.log:1239: trailing whitespace.
++[ 1164.833016] ksmbd: NTLMSSP SecurityBufferLength 152
+vm/qemu-serial-VM3.log:1240: trailing whitespace.
++[ 1164.834094] ksmbd: credit_rsp: dispatch cmd=1 total=1 out=1 granted_total=0
+vm/qemu-serial-VM3.log:1241: trailing whitespace.
++[ 1164.835571] ksmbd: credit_rsp: lock_enter cmd=1 charge=1 req=31 total=1 out=1 granted_total=0
+vm/qemu-serial-VM3.log:1242: trailing whitespace.
++[ 1164.837354] ksmbd: credit_rsp: lock_exit cmd=1 charge=1 req=31 granted=31 total=31 out=0 granted_total=31
+vm/qemu-serial-VM3.log:1243: trailing whitespace.
++[ 1164.839309] ksmbd: credits: requested[31] granted[31] total_granted[31]
+vm/qemu-serial-VM3.log:1244: trailing whitespace.
++[ 1164.841021] ksmbd: RFC1002 hdr=00 00 02 06 len=518 status=5
+vm/qemu-serial-VM3.log:1245: trailing whitespace.
++[ 1164.842130] ksmbd: PDU sig=fe 53 4d 42 pdu=518 req_running=0
+vm/qemu-serial-VM3.log:1246: trailing whitespace.
++[ 1164.843469] ksmbd: got SMB2 command
+vm/qemu-serial-VM3.log:1247: trailing whitespace.
++[ 1164.844308] ksmbd: SMB2 data length 430 offset 88
+vm/qemu-serial-VM3.log:1248: trailing whitespace.
++[ 1164.845397] ksmbd: SMB2 len 518
+vm/qemu-serial-VM3.log:1249: trailing whitespace.
++[ 1164.846194] ksmbd: Unknown command 1 in credit charge validation, defaulting to 1
+vm/qemu-serial-VM3.log:1250: trailing whitespace.
++[ 1164.847884] ksmbd: credit_check: cmd=1 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+vm/qemu-serial-VM3.log:1251: trailing whitespace.
++[ 1164.849618] ksmbd: credit_check: lock_enter cmd=1 charge=1 total=31 out=0
+vm/qemu-serial-VM3.log:1252: trailing whitespace.
++[ 1164.851056] ksmbd: credit_check: lock_exit cmd=1 ret=0 total=31 out=1
+vm/qemu-serial-VM3.log:1253: trailing whitespace.
++[ 1164.852447] ksmbd: Received smb2 session setup request
+vm/qemu-serial-VM3.log:1254: trailing whitespace.
++[ 1164.853566] ksmbd: authenticate phase
+vm/qemu-serial-VM3.log:1255: trailing whitespace.
++[ 1164.854423] ksmbd: session setup request for user testuser
+vm/qemu-serial-VM3.log:1256: trailing whitespace.
++[ 1164.856054] ksmbd: decode_ntlmssp_authenticate_blob dnameWORKGROUP
+vm/qemu-serial-VM3.log:1257: trailing whitespace.
++[ 1164.857450] ksmbd: generated encryption keys for session 1, cipher type 4
+vm/qemu-serial-VM3.log:1258: trailing whitespace.
++[ 1164.858854] ksmbd: generated signing key for session 1
+vm/qemu-serial-VM3.log:1259: trailing whitespace.
++[ 1164.860132] ksmbd: credit_rsp: dispatch cmd=1 total=31 out=1 granted_total=0
+vm/qemu-serial-VM3.log:1260: trailing whitespace.
++[ 1164.861666] ksmbd: credit_rsp: lock_enter cmd=1 charge=1 req=1 total=31 out=1 granted_total=0
+vm/qemu-serial-VM3.log:1261: trailing whitespace.
++[ 1164.863969] ksmbd: credit_rsp: lock_exit cmd=1 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+vm/qemu-serial-VM3.log:1262: trailing whitespace.
++[ 1164.865796] ksmbd: credits: requested[1] granted[1] total_granted[31]
+vm/qemu-serial-VM3.log:1263: trailing whitespace.
++[ 1164.867483] ksmbd: RFC1002 hdr=00 00 00 68 len=104 status=1
+vm/qemu-serial-VM3.log:1264: trailing whitespace.
++[ 1164.868606] ksmbd: PDU sig=fe 53 4d 42 pdu=104 req_running=0
+vm/qemu-serial-VM3.log:1265: trailing whitespace.
++[ 1164.869816] ksmbd: skip to check tree connect request
+vm/qemu-serial-VM3.log:1266: trailing whitespace.
++[ 1164.870854] ksmbd: got SMB2 command
+vm/qemu-serial-VM3.log:1267: trailing whitespace.
++[ 1164.871575] ksmbd: SMB2 data length 32 offset 72
+vm/qemu-serial-VM3.log:1268: trailing whitespace.
++[ 1164.872543] ksmbd: SMB2 len 104
+vm/qemu-serial-VM3.log:1269: trailing whitespace.
++[ 1164.873195] ksmbd: Unknown command 3 in credit charge validation, defaulting to 1
+vm/qemu-serial-VM3.log:1270: trailing whitespace.
++[ 1164.874716] ksmbd: credit_check: cmd=3 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+vm/qemu-serial-VM3.log:1271: trailing whitespace.
++[ 1164.877324] ksmbd: credit_check: lock_enter cmd=3 charge=1 total=31 out=0
+vm/qemu-serial-VM3.log:1272: trailing whitespace.
++[ 1164.878673] ksmbd: credit_check: lock_exit cmd=3 ret=0 total=31 out=1
+vm/qemu-serial-VM3.log:1273: trailing whitespace.
++[ 1164.880021] ksmbd: Received smb2 tree connect request
+vm/qemu-serial-VM3.log:1274: trailing whitespace.
++[ 1164.881061] ksmbd: tree connect request for tree test treename \\127.0.0.1\test
+vm/qemu-serial-VM3.log:1275: trailing whitespace.
++[ 1164.882779] ksmbd: MaximalAccess: perm_r=0 perm_w=0 perm_x=0 access=0x001f01ff
+vm/qemu-serial-VM3.log:1276: trailing whitespace.
++[ 1164.884206] ksmbd: credit_rsp: dispatch cmd=3 total=31 out=1 granted_total=0
+vm/qemu-serial-VM3.log:1277: trailing whitespace.
++[ 1164.885630] ksmbd: credit_rsp: lock_enter cmd=3 charge=1 req=1 total=31 out=1 granted_total=0
+vm/qemu-serial-VM3.log:1278: trailing whitespace.
++[ 1164.887339] ksmbd: credit_rsp: lock_exit cmd=3 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+vm/qemu-serial-VM3.log:1279: trailing whitespace.
++[ 1164.889192] ksmbd: credits: requested[1] granted[1] total_granted[31]
+vm/qemu-serial-VM3.log:1280: trailing whitespace.
++[ 1164.890692] ksmbd: RFC1002 hdr=00 00 00 ba len=186 status=1
+vm/qemu-serial-VM3.log:1281: trailing whitespace.
++[ 1164.891831] ksmbd: PDU sig=fe 53 4d 42 pdu=186 req_running=0
+vm/qemu-serial-VM3.log:1282: trailing whitespace.
++[ 1164.893004] ksmbd: got SMB2 command
+vm/qemu-serial-VM3.log:1283: trailing whitespace.
++[ 1164.893715] ksmbd: SMB2 data length 66 offset 120
+vm/qemu-serial-VM3.log:1284: trailing whitespace.
++[ 1164.894710] ksmbd: SMB2 len 186
+vm/qemu-serial-VM3.log:1285: trailing whitespace.
++[ 1164.895539] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+vm/qemu-serial-VM3.log:1286: trailing whitespace.
++[ 1164.897106] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+vm/qemu-serial-VM3.log:1287: trailing whitespace.
++[ 1164.898844] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+vm/qemu-serial-VM3.log:1288: trailing whitespace.
++[ 1164.900333] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+vm/qemu-serial-VM3.log:1289: trailing whitespace.
++[ 1164.901712] ksmbd: Received smb2 create request
+vm/qemu-serial-VM3.log:1290: trailing whitespace.
++[ 1164.902737] ksmbd: converted name = lease_v2_rename_overwrite_src.dat
+vm/qemu-serial-VM3.log:1291: trailing whitespace.
++[ 1164.904123] ksmbd: can not get linux path for lease_v2_rename_overwrite_src.dat, rc = -2
+vm/qemu-serial-VM3.log:1292: trailing whitespace.
++[ 1164.905845] ksmbd: Error response: c0000034
+vm/qemu-serial-VM3.log:1293: trailing whitespace.
++[ 1164.906685] ksmbd: Failed to process 5 [-9]
+vm/qemu-serial-VM3.log:1294: trailing whitespace.
++[ 1164.907670] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+vm/qemu-serial-VM3.log:1295: trailing whitespace.
++[ 1164.909146] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+vm/qemu-serial-VM3.log:1296: trailing whitespace.
++[ 1164.910984] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+vm/qemu-serial-VM3.log:1297: trailing whitespace.
++[ 1164.913023] ksmbd: credits: requested[1] granted[1] total_granted[31]
+vm/qemu-serial-VM3.log:1298: trailing whitespace.
++[ 1164.914593] ksmbd: RFC1002 hdr=00 00 00 ba len=186 status=1
+vm/qemu-serial-VM3.log:1299: trailing whitespace.
++[ 1164.915841] ksmbd: PDU sig=fe 53 4d 42 pdu=186 req_running=1
+vm/qemu-serial-VM3.log:1300: trailing whitespace.
++[ 1164.917181] ksmbd: got SMB2 command
+vm/qemu-serial-VM3.log:1301: trailing whitespace.
++[ 1164.918043] ksmbd: SMB2 data length 66 offset 120
+vm/qemu-serial-VM3.log:1302: trailing whitespace.
++[ 1164.919101] ksmbd: SMB2 len 186
+vm/qemu-serial-VM3.log:1303: trailing whitespace.
++[ 1164.919864] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+vm/qemu-serial-VM3.log:1304: trailing whitespace.
++[ 1164.921469] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+vm/qemu-serial-VM3.log:1305: trailing whitespace.
++[ 1164.923203] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+vm/qemu-serial-VM3.log:1306: trailing whitespace.
++[ 1164.924667] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+vm/qemu-serial-VM3.log:1307: trailing whitespace.
++[ 1164.926041] ksmbd: Received smb2 create request
+vm/qemu-serial-VM3.log:1308: trailing whitespace.
++[ 1164.927066] ksmbd: converted name = lease_v2_rename_overwrite_dst.dat
+vm/qemu-serial-VM3.log:1309: trailing whitespace.
++[ 1164.928496] ksmbd: can not get linux path for lease_v2_rename_overwrite_dst.dat, rc = -2
+vm/qemu-serial-VM3.log:1310: trailing whitespace.
++[ 1164.930199] ksmbd: Error response: c0000034
+vm/qemu-serial-VM3.log:1311: trailing whitespace.
++[ 1164.931171] ksmbd: Failed to process 5 [-9]
+vm/qemu-serial-VM3.log:1312: trailing whitespace.
++[ 1164.932136] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+vm/qemu-serial-VM3.log:1313: trailing whitespace.
++[ 1164.933701] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+vm/qemu-serial-VM3.log:1314: trailing whitespace.
++[ 1164.935506] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+vm/qemu-serial-VM3.log:1315: trailing whitespace.
++[ 1164.937435] ksmbd: credits: requested[1] granted[1] total_granted[31]
+vm/qemu-serial-VM3.log:1316: trailing whitespace.
++[ 1164.938942] ksmbd: RFC1002 hdr=00 00 01 0c len=268 status=1
+vm/qemu-serial-VM3.log:1317: trailing whitespace.
++[ 1164.940085] ksmbd: PDU sig=fe 53 4d 42 pdu=268 req_running=1
+vm/qemu-serial-VM3.log:1318: trailing whitespace.
++[ 1164.941390] ksmbd: got SMB2 command
+vm/qemu-serial-VM3.log:1319: trailing whitespace.
++[ 1164.942189] ksmbd: SMB2 data length 76 offset 192
+vm/qemu-serial-VM3.log:1320: trailing whitespace.
++[ 1164.943246] ksmbd: SMB2 len 268
+vm/qemu-serial-VM3.log:1321: trailing whitespace.
++[ 1164.944024] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+vm/qemu-serial-VM3.log:1322: trailing whitespace.
++[ 1164.945625] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+vm/qemu-serial-VM3.log:1323: trailing whitespace.
++[ 1164.947455] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+vm/qemu-serial-VM3.log:1324: trailing whitespace.
++[ 1164.948891] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+vm/qemu-serial-VM3.log:1325: trailing whitespace.
++[ 1164.950294] ksmbd: Received smb2 create request
+vm/qemu-serial-VM3.log:1326: trailing whitespace.
++[ 1164.951317] ksmbd: converted name = lease_v2_rename_overwrite_src.dat
+vm/qemu-serial-VM3.log:1327: trailing whitespace.
++[ 1164.952682] ksmbd: can not get linux path for lease_v2_rename_overwrite_src.dat, rc = -2
+vm/qemu-serial-VM3.log:1328: trailing whitespace.
++[ 1164.954399] ksmbd: file does not exist, so creating
+vm/qemu-serial-VM3.log:1329: trailing whitespace.
++[ 1164.955504] ksmbd: creating regular file
+vm/qemu-serial-VM3.log:1330: trailing whitespace.
++[ 1164.956463] ksmbd: inherit posix acl failed : -2
+vm/qemu-serial-VM3.log:1331: trailing whitespace.
++[ 1164.957570] ksmbd: Set posix acls
+vm/qemu-serial-VM3.log:1332: trailing whitespace.
++[ 1164.958387] ksmbd: mode: 7, access flags now 0x1f01bf
+vm/qemu-serial-VM3.log:1333: trailing whitespace.
++[ 1164.959526] ksmbd: mode: 7, access flags now 0x1f01bf
+vm/qemu-serial-VM3.log:1334: trailing whitespace.
++[ 1164.960661] ksmbd: mode: 7, access flags now 0x1f01bf
+vm/qemu-serial-VM3.log:1335: trailing whitespace.
++[ 1164.961853] ksmbd: lease req for(lease_v2_rename_overwrite_src.dat) req oplock state 0x9, lease state 0x7
+vm/qemu-serial-VM3.log:1336: trailing whitespace.
++[ 1164.963877] ksmbd: lease granted on(lease_v2_rename_overwrite_src.dat) lease state 0x7
+vm/qemu-serial-VM3.log:1337: trailing whitespace.
++[ 1164.965563] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+vm/qemu-serial-VM3.log:1338: trailing whitespace.
++[ 1164.967060] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+vm/qemu-serial-VM3.log:1339: trailing whitespace.
++[ 1164.968882] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+vm/qemu-serial-VM3.log:1340: trailing whitespace.
++[ 1164.970809] ksmbd: credits: requested[1] granted[1] total_granted[31]
+vm/qemu-serial-VM3.log:1341: trailing whitespace.
++[ 1164.972308] ksmbd: RFC1002 hdr=00 00 01 0c len=268 status=1
+vm/qemu-serial-VM3.log:1342: trailing whitespace.
++[ 1164.973558] ksmbd: PDU sig=fe 53 4d 42 pdu=268 req_running=1
+vm/qemu-serial-VM3.log:1343: trailing whitespace.
++[ 1164.974818] ksmbd: got SMB2 command
+vm/qemu-serial-VM3.log:1344: trailing whitespace.
++[ 1164.975540] ksmbd: SMB2 data length 76 offset 192
+vm/qemu-serial-VM3.log:1345: trailing whitespace.
++[ 1164.976627] ksmbd: SMB2 len 268
+vm/qemu-serial-VM3.log:1346: trailing whitespace.
++[ 1164.977429] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+vm/qemu-serial-VM3.log:1347: trailing whitespace.
++[ 1164.978986] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+vm/qemu-serial-VM3.log:1348: trailing whitespace.
++[ 1164.980716] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+vm/qemu-serial-VM3.log:1349: trailing whitespace.
++[ 1164.982149] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+vm/qemu-serial-VM3.log:1350: trailing whitespace.
++[ 1164.983546] ksmbd: Received smb2 create request
+vm/qemu-serial-VM3.log:1351: trailing whitespace.
++[ 1164.984574] ksmbd: converted name = lease_v2_rename_overwrite_dst.dat
+vm/qemu-serial-VM3.log:1352: trailing whitespace.
++[ 1164.985974] ksmbd: can not get linux path for lease_v2_rename_overwrite_dst.dat, rc = -2
+vm/qemu-serial-VM3.log:1353: trailing whitespace.
++[ 1164.987615] ksmbd: file does not exist, so creating
+vm/qemu-serial-VM3.log:1354: trailing whitespace.
++[ 1164.988636] ksmbd: creating regular file
+vm/qemu-serial-VM3.log:1355: trailing whitespace.
++[ 1164.989503] ksmbd: inherit posix acl failed : -2
+vm/qemu-serial-VM3.log:1356: trailing whitespace.
++[ 1164.990468] ksmbd: Set posix acls
+vm/qemu-serial-VM3.log:1357: trailing whitespace.
++[ 1164.991162] ksmbd: mode: 7, access flags now 0x1f01bf
+vm/qemu-serial-VM3.log:1358: trailing whitespace.
++[ 1164.992193] ksmbd: mode: 7, access flags now 0x1f01bf
+vm/qemu-serial-VM3.log:1359: trailing whitespace.
++[ 1164.993221] ksmbd: mode: 7, access flags now 0x1f01bf
+vm/qemu-serial-VM3.log:1360: trailing whitespace.
++[ 1164.994320] ksmbd: lease req for(lease_v2_rename_overwrite_dst.dat) req oplock state 0x9, lease state 0x7
+vm/qemu-serial-VM3.log:1361: trailing whitespace.
++[ 1164.996214] ksmbd: lease granted on(lease_v2_rename_overwrite_dst.dat) lease state 0x7
+vm/qemu-serial-VM3.log:1362: trailing whitespace.
++[ 1164.997894] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+vm/qemu-serial-VM3.log:1363: trailing whitespace.
++[ 1164.999369] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+vm/qemu-serial-VM3.log:1364: trailing whitespace.
++[ 1165.001061] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+vm/qemu-serial-VM3.log:1365: trailing whitespace.
++[ 1165.002929] ksmbd: credits: requested[1] granted[1] total_granted[31]
+vm/qemu-serial-VM3.log:1366: trailing whitespace.
++[ 1165.004381] ksmbd: RFC1002 hdr=00 00 00 b8 len=184 status=1
+vm/qemu-serial-VM3.log:1367: trailing whitespace.
++[ 1165.005540] ksmbd: PDU sig=fe 53 4d 42 pdu=184 req_running=1
+vm/qemu-serial-VM3.log:1368: trailing whitespace.
++[ 1165.006702] ksmbd: got SMB2 command
+vm/qemu-serial-VM3.log:1369: trailing whitespace.
++[ 1165.007445] ksmbd: SMB2 data length 88 offset 96
+vm/qemu-serial-VM3.log:1370: trailing whitespace.
++[ 1165.008403] ksmbd: SMB2 len 184
+vm/qemu-serial-VM3.log:1371: trailing whitespace.
++[ 1165.009062] ksmbd: credit_check: cmd=17 charge=1 calc=1 req_len=88 resp_len=0 total=31 out=0
+vm/qemu-serial-VM3.log:1372: trailing whitespace.
++[ 1165.010758] ksmbd: credit_check: lock_enter cmd=17 charge=1 total=31 out=0
+vm/qemu-serial-VM3.log:1373: trailing whitespace.
++[ 1165.012128] ksmbd: credit_check: lock_exit cmd=17 ret=0 total=31 out=1
+vm/qemu-serial-VM3.log:1374: trailing whitespace.
++[ 1165.013459] ksmbd: Received smb2 set info request
+vm/qemu-serial-VM3.log:1375: trailing whitespace.
++[ 1165.014433] ksmbd: GOT SMB2_O_INFO_FILE
+vm/qemu-serial-VM3.log:1376: trailing whitespace.
++[ 1165.015214] ksmbd: check permission using windows acl
+vm/qemu-serial-VM3.log:1377: trailing whitespace.
++[ 1165.016292] ksmbd: check permission using windows acl
+vm/qemu-serial-VM3.log:1378: trailing whitespace.
++[ 1165.017312] ksmbd: setting FILE_RENAME_INFO
+vm/qemu-serial-VM3.log:1379: trailing whitespace.
++[ 1165.018161] ksmbd: new name lease_v2_rename_overwrite_dst.dat
+vm/qemu-serial-VM3.log:1380: trailing whitespace.
++[ 1165.019353] ksmbd: handle lease break: scanning inode 0000000097f12fdf op_list
+vm/qemu-serial-VM3.log:1381: trailing whitespace.
++[ 1165.020806] ksmbd:   op_entry: conn=0000000026c0d774 is_lease=1 state=0x7
+vm/qemu-serial-VM3.log:1382: trailing whitespace.
++[ 1165.022178] ksmbd: handle lease break: found 0 leases to break
+vm/qemu-serial-VM3.log:1383: trailing whitespace.
++[ 1165.023425] ksmbd: credit_rsp: dispatch cmd=17 total=31 out=1 granted_total=0
+vm/qemu-serial-VM3.log:1384: trailing whitespace.
++[ 1165.025272] ksmbd: credit_rsp: lock_enter cmd=17 charge=1 req=1 total=31 out=1 granted_total=0
+vm/qemu-serial-VM3.log:1385: trailing whitespace.
++[ 1165.027064] ksmbd: credit_rsp: lock_exit cmd=17 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+vm/qemu-serial-VM3.log:1386: trailing whitespace.
++[ 1165.028995] ksmbd: credits: requested[1] granted[1] total_granted[31]
+vm/qemu-serial-VM3.log:1387: trailing whitespace.
++[ 1165.030738] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+vm/qemu-serial-VM3.log:1388: trailing whitespace.
++[ 1165.031878] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+vm/qemu-serial-VM3.log:1389: trailing whitespace.
++[ 1165.033050] ksmbd: got SMB2 command
+vm/qemu-serial-VM3.log:1390: trailing whitespace.
++[ 1165.033788] ksmbd: SMB2 len 88
+vm/qemu-serial-VM3.log:1391: trailing whitespace.
++[ 1165.034436] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+vm/qemu-serial-VM3.log:1392: trailing whitespace.
++[ 1165.035964] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+vm/qemu-serial-VM3.log:1393: trailing whitespace.
++[ 1165.037631] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+vm/qemu-serial-VM3.log:1394: trailing whitespace.
++[ 1165.038996] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+vm/qemu-serial-VM3.log:1395: trailing whitespace.
++[ 1165.040309] ksmbd: Received smb2 close request
+vm/qemu-serial-VM3.log:1396: trailing whitespace.
++[ 1165.041204] ksmbd: volatile_id = 0
+vm/qemu-serial-VM3.log:1397: trailing whitespace.
++[ 1165.041947] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+vm/qemu-serial-VM3.log:1398: trailing whitespace.
++[ 1165.043388] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+vm/qemu-serial-VM3.log:1399: trailing whitespace.
++[ 1165.045088] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+vm/qemu-serial-VM3.log:1400: trailing whitespace.
++[ 1165.046940] ksmbd: credits: requested[1] granted[1] total_granted[31]
+vm/qemu-serial-VM3.log:1401: trailing whitespace.
++[ 1165.048981] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+vm/qemu-serial-VM3.log:1402: trailing whitespace.
++[ 1165.050117] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+vm/qemu-serial-VM3.log:1403: trailing whitespace.
++[ 1165.051256] ksmbd: got SMB2 command
+vm/qemu-serial-VM3.log:1404: trailing whitespace.
++[ 1165.052015] ksmbd: SMB2 len 88
+vm/qemu-serial-VM3.log:1405: trailing whitespace.
++[ 1165.052658] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+vm/qemu-serial-VM3.log:1406: trailing whitespace.
++[ 1165.054146] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+vm/qemu-serial-VM3.log:1407: trailing whitespace.
++[ 1165.055814] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+vm/qemu-serial-VM3.log:1408: trailing whitespace.
++[ 1165.057172] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+vm/qemu-serial-VM3.log:1409: trailing whitespace.
++[ 1165.058519] ksmbd: Received smb2 close request
+vm/qemu-serial-VM3.log:1410: trailing whitespace.
++[ 1165.059449] ksmbd: volatile_id = 1
+vm/qemu-serial-VM3.log:1411: trailing whitespace.
++[ 1165.060156] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+vm/qemu-serial-VM3.log:1412: trailing whitespace.
++[ 1165.061598] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+vm/qemu-serial-VM3.log:1413: trailing whitespace.
++[ 1165.063361] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+vm/qemu-serial-VM3.log:1414: trailing whitespace.
++[ 1165.065210] ksmbd: credits: requested[1] granted[1] total_granted[31]
+vm/qemu-serial-VM3.log:1415: trailing whitespace.
++[ 1165.066777] ksmbd: RFC1002 hdr=00 00 00 ba len=186 status=1
+vm/qemu-serial-VM3.log:1416: trailing whitespace.
++[ 1165.067960] ksmbd: PDU sig=fe 53 4d 42 pdu=186 req_running=0
+vm/qemu-serial-VM3.log:1417: trailing whitespace.
++[ 1165.069146] ksmbd: got SMB2 command
+vm/qemu-serial-VM3.log:1418: trailing whitespace.
++[ 1165.069901] ksmbd: SMB2 data length 66 offset 120
+vm/qemu-serial-VM3.log:1419: trailing whitespace.
++[ 1165.070875] ksmbd: SMB2 len 186
+vm/qemu-serial-VM3.log:1420: trailing whitespace.
++[ 1165.071552] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+vm/qemu-serial-VM3.log:1421: trailing whitespace.
++[ 1165.073035] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+vm/qemu-serial-VM3.log:1422: trailing whitespace.
++[ 1165.074701] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+vm/qemu-serial-VM3.log:1423: trailing whitespace.
++[ 1165.076085] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+vm/qemu-serial-VM3.log:1424: trailing whitespace.
++[ 1165.077429] ksmbd: Received smb2 create request
+vm/qemu-serial-VM3.log:1425: trailing whitespace.
++[ 1165.078382] ksmbd: converted name = lease_v2_rename_overwrite_src.dat
+vm/qemu-serial-VM3.log:1426: trailing whitespace.
++[ 1165.079687] ksmbd: can not get linux path for lease_v2_rename_overwrite_src.dat, rc = -2
+vm/qemu-serial-VM3.log:1427: trailing whitespace.
++[ 1165.081350] ksmbd: Error response: c0000034
+vm/qemu-serial-VM3.log:1428: trailing whitespace.
++[ 1165.082194] ksmbd: Failed to process 5 [-9]
+vm/qemu-serial-VM3.log:1429: trailing whitespace.
++[ 1165.083065] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+vm/qemu-serial-VM3.log:1430: trailing whitespace.
++[ 1165.084509] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+vm/qemu-serial-VM3.log:1431: trailing whitespace.
++[ 1165.086211] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+vm/qemu-serial-VM3.log:1432: trailing whitespace.
++[ 1165.088078] ksmbd: credits: requested[1] granted[1] total_granted[31]
+vm/qemu-serial-VM3.log:1433: trailing whitespace.
++[ 1165.089531] ksmbd: RFC1002 hdr=00 00 00 ba len=186 status=1
+vm/qemu-serial-VM3.log:1434: trailing whitespace.
++[ 1165.090667] ksmbd: PDU sig=fe 53 4d 42 pdu=186 req_running=0
+vm/qemu-serial-VM3.log:1435: trailing whitespace.
++[ 1165.091836] ksmbd: got SMB2 command
+vm/qemu-serial-VM3.log:1436: trailing whitespace.
++[ 1165.092561] ksmbd: SMB2 data length 66 offset 120
+vm/qemu-serial-VM3.log:1437: trailing whitespace.
++[ 1165.093533] ksmbd: SMB2 len 186
+vm/qemu-serial-VM3.log:1438: trailing whitespace.
++[ 1165.094199] ksmbd: Unknown command 5 in credit charge validation, defaulting to 1
+vm/qemu-serial-VM3.log:1439: trailing whitespace.
++[ 1165.095722] ksmbd: credit_check: cmd=5 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+vm/qemu-serial-VM3.log:1440: trailing whitespace.
++[ 1165.097382] ksmbd: credit_check: lock_enter cmd=5 charge=1 total=31 out=0
+vm/qemu-serial-VM3.log:1441: trailing whitespace.
++[ 1165.098734] ksmbd: credit_check: lock_exit cmd=5 ret=0 total=31 out=1
+vm/qemu-serial-VM3.log:1442: trailing whitespace.
++[ 1165.100028] ksmbd: Received smb2 create request
+vm/qemu-serial-VM3.log:1443: trailing whitespace.
++[ 1165.100976] ksmbd: converted name = lease_v2_rename_overwrite_dst.dat
+vm/qemu-serial-VM3.log:1444: trailing whitespace.
++[ 1165.102318] ksmbd: handle lease break: scanning inode 0000000097f12fdf op_list
+vm/qemu-serial-VM3.log:1445: trailing whitespace.
++[ 1165.103769] ksmbd:   op_entry: conn=0000000026c0d774 is_lease=0 state=0x0
+vm/qemu-serial-VM3.log:1446: trailing whitespace.
++[ 1165.105195] ksmbd: handle lease break: found 0 leases to break
+vm/qemu-serial-VM3.log:1447: trailing whitespace.
++[ 1165.106412] ksmbd: credit_rsp: dispatch cmd=5 total=31 out=1 granted_total=0
+vm/qemu-serial-VM3.log:1448: trailing whitespace.
++[ 1165.107818] ksmbd: credit_rsp: lock_enter cmd=5 charge=1 req=1 total=31 out=1 granted_total=0
+vm/qemu-serial-VM3.log:1449: trailing whitespace.
++[ 1165.109579] ksmbd: credit_rsp: lock_exit cmd=5 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+vm/qemu-serial-VM3.log:1450: trailing whitespace.
++[ 1165.111446] ksmbd: credits: requested[1] granted[1] total_granted[31]
+vm/qemu-serial-VM3.log:1451: trailing whitespace.
++[ 1165.112895] ksmbd: RFC1002 hdr=00 00 00 58 len=88 status=1
+vm/qemu-serial-VM3.log:1452: trailing whitespace.
++[ 1165.114009] ksmbd: PDU sig=fe 53 4d 42 pdu=88 req_running=0
+vm/qemu-serial-VM3.log:1453: trailing whitespace.
++[ 1165.115211] ksmbd: got SMB2 command
+vm/qemu-serial-VM3.log:1454: trailing whitespace.
++[ 1165.115984] ksmbd: SMB2 len 88
+vm/qemu-serial-VM3.log:1455: trailing whitespace.
++[ 1165.116631] ksmbd: Unknown command 6 in credit charge validation, defaulting to 1
+vm/qemu-serial-VM3.log:1456: trailing whitespace.
++[ 1165.118142] ksmbd: credit_check: cmd=6 charge=1 calc=1 req_len=1 resp_len=0 total=31 out=0
+vm/qemu-serial-VM3.log:1457: trailing whitespace.
++[ 1165.119801] ksmbd: credit_check: lock_enter cmd=6 charge=1 total=31 out=0
+vm/qemu-serial-VM3.log:1458: trailing whitespace.
++[ 1165.121170] ksmbd: credit_check: lock_exit cmd=6 ret=0 total=31 out=1
+vm/qemu-serial-VM3.log:1459: trailing whitespace.
++[ 1165.122493] ksmbd: Received smb2 close request
+vm/qemu-serial-VM3.log:1460: trailing whitespace.
++[ 1165.123420] ksmbd: volatile_id = 2
+vm/qemu-serial-VM3.log:1461: trailing whitespace.
++[ 1165.124148] ksmbd: credit_rsp: dispatch cmd=6 total=31 out=1 granted_total=0
+vm/qemu-serial-VM3.log:1462: trailing whitespace.
++[ 1165.125598] ksmbd: credit_rsp: lock_enter cmd=6 charge=1 req=1 total=31 out=1 granted_total=0
+vm/qemu-serial-VM3.log:1463: trailing whitespace.
++[ 1165.127356] ksmbd: credit_rsp: lock_exit cmd=6 charge=1 req=1 granted=1 total=31 out=0 granted_total=1
+vm/qemu-serial-VM3.log:1464: trailing whitespace.
++[ 1165.129174] ksmbd: credits: requested[1] granted[1] total_granted[31]
+vm/qemu-serial-VM3.log:1465: trailing whitespace.
++[ 1165.130624] ksmbd: Wait for all pending requests(0)

@@ -1,0 +1,317 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+#
+# Syzkaller system call description for ksmbd generic netlink interface.
+#
+# This file describes the KSMBD_GENL_NAME ("SMBD_GENL") generic netlink
+# family used for kernel-userspace IPC between ksmbd.ko and ksmbd.mountd.
+#
+# Reference: ksmbd_netlink.h, transport_ipc.c
+#
+# Usage:
+#   Copy this file into syzkaller's sys/linux/ directory and rebuild.
+#   syz-extract -os linux -sourcedir /path/to/kernel -arch amd64 ksmbd_netlink.txt
+#   syz-sysgen
+#
+# The netlink family requires CAP_NET_ADMIN (GENL_ADMIN_PERM on all ops).
+
+include <linux/genetlink.h>
+include <linux/ksmbd_server.h>
+
+# Generic netlink family name: "SMBD_GENL", version 0x01
+resource genl_ksmbd_family_id[int16]
+
+type msghdr_ksmbd msghdr_netlink[netlink_msg_t[genl_ksmbd_family_id, genlmsghdr_t[KSMBD_CMD], ksmbd_nl_attr]]
+
+# -------------------------------------------------------------------------
+# Event/command IDs (enum ksmbd_event from ksmbd_netlink.h)
+# These are used both as genl command IDs and as NLA attribute types.
+# -------------------------------------------------------------------------
+
+define KSMBD_EVENT_UNSPEC			0
+define KSMBD_EVENT_HEARTBEAT_REQUEST		1
+define KSMBD_EVENT_STARTING_UP			2
+define KSMBD_EVENT_SHUTTING_DOWN		3
+define KSMBD_EVENT_LOGIN_REQUEST		4
+define KSMBD_EVENT_LOGIN_RESPONSE		5
+define KSMBD_EVENT_SHARE_CONFIG_REQUEST		6
+define KSMBD_EVENT_SHARE_CONFIG_RESPONSE	7
+define KSMBD_EVENT_TREE_CONNECT_REQUEST		8
+define KSMBD_EVENT_TREE_CONNECT_RESPONSE	9
+define KSMBD_EVENT_TREE_DISCONNECT_REQUEST	10
+define KSMBD_EVENT_LOGOUT_REQUEST		11
+define KSMBD_EVENT_RPC_REQUEST			12
+define KSMBD_EVENT_RPC_RESPONSE			13
+define KSMBD_EVENT_SPNEGO_AUTHEN_REQUEST	14
+define KSMBD_EVENT_SPNEGO_AUTHEN_RESPONSE	15
+define KSMBD_EVENT_LOGIN_REQUEST_EXT		16
+define KSMBD_EVENT_LOGIN_RESPONSE_EXT		17
+
+# Size limits
+define KSMBD_REQ_MAX_ACCOUNT_NAME_SZ	48
+define KSMBD_REQ_MAX_HASH_SZ		18
+define KSMBD_REQ_MAX_SHARE_NAME	64
+
+# -------------------------------------------------------------------------
+# Command type union (maps to genl cmd field)
+# -------------------------------------------------------------------------
+
+KSMBD_CMD = KSMBD_EVENT_UNSPEC, KSMBD_EVENT_HEARTBEAT_REQUEST, KSMBD_EVENT_STARTING_UP, KSMBD_EVENT_SHUTTING_DOWN, KSMBD_EVENT_LOGIN_REQUEST, KSMBD_EVENT_LOGIN_RESPONSE, KSMBD_EVENT_SHARE_CONFIG_REQUEST, KSMBD_EVENT_SHARE_CONFIG_RESPONSE, KSMBD_EVENT_TREE_CONNECT_REQUEST, KSMBD_EVENT_TREE_CONNECT_RESPONSE, KSMBD_EVENT_TREE_DISCONNECT_REQUEST, KSMBD_EVENT_LOGOUT_REQUEST, KSMBD_EVENT_RPC_REQUEST, KSMBD_EVENT_RPC_RESPONSE, KSMBD_EVENT_SPNEGO_AUTHEN_REQUEST, KSMBD_EVENT_SPNEGO_AUTHEN_RESPONSE, KSMBD_EVENT_LOGIN_REQUEST_EXT, KSMBD_EVENT_LOGIN_RESPONSE_EXT
+
+# -------------------------------------------------------------------------
+# NLA attribute payloads
+# -------------------------------------------------------------------------
+
+ksmbd_nl_attr [
+	heartbeat	nlattr_t[KSMBD_EVENT_HEARTBEAT_REQUEST, ksmbd_heartbeat]
+	startup		nlattr_t[KSMBD_EVENT_STARTING_UP, ksmbd_startup_request]
+	shutdown	nlattr_t[KSMBD_EVENT_SHUTTING_DOWN, ksmbd_shutdown_request]
+	login_req	nlattr_t[KSMBD_EVENT_LOGIN_REQUEST, ksmbd_login_request]
+	login_resp	nlattr_t[KSMBD_EVENT_LOGIN_RESPONSE, ksmbd_login_response]
+	share_req	nlattr_t[KSMBD_EVENT_SHARE_CONFIG_REQUEST, ksmbd_share_config_request]
+	share_resp	nlattr_t[KSMBD_EVENT_SHARE_CONFIG_RESPONSE, ksmbd_share_config_response]
+	tree_conn_req	nlattr_t[KSMBD_EVENT_TREE_CONNECT_REQUEST, ksmbd_tree_connect_request]
+	tree_conn_resp	nlattr_t[KSMBD_EVENT_TREE_CONNECT_RESPONSE, ksmbd_tree_connect_response]
+	tree_disconn	nlattr_t[KSMBD_EVENT_TREE_DISCONNECT_REQUEST, ksmbd_tree_disconnect_request]
+	logout		nlattr_t[KSMBD_EVENT_LOGOUT_REQUEST, ksmbd_logout_request]
+	rpc_req		nlattr_t[KSMBD_EVENT_RPC_REQUEST, ksmbd_rpc_command]
+	rpc_resp	nlattr_t[KSMBD_EVENT_RPC_RESPONSE, ksmbd_rpc_command]
+	spnego_req	nlattr_t[KSMBD_EVENT_SPNEGO_AUTHEN_REQUEST, ksmbd_spnego_authen_request]
+	spnego_resp	nlattr_t[KSMBD_EVENT_SPNEGO_AUTHEN_RESPONSE, ksmbd_spnego_authen_response]
+	login_ext_req	nlattr_t[KSMBD_EVENT_LOGIN_REQUEST_EXT, ksmbd_login_request]
+	login_ext_resp	nlattr_t[KSMBD_EVENT_LOGIN_RESPONSE_EXT, ksmbd_login_response_ext]
+] [varlen]
+
+# -------------------------------------------------------------------------
+# Structure definitions (from ksmbd_netlink.h)
+# -------------------------------------------------------------------------
+
+# struct ksmbd_heartbeat
+ksmbd_heartbeat {
+	handle	int32
+}
+
+# struct ksmbd_startup_request (packed)
+ksmbd_startup_request {
+	flags			flags[ksmbd_global_flags, int32]
+	signing			int32[-1:3]
+	min_prot		array[int8, 16]
+	max_prot		array[int8, 16]
+	netbios_name		array[int8, 16]
+	work_group		array[int8, 64]
+	server_string		array[int8, 64]
+	tcp_port		int16[0:65535]
+	ipc_timeout		int16[0:300]
+	deadtime		int32[0:1440]
+	file_max		int32[0:65536]
+	smb2_max_write		int32[0:8388608]
+	smb2_max_read		int32[0:8388608]
+	smb2_max_trans		int32[0:8388608]
+	share_fake_fscaps	int32
+	sub_auth		array[int32, 3]
+	smb2_max_credits	int32[0:65535]
+	smbd_max_io_size	int32
+	max_connections		int32[0:65535]
+	bind_interfaces_only	int8[0:1]
+	max_ip_connections	int32[0:65535]
+	fruit_model		array[int8, 64]
+	reserved		array[int8, 435]
+	ifc_list_sz		int32[0:4096]
+	ifc_list		array[int8]
+} [packed]
+
+ksmbd_global_flags = KSMBD_GLOBAL_FLAG_SMB2_LEASES, KSMBD_GLOBAL_FLAG_SMB2_ENCRYPTION, KSMBD_GLOBAL_FLAG_SMB3_MULTICHANNEL, KSMBD_GLOBAL_FLAG_SMB2_ENCRYPTION_OFF, KSMBD_GLOBAL_FLAG_DURABLE_HANDLE, KSMBD_GLOBAL_FLAG_FRUIT_EXTENSIONS, KSMBD_GLOBAL_FLAG_FRUIT_ZERO_FILEID, KSMBD_GLOBAL_FLAG_FRUIT_NFS_ACES, KSMBD_GLOBAL_FLAG_FRUIT_COPYFILE
+
+define KSMBD_GLOBAL_FLAG_SMB2_LEASES		1
+define KSMBD_GLOBAL_FLAG_SMB2_ENCRYPTION	2
+define KSMBD_GLOBAL_FLAG_SMB3_MULTICHANNEL	4
+define KSMBD_GLOBAL_FLAG_SMB2_ENCRYPTION_OFF	8
+define KSMBD_GLOBAL_FLAG_DURABLE_HANDLE		16
+define KSMBD_GLOBAL_FLAG_FRUIT_EXTENSIONS	32
+define KSMBD_GLOBAL_FLAG_FRUIT_ZERO_FILEID	64
+define KSMBD_GLOBAL_FLAG_FRUIT_NFS_ACES		128
+define KSMBD_GLOBAL_FLAG_FRUIT_COPYFILE		256
+
+# struct ksmbd_shutdown_request
+ksmbd_shutdown_request {
+	reserved	array[int32, 16]
+}
+
+# struct ksmbd_login_request
+ksmbd_login_request {
+	handle		int32
+	account		array[int8, KSMBD_REQ_MAX_ACCOUNT_NAME_SZ]
+	reserved	array[int32, 16]
+}
+
+# struct ksmbd_login_response
+ksmbd_login_response {
+	handle		int32
+	gid		int32
+	uid		int32
+	account		array[int8, KSMBD_REQ_MAX_ACCOUNT_NAME_SZ]
+	status		int16
+	hash_sz		int16[0:KSMBD_REQ_MAX_HASH_SZ]
+	hash		array[int8, KSMBD_REQ_MAX_HASH_SZ]
+	reserved	array[int32, 16]
+}
+
+# struct ksmbd_login_response_ext
+ksmbd_login_response_ext {
+	handle		int32
+	ngroups		int32[0:65536]
+	reserved	array[int8, 128]
+	groups		array[int32]
+}
+
+# struct ksmbd_share_config_request
+ksmbd_share_config_request {
+	handle		int32
+	share_name	array[int8, KSMBD_REQ_MAX_SHARE_NAME]
+	reserved	array[int32, 16]
+}
+
+# struct ksmbd_share_config_response
+ksmbd_share_config_response {
+	handle			int32
+	flags			flags[ksmbd_share_flags, int32]
+	create_mask		int16
+	directory_mask		int16
+	force_create_mode	int16
+	force_directory_mode	int16
+	force_uid		int16
+	force_gid		int16
+	share_name		array[int8, KSMBD_REQ_MAX_SHARE_NAME]
+	time_machine_max_size	int64
+	reserved		array[int32, 109]
+	payload_sz		int32[0:4096]
+	veto_list_sz		int32[0:4096]
+	payload			array[int8]
+}
+
+ksmbd_share_flags = KSMBD_SHARE_FLAG_AVAILABLE, KSMBD_SHARE_FLAG_BROWSEABLE, KSMBD_SHARE_FLAG_WRITEABLE, KSMBD_SHARE_FLAG_READONLY, KSMBD_SHARE_FLAG_GUEST_OK, KSMBD_SHARE_FLAG_GUEST_ONLY, KSMBD_SHARE_FLAG_STORE_DOS_ATTRS, KSMBD_SHARE_FLAG_OPLOCKS, KSMBD_SHARE_FLAG_PIPE, KSMBD_SHARE_FLAG_HIDE_DOT_FILES, KSMBD_SHARE_FLAG_INHERIT_OWNER, KSMBD_SHARE_FLAG_STREAMS, KSMBD_SHARE_FLAG_FOLLOW_SYMLINKS, KSMBD_SHARE_FLAG_ACL_XATTR, KSMBD_SHARE_FLAG_UPDATE, KSMBD_SHARE_FLAG_CROSSMNT, KSMBD_SHARE_FLAG_CONTINUOUS_AVAILABILITY, KSMBD_SHARE_FLAG_FRUIT_TIME_MACHINE, KSMBD_SHARE_FLAG_FRUIT_FINDER_INFO, KSMBD_SHARE_FLAG_FRUIT_RFORK_SIZE, KSMBD_SHARE_FLAG_FRUIT_MAX_ACCESS
+
+define KSMBD_SHARE_FLAG_AVAILABLE			1
+define KSMBD_SHARE_FLAG_BROWSEABLE			2
+define KSMBD_SHARE_FLAG_WRITEABLE			4
+define KSMBD_SHARE_FLAG_READONLY			8
+define KSMBD_SHARE_FLAG_GUEST_OK			16
+define KSMBD_SHARE_FLAG_GUEST_ONLY			32
+define KSMBD_SHARE_FLAG_STORE_DOS_ATTRS			64
+define KSMBD_SHARE_FLAG_OPLOCKS				128
+define KSMBD_SHARE_FLAG_PIPE				256
+define KSMBD_SHARE_FLAG_HIDE_DOT_FILES			512
+define KSMBD_SHARE_FLAG_INHERIT_OWNER			1024
+define KSMBD_SHARE_FLAG_STREAMS				2048
+define KSMBD_SHARE_FLAG_FOLLOW_SYMLINKS			4096
+define KSMBD_SHARE_FLAG_ACL_XATTR			8192
+define KSMBD_SHARE_FLAG_UPDATE				16384
+define KSMBD_SHARE_FLAG_CROSSMNT			32768
+define KSMBD_SHARE_FLAG_CONTINUOUS_AVAILABILITY		65536
+define KSMBD_SHARE_FLAG_FRUIT_TIME_MACHINE		131072
+define KSMBD_SHARE_FLAG_FRUIT_FINDER_INFO		262144
+define KSMBD_SHARE_FLAG_FRUIT_RFORK_SIZE		524288
+define KSMBD_SHARE_FLAG_FRUIT_MAX_ACCESS		1048576
+
+# struct ksmbd_tree_connect_request
+ksmbd_tree_connect_request {
+	handle		int32
+	account_flags	flags[ksmbd_user_flags, int16]
+	flags		flags[ksmbd_tree_conn_req_flags, int16]
+	session_id	int64
+	connect_id	int64
+	account		array[int8, KSMBD_REQ_MAX_ACCOUNT_NAME_SZ]
+	share		array[int8, KSMBD_REQ_MAX_SHARE_NAME]
+	peer_addr	array[int8, 64]
+	reserved	array[int32, 16]
+}
+
+ksmbd_user_flags = KSMBD_USER_FLAG_OK, KSMBD_USER_FLAG_BAD_PASSWORD, KSMBD_USER_FLAG_BAD_UID, KSMBD_USER_FLAG_BAD_USER, KSMBD_USER_FLAG_GUEST_ACCOUNT, KSMBD_USER_FLAG_DELAY_SESSION, KSMBD_USER_FLAG_EXTENSION
+
+define KSMBD_USER_FLAG_OK		1
+define KSMBD_USER_FLAG_BAD_PASSWORD	2
+define KSMBD_USER_FLAG_BAD_UID		4
+define KSMBD_USER_FLAG_BAD_USER		8
+define KSMBD_USER_FLAG_GUEST_ACCOUNT	16
+define KSMBD_USER_FLAG_DELAY_SESSION	32
+define KSMBD_USER_FLAG_EXTENSION	64
+
+ksmbd_tree_conn_req_flags = KSMBD_TREE_CONN_FLAG_REQUEST_IPV6, KSMBD_TREE_CONN_FLAG_REQUEST_SMB2
+
+define KSMBD_TREE_CONN_FLAG_REQUEST_IPV6	1
+define KSMBD_TREE_CONN_FLAG_REQUEST_SMB2	2
+
+# struct ksmbd_tree_connect_response
+ksmbd_tree_connect_response {
+	handle		int32
+	status		int16[0:9]
+	connection_flags	flags[ksmbd_tree_conn_resp_flags, int16]
+	reserved	array[int32, 16]
+}
+
+ksmbd_tree_conn_resp_flags = KSMBD_TREE_CONN_FLAG_GUEST_ACCOUNT, KSMBD_TREE_CONN_FLAG_READ_ONLY, KSMBD_TREE_CONN_FLAG_WRITABLE, KSMBD_TREE_CONN_FLAG_ADMIN_ACCOUNT, KSMBD_TREE_CONN_FLAG_UPDATE
+
+define KSMBD_TREE_CONN_FLAG_GUEST_ACCOUNT	1
+define KSMBD_TREE_CONN_FLAG_READ_ONLY		2
+define KSMBD_TREE_CONN_FLAG_WRITABLE		4
+define KSMBD_TREE_CONN_FLAG_ADMIN_ACCOUNT	8
+define KSMBD_TREE_CONN_FLAG_UPDATE		16
+
+# struct ksmbd_tree_disconnect_request
+ksmbd_tree_disconnect_request {
+	session_id	int64
+	connect_id	int64
+	reserved	array[int32, 16]
+}
+
+# struct ksmbd_logout_request
+ksmbd_logout_request {
+	account		array[int8, KSMBD_REQ_MAX_ACCOUNT_NAME_SZ]
+	account_flags	int32
+	reserved	array[int32, 16]
+}
+
+# struct ksmbd_rpc_command (variable-length payload)
+ksmbd_rpc_command {
+	handle		int32
+	flags		flags[ksmbd_rpc_flags, int32]
+	payload_sz	bytesize[payload, int32]
+	payload		array[int8]
+}
+
+ksmbd_rpc_flags = KSMBD_RPC_METHOD_RETURN, KSMBD_RPC_SRVSVC_METHOD_INVOKE, KSMBD_RPC_WKSSVC_METHOD_INVOKE, KSMBD_RPC_OPEN_METHOD, KSMBD_RPC_WRITE_METHOD, KSMBD_RPC_READ_METHOD, KSMBD_RPC_CLOSE_METHOD, KSMBD_RPC_RAP_METHOD, KSMBD_RPC_RESTRICTED_CONTEXT, KSMBD_RPC_SAMR_METHOD_INVOKE, KSMBD_RPC_LSARPC_METHOD_INVOKE
+
+define KSMBD_RPC_METHOD_RETURN		1
+define KSMBD_RPC_SRVSVC_METHOD_INVOKE	2
+define KSMBD_RPC_WKSSVC_METHOD_INVOKE	4
+define KSMBD_RPC_OPEN_METHOD		16
+define KSMBD_RPC_WRITE_METHOD		32
+define KSMBD_RPC_READ_METHOD		65
+define KSMBD_RPC_CLOSE_METHOD		128
+define KSMBD_RPC_RAP_METHOD		257
+define KSMBD_RPC_RESTRICTED_CONTEXT	512
+define KSMBD_RPC_SAMR_METHOD_INVOKE	1024
+define KSMBD_RPC_LSARPC_METHOD_INVOKE	2048
+
+# struct ksmbd_spnego_authen_request (variable-length blob)
+ksmbd_spnego_authen_request {
+	handle		int32
+	spnego_blob_len	bytesize[spnego_blob, int16]
+	spnego_blob	array[int8]
+}
+
+# struct ksmbd_spnego_authen_response (variable-length payload)
+ksmbd_spnego_authen_response {
+	handle			int32
+	login_response		ksmbd_login_response
+	session_key_len		int16
+	spnego_blob_len		int16
+	payload			array[int8]
+}
+
+# -------------------------------------------------------------------------
+# Syscall: send ksmbd netlink messages
+# -------------------------------------------------------------------------
+
+syz_genetlink_get_family_id$ksmbd(name ptr[in, string["SMBD_GENL"]], fd sock_nl_generic) genl_ksmbd_family_id
+
+sendmsg$ksmbd(fd sock_nl_generic, msg ptr[in, msghdr_ksmbd], f flags[send_flags])

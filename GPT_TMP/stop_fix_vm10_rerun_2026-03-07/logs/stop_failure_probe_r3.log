@@ -1,0 +1,131 @@
+peer                 dialect status     credits  requests
+-----------------------------------------------------------
+[   33.630947] ksmbd: durable reconnect v2: client GUID mismatch
+[   33.634966] ksmbd: durable reconnect v2: client GUID mismatch
+[   33.664548] ksmbd: inherit ACL overflow
+[   33.676300] ksmbd: inherit ACL overflow
+[   33.707931] ksmbd: inherit ACL overflow
+[   33.717542] ksmbd: inherit ACL overflow
+[   33.729413] ksmbd: inherit ACL overflow
+[   33.742997] ksmbd: inherit ACL overflow
+[   33.752304] ksmbd: inherit ACL overflow
+[   33.765732] ksmbd: inherit ACL overflow
+[   37.783359] ksmbd: inherit ACL overflow
+[   39.791637] ksmbd: inherit ACL overflow
+[   41.799912] ksmbd: inherit ACL overflow
+[   45.823000] ksmbd: inherit ACL overflow
+[   49.846375] ksmbd: inherit ACL overflow
+[   53.861466] ksmbd: inherit ACL overflow
+[   57.884111] ksmbd: inherit ACL overflow
+[   61.904610] ksmbd: inherit ACL overflow
+[  105.966234] ksmbd: stop_sessions: giving up after 301 retries - 5 connections leaked, forcing cleanup
+[  105.968203] ------------[ cut here ]------------
+[  105.969191] refcount_t: addition on 0; use-after-free.
+[  105.970883] WARNING: CPU: 0 PID: 714 at lib/refcount.c:25 refcount_warn_saturate+0xe5/0x110
+[  105.972670] Modules linked in: nls_utf8 tcp_diag inet_diag md4 ksmbd(OE) rdma_ucm rdma_cm iw_cm ib_cm ib_umad ib_uverbs ib_core hkdf crypto_user lz4_compress libdes intel_rapl_msr intel_rapl_common intel_uncore_frequency_common intel_pmc_core pmt_telemetry pmt_discovery pmt_class intel_pmc_ssram_telemetry intel_vsec kvm_intel kvm irqbypass polyval_clmulni ghash_clmulni_intel aesni_intel ppdev rapl joydev mousedev i2c_piix4 psmouse parport_pc i2c_smbus pcspkr parport mac_hid cfg80211 rfkill nfnetlink vsock_loopback vmw_vsock_virtio_transport_common vmw_vsock_vmci_transport vsock vmw_vmci qemu_fw_cfg sr_mod cdrom ata_generic pata_acpi intel_agp ata_piix bochs intel_gtt floppy serio_raw 9pnet_virtio 9p 9pnet virtio_net netfs net_failover failover
+[  105.986424] CPU: 0 UID: 0 PID: 714 Comm: ksmbdctl Tainted: G           OE       6.18.13-arch1-1 #1 PREEMPT(full)  37d84e5c59d38b1e3c61214631c6e0356ae9b977
+[  105.989322] Tainted: [O]=OOT_MODULE, [E]=UNSIGNED_MODULE
+[  105.990474] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Arch Linux 1.17.0-2-2 04/01/2014
+[  105.992441] RIP: 0010:refcount_warn_saturate+0xe5/0x110
+[  105.993658] Code: 53 7b ff 0f 0b c3 cc cc cc cc 80 3d 68 a8 ae 01 00 0f 85 5e ff ff ff 48 c7 c7 e8 1b 1d 92 c6 05 54 a8 ae 01 01 e8 fb 52 7b ff <0f> 0b c3 cc cc cc cc 48 c7 c7 40 1c 1d 92 c6 05 38 a8 ae 01 01 e8
+[  105.997418] RSP: 0018:ffffd4a502593c00 EFLAGS: 00010246
+[  105.998706] RAX: 0000000000000000 RBX: ffff8f3d04aa5280 RCX: 0000000000000000
+[  106.000243] RDX: ffff8f3d7d22b000 RSI: 0000000000000001 RDI: ffff8f3d7d21d000
+[  106.004209] RBP: 0000000000000004 R08: 0000000000000000 R09: 00000000ffffefff
+[  106.005856] R10: ffffffff92a61440 R11: ffffd4a502593a98 R12: 0000000000000004
+[  106.007343] R13: fffffffffffffff2 R14: ffffd4a502593ca8 R15: 0000000000000000
+[  106.008935] FS:  00007f3c8b042740(0000) GS:ffff8f3de9aee000(0000) knlGS:0000000000000000
+[  106.010746] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  106.011982] CR2: 00007f0e27118fc8 CR3: 00000000052c6004 CR4: 0000000000372ef0
+[  106.013583] Call Trace:
+[  106.014069]  <TASK>
+[  106.014695]  kthread_stop+0x176/0x180
+[  106.015653]  kill_server_store+0x6d/0x100 [ksmbd e5320fb2bfa2779212d4013a0e6a5970796d7cd1]
+[  106.017475]  kernfs_fop_write_iter+0x14d/0x200
+[  106.018540]  vfs_write+0x25d/0x480
+[  106.019424]  ksys_write+0x73/0xf0
+[  106.020122]  do_syscall_64+0x81/0x7f0
+[  106.021061]  ? set_ptes.isra.0+0x36/0x80
+[  106.022122]  ? _raw_spin_unlock+0xe/0x30
+[  106.023066]  ? do_anonymous_page+0xfb/0x890
+[  106.024058]  ? ___pte_offset_map+0x1b/0x160
+[  106.025037]  ? __handle_mm_fault+0xa60/0xf10
+[  106.026050]  ? count_memcg_events+0xc2/0x190
+[  106.027056]  ? handle_mm_fault+0x1d7/0x2d0
+[  106.028057]  ? do_user_addr_fault+0x21a/0x690
+[  106.029117]  ? clear_bhb_loop+0x50/0xa0
+[  106.033234]  ? clear_bhb_loop+0x50/0xa0
+[  106.035268]  ? clear_bhb_loop+0x50/0xa0
+[  106.036168]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+[  106.038360] RIP: 0033:0x7f3c8b1b53be
+[  106.040791] Code: 4d 89 d8 e8 64 bb 00 00 4c 8b 5d f8 41 8b 93 08 03 00 00 59 5e 48 83 f8 fc 74 11 c9 c3 0f 1f 80 00 00 00 00 48 8b 45 10 0f 05 <c9> c3 83 e2 39 83 fa 08 75 e7 e8 03 ff ff ff 0f 1f 00 f3 0f 1e fa
+[  106.048814] RSP: 002b:00007ffd01483ef0 EFLAGS: 00000202 ORIG_RAX: 0000000000000001
+[  106.052052] RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f3c8b1b53be
+[  106.053846] RDX: 0000000000000004 RSI: 000055f0f5847aaa RDI: 0000000000000003
+[  106.059959] RBP: 00007ffd01483f00 R08: 0000000000000000 R09: 0000000000000000
+[  106.061682] R10: 0000000000000000 R11: 0000000000000202 R12: 0000000000000003
+[  106.064431] R13: 0000000000000002 R14: 00007f3c8b4e4000 R15: 000055f0f5852518
+[  106.067481]  </TASK>
+[  106.067960] ---[ end trace 0000000000000000 ]---
+[  106.076454] BUG: kernel NULL pointer dereference, address: 0000000000000000
+[  106.079491] #PF: supervisor write access in kernel mode
+[  106.081571] #PF: error_code(0x0002) - not-present page
+[  106.084673] PGD 0 P4D 0 
+[  106.085154] Oops: Oops: 0002 [#1] SMP PTI
+[  106.085947] CPU: 1 UID: 0 PID: 714 Comm: ksmbdctl Tainted: G        W  OE       6.18.13-arch1-1 #1 PREEMPT(full)  37d84e5c59d38b1e3c61214631c6e0356ae9b977
+[  106.089321] Tainted: [W]=WARN, [O]=OOT_MODULE, [E]=UNSIGNED_MODULE
+[  106.090755] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Arch Linux 1.17.0-2-2 04/01/2014
+[  106.092521] RIP: 0010:kthread_stop+0x40/0x180
+[  106.093363] Code: 00 f0 0f c1 43 28 85 c0 0f 84 44 01 00 00 8d 50 01 09 c2 0f 88 07 01 00 00 f6 43 2e 20 0f 84 15 01 00 00 48 8b ab a8 0b 00 00 <f0> 80 4d 00 02 48 89 df e8 b3 fb ff ff f0 80 0b 04 48 89 df e8 77
+[  106.096765] RSP: 0018:ffffd4a502593c08 EFLAGS: 00010202
+[  106.097750] RAX: 0000000000000000 RBX: ffff8f3d04aa5280 RCX: 0000000000000000
+[  106.099327] RDX: ffff8f3d7d22b000 RSI: 0000000000000001 RDI: ffff8f3d7d21d000
+[  106.100720] RBP: 0000000000000000 R08: 0000000000000000 R09: 00000000ffffefff
+[  106.102024] R10: ffffffff92a61440 R11: ffffd4a502593a98 R12: 0000000000000004
+[  106.103381] R13: fffffffffffffff2 R14: ffffd4a502593ca8 R15: 0000000000000000
+[  106.104700] FS:  00007f3c8b042740(0000) GS:ffff8f3de9bee000(0000) knlGS:0000000000000000
+[  106.106428] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  106.107799] CR2: 0000000000000000 CR3: 00000000052c6003 CR4: 0000000000372ef0
+[  106.109333] Call Trace:
+[  106.109862]  <TASK>
+[  106.110352]  kill_server_store+0x6d/0x100 [ksmbd e5320fb2bfa2779212d4013a0e6a5970796d7cd1]
+[  106.112157]  kernfs_fop_write_iter+0x14d/0x200
+[  106.113427]  vfs_write+0x25d/0x480
+[  106.114346]  ksys_write+0x73/0xf0
+[  106.115051]  do_syscall_64+0x81/0x7f0
+[  106.115878]  ? set_ptes.isra.0+0x36/0x80
+[  106.116755]  ? _raw_spin_unlock+0xe/0x30
+[  106.117591]  ? do_anonymous_page+0xfb/0x890
+[  106.118508]  ? ___pte_offset_map+0x1b/0x160
+[  106.119431]  ? __handle_mm_fault+0xa60/0xf10
+[  106.120507]  ? count_memcg_events+0xc2/0x190
+[  106.121806]  ? handle_mm_fault+0x1d7/0x2d0
+[  106.122766]  ? do_user_addr_fault+0x21a/0x690
+[  106.123743]  ? clear_bhb_loop+0x50/0xa0
+[  106.124638]  ? clear_bhb_loop+0x50/0xa0
+[  106.125676]  ? clear_bhb_loop+0x50/0xa0
+[  106.129296]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+[  106.130837] RIP: 0033:0x7f3c8b1b53be
+[  106.131661] Code: 4d 89 d8 e8 64 bb 00 00 4c 8b 5d f8 41 8b 93 08 03 00 00 59 5e 48 83 f8 fc 74 11 c9 c3 0f 1f 80 00 00 00 00 48 8b 45 10 0f 05 <c9> c3 83 e2 39 83 fa 08 75 e7 e8 03 ff ff ff 0f 1f 00 f3 0f 1e fa
+[  106.135716] RSP: 002b:00007ffd01483ef0 EFLAGS: 00000202 ORIG_RAX: 0000000000000001
+[  106.137383] RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f3c8b1b53be
+[  106.138926] RDX: 0000000000000004 RSI: 000055f0f5847aaa RDI: 0000000000000003
+[  106.140493] RBP: 00007ffd01483f00 R08: 0000000000000000 R09: 0000000000000000
+[  106.142037] R10: 0000000000000000 R11: 0000000000000202 R12: 0000000000000003
+[  106.145874] R13: 0000000000000002 R14: 00007f3c8b4e4000 R15: 000055f0f5852518
+[  106.148298]  </TASK>
+[  106.148830] Modules linked in: nls_utf8 tcp_diag inet_diag md4 ksmbd(OE) rdma_ucm rdma_cm iw_cm ib_cm ib_umad ib_uverbs ib_core hkdf crypto_user lz4_compress libdes intel_rapl_msr intel_rapl_common intel_uncore_frequency_common intel_pmc_core pmt_telemetry pmt_discovery pmt_class intel_pmc_ssram_telemetry intel_vsec kvm_intel kvm irqbypass polyval_clmulni ghash_clmulni_intel aesni_intel ppdev rapl joydev mousedev i2c_piix4 psmouse parport_pc i2c_smbus pcspkr parport mac_hid cfg80211 rfkill nfnetlink vsock_loopback vmw_vsock_virtio_transport_common vmw_vsock_vmci_transport vsock vmw_vmci qemu_fw_cfg sr_mod cdrom ata_generic pata_acpi intel_agp ata_piix bochs intel_gtt floppy serio_raw 9pnet_virtio 9p 9pnet virtio_net netfs net_failover failover
+[  106.165737] CR2: 0000000000000000
+[  106.166467] ---[ end trace 0000000000000000 ]---
+[  106.167494] RIP: 0010:kthread_stop+0x40/0x180
+[  106.168470] Code: 00 f0 0f c1 43 28 85 c0 0f 84 44 01 00 00 8d 50 01 09 c2 0f 88 07 01 00 00 f6 43 2e 20 0f 84 15 01 00 00 48 8b ab a8 0b 00 00 <f0> 80 4d 00 02 48 89 df e8 b3 fb ff ff f0 80 0b 04 48 89 df e8 77
+[  106.172500] RSP: 0018:ffffd4a502593c08 EFLAGS: 00010202
+[  106.173681] RAX: 0000000000000000 RBX: ffff8f3d04aa5280 RCX: 0000000000000000
+[  106.175241] RDX: ffff8f3d7d22b000 RSI: 0000000000000001 RDI: ffff8f3d7d21d000
+[  106.176850] RBP: 0000000000000000 R08: 0000000000000000 R09: 00000000ffffefff
+[  106.178414] R10: ffffffff92a61440 R11: ffffd4a502593a98 R12: 0000000000000004
+[  106.179957] R13: fffffffffffffff2 R14: ffffd4a502593ca8 R15: 0000000000000000
+[  106.181534] FS:  00007f3c8b042740(0000) GS:ffff8f3de9bee000(0000) knlGS:0000000000000000
+[  106.183289] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  106.184573] CR2: 0000000000000000 CR3: 00000000052c6003 CR4: 0000000000372ef0
+[  106.186202] note: ksmbdctl[714] exited with irqs disabled

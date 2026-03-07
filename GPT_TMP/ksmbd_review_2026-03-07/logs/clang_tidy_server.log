@@ -1,0 +1,41 @@
+460 warnings and 1 error generated.
+Error while processing /home/ezechiel203/ksmbd/src/core/server.c.
+/home/ezechiel203/ksmbd/src/core/server.c:8:10: error: 'oplock.h' file not found [clang-diagnostic-error]
+    8 | #include "oplock.h"
+      |          ^~~~~~~~~~
+/home/ezechiel203/ksmbd/src/core/server.c:67:12: warning: declaration uses identifier '___server_conf_set', which is a reserved identifier [bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp]
+   67 | static int ___server_conf_set(int idx, char *val)
+      |            ^~~~~~~~~~~~~~~~~~
+      |            server_conf_set
+/home/ezechiel203/ksmbd/src/core/server.c:135:12: warning: declaration uses identifier '__process_request', which is a reserved identifier [bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp]
+  135 | static int __process_request(struct ksmbd_work *work, struct ksmbd_conn *conn,
+      |            ^~~~~~~~~~~~~~~~~
+      |            process_request
+/home/ezechiel203/ksmbd/src/core/server.c:238:13: warning: declaration uses identifier '__handle_ksmbd_work', which is a reserved identifier [bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp]
+  238 | static bool __handle_ksmbd_work(struct ksmbd_work *work,
+      |             ^~~~~~~~~~~~~~~~~~~
+      |             handle_ksmbd_work
+/home/ezechiel203/ksmbd/src/core/server.c:817:12: warning: declaration uses identifier '__queue_ctrl_work', which is a reserved identifier [bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp]
+  817 | static int __queue_ctrl_work(int type)
+      |            ^~~~~~~~~~~~~~~~~
+      |            queue_ctrl_work
+/home/ezechiel203/ksmbd/src/core/server.c:880:10: warning: narrowing conversion from 'size_t' (aka 'unsigned long') to signed type 'int' is implementation-defined [bugprone-narrowing-conversions]
+  880 |                 return len;
+      |                        ^
+/home/ezechiel203/ksmbd/src/core/server.c:888:9: warning: narrowing conversion from 'size_t' (aka 'unsigned long') to signed type 'int' is implementation-defined [bugprone-narrowing-conversions]
+  888 |         return len;
+      |                ^
+/home/ezechiel203/ksmbd/src/core/server.c:944:9: warning: narrowing conversion from 'size_t' (aka 'unsigned long') to signed type 'int' is implementation-defined [bugprone-narrowing-conversions]
+  944 |         return len;
+      |                ^
+/home/ezechiel203/ksmbd/src/core/server.c:998:12: warning: declaration uses identifier '__init', which is a reserved identifier [bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp]
+  998 | static int __init ksmbd_server_init(void)
+      |            ^~~~~~
+      |            init
+/home/ezechiel203/ksmbd/src/core/server.c:1205:13: warning: declaration uses identifier '__exit', which is a reserved identifier [bugprone-reserved-identifier,cert-dcl37-c,cert-dcl51-cpp]
+ 1205 | static void __exit ksmbd_server_exit(void)
+      |             ^~~~~~
+      |             exit
+Suppressed 439 warnings (439 in non-user code).
+Use -header-filter=.* to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+Found compiler error(s).

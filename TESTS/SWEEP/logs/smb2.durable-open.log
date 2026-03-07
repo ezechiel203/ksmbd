@@ -1,0 +1,138 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772586898
+time: 2026-03-04 01:14:58.421578
+progress: 26
+test: open-oplock
+time: 2026-03-04 01:14:58.422251
+time: 2026-03-04 01:14:59.603095
+success: open-oplock
+test: open-lease
+time: 2026-03-04 01:14:59.603158
+time: 2026-03-04 01:15:07.251870
+success: open-lease
+test: reopen1
+time: 2026-03-04 01:15:07.251926
+time: 2026-03-04 01:15:07.529948
+success: reopen1
+test: reopen1a
+time: 2026-03-04 01:15:07.529997
+time: 2026-03-04 01:15:08.131363
+failure: reopen1a [
+../../source4/torture/smb2/durable_open.c:487: status was NT_STATUS_OBJECT_NAME_NOT_FOUND, expected NT_STATUS_OK: ../../source4/torture/smb2/durable_open.c:487
+]
+test: reopen1a-lease
+time: 2026-03-04 01:15:08.131502
+time: 2026-03-04 01:15:08.665183
+failure: reopen1a-lease [
+../../source4/torture/smb2/durable_open.c:691: io.out.durable_open was 1 (0x1), expected 0 (0x0): ../../source4/torture/smb2/durable_open.c:691
+]
+test: reopen2
+time: 2026-03-04 01:15:08.665239
+time: 2026-03-04 01:15:09.172023
+failure: reopen2 [
+../../source4/torture/smb2/durable_open.c:777: status was NT_STATUS_OBJECT_NAME_NOT_FOUND, expected NT_STATUS_OK: ../../source4/torture/smb2/durable_open.c:777
+]
+test: reopen2-lease
+time: 2026-03-04 01:15:09.172089
+time: 2026-03-04 01:15:09.437840
+failure: reopen2-lease [
+../../source4/torture/smb2/durable_open.c:1009: io.out.durable_open was 1 (0x1), expected 0 (0x0): ../../source4/torture/smb2/durable_open.c:1009
+]
+test: reopen2-lease-v2
+time: 2026-03-04 01:15:09.437901
+time: 2026-03-04 01:15:09.932544
+failure: reopen2-lease-v2 [
+../../source4/torture/smb2/durable_open.c:1246: io.out.durable_open was 1 (0x1), expected 0 (0x0): ../../source4/torture/smb2/durable_open.c:1246
+]
+test: reopen2a
+time: 2026-03-04 01:15:09.932597
+time: 2026-03-04 01:15:10.352519
+success: reopen2a
+test: reopen3
+time: 2026-03-04 01:15:10.352569
+time: 2026-03-04 01:15:10.802768
+success: reopen3
+test: reopen4
+time: 2026-03-04 01:15:10.802828
+time: 2026-03-04 01:15:14.203764
+success: reopen4
+test: reopen5
+time: 2026-03-04 01:15:14.203823
+time: 2026-03-04 01:15:17.751189
+success: reopen5
+test: reopen6
+time: 2026-03-04 01:15:17.751240
+Fallback to anonymous for 'torture:user2name'=NULL 'torture:user2domain'='WORKGROUP' 'torture:user2password'='REDACTED'time: 2026-03-04 01:15:17.860188
+skip: reopen6 [
+../../source4/torture/smb2/durable_open.c:1723: valid user2 credentials are required
+]
+test: delete_on_close1
+time: 2026-03-04 01:15:17.860261
+time: 2026-03-04 01:15:18.274435
+failure: delete_on_close1 [
+../../source4/torture/smb2/durable_open.c:1852: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: ../../source4/torture/smb2/durable_open.c:1852
+]
+test: delete_on_close2
+time: 2026-03-04 01:15:18.274492
+time: 2026-03-04 01:15:18.738703
+failure: delete_on_close2 [
+../../source4/torture/smb2/durable_open.c:1939: io.out.durable_open was 1 (0x1), expected 0 (0x0): ../../source4/torture/smb2/durable_open.c:1939
+]
+test: file-position
+time: 2026-03-04 01:15:18.738775
+position: 0
+position: 4096
+position: 4096
+time: 2026-03-04 01:15:18.964364
+success: file-position
+test: oplock
+time: 2026-03-04 01:15:18.964423
+time: 2026-03-04 01:15:19.381381
+success: oplock
+test: lease
+time: 2026-03-04 01:15:19.381446
+time: 2026-03-04 01:15:19.788567
+success: lease
+test: lock-oplock
+time: 2026-03-04 01:15:19.788623
+time: 2026-03-04 01:15:20.109245
+failure: lock-oplock [
+../../source4/torture/smb2/durable_open.c:2352: status was NT_STATUS_OBJECT_NAME_NOT_FOUND, expected NT_STATUS_OK: ../../source4/torture/smb2/durable_open.c:2352
+]
+test: lock-lease
+time: 2026-03-04 01:15:20.109300
+time: 2026-03-04 01:15:20.382338
+failure: lock-lease [
+../../source4/torture/smb2/durable_open.c:2457: status was NT_STATUS_RANGE_NOT_LOCKED, expected NT_STATUS_OK: ../../source4/torture/smb2/durable_open.c:2457
+]
+test: lock-noW-lease
+time: 2026-03-04 01:15:20.382407
+time: 2026-03-04 01:15:20.773240
+failure: lock-noW-lease [
+../../source4/torture/smb2/durable_open.c:2550: status was NT_STATUS_OK, expected NT_STATUS_OBJECT_NAME_NOT_FOUND: ../../source4/torture/smb2/durable_open.c:2550
+]
+test: open2-lease
+time: 2026-03-04 01:15:20.773329
+time: 2026-03-04 01:15:21.289014
+failure: open2-lease [
+../../source4/torture/smb2/durable_open.c:2652: status was NT_STATUS_OK, expected NT_STATUS_OBJECT_NAME_NOT_FOUND: ../../source4/torture/smb2/durable_open.c:2652
+]
+test: open2-oplock
+time: 2026-03-04 01:15:21.289077
+time: 2026-03-04 01:15:21.696627
+success: open2-oplock
+test: alloc-size
+time: 2026-03-04 01:15:21.696680
+time: 2026-03-04 01:15:25.421263
+failure: alloc-size [
+../../source4/torture/smb2/durable_open.c:2851: (&io)->out.alloc_size was 8192 (0x2000), expected 4096 (0x1000): ../../source4/torture/smb2/durable_open.c:2851
+]
+test: read-only
+time: 2026-03-04 01:15:25.421355
+time: 2026-03-04 01:15:25.964278
+success: read-only
+test: stat-open
+time: 2026-03-04 01:15:25.964329
+time: 2026-03-04 01:15:26.288928
+success: stat-open

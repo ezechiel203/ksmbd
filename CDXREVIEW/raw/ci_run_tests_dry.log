@@ -1,0 +1,20 @@
+[0;36m[1mApple SMB Extensions Test Framework[0m
+[0;36m===================================[0m
+[0;34m[INFO][0m Started at Mon Feb 23 22:47:54 CET 2026
+[0;34m[INFO][0m Test type: all
+[0;34m[INFO][0m Validating test environment...
+[0;32m[SUCCESS][0m Environment validation passed
+[0;36m[1mBuilding Test Modules[0m
+[0;36m=====================[0m
+[0;34m[INFO][0m [DRY RUN] Would build test modules using: /home/ezechiel203/ksmbd/test_compilation.sh
+[0;36m[1mRunning all Tests[0m
+[0;36m=================[0m
+[0;34m[INFO][0m [DRY RUN] Would run all tests using: bash -lc /home/ezechiel203/ksmbd/test_compilation.sh && /home/ezechiel203/ksmbd/tests/run_integration.sh --help && /home/ezechiel203/ksmbd/tests/run_smbtorture.sh --list && /home/ezechiel203/ksmbd/benchmarks/run_benchmarks.sh --help
+[0;36m[1mGenerating Test Summary[0m
+[0;36m=======================[0m
+[0;32m[SUCCESS][0m Summary generated: /home/ezechiel203/ksmbd/test_results/summary.txt
+[0;36m[1mTest Execution Complete[0m
+[0;36m=======================[0m
+[0;34m[INFO][0m Total duration: 0s
+[0;34m[INFO][0m Exit code: 0
+[0;32m[SUCCESS][0m All operations completed successfully

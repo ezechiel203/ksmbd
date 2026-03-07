@@ -1,0 +1,32 @@
+# Program B Technical Artifacts
+
+This directory materializes the task-level technical files implied by
+`B_PROGRAM_TASK_TRACKER.md`.
+
+Program B remains planning-only unless the explicit approval gates are met.
+These files therefore define engineering decision packages, prototypes,
+qualification models, and claim boundaries. They are not implementation-start
+authorization by themselves.
+
+## Files
+1. `B0_T1_PROGRAM_B_APPROVAL_MEMO.md`
+2. `B0_T2_NTFS_STRATEGY_SELECTION.md`
+3. `B0_T3_RSVD_SCOPE_SELECTION.md`
+4. `B0_T4_FAILOVER_POSITION_SELECTION.md`
+5. `B1_T1_MULTICHANNEL_MATURITY.md`
+6. `B1_T2_WITNESS_MATURITY.md`
+7. `B1_T3_RDMA_SECURE_TRANSPORT_COMPLETION.md`
+8. `B2_T1_BROADER_HYPERV_MATRIX_EXPANSION.md`
+9. `B2_T2_PROGRAM_A_CARRY_FORWARD_HARDENING.md`
+10. `B3_T1_SHORT_NAME_STRATEGY_PROTOTYPE.md`
+11. `B3_T2_COMPRESSION_SET_SEMANTICS_PROTOTYPE.md`
+12. `B3_T3_OBJECT_ID_AND_METADATA_SURFACE_PROTOTYPE.md`
+13. `B3_T4_QUOTA_SEMANTICS_STRATEGY.md`
+14. `B4_T1_RSVD_COMMAND_MATRIX.md`
+15. `B4_T2_RESERVATION_STATE_MODEL.md`
+16. `B4_T3_VHDX_BACKEND_FEASIBILITY_PROTOTYPE.md`
+17. `B5_T1_SHARED_STATE_ARCHITECTURE.md`
+18. `B5_T2_FAILOVER_NEGATIVE_PATH_TEST_DESIGN.md`
+19. `B5_T3_WITNESS_DRIVEN_RECOVERY_FLOW.md`
+20. `B6_T1_PROGRAM_B_MATRIX_DEFINITION.md`
+21. `B6_T2_RELEASE_CLAIMS_DRAFT.md`

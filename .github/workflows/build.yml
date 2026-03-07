@@ -1,0 +1,59 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+name: Build
+
+on: [push, pull_request, workflow_dispatch]
+
+jobs:
+  build-matrix:
+    name: Build (${{ matrix.distro_id }} / ${{ matrix.target_arch }})
+    runs-on: ubuntu-latest
+    container:
+      image: ${{ matrix.distro }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - distro: ubuntu:24.04
+            distro_id: ubuntu2404
+            target_arch: x86_64
+          - distro: debian:bookworm
+            distro_id: debian-bookworm
+            target_arch: x86_64
+          - distro: fedora:41
+            distro_id: fedora41
+            target_arch: x86_64
+          - distro: ubuntu:24.04
+            distro_id: ubuntu2404
+            target_arch: arm32
+          - distro: ubuntu:24.04
+            distro_id: ubuntu2404
+            target_arch: arm64
+          - distro: ubuntu:24.04
+            distro_id: ubuntu2404
+            target_arch: powerpc64le
+          - distro: ubuntu:24.04
+            distro_id: ubuntu2404
+            target_arch: riscv64
+    env:
+      TARGET_ARCH: ${{ matrix.target_arch }}
+      KERNEL_VERSION: "6.1.0"
+      JOBS: "2"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: .github/scripts/ci-install-deps.sh
+
+      - name: Build ksmbd module
+        run: .github/scripts/ci-build-module.sh
+
+      - name: Verify module output
+        run: |
+          ls -lh ksmbd.ko
+          file ksmbd.ko
+
+      - name: Upload module artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ksmbd-${{ matrix.distro_id }}-${{ matrix.target_arch }}
+          path: ksmbd.ko

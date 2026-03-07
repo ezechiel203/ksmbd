@@ -1,0 +1,346 @@
+{
+  "test_framework": {
+    "name": "Apple SMB Extensions Test Framework",
+    "version": "1.0.0",
+    "description": "Comprehensive testing framework for Apple SMB client support in ksmbd"
+  },
+  "results_dir": "test_results",
+  "repo_root": ".",
+  "quality_gates": {
+    "min_coverage": 95.0,
+    "max_vulnerabilities": 0,
+    "min_performance_improvement": 14.0,
+    "max_test_duration": 1800,
+    "max_memory_usage_mb": 2048
+  },
+  "test_suites": {
+    "unit_tests": {
+      "enabled": true,
+      "module": "test_framework/unit_test_framework.ko",
+      "timeout": 300,
+      "critical": true,
+      "description": "Unit testing for Apple client detection and AAPL context handling"
+    },
+    "integration_tests": {
+      "enabled": true,
+      "module": "test_framework/integration_test_framework.ko",
+      "timeout": 600,
+      "critical": true,
+      "description": "End-to-end testing of Apple client connection workflows"
+    },
+    "performance_tests": {
+      "enabled": true,
+      "module": "test_framework/performance_test_framework.ko",
+      "timeout": 1200,
+      "critical": true,
+      "description": "Performance validation and benchmarking for directory traversal"
+    },
+    "security_tests": {
+      "enabled": true,
+      "timeout": 900,
+      "critical": true,
+      "description": "Security validation and vulnerability testing"
+    }
+  },
+  "unit_test_config": {
+    "apple_client_detection": {
+      "test_new_connection": true,
+      "test_aapl_context": true,
+      "test_preexisting_connection": true,
+      "test_edge_cases": true
+    },
+    "aapl_context_parsing": {
+      "test_valid_context": true,
+      "test_empty_data": true,
+      "test_large_data": true,
+      "test_malformed_context": true,
+      "test_boundary_conditions": true
+    },
+    "connection_management": {
+      "test_memory_management": true,
+      "test_connection_flags": true,
+      "test_resource_cleanup": true,
+      "test_error_conditions": true
+    }
+  },
+  "integration_test_config": {
+    "scenarios": {
+      "basic_connection": {
+        "enabled": true,
+        "iterations": 100,
+        "timeout_ms": 5000,
+        "critical": true
+      },
+      "aapl_negotiation": {
+        "enabled": true,
+        "iterations": 50,
+        "timeout_ms": 8000,
+        "critical": true
+      },
+      "directory_traversal": {
+        "enabled": true,
+        "iterations": 500,
+        "timeout_ms": 15000,
+        "critical": true
+      },
+      "concurrent_clients": {
+        "enabled": true,
+        "client_count": 10,
+        "iterations": 200,
+        "timeout_ms": 20000,
+        "critical": true
+      },
+      "error_recovery": {
+        "enabled": true,
+        "iterations": 25,
+        "timeout_ms": 10000,
+        "critical": false
+      }
+    },
+    "apple_client_versions": [
+      {
+        "macos_version": "10.14",
+        "build_number": "18G6032",
+        "smb_client_version": "2.1.0",
+        "user_agent": "Mac OS X",
+        "supports_spotlight": true,
+        "supports_directory_speedup": false,
+        "supports_file_cloning": false,
+        "supports_compression": false
+      },
+      {
+        "macos_version": "11.0",
+        "build_number": "20A2411",
+        "smb_client_version": "3.0.0",
+        "user_agent": "macOS",
+        "supports_spotlight": true,
+        "supports_directory_speedup": true,
+        "supports_file_cloning": true,
+        "supports_compression": false
+      },
+      {
+        "macos_version": "12.0",
+        "build_number": "21A558",
+        "smb_client_version": "3.0.1",
+        "user_agent": "macOS",
+        "supports_spotlight": true,
+        "supports_directory_speedup": true,
+        "supports_file_cloning": true,
+        "supports_compression": true
+      },
+      {
+        "macos_version": "13.0",
+        "build_number": "22A380",
+        "smb_client_version": "3.0.2",
+        "user_agent": "macOS",
+        "supports_spotlight": true,
+        "supports_directory_speedup": true,
+        "supports_file_cloning": true,
+        "supports_compression": true
+      },
+      {
+        "macos_version": "14.0",
+        "build_number": "23A344",
+        "smb_client_version": "3.1.0",
+        "user_agent": "macOS",
+        "supports_spotlight": true,
+        "supports_directory_speedup": true,
+        "supports_file_cloning": true,
+        "supports_compression": true
+      }
+    ]
+  },
+  "performance_test_config": {
+    "test_types": {
+      "basic_traversal": {
+        "enabled": true,
+        "iterations": 1000,
+        "directory_depth": 3,
+        "directory_width": 5,
+        "file_count": 100,
+        "max_file_size_kb": 1024,
+        "duration_ms": 10000,
+        "apple_optimized": false,
+        "baseline_test": true
+      },
+      "apple_traversal": {
+        "enabled": true,
+        "iterations": 1000,
+        "directory_depth": 3,
+        "directory_width": 5,
+        "file_count": 100,
+        "max_file_size_kb": 1024,
+        "duration_ms": 10000,
+        "apple_optimized": true,
+        "baseline_test": false
+      },
+      "deep_traversal": {
+        "enabled": true,
+        "iterations": 500,
+        "directory_depth": 15,
+        "directory_width": 3,
+        "file_count": 200,
+        "max_file_size_kb": 512,
+        "duration_ms": 15000,
+        "apple_optimized": false,
+        "baseline_test": true
+      },
+      "apple_deep_traversal": {
+        "enabled": true,
+        "iterations": 500,
+        "directory_depth": 15,
+        "directory_width": 3,
+        "file_count": 200,
+        "max_file_size_kb": 512,
+        "duration_ms": 15000,
+        "apple_optimized": true,
+        "baseline_test": false
+      },
+      "wide_traversal": {
+        "enabled": true,
+        "iterations": 800,
+        "directory_depth": 2,
+        "directory_width": 50,
+        "file_count": 500,
+        "max_file_size_kb": 256,
+        "duration_ms": 12000,
+        "apple_optimized": false,
+        "baseline_test": true
+      },
+      "apple_wide_traversal": {
+        "enabled": true,
+        "iterations": 800,
+        "directory_depth": 2,
+        "directory_width": 50,
+        "file_count": 500,
+        "max_file_size_kb": 256,
+        "duration_ms": 12000,
+        "apple_optimized": true,
+        "baseline_test": false
+      },
+      "concurrent_access": {
+        "enabled": true,
+        "iterations": 2000,
+        "concurrent_clients": 10,
+        "directory_depth": 5,
+        "directory_width": 4,
+        "file_count": 300,
+        "max_file_size_kb": 1024,
+        "duration_ms": 20000,
+        "apple_optimized": false,
+        "baseline_test": true
+      },
+      "apple_concurrent_access": {
+        "enabled": true,
+        "iterations": 2000,
+        "concurrent_clients": 10,
+        "directory_depth": 5,
+        "directory_width": 4,
+        "file_count": 300,
+        "max_file_size_kb": 1024,
+        "duration_ms": 20000,
+        "apple_optimized": true,
+        "baseline_test": false
+      }
+    },
+    "performance_thresholds": {
+      "min_improvement_ratio": 14.0,
+      "max_regression_percent": 5.0,
+      "max_memory_increase_percent": 10.0,
+      "max_timeout_rate_percent": 1.0
+    },
+    "benchmark_metrics": {
+      "collect_timing_data": true,
+      "collect_memory_usage": true,
+      "collect_cpu_usage": true,
+      "collect_network_stats": true,
+      "collect_system_load": true
+    }
+  },
+  "security_test_config": {
+    "test_categories": {
+      "input_validation": {
+        "enabled": true,
+        "fuzz_iterations": 10000,
+        "max_input_size": 4096,
+        "test_malformed_packets": true,
+        "test_boundary_conditions": true,
+        "test_buffer_overflows": true
+      },
+      "resource_limits": {
+        "enabled": true,
+        "max_connections": 100,
+        "max_memory_per_connection_mb": 10,
+        "max_files_per_connection": 1000,
+        "test_connection_flooding": true,
+        "test_memory_exhaustion": true
+      },
+      "authentication": {
+        "enabled": true,
+        "test_brute_force": true,
+        "test_token_validation": true,
+        "test_session_hijacking": true,
+        "test_privilege_escalation": true
+      },
+      "data_integrity": {
+        "enabled": true,
+        "test_packet_corruption": true,
+        "test_man_in_middle": true,
+        "test_replay_attacks": true,
+        "test_data_tampering": true
+      }
+    },
+    "vulnerability_scanning": {
+      "static_analysis": true,
+      "dynamic_analysis": true,
+      "memory_safety_checks": true,
+      "use_after_free_detection": true,
+      "race_condition_detection": true
+    }
+  },
+  "coverage_config": {
+    "enabled": true,
+    "min_coverage_percent": 95.0,
+    "exclude_files": [
+      "*.mod.c",
+      "*.symvers",
+      ".tmp_versions/*"
+    ],
+    "include_patterns": [
+      "*apple*",
+      "*aapl*",
+      "smb2pdu.c",
+      "connection.c"
+    ],
+    "gcov_tool": "gcov",
+    "lcov_tool": "lcov",
+    "genhtml_tool": "genhtml",
+    "coverage_report_format": "html"
+  },
+  "reporting_config": {
+    "generate_json_report": true,
+    "generate_html_report": true,
+    "generate_junit_xml": true,
+    "include_performance_metrics": true,
+    "include_coverage_data": true,
+    "include_security_findings": true,
+    "report_retention_days": 30
+  },
+  "ci_cd_config": {
+    "fail_build_on_critical_test_failure": true,
+    "fail_build_on_quality_gate_failure": true,
+    "publish_coverage_to_codecov": true,
+    "publish_results_to_artifacts": true,
+    "parallel_test_execution": true,
+    "max_parallel_jobs": 8
+  },
+  "logging_config": {
+    "log_level": "INFO",
+    "log_to_file": true,
+    "log_file": "test_automation.log",
+    "max_log_size_mb": 10,
+    "max_log_files": 5,
+    "include_timestamps": true,
+    "include_thread_ids": true
+  }
+}

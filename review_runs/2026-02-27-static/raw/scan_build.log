@@ -1,0 +1,36 @@
+scan-build: Using '/usr/bin/clang-21' for static analysis
+make -C /lib/modules/6.18.9-arch1-2/build M=/home/ezechiel203/ksmbd ARCH=x86_64 modules
+make[1]: Entering directory '/usr/lib/modules/6.18.9-arch1-2/build'
+make[2]: Entering directory '/home/ezechiel203/ksmbd'
+  CC [M]  src/encoding/unicode.o
+perl: warning: Setting locale failed.
+perl: warning: Please check that your locale settings:
+	LANGUAGE = (unset),
+	LC_ALL = (unset),
+	LC_CTYPE = "C.UTF-8",
+	LC_NUMERIC = "C",
+	LC_COLLATE = "C",
+	LC_TIME = (unset),
+	LC_MESSAGES = (unset),
+	LC_MONETARY = (unset),
+	LC_ADDRESS = (unset),
+	LC_IDENTIFICATION = (unset),
+	LC_MEASUREMENT = (unset),
+	LC_PAPER = (unset),
+	LC_TELEPHONE = (unset),
+	LC_NAME = (unset),
+	LANG = "fr_FR.UTF-8"
+    are supported and installed on your system.
+perl: warning: Falling back to the standard locale ("C").
+could not find clang line
+make[4]: *** [/usr/lib/modules/6.18.9-arch1-2/build/scripts/Makefile.build:287: src/encoding/unicode.o] Error 1
+make[4]: *** Deleting file 'src/encoding/unicode.o'
+make[3]: *** [/usr/lib/modules/6.18.9-arch1-2/build/Makefile:2011: .] Error 2
+make[2]: *** [/usr/lib/modules/6.18.9-arch1-2/build/Makefile:248: __sub-make] Error 2
+make[2]: Leaving directory '/home/ezechiel203/ksmbd'
+make[1]: *** [Makefile:248: __sub-make] Error 2
+make[1]: Leaving directory '/usr/lib/modules/6.18.9-arch1-2/build'
+make: *** [Makefile:148: all] Error 2
+scan-build: Analysis run complete.
+scan-build: Removing directory '/home/ezechiel203/ksmbd/review_runs/2026-02-27-static/raw/scanbuild/2026-02-27-212931-288620-1' because it contains no reports.
+scan-build: No bugs found.

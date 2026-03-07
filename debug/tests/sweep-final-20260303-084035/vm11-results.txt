@@ -1,0 +1,13 @@
+ioctl: PASS=20 FAIL=42 SKIP=13
+streams: PASS=0
+0 FAIL=14 SKIP=0
+0
+getinfo: PASS=6 FAIL=2 SKIP=0
+0
+create: PASS=10 FAIL=7 SKIP=1
+compound_find: PASS=2 FAIL=1 SKIP=0
+0
+compound_async: PASS=4 FAIL=6 SKIP=0
+0
+compound: PASS=17 FAIL=3 SKIP=0
+0

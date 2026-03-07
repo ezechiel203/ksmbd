@@ -1,0 +1,128 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772890232
+time: 2026-03-07 13:30:32.161885
+progress: 13
+test: simple
+time: 2026-03-07 13:30:32.162876
+Creating base directory
+Creating test file
+Renaming test file
+Checking for new filename
+Closing test file
+Cleaning up
+time: 2026-03-07 13:30:32.197971
+success: simple
+test: simple_modtime
+time: 2026-03-07 13:30:32.198012
+Creating test file: file1.txt
+Waitig for 5 secs..
+Creating test file: file2.txt
+Renaming file1.txt --> tmp1.txt
+GetInfo of tmp1.txt
+Check if timestamps are good after rename(file1.txt --> tmp1.txt).
+Renaming file2.txt --> file1.txt
+GetInfo of file1.txt
+Check if timestamps are good after rename(file2.txt --> file1.txt).
+time: 2026-03-07 13:30:37.213247
+success: simple_modtime
+test: simple_nodelete
+time: 2026-03-07 13:30:37.213287
+Creating base directory
+Creating test file
+Renaming test file
+Closing test file
+Cleaning up
+time: 2026-03-07 13:30:37.224788
+success: simple_nodelete
+test: no_sharing
+time: 2026-03-07 13:30:37.224828
+Creating base directory
+Creating test file
+Renaming test file
+Checking for new filename
+Closing test file
+Cleaning up
+time: 2026-03-07 13:30:37.234552
+success: no_sharing
+test: share_delete_and_delete_access
+time: 2026-03-07 13:30:37.234665
+Creating base directory
+Opening parent directory
+Creating test file
+Renaming test file
+Closing test file
+Closing directory
+Cleaning up
+time: 2026-03-07 13:30:37.245399
+success: share_delete_and_delete_access
+test: no_share_delete_but_delete_access
+time: 2026-03-07 13:30:37.245438
+Creating base directory
+Opening parent directory
+Creating test file
+Renaming test file
+Closing test file
+Closing directory
+Cleaning up
+time: 2026-03-07 13:30:37.257264
+success: no_share_delete_but_delete_access
+test: share_delete_no_delete_access
+time: 2026-03-07 13:30:37.257303
+Creating base directory
+Opening parent directory
+Creating test file
+Renaming test file
+Checking for new filename
+Closing test file
+Closing directory
+Cleaning up
+time: 2026-03-07 13:30:37.270661
+success: share_delete_no_delete_access
+test: no_share_delete_no_delete_access
+time: 2026-03-07 13:30:37.270698
+Creating base directory
+Opening parent directory
+Creating test file
+Renaming test file
+Closing test file
+Closing directory
+Cleaning up
+time: 2026-03-07 13:30:37.282711
+success: no_share_delete_no_delete_access
+test: msword
+time: 2026-03-07 13:30:37.282751
+Creating base directory
+Creating test file
+Opening parent directory
+Renaming test file
+Checking for new filename
+Closing test file
+Closing directory
+Cleaning up
+time: 2026-03-07 13:30:37.295117
+success: msword
+test: rename_dir_openfile
+time: 2026-03-07 13:30:37.295158
+Creating base directory
+Creating test file
+Renaming directory
+Closing directory
+Closing test file
+Cleaning up
+time: 2026-03-07 13:30:37.307320
+success: rename_dir_openfile
+test: rename_dir_bench
+time: 2026-03-07 13:30:37.307358
+rename_dirs_bench returned NT_STATUS_OK
+time: 2026-03-07 13:30:37.322376
+success: rename_dir_bench
+test: close-full-information
+time: 2026-03-07 13:30:37.322411
+time: 2026-03-07 13:30:40.339615
+success: close-full-information
+test: rename-open
+time: 2026-03-07 13:30:40.339738
+Renaming test file
+time: 2026-03-07 13:30:40.376997
+success: rename-open

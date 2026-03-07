@@ -1,0 +1,75 @@
+smbtorture 4.23.6
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772850450
+time: 2026-03-07 02:27:30.553494
+progress: 10
+test: flush_close
+time: 2026-03-07 02:27:30.556544
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_REFUSED
+time: 2026-03-07 02:27:30.558513
+failure: flush_close [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: flush_flush
+time: 2026-03-07 02:27:30.558546
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_REFUSED
+time: 2026-03-07 02:27:30.558895
+failure: flush_flush [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: write_write
+time: 2026-03-07 02:27:30.558926
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_REFUSED
+time: 2026-03-07 02:27:30.559373
+failure: write_write [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: read_read
+time: 2026-03-07 02:27:30.560031
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_REFUSED
+time: 2026-03-07 02:27:30.560634
+failure: read_read [
+../../source4/torture/smb2/smb2.c:37: Establishing SMB2 connection failed
+]
+test: create_lease_break_async
+time: 2026-03-07 02:27:30.560855
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_REFUSED
+time: 2026-03-07 02:27:30.561754
+failure: create_lease_break_async [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: getinfo_middle
+time: 2026-03-07 02:27:30.561807
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_REFUSED
+time: 2026-03-07 02:27:30.562633
+failure: getinfo_middle [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: rename_same_srcdst_non_compound_no_async
+time: 2026-03-07 02:27:30.562664
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_REFUSED
+time: 2026-03-07 02:27:30.564077
+failure: rename_same_srcdst_non_compound_no_async [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: rename_non_compound_no_async
+time: 2026-03-07 02:27:30.564112
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_REFUSED
+time: 2026-03-07 02:27:30.565283
+failure: rename_non_compound_no_async [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: rename_last
+time: 2026-03-07 02:27:30.565318
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_REFUSED
+time: 2026-03-07 02:27:30.565705
+failure: rename_last [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]
+test: rename_middle
+time: 2026-03-07 02:27:30.565733
+Failed to connect to SMB2 share \\127.0.0.1\test - NT_STATUS_CONNECTION_REFUSED
+time: 2026-03-07 02:27:30.566347
+failure: rename_middle [
+../../source4/torture/smb2/smb2.c:95: Establishing SMB2 connection failed
+]

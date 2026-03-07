@@ -1,0 +1,142 @@
+{
+  "suite": "ksmbd-torture",
+  "version": "1.0.0",
+  "timestamp": "2026-03-07T10:54:13Z",
+  "vm": "custom",
+  "server_version": "ksmbd ",
+  "kernel_version": "6.18.13-arch1-1",
+  "duration_ms": 38933,
+  "summary": {
+    "total": 14,
+    "pass": 14,
+    "fail": 0,
+    "skip": 0,
+    "crash": 0
+  },
+  "categories": [
+    {
+      "id": "T25",
+      "duration_ms": 38629,
+      "pass": 14,
+      "fail": 0,
+      "skip": 0,
+      "crash": 0,
+      "health": "OK",
+      "tests": [
+        {
+          "id": "T25.01",
+          "name": "test_ioctl_enumerate_snapshots",
+          "status": "PASS",
+          "duration_ms": 2179,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T25.02",
+          "name": "test_ioctl_is_pathname_valid",
+          "status": "PASS",
+          "duration_ms": 1245,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T25.03",
+          "name": "test_ioctl_is_volume_dirty",
+          "status": "PASS",
+          "duration_ms": 4870,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T25.04",
+          "name": "test_ioctl_lock_volume",
+          "status": "PASS",
+          "duration_ms": 3864,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T25.05",
+          "name": "test_ioctl_unlock_volume",
+          "status": "PASS",
+          "duration_ms": 1521,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T25.06",
+          "name": "test_ioctl_create_get_object_id",
+          "status": "PASS",
+          "duration_ms": 4568,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T25.07",
+          "name": "test_ioctl_get_object_id",
+          "status": "PASS",
+          "duration_ms": 1646,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T25.08",
+          "name": "test_ioctl_set_object_id",
+          "status": "PASS",
+          "duration_ms": 1410,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T25.09",
+          "name": "test_ioctl_delete_object_id",
+          "status": "PASS",
+          "duration_ms": 818,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T25.10",
+          "name": "test_ioctl_srv_read_hash",
+          "status": "PASS",
+          "duration_ms": 1426,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T25.11",
+          "name": "test_ioctl_offload_read",
+          "status": "PASS",
+          "duration_ms": 2082,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T25.12",
+          "name": "test_ioctl_offload_write",
+          "status": "PASS",
+          "duration_ms": 4445,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T25.13",
+          "name": "test_ioctl_mark_handle",
+          "status": "PASS",
+          "duration_ms": 1096,
+          "message": ""
+        }
+        ,
+        {
+          "id": "T25.14",
+          "name": "test_ioctl_query_on_disk_volume",
+          "status": "PASS",
+          "duration_ms": 1454,
+          "message": ""
+        }
+      ]
+    }
+  ],
+  "health_events": [
+  ]
+}

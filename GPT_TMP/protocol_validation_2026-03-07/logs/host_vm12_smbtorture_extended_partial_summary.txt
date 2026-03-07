@@ -1,0 +1,16 @@
+PASS=10 FAIL=13 SKIP=1 INFRA=0
+RESULT smb2.dir: FAIL(rc=1)
+RESULT smb2.mkdir: FAIL(rc=1)
+RESULT smb2.dosmode: FAIL(rc=1)
+RESULT smb2.timestamps: FAIL(rc=1)
+RESULT smb2.ea: FAIL(rc=1)
+RESULT smb2.winattr: PASS
+RESULT smb2.streams: FAIL(rc=1)
+RESULT smb2.lock: PASS
+RESULT smb2.sharemode: PASS
+RESULT smb2.deny: PASS
+RESULT smb2.delete-on-close-perms: FAIL(rc=1)
+RESULT smb2.openattr: FAIL(rc=1)
+RESULT smb2.maximum_allowed: FAIL(rc=1)
+RESULT smb2.ioctl: FAIL(rc=1)
+RESULT smb2.notify: SKIP(timeout 180s)

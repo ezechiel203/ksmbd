@@ -1,0 +1,242 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+#
+# GitHub Actions workflow: run ksmbd KUnit tests via kunit.py.
+#
+# Strategy
+# --------
+# kunit.py builds a User Mode Linux (UML) kernel in-tree, inserts only the
+# symbols listed in test/kunit.kunitconfig, boots it inside the runner
+# process, and reports TAP-formatted results.  No hardware, QEMU, root
+# privileges, or pre-built VM images are required.
+#
+# Resource envelope (GitHub-hosted ubuntu-latest, 2026)
+#   RAM   : ~7 GB    Build uses ~1.5 GB; UML run uses ~256 MB.
+#   Disk  : ~14 GB   Kernel source ~1.2 GB unpacked; UML build ~600 MB.
+#   vCPUs : 4        (-j4 for the UML build).
+#   Time  : 6 h max  Full UML build + test run fits in ~20 minutes.
+
+name: KUnit Tests
+
+on:
+  push:
+    branches:
+      - master
+      - main
+      - next
+  pull_request:
+    branches:
+      - master
+      - main
+      - next
+  workflow_dispatch:
+
+jobs:
+  kunit:
+    name: KUnit (UML / x86_64)
+    runs-on: ubuntu-latest
+
+    env:
+      # Kernel version to build the UML test runner from.
+      # Must be >= 6.1 for CONFIG_KSMBD_KUNIT_TEST.
+      # 6.12 is the current stable LTS series as of early 2026.
+      KERNEL_VERSION: "6.12.16"
+      JOBS: "4"
+
+    steps:
+      # ------------------------------------------------------------------ #
+      # 1. Check out the ksmbd source tree.
+      # ------------------------------------------------------------------ #
+      - name: Checkout ksmbd
+        uses: actions/checkout@v4
+        with:
+          path: ksmbd
+
+      # ------------------------------------------------------------------ #
+      # 2. Install build dependencies.
+      #    flex/bison: Kconfig + Makefile parsers
+      #    libssl-dev / libelf-dev: kernel build requirements
+      #    dwarves (pahole): needed for BTF generation in newer kernels
+      #    python3: kunit.py runtime
+      #    bc: used by the kernel top-level Makefile
+      # ------------------------------------------------------------------ #
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            build-essential bc bison flex \
+            libssl-dev libelf-dev dwarves \
+            python3 python3-pip \
+            cpio rsync pahole
+
+      # ------------------------------------------------------------------ #
+      # 3. Cache the downloaded kernel tarball and the UML build directory.
+      #    The cache key includes the kernel version and kunitconfig checksum
+      #    so a change to either invalidates the cache automatically.
+      # ------------------------------------------------------------------ #
+      - name: Compute kunitconfig checksum
+        id: kunitcfg
+        run: |
+          echo "sha=$(sha256sum ksmbd/test/kunit.kunitconfig | cut -d' ' -f1)" \
+            >> "$GITHUB_OUTPUT"
+
+      - name: Cache kernel source tarball
+        id: cache-kernel-tar
+        uses: actions/cache@v4
+        with:
+          path: kernel-cache/linux-${{ env.KERNEL_VERSION }}.tar.xz
+          key: kernel-tar-${{ env.KERNEL_VERSION }}
+
+      - name: Cache UML build tree
+        id: cache-uml
+        uses: actions/cache@v4
+        with:
+          path: linux-uml
+          key: kunit-uml-${{ env.KERNEL_VERSION }}-${{ steps.kunitcfg.outputs.sha }}
+
+      # ------------------------------------------------------------------ #
+      # 4. Download the kernel source (skipped if cache hit on tarball).
+      # ------------------------------------------------------------------ #
+      - name: Download kernel source
+        if: steps.cache-kernel-tar.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p kernel-cache
+          kernel_major=$(echo "$KERNEL_VERSION" | cut -d. -f1)
+          for base in \
+            "https://cdn.kernel.org/pub/linux/kernel/v${kernel_major}.x" \
+            "https://mirrors.edge.kernel.org/pub/linux/kernel/v${kernel_major}.x"; do
+            if curl -fsSL \
+                "${base}/linux-${KERNEL_VERSION}.tar.xz" \
+                -o "kernel-cache/linux-${KERNEL_VERSION}.tar.xz"; then
+              echo "Downloaded kernel $KERNEL_VERSION from $base"
+              break
+            fi
+          done
+          if [ ! -s "kernel-cache/linux-${KERNEL_VERSION}.tar.xz" ]; then
+            echo "ERROR: failed to download linux-${KERNEL_VERSION}.tar.xz" >&2
+            exit 1
+          fi
+
+      # ------------------------------------------------------------------ #
+      # 5. Extract the kernel and copy ksmbd into fs/ksmbd/.
+      #    Skipped when the full UML build cache is available.
+      # ------------------------------------------------------------------ #
+      - name: Extract kernel and inject ksmbd
+        if: steps.cache-uml.outputs.cache-hit != 'true'
+        run: |
+          if [ ! -d linux-uml ]; then
+            tar -xf "kernel-cache/linux-${KERNEL_VERSION}.tar.xz"
+            mv "linux-${KERNEL_VERSION}" linux-uml
+          fi
+
+          # Inject ksmbd into the kernel tree.
+          rm -rf linux-uml/fs/ksmbd
+          cp -a ksmbd linux-uml/fs/ksmbd
+
+          # Wire ksmbd into the kernel build system if not already present.
+          if ! grep -q 'ksmbd' linux-uml/fs/Kconfig; then
+            echo 'source "fs/ksmbd/Kconfig"' >> linux-uml/fs/Kconfig
+          fi
+          if ! grep -q 'ksmbd' linux-uml/fs/Makefile; then
+            echo 'obj-$(CONFIG_SMB_SERVER) += ksmbd/' >> linux-uml/fs/Makefile
+          fi
+
+      # ------------------------------------------------------------------ #
+      # 6. Run ksmbd KUnit tests via kunit.py.
+      #
+      #    --arch=um            builds a User Mode Linux kernel (no hardware)
+      #    --kunitconfig=...    selects exactly the symbols in kunit.kunitconfig
+      #    --jobs=$JOBS         parallelism for the UML build step
+      #    --timeout=300        seconds allowed for the test run phase
+      #
+      #    kunit.py exits non-zero if any test fails, which fails the step.
+      # ------------------------------------------------------------------ #
+      - name: Run ksmbd KUnit tests
+        working-directory: linux-uml
+        run: |
+          # Sync the ksmbd source from the checkout into the kernel tree on
+          # every run (even on cache hit) so that PR changes are always tested.
+          rm -rf fs/ksmbd
+          cp -a ../ksmbd fs/ksmbd
+
+          # Wire ksmbd into the kernel build system if not already present.
+          if ! grep -q 'ksmbd' fs/Kconfig; then
+            echo 'source "fs/ksmbd/Kconfig"' >> fs/Kconfig
+          fi
+          if ! grep -q 'ksmbd' fs/Makefile; then
+            echo 'obj-$(CONFIG_SMB_SERVER) += ksmbd/' >> fs/Makefile
+          fi
+
+          python3 tools/testing/kunit/kunit.py run \
+            --arch=um \
+            --kunitconfig=fs/ksmbd/test/kunit.kunitconfig \
+            --jobs="${JOBS}" \
+            --timeout=300 \
+            2>&1 | tee ../kunit-output.txt
+
+          # kunit.py exits with 0 on all-pass and non-zero on any failure.
+          # The pipe above makes the shell see only tee's exit code, so we
+          # use PIPESTATUS to propagate kunit.py's real exit status.
+          exit "${PIPESTATUS[0]}"
+
+      # ------------------------------------------------------------------ #
+      # 7. Parse and summarise TAP output for the Actions summary page.
+      # ------------------------------------------------------------------ #
+      - name: Summarise KUnit results
+        if: always()
+        run: |
+          tap_file=kunit-output.txt
+          if [ ! -f "$tap_file" ]; then
+            echo "No TAP output found." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          total=0
+          passed=0
+          failed=0
+          skipped=0
+
+          while IFS= read -r line; do
+            case "$line" in
+              "ok "*)
+                total=$((total + 1))
+                if echo "$line" | grep -q "# SKIP"; then
+                  skipped=$((skipped + 1))
+                else
+                  passed=$((passed + 1))
+                fi
+                ;;
+              "not ok "*)
+                total=$((total + 1))
+                failed=$((failed + 1))
+                ;;
+            esac
+          done < "$tap_file"
+
+          {
+            echo "## KUnit Test Results"
+            echo ""
+            echo "| Result  | Count |"
+            echo "|---------|-------|"
+            echo "| Passed  | $passed |"
+            echo "| Failed  | $failed |"
+            echo "| Skipped | $skipped |"
+            echo "| Total   | $total |"
+            echo ""
+            if [ "$failed" -gt 0 ]; then
+              echo "### Failed tests"
+              echo '```'
+              grep '^not ok ' "$tap_file" || true
+              echo '```'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # ------------------------------------------------------------------ #
+      # 8. Upload the full TAP log as a downloadable artifact.
+      # ------------------------------------------------------------------ #
+      - name: Upload KUnit TAP log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kunit-tap-log
+          path: kunit-output.txt
+          if-no-files-found: ignore

@@ -1,0 +1,60 @@
+smbtorture 4.23.6
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772858080
+time: 2026-03-07 04:34:40.468988
+progress: 9
+test: find
+time: 2026-03-07 04:34:40.469514
+time: 2026-03-07 04:34:52.612563
+success: find
+test: fixed
+time: 2026-03-07 04:34:52.612606
+time: 2026-03-07 04:35:02.828057
+success: fixed
+test: one
+time: 2026-03-07 04:35:02.828103
+Testing SMB2_FIND_DIRECTORY_INFO 1
+Testing SMB2_FIND_FULL_DIRECTORY_INFO 2
+Testing SMB2_FIND_NAME_INFO 12
+Testing SMB2_FIND_BOTH_DIRECTORY_INFO 3
+Testing SMB2_FIND_ID_FULL_DIRECTORY_INFO 38
+Testing SMB2_FIND_ID_BOTH_DIRECTORY_INFO 37
+time: 2026-03-07 04:35:03.282530
+success: one
+test: many
+time: 2026-03-07 04:35:03.282593
+Testing with 700 files
+Continue SMB2_FIND_BOTH_DIRECTORY_INFO via SINGLE
+Continue SMB2_FIND_BOTH_DIRECTORY_INFO via INDEX
+Continue SMB2_FIND_BOTH_DIRECTORY_INFO via RESTART
+Continue SMB2_FIND_BOTH_DIRECTORY_INFO via REOPEN
+Continue SMB2_FIND_DIRECTORY_INFO via SINGLE
+Continue SMB2_FIND_DIRECTORY_INFO via INDEX
+Continue SMB2_FIND_DIRECTORY_INFO via RESTART
+Continue SMB2_FIND_DIRECTORY_INFO via REOPEN
+Continue SMB2_FIND_FULL_DIRECTORY_INFO via SINGLE
+Continue SMB2_FIND_FULL_DIRECTORY_INFO via INDEX
+Continue SMB2_FIND_FULL_DIRECTORY_INFO via RESTART
+Continue SMB2_FIND_FULL_DIRECTORY_INFO via REOPEN
+Continue SMB2_FIND_ID_FULL_DIRECTORY_INFO via SINGLE
+Continue SMB2_FIND_ID_FULL_DIRECTORY_INFO via INDEX
+Continue SMB2_FIND_ID_FULL_DIRECTORY_INFO via RESTART
+Continue SMB2_FIND_ID_FULL_DIRECTORY_INFO via REOPEN
+Continue SMB2_FIND_ID_BOTH_DIRECTORY_INFO via SINGLE
+Continue SMB2_FIND_ID_BOTH_DIRECTORY_INFO via INDEX
+Continue SMB2_FIND_ID_BOTH_DIRECTORY_INFO via RESTART
+Continue SMB2_FIND_ID_BOTH_DIRECTORY_INFO via REOPEN
+time: 2026-03-07 04:36:56.164488
+success: many
+test: modify
+time: 2026-03-07 04:36:56.164540
+Creating 700 files
+pulling the first two files
+Changing attributes and deleting
+time: 2026-03-07 04:38:20.212809
+success: modify
+test: sorted
+time: 2026-03-07 04:38:20.212852
+Testing if directories always come back sorted
+non-alphabetical order at entry 0 '1qaaaaaa' '0qaaaaaa'
+Server does not produce sorted directory listings(not an error)

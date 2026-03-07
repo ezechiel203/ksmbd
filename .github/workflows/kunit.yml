@@ -1,0 +1,177 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+#
+# CI workflow: verify ksmbd test infrastructure builds cleanly.
+#
+# Three gates:
+#   1. check_test_registration.sh  -- all .c files registered in Makefiles
+#   2. Kernel compile check        -- ksmbd + KUnit tests build against a kernel
+#   3. Userspace fuzz compile check -- libFuzzer targets build with clang
+#
+name: ksmbd-kunit-ci
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  # -------------------------------------------------------------------
+  # Gate 1: Verify every test/fuzz source file is registered
+  # -------------------------------------------------------------------
+  registration-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check test and fuzz file registration
+        run: ./test/check_test_registration.sh
+
+  # -------------------------------------------------------------------
+  # Gate 2: Compile ksmbd + KUnit tests against a real kernel tree
+  # -------------------------------------------------------------------
+  kernel-build:
+    runs-on: ubuntu-latest
+    needs: registration-check
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install kernel build dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            build-essential bc bison flex libelf-dev libssl-dev \
+            wget tar gzip cpio kmod
+
+      - name: Download kernel source
+        run: |
+          # Use a stable 6.x kernel that has KUnit and CONFIG_KSMBD_KUNIT_TEST
+          KVER=6.6.80
+          MAJOR=$(echo "$KVER" | cut -d. -f1)
+          wget -q "https://cdn.kernel.org/pub/linux/kernel/v${MAJOR}.x/linux-${KVER}.tar.xz"
+          tar xf "linux-${KVER}.tar.xz"
+          mv "linux-${KVER}" linux-stable
+
+      - name: Copy ksmbd into kernel tree
+        run: |
+          mkdir -p linux-stable/fs/ksmbd
+          # Copy all ksmbd source files (not docs/tests metadata)
+          cp -a *.c *.h *.asn1 Kconfig Makefile linux-stable/fs/ksmbd/
+          cp -a mgmt/ linux-stable/fs/ksmbd/
+          # Copy test directory
+          mkdir -p linux-stable/fs/ksmbd/test
+          cp -a test/*.c test/Makefile linux-stable/fs/ksmbd/test/
+          # Copy fuzz directory structure
+          mkdir -p linux-stable/fs/ksmbd/test/fuzz
+          cp -a test/fuzz/*.c test/fuzz/Makefile linux-stable/fs/ksmbd/test/fuzz/
+
+          # Wire ksmbd into the kernel build
+          echo 'source "fs/ksmbd/Kconfig"' >> linux-stable/fs/Kconfig
+          echo 'obj-$(CONFIG_SMB_SERVER) += ksmbd/' >> linux-stable/fs/Makefile
+
+      - name: Configure kernel
+        working-directory: linux-stable
+        run: |
+          make defconfig
+          echo 'CONFIG_SMB_SERVER=m' >> .config
+          echo 'CONFIG_SMB_INSECURE_SERVER=y' >> .config
+          echo 'CONFIG_KUNIT=y' >> .config
+          echo 'CONFIG_KSMBD_KUNIT_TEST=m' >> .config
+          echo 'CONFIG_CRYPTO=y' >> .config
+          echo 'CONFIG_CRYPTO_MD5=y' >> .config
+          echo 'CONFIG_CRYPTO_HMAC=y' >> .config
+          echo 'CONFIG_CRYPTO_ECB=y' >> .config
+          echo 'CONFIG_CRYPTO_LIB_DES=y' >> .config
+          echo 'CONFIG_CRYPTO_DES=y' >> .config
+          echo 'CONFIG_CRYPTO_AES=y' >> .config
+          echo 'CONFIG_CRYPTO_CCM=y' >> .config
+          echo 'CONFIG_CRYPTO_GCM=y' >> .config
+          echo 'CONFIG_CRYPTO_SHA256=y' >> .config
+          echo 'CONFIG_CRYPTO_SHA512=y' >> .config
+          echo 'CONFIG_CRYPTO_CMAC=y' >> .config
+          echo 'CONFIG_ASN1=y' >> .config
+          echo 'CONFIG_OID_REGISTRY=y' >> .config
+          echo 'CONFIG_NLS=y' >> .config
+          echo 'CONFIG_NLS_UTF8=y' >> .config
+          echo 'CONFIG_CRC32=y' >> .config
+          yes "" | make oldconfig 2>/dev/null
+
+      - name: Build ksmbd module with KUnit tests
+        working-directory: linux-stable
+        run: |
+          make -j$(nproc) fs/ksmbd/ksmbd.ko 2>&1 | tail -50
+          echo ""
+          echo "=== Build result ==="
+          if [ -f fs/ksmbd/ksmbd.ko ]; then
+            echo "SUCCESS: ksmbd.ko built"
+            ls -lh fs/ksmbd/ksmbd.ko
+          else
+            echo "FAIL: ksmbd.ko not found"
+            exit 1
+          fi
+
+      - name: Attempt kunit.py run (best-effort)
+        working-directory: linux-stable
+        continue-on-error: true
+        run: |
+          if [ -f tools/testing/kunit/kunit.py ]; then
+            echo "kunit.py found, attempting UML test run..."
+            python3 tools/testing/kunit/kunit.py run \
+              --kunitconfig=fs/ksmbd/test/kunit.kunitconfig \
+              --arch=um \
+              --timeout=300 \
+              --json=kunit-results.json 2>&1 | tail -100 || true
+            if [ -f kunit-results.json ]; then
+              echo ""
+              echo "=== KUnit Results ==="
+              python3 -c "
+import json, sys
+with open('kunit-results.json') as f:
+    data = json.load(f)
+for suite in data.get('sub_groups', []):
+    name = suite.get('name', '?')
+    cases = suite.get('test_cases', [])
+    passed = sum(1 for c in cases if c.get('status') == 'PASS')
+    failed = sum(1 for c in cases if c.get('status') == 'FAIL')
+    print(f'  {name}: {passed} passed, {failed} failed')
+" 2>/dev/null || echo "(could not parse results)"
+            fi
+          else
+            echo "kunit.py not available in this kernel tree, skipping runtime tests"
+          fi
+
+  # -------------------------------------------------------------------
+  # Gate 3: Compile userspace fuzz targets with clang
+  # -------------------------------------------------------------------
+  fuzz-build:
+    runs-on: ubuntu-latest
+    needs: registration-check
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install clang
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends clang
+
+      - name: Build userspace fuzz targets
+        working-directory: test/fuzz/userspace
+        run: |
+          echo "=== Building userspace libFuzzer targets ==="
+          make CC=clang 2>&1
+          echo ""
+          echo "=== Built targets ==="
+          ls -lh fuzz_* 2>/dev/null || echo "No fuzz targets built"
+          echo ""
+          # Verify all expected targets were built
+          EXPECTED="fuzz_security_descriptor fuzz_negotiate_context fuzz_ntlmssp fuzz_compression fuzz_create_context"
+          FAIL=0
+          for t in $EXPECTED; do
+            if [ -x "$t" ]; then
+              echo "  OK: $t"
+            else
+              echo "  MISSING: $t"
+              FAIL=1
+            fi
+          done
+          exit $FAIL

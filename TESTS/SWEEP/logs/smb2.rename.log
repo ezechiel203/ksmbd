@@ -1,0 +1,128 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772584856
+time: 2026-03-04 00:40:56.028186
+progress: 13
+test: simple
+time: 2026-03-04 00:40:56.029493
+Creating base directory
+Creating test file
+Renaming test file
+Checking for new filename
+Closing test file
+Cleaning up
+time: 2026-03-04 00:40:56.059289
+success: simple
+test: simple_modtime
+time: 2026-03-04 00:40:56.059341
+Creating test file: file1.txt
+Waitig for 5 secs..
+Creating test file: file2.txt
+Renaming file1.txt --> tmp1.txt
+GetInfo of tmp1.txt
+Check if timestamps are good after rename(file1.txt --> tmp1.txt).
+Renaming file2.txt --> file1.txt
+GetInfo of file1.txt
+Check if timestamps are good after rename(file2.txt --> file1.txt).
+time: 2026-03-04 00:41:01.081797
+success: simple_modtime
+test: simple_nodelete
+time: 2026-03-04 00:41:01.081852
+Creating base directory
+Creating test file
+Renaming test file
+Closing test file
+Cleaning up
+time: 2026-03-04 00:41:01.116281
+success: simple_nodelete
+test: no_sharing
+time: 2026-03-04 00:41:01.116336
+Creating base directory
+Creating test file
+Renaming test file
+Checking for new filename
+Closing test file
+Cleaning up
+time: 2026-03-04 00:41:01.161061
+success: no_sharing
+test: share_delete_and_delete_access
+time: 2026-03-04 00:41:01.161124
+Creating base directory
+Opening parent directory
+Creating test file
+Renaming test file
+Closing test file
+Closing directory
+Cleaning up
+time: 2026-03-04 00:41:01.174336
+success: share_delete_and_delete_access
+test: no_share_delete_but_delete_access
+time: 2026-03-04 00:41:01.174438
+Creating base directory
+Opening parent directory
+Creating test file
+Renaming test file
+Closing test file
+Closing directory
+Cleaning up
+time: 2026-03-04 00:41:01.192667
+success: no_share_delete_but_delete_access
+test: share_delete_no_delete_access
+time: 2026-03-04 00:41:01.192724
+Creating base directory
+Opening parent directory
+Creating test file
+Renaming test file
+Checking for new filename
+Closing test file
+Closing directory
+Cleaning up
+time: 2026-03-04 00:41:01.215916
+success: share_delete_no_delete_access
+test: no_share_delete_no_delete_access
+time: 2026-03-04 00:41:01.215973
+Creating base directory
+Opening parent directory
+Creating test file
+Renaming test file
+Cleaning up
+time: 2026-03-04 00:41:01.253548
+failure: no_share_delete_no_delete_access [
+(../../source4/torture/smb2/rename.c:804) Incorrect status NT_STATUS_OK - should be NT_STATUS_SHARING_VIOLATION
+]
+test: msword
+time: 2026-03-04 00:41:01.253611
+Creating base directory
+Creating test file
+Opening parent directory
+Renaming test file
+Checking for new filename
+Closing test file
+Closing directory
+Cleaning up
+time: 2026-03-04 00:41:01.279928
+success: msword
+test: rename_dir_openfile
+time: 2026-03-04 00:41:01.279976
+Creating base directory
+Creating test file
+Renaming directory
+Closing directory
+Closing test file
+Cleaning up
+time: 2026-03-04 00:41:01.291313
+success: rename_dir_openfile
+test: rename_dir_bench
+time: 2026-03-04 00:41:01.291369
+rename_dirs_bench returned NT_STATUS_OK
+time: 2026-03-04 00:41:01.307543
+success: rename_dir_bench
+test: close-full-information
+time: 2026-03-04 00:41:01.307587
+time: 2026-03-04 00:41:04.326451
+success: close-full-information
+test: rename-open
+time: 2026-03-04 00:41:04.326507
+Renaming test file
+time: 2026-03-04 00:41:04.377844
+success: rename-open

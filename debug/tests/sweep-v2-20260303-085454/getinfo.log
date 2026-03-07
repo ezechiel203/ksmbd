@@ -1,0 +1,45 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772524510
+time: 2026-03-03 07:55:10.278926
+progress: 8
+test: complex
+time: 2026-03-03 07:55:10.279410
+time: 2026-03-03 07:55:10.287510
+failure: complex [
+../../source4/torture/smb2/getinfo.c:770: status was NT_STATUS_OBJECT_NAME_NOT_FOUND, expected NT_STATUS_OK: setup complex file testsmb2_file.dat:streamtwo
+]
+test: fsinfo
+time: 2026-03-03 07:55:10.287673
+Testing fsinfo levels
+time: 2026-03-03 07:55:10.300074
+success: fsinfo
+test: qfs_buffercheck
+time: 2026-03-03 07:55:10.300157
+Testing SMB2_GETINFO_FS buffer sizes
+time: 2026-03-03 07:55:10.339206
+success: qfs_buffercheck
+test: qfile_buffercheck
+time: 2026-03-03 07:55:10.339294
+Testing SMB2_GETINFO_FILE buffer sizes
+time: 2026-03-03 07:55:10.434612
+success: qfile_buffercheck
+test: qsec_buffercheck
+time: 2026-03-03 07:55:10.434697
+Testing SMB2_GETINFO_SECURITY buffer sizes
+time: 2026-03-03 07:55:10.437829
+success: qsec_buffercheck
+test: granted
+time: 2026-03-03 07:55:10.438016
+time: 2026-03-03 07:55:10.441654
+success: granted
+test: normalized
+time: 2026-03-03 07:55:10.441732
+time: 2026-03-03 07:55:10.449931
+failure: normalized [
+../../source4/torture/smb2/getinfo.c:304: status was NT_STATUS_OBJECT_NAME_NOT_FOUND, expected NT_STATUS_OK: Unable to create hd3s
+]
+test: getinfo_access
+time: 2026-03-03 07:55:10.450018
+time: 2026-03-03 07:55:10.487226
+success: getinfo_access

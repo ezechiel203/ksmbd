@@ -1,0 +1,397 @@
+smbtorture 4.23.5
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Using seed 1772523638
+time: 2026-03-03 07:40:38.338776
+progress: 71
+test: reconnect1
+time: 2026-03-03 07:40:38.339694
+time: 2026-03-03 07:40:38.347268
+success: reconnect1
+test: reconnect2
+time: 2026-03-03 07:40:38.347325
+time: 2026-03-03 07:40:38.349513
+success: reconnect2
+test: reauth1
+time: 2026-03-03 07:40:38.349554
+time: 2026-03-03 07:40:38.352546
+success: reauth1
+test: reauth2
+time: 2026-03-03 07:40:38.352588
+time: 2026-03-03 07:40:38.355568
+success: reauth2
+test: reauth3
+time: 2026-03-03 07:40:38.355614
+time: 2026-03-03 07:40:38.359095
+success: reauth3
+test: reauth4
+time: 2026-03-03 07:40:38.359148
+time: 2026-03-03 07:40:38.364218
+success: reauth4
+test: reauth5
+time: 2026-03-03 07:40:38.364289
+time: 2026-03-03 07:40:38.369477
+failure: reauth5 [
+../../source4/torture/smb2/session.c:730: status was NT_STATUS_OBJECT_NAME_NOT_FOUND, expected NT_STATUS_OK: smb2_util_unlink failed
+]
+test: reauth6
+time: 2026-03-03 07:40:38.369537
+did failed reauth
+time: 2026-03-03 07:40:38.372170
+success: reauth6
+test: expire1n
+time: 2026-03-03 07:40:38.372212
+WARNING!: smb2.session.expire1 requires --use-kerberos=required!
+time: 2026-03-03 07:40:38.372222
+skip: expire1n [
+../../source4/torture/smb2/session.c:1106: smb2.session.expire1 requires --use-kerberos=required!
+]
+test: expire1s
+time: 2026-03-03 07:40:38.372254
+WARNING!: smb2.session.expire1 requires --use-kerberos=required!
+time: 2026-03-03 07:40:38.372262
+skip: expire1s [
+../../source4/torture/smb2/session.c:1106: smb2.session.expire1 requires --use-kerberos=required!
+]
+test: expire1e
+time: 2026-03-03 07:40:38.372292
+WARNING!: smb2.session.expire1 requires --use-kerberos=required!
+time: 2026-03-03 07:40:38.372301
+skip: expire1e [
+../../source4/torture/smb2/session.c:1106: smb2.session.expire1 requires --use-kerberos=required!
+]
+test: expire2s
+time: 2026-03-03 07:40:38.372331
+WARNING!: smb2.session.expire1 requires --use-kerberos=required!
+time: 2026-03-03 07:40:38.372339
+skip: expire2s [
+../../source4/torture/smb2/session.c:1350: smb2.session.expire1 requires --use-kerberos=required!
+]
+test: expire2e
+time: 2026-03-03 07:40:38.372369
+WARNING!: smb2.session.expire1 requires --use-kerberos=required!
+time: 2026-03-03 07:40:38.372376
+skip: expire2e [
+../../source4/torture/smb2/session.c:1350: smb2.session.expire1 requires --use-kerberos=required!
+]
+test: expire_disconnect
+time: 2026-03-03 07:40:38.372406
+WARNING!: smb2.session.expire1 requires --use-kerberos=required!
+time: 2026-03-03 07:40:38.372414
+skip: expire_disconnect [
+../../source4/torture/smb2/session.c:1778: smb2.session.expire1 requires --use-kerberos=required!
+]
+test: bind1
+time: 2026-03-03 07:40:38.372445
+time: 2026-03-03 07:40:38.374115
+skip: bind1 [
+../../source4/torture/smb2/session.c:1900: server doesn't support SMB2_CAP_MULTI_CHANNEL
+]
+test: bind2
+time: 2026-03-03 07:40:38.374168
+time: 2026-03-03 07:40:38.375642
+skip: bind2 [
+../../source4/torture/smb2/session.c:2061: server doesn't support SMB2_CAP_MULTI_CHANNEL
+]
+test: bind_invalid_auth
+time: 2026-03-03 07:40:38.375691
+time: 2026-03-03 07:40:38.377673
+skip: bind_invalid_auth [
+../../source4/torture/smb2/session.c:2363: server doesn't support SMB2_CAP_MULTI_CHANNEL
+]
+test: bind_different_user
+time: 2026-03-03 07:40:38.377729
+Fallback to anonymous for 'torture:user2name'=NULL 'torture:user2domain'='WORKGROUP' 'torture:user2password'='REDACTED'time: 2026-03-03 07:40:38.379866
+skip: bind_different_user [
+../../source4/torture/smb2/session.c:2652: valid user2 credentials are required
+]
+test: bind_negative_smb202
+time: 2026-03-03 07:40:38.379922
+time: 2026-03-03 07:40:38.382429
+failure: bind_negative_smb202 [
+../../source4/torture/smb2/session.c:2703: status was NT_STATUS_NOT_SUPPORTED, expected NT_STATUS_OK: smb2_connect options1 failed
+]
+test: bind_negative_smb210s
+time: 2026-03-03 07:40:38.382486
+time: 2026-03-03 07:40:38.387078
+failure: bind_negative_smb210s [
+../../source4/torture/smb2/session.c:2721: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: smb2_create failed
+]
+test: bind_negative_smb210d
+time: 2026-03-03 07:40:38.387143
+time: 2026-03-03 07:40:38.391431
+failure: bind_negative_smb210d [
+../../source4/torture/smb2/session.c:2721: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: smb2_create failed
+]
+test: bind_negative_smb2to3s
+time: 2026-03-03 07:40:38.391480
+time: 2026-03-03 07:40:38.396231
+failure: bind_negative_smb2to3s [
+../../source4/torture/smb2/session.c:2721: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: smb2_create failed
+]
+test: bind_negative_smb2to3d
+time: 2026-03-03 07:40:38.396289
+time: 2026-03-03 07:40:38.401105
+failure: bind_negative_smb2to3d [
+../../source4/torture/smb2/session.c:2721: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: smb2_create failed
+]
+test: bind_negative_smb3to2s
+time: 2026-03-03 07:40:38.401157
+time: 2026-03-03 07:40:38.427883
+failure: bind_negative_smb3to2s [
+../../source4/torture/smb2/session.c:2758: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_REQUEST_NOT_ACCEPTED: smb2_session_setup_spnego failed
+]
+test: bind_negative_smb3to2d
+time: 2026-03-03 07:40:38.427945
+time: 2026-03-03 07:40:38.432658
+failure: bind_negative_smb3to2d [
+../../source4/torture/smb2/session.c:2758: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_REQUEST_NOT_ACCEPTED: smb2_session_setup_spnego failed
+]
+test: bind_negative_smb3to3s
+time: 2026-03-03 07:40:38.432720
+time: 2026-03-03 07:40:38.437164
+failure: bind_negative_smb3to3s [
+../../source4/torture/smb2/session.c:2758: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_INVALID_PARAMETER: smb2_session_setup_spnego failed
+]
+test: bind_negative_smb3to3d
+time: 2026-03-03 07:40:38.437224
+time: 2026-03-03 07:40:38.441499
+failure: bind_negative_smb3to3d [
+../../source4/torture/smb2/session.c:2758: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_INVALID_PARAMETER: smb2_session_setup_spnego failed
+]
+test: bind_negative_smb3encGtoCs
+time: 2026-03-03 07:40:38.441555
+time: 2026-03-03 07:40:38.445655
+failure: bind_negative_smb3encGtoCs [
+../../source4/torture/smb2/session.c:2758: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_INVALID_PARAMETER: smb2_session_setup_spnego failed
+]
+test: bind_negative_smb3encGtoCd
+time: 2026-03-03 07:40:38.445707
+time: 2026-03-03 07:40:38.449583
+failure: bind_negative_smb3encGtoCd [
+../../source4/torture/smb2/session.c:2758: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_INVALID_PARAMETER: smb2_session_setup_spnego failed
+]
+test: bind_negative_smb3signCtoHs
+time: 2026-03-03 07:40:38.449638
+time: 2026-03-03 07:40:38.453307
+failure: bind_negative_smb3signCtoHs [
+../../source4/torture/smb2/session.c:2758: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: smb2_session_setup_spnego failed
+]
+test: bind_negative_smb3signCtoHd
+time: 2026-03-03 07:40:38.453359
+time: 2026-03-03 07:40:38.457067
+failure: bind_negative_smb3signCtoHd [
+../../source4/torture/smb2/session.c:2758: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: smb2_session_setup_spnego failed
+]
+test: bind_negative_smb3signCtoGs
+time: 2026-03-03 07:40:38.457164
+time: 2026-03-03 07:40:38.461050
+failure: bind_negative_smb3signCtoGs [
+../../source4/torture/smb2/session.c:2758: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_NOT_SUPPORTED: smb2_session_setup_spnego failed
+]
+test: bind_negative_smb3signCtoGd
+time: 2026-03-03 07:40:38.461105
+time: 2026-03-03 07:40:38.464834
+failure: bind_negative_smb3signCtoGd [
+../../source4/torture/smb2/session.c:2758: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_NOT_SUPPORTED: smb2_session_setup_spnego failed
+]
+test: bind_negative_smb3signHtoCs
+time: 2026-03-03 07:40:38.464884
+time: 2026-03-03 07:40:38.468659
+failure: bind_negative_smb3signHtoCs [
+../../source4/torture/smb2/session.c:2758: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: smb2_session_setup_spnego failed
+]
+test: bind_negative_smb3signHtoCd
+time: 2026-03-03 07:40:38.468712
+time: 2026-03-03 07:40:38.472379
+failure: bind_negative_smb3signHtoCd [
+../../source4/torture/smb2/session.c:2758: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_OK: smb2_session_setup_spnego failed
+]
+test: bind_negative_smb3signHtoGs
+time: 2026-03-03 07:40:38.472439
+time: 2026-03-03 07:40:38.476259
+failure: bind_negative_smb3signHtoGs [
+../../source4/torture/smb2/session.c:2758: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_NOT_SUPPORTED: smb2_session_setup_spnego failed
+]
+test: bind_negative_smb3signHtoGd
+time: 2026-03-03 07:40:38.476316
+time: 2026-03-03 07:40:38.480200
+failure: bind_negative_smb3signHtoGd [
+../../source4/torture/smb2/session.c:2758: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_NOT_SUPPORTED: smb2_session_setup_spnego failed
+]
+test: bind_negative_smb3signGtoCs
+time: 2026-03-03 07:40:38.480254
+time: 2026-03-03 07:40:38.484348
+failure: bind_negative_smb3signGtoCs [
+../../source4/torture/smb2/session.c:2758: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_REQUEST_OUT_OF_SEQUENCE: smb2_session_setup_spnego failed
+]
+test: bind_negative_smb3signGtoCd
+time: 2026-03-03 07:40:38.484392
+time: 2026-03-03 07:40:38.488670
+failure: bind_negative_smb3signGtoCd [
+../../source4/torture/smb2/session.c:2758: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_REQUEST_OUT_OF_SEQUENCE: smb2_session_setup_spnego failed
+]
+test: bind_negative_smb3signGtoHs
+time: 2026-03-03 07:40:38.488726
+time: 2026-03-03 07:40:38.493026
+failure: bind_negative_smb3signGtoHs [
+../../source4/torture/smb2/session.c:2758: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_REQUEST_OUT_OF_SEQUENCE: smb2_session_setup_spnego failed
+]
+test: bind_negative_smb3signGtoHd
+time: 2026-03-03 07:40:38.493128
+time: 2026-03-03 07:40:38.497697
+failure: bind_negative_smb3signGtoHd [
+../../source4/torture/smb2/session.c:2758: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_REQUEST_OUT_OF_SEQUENCE: smb2_session_setup_spnego failed
+]
+test: bind_negative_smb3sneGtoCs
+time: 2026-03-03 07:40:38.497759
+time: 2026-03-03 07:40:38.501673
+failure: bind_negative_smb3sneGtoCs [
+../../source4/torture/smb2/session.c:2758: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_REQUEST_OUT_OF_SEQUENCE: smb2_session_setup_spnego failed
+]
+test: bind_negative_smb3sneGtoCd
+time: 2026-03-03 07:40:38.501726
+time: 2026-03-03 07:40:38.505507
+failure: bind_negative_smb3sneGtoCd [
+../../source4/torture/smb2/session.c:2758: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_REQUEST_OUT_OF_SEQUENCE: smb2_session_setup_spnego failed
+]
+test: bind_negative_smb3sneGtoHs
+time: 2026-03-03 07:40:38.505557
+time: 2026-03-03 07:40:38.509763
+failure: bind_negative_smb3sneGtoHs [
+../../source4/torture/smb2/session.c:2758: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_REQUEST_OUT_OF_SEQUENCE: smb2_session_setup_spnego failed
+]
+test: bind_negative_smb3sneGtoHd
+time: 2026-03-03 07:40:38.509821
+time: 2026-03-03 07:40:38.514103
+failure: bind_negative_smb3sneGtoHd [
+../../source4/torture/smb2/session.c:2758: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_REQUEST_OUT_OF_SEQUENCE: smb2_session_setup_spnego failed
+]
+test: bind_negative_smb3sneCtoGs
+time: 2026-03-03 07:40:38.514162
+time: 2026-03-03 07:40:38.539140
+failure: bind_negative_smb3sneCtoGs [
+../../source4/torture/smb2/session.c:2758: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_NOT_SUPPORTED: smb2_session_setup_spnego failed
+]
+test: bind_negative_smb3sneCtoGd
+time: 2026-03-03 07:40:38.539206
+time: 2026-03-03 07:40:38.543180
+failure: bind_negative_smb3sneCtoGd [
+../../source4/torture/smb2/session.c:2758: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_NOT_SUPPORTED: smb2_session_setup_spnego failed
+]
+test: bind_negative_smb3sneHtoGs
+time: 2026-03-03 07:40:38.543238
+time: 2026-03-03 07:40:38.549339
+failure: bind_negative_smb3sneHtoGs [
+../../source4/torture/smb2/session.c:2758: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_NOT_SUPPORTED: smb2_session_setup_spnego failed
+]
+test: bind_negative_smb3sneHtoGd
+time: 2026-03-03 07:40:38.549408
+time: 2026-03-03 07:40:38.556706
+failure: bind_negative_smb3sneHtoGd [
+../../source4/torture/smb2/session.c:2758: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_NOT_SUPPORTED: smb2_session_setup_spnego failed
+]
+test: bind_negative_smb3signC30toGs
+time: 2026-03-03 07:40:38.556782
+time: 2026-03-03 07:40:38.562725
+failure: bind_negative_smb3signC30toGs [
+../../source4/torture/smb2/session.c:2758: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_NOT_SUPPORTED: smb2_session_setup_spnego failed
+]
+test: bind_negative_smb3signC30toGd
+time: 2026-03-03 07:40:38.562815
+time: 2026-03-03 07:40:38.568062
+failure: bind_negative_smb3signC30toGd [
+../../source4/torture/smb2/session.c:2758: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_NOT_SUPPORTED: smb2_session_setup_spnego failed
+]
+test: bind_negative_smb3signH2XtoGs
+time: 2026-03-03 07:40:38.568124
+time: 2026-03-03 07:40:38.572918
+failure: bind_negative_smb3signH2XtoGs [
+../../source4/torture/smb2/session.c:2758: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_NOT_SUPPORTED: smb2_session_setup_spnego failed
+]
+test: bind_negative_smb3signH2XtoGd
+time: 2026-03-03 07:40:38.572983
+time: 2026-03-03 07:40:38.578307
+failure: bind_negative_smb3signH2XtoGd [
+../../source4/torture/smb2/session.c:2758: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_NOT_SUPPORTED: smb2_session_setup_spnego failed
+]
+test: bind_negative_smb3signGtoC30s
+time: 2026-03-03 07:40:38.578374
+time: 2026-03-03 07:40:38.584530
+failure: bind_negative_smb3signGtoC30s [
+../../source4/torture/smb2/session.c:2758: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_REQUEST_OUT_OF_SEQUENCE: smb2_session_setup_spnego failed
+]
+test: bind_negative_smb3signGtoC30d
+time: 2026-03-03 07:40:38.584594
+time: 2026-03-03 07:40:38.592373
+failure: bind_negative_smb3signGtoC30d [
+../../source4/torture/smb2/session.c:2758: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_REQUEST_OUT_OF_SEQUENCE: smb2_session_setup_spnego failed
+]
+test: bind_negative_smb3signGtoH2Xs
+time: 2026-03-03 07:40:38.592447
+time: 2026-03-03 07:40:38.598280
+failure: bind_negative_smb3signGtoH2Xs [
+../../source4/torture/smb2/session.c:2758: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_REQUEST_OUT_OF_SEQUENCE: smb2_session_setup_spnego failed
+]
+test: bind_negative_smb3signGtoH2Xd
+time: 2026-03-03 07:40:38.598342
+time: 2026-03-03 07:40:38.605056
+failure: bind_negative_smb3signGtoH2Xd [
+../../source4/torture/smb2/session.c:2758: status was NT_STATUS_ACCESS_DENIED, expected NT_STATUS_REQUEST_OUT_OF_SEQUENCE: smb2_session_setup_spnego failed
+]
+test: two_logoff
+time: 2026-03-03 07:40:38.605115
+connect tree2 with the same client_guid
+session2: logoff
+transport2: keepalive
+transport2: disconnect
+session1: logoff
+transport1: keepalive
+transport1: disconnect
+time: 2026-03-03 07:40:38.613796
+success: two_logoff
+test: signing-hmac-sha-256
+time: 2026-03-03 07:40:38.613840
+time: 2026-03-03 07:40:38.620527
+success: signing-hmac-sha-256
+test: signing-aes-128-cmac
+time: 2026-03-03 07:40:38.620581
+time: 2026-03-03 07:40:38.628643
+success: signing-aes-128-cmac
+test: signing-aes-128-gmac
+time: 2026-03-03 07:40:38.628686
+time: 2026-03-03 07:40:38.634618
+success: signing-aes-128-gmac
+test: encryption-aes-128-ccm
+time: 2026-03-03 07:40:38.634671
+time: 2026-03-03 07:40:38.642423
+success: encryption-aes-128-ccm
+test: encryption-aes-128-gcm
+time: 2026-03-03 07:40:38.642473
+time: 2026-03-03 07:40:38.649838
+success: encryption-aes-128-gcm
+test: encryption-aes-256-ccm
+time: 2026-03-03 07:40:38.649920
+time: 2026-03-03 07:40:38.658357
+success: encryption-aes-256-ccm
+test: encryption-aes-256-gcm
+time: 2026-03-03 07:40:38.658414
+time: 2026-03-03 07:40:38.664589
+success: encryption-aes-256-gcm
+test: ntlmssp_bug14932
+time: 2026-03-03 07:40:38.664631
+time: 2026-03-03 07:40:38.668641
+success: ntlmssp_bug14932
+test: anon-encryption1
+time: 2026-03-03 07:40:38.668698
+time: 2026-03-03 07:41:38.733162
+failure: anon-encryption1 [
+../../source4/torture/smb2/session.c:5676: status was NT_STATUS_IO_TIMEOUT, expected NT_STATUS_CONNECTION_RESET: smb2cli_tcon_recv
+]
+test: anon-encryption2
+time: 2026-03-03 07:41:38.733248
+time: 2026-03-03 07:42:38.796148
+failure: anon-encryption2 [
+../../source4/torture/smb2/session.c:5816: status was NT_STATUS_IO_TIMEOUT, expected NT_STATUS_OK: smb2cli_tcon_recv(anon)
+]
+test: anon-encryption3
+time: 2026-03-03 07:42:38.796280

@@ -1,0 +1,527 @@
+  [INFO] Discovered 806 tests from 68 category files
+  [INFO] Checking VM VM3 reachability (127.0.0.1:13022)...
+  [INFO] VM VM3 is reachable (SSH + SMB)
+  [INFO] Testing SMB connectivity to //127.0.0.1/test:13445...
+  [INFO] SMB connectivity verified
+  [INFO] Filtered to 290 tests
+
+  ================================================================
+  ksmbd-torture -- Integration Test Suite
+  ================================================================
+  VM: VM3 (127.0.0.1:13445)
+  Tests: 290
+
+  === T01 ===
+  FAIL   T01.01     Negotiate SMB 2.0.2 only                           (7910ms)
+  FAIL   T01.02     Negotiate SMB 2.1 only                             (9612ms)
+  PASS   T01.03     Negotiate SMB 3.0 only                             (3713ms)
+  PASS   T01.04     Negotiate SMB 3.0.2 only                           (1023ms)
+  PASS   T01.05     Negotiate SMB 3.1.1 only                           (1739ms)
+  PASS   T01.06     Offer all dialects 0x0202-0x0311, server selects h (4627ms)
+  FAIL   T01.07     SMB1 negotiate then verify upgrade to SMB2         (4355ms)
+  PASS   T01.08     Second NEGOTIATE on same connection is rejected    (7535ms)
+  PASS   T01.09     DialectCount=0 in NEGOTIATE request returns error  (1011ms)
+  PASS   T01.10     Duplicate PREAUTH_INTEGRITY_CAPABILITIES context r (2739ms)
+  PASS   T01.11     Duplicate ENCRYPTION_CAPABILITIES context rejected (6887ms)
+  PASS   T01.12     Duplicate COMPRESSION_CAPABILITIES context rejecte (6574ms)
+  PASS   T01.13     SIGNING_CAPABILITIES with SigningAlgorithmCount=0  (9933ms)
+  FAIL   T01.14     COMPRESSION_CAPABILITIES with CompressionAlgorithm (10804ms)
+  FAIL   T01.15     SMB 3.1.1 without PREAUTH context returns error    (10017ms)
+  PASS   T01.16     No signing algorithm overlap falls back to AES-CMA (6542ms)
+  PASS   T01.17     Server prefers AES-128-GCM over AES-128-CCM        (6289ms)
+  PASS   T01.18     Verify SMB2_GLOBAL_CAP flags in negotiate response (2696ms)
+  PASS   T01.20     Verify MaxTransactSize, MaxReadSize, MaxWriteSize  (4343ms)
+
+  --- T01 --- pass=14 fail=5 (120374ms) health=OK
+
+  === T02 ===
+  FAIL   T02.02     NTLMv2 with wrong password returns LOGON_FAILURE   (10187ms)
+  FAIL   T02.03     NTLMv2 with nonexistent username returns LOGON_FAI (10857ms)
+  FAIL   T02.04     Guest session setup with empty credentials         (10732ms)
+  PASS   T02.05     Anonymous session (empty credentials, no auth)     (10111ms)
+  PASS   T02.06     Anonymous re-auth with zero-length NtChallengeResp (3434ms)
+  FAIL   T02.13     Normal session logoff                              (10838ms)
+  FAIL   T02.14     Logoff an already logged-off session               (10358ms)
+  PASS   T02.19     Session with HMAC-SHA256 signing (SMB 2.x)         (7167ms)
+  FAIL   T02.20     Session with AES-CMAC signing (SMB 3.0+)           (10201ms)
+  PASS   T02.21     Session with AES-GMAC signing (SMB 3.1.1)          (9561ms)
+  FAIL   T02.24     Unencrypted request on encrypted session rejected  (12771ms)
+  FAIL   T02.25     Verify preauth integrity hash chain for SMB 3.1.1  (10209ms)
+  PASS   T02.28     SPNEGO negotiate token with multiple mechTypes     (8827ms)
+  PASS   T02.29     SESSION_SETUP with zero-length SecurityBuffer      (8139ms)
+  PASS   T02.30     SecurityBuffer exceeds MaxTransactSize             (8397ms)
+  FAIL   T02.31     CANCEL a pending SESSION_SETUP                     (10055ms)
+  FAIL   T02.32     Server requires signing, client does not sign      (10401ms)
+  FAIL   T02.33     Verify ChannelSequence starts at 0                 (11526ms)
+
+  --- T02 --- pass=7 fail=11 (193860ms) health=OK
+
+  === T03 ===
+  PASS   T03.01     Connect to a disk share                            (7069ms)
+  FAIL   T03.02     Connect to IPC$                                    (11301ms)
+  FAIL   T03.03     Connect to nonexistent share name                  (6513ms)
+  PASS   T03.04     Share name >= 80 characters returns BAD_NETWORK_NA (6361ms)
+  PASS   T03.05     TREE_CONNECT without valid session                 (3629ms)
+  PASS   T03.06     Normal tree disconnect                             (2727ms)
+  PASS   T03.07     Disconnect an already-disconnected tree            (7172ms)
+  PASS   T03.09     Connect to share user is not authorized for        (5380ms)
+  SKIP   T03.10     Connect from IP not in host allow list             (3746ms)
+  FAIL   T03.11     SMB 3.1.1 TREE_CONNECT with EXTENSION_PRESENT flag (11476ms)
+  FAIL   T03.12     Extension with out-of-bounds PathOffset            (11427ms)
+  PASS   T03.13     Connect to share with encryption required          (7830ms)
+  SKIP   T03.14     Connect to read-only share                         (8179ms)
+  PASS   T03.15     Connect with mixed-case share name                 (6351ms)
+  PASS   T03.16     Path in \\server\share UNC format                  (1583ms)
+  FAIL   T03.17     Multiple TREE_CONNECT to different shares on one s (6987ms)
+  PASS   T03.18     Use invalid TreeId in subsequent operations        (3330ms)
+
+  --- T03 --- pass=10 fail=5 skip=2 (124016ms) health=OK
+
+  === T04 ===
+  PASS   T04.01     FILE_SUPERSEDE on nonexistent file                 (10063ms)
+  PASS   T04.02     FILE_SUPERSEDE on existing file                    (1672ms)
+  PASS   T04.03     FILE_OPEN on existing file                         (3561ms)
+  FAIL   T04.04     FILE_OPEN on nonexistent file                      (11646ms)
+  FAIL   T04.05     FILE_CREATE on nonexistent file                    (11743ms)
+  FAIL   T04.06     FILE_CREATE on existing file returns OBJECT_NAME_C (10228ms)
+  PASS   T04.07     FILE_OPEN_IF on nonexistent file                   (8264ms)
+  FAIL   T04.08     FILE_OPEN_IF on existing file opens it             (10308ms)
+  PASS   T04.09     FILE_OVERWRITE on existing file truncates it       (4623ms)
+  FAIL   T04.10     FILE_OVERWRITE on nonexistent file fails           (10017ms)
+  PASS   T04.11     FILE_OVERWRITE_IF on nonexistent file creates it   (9690ms)
+  PASS   T04.12     FILE_OVERWRITE_IF on existing file truncates it    (1103ms)
+  PASS   T04.13     Disposition value > 5 returns error                (1662ms)
+  PASS   T04.14     FILE_SUPERSEDE on directory                        (6733ms)
+  FAIL   T04.15     DesiredAccess with bits outside 0xF21F01FF         (10802ms)
+  FAIL   T04.16     MAXIMUM_ALLOWED access on file                     (2522ms)
+  FAIL   T04.17     FILE_READ_ATTRIBUTES only (O_PATH open)            (2174ms)
+  PASS   T04.18     FILE_SYNCHRONIZE only                              (677ms)
+  FAIL   T04.19     FILE_DELETE access allows delete-on-close and rena (2093ms)
+  PASS   T04.20     WRITE_DAC access for security descriptor modificat (5061ms)
+  PASS   T04.21     WRITE_OWNER access for owner change                (4820ms)
+  FAIL   T04.22     GENERIC_ALL maps to full access                    (745ms)
+  FAIL   T04.23     GENERIC_READ | GENERIC_WRITE mapping               (646ms)
+  PASS   T04.24     DesiredAccess = 0 returns error                    (648ms)
+  FAIL   T04.25     Empty filename (NameLength=0) opens share root     (957ms)
+  PASS   T04.26     Odd NameLength (UTF-16LE must be even) rejected    (914ms)
+  FAIL   T04.27     Forward slash in path converted to backslash       (783ms)
+  PASS   T04.28     Path ending with backslash                         (754ms)
+  PASS   T04.29     Path with '..' attempting share escape blocked     (3682ms)
+  PASS   T04.30     Filename at MAX_PATH_LENGTH boundary               (2594ms)
+  PASS   T04.31     Filename with special characters rejected appropri (3055ms)
+  PASS   T04.32     Case-insensitive name matching                     (6721ms)
+  FAIL   T04.33     FILE_DIRECTORY_FILE on existing directory          (3377ms)
+  PASS   T04.34     FILE_DIRECTORY_FILE on regular file returns NOT_A_ (2931ms)
+  FAIL   T04.35     FILE_NON_DIRECTORY_FILE on directory returns FILE_ (3978ms)
+  PASS   T04.36     FILE_DELETE_ON_CLOSE deletes file when last handle (1401ms)
+  PASS   T04.37     DELETE_ON_CLOSE without FILE_DELETE access rejecte (787ms)
+  PASS   T04.38     DELETE_ON_CLOSE on read-only file returns STATUS_C (1112ms)
+  SKIP   T04.39     FILE_OPEN_REPARSE_POINT on symlink                 (3397ms)
+  PASS   T04.40     FILE_COMPLETE_IF_OPLOCKED option                   (1618ms)
+  PASS   T04.41     FILE_OPEN_REQUIRING_OPLOCK option                  (809ms)
+  PASS   T04.42     FILE_NO_INTERMEDIATE_BUFFERING write-through seman (726ms)
+  PASS   T04.43     SMB2_CREATE_QUERY_MAXIMAL_ACCESS context           (3431ms)
+  PASS   T04.44     SMB2_CREATE_QUERY_ON_DISK_ID context               (901ms)
+  PASS   T04.45     SMB2_CREATE_SD_BUFFER context                      (3889ms)
+  SKIP   T04.49     TWrp timewarp context with snapshot token          (1159ms)
+  PASS   T04.51     AAPL (Apple) create context                        (762ms)
+  PASS   T04.52     AlSi allocation size context                       (537ms)
+  FAIL   T04.53     SMB2_CREATE_TAG_POSIX context                      (10186ms)
+  PASS   T04.54     SMB2_CREATE_EA_BUFFER context                      (2109ms)
+  PASS   T04.60     Open file with pending delete returns STATUS_DELET (4640ms)
+
+  --- T04 --- pass=33 fail=16 skip=2 (203931ms) health=OK
+
+  === T05 ===
+  FAIL   T05.01     Read entire small file (< 64KB)                    (2575ms)
+  PASS   T05.03     Read starting exactly at EOF                       (2642ms)
+  FAIL   T05.04     Read range partially past EOF returns short read   (3315ms)
+  PASS   T05.05     Read with Length=0                                 (3592ms)
+  FAIL   T05.06     Read from directory handle returns INVALID_DEVICE_ (4814ms)
+  PASS   T05.07     Read from named pipe (IPC$)                        (551ms)
+  PASS   T05.08     Read on handle without FILE_READ_DATA              (702ms)
+  PASS   T05.09     Read with offset that converts to negative loff_t  (544ms)
+  PASS   T05.10     offset + length overflows u64 rejected             (825ms)
+  SKIP   T05.11     Read with RDMA channel descriptor                  (1740ms)
+  PASS   T05.14     SMB2_READFLAG_READ_UNBUFFERED (0x01)               (869ms)
+  PASS   T05.15     SMB2_READFLAG_READ_COMPRESSED (0x02)               (1295ms)
+  PASS   T05.16     Read with invalid VolatileFileId returns FILE_CLOS (784ms)
+  PASS   T05.17     Read using compound FID sentinel (0xFFFFFFFFFFFFFF (3462ms)
+  PASS   T05.18     Read with MinCount > 0, returned data < MinCount   (3869ms)
+
+  --- T05 --- pass=11 fail=3 skip=1 (34867ms) health=OK
+
+  === T06 ===
+  FAIL   T06.01     Write data to file at offset 0                     (913ms)
+  PASS   T06.02     Write with offset 0xFFFFFFFFFFFFFFFF (append-to-EO (787ms)
+  PASS   T06.03     Append-to-EOF sentinel without FILE_APPEND_DATA re (653ms)
+  PASS   T06.04     Write to named pipe (IPC$)                         (598ms)
+  PASS   T06.05     Append-only handle, write at non-EOF offset reject (631ms)
+  PASS   T06.06     Write on handle without FILE_WRITE_DATA/FILE_APPEN (856ms)
+  PASS   T06.07     Write offset that converts to negative loff_t reje (4479ms)
+  PASS   T06.08     offset + length overflows u64 rejected             (1106ms)
+  PASS   T06.09     Write with Length=0 succeeds with no data written  (1585ms)
+  PASS   T06.10     SMB2_WRITEFLAG_WRITE_THROUGH (0x01) triggers fsync (580ms)
+  PASS   T06.11     Data length exceeds MaxWriteSize rejected          (989ms)
+  SKIP   T06.12     Write on read-only share returns ACCESS_DENIED     (2440ms)
+  FAIL   T06.13     Write with current ChannelSequence succeeds        (828ms)
+  PASS   T06.14     Write with stale ChannelSequence returns FILE_NOT_ (909ms)
+  PASS   T06.15     Write using compound FID sentinel                  (614ms)
+  PASS   T06.18     SMB2_WRITEFLAG_WRITE_UNBUFFERED (0x02)             (616ms)
+  PASS   T06.21     DataOffset field validation                        (3011ms)
+  PASS   T06.22     Write with invalid VolatileFileId returns FILE_CLO (1847ms)
+
+  --- T06 --- pass=15 fail=2 skip=1 (26726ms) health=OK
+
+  === T07 ===
+  FAIL   T07.01     Close an open file handle                          (1990ms)
+  PASS   T07.02     Close with SMB2_CLOSE_FLAG_POSTQUERY_ATTRIB        (1358ms)
+  PASS   T07.03     Close with invalid VolatileFileId returns FILE_CLO (4833ms)
+  PASS   T07.04     Close same FID twice returns FILE_CLOSED           (5011ms)
+  FAIL   T07.05     Close directory handle                             (2956ms)
+  PASS   T07.08     Close using compound FID sentinel                  (775ms)
+
+  --- T07 --- pass=4 fail=2 (20890ms) health=OK
+
+  === T08 ===
+  FAIL   T08.01     Flush an open file with pending writes             (3281ms)
+  PASS   T08.02     Flush handle without FILE_WRITE_DATA returns ACCES (2200ms)
+  PASS   T08.03     Flush nonexistent FID returns FILE_CLOSED          (866ms)
+  PASS   T08.04     Flush directory handle                             (2228ms)
+  PASS   T08.05     Flush pipe handle succeeds (no-op)                 (1708ms)
+  PASS   T08.06     Flush using compound FID sentinel                  (2636ms)
+  PASS   T08.07     Flush with stale ChannelSequence returns FILE_NOT_ (2519ms)
+  PASS   T08.08     Flush on read-only handle returns ACCESS_DENIED    (3180ms)
+  FAIL   T08.09     Write then flush in compound persists data         (8367ms)
+  FAIL   T08.10     Flush with no dirty data succeeds (no-op)          (5158ms)
+
+  --- T08 --- pass=7 fail=3 (34676ms) health=OK
+
+  === T09 ===
+  FAIL   T09.01     FileFullDirectoryInformation enumeration           (1084ms)
+  FAIL   T09.02     FileBothDirectoryInformation enumeration           (4514ms)
+  FAIL   T09.03     FileDirectoryInformation enumeration               (2940ms)
+  PASS   T09.04     FileNamesInformation enumeration                   (866ms)
+  PASS   T09.05     FileIdBothDirectoryInformation with FileId         (5599ms)
+  PASS   T09.06     FileIdFullDirectoryInformation with FileId         (640ms)
+  PASS   T09.07     FileIdExtdDirectoryInformation                     (596ms)
+  FAIL   T09.08     Wildcard pattern * matches all entries             (982ms)
+  FAIL   T09.09     Wildcard pattern ? matches single char             (5661ms)
+  PASS   T09.10     DOS wildcard < matches base name                   (2668ms)
+  PASS   T09.11     DOS wildcard > matches extension                   (571ms)
+  PASS   T09.12     DOS wildcard '"' matches dot                       (4778ms)
+  PASS   T09.13     RESTART_SCANS flag resets enumeration              (750ms)
+  PASS   T09.14     REOPEN flag on directory handle                    (680ms)
+  PASS   T09.15     SMB2_RETURN_SINGLE_ENTRY flag                      (499ms)
+  FAIL   T09.16     Enumerate empty directory shows . and ..           (4136ms)
+  PASS   T09.20     SMB2_INDEX_SPECIFIED flag with FileIndex           (3733ms)
+  PASS   T09.21     Invalid FileInformationClass value                 (2023ms)
+  PASS   T09.22     OutputBufferLength smaller than single entry       (4398ms)
+
+  --- T09 --- pass=13 fail=6 (50399ms) health=OK
+
+  === T10 ===
+  FAIL   T10.01     FileBasicInformation (class 4)                     (660ms)
+  FAIL   T10.02     FileStandardInformation (class 5)                  (745ms)
+  PASS   T10.03     FileInternalInformation (class 6)                  (2484ms)
+  FAIL   T10.04     FileEaInformation (class 7)                        (10015ms)
+  PASS   T10.05     FileAccessInformation (class 8)                    (1133ms)
+  PASS   T10.06     FilePositionInformation (class 14)                 (640ms)
+  PASS   T10.07     FileModeInformation (class 16)                     (583ms)
+  PASS   T10.08     FileAlignmentInformation (class 17)                (510ms)
+  FAIL   T10.09     FileAllInformation (class 18)                      (931ms)
+  PASS   T10.10     FileAlternateNameInformation (class 21) - 8.3 shor (620ms)
+  FAIL   T10.11     FileStreamInformation (class 22)                   (785ms)
+  PASS   T10.12     FileCompressionInformation (class 28)              (1619ms)
+  PASS   T10.13     FileNetworkOpenInformation (class 34)              (578ms)
+  PASS   T10.14     FileAttributeTagInformation (class 35)             (3393ms)
+  PASS   T10.15     FileIdInformation (class 59)                       (687ms)
+  PASS   T10.16     FileStatInformation (class 0x46)                   (629ms)
+  PASS   T10.17     FileStatLxInformation (class 0x47)                 (574ms)
+  PASS   T10.18     FileFullEaInformation (class 15)                   (791ms)
+  [WARN] Health check after T10: CRASH: [    5.933015] systemd[1]: Mounting Kernel Debug File System...;MODULE: ksmbd not loaded;PORT: SMB port not listening
+
+  --- T10 --- pass=13 fail=5 (30450ms) health=CRASH: [    5.933015] systemd[1]: Mounting Kernel Debug File System...;MODULE: ksmbd not loaded;PORT: SMB port not listening
+
+  === T11 ===
+  PASS   T11.01     FileFsVolumeInformation                            (1850ms)
+  FAIL   T11.02     FileFsSizeInformation                              (571ms)
+  PASS   T11.03     FileFsDeviceInformation                            (842ms)
+  FAIL   T11.04     FileFsAttributeInformation                         (1477ms)
+  PASS   T11.05     FileFsFullSizeInformation                          (3551ms)
+  PASS   T11.06     FileFsSectorSizeInformation                        (772ms)
+  PASS   T11.07     FileFsObjectIdInformation                          (985ms)
+  PASS   T11.08     FileFsControlInformation                           (658ms)
+  [WARN] Health check after T11: CRASH: [    5.933015] systemd[1]: Mounting Kernel Debug File System...
+
+  --- T11 --- pass=6 fail=2 (13979ms) health=CRASH: [    5.933015] systemd[1]: Mounting Kernel Debug File System...
+
+  === T12 ===
+  FAIL   T12.01     FileBasicInformation set timestamps                (10345ms)
+  PASS   T12.02     FileAllocationInformation                          (6617ms)
+  PASS   T12.03     FileEndOfFileInformation truncate/extend           (860ms)
+  FAIL   T12.04     FileRenameInformation (class 10)                   (1758ms)
+  PASS   T12.05     FileRenameInformationEx (class 65)                 (8322ms)
+  PASS   T12.06     FileLinkInformation hard link                      (797ms)
+  PASS   T12.07     FileDispositionInformation delete-on-close         (9475ms)
+  PASS   T12.08     FileDispositionInformationEx                       (5799ms)
+  PASS   T12.09     FilePositionInformation                            (1982ms)
+  PASS   T12.10     FileModeInformation                                (5073ms)
+  PASS   T12.11     FileFullEaInformation set extended attributes      (778ms)
+  PASS   T12.13     SecurityInformation SACL                           (526ms)
+  PASS   T12.14     SecurityInformation Owner SID change               (3649ms)
+  PASS   T12.16     Set timestamp to -1 preserves original             (491ms)
+
+  --- T12 --- pass=12 fail=2 (60599ms) health=OK
+
+  === T13 ===
+  PASS   T13.01     Exclusive lock on byte range                       (687ms)
+  PASS   T13.02     Shared lock on byte range                          (3323ms)
+  PASS   T13.03     Exclusive lock with FAIL_IMMEDIATELY on contested  (2823ms)
+  PASS   T13.04     Shared lock with FAIL_IMMEDIATELY on exclusive-hel (3128ms)
+  PASS   T13.05     Unlock a previously locked range                   (1070ms)
+  FAIL   T13.06     Unlock with no matching lock returns RANGE_NOT_LOC (10065ms)
+  PASS   T13.07     Lock with Length=0 (zero-byte lock)                (3917ms)
+  PASS   T13.08     Lock range 0 to 0xFFFFFFFFFFFFFFFF                 (492ms)
+  PASS   T13.09     Lock range that wraps past 2^64                    (473ms)
+  PASS   T13.10     Lock range beyond OFFSET_MAX tracked internally on (3983ms)
+  PASS   T13.11     LockCount=0 in LOCK request returns INVALID_PARAME (4548ms)
+  PASS   T13.12     LockCount exceeds server limit                     (558ms)
+  PASS   T13.18     Mix of lock and unlock in single request returns I (594ms)
+  PASS   T13.20     Lock with sequence index 0 treated as new lock req (3615ms)
+  PASS   T13.21     Lock_seq slot initialized to 0xFF sentinel         (2350ms)
+  PASS   T13.22     All valid sequence bucket indices (1-64)           (7860ms)
+  PASS   T13.23     Sequence stored only AFTER lock success            (492ms)
+  PASS   T13.25     Lock with ChannelSequence validation               (1640ms)
+  PASS   T13.26     POSIX fl_end = fl_start + length - 1 (off-by-one r (750ms)
+  PASS   T13.28     Downgrade exclusive to shared                      (1098ms)
+  PASS   T13.31     Lock with undefined flag bits                      (707ms)
+  PASS   T13.32     Lock on invalid FID returns FILE_CLOSED            (832ms)
+
+  --- T13 --- pass=21 fail=1 (59633ms) health=OK
+
+  === T17 ===
+  PASS   T17.01     CREATE + READ + CLOSE in single compound           (2221ms)
+  PASS   T17.02     CREATE + WRITE + CLOSE                             (3812ms)
+  PASS   T17.03     FID=0xFFFFFFFFFFFFFFFF in chained request          (617ms)
+  PASS   T17.04     FLUSH/READ/WRITE/CLOSE chain with non-CREATE FID c (1209ms)
+  PASS   T17.05     CREATE fails, subsequent ops get cascade error     (926ms)
+  PASS   T17.06     Non-CREATE failure does NOT cascade                (566ms)
+  PASS   T17.07     FLUSH + CLOSE compound                             (847ms)
+  PASS   T17.08     FLUSH + FLUSH compound                             (661ms)
+  PASS   T17.09     CREATE + SET_INFO(rename) + CLOSE                  (1185ms)
+  PASS   T17.10     QUERY_INFO + SET_INFO in compound                  (1191ms)
+  PASS   T17.12     8-byte alignment between compound messages         (3115ms)
+  PASS   T17.13     Multiple unrelated operations in one compound      (918ms)
+  PASS   T17.14     Maximum number of chained operations               (1257ms)
+  PASS   T17.15     IOCTL using compound FID                           (1988ms)
+
+  --- T17 --- pass=14 fail=0 (25213ms) health=OK
+
+  === T19 ===
+  FAIL   T19.01     FSCTL_VALIDATE_NEGOTIATE_INFO with correct data    (2860ms)
+  PASS   T19.02     FSCTL_VALIDATE_NEGOTIATE_INFO with wrong dialect t (2817ms)
+  PASS   T19.03     IOCTL Flags != SMB2_0_IOCTL_IS_FSCTL returns INVAL (538ms)
+  PASS   T19.04     IOCTL on invalid FID returns FILE_CLOSED           (880ms)
+  PASS   T19.05     Unknown FSCTL code returns INVALID_DEVICE_REQUEST  (829ms)
+  PASS   T19.06     IOCTL with stale ChannelSequence returns FILE_NOT_ (1118ms)
+
+  --- T19 --- pass=5 fail=1 (11814ms) health=OK
+
+  === T20 ===
+  PASS   T20.01     FSCTL_QUERY_NETWORK_INTERFACE_INFO                 (1672ms)
+  PASS   T20.02     FSCTL_QUERY_NETWORK_INTERFACE_INFO_WIN (0x001401FC (556ms)
+  SKIP   T20.03     Interface info includes RDMA capability            (520ms)
+  PASS   T20.04     Interface info includes RSS capability             (2416ms)
+
+  --- T20 --- pass=3 fail=0 skip=1 (7701ms) health=OK
+
+  === T21 ===
+  PASS   T21.03     FSCTL_REQUEST_RESUME_KEY for source file           (8369ms)
+  PASS   T21.04     Copy chunk with wrong resume key                   (1525ms)
+  PASS   T21.08     Copy with 0 chunks returns limits                  (863ms)
+
+  --- T21 --- pass=3 fail=0 (14936ms) health=OK
+
+  === T22 ===
+  PASS   T22.01     FSCTL_SET_SPARSE with SetSparse=TRUE               (2476ms)
+  PASS   T22.02     FSCTL_SET_SPARSE with empty buffer defaults to TRU (2026ms)
+  PASS   T22.03     FSCTL_SET_SPARSE with SetSparse=FALSE              (1053ms)
+  PASS   T22.04     FSCTL_QUERY_ALLOCATED_RANGES                       (2290ms)
+  PASS   T22.05     FSCTL_SET_ZERO_DATA on sparse file                 (2095ms)
+  PASS   T22.06     FSCTL_SET_ZERO_DATA without write access           (768ms)
+  PASS   T22.07     FSCTL_FILE_LEVEL_TRIM                              (649ms)
+  PASS   T22.08     FSCTL_FILE_LEVEL_TRIM without write access         (532ms)
+
+  --- T22 --- pass=8 fail=0 (16103ms) health=OK
+
+  === T23 ===
+  PASS   T23.01     FSCTL_GET_COMPRESSION                              (849ms)
+  PASS   T23.02     FSCTL_SET_COMPRESSION                              (928ms)
+  PASS   T23.03     FSCTL_GET_INTEGRITY_INFORMATION                    (3502ms)
+  PASS   T23.04     FSCTL_SET_INTEGRITY_INFORMATION                    (1665ms)
+  PASS   T23.06     FSCTL_QUERY_FILE_REGIONS                           (701ms)
+
+  --- T23 --- pass=5 fail=0 (12240ms) health=OK
+
+  === T24 ===
+  PASS   T24.01     FSCTL_PIPE_TRANSCEIVE on IPC$                      (2377ms)
+  PASS   T24.02     FSCTL_PIPE_PEEK                                    (888ms)
+  PASS   T24.03     FSCTL_PIPE_WAIT for named pipe                     (3238ms)
+  PASS   T24.04     FSCTL_PIPE_WAIT with timeout, pipe unavailable     (5524ms)
+  PASS   T24.05     FSCTL_PIPE_WAIT with empty buffer                  (456ms)
+  PASS   T24.06     FSCTL_PIPE_TRANSCEIVE with large payload           (462ms)
+
+  --- T24 --- pass=6 fail=0 (15589ms) health=OK
+
+  === T25 ===
+  PASS   T25.02     FSCTL_IS_PATHNAME_VALID - server accepts valid pat (885ms)
+  PASS   T25.03     FSCTL_IS_VOLUME_DIRTY - returns NOT_SUPPORTED or c (586ms)
+  FAIL   T25.04     FSCTL_LOCK_VOLUME - returns NOT_SUPPORTED on ksmbd (646ms)
+  FAIL   T25.05     FSCTL_UNLOCK_VOLUME - returns NOT_SUPPORTED on ksm (1283ms)
+  PASS   T25.08     FSCTL_SET_OBJECT_ID - returns NOT_SUPPORTED (read- (1258ms)
+  FAIL   T25.09     FSCTL_DELETE_OBJECT_ID - returns NOT_SUPPORTED     (774ms)
+  FAIL   T25.10     FSCTL_SRV_READ_HASH (BranchCache) - returns NOT_SU (1458ms)
+  FAIL   T25.13     FSCTL_MARK_HANDLE - returns NOT_SUPPORTED or succe (2997ms)
+  PASS   T25.14     FSCTL_QUERY_ON_DISK_VOLUME_INFO returns NOT_SUPPOR (1184ms)
+
+  --- T25 --- pass=4 fail=5 (14194ms) health=OK
+
+  ================================================================
+  RESULTS
+  ================================================================
+
+  CATEGORY     PASS   FAIL   SKIP  CRASH   TIME(ms)   HEALTH
+  --------     ----   ----   ----  -----   --------   ------
+  T01            14      5      0      0     120374       OK
+  T02             7     11      0      0     193860       OK
+  T03            10      5      2      0     124016       OK
+  T04            33     16      2      0     203931       OK
+  T05            11      3      1      0      34867       OK
+  T06            15      2      1      0      26726       OK
+  T07             4      2      0      0      20890       OK
+  T08             7      3      0      0      34676       OK
+  T09            13      6      0      0      50399       OK
+  T10            13      5      0      0      30450 CRASH: [    5.933015] systemd[1]: Mounting Kernel Debug File System...;MODULE: ksmbd not loaded;PORT: SMB port not listening
+  T11             6      2      0      0      13979 CRASH: [    5.933015] systemd[1]: Mounting Kernel Debug File System...
+  T12            12      2      0      0      60599       OK
+  T13            21      1      0      0      59633       OK
+  T17            14      0      0      0      25213       OK
+  T19             5      1      0      0      11814       OK
+  T20             3      0      1      0       7701       OK
+  T21             3      0      0      0      14936       OK
+  T22             8      0      0      0      16103       OK
+  T23             5      0      0      0      12240       OK
+  T24             6      0      0      0      15589       OK
+  T25             4      5      0      0      14194       OK
+
+  TOTAL         214     69      7      0    1095489
+
+  Duration: 1095.489s
+
+  Health Events:
+    ! T10: CRASH: [    5.933015] systemd[1]: Mounting Kernel Debug File System...;MODULE: ksmbd not loaded;PORT: SMB port not listening
+    ! T11: CRASH: [    5.933015] systemd[1]: Mounting Kernel Debug File System...
+
+  Failed Tests:
+    T01.01: smbclient connection failed: expected exit code 0, got 1
+    T01.02: smbclient connection failed: expected exit code 0, got 1
+    T01.07: smbclient with NT1 min protocol failed: expected exit code 0, got 1
+    T01.14: TIMEOUT after 10s
+    T01.15: TIMEOUT after 10s
+    T02.02: TIMEOUT after 10s
+    T02.03: TIMEOUT after 10s
+    T02.04: TIMEOUT after 10s
+    T02.13: TIMEOUT after 10s
+    T02.14: TIMEOUT after 10s
+    T02.20: TIMEOUT after 10s
+    T02.24: TIMEOUT after 10s
+    T02.25: TIMEOUT after 10s
+    T02.31: TIMEOUT after 10s
+    T02.32: TIMEOUT after 10s
+    T02.33: TIMEOUT after 10s
+    T03.02: TIMEOUT after 10s
+    T03.03: expected BAD_NETWORK_NAME error: 'BAD_NETWORK_NAME\|NT_STATUS_\|tree connect' no
+    T03.11: TIMEOUT after 10s
+    T03.12: TIMEOUT after 10s
+    T03.17: second tree connect failed: expected exit code 0, got 1
+    T04.04: TIMEOUT after 10s
+    T04.05: TIMEOUT after 10s
+    T04.06: TIMEOUT after 10s
+    T04.08: TIMEOUT after 10s
+    T04.10: TIMEOUT after 10s
+    T04.15: TIMEOUT after 10s
+    T04.16: Can't load /etc/samba/smb.conf - run testparm to debug it
+Protocol negotiation t
+    T04.17: Can't load /etc/samba/smb.conf - run testparm to debug it
+Protocol negotiation t
+    T04.19: Can't load /etc/samba/smb.conf - run testparm to debug it
+Protocol negotiation t
+    T04.22: Can't load /etc/samba/smb.conf - run testparm to debug it
+Protocol negotiation t
+    T04.23: Can't load /etc/samba/smb.conf - run testparm to debug it
+Protocol negotiation t
+    T04.25: empty path listing failed: expected exit code 0, got 1
+    T04.27: Can't load /etc/samba/smb.conf - run testparm to debug it
+session setup failed: 
+    T04.33: Can't load /etc/samba/smb.conf - run testparm to debug it
+session setup failed: 
+    T04.35: Can't load /etc/samba/smb.conf - run testparm to debug it
+session setup failed: 
+    T04.53: TIMEOUT after 10s
+    T05.01: Can't load /etc/samba/smb.conf - run testparm to debug it
+session setup failed: 
+    T05.04: Can't load /etc/samba/smb.conf - run testparm to debug it
+session setup failed: 
+    T05.06: Can't load /etc/samba/smb.conf - run testparm to debug it
+session setup failed: 
+    T06.01: Can't load /etc/samba/smb.conf - run testparm to debug it
+session setup failed: 
+    T06.13: Can't load /etc/samba/smb.conf - run testparm to debug it
+session setup failed: 
+    T07.01: Can't load /etc/samba/smb.conf - run testparm to debug it
+session setup failed: 
+    T07.05: Can't load /etc/samba/smb.conf - run testparm to debug it
+session setup failed: 
+    T08.01: Can't load /etc/samba/smb.conf - run testparm to debug it
+session setup failed: 
+    T08.09: Can't load /etc/samba/smb.conf - run testparm to debug it
+session setup failed: 
+    T08.10: Can't load /etc/samba/smb.conf - run testparm to debug it
+session setup failed: 
+    T09.01: Can't load /etc/samba/smb.conf - run testparm to debug it
+session setup failed: 
+    T09.02: Can't load /etc/samba/smb.conf - run testparm to debug it
+session setup failed: 
+    T09.03: directory listing failed: expected exit code 0, got 1
+    T09.08: Can't load /etc/samba/smb.conf - run testparm to debug it
+session setup failed: 
+    T09.09: Can't load /etc/samba/smb.conf - run testparm to debug it
+session setup failed: 
+    T09.16: Can't load /etc/samba/smb.conf - run testparm to debug it
+session setup failed: 
+    T10.01: Can't load /etc/samba/smb.conf - run testparm to debug it
+session setup failed: 
+    T10.02: Can't load /etc/samba/smb.conf - run testparm to debug it
+session setup failed: 
+    T10.04: TIMEOUT after 10s
+    T10.09: Can't load /etc/samba/smb.conf - run testparm to debug it
+Protocol negotiation t
+    T10.11: Can't load /etc/samba/smb.conf - run testparm to debug it
+Protocol negotiation t
+    T11.02: size info (blocks) expected: 'blocks' not found in output
+    T11.04: fs attribute query path failed: expected exit code 0, got 1
+    T12.01: TIMEOUT after 10s
+    T12.04: Can't load /etc/samba/smb.conf - run testparm to debug it
+session setup failed: 
+    T13.06: TIMEOUT after 10s
+    T19.01: validate negotiate failed: expected exit code 0, got 1
+    T25.04: Server connectivity lost: Can't load /etc/samba/smb.conf - run testparm to debug
+    T25.05: Server connectivity lost: Can't load /etc/samba/smb.conf - run testparm to debug
+    T25.09: Server unhealthy after FSCTL_DELETE_OBJECT_ID path: Can't load /etc/samba/smb.co
+    T25.10: Server unhealthy: Can't load /etc/samba/smb.conf - run testparm to debug it
+sess
+    T25.13: Server unhealthy after FSCTL_MARK_HANDLE path: Can't load /etc/samba/smb.conf - 
+
+  FAILURES DETECTED
+

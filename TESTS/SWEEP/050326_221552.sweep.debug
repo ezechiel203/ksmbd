@@ -1,0 +1,76 @@
+[    4.613105] systemd[1]: Hostname set to <ksmbd-vm>.
+[   22.643155] ksmbd: loading out-of-tree module taints kernel.
+[   22.644314] ksmbd: module verification failed: signature and/or required key missing - tainting kernel
+[   22.646315] ksmbd: Unknown symbol des_encrypt (err -2)
+[   22.647697] ksmbd: Unknown symbol des_expand_key (err -2)
+[   57.957729] ksmbd: Unknown symbol des_encrypt (err -2)
+[   57.958889] ksmbd: Unknown symbol des_expand_key (err -2)
+[  171.628912] ksmbd: Unknown symbol des_encrypt (err -2)
+[  171.630041] ksmbd: Unknown symbol des_expand_key (err -2)
+[  204.038249] ksmbd: Configuration subsystem initialized with 12 parameters
+[  204.043494] ksmbd: ksmbd: registered built-in md4 (md4-ksmbd) for NTLMv1 support
+[  204.047809] ksmbd: ksmbd: Fruit SMB extensions loaded
+[  204.048874] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[  204.050129] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[  204.051397] ksmbd: ksmbd: witness protocol support initialised
+[  209.639768] ksmbd: selected SMB2_02 dialect idx = 1
+[  209.640770] ksmbd: selected SMB3_11 dialect idx = 4
+[  209.641814] ksmbd: netdev-up event: netdev(lo) is going up
+[  209.643163] ksmbd: netdev-up event: netdev(ens4) is going up
+[  274.272206] ksmbd: netdev-down event: netdev(lo) is going down
+[  274.273429] ksmbd: releasing socket
+[  274.274281] ksmbd: netdev-down event: netdev(ens4) is going down
+[  274.275502] ksmbd: releasing socket
+[  276.297731] ksmbd: ksmbd: witness protocol support removed
+[  276.508519] ksmbd: VSS backend 'generic' unregistered
+[  276.509546] ksmbd: VSS backend 'zfs' unregistered
+[  276.510475] ksmbd: VSS backend 'btrfs' unregistered
+[  276.804485] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[  278.863678] ksmbd: Configuration subsystem initialized with 12 parameters
+[  278.869216] ksmbd: ksmbd: registered built-in md4 (md4-ksmbd) for NTLMv1 support
+[  278.871307] ksmbd: ksmbd: Fruit SMB extensions loaded
+[  278.873349] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[  278.874949] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[  278.876171] ksmbd: ksmbd: witness protocol support initialised
+[  279.888424] ksmbd: selected SMB2_02 dialect idx = 1
+[  279.889542] ksmbd: selected SMB3_11 dialect idx = 4
+[  279.890625] ksmbd: netdev-up event: netdev(lo) is going up
+[  279.891759] ksmbd: netdev-up event: netdev(ens4) is going up
+[  285.718504] ksmbd: netdev-down event: netdev(lo) is going down
+[  285.721635] ksmbd: releasing socket
+[  285.723869] ksmbd: netdev-down event: netdev(ens4) is going down
+[  285.726190] ksmbd: releasing socket
+[  287.753661] ksmbd: ksmbd: witness protocol support removed
+[  287.942527] ksmbd: VSS backend 'generic' unregistered
+[  287.943695] ksmbd: VSS backend 'zfs' unregistered
+[  287.944867] ksmbd: VSS backend 'btrfs' unregistered
+[  288.214494] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[  290.275295] ksmbd: Configuration subsystem initialized with 12 parameters
+[  290.281195] ksmbd: ksmbd: registered built-in md4 (md4-ksmbd) for NTLMv1 support
+[  290.283320] ksmbd: ksmbd: Fruit SMB extensions loaded
+[  290.287510] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[  290.289568] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[  290.290786] ksmbd: ksmbd: witness protocol support initialised
+[  291.300575] ksmbd: selected SMB2_02 dialect idx = 1
+[  291.301836] ksmbd: selected SMB3_11 dialect idx = 4
+[  291.302925] ksmbd: netdev-up event: netdev(lo) is going up
+[  291.304094] ksmbd: netdev-up event: netdev(ens4) is going up
+[  297.877321] ksmbd: netdev-down event: netdev(lo) is going down
+[  297.880860] ksmbd: releasing socket
+[  297.881678] ksmbd: netdev-down event: netdev(ens4) is going down
+[  297.883210] ksmbd: releasing socket
+[  299.905664] ksmbd: ksmbd: witness protocol support removed
+[  300.091493] ksmbd: VSS backend 'generic' unregistered
+[  300.092418] ksmbd: VSS backend 'zfs' unregistered
+[  300.093489] ksmbd: VSS backend 'btrfs' unregistered
+[  300.363495] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[  302.423946] ksmbd: Configuration subsystem initialized with 12 parameters
+[  302.429367] ksmbd: ksmbd: registered built-in md4 (md4-ksmbd) for NTLMv1 support
+[  302.431630] ksmbd: ksmbd: Fruit SMB extensions loaded
+[  302.432867] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[  302.434076] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[  302.435444] ksmbd: ksmbd: witness protocol support initialised
+[  303.447354] ksmbd: selected SMB2_02 dialect idx = 1
+[  303.448577] ksmbd: selected SMB3_11 dialect idx = 4
+[  303.449843] ksmbd: netdev-up event: netdev(lo) is going up
+[  303.451566] ksmbd: netdev-up event: netdev(ens4) is going up

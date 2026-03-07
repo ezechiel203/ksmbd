@@ -1,0 +1,2122 @@
+[    0.000000] Linux version 6.18.13-arch1-1 (linux@archlinux) (gcc (GCC) 15.2.1 20260209, GNU ld (GNU Binutils) 2.46) #1 SMP PREEMPT_DYNAMIC Wed, 25 Feb 2026 23:12:35 +0000
+[    0.000000] Command line: root=/dev/vda1 rw console=ttyS0,115200 loglevel=7
+[    0.000000] BIOS-provided physical RAM map:
+[    0.000000] BIOS-e820: [mem 0x0000000000000000-0x000000000009fbff] usable
+[    0.000000] BIOS-e820: [mem 0x000000000009fc00-0x000000000009ffff] reserved
+[    0.000000] BIOS-e820: [mem 0x00000000000f0000-0x00000000000fffff] reserved
+[    0.000000] BIOS-e820: [mem 0x0000000000100000-0x000000007ffdcfff] usable
+[    0.000000] BIOS-e820: [mem 0x000000007ffdd000-0x000000007fffffff] reserved
+[    0.000000] BIOS-e820: [mem 0x00000000feffc000-0x00000000feffffff] reserved
+[    0.000000] BIOS-e820: [mem 0x00000000fffc0000-0x00000000ffffffff] reserved
+[    0.000000] NX (Execute Disable) protection: active
+[    0.000000] APIC: Static calls initialized
+[    0.000000] SMBIOS 2.8 present.
+[    0.000000] DMI: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Arch Linux 1.17.0-2-2 04/01/2014
+[    0.000000] DMI: Memory slots populated: 1/1
+[    0.000000] Hypervisor detected: KVM
+[    0.000000] last_pfn = 0x7ffdd max_arch_pfn = 0x400000000
+[    0.000000] kvm-clock: Using msrs 4b564d01 and 4b564d00
+[    0.000001] kvm-clock: using sched offset of 752406926 cycles
+[    0.000004] clocksource: kvm-clock: mask: 0xffffffffffffffff max_cycles: 0x1cd42e4dffb, max_idle_ns: 881590591483 ns
+[    0.000008] tsc: Detected 3600.000 MHz processor
+[    0.001353] last_pfn = 0x7ffdd max_arch_pfn = 0x400000000
+[    0.001389] MTRR map: 4 entries (3 fixed + 1 variable; max 19), built from 8 variable MTRRs
+[    0.001393] x86/PAT: Configuration [0-7]: WB  WC  UC- UC  WB  WP  UC- WT  
+[    0.011609] found SMP MP-table at [mem 0x000f66b0-0x000f66bf]
+[    0.011644] Using GB pages for direct mapping
+[    0.012052] RAMDISK: [mem 0x7f508000-0x7ffcffff]
+[    0.012143] ACPI: Early table checksum verification disabled
+[    0.012147] ACPI: RSDP 0x00000000000F64E0 000014 (v00 BOCHS )
+[    0.012153] ACPI: RSDT 0x000000007FFE239C 000034 (v01 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.012162] ACPI: FACP 0x000000007FFE2248 000074 (v01 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.012172] ACPI: DSDT 0x000000007FFE0040 002208 (v01 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.012178] ACPI: FACS 0x000000007FFE0000 000040
+[    0.012183] ACPI: APIC 0x000000007FFE22BC 000080 (v03 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.012188] ACPI: HPET 0x000000007FFE233C 000038 (v01 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.012193] ACPI: WAET 0x000000007FFE2374 000028 (v01 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.012197] ACPI: Reserving FACP table memory at [mem 0x7ffe2248-0x7ffe22bb]
+[    0.012199] ACPI: Reserving DSDT table memory at [mem 0x7ffe0040-0x7ffe2247]
+[    0.012200] ACPI: Reserving FACS table memory at [mem 0x7ffe0000-0x7ffe003f]
+[    0.012201] ACPI: Reserving APIC table memory at [mem 0x7ffe22bc-0x7ffe233b]
+[    0.012202] ACPI: Reserving HPET table memory at [mem 0x7ffe233c-0x7ffe2373]
+[    0.012203] ACPI: Reserving WAET table memory at [mem 0x7ffe2374-0x7ffe239b]
+[    0.012704] No NUMA configuration found
+[    0.012705] Faking a node at [mem 0x0000000000000000-0x000000007ffdcfff]
+[    0.012715] NODE_DATA(0) allocated [mem 0x7f4dd280-0x7f507fff]
+[    0.013229] Zone ranges:
+[    0.013230]   DMA      [mem 0x0000000000001000-0x0000000000ffffff]
+[    0.013234]   DMA32    [mem 0x0000000001000000-0x000000007ffdcfff]
+[    0.013236]   Normal   empty
+[    0.013237]   Device   empty
+[    0.013239] Movable zone start for each node
+[    0.013242] Early memory node ranges
+[    0.013243]   node   0: [mem 0x0000000000001000-0x000000000009efff]
+[    0.013244]   node   0: [mem 0x0000000000100000-0x000000007ffdcfff]
+[    0.013247] Initmem setup node 0 [mem 0x0000000000001000-0x000000007ffdcfff]
+[    0.013262] On node 0, zone DMA: 1 pages in unavailable ranges
+[    0.013616] On node 0, zone DMA: 97 pages in unavailable ranges
+[    0.040831] On node 0, zone DMA32: 35 pages in unavailable ranges
+[    0.041586] ACPI: PM-Timer IO Port: 0x608
+[    0.041608] ACPI: LAPIC_NMI (acpi_id[0xff] dfl dfl lint[0x1])
+[    0.041649] IOAPIC[0]: apic_id 0, version 17, address 0xfec00000, GSI 0-23
+[    0.041654] ACPI: INT_SRC_OVR (bus 0 bus_irq 0 global_irq 2 dfl dfl)
+[    0.041656] ACPI: INT_SRC_OVR (bus 0 bus_irq 5 global_irq 5 high level)
+[    0.041658] ACPI: INT_SRC_OVR (bus 0 bus_irq 9 global_irq 9 high level)
+[    0.041660] ACPI: INT_SRC_OVR (bus 0 bus_irq 10 global_irq 10 high level)
+[    0.041661] ACPI: INT_SRC_OVR (bus 0 bus_irq 11 global_irq 11 high level)
+[    0.041668] ACPI: Using ACPI (MADT) for SMP configuration information
+[    0.041670] ACPI: HPET id: 0x8086a201 base: 0xfed00000
+[    0.041675] TSC deadline timer available
+[    0.041684] CPU topo: Max. logical packages:   1
+[    0.041685] CPU topo: Max. logical dies:       1
+[    0.041686] CPU topo: Max. dies per package:   1
+[    0.041694] CPU topo: Max. threads per core:   1
+[    0.041695] CPU topo: Num. cores per package:     2
+[    0.041696] CPU topo: Num. threads per package:   2
+[    0.041697] CPU topo: Allowing 2 present CPUs plus 0 hotplug CPUs
+[    0.041719] kvm-guest: APIC: eoi() replaced with kvm_guest_apic_eoi_write()
+[    0.041734] kvm-guest: KVM setup pv remote TLB flush
+[    0.041738] kvm-guest: setup PV sched yield
+[    0.041747] PM: hibernation: Registered nosave memory: [mem 0x00000000-0x00000fff]
+[    0.041749] PM: hibernation: Registered nosave memory: [mem 0x0009f000-0x000fffff]
+[    0.041752] [mem 0x80000000-0xfeffbfff] available for PCI devices
+[    0.041753] Booting paravirtualized kernel on KVM
+[    0.041755] clocksource: refined-jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 1910969940391419 ns
+[    0.048489] setup_percpu: NR_CPUS:8192 nr_cpumask_bits:2 nr_cpu_ids:2 nr_node_ids:1
+[    0.050061] percpu: Embedded 62 pages/cpu s217088 r8192 d28672 u1048576
+[    0.050124] kvm-guest: PV spinlocks enabled
+[    0.050126] PV qspinlock hash table entries: 256 (order: 0, 4096 bytes, linear)
+[    0.050130] Kernel command line: root=/dev/vda1 rw console=ttyS0,115200 loglevel=7
+[    0.050202] random: crng init done
+[    0.050203] printk: log buffer data + meta data: 131072 + 458752 = 589824 bytes
+[    0.051686] Dentry cache hash table entries: 262144 (order: 9, 2097152 bytes, linear)
+[    0.052471] Inode-cache hash table entries: 131072 (order: 8, 1048576 bytes, linear)
+[    0.052573] Fallback order for Node 0: 0 
+[    0.052577] Built 1 zonelists, mobility grouping on.  Total pages: 524155
+[    0.052579] Policy zone: DMA32
+[    0.054296] mem auto-init: stack:all(zero), heap alloc:on, heap free:off
+[    0.059791] SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=2, Nodes=1
+[    0.059816] Kernel/User page tables isolation: enabled
+[    0.070721] ftrace: allocating 57060 entries in 224 pages
+[    0.070726] ftrace: allocated 224 pages with 3 groups
+[    0.071081] Dynamic Preempt: full
+[    0.071152] rcu: Preemptible hierarchical RCU implementation.
+[    0.071153] rcu: 	RCU restricting CPUs from NR_CPUS=8192 to nr_cpu_ids=2.
+[    0.071154] rcu: 	RCU priority boosting: priority 1 delay 500 ms.
+[    0.071155] 	Trampoline variant of Tasks RCU enabled.
+[    0.071156] 	Rude variant of Tasks RCU enabled.
+[    0.071156] 	Tracing variant of Tasks RCU enabled.
+[    0.071157] rcu: RCU calculated value of scheduler-enlistment delay is 100 jiffies.
+[    0.071158] rcu: Adjusting geometry for rcu_fanout_leaf=16, nr_cpu_ids=2
+[    0.071336] RCU Tasks: Setting shift to 1 and lim to 1 rcu_task_cb_adjust=1 rcu_task_cpu_ids=2.
+[    0.071338] RCU Tasks Rude: Setting shift to 1 and lim to 1 rcu_task_cb_adjust=1 rcu_task_cpu_ids=2.
+[    0.071340] RCU Tasks Trace: Setting shift to 1 and lim to 1 rcu_task_cb_adjust=1 rcu_task_cpu_ids=2.
+[    0.080043] NR_IRQS: 524544, nr_irqs: 440, preallocated irqs: 16
+[    0.080336] rcu: srcu_init: Setting srcu_struct sizes based on contention.
+[    0.080576] kfence: initialized - using 2097152 bytes for 255 objects at 0x(____ptrval____)-0x(____ptrval____)
+[    0.101489] Console: colour VGA+ 80x25
+[    0.101557] printk: legacy console [ttyS0] enabled
+[    0.305716] ACPI: Core revision 20250807
+[    0.307063] clocksource: hpet: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 19112604467 ns
+[    0.309685] APIC: Switch to symmetric I/O mode setup
+[    0.311359] x2apic enabled
+[    0.312476] APIC: Switched APIC routing to: physical x2apic
+[    0.314025] kvm-guest: APIC: send_IPI_mask() replaced with kvm_send_ipi_mask()
+[    0.316175] kvm-guest: APIC: send_IPI_mask_allbutself() replaced with kvm_send_ipi_mask_allbutself()
+[    0.318718] kvm-guest: setup PV IPIs
+[    0.321179] ..TIMER: vector=0x30 apic1=0 pin1=2 apic2=-1 pin2=-1
+[    0.322935] clocksource: tsc-early: mask: 0xffffffffffffffff max_cycles: 0x33e452fbb2f, max_idle_ns: 440795236593 ns
+[    0.326533] Calibrating delay loop (skipped) preset value.. 7200.00 BogoMIPS (lpj=3600000)
+[    0.327528] x86/cpu: User Mode Instruction Prevention (UMIP) activated
+[    0.327646] Last level iTLB entries: 4KB 0, 2MB 0, 4MB 0
+[    0.328528] Last level dTLB entries: 4KB 0, 2MB 0, 4MB 0, 1GB 0
+[    0.328549] mitigations: Enabled attack vectors: user_kernel, user_user, guest_host, guest_guest, SMT mitigations: auto
+[    0.329533] Speculative Store Bypass: Mitigation: Speculative Store Bypass disabled via prctl
+[    0.330532] SRBDS: Unknown: Dependent on hypervisor status
+[    0.331532] Spectre V2 : Mitigation: IBRS
+[    0.332531] RETBleed: Mitigation: IBRS
+[    0.333531] MDS: Mitigation: Clear CPU buffers
+[    0.334532] TAA: Mitigation: Clear CPU buffers
+[    0.335531] MMIO Stale Data: Mitigation: Clear CPU buffers
+[    0.336532] Spectre V1 : Mitigation: usercopy/swapgs barriers and __user pointer sanitization
+[    0.337534] Spectre V2 : Spectre v2 / SpectreRSB: Filling RSB on context switch and VMEXIT
+[    0.338535] Spectre V2 : mitigation: Enabling conditional Indirect Branch Prediction Barrier
+[    0.339539] GDS: Unknown: Dependent on hypervisor status
+[    0.340532] Spectre V2 : Spectre BHI mitigation: SW BHB clearing on syscall and VM exit
+[    0.341551] x86/fpu: Supporting XSAVE feature 0x001: 'x87 floating point registers'
+[    0.342533] x86/fpu: Supporting XSAVE feature 0x002: 'SSE registers'
+[    0.343533] x86/fpu: Supporting XSAVE feature 0x004: 'AVX registers'
+[    0.344533] x86/fpu: Supporting XSAVE feature 0x008: 'MPX bounds registers'
+[    0.345532] x86/fpu: Supporting XSAVE feature 0x010: 'MPX CSR'
+[    0.346533] x86/fpu: xstate_offset[2]:  576, xstate_sizes[2]:  256
+[    0.347532] x86/fpu: xstate_offset[3]:  832, xstate_sizes[3]:   64
+[    0.348534] x86/fpu: xstate_offset[4]:  896, xstate_sizes[4]:   64
+[    0.349532] x86/fpu: Enabled xstate features 0x1f, context size is 960 bytes, using 'compacted' format.
+[    0.388076] Freeing SMP alternatives memory: 56K
+[    0.388537] pid_max: default: 32768 minimum: 301
+[    0.389591] LSM: initializing lsm=capability,landlock,lockdown,yama,bpf
+[    0.390622] landlock: Up and running.
+[    0.391535] Yama: becoming mindful.
+[    0.392729] LSM support for eBPF active
+[    0.393590] Mount-cache hash table entries: 4096 (order: 3, 32768 bytes, linear)
+[    0.394568] Mountpoint-cache hash table entries: 4096 (order: 3, 32768 bytes, linear)
+[    0.396890] smpboot: CPU0: Intel(R) Core(TM) i7-7700 CPU @ 3.60GHz (family: 0x6, model: 0x9e, stepping: 0x9)
+[    0.398086] Performance Events: Skylake events, full-width counters, Intel PMU driver.
+[    0.398540] ... version:                   2
+[    0.399544] ... bit width:                 48
+[    0.400532] ... generic counters:          4
+[    0.401532] ... generic bitmap:            000000000000000f
+[    0.402532] ... fixed-purpose counters:    3
+[    0.403533] ... fixed-purpose bitmap:      0000000000000007
+[    0.404533] ... value mask:                0000ffffffffffff
+[    0.405532] ... max period:                00007fffffffffff
+[    0.406531] ... global_ctrl mask:          000000070000000f
+[    0.407752] signal: max sigframe size: 2032
+[    0.408634] rcu: Hierarchical SRCU implementation.
+[    0.409532] rcu: 	Max phase no-delay instances is 400.
+[    0.410735] Timer migration: 1 hierarchy levels; 8 children per group; 1 crossnode level
+[    0.412073] smp: Bringing up secondary CPUs ...
+[    0.412835] smpboot: x86: Booting SMP configuration:
+[    0.413538] .... node  #0, CPUs:      #1
+[    0.413758] smp: Brought up 1 node, 2 CPUs
+[    0.415539] smpboot: Total of 2 processors activated (14400.00 BogoMIPS)
+[    0.417006] Memory: 1985456K/2096620K available (20319K kernel code, 2939K rwdata, 16368K rodata, 4736K init, 4772K bss, 105892K reserved, 0K cma-reserved)
+[    0.417786] devtmpfs: initialized
+[    0.418587] x86/mm: Memory block size: 128MB
+[    0.420545] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 1911260446275000 ns
+[    0.421573] posixtimers hash table entries: 1024 (order: 2, 16384 bytes, linear)
+[    0.422565] futex hash table entries: 512 (32768 bytes on 1 NUMA nodes, total 32 KiB, linear).
+[    0.423632] pinctrl core: initialized pinctrl subsystem
+[    0.424765] PM: RTC time: 13:43:30, date: 2026-03-03
+[    0.427670] NET: Registered PF_NETLINK/PF_ROUTE protocol family
+[    0.428890] DMA: preallocated 256 KiB GFP_KERNEL pool for atomic allocations
+[    0.429563] DMA: preallocated 256 KiB GFP_KERNEL|GFP_DMA pool for atomic allocations
+[    0.430720] DMA: preallocated 256 KiB GFP_KERNEL|GFP_DMA32 pool for atomic allocations
+[    0.431545] audit: initializing netlink subsys (disabled)
+[    0.432751] thermal_sys: Registered thermal governor 'fair_share'
+[    0.432753] thermal_sys: Registered thermal governor 'bang_bang'
+[    0.433534] thermal_sys: Registered thermal governor 'step_wise'
+[    0.434532] thermal_sys: Registered thermal governor 'user_space'
+[    0.434534] audit: type=2000 audit(1772545410.367:1): state=initialized audit_enabled=0 res=1
+[    0.435531] thermal_sys: Registered thermal governor 'power_allocator'
+[    0.438611] cpuidle: using governor ladder
+[    0.440546] cpuidle: using governor menu
+[    0.441791] acpiphp: ACPI Hot Plug PCI Controller Driver version: 0.5
+[    0.442879] PCI: Using configuration type 1 for base access
+[    0.443797] kprobes: kprobe jump-optimization is enabled. All kprobes are optimized if possible.
+[    0.479533] HugeTLB: registered 1.00 GiB page size, pre-allocated 0 pages
+[    0.480536] HugeTLB: 16380 KiB vmemmap can be freed for a 1.00 GiB page
+[    0.481534] HugeTLB: registered 2.00 MiB page size, pre-allocated 0 pages
+[    0.482535] HugeTLB: 28 KiB vmemmap can be freed for a 2.00 MiB page
+[    0.488494] raid6: skipped pq benchmark and selected avx2x4
+[    0.488532] raid6: using avx2x2 recovery algorithm
+[    0.489674] ACPI: Added _OSI(Module Device)
+[    0.490533] ACPI: Added _OSI(Processor Device)
+[    0.491532] ACPI: Added _OSI(Processor Aggregator Device)
+[    0.494160] ACPI: 1 ACPI AML tables successfully acquired and loaded
+[    0.495749] ACPI: Interpreter enabled
+[    0.496552] ACPI: PM: (supports S0 S3 S4 S5)
+[    0.497534] ACPI: Using IOAPIC for interrupt routing
+[    0.498748] PCI: Using host bridge windows from ACPI; if necessary, use "pci=nocrs" and report a bug
+[    0.499533] PCI: Using E820 reservations for host bridge windows
+[    0.500688] ACPI: Enabled 2 GPEs in block 00 to 0F
+[    0.505484] ACPI: PCI Root Bridge [PCI0] (domain 0000 [bus 00-ff])
+[    0.505556] acpi PNP0A03:00: _OSC: OS supports [ASPM ClockPM Segments MSI EDR HPX-Type3]
+[    0.506534] acpi PNP0A03:00: _OSC: not requesting OS control; OS requires [ExtendedConfig ASPM ClockPM MSI]
+[    0.507554] acpi PNP0A03:00: fail to add MMCONFIG information, can't access extended configuration space under this bridge
+[    0.509077] acpiphp: Slot [3] registered
+[    0.509564] acpiphp: Slot [4] registered
+[    0.510562] acpiphp: Slot [5] registered
+[    0.511559] acpiphp: Slot [6] registered
+[    0.512559] acpiphp: Slot [7] registered
+[    0.513563] acpiphp: Slot [8] registered
+[    0.514608] acpiphp: Slot [9] registered
+[    0.515559] acpiphp: Slot [10] registered
+[    0.516559] acpiphp: Slot [11] registered
+[    0.517560] acpiphp: Slot [12] registered
+[    0.518560] acpiphp: Slot [13] registered
+[    0.519559] acpiphp: Slot [14] registered
+[    0.520569] acpiphp: Slot [15] registered
+[    0.521564] acpiphp: Slot [16] registered
+[    0.522579] acpiphp: Slot [17] registered
+[    0.523559] acpiphp: Slot [18] registered
+[    0.524559] acpiphp: Slot [19] registered
+[    0.525560] acpiphp: Slot [20] registered
+[    0.526565] acpiphp: Slot [21] registered
+[    0.527559] acpiphp: Slot [22] registered
+[    0.528581] acpiphp: Slot [23] registered
+[    0.529579] acpiphp: Slot [24] registered
+[    0.530564] acpiphp: Slot [25] registered
+[    0.531562] acpiphp: Slot [26] registered
+[    0.532563] acpiphp: Slot [27] registered
+[    0.533562] acpiphp: Slot [28] registered
+[    0.534586] acpiphp: Slot [29] registered
+[    0.535561] acpiphp: Slot [30] registered
+[    0.536561] acpiphp: Slot [31] registered
+[    0.537555] PCI host bridge to bus 0000:00
+[    0.538540] pci_bus 0000:00: root bus resource [io  0x0000-0x0cf7 window]
+[    0.539544] pci_bus 0000:00: root bus resource [io  0x0d00-0xffff window]
+[    0.540528] pci_bus 0000:00: root bus resource [mem 0x000a0000-0x000bffff window]
+[    0.540535] pci_bus 0000:00: root bus resource [mem 0x80000000-0xfebfffff window]
+[    0.542534] pci_bus 0000:00: root bus resource [mem 0x100000000-0x17fffffff window]
+[    0.544534] pci_bus 0000:00: root bus resource [bus 00-ff]
+[    0.545664] pci 0000:00:00.0: [8086:1237] type 00 class 0x060000 conventional PCI endpoint
+[    0.549465] pci 0000:00:01.0: [8086:7000] type 00 class 0x060100 conventional PCI endpoint
+[    0.552478] pci 0000:00:01.1: [8086:7010] type 00 class 0x010180 conventional PCI endpoint
+[    0.555631] pci 0000:00:01.1: BAR 4 [io  0xc0e0-0xc0ef]
+[    0.557600] pci 0000:00:01.1: BAR 0 [io  0x01f0-0x01f7]: legacy IDE quirk
+[    0.559533] pci 0000:00:01.1: BAR 1 [io  0x03f6]: legacy IDE quirk
+[    0.561533] pci 0000:00:01.1: BAR 2 [io  0x0170-0x0177]: legacy IDE quirk
+[    0.563533] pci 0000:00:01.1: BAR 3 [io  0x0376]: legacy IDE quirk
+[    0.564897] pci 0000:00:01.3: [8086:7113] type 00 class 0x068000 conventional PCI endpoint
+[    0.567176] pci 0000:00:01.3: quirk: [io  0x0600-0x063f] claimed by PIIX4 ACPI
+[    0.568549] pci 0000:00:01.3: quirk: [io  0x0700-0x070f] claimed by PIIX4 SMB
+[    0.571054] pci 0000:00:02.0: [1234:1111] type 00 class 0x030000 conventional PCI endpoint
+[    0.589628] pci 0000:00:02.0: BAR 0 [mem 0xfd000000-0xfdffffff pref]
+[    0.591564] pci 0000:00:02.0: BAR 2 [mem 0xfebd0000-0xfebd0fff]
+[    0.593620] pci 0000:00:02.0: ROM [mem 0xfebc0000-0xfebcffff pref]
+[    0.594761] pci 0000:00:02.0: Video device with shadowed ROM at [mem 0x000c0000-0x000dffff]
+[    0.598536] pci 0000:00:03.0: [1af4:1009] type 00 class 0x000200 conventional PCI endpoint
+[    0.603551] pci 0000:00:03.0: BAR 0 [io  0xc080-0xc0bf]
+[    0.604550] pci 0000:00:03.0: BAR 1 [mem 0xfebd1000-0xfebd1fff]
+[    0.605528] pci 0000:00:03.0: BAR 4 [mem 0xfe000000-0xfe003fff 64bit pref]
+[    0.612971] pci 0000:00:04.0: [1af4:1000] type 00 class 0x020000 conventional PCI endpoint
+[    0.622555] pci 0000:00:04.0: BAR 0 [io  0xc0c0-0xc0df]
+[    0.623551] pci 0000:00:04.0: BAR 1 [mem 0xfebd2000-0xfebd2fff]
+[    0.624593] pci 0000:00:04.0: BAR 4 [mem 0xfe004000-0xfe007fff 64bit pref]
+[    0.626556] pci 0000:00:04.0: ROM [mem 0xfeb80000-0xfebbffff pref]
+[    0.634982] pci 0000:00:05.0: [1af4:1001] type 00 class 0x010000 conventional PCI endpoint
+[    0.647551] pci 0000:00:05.0: BAR 0 [io  0xc000-0xc07f]
+[    0.648550] pci 0000:00:05.0: BAR 1 [mem 0xfebd3000-0xfebd3fff]
+[    0.650589] pci 0000:00:05.0: BAR 4 [mem 0xfe008000-0xfe00bfff 64bit pref]
+[    0.666720] ACPI: PCI: Interrupt link LNKA configured for IRQ 10
+[    0.667717] ACPI: PCI: Interrupt link LNKB configured for IRQ 10
+[    0.669711] ACPI: PCI: Interrupt link LNKC configured for IRQ 11
+[    0.671703] ACPI: PCI: Interrupt link LNKD configured for IRQ 11
+[    0.673638] ACPI: PCI: Interrupt link LNKS configured for IRQ 9
+[    0.676698] iommu: Default domain type: Translated
+[    0.677532] iommu: DMA domain TLB invalidation policy: lazy mode
+[    0.680944] SCSI subsystem initialized
+[    0.681610] ACPI: bus type USB registered
+[    0.682591] usbcore: registered new interface driver usbfs
+[    0.683553] usbcore: registered new interface driver hub
+[    0.684545] usbcore: registered new device driver usb
+[    0.685528] EDAC MC: Ver: 3.0.0
+[    0.688220] NetLabel: Initializing
+[    0.689538] NetLabel:  domain hash size = 128
+[    0.690533] NetLabel:  protocols = UNLABELED CIPSOv4 CALIPSO
+[    0.691619] NetLabel:  unlabeled traffic allowed by default
+[    0.693554] mctp: management component transport protocol core
+[    0.694540] NET: Registered PF_MCTP protocol family
+[    0.695585] PCI: Using ACPI for IRQ routing
+[    0.700857] pci 0000:00:02.0: vgaarb: setting as boot VGA device
+[    0.701528] pci 0000:00:02.0: vgaarb: bridge control possible
+[    0.701528] pci 0000:00:02.0: vgaarb: VGA device added: decodes=io+mem,owns=io+mem,locks=none
+[    0.703567] vgaarb: loaded
+[    0.704855] hpet0: at MMIO 0xfed00000, IRQs 2, 8, 0
+[    0.705556] hpet0: 3 comparators, 64-bit 100.000000 MHz counter
+[    0.710635] clocksource: Switched to clocksource kvm-clock
+[    0.716755] VFS: Disk quotas dquot_6.6.0
+[    0.718929] VFS: Dquot-cache hash table entries: 512 (order 0, 4096 bytes)
+[    0.725429] pnp: PnP ACPI init
+[    0.726944] pnp: PnP ACPI: found 6 devices
+[    0.734857] clocksource: acpi_pm: mask: 0xffffff max_cycles: 0xffffff, max_idle_ns: 2085701024 ns
+[    0.737457] NET: Registered PF_INET protocol family
+[    0.739218] IP idents hash table entries: 32768 (order: 6, 262144 bytes, linear)
+[    0.766577] tcp_listen_portaddr_hash hash table entries: 1024 (order: 2, 16384 bytes, linear)
+[    0.769444] Table-perturb hash table entries: 65536 (order: 6, 262144 bytes, linear)
+[    0.771841] TCP established hash table entries: 16384 (order: 5, 131072 bytes, linear)
+[    0.774414] TCP bind hash table entries: 16384 (order: 7, 524288 bytes, linear)
+[    0.776519] TCP: Hash tables configured (established 16384 bind 16384)
+[    0.778479] MPTCP token hash table entries: 2048 (order: 4, 49152 bytes, linear)
+[    0.780616] UDP hash table entries: 1024 (order: 4, 65536 bytes, linear)
+[    0.782616] UDP-Lite hash table entries: 1024 (order: 4, 65536 bytes, linear)
+[    0.784677] NET: Registered PF_UNIX/PF_LOCAL protocol family
+[    0.786245] NET: Registered PF_XDP protocol family
+[    0.787588] pci_bus 0000:00: resource 4 [io  0x0000-0x0cf7 window]
+[    0.789300] pci_bus 0000:00: resource 5 [io  0x0d00-0xffff window]
+[    0.791022] pci_bus 0000:00: resource 6 [mem 0x000a0000-0x000bffff window]
+[    0.792923] pci_bus 0000:00: resource 7 [mem 0x80000000-0xfebfffff window]
+[    0.794993] pci_bus 0000:00: resource 8 [mem 0x100000000-0x17fffffff window]
+[    0.797052] pci 0000:00:01.0: PIIX3: Enabling Passive Release
+[    0.798718] pci 0000:00:00.0: Limiting direct PCI/PCI transfers
+[    0.800542] PCI: CLS 0 bytes, default 64
+[    0.801866] clocksource: tsc: mask: 0xffffffffffffffff max_cycles: 0x33e452fbb2f, max_idle_ns: 440795236593 ns
+[    0.802633] Trying to unpack rootfs image as initramfs...
+[    0.850570] Initialise system trusted keyrings
+[    0.851856] Key type blacklist registered
+[    0.853080] workingset: timestamp_bits=36 max_order=19 bucket_order=0
+[    0.855319] fuse: init (API version 7.45)
+[    0.856754] integrity: Platform Keyring initialized
+[    0.858092] integrity: Machine keyring initialized
+[    0.875388] xor: automatically using best checksumming function   avx       
+[    0.877347] Key type asymmetric registered
+[    0.878523] Asymmetric key parser 'x509' registered
+[    0.879910] Block layer SCSI generic (bsg) driver version 0.4 loaded (major 245)
+[    0.882085] io scheduler mq-deadline registered
+[    0.883347] io scheduler kyber registered
+[    0.884599] io scheduler bfq registered
+[    0.887173] ledtrig-cpu: registered to indicate activity on CPUs
+[    0.890349] input: Power Button as /devices/LNXSYSTM:00/LNXPWRBN:00/input/input0
+[    0.894465] ACPI: button: Power Button [PWRF]
+[    0.899578] ACPI: \_SB_.LNKC: Enabled at IRQ 11
+[    0.903901] ACPI: \_SB_.LNKD: Enabled at IRQ 10
+[    0.908112] ACPI: \_SB_.LNKA: Enabled at IRQ 10
+[    0.944289] Serial: 8250/16550 driver, 32 ports, IRQ sharing enabled
+[    0.946682] 00:04: ttyS0 at I/O 0x3f8 (irq = 4, base_baud = 115200) is a 16550A
+[    0.952335] Non-volatile memory driver v1.3
+[    0.953506] Linux agpgart interface v0.103
+[    0.954799] ACPI: bus type drm_connector registered
+[    0.956933] virtio_blk virtio2: 2/0/0 default/read/poll queues
+[    0.960262] virtio_blk virtio2: [vda] 25165824 512-byte logical blocks (12.9 GB/12.0 GiB)
+[    0.975797]  vda: vda1
+[    0.976965] usbcore: registered new interface driver usbserial_generic
+[    0.979833] usbserial: USB Serial support registered for generic
+[    0.983599] i8042: PNP: PS/2 Controller [PNP0303:KBD,PNP0f13:MOU] at 0x60,0x64 irq 1,12
+[    0.990357] serio: i8042 KBD port at 0x60,0x64 irq 1
+[    0.991874] serio: i8042 AUX port at 0x60,0x64 irq 12
+[    0.992696] Freeing initrd memory: 11040K
+[    0.993532] rtc_cmos 00:05: RTC can wake from S4
+[    1.000290] rtc_cmos 00:05: registered as rtc0
+[    1.001661] rtc_cmos 00:05: setting system clock to 2026-03-03T13:43:30 UTC (1772545410)
+[    1.004297] input: AT Translated Set 2 keyboard as /devices/platform/i8042/serio0/input/input1
+[    1.006691] rtc_cmos 00:05: alarms up to one day, y3k, 242 bytes nvram, hpet irqs
+[    1.008816] intel_pstate: CPU model not supported
+[    1.013682] hid: raw HID events driver (C) Jiri Kosina
+[    1.016817] usbcore: registered new interface driver usbhid
+[    1.021236] usbhid: USB HID core driver
+[    1.023293] rust_binder: Loaded Rust Binder.
+[    1.023341] drop_monitor: Initializing network drop monitor service
+[    1.033137] NET: Registered PF_INET6 protocol family
+[    1.035138] Segment Routing with IPv6
+[    1.036195] RPL Segment Routing with IPv6
+[    1.037331] In-situ OAM (IOAM) with IPv6
+[    1.038465] NET: Registered PF_PACKET protocol family
+[    1.040347] IPI shorthand broadcast: enabled
+[    1.046365] sched_clock: Marking stable (806003081, 240185443)->(1202352635, -156164111)
+[    1.052022] registered taskstats version 1
+[    1.060061] Loading compiled-in X.509 certificates
+[    1.078063] Loaded X.509 cert 'Build time autogenerated kernel key: 4f282eb87851fdb04b530c5e67453df628afff93'
+[    1.092994] zswap: loaded using pool zstd
+[    1.094441] Demotion targets for Node 0: null
+[    1.096114] Key type .fscrypt registered
+[    1.097267] Key type fscrypt-provisioning registered
+[    1.099106] Btrfs loaded, zoned=yes, fsverity=yes
+[    1.100531] Key type big_key registered
+[    1.102013] PM:   Magic number: 2:269:735
+[    1.104875] RAS: Correctable Errors collector initialized.
+[    1.113706] clk: Disabling unused clocks
+[    1.114948] PM: genpd: Disabling unused power domains
+[    1.119945] Freeing unused decrypted memory: 2028K
+[    1.123466] Freeing unused kernel image (initmem) memory: 4736K
+[    1.124918] Write protecting the kernel read-only data: 36864k
+[    1.126663] Freeing unused kernel image (text/rodata gap) memory: 160K
+[    1.128102] Freeing unused kernel image (rodata/data gap) memory: 16K
+[    1.177748] x86/mm: Checked W+X mappings: passed, no W+X pages found.
+[    1.179121] rodata_test: all tests were successful
+[    1.180169] x86/mm: Checking user space page tables
+[    1.227558] x86/mm: Checked W+X mappings: passed, no W+X pages found.
+[    1.228901] Run /init as init process
+P+q6E616D65\[    1.584325] systemd[1]: Successfully made /usr/ read-only.
+[6n[32766;32766H[6n[!p]104\[0m[?7h[1G[0J[    1.923801] systemd[1]: systemd 259.2-1-arch running in system mode (+PAM +AUDIT -SELINUX +APPARMOR -IMA +IPE +SMACK +SECCOMP +GCRYPT +GNUTLS +OPENSSL +ACL +BLKID +CURL +ELFUTILS +FIDO2 +IDN2 -IDN +KMOD +LIBCRYPTSETUP +LIBCRYPTSETUP_PLUGINS +LIBFDISK +PCRE2 +PWQUALITY +P11KIT +QRENCODE +TPM2 +BZIP2 +LZ4 +XZ +ZLIB +ZSTD +BPF_FRAMEWORK +BTF +XKBCOMMON +UTMP -SYSVINIT +LIBARCHIVE)
+[    1.937098] systemd[1]: Detected virtualization kvm.
+[    1.939213] systemd[1]: Detected architecture x86-64.
+[    1.943329] systemd[1]: Running in initrd.
+[0;1;39mBooting initrd of [0m[38;2;23;147;209mArch Linux[0m[0;1;39m.[0m
+[    1.949378] systemd[1]: Initializing machine ID from random generator.
+]3008;start=26e54ebd8f1e434ab6347775f9123c01;user=root;hostname=archlinux;machineid=ca42d22615b5473cbd5d759fe25c63a9;bootid=4fb90c6168414cbf8b6055c58c187e9c;pid=1;pidfdid=2;comm=systemd;type=boot\[    2.082679] systemd[1]: Queued start job for default target Initrd Default Target.
+[    2.218708] systemd[1]: Expecting device /dev/vda1...
+         Expecting device [0;1;39m/dev/vda1[0m...
+[    2.226362] systemd[1]: Reached target Path Units.
+[[0;32m  OK  [0m] Reached target [0;1;39mPath Units[0m.
+[    2.229039] systemd[1]: Reached target Slice Units.
+[[0;32m  OK  [0m] Reached target [0;1;39mSlice Units[0m.
+[    2.232399] systemd[1]: Reached target Swaps.
+[[0;32m  OK  [0m] Reached target [0;1;39mSwaps[0m.
+[    2.235442] systemd[1]: Reached target Timer Units.
+[[0;32m  OK  [0m] Reached target [0;1;39mTimer Units[0m.
+[    2.238296] systemd[1]: Listening on Journal Socket (/dev/log).
+[[0;32m  OK  [0m] Listening on [0;1;39mJournal Socket (/dev/log)[0m.
+[    2.242182] systemd[1]: Listening on Journal Sockets.
+[[0;32m  OK  [0m] Listening on [0;1;39mJournal Sockets[0m.
+[    2.245820] systemd[1]: Listening on udev Control Socket.
+[[0;32m  OK  [0m] Listening on [0;1;39mudev Control Socket[0m.
+[    2.248825] systemd[1]: Listening on udev Kernel Socket.
+[[0;32m  OK  [0m] Listening on [0;1;39mudev Kernel Socket[0m.
+[    2.252745] systemd[1]: Reached target Socket Units.
+[[0;32m  OK  [0m] Reached target [0;1;39mSocket Units[0m.
+[    2.255434] systemd[1]: Create List of Static Device Nodes skipped, unmet condition check ConditionFileNotEmpty=/lib/modules/6.18.13-arch1-1/modules.devname
+[    2.258369] systemd[1]: Early Battery Level Check skipped, unmet condition check ConditionDirectoryNotEmpty=/sys/class/power_supply
+[    2.260785] systemd[1]: Display Boot-Time Emergency Messages In Full Screen skipped, unmet condition check ConditionVirtualization=no
+[    2.274675] systemd[1]: Starting Journal Service...
+         Starting [0;1;39mJournal Service[0m...
+[    2.286398] systemd[1]: Starting Load Kernel Modules...
+         Starting [0;1;39mLoad Kernel Modules[0m...
+[    2.297448] systemd[1]: TPM PCR Barrier (initrd) skipped, unmet condition check ConditionSecurity=measured-uki
+[    2.309311] systemd[1]: Starting Create Static Device Nodes in /dev...
+         Starting [0;1;39mCreate Static Device Nodes in /dev[0m...
+[    2.330656] systemd-journald[104]: Collecting audit messages is disabled.
+[    2.333936] systemd[1]: Starting Coldplug All udev Devices...
+         Starting [0;1;39mColdplug All udev Devices[0m...
+[    2.377863] systemd[1]: Finished Create Static Device Nodes in /dev.
+[[0;32m  OK  [0m] Finished [0;1;39mCreate Static Device Nodes in /dev[0m.
+[    2.392336] systemd[1]: Started Journal Service.
+[[0;32m  OK  [0m] Started [0;1;39mJournal Service[0m.
+[[0;32m  OK  [0m] Reached target [0;1;39mPreparation for Local File Systems[0m.
+[[0;32m  OK  [0m] Reached target [0;1;39mLocal File Systems[0m.
+[    2.431878] netfs: FS-Cache loaded
+         Starting [0;1;39mCreate System Files and Directories[0m...
+         Starting [0;1;39mRule-based Manager for Device Events and Files[0m...
+[    2.461995] 9pnet: Installing 9P2000 support
+[    2.496680] 9p: Installing v9fs 9p2000 file system support
+[[0;32m  OK  [0m] Finished [0;1;39mLoad Kernel Modules[0m.
+[[0;32m  OK  [0m] Finished [0;1;39mCreate System Files and Directories[0m.
+[[0;32m  OK  [0m] Started [0;1;39mRule-based Manager for Device Events and Files[0m.
+[[0;32m  OK  [0m] Finished [0;1;39mColdplug All udev Devices[0m.
+[[0;32m  OK  [0m] Reached target [0;1;39mSystem Initialization[0m.
+[[0;32m  OK  [0m] Reached target [0;1;39mBasic System[0m.
+[[0;32m  OK  [0m] Found device [0;1;39m/dev/vda1[0m.
+[[0;32m  OK  [0m] Reached target [0;1;39mInitrd Root Device[0m.
+         Starting [0;1;39mFile System Check on /dev/vda1[0m...
+[    3.336516] bochs-drm 0000:00:02.0: vgaarb: deactivate vga console
+[    3.411429] Console: switching to colour dummy device 80x25
+[    3.416467] [drm] Found bochs VGA, ID 0xb0c5.
+[    3.422129] [drm] Framebuffer size 16384 kB @ 0xfd000000, mmio @ 0xfebd0000.
+[    3.426088] bochs-drm 0000:00:02.0: [drm] Registered 1 planes with drm panic
+[    3.432525] [drm] Initialized bochs-drm 1.0.0 for 0000:00:02.0 on minor 0
+[    3.477393] scsi host0: ata_piix
+[    3.478877] scsi host1: ata_piix
+[    3.490235] Floppy drive(s): fd0 is 2.88M AMI BIOS
+[    3.496567] ata1: PATA max MWDMA2 cmd 0x1f0 ctl 0x3f6 bmdma 0xc0e0 irq 14 lpm-pol 0
+[    3.503269] fbcon: bochs-drmdrmfb (fb0) is primary device
+[    3.527375] ata2: PATA max MWDMA2 cmd 0x170 ctl 0x376 bmdma 0xc0e8 irq 15 lpm-pol 0
+[    3.533558] Console: switching to colour frame buffer device 160x50
+[    3.549429] bochs-drm 0000:00:02.0: [drm] fb0: bochs-drmdrmfb frame buffer device
+[    3.549615] FDC 0 is a S82078B
+         Starting [0;1;39mVirtual Console Setup[0m...
+[[0;32m  OK  [0m] Finished [0;1;39mFile System Check on /dev/vda1[0m.
+         Mounting [0;1;39m/sysroot[0m...
+[[0;32m  OK  [0m] Stopped [0;1;39mVirtual Console Setup[0m.
+         Starting [0;1;39mVirtual Console Setup[0m...
+[    3.689583] ata2: found unknown device (class 0)
+[    3.702230] ata2.00: ATAPI: QEMU DVD-ROM, 2.5+, max UDMA/100
+[[0;32m  OK  [0m] Stopped [0;1;39mVirtual Console Setup[0m.[    3.727722] scsi 1:0:0:0: CD-ROM            QEMU     QEMU DVD-ROM     2.5+ PQ: 0 ANSI: 5
+
+         Starting [0;1;39mVirtual Console Setup[0m...
+[    3.787928] EXT4-fs (vda1): mounted filesystem ddfae1cc-629e-47f4-9008-261996ba3811 r/w with ordered data mode. Quota mode: none.
+[[0;32m  OK  [0m] Mounted [0;1;39m/sysroot[0m.
+[[0;32m  OK  [0m] Reached target [0;1;39mInitrd Root File System[0m.
+         Starting [0;1;39mMountpoints Configured in the Real Root[0m...
+[[0;32m  OK  [0m] Finished [0;1;39mVirtual Console Setup[0m.
+[[0;32m  OK  [0m] Finished [0;1;39mMountpoints Configured in the Real Root[0m.
+[[0;32m  OK  [0m] Reached target [0;1;39mInitrd File Systems[0m.
+[[0;32m  OK  [0m] Reached target [0;1;39mInitrd Default Target[0m.
+         Starting [0;1;39mCleaning Up and Shutting Down Daemons[0m...
+[[0;32m  OK  [0m] Stopped target [0;1;39mInitrd Default Target[0m.
+[[0;32m  OK  [0m] Stopped target [0;1;39mBasic System[0m.
+[[0;32m  OK  [0m] Stopped target [0;1;39mInitrd Root Device[0m.
+[[0;32m  OK  [0m] Stopped target [0;1;39mPath Units[0m.
+[[0;32m  OK  [0m] Stopped target [0;1;39mSlice Units[0m.
+[[0;32m  OK  [0m] Stopped target [0;1;39mSocket Units[0m.
+[[0;32m  OK  [0m] Stopped target [0;1;39mSystem Initialization[0m.
+[[0;32m  OK  [0m] Stopped target [0;1;39mSwaps[0m.
+[    3.964014] sr 1:0:0:0: [sr0] scsi3-mmc drive: 4x/4x cd/rw xa/form2 tray
+[    3.965655] cdrom: Uniform CD-ROM driver Revision: 3.20
+[[0;32m  OK  [0m] Stopped target [0;1;39mTimer Units[0m.
+[[0;32m  OK  [0m] Stopped [0;1;39mLoad Kernel Modules[0m.
+[[0;32m  OK  [0m] Stopped [0;1;39mCreate System Files and Directories[0m.
+[[0;32m  OK  [0m] Stopped target [0;1;39mLocal File Systems[0m.
+[[0;32m  OK  [0m] Stopped target [0;1;39mPreparation for Local File Systems[0m.
+[[0;32m  OK  [0m] Stopped [0;1;39mColdplug All udev Devices[0m.
+         Stopping [0;1;39mRule-based Manager for Device Events and Files[0m...
+[[0;32m  OK  [0m] Stopped [0;1;39mVirtual Console Setup[0m.
+[[0;32m  OK  [0m] Finished [0;1;39mCleaning Up and Shutting Down Daemons[0m.
+[[0;32m  OK  [0m] Stopped [0;1;39mRule-based Manager for Device Events and Files[0m.
+[[0;32m  OK  [0m] Closed [0;1;39mudev Control Socket[0m.
+         Starting [0;1;39mCleanup udev Database[0m...
+[[0;32m  OK  [0m] Stopped [0;1;39mCreate Static Device Nodes in /dev[0m.
+[[0;32m  OK  [0m] Finished [0;1;39mCleanup udev Database[0m.
+[[0;32m  OK  [0m] Reached target [0;1;39mSwitch Root[0m.
+         Starting [0;1;39mSwitch Root[0m...
+[    4.469437] systemd-journald[104]: Received SIGTERM from PID 1 (systemd).
+P+q6E616D65\[6n[32766;32766H[6n[!p]104\[0m[?7h[1G[0J[    5.238955] systemd[1]: systemd 259.1-1-arch running in system mode (+PAM +AUDIT -SELINUX +APPARMOR -IMA +IPE +SMACK +SECCOMP +GCRYPT +GNUTLS +OPENSSL +ACL +BLKID +CURL +ELFUTILS +FIDO2 +IDN2 -IDN +KMOD +LIBCRYPTSETUP +LIBCRYPTSETUP_PLUGINS +LIBFDISK +PCRE2 +PWQUALITY +P11KIT +QRENCODE +TPM2 +BZIP2 +LZ4 +XZ +ZLIB +ZSTD +BPF_FRAMEWORK +BTF +XKBCOMMON +UTMP -SYSVINIT +LIBARCHIVE)
+[    5.249238] systemd[1]: Detected virtualization kvm.
+[    5.250288] systemd[1]: Detected architecture x86-64.
+
+[0;1;39mWelcome to [0m[38;2;23;147;209mArch Linux[0m[0;1;39m![0m
+
+[    5.255342] systemd[1]: Hostname set to <ksmbd-vm>.
+]3008;start=8655d7e3afc140db87048030d7e25ffc;user=root;hostname=ksmbd-vm;machineid=0ab76daf18ce42b0b036a81eb53bdd79;bootid=4fb90c6168414cbf8b6055c58c187e9c;pid=1;pidfdid=2;comm=systemd;type=boot\[    5.482774] systemd[1]: bpf-restrict-fs: LSM BPF program attached
+[    5.607750] Guest personality initialized and is inactive
+[    5.612368] VMCI host device registered (name=vmci, major=10, minor=260)
+[    5.613694] Initialized host personality
+[    5.643296] NET: Registered PF_VSOCK protocol family
+[    5.979152] systemd[1]: initrd-switch-root.service: Deactivated successfully.
+[    5.981602] systemd[1]: Stopped Switch Root.
+[[0;32m  OK  [0m] Stopped [0;1;39mSwitch Root[0m.
+[    5.985974] systemd[1]: systemd-journald.service: Scheduled restart job, restart counter is at 1.
+[    5.988809] systemd[1]: Created slice Slice /system/dirmngr.
+[[0;32m  OK  [0m] Created slice [0;1;39mSlice /system/dirmngr[0m.
+[    5.992579] systemd[1]: Created slice Slice /system/getty.
+[[0;32m  OK  [0m] Created slice [0;1;39mSlice /system/getty[0m.
+[    5.996099] systemd[1]: Created slice Slice /system/gpg-agent.
+[[0;32m  OK  [0m] Created slice [0;1;39mSlice /system/gpg-agent[0m.
+[    6.000629] systemd[1]: Created slice Slice /system/gpg-agent-browser.
+[[0;32m  OK  [0m] Created slice [0;1;39mSlice /system/gpg-agent-browser[0m.
+[    6.004882] systemd[1]: Created slice Slice /system/gpg-agent-extra.
+[[0;32m  OK  [0m] Created slice [0;1;39mSlice /system/gpg-agent-extra[0m.
+[    6.008881] systemd[1]: Created slice Slice /system/gpg-agent-ssh.
+[[0;32m  OK  [0m] Created slice [0;1;39mSlice /system/gpg-agent-ssh[0m.
+[    6.013894] systemd[1]: Created slice Slice /system/keyboxd.
+[[0;32m  OK  [0m] Created slice [0;1;39mSlice /system/keyboxd[0m.
+[    6.018406] systemd[1]: Created slice Slice /system/modprobe.
+[[0;32m  OK  [0m] Created slice [0;1;39mSlice /system/modprobe[0m.
+[    6.023612] systemd[1]: Created slice Slice /system/serial-getty.
+[[0;32m  OK  [0m] Created slice [0;1;39mSlice /system/serial-getty[0m.
+[    6.028898] systemd[1]: Created slice User and Session Slice.
+[[0;32m  OK  [0m] Created slice [0;1;39mUser and Session Slice[0m.
+[    6.032018] systemd[1]: Started Dispatch Password Requests to Console Directory Watch.
+[[0;32m  OK  [0m] Started [0;1;39mDispatch Password Requests to Console Directory Watch[0m.
+[    6.037321] systemd[1]: Started Forward Password Requests to Wall Directory Watch.
+[[0;32m  OK  [0m] Started [0;1;39mForward Password Requests to Wall Directory Watch[0m.
+[    6.042263] systemd[1]: Set up automount Arbitrary Executable File Formats File System Automount Point.
+[[0;32m  OK  [0m] Set up automount [0;1;39mArbitrary Executa…ormats File System Automount Point[0m.
+[    6.047018] systemd[1]: Expecting device /dev/ttyS0...
+         Expecting device [0;1;39m/dev/ttyS0[0m...
+[    6.050527] systemd[1]: Reached target Local Encrypted Volumes.
+[[0;32m  OK  [0m] Reached target [0;1;39mLocal Encrypted Volumes[0m.
+[    6.054810] systemd[1]: Reached target Image Downloads.
+[[0;32m  OK  [0m] Reached target [0;1;39mImage Downloads[0m.
+[    6.058403] systemd[1]: Stopped target Switch Root.
+[[0;32m  OK  [0m] Stopped target [0;1;39mSwitch Root[0m.
+[    6.061251] systemd[1]: Stopped target Initrd File Systems.
+[[0;32m  OK  [0m] Stopped target [0;1;39mInitrd File Systems[0m.
+[    6.064996] systemd[1]: Stopped target Initrd Root File System.
+[[0;32m  OK  [0m] Stopped target [0;1;39mInitrd Root File System[0m.
+[    6.068926] systemd[1]: Reached target Local Integrity Protected Volumes.
+[[0;32m  OK  [0m] Reached target [0;1;39mLocal Integrity Protected Volumes[0m.
+[    6.073849] systemd[1]: Reached target Path Units.
+[[0;32m  OK  [0m] Reached target [0;1;39mPath Units[0m.
+[    6.077180] systemd[1]: Reached target Remote File Systems.
+[[0;32m  OK  [0m] Reached target [0;1;39mRemote File Systems[0m.
+[    6.080985] systemd[1]: Reached target Slice Units.
+[[0;32m  OK  [0m] Reached target [0;1;39mSlice Units[0m.
+[    6.084352] systemd[1]: Reached target Swaps.
+[[0;32m  OK  [0m] Reached target [0;1;39mSwaps[0m.
+[    6.087558] systemd[1]: Reached target Local Verity Protected Volumes.
+[[0;32m  OK  [0m] Reached target [0;1;39mLocal Verity Protected Volumes[0m.
+[    6.091392] systemd[1]: Listening on Device-mapper event daemon FIFOs.
+[[0;32m  OK  [0m] Listening on [0;1;39mDevice-mapper event daemon FIFOs[0m.
+[    6.097564] systemd[1]: Listening on Query the User Interactively for a Password.
+[[0;32m  OK  [0m] Listening on [0;1;39mQuery the User Interactively for a Password[0m.
+[    6.104297] systemd[1]: Listening on Process Core Dump Socket.
+[[0;32m  OK  [0m] Listening on [0;1;39mProcess Core Dump Socket[0m.
+[    6.109755] systemd[1]: Listening on Credential Encryption/Decryption.
+[[0;32m  OK  [0m] Listening on [0;1;39mCredential Encryption/Decryption[0m.
+[    6.116477] systemd[1]: Listening on Factory Reset Management.
+[[0;32m  OK  [0m] Listening on [0;1;39mFactory Reset Management[0m.
+[    6.132163] systemd[1]: Listening on Console Output Muting Service Socket.
+[[0;32m  OK  [0m] Listening on [0;1;39mConsole Output Muting Service Socket[0m.
+[    6.138819] systemd[1]: Listening on Network Management Resolve Hook Socket.
+[[0;32m  OK  [0m] Listening on [0;1;39mNetwork Management Resolve Hook Socket[0m.
+[    6.142656] systemd[1]: Listening on Network Management Varlink Socket.
+[[0;32m  OK  [0m] Listening on [0;1;39mNetwork Management Varlink Socket[0m.
+[    6.147590] systemd[1]: Listening on Network Management Netlink Socket.
+[[0;32m  OK  [0m] Listening on [0;1;39mNetwork Management Netlink Socket[0m.
+[    6.153448] systemd[1]: TPM PCR Measurements skipped, unmet condition check ConditionSecurity=measured-uki
+[    6.158691] systemd[1]: Make TPM PCR Policy skipped, unmet condition check ConditionSecurity=measured-uki
+[    6.163425] systemd[1]: Listening on Disk Repartitioning Service Socket.
+[[0;32m  OK  [0m] Listening on [0;1;39mDisk Repartitioning Service Socket[0m.
+[    6.168510] systemd[1]: Listening on Resolve Monitor Varlink Socket.
+[[0;32m  OK  [0m] Listening on [0;1;39mResolve Monitor Varlink Socket[0m.
+[    6.171700] systemd[1]: Listening on Resolve Service Varlink Socket.
+[[0;32m  OK  [0m] Listening on [0;1;39mResolve Service Varlink Socket[0m.
+[    6.179619] systemd[1]: Listening on udev Control Socket.
+[[0;32m  OK  [0m] Listening on [0;1;39mudev Control Socket[0m.
+[    6.189824] systemd[1]: Listening on udev Varlink Socket.
+[[0;32m  OK  [0m] Listening on [0;1;39mudev Varlink Socket[0m.
+[    6.199816] systemd[1]: Listening on User Database Manager Socket.
+[[0;32m  OK  [0m] Listening on [0;1;39mUser Database Manager Socket[0m.
+[    6.206652] systemd[1]: Mounting Huge Pages File System...
+         Mounting [0;1;39mHuge Pages File System[0m...
+[    6.213325] systemd[1]: Mounting POSIX Message Queue File System...
+         Mounting [0;1;39mPOSIX Message Queue File System[0m...
+[    6.235468] systemd[1]: Mounting Kernel Debug File System...
+         Mounting [0;1;39mKernel Debug File System[0m...
+[    6.249639] systemd[1]: Mounting Kernel Trace File System...
+         Mounting [0;1;39mKernel Trace File System[0m...
+[    6.262620] systemd[1]: Mounting Temporary Directory /tmp...
+         Mounting [0;1;39mTemporary Directory /tmp[0m...
+[    6.275907] systemd[1]: Starting Create List of Static Device Nodes...
+         Starting [0;1;39mCreate List of Static Device Nodes[0m...
+[    6.283642] systemd[1]: Load Kernel Module configfs skipped, unmet condition check ConditionKernelModuleLoaded=!configfs
+[    6.295293] systemd[1]: Mounting Kernel Configuration File System...
+         Mounting [0;1;39mKernel Configuration File System[0m...
+[    6.301813] systemd[1]: Load Kernel Module drm skipped, unmet condition check ConditionKernelModuleLoaded=!drm
+[    6.304327] systemd[1]: Load Kernel Module fuse skipped, unmet condition check ConditionKernelModuleLoaded=!fuse
+[    6.311135] systemd[1]: Mounting FUSE Control File System...
+         Mounting [0;1;39mFUSE Control File System[0m...
+[    6.317367] systemd[1]: Clear Stale Hibernate Storage Info skipped, unmet condition check ConditionPathExists=/sys/firmware/efi/efivars/HibernateLocation-8cf2644b-4b0b-428f-9387-6d876050dc67
+[    6.330295] systemd[1]: Starting Journal Service...
+         Starting [0;1;39mJournal Service[0m...
+[    6.334573] systemd[1]: Load Kernel Modules skipped, no trigger condition checks were met.
+[    6.341100] systemd[1]: Starting Generate Network Units from Kernel Command Line...
+         Starting [0;1;39mGenerate Network Units from Kernel Command Line[0m...
+[    6.347640] systemd[1]: TPM PCR Machine ID Measurement skipped, unmet condition check ConditionSecurity=measured-uki
+[    6.350030] systemd[1]: TPM NvPCR Product ID Measurement skipped, unmet condition check ConditionSecurity=measured-uki
+[    6.351231] systemd[1]: Starting Remount Root and Kernel File Systems...
+         Starting [0;1;39mRemount Root and Kernel File Systems[0m...
+[    6.364289] systemd[1]: Starting Apply Kernel Variables...
+         Starting [0;1;39mApply Kernel Variables[0m...
+[    6.378074] systemd[1]: Early TPM SRK Setup skipped, unmet condition check ConditionSecurity=measured-uki
+[    6.380068] EXT4-fs (vda1): re-mounted ddfae1cc-629e-47f4-9008-261996ba3811.
+[    6.386549] systemd[1]: Starting Load udev Rules from Credentials...
+         Starting [0;1;39mLoad udev Rules from Credentials[0m...
+[    6.395678] systemd-journald[347]: Collecting audit messages is disabled.
+[    6.398879] systemd[1]: Starting Coldplug All udev Devices...
+         Starting [0;1;39mColdplug All udev Devices[0m...
+[    6.428790] systemd[1]: Started Journal Service.
+[[0;32m  OK  [0m] Started [0;1;39mJournal Service[0m.
+[[0;32m  OK  [0m] Mounted [0;1;39mHuge Pages File System[0m.
+[[0;32m  OK  [0m] Mounted [0;1;39mPOSIX Message Queue File System[0m.
+[[0;32m  OK  [0m] Mounted [0;1;39mKernel Debug File System[0m.
+[[0;32m  OK  [0m] Mounted [0;1;39mKernel Trace File System[0m.
+[[0;32m  OK  [0m] Mounted [0;1;39mTemporary Directory /tmp[0m.
+[[0;32m  OK  [0m] Finished [0;1;39mCreate List of Static Device Nodes[0m.
+[[0;32m  OK  [0m] Mounted [0;1;39mKernel Configuration File System[0m.
+[[0;32m  OK  [0m] Mounted [0;1;39mFUSE Control File System[0m.
+[[0;32m  OK  [0m] Finished [0;1;39mGenerate Network Units from Kernel Command Line[0m.
+[[0;32m  OK  [0m] Finished [0;1;39mRemount Root and Kernel File Systems[0m.
+[[0;32m  OK  [0m] Finished [0;1;39mApply Kernel Variables[0m.
+[[0;32m  OK  [0m] Finished [0;1;39mLoad udev Rules from Credentials[0m.
+[[0;32m  OK  [0m] Reached target [0;1;39mPreparation for Network[0m.
+         Starting [0;1;39mFlush Journal to Persistent Storage[0m...
+         Starting [0;1;39mLoad/Save OS Random Seed[0m...
+         Starting [0;1;39mCreate Static Device Nodes in /dev gracefully[0m...
+[    6.542298] systemd-journald[347]: Received client request to flush runtime journal.
+[    6.562282] systemd-journald[347]: File /var/log/journal/0ab76daf18ce42b0b036a81eb53bdd79/system.journal corrupted or uncleanly shut down, renaming and replacing.
+         Starting [0;1;39mUser Database Manager[0m...
+[[0;32m  OK  [0m] Finished [0;1;39mLoad/Save OS Random Seed[0m.
+[[0;32m  OK  [0m] Started [0;1;39mUser Database Manager[0m.
+[[0;32m  OK  [0m] Finished [0;1;39mFlush Journal to Persistent Storage[0m.
+[[0;32m  OK  [0m] Finished [0;1;39mCreate Static Device Nodes in /dev gracefully[0m.
+         Starting [0;1;39mNetwork Name Resolution[0m...
+         Starting [0;1;39mCreate Static Device Nodes in /dev[0m...
+[[0;32m  OK  [0m] Finished [0;1;39mCreate Static Device Nodes in /dev[0m.
+[[0;32m  OK  [0m] Reached target [0;1;39mPreparation for Local File Systems[0m.
+         Starting [0;1;39mRule-based Manager for Device Events and Files[0m...
+[[0;32m  OK  [0m] Finished [0;1;39mColdplug All udev Devices[0m.
+         Mounting [0;1;39m/mnt/ksmbd[0m...
+[[0;32m  OK  [0m] Reached target [0;1;39mLocal File Systems[0m.
+[[0;32m  OK  [0m] Listening on [0;1;39mBoot Entries Service Socket[0m.
+[[0;32m  OK  [0m] Listening on [0;1;39mDisk Image Download Service Socket[0m.
+[    7.029199] 9pnet: Limiting 'msize' to 512000 as this is the maximum supported by transport virtio
+[[0;32m  OK  [0m] Listening on [0;1;39mSystem Extension Image Management[0m.
+         Starting [0;1;39mCreate System Files and Directories[0m...
+         Starting [0;1;39mLoad JSON user/group Records from Credentials[0m...
+[[0;32m  OK  [0m] Started [0;1;39mNetwork Name Resolution[0m.
+[[0;32m  OK  [0m] Mounted [0;1;39m/mnt/ksmbd[0m.
+[[0;32m  OK  [0m] Reached target [0;1;39mHost and Network Name Lookups[0m.
+[[0;32m  OK  [0m] Finished [0;1;39mLoad JSON user/group Records from Credentials[0m.
+[[0;32m  OK  [0m] Started [0;1;39mRule-based Manager for Device Events and Files[0m.
+         Starting [0;1;39mNetwork Management[0m...
+[[0;32m  OK  [0m] Finished [0;1;39mCreate System Files and Directories[0m.
+         Starting [0;1;39mRecord System Boot/Shutdown in UTMP[0m...
+[    7.558160] cfg80211: Loading compiled-in X.509 certificates for regulatory database
+[    7.599226] Loaded X.509 cert 'sforshee: 00b28ddf47aef9cea7'
+[    7.600811] Loaded X.509 cert 'wens: 61c038651aabdcf94bd0ac7ff06c7248db18c600'
+[    7.604968] faux_driver regulatory: Direct firmware load for regulatory.db failed with error -2
+[    7.608642] cfg80211: failed to load regulatory.db
+[[0;32m  OK  [0m] Finished [0;1;39mRecord System Boot/Shutdown in UTMP[0m.
+[    7.665471] virtio_net virtio1 ens4: renamed from eth0
+[[0;32m  OK  [0m] Started [0;1;39mNetwork Management[0m.
+[[0;32m  OK  [0m] Reached target [0;1;39mNetwork[0m.
+         Starting [0;1;39mEnable Persistent Storage in systemd-networkd[0m...
+[[0;32m  OK  [0m] Finished [0;1;39mEnable Persistent Storage in systemd-networkd[0m.
+[[0;32m  OK  [0m] Reached target [0;1;39mSystem Initialization[0m.
+[[0;32m  OK  [0m] Started [0;1;39mRefresh existing PGP keys of archlinux-keyring regularly[0m.
+[[0;32m  OK  [0m] Started [0;1;39mDaily verification of password and group files[0m.
+[[0;32m  OK  [0m] Started [0;1;39mDaily Cleanup of Temporary Directories[0m.
+[[0;32m  OK  [0m] Reached target [0;1;39mTimer Units[0m.
+[[0;32m  OK  [0m] Listening on [0;1;39mD-Bus System Message Bus Socket[0m.
+[[0;32m  OK  [0m] Listening on [0;1;39mGnuPG network certifi…ent daemon for /etc/pacman.d/gnupg[0m.
+[[0;32m  OK  [0m] Listening on [0;1;39mGnuPG cryptographic a… browsers) for /etc/pacman.d/gnupg[0m.
+[[0;32m  OK  [0m] Listening on [0;1;39mGnuPG cryptographic a…estricted) for /etc/pacman.d/gnupg[0m.
+[[0;32m  OK  [0m] Listening on [0;1;39mGnuPG cryptographic a…emulation) for /etc/pacman.d/gnupg[0m.
+[[0;32m  OK  [0m] Listening on [0;1;39mGnuPG cryptographic a…rase cache for /etc/pacman.d/gnupg[0m.
+[[0;32m  OK  [0m] Listening on [0;1;39mGnuPG public key mana…nt service for /etc/pacman.d/gnupg[0m.
+[[0;32m  OK  [0m] Listening on [0;1;39mOpenSSH Server Socket…temd-ssh-generator, AF_UNIX Local)[0m.
+[[0;32m  OK  [0m] Listening on [0;1;39mHostname Service Socket[0m.
+[[0;32m  OK  [0m] Listening on [0;1;39mUser Login Management Varlink Socket[0m.
+[[0;32m  OK  [0m] Listening on [0;1;39mVirtual Machine and C…tainer Registration Service Socket[0m.
+[[0;32m  OK  [0m] Reached target [0;1;39mSocket Units[0m.
+         Starting [0;1;39mD-Bus System Message Bus[0m...
+[    8.183172] input: PC Speaker as /devices/platform/pcspkr/input/input3
+[[0;32m  OK  [0m] Started [0;1;39mD-Bus System Message Bus[0m.
+[[0;32m  OK  [0m] Reached target [0;1;39mBasic System[0m.
+         Starting [0;1;39mOpenSSH Daemon[0m...
+[    8.307325] parport_pc 00:03: reported by Plug and Play ACPI
+         Starting [0;1;39mUser Login Management[0m...[    8.324550] parport0: PC-style at 0x378, irq 7 [PCSPP,TRISTATE]
+
+         Starting [0;1;39mPermit User Sessions[0m...
+[[0;32m  OK  [0m] Finished [0;1;39mPermit User Sessions[0m.
+[[0;32m  OK  [0m] Started [0;1;39mOpenSSH Daemon[0m.
+[    8.497349] input: VirtualPS/2 VMware VMMouse as /devices/platform/i8042/serio1/input/input5
+[[0;32m  OK  [0m] Reached target [0;1;39mSSH Access Available[0m.
+[[0;32m  OK  [0m] Listening on [0;1;39mLoad/Save RF Kill Switch Status /dev/rfkill Watch[0m.
+[[0;32m  OK  [0m] Started [0;1;39mGetty on tty1[0m.[    8.559964] input: VirtualPS/2 VMware VMMouse as /devices/platform/i8042/serio1/input/input4
+
+[[0;32m  OK  [0m] Started [0;1;39mSerial Getty on ttyS0[0m.
+[[0;32m  OK  [0m] Reached target [0;1;39mLogin Prompts[0m.
+         Starting [0;1;39mVirtual Console Setup[0m...
+[    8.660565] piix4_smbus 0000:00:01.3: SMBus Host Controller at 0x700, revision 0
+[    8.689737] i2c i2c-0: Memory type 0x07 not supported yet, not instantiating SPD
+[    8.708400] ppdev: user-space parallel port driver
+[    8.744096] mousedev: PS/2 mouse device common for all mice
+[[0;32m  OK  [0m] Started [0;1;39mUser Login Management[0m.
+[[0;32m  OK  [0m] Reached target [0;1;39mMulti-User System[0m.
+[[0;32m  OK  [0m] Reached target [0;1;39mGraphical Interface[0m.
+[[0;32m  OK  [0m] Finished [0;1;39mVirtual Console Setup[0m.
+[!p]104\[0m[?7h[1G[0J[6n[32766;32766H[6n[    8.830752] RAPL PMU: API unit is 2^-32 Joules, 0 fixed counters, 10737418240 ms ovfl timer
+[!p]104\[0m[?7h[1G[0J[6n[32766;32766H[6n]3008;start=8564c2fd463c49d09b00e8e1a0463b25;user=root;hostname=ksmbd-vm;machineid=0ab76daf18ce42b0b036a81eb53bdd79;bootid=4fb90c6168414cbf8b6055c58c187e9c;pid=447;pidfdid=448;comm=(agetty);servicename=serial-getty@ttyS0.service;invocationid=c750c04cc6e9476ab6b7e5b4e97b5254;type=service\P+q6E616D65\
+Arch Linux 6.18.13-arch1-1 (ttyS0)
+
+ksmbd-vm login: root (automatic login)
+
+]3008;start=ca4d503d178944b4bb74245f92b88de0;user=root;hostname=ksmbd-vm;machineid=0ab76daf18ce42b0b036a81eb53bdd79;bootid=4fb90c6168414cbf8b6055c58c187e9c;pid=447;pidfdid=448;comm=login;targetuser=root;sessionid=1;type=session\
+  ╔══════════════════════════════════════════════╗
+  ║         ksmbd Test VM                        ║
+  ╠══════════════════════════════════════════════╣
+  ║  /root/start-ksmbd.sh   - Start server      ║
+  ║  /root/reload-ksmbd.sh  - Reload module      ║
+  ║  /root/dev-info.sh      - Debug/analysis info║
+  ║  /mnt/ksmbd/            - Shared source      ║
+  ║  poweroff                - Shutdown VM        ║
+  ╚══════════════════════════════════════════════╝
+
+]3008;start=cabf334a-0d2d-4784-983a-7537acb504e5;machineid=0ab76daf18ce42b0b036a81eb53bdd79;user=root;hostname=ksmbd-vm;bootid=4fb90c61-6841-4cbf-8b60-55c58c187e9c;pid=468;type=shell;cwd=/root\[?2004h[root@ksmbd-vm ~]# [   38.930889] ksmbd: loading out-of-tree module taints kernel.
+[   38.932240] ksmbd: module verification failed: signature and/or required key missing - tainting kernel
+[   38.968164] ksmbd: Configuration subsystem initialized with 12 parameters
+[   38.979932] ksmbd: kernel provides md4, skipping built-in registration
+[   38.986354] ksmbd: ksmbd: Fruit SMB extensions loaded
+[   38.987548] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[   38.988671] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[   38.989936] ksmbd: ksmbd: witness protocol support initialised
+[   39.004307] ksmbd: smb_quic: ksmbd: QUIC transport initialized (abstract socket: @ksmbd-quic)
+[   71.441085] ksmbd: ksmbd: witness protocol support removed
+[   71.917228] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[   73.997054] ksmbd: Configuration subsystem initialized with 12 parameters
+[   73.998575] ksmbd: kernel provides md4, skipping built-in registration
+[   74.007493] ksmbd: ksmbd: Fruit SMB extensions loaded
+[   74.008759] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[   74.010100] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[   74.011712] ksmbd: ksmbd: witness protocol support initialised
+[   74.021633] ksmbd: smb_quic: ksmbd: QUIC transport initialized (abstract socket: @ksmbd-quic)
+[  171.238691] ksmbd: Not allow lock operation on exclusive lock range
+[  172.257930] ksmbd: Not allow lock operation on exclusive lock range
+[  174.278657] ksmbd: Not allow lock operation on exclusive lock range
+[  186.612478] ksmbd: ksmbd: witness protocol support removed
+[  187.095697] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[  189.156028] ksmbd: Configuration subsystem initialized with 12 parameters
+[  189.157673] ksmbd: kernel provides md4, skipping built-in registration
+[  189.162434] ksmbd: ksmbd: Fruit SMB extensions loaded
+[  189.164378] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[  189.165826] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[  189.167953] ksmbd: ksmbd: witness protocol support initialised
+[  189.180535] ksmbd: smb_quic: ksmbd: QUIC transport initialized (abstract socket: @ksmbd-quic)
+[  305.440287] ksmbd: Failed to send message: -32
+[  373.915647] ksmbd: ksmbd: witness protocol support removed
+[  374.399240] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[  376.514857] ksmbd: Configuration subsystem initialized with 12 parameters
+[  376.516273] ksmbd: kernel provides md4, skipping built-in registration
+[  376.520017] ksmbd: ksmbd: Fruit SMB extensions loaded
+[  376.522181] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[  376.526032] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[  376.529608] ksmbd: ksmbd: witness protocol support initialised
+[  376.557781] ksmbd: smb_quic: ksmbd: QUIC transport initialized (abstract socket: @ksmbd-quic)
+[  406.552225] ksmbd: cannot get linux path for /srv/smb/test/test_dirlease_rename_dir/srcfile, err = -18
+[  490.151339] ksmbd: ksmbd: witness protocol support removed
+[  490.644237] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[  492.765851] ksmbd: Configuration subsystem initialized with 12 parameters
+[  492.767311] ksmbd: kernel provides md4, skipping built-in registration
+[  492.771114] ksmbd: ksmbd: Fruit SMB extensions loaded
+[  492.772219] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[  492.773590] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[  492.774941] ksmbd: ksmbd: witness protocol support initialised
+[  492.801575] ksmbd: smb_quic: ksmbd: QUIC transport initialized (abstract socket: @ksmbd-quic)
+[  495.296330] ksmbd: Invalid lock count: 0
+[  495.297715] ksmbd: Invalid lock count: 0
+[  495.302269] ksmbd: Invalid lock range requested
+[  495.303466] ksmbd: Invalid lock range requested
+[  495.305974] ksmbd: Try to unlock nolocked range
+[  495.310811] ksmbd: Try to unlock nolocked range
+[  495.312857] ksmbd: conflict two locks in one request
+[  495.314109] ksmbd: conflict two locks in one request
+[  495.319235] ksmbd: Try to unlock nolocked range
+[  495.323464] ksmbd: Try to unlock nolocked range
+[  495.324699] ksmbd: Try to unlock nolocked range
+[  495.330055] ksmbd: Try to unlock nolocked range
+[  495.333103] ksmbd: Try to unlock nolocked range
+[  495.353233] ksmbd: not allow write by shared lock
+[  495.354289] ksmbd: unable to write due to lock
+[  495.358362] ksmbd: not allow write by shared lock
+[  495.359294] ksmbd: unable to write due to lock
+[  495.370600] ksmbd: not allow rw access by exclusive lock from other opens
+[  495.371924] ksmbd: unable to write due to lock
+[  495.376000] ksmbd: not allow rw access by exclusive lock from other opens
+[  495.377613] ksmbd: unable to read due to lock
+[  495.383682] ksmbd: Not allow lock operation on exclusive lock range
+[  495.385423] ksmbd: Not allow lock operation on exclusive lock range
+[  495.390403] ksmbd: Not allow lock operation on exclusive lock range
+[  495.398113] ksmbd: Not allow lock operation on exclusive lock range
+[  495.399957] ksmbd: Try to unlock nolocked range
+[  495.402061] ksmbd: Not allow lock operation on exclusive lock range
+[  495.405042] ksmbd: Try to unlock nolocked range
+[  495.406886] ksmbd: Not allow lock operation on exclusive lock range
+[  495.411691] ksmbd: Try to unlock nolocked range
+[  495.414556] ksmbd: Not allow lock operation on exclusive lock range
+[  495.419944] ksmbd: Not allow lock operation on exclusive lock range
+[  495.422922] ksmbd: Not allow lock operation on exclusive lock range
+[  495.424675] ksmbd: Invalid lock range requested
+[  495.508911] ksmbd: Not allow lock operation on exclusive lock range
+[  495.516131] ksmbd: current lock conflict with zero byte lock range
+[  495.518170] ksmbd: current lock conflict with zero byte lock range
+[  495.535710] ksmbd: previous lock conflict with zero byte lock range
+[  495.545704] ksmbd: previous lock conflict with zero byte lock range
+[  495.555891] ksmbd: current lock conflict with zero byte lock range
+[  495.558719] ksmbd: current lock conflict with zero byte lock range
+[  495.564844] ksmbd: previous lock conflict with zero byte lock range
+[  495.568110] ksmbd: previous lock conflict with zero byte lock range
+[  495.576228] ksmbd: current lock conflict with zero byte lock range
+[  495.578994] ksmbd: current lock conflict with zero byte lock range
+[  495.615919] ksmbd: previous lock conflict with zero byte lock range
+[  495.617429] ksmbd: previous lock conflict with zero byte lock range
+[  498.346812] ksmbd: ksmbd: witness protocol support removed
+[  498.841243] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[  500.993366] ksmbd: Configuration subsystem initialized with 12 parameters
+[  500.995120] ksmbd: kernel provides md4, skipping built-in registration
+[  501.002955] ksmbd: ksmbd: Fruit SMB extensions loaded
+[  501.005644] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[  501.007970] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[  501.013279] ksmbd: ksmbd: witness protocol support initialised
+[  501.032046] ksmbd: smb_quic: ksmbd: QUIC transport initialized (abstract socket: @ksmbd-quic)
+[  503.740114] ksmbd: bad smb2 signature
+[  503.741290] ksmbd: bad smb2 signature
+[  503.748318] ksmbd: bad smb2 signature
+[  503.749498] ksmbd: bad smb2 signature
+[  503.755378] ksmbd: bad smb2 signature
+[  503.756413] ksmbd: bad smb2 signature
+[  503.763423] ksmbd: bad smb2 signature
+[  503.764692] ksmbd: bad smb2 signature
+[  685.960019] ksmbd: ksmbd: witness protocol support removed
+[  686.472249] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[  688.623573] ksmbd: Configuration subsystem initialized with 12 parameters
+[  688.625432] ksmbd: kernel provides md4, skipping built-in registration
+[  688.632461] ksmbd: ksmbd: Fruit SMB extensions loaded
+[  688.635488] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[  688.638573] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[  688.645483] ksmbd: ksmbd: witness protocol support initialised
+[  688.684020] ksmbd: smb_quic: ksmbd: QUIC transport initialized (abstract socket: @ksmbd-quic)
+[  691.349005] ksmbd: Not permitted to write : 0x1
+[  691.486709] ksmbd: Outstanding credits underflow: charge 1, outstanding 0
+[  694.069746] ksmbd: ksmbd: witness protocol support removed
+[  694.538296] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[  696.734123] ksmbd: Configuration subsystem initialized with 12 parameters
+[  696.736161] ksmbd: kernel provides md4, skipping built-in registration
+[  696.738472] ksmbd: ksmbd: Fruit SMB extensions loaded
+[  696.739713] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[  696.741683] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[  696.745545] ksmbd: ksmbd: witness protocol support initialised
+[  696.765282] ksmbd: smb_quic: ksmbd: QUIC transport initialized (abstract socket: @ksmbd-quic)
+[  710.210204] ksmbd: ksmbd: witness protocol support removed
+[  710.721238] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[  712.864108] ksmbd: Configuration subsystem initialized with 12 parameters
+[  712.865698] ksmbd: kernel provides md4, skipping built-in registration
+[  712.872494] ksmbd: ksmbd: Fruit SMB extensions loaded
+[  712.875274] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[  712.876597] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[  712.878180] ksmbd: ksmbd: witness protocol support initialised
+[  712.891079] ksmbd: smb_quic: ksmbd: QUIC transport initialized (abstract socket: @ksmbd-quic)
+[  747.525942] ksmbd: ksmbd: witness protocol support removed
+[  748.080411] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[  750.198834] ksmbd: Configuration subsystem initialized with 12 parameters
+[  750.202681] ksmbd: kernel provides md4, skipping built-in registration
+[  750.207598] ksmbd: ksmbd: Fruit SMB extensions loaded
+[  750.210980] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[  750.214395] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[  750.216631] ksmbd: ksmbd: witness protocol support initialised
+[  750.262061] ksmbd: smb_quic: ksmbd: QUIC transport initialized (abstract socket: @ksmbd-quic)
+[15189.054674] ksmbd: ksmbd: witness protocol support removed
+[15189.570232] ksmbd: ksmbd: Fruit SMB extensions unloaded
+[15189.682033] ksmbd: Configuration subsystem initialized with 12 parameters
+[15189.683515] ksmbd: kernel provides md4, skipping built-in registration
+[15189.686552] ksmbd: ksmbd: Fruit SMB extensions loaded
+[15189.688059] ksmbd: ksmbd: CHANGE_NOTIFY subsystem initialised
+[15189.689729] ksmbd: ksmbd: hook subsystem initialized (22 hook points)
+[15189.691244] ksmbd: ksmbd: witness protocol support initialised
+[15189.705717] ksmbd: smb_quic: ksmbd: QUIC transport initialized (abstract socket: @ksmbd-quic)
+[15200.181402] kernel tried to execute NX-protected page - exploit attempt? (uid: 0)
+[15200.182733] BUG: unable to handle page fault for address: ffffffffc0e25070
+[15200.188084] #PF: supervisor instruction fetch in kernel mode
+[15200.189274] #PF: error_code(0x0011) - permissions violation
+[15200.193696] PGD 17e29067 P4D 17e29067 PUD 17e2b067 PMD 10be9067 PTE 8000000019f19021
+[15200.195047] Oops: Oops: 0011 [#1] SMP PTI
+[15200.195907] CPU: 0 UID: 0 PID: 1386 Comm: kworker/0:1 Tainted: G           OE       6.18.13-arch1-1 #1 PREEMPT(full)  37d84e5c59d38b1e3c61214631c6e0356ae9b977
+[15200.199686] Tainted: [O]=OOT_MODULE, [E]=UNSIGNED_MODULE
+[15200.200818] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Arch Linux 1.17.0-2-2 04/01/2014
+[15200.202856] Workqueue: ksmbd-io handle_ksmbd_work [ksmbd]
+[15200.204081] RIP: 0010:ksmbd_quic_transport_ops+0xc670/0xffffffffffe87600 [ksmbd]
+[15200.205745] Code: 3a 20 70 69 67 67 79 62 61 63 6b 20 63 61 6e 63 65 6c 20 65 6e 63 72 79 70 74 20 66 61 69 6c 65 64 3a 20 25 64 0a 00 00 00 00 <01> 36 6b 73 6d 62 64 3a 20 6e 6f 74 69 66 79 5f 63 61 6e 63 65 6c
+[15200.209957] RSP: 0018:ffffd1a9c2397a40 EFLAGS: 00010282
+[15200.211119] RAX: ffffffffc0e25070 RBX: 0000000000000001 RCX: 0000000000000004
+[15200.213475] RDX: ffff8e290cb3eb40 RSI: 0000000000000100 RDI: ffff8e29057ebc00
+[15200.217275] RBP: ffffd1a9c2397a90 R08: ffff8e29103a9bb0 R09: ffff8e290cb3eb60
+[15200.218547] R10: 00000000ffffffff R11: 0000000000000004 R12: ffffd1a9c2397ac0
+[15200.223269] R13: 0000000000000000 R14: ffffd1a9c2397a90 R15: ffff8e29057ebc00
+[15200.224548] FS:  0000000000000000(0000) GS:ffff8e29d78ee000(0000) knlGS:0000000000000000
+[15200.227038] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[15200.229609] CR2: ffffffffc0e25070 CR3: 0000000010938002 CR4: 0000000000372ef0
+[15200.231462] Call Trace:
+[15200.234437]  <TASK>
+[15200.234900]  ? fsnotify+0x433/0x1530
+[15200.235645]  ? vfs_create+0x1ea/0x240
+[15200.236467]  ? ksmbd_vfs_create+0xab/0x150 [ksmbd 9400adffeda2675965047d24cc5838ad0859d248]
+[15200.238234]  ? smb2_open+0x25b1/0x3830 [ksmbd 9400adffeda2675965047d24cc5838ad0859d248]
+[15200.239826]  ? kvm_sched_clock_read+0x11/0x20
+[15200.240623]  ? sched_clock+0x10/0x30
+[15200.241329]  ? ksmbd_tree_conn_lookup+0x47/0x80 [ksmbd 9400adffeda2675965047d24cc5838ad0859d248]
+[15200.242961]  ? handle_ksmbd_work+0x450/0x840 [ksmbd 9400adffeda2675965047d24cc5838ad0859d248]
+[15200.244695]  ? process_one_work+0x193/0x350
+[15200.245493]  ? worker_thread+0x2d7/0x410
+[15200.246224]  ? __pfx_worker_thread+0x10/0x10
+[15200.247001]  ? kthread+0xfc/0x240
+[15200.247628]  ? __pfx_kthread+0x10/0x10
+[15200.248322]  ? __pfx_kthread+0x10/0x10
+[15200.249017]  ? ret_from_fork+0x1c2/0x1f0
+[15200.249853]  ? __pfx_kthread+0x10/0x10
+[15200.250619]  ? ret_from_fork_asm+0x1a/0x30
+[15200.251375]  </TASK>
+[15200.251808] Modules linked in: ksmbd(OE) ccm cmac nls_utf8 md4 des_generic libdes lz4 lz4_compress hkdf intel_rapl_msr intel_rapl_common intel_uncore_frequency_common intel_pmc_core pmt_telemetry pmt_discovery pmt_class intel_pmc_ssram_telemetry intel_vsec kvm_intel kvm irqbypass polyval_clmulni ghash_clmulni_intel aesni_intel rapl joydev mousedev ppdev i2c_piix4 i2c_smbus psmouse parport_pc pcspkr parport mac_hid cfg80211 rfkill nfnetlink vsock_loopback vmw_vsock_virtio_transport_common vmw_vsock_vmci_transport vsock vmw_vmci qemu_fw_cfg sr_mod cdrom ata_generic pata_acpi intel_agp floppy intel_gtt ata_piix bochs serio_raw 9p 9pnet_virtio 9pnet virtio_net netfs net_failover failover
+[15200.251860] Unloaded tainted modules: ksmbd(OE):10 [last unloaded: ksmbd(OE)]
+[15200.268560] CR2: ffffffffc0e25070
+[15200.269251] ---[ end trace 0000000000000000 ]---
+[15200.270612] RIP: 0010:ksmbd_quic_transport_ops+0xc670/0xffffffffffe87600 [ksmbd]
+[15200.272070] Code: 3a 20 70 69 67 67 79 62 61 63 6b 20 63 61 6e 63 65 6c 20 65 6e 63 72 79 70 74 20 66 61 69 6c 65 64 3a 20 25 64 0a 00 00 00 00 <01> 36 6b 73 6d 62 64 3a 20 6e 6f 74 69 66 79 5f 63 61 6e 63 65 6c
+[15200.275763] RSP: 0018:ffffd1a9c2397a40 EFLAGS: 00010282
+[15200.276885] RAX: ffffffffc0e25070 RBX: 0000000000000001 RCX: 0000000000000004
+[15200.278298] RDX: ffff8e290cb3eb40 RSI: 0000000000000100 RDI: ffff8e29057ebc00
+[15200.279733] RBP: ffffd1a9c2397a90 R08: ffff8e29103a9bb0 R09: ffff8e290cb3eb60
+[15200.281145] R10: 00000000ffffffff R11: 0000000000000004 R12: ffffd1a9c2397ac0
+[15200.282568] R13: 0000000000000000 R14: ffffd1a9c2397a90 R15: ffff8e29057ebc00
+[15200.284005] FS:  0000000000000000(0000) GS:ffff8e29d78ee000(0000) knlGS:0000000000000000
+[15200.285606] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[15200.286770] CR2: ffffffffc0e25070 CR3: 0000000010938002 CR4: 0000000000372ef0
+[15200.288165] note: kworker/0:1[1386] exited with irqs disabled
+[15335.200246] ksmbd: ksmbd: timeout waiting for r_count drain (stuck at 2), forcing cleanup
+[15455.520245] ksmbd: ksmbd: timeout waiting for r_count drain (stuck at 2), forcing cleanup
+[15575.328247] ksmbd: ksmbd: timeout waiting for r_count drain (stuck at 2), forcing cleanup
+[15680.211278] kernel tried to execute NX-protected page - exploit attempt? (uid: 0)
+[15680.215955] BUG: unable to handle page fault for address: ffffffffc0e25070
+[15680.217475] #PF: supervisor instruction fetch in kernel mode
+[15680.219301] #PF: error_code(0x0011) - permissions violation
+[15680.223171] PGD 17e29067 P4D 17e29067 PUD 17e2b067 PMD 10be9067 PTE 8000000019f19021
+[15680.224741] Oops: Oops: 0011 [#2] SMP PTI
+[15680.226209] CPU: 0 UID: 0 PID: 1884 Comm: kworker/0:4 Tainted: G      D    OE       6.18.13-arch1-1 #1 PREEMPT(full)  37d84e5c59d38b1e3c61214631c6e0356ae9b977
+[15680.229253] Tainted: [D]=DIE, [O]=OOT_MODULE, [E]=UNSIGNED_MODULE
+[15680.230554] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Arch Linux 1.17.0-2-2 04/01/2014
+[15680.232673] Workqueue: ksmbd-io handle_ksmbd_work [ksmbd]
+[15680.233852] RIP: 0010:ksmbd_quic_transport_ops+0xc670/0xffffffffffe87600 [ksmbd]
+[15680.235549] Code: 3a 20 70 69 67 67 79 62 61 63 6b 20 63 61 6e 63 65 6c 20 65 6e 63 72 79 70 74 20 66 61 69 6c 65 64 3a 20 25 64 0a 00 00 00 00 <01> 36 6b 73 6d 62 64 3a 20 6e 6f 74 69 66 79 5f 63 61 6e 63 65 6c
+[15680.239701] RSP: 0018:ffffd1a9c0e63ab8 EFLAGS: 00010282
+[15680.240812] RAX: ffffffffc0e25070 RBX: 0000000000000001 RCX: 0000000000000002
+[15680.242350] RDX: ffff8e29035e3640 RSI: 0000000008000002 RDI: ffff8e29057ebc00
+[15680.243844] RBP: ffffd1a9c0e63b08 R08: ffff8e29103a9bb0 R09: ffffd1a9c0e63bc0
+[15680.245393] R10: 00000000ffffffff R11: 0000000000000002 R12: ffffd1a9c0e63b38
+[15680.246883] R13: 0000000000000000 R14: ffffd1a9c0e63b08 R15: ffff8e29057ebc00
+[15680.248450] FS:  0000000000000000(0000) GS:ffff8e29d78ee000(0000) knlGS:0000000000000000
+[15680.250155] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[15680.251373] CR2: ffffffffc0e25070 CR3: 0000000010938003 CR4: 0000000000372ef0
+[15680.252888] Call Trace:
+[15680.253487]  <TASK>
+[15680.253943]  ? fsnotify+0x433/0x1530
+[15680.254731]  ? __fsnotify_parent+0x31e/0x410
+[15680.255674]  ? generic_perform_write+0x13e/0x2a0
+[15680.256684]  ? __kernel_write_iter+0x1bb/0x280
+[15680.257653]  ? __kernel_write_iter+0x1bb/0x280
+[15680.258660]  ? kernel_write+0xf0/0x1d0
+[15680.259527]  ? ksmbd_vfs_write+0xda/0x390 [ksmbd 9400adffeda2675965047d24cc5838ad0859d248]
+[15680.261306]  ? xas_load+0xd/0xd0
+[15680.262059]  ? smb2_write+0x279/0x6c0 [ksmbd 9400adffeda2675965047d24cc5838ad0859d248]
+[15680.263818]  ? handle_ksmbd_work+0x450/0x840 [ksmbd 9400adffeda2675965047d24cc5838ad0859d248]
+[15680.265707]  ? process_one_work+0x193/0x350
+[15680.266638]  ? worker_thread+0x2d7/0x410
+[15680.267513]  ? __pfx_worker_thread+0x10/0x10
+[15680.268458]  ? kthread+0xfc/0x240
+[15680.269163]  ? __pfx_kthread+0x10/0x10
+[15680.269968]  ? __pfx_kthread+0x10/0x10
+[15680.270785]  ? ret_from_fork+0x1c2/0x1f0
+[15680.271657]  ? __pfx_kthread+0x10/0x10
+[15680.272491]  ? ret_from_fork_asm+0x1a/0x30
+[15680.273358]  </TASK>
+[15680.273834] Modules linked in: ksmbd(OE) ccm cmac nls_utf8 md4 des_generic libdes lz4 lz4_compress hkdf intel_rapl_msr intel_rapl_common intel_uncore_frequency_common intel_pmc_core pmt_telemetry pmt_discovery pmt_class intel_pmc_ssram_telemetry intel_vsec kvm_intel kvm irqbypass polyval_clmulni ghash_clmulni_intel aesni_intel rapl joydev mousedev ppdev i2c_piix4 i2c_smbus psmouse parport_pc pcspkr parport mac_hid cfg80211 rfkill nfnetlink vsock_loopback vmw_vsock_virtio_transport_common vmw_vsock_vmci_transport vsock vmw_vmci qemu_fw_cfg sr_mod cdrom ata_generic pata_acpi intel_agp floppy intel_gtt ata_piix bochs serio_raw 9p 9pnet_virtio 9pnet virtio_net netfs net_failover failover
+[15680.273903] Unloaded tainted modules: ksmbd(OE):10 [last unloaded: ksmbd(OE)]
+[15680.288010] CR2: ffffffffc0e25070
+[15680.288738] ---[ end trace 0000000000000000 ]---
+[15680.289729] RIP: 0010:ksmbd_quic_transport_ops+0xc670/0xffffffffffe87600 [ksmbd]
+[15680.291375] Code: 3a 20 70 69 67 67 79 62 61 63 6b 20 63 61 6e 63 65 6c 20 65 6e 63 72 79 70 74 20 66 61 69 6c 65 64 3a 20 25 64 0a 00 00 00 00 <01> 36 6b 73 6d 62 64 3a 20 6e 6f 74 69 66 79 5f 63 61 6e 63 65 6c
+[15680.295264] RSP: 0018:ffffd1a9c2397a40 EFLAGS: 00010282
+[15680.296459] RAX: ffffffffc0e25070 RBX: 0000000000000001 RCX: 0000000000000004
+[15680.297949] RDX: ffff8e290cb3eb40 RSI: 0000000000000100 RDI: ffff8e29057ebc00
+[15680.299513] RBP: ffffd1a9c2397a90 R08: ffff8e29103a9bb0 R09: ffff8e290cb3eb60
+[15680.301013] R10: 00000000ffffffff R11: 0000000000000004 R12: ffffd1a9c2397ac0
+[15680.302582] R13: 0000000000000000 R14: ffffd1a9c2397a90 R15: ffff8e29057ebc00
+[15680.304114] FS:  0000000000000000(0000) GS:ffff8e29d78ee000(0000) knlGS:0000000000000000
+[15680.305818] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[15680.307088] CR2: ffffffffc0e25070 CR3: 0000000010938003 CR4: 0000000000372ef0
+[15680.308626] note: kworker/0:4[1884] exited with irqs disabled
+[15695.136231] ksmbd: ksmbd: timeout waiting for r_count drain (stuck at 2), forcing cleanup
+[15740.291927] kernel tried to execute NX-protected page - exploit attempt? (uid: 0)
+[15740.294595] BUG: unable to handle page fault for address: ffffffffc0e25070
+[15740.296017] #PF: supervisor instruction fetch in kernel mode
+[15740.299541] #PF: error_code(0x0011) - permissions violation
+[15740.300976] PGD 17e29067 P4D 17e29067 PUD 17e2b067 PMD 10be9067 PTE 8000000019f19021
+[15740.304769] Oops: Oops: 0011 [#3] SMP PTI
+[15740.305677] CPU: 0 UID: 0 PID: 1893 Comm: kworker/0:5 Tainted: G      D    OE       6.18.13-arch1-1 #1 PREEMPT(full)  37d84e5c59d38b1e3c61214631c6e0356ae9b977
+[15740.308721] Tainted: [D]=DIE, [O]=OOT_MODULE, [E]=UNSIGNED_MODULE
+[15740.309964] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Arch Linux 1.17.0-2-2 04/01/2014
+[15740.314963] Workqueue: ksmbd-io handle_ksmbd_work [ksmbd]
+[15740.316216] RIP: 0010:ksmbd_quic_transport_ops+0xc670/0xffffffffffe87600 [ksmbd]
+[15740.317895] Code: 3a 20 70 69 67 67 79 62 61 63 6b 20 63 61 6e 63 65 6c 20 65 6e 63 72 79 70 74 20 66 61 69 6c 65 64 3a 20 25 64 0a 00 00 00 00 <01> 36 6b 73 6d 62 64 3a 20 6e 6f 74 69 66 79 5f 63 61 6e 63 65 6c
+[15740.322054] RSP: 0018:ffffd1a9c22cfab8 EFLAGS: 00010282
+[15740.323215] RAX: ffffffffc0e25070 RBX: 0000000000000001 RCX: 0000000000000002
+[15740.324645] RDX: ffff8e29035e3700 RSI: 0000000008000002 RDI: ffff8e29057ebc00
+[15740.326002] RBP: ffffd1a9c22cfb08 R08: ffff8e29103a9bb0 R09: ffffd1a9c22cfbc0
+[15740.327388] R10: 00000000ffffffff R11: 0000000000000002 R12: ffffd1a9c22cfb38
+[15740.328996] R13: 0000000000000000 R14: ffffd1a9c22cfb08 R15: ffff8e29057ebc00
+[15740.330523] FS:  0000000000000000(0000) GS:ffff8e29d78ee000(0000) knlGS:0000000000000000
+[15740.332259] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[15740.333676] CR2: ffffffffc0e25070 CR3: 0000000010938005 CR4: 0000000000372ef0
+[15740.335172] Call Trace:
+[15740.335768]  <TASK>
+[15740.336317]  ? fsnotify+0x433/0x1530
+[15740.337033]  ? __fsnotify_parent+0x31e/0x410
+[15740.337984]  ? generic_perform_write+0x13e/0x2a0
+[15740.339299]  ? __kernel_write_iter+0x1bb/0x280
+[15740.340275]  ? __kernel_write_iter+0x1bb/0x280
+[15740.341209]  ? kernel_write+0xf0/0x1d0
+[15740.342010]  ? ksmbd_vfs_write+0xda/0x390 [ksmbd 9400adffeda2675965047d24cc5838ad0859d248]
+[15740.343885]  ? xas_load+0xd/0xd0
+[15740.344629]  ? smb2_write+0x279/0x6c0 [ksmbd 9400adffeda2675965047d24cc5838ad0859d248]
+[15740.346427]  ? handle_ksmbd_work+0x450/0x840 [ksmbd 9400adffeda2675965047d24cc5838ad0859d248]
+[15740.348343]  ? process_one_work+0x193/0x350
+[15740.349295]  ? worker_thread+0x2d7/0x410
+[15740.350098]  ? __pfx_worker_thread+0x10/0x10
+[15740.351032]  ? kthread+0xfc/0x240
+[15740.351816]  ? __pfx_kthread+0x10/0x10
+[15740.352638]  ? __pfx_kthread+0x10/0x10
+[15740.353472]  ? ret_from_fork+0x1c2/0x1f0
+[15740.354331]  ? __pfx_kthread+0x10/0x10
+[15740.355076]  ? ret_from_fork_asm+0x1a/0x30
+[15740.355992]  </TASK>
+[15740.356510] Modules linked in: ksmbd(OE) ccm cmac nls_utf8 md4 des_generic libdes lz4 lz4_compress hkdf intel_rapl_msr intel_rapl_common intel_uncore_frequency_common intel_pmc_core pmt_telemetry pmt_discovery pmt_class intel_pmc_ssram_telemetry intel_vsec kvm_intel kvm irqbypass polyval_clmulni ghash_clmulni_intel aesni_intel rapl joydev mousedev ppdev i2c_piix4 i2c_smbus psmouse parport_pc pcspkr parport mac_hid cfg80211 rfkill nfnetlink vsock_loopback vmw_vsock_virtio_transport_common vmw_vsock_vmci_transport vsock vmw_vmci qemu_fw_cfg sr_mod cdrom ata_generic pata_acpi intel_agp floppy intel_gtt ata_piix bochs serio_raw 9p 9pnet_virtio 9pnet virtio_net netfs net_failover failover
+[15740.356571] Unloaded tainted modules: ksmbd(OE):10 [last unloaded: ksmbd(OE)]
+[15740.371433] CR2: ffffffffc0e25070
+[15740.372113] ---[ end trace 0000000000000000 ]---
+[15740.374093] RIP: 0010:ksmbd_quic_transport_ops+0xc670/0xffffffffffe87600 [ksmbd]
+[15740.375794] Code: 3a 20 70 69 67 67 79 62 61 63 6b 20 63 61 6e 63 65 6c 20 65 6e 63 72 79 70 74 20 66 61 69 6c 65 64 3a 20 25 64 0a 00 00 00 00 <01> 36 6b 73 6d 62 64 3a 20 6e 6f 74 69 66 79 5f 63 61 6e 63 65 6c
+[15740.380509] RSP: 0018:ffffd1a9c2397a40 EFLAGS: 00010282
+[15740.381623] RAX: ffffffffc0e25070 RBX: 0000000000000001 RCX: 0000000000000004
+[15740.383109] RDX: ffff8e290cb3eb40 RSI: 0000000000000100 RDI: ffff8e29057ebc00
+[15740.384714] RBP: ffffd1a9c2397a90 R08: ffff8e29103a9bb0 R09: ffff8e290cb3eb60
+[15740.386290] R10: 00000000ffffffff R11: 0000000000000004 R12: ffffd1a9c2397ac0
+[15740.387794] R13: 0000000000000000 R14: ffffd1a9c2397a90 R15: ffff8e29057ebc00
+[15740.389348] FS:  0000000000000000(0000) GS:ffff8e29d78ee000(0000) knlGS:0000000000000000
+[15740.391700] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[15740.393216] CR2: ffffffffc0e25070 CR3: 0000000010938005 CR4: 0000000000372ef0
+[15740.394757] note: kworker/0:5[1893] exited with irqs disabled
+[15755.556697] ksmbd: ksmbd: timeout waiting for r_count drain (stuck at 1), forcing cleanup
+[15815.456378] ksmbd: ksmbd: timeout waiting for r_count drain (stuck at 1), forcing cleanup
+[15935.264266] ksmbd: ksmbd: timeout waiting for r_count drain (stuck at 2), forcing cleanup
+[15970.080543] ksmbd: ksmbd: timeout waiting for r_count drain (stuck at 1), forcing cleanup
+
+Broadcast message from root@ksmbd-vm (Wed 2026-03-04 12:55:51 UTC):
+
+The system will reboot now!
+
+[[0;32m  OK  [0m] Stopped [0;1;39mSession 44 of User root[0m.
+[?2004l[?2004h[?2004l
+         Stopping [0;1;39mSession 1 of User root[0m...
+         Stopping [0;1;39mSession 38 of User root[0m...
+[[0;32m  OK  [0m] Removed slice [0;1;39mSlice /system/modprobe[0m.
+[[0;32m  OK  [0m] Stopped target [0;1;39mGraphical Interface[0m.
+[[0;32m  OK  [0m] Stopped target [0;1;39mMulti-User System[0m.
+[[0;32m  OK  [0m] Stopped target [0;1;39mLogin Prompts[0m.
+[[0;32m  OK  [0m] Stopped target [0;1;39mHost and Network Name Lookups[0m.
+[[0;32m  OK  [0m] Stopped target [0;1;39mSSH Access Available[0m.
+[[0;32m  OK  [0m] Stopped target [0;1;39mTimer Units[0m.
+[[0;32m  OK  [0m] Stopped [0;1;39mRefresh existing PGP keys of archlinux-keyring regularly[0m.
+[[0;32m  OK  [0m] Stopped [0;1;39mDaily verification of password and group files[0m.
+[[0;32m  OK  [0m] Stopped [0;1;39mDaily Cleanup of Temporary Directories[0m.
+[[0;32m  OK  [0m] Closed [0;1;39mLoad/Save RF Kill Switch Status /dev/rfkill Watch[0m.
+[?2004h[?2004l
+[?2004h         Unmounting [0;1;39m/mnt/ksmbd[0m...
+         Stopping [0;1;39mGetty on tty1[0m...
+]3008;end=ca4d503d178944b4bb74245f92b88de0\         Starting [0;1;39mGenerate shutdown-ramfs[0m...
+         Stopping [0;1;39mSerial Getty on ttyS0[0m...
+         Stopping [0;1;39mOpenSSH Daemon[0m...
+         Stopping [0;1;39mEnable Persistent Storage in systemd-networkd[0m...
+         Stopping [0;1;39mLoad/Save OS Random Seed[0m...
+[[0;32m  OK  [0m] Stopped [0;1;39mLoad udev Rules from Credentials[0m.
+[[0;32m  OK  [0m] Stopped [0;1;39mOpenSSH Daemon[0m.
+[[0;32m  OK  [0m] Stopped [0;1;39mSession 1 of User root[0m.
+[[0;32m  OK  [0m] Stopped [0;1;39mSerial Getty on ttyS0[0m.
+[!p]104\[0m[?7h[1G[0J[6n[32766;32766H[6n[[0;32m  OK  [0m] Unmounted [0;1;39m/mnt/ksmbd[0m.
+[[0;32m  OK  [0m] Stopped [0;1;39mLoad/Save OS Random Seed[0m.
+[[0;32m  OK  [0m] Removed slice [0;1;39mSlice /system/serial-getty[0m.
+[[0;32m  OK  [0m] Stopped [0;1;39mEnable Persistent Storage in systemd-networkd[0m.
+[[0;32m  OK  [0m] Finished [0;1;39mGenerate shutdown-ramfs[0m.
+[[0m[0;31m*     [0m] (1 of 2) A stop job is running for Getty on tty1 (3s / 1min 30s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (1 of 2) A stop job is running for Getty on tty1 (3s / 1min 30s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (4s / 1min 30s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for …on 38 of User root (4s / 1min 30s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (2 of 2) A stop job is running for …on 38 of User root (5s / 1min 30s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for …on 38 of User root (5s / 1min 30s)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (6s / 1min 30s)
+M[K[     [0;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (6s / 1min 30s)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (7s / 1min 30s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for …on 38 of User root (7s / 1min 30s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (2 of 2) A stop job is running for …on 38 of User root (8s / 1min 30s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for …on 38 of User root (8s / 1min 30s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (9s / 1min 30s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (1 of 2) A stop job is running for Getty on tty1 (9s / 1min 30s)
+M[K[[0m[0;31m*     [0m] (1 of 2) A stop job is running for Getty on tty1 (10s / 1min 30s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for …n 38 of User root (10s / 1min 30s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (2 of 2) A stop job is running for …n 38 of User root (11s / 1min 30s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for …n 38 of User root (11s / 1min 30s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (12s / 1min 30s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (12s / 1min 30s)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (13s / 1min 30s)
+M[K[     [0;31m*[0m] (2 of 2) A stop job is running for …n 38 of User root (13s / 1min 30s)
+M[K[    [0;31m*[0;1;31m*[0m] (2 of 2) A stop job is running for …n 38 of User root (14s / 1min 30s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for …n 38 of User root (14s / 1min 30s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (15s / 1min 30s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (1 of 2) A stop job is running for Getty on tty1 (15s / 1min 30s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (16s / 1min 30s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for …n 38 of User root (16s / 1min 30s)
+M[K[[0m[0;31m*     [0m] (2 of 2) A stop job is running for …n 38 of User root (17s / 1min 30s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for …n 38 of User root (17s / 1min 30s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (18s / 1min 30s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (1 of 2) A stop job is running for Getty on tty1 (18s / 1min 30s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (19s / 1min 30s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for …n 38 of User root (19s / 1min 30s)
+M[K[    [0;31m*[0;1;31m*[0m] (2 of 2) A stop job is running for …n 38 of User root (20s / 1min 30s)
+M[K[     [0;31m*[0m] (2 of 2) A stop job is running for …n 38 of User root (20s / 1min 30s)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (21s / 1min 30s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (21s / 1min 30s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (22s / 1min 30s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for …n 38 of User root (22s / 1min 30s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (2 of 2) A stop job is running for …n 38 of User root (23s / 1min 30s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for …n 38 of User root (23s / 1min 30s)
+M[K[[0m[0;31m*     [0m] (1 of 2) A stop job is running for Getty on tty1 (24s / 1min 30s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (1 of 2) A stop job is running for Getty on tty1 (24s / 1min 30s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (25s / 1min 30s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for …n 38 of User root (25s / 1min 30s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (2 of 2) A stop job is running for …n 38 of User root (26s / 1min 30s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for …n 38 of User root (26s / 1min 30s)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (27s / 1min 30s)
+M[K[     [0;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (27s / 1min 30s)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (28s / 1min 30s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for …n 38 of User root (28s / 1min 30s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (2 of 2) A stop job is running for …n 38 of User root (29s / 1min 30s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for …n 38 of User root (29s / 1min 30s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (30s / 1min 30s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (1 of 2) A stop job is running for Getty on tty1 (30s / 1min 30s)
+M[K[[0m[0;31m*     [0m] (1 of 2) A stop job is running for Getty on tty1 (31s / 1min 30s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for …n 38 of User root (31s / 1min 30s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (2 of 2) A stop job is running for …n 38 of User root (32s / 1min 30s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for …n 38 of User root (32s / 1min 30s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (33s / 1min 30s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (33s / 1min 30s)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (34s / 1min 30s)
+M[K[     [0;31m*[0m] (2 of 2) A stop job is running for …n 38 of User root (34s / 1min 30s)
+M[K[    [0;31m*[0;1;31m*[0m] (2 of 2) A stop job is running for …n 38 of User root (35s / 1min 30s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for …n 38 of User root (35s / 1min 30s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (36s / 1min 30s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (1 of 2) A stop job is running for Getty on tty1 (36s / 1min 30s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (37s / 1min 30s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for …n 38 of User root (37s / 1min 30s)
+M[K[[0m[0;31m*     [0m] (2 of 2) A stop job is running for …n 38 of User root (38s / 1min 30s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for …n 38 of User root (38s / 1min 30s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (39s / 1min 30s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (1 of 2) A stop job is running for Getty on tty1 (39s / 1min 30s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (40s / 1min 30s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for …n 38 of User root (40s / 1min 30s)
+M[K[    [0;31m*[0;1;31m*[0m] (2 of 2) A stop job is running for …n 38 of User root (41s / 1min 30s)
+M[K[     [0;31m*[0m] (2 of 2) A stop job is running for …n 38 of User root (41s / 1min 30s)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (42s / 1min 30s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (42s / 1min 30s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (43s / 1min 30s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for …n 38 of User root (43s / 1min 30s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (2 of 2) A stop job is running for …n 38 of User root (44s / 1min 30s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for …n 38 of User root (44s / 1min 30s)
+M[K[[0m[0;31m*     [0m] (1 of 2) A stop job is running for Getty on tty1 (45s / 1min 30s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (1 of 2) A stop job is running for Getty on tty1 (45s / 1min 30s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (46s / 1min 30s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for …n 38 of User root (46s / 1min 30s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (2 of 2) A stop job is running for …n 38 of User root (47s / 1min 30s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for …n 38 of User root (47s / 1min 30s)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (48s / 1min 30s)
+M[K[     [0;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (48s / 1min 30s)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (49s / 1min 30s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for …n 38 of User root (49s / 1min 30s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (2 of 2) A stop job is running for …n 38 of User root (50s / 1min 30s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for …n 38 of User root (50s / 1min 30s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (51s / 1min 30s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (1 of 2) A stop job is running for Getty on tty1 (51s / 1min 30s)
+M[K[[0m[0;31m*     [0m] (1 of 2) A stop job is running for Getty on tty1 (52s / 1min 30s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for …n 38 of User root (52s / 1min 30s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (2 of 2) A stop job is running for …n 38 of User root (53s / 1min 30s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for …n 38 of User root (53s / 1min 30s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (54s / 1min 30s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (54s / 1min 30s)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (55s / 1min 30s)
+M[K[     [0;31m*[0m] (2 of 2) A stop job is running for …n 38 of User root (55s / 1min 30s)
+M[K[    [0;31m*[0;1;31m*[0m] (2 of 2) A stop job is running for …n 38 of User root (56s / 1min 30s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for …n 38 of User root (56s / 1min 30s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (57s / 1min 30s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (1 of 2) A stop job is running for Getty on tty1 (57s / 1min 30s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (58s / 1min 30s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for …n 38 of User root (58s / 1min 30s)
+M[K[[0m[0;31m*     [0m] (2 of 2) A stop job is running for …n 38 of User root (59s / 1min 30s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for …n 38 of User root (59s / 1min 30s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (1min / 1min 30s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (1 of 2) A stop job is running for Getty on tty1 (1min / 1min 30s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (1min 1s / 1min 30s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for … of User root (1min 1s / 1min 30s)
+M[K[    [0;31m*[0;1;31m*[0m] (2 of 2) A stop job is running for … of User root (1min 2s / 1min 30s)
+M[K[     [0;31m*[0m] (2 of 2) A stop job is running for … of User root (1min 2s / 1min 30s)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (1min 3s / 1min 30s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (1min 3s / 1min 30s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (1min 4s / 1min 30s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for … of User root (1min 4s / 1min 30s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (2 of 2) A stop job is running for … of User root (1min 5s / 1min 30s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for … of User root (1min 5s / 1min 30s)
+M[K[[0m[0;31m*     [0m] (1 of 2) A stop job is running for Getty on tty1 (1min 6s / 1min 30s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (1 of 2) A stop job is running for Getty on tty1 (1min 6s / 1min 30s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (1min 7s / 1min 30s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for … of User root (1min 7s / 1min 30s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (2 of 2) A stop job is running for … of User root (1min 8s / 1min 30s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for … of User root (1min 8s / 1min 30s)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (1min 9s / 1min 30s)
+M[K[     [0;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (1min 9s / 1min 30s)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (1min 10s / 1min 30s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for …of User root (1min 10s / 1min 30s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (2 of 2) A stop job is running for …of User root (1min 11s / 1min 30s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for …of User root (1min 11s / 1min 30s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (1min 12s / 1min 30s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (1 of 2) A stop job is running for Getty on tty1 (1min 12s / 1min 30s)
+M[K[[0m[0;31m*     [0m] (1 of 2) A stop job is running for Getty on tty1 (1min 13s / 1min 30s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for …of User root (1min 13s / 1min 30s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (2 of 2) A stop job is running for …of User root (1min 14s / 1min 30s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for …of User root (1min 14s / 1min 30s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (1min 15s / 1min 30s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (1min 15s / 1min 30s)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (1min 16s / 1min 30s)
+M[K[     [0;31m*[0m] (2 of 2) A stop job is running for …of User root (1min 16s / 1min 30s)
+M[K[    [0;31m*[0;1;31m*[0m] (2 of 2) A stop job is running for …of User root (1min 17s / 1min 30s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for …of User root (1min 17s / 1min 30s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (1min 18s / 1min 30s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (1 of 2) A stop job is running for Getty on tty1 (1min 18s / 1min 30s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (1min 19s / 1min 30s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for …of User root (1min 19s / 1min 30s)
+M[K[[0m[0;31m*     [0m] (2 of 2) A stop job is running for …of User root (1min 20s / 1min 30s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for …of User root (1min 20s / 1min 30s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (1min 21s / 1min 30s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (1 of 2) A stop job is running for Getty on tty1 (1min 21s / 1min 30s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (1min 22s / 1min 30s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for …of User root (1min 22s / 1min 30s)
+M[K[    [0;31m*[0;1;31m*[0m] (2 of 2) A stop job is running for …of User root (1min 23s / 1min 30s)
+M[K[     [0;31m*[0m] (2 of 2) A stop job is running for …of User root (1min 23s / 1min 30s)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (1min 24s / 1min 30s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (1min 24s / 1min 30s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (1min 25s / 1min 30s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for …of User root (1min 25s / 1min 30s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (2 of 2) A stop job is running for …of User root (1min 26s / 1min 30s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for …of User root (1min 26s / 1min 30s)
+M[K[[0m[0;31m*     [0m] (1 of 2) A stop job is running for Getty on tty1 (1min 27s / 1min 30s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (1 of 2) A stop job is running for Getty on tty1 (1min 27s / 1min 30s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (1min 28s / 1min 30s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for …of User root (1min 28s / 1min 30s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (2 of 2) A stop job is running for …of User root (1min 29s / 1min 30s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for …of User root (1min 29s / 1min 30s)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (1min 30s / 3min)
+M[K[     [0;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (1min 30s / 3min)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (1min 31s / 3min)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for … 38 of User root (1min 31s / 3min)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (2 of 2) A stop job is running for … 38 of User root (1min 32s / 3min)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for … 38 of User root (1min 32s / 3min)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (1min 33s / 3min)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (1 of 2) A stop job is running for Getty on tty1 (1min 33s / 3min)
+M[K[[0m[0;31m*     [0m] (1 of 2) A stop job is running for Getty on tty1 (1min 34s / 3min)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for … 38 of User root (1min 34s / 3min)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (2 of 2) A stop job is running for … 38 of User root (1min 35s / 3min)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for … 38 of User root (1min 35s / 3min)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (1min 36s / 3min)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (1min 36s / 3min)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (1min 37s / 3min)
+M[K[     [0;31m*[0m] (2 of 2) A stop job is running for … 38 of User root (1min 37s / 3min)
+M[K[    [0;31m*[0;1;31m*[0m] (2 of 2) A stop job is running for … 38 of User root (1min 38s / 3min)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for … 38 of User root (1min 38s / 3min)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (1min 39s / 3min)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (1 of 2) A stop job is running for Getty on tty1 (1min 39s / 3min)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (1min 40s / 3min)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for … 38 of User root (1min 40s / 3min)
+M[K[[0m[0;31m*     [0m] (2 of 2) A stop job is running for … 38 of User root (1min 41s / 3min)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for … 38 of User root (1min 41s / 3min)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (1min 42s / 3min)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (1 of 2) A stop job is running for Getty on tty1 (1min 42s / 3min)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (1min 43s / 3min)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for … 38 of User root (1min 43s / 3min)
+M[K[    [0;31m*[0;1;31m*[0m] (2 of 2) A stop job is running for … 38 of User root (1min 44s / 3min)
+M[K[     [0;31m*[0m] (2 of 2) A stop job is running for … 38 of User root (1min 44s / 3min)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (1min 45s / 3min)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (1min 45s / 3min)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (1min 46s / 3min)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for … 38 of User root (1min 46s / 3min)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (2 of 2) A stop job is running for … 38 of User root (1min 47s / 3min)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for … 38 of User root (1min 47s / 3min)
+M[K[[0m[0;31m*     [0m] (1 of 2) A stop job is running for Getty on tty1 (1min 48s / 3min)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (1 of 2) A stop job is running for Getty on tty1 (1min 48s / 3min)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (1min 49s / 3min)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for … 38 of User root (1min 49s / 3min)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (2 of 2) A stop job is running for … 38 of User root (1min 50s / 3min)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for … 38 of User root (1min 50s / 3min)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (1min 51s / 3min)
+M[K[     [0;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (1min 51s / 3min)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (1min 52s / 3min)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for … 38 of User root (1min 52s / 3min)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (2 of 2) A stop job is running for … 38 of User root (1min 53s / 3min)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for … 38 of User root (1min 53s / 3min)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (1min 54s / 3min)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (1 of 2) A stop job is running for Getty on tty1 (1min 54s / 3min)
+M[K[[0m[0;31m*     [0m] (1 of 2) A stop job is running for Getty on tty1 (1min 55s / 3min)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for … 38 of User root (1min 55s / 3min)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (2 of 2) A stop job is running for … 38 of User root (1min 56s / 3min)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for … 38 of User root (1min 56s / 3min)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (1min 57s / 3min)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (1min 57s / 3min)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (1min 58s / 3min)
+M[K[     [0;31m*[0m] (2 of 2) A stop job is running for … 38 of User root (1min 58s / 3min)
+M[K[    [0;31m*[0;1;31m*[0m] (2 of 2) A stop job is running for … 38 of User root (1min 59s / 3min)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for … 38 of User root (1min 59s / 3min)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (2min / 3min)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (1 of 2) A stop job is running for Getty on tty1 (2min / 3min)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (2min 1s / 3min)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for …n 38 of User root (2min 1s / 3min)
+M[K[[0m[0;31m*     [0m] (2 of 2) A stop job is running for …n 38 of User root (2min 2s / 3min)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for …n 38 of User root (2min 2s / 3min)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (2min 3s / 3min)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (1 of 2) A stop job is running for Getty on tty1 (2min 3s / 3min)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (2min 4s / 3min)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for …n 38 of User root (2min 4s / 3min)
+M[K[    [0;31m*[0;1;31m*[0m] (2 of 2) A stop job is running for …n 38 of User root (2min 5s / 3min)
+M[K[     [0;31m*[0m] (2 of 2) A stop job is running for …n 38 of User root (2min 5s / 3min)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (2min 6s / 3min)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (2min 6s / 3min)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (2min 7s / 3min)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for …n 38 of User root (2min 7s / 3min)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (2 of 2) A stop job is running for …n 38 of User root (2min 8s / 3min)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for …n 38 of User root (2min 8s / 3min)
+M[K[[0m[0;31m*     [0m] (1 of 2) A stop job is running for Getty on tty1 (2min 9s / 3min)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (1 of 2) A stop job is running for Getty on tty1 (2min 9s / 3min)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (2min 10s / 3min)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for … 38 of User root (2min 10s / 3min)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (2 of 2) A stop job is running for … 38 of User root (2min 11s / 3min)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for … 38 of User root (2min 11s / 3min)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (2min 12s / 3min)
+M[K[     [0;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (2min 12s / 3min)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (2min 13s / 3min)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for … 38 of User root (2min 13s / 3min)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (2 of 2) A stop job is running for … 38 of User root (2min 14s / 3min)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for … 38 of User root (2min 14s / 3min)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (2min 15s / 3min)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (1 of 2) A stop job is running for Getty on tty1 (2min 15s / 3min)
+M[K[[0m[0;31m*     [0m] (1 of 2) A stop job is running for Getty on tty1 (2min 16s / 3min)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for … 38 of User root (2min 16s / 3min)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (2 of 2) A stop job is running for … 38 of User root (2min 17s / 3min)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for … 38 of User root (2min 17s / 3min)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (2min 18s / 3min)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (2min 18s / 3min)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (2min 19s / 3min)
+M[K[     [0;31m*[0m] (2 of 2) A stop job is running for … 38 of User root (2min 19s / 3min)
+M[K[    [0;31m*[0;1;31m*[0m] (2 of 2) A stop job is running for … 38 of User root (2min 20s / 3min)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for … 38 of User root (2min 20s / 3min)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (2min 21s / 3min)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (1 of 2) A stop job is running for Getty on tty1 (2min 21s / 3min)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (2min 22s / 3min)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for … 38 of User root (2min 22s / 3min)
+M[K[[0m[0;31m*     [0m] (2 of 2) A stop job is running for … 38 of User root (2min 23s / 3min)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for … 38 of User root (2min 23s / 3min)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (2min 24s / 3min)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (1 of 2) A stop job is running for Getty on tty1 (2min 24s / 3min)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (2min 25s / 3min)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for … 38 of User root (2min 25s / 3min)
+M[K[    [0;31m*[0;1;31m*[0m] (2 of 2) A stop job is running for … 38 of User root (2min 26s / 3min)
+M[K[     [0;31m*[0m] (2 of 2) A stop job is running for … 38 of User root (2min 26s / 3min)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (2min 27s / 3min)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (2min 27s / 3min)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (2min 28s / 3min)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for … 38 of User root (2min 28s / 3min)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (2 of 2) A stop job is running for … 38 of User root (2min 29s / 3min)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for … 38 of User root (2min 29s / 3min)
+M[K[[0m[0;31m*     [0m] (1 of 2) A stop job is running for Getty on tty1 (2min 30s / 3min)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (1 of 2) A stop job is running for Getty on tty1 (2min 30s / 3min)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (2min 31s / 3min)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for … 38 of User root (2min 31s / 3min)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (2 of 2) A stop job is running for … 38 of User root (2min 32s / 3min)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for … 38 of User root (2min 32s / 3min)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (2min 33s / 3min)
+M[K[     [0;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (2min 33s / 3min)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (2min 34s / 3min)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for … 38 of User root (2min 34s / 3min)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (2 of 2) A stop job is running for … 38 of User root (2min 35s / 3min)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for … 38 of User root (2min 35s / 3min)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (2min 36s / 3min)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (1 of 2) A stop job is running for Getty on tty1 (2min 36s / 3min)
+M[K[[0m[0;31m*     [0m] (1 of 2) A stop job is running for Getty on tty1 (2min 37s / 3min)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for … 38 of User root (2min 37s / 3min)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (2 of 2) A stop job is running for … 38 of User root (2min 38s / 3min)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for … 38 of User root (2min 38s / 3min)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (2min 39s / 3min)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (2min 39s / 3min)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (2min 40s / 3min)
+M[K[     [0;31m*[0m] (2 of 2) A stop job is running for … 38 of User root (2min 40s / 3min)
+M[K[    [0;31m*[0;1;31m*[0m] (2 of 2) A stop job is running for … 38 of User root (2min 41s / 3min)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for … 38 of User root (2min 41s / 3min)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (2min 42s / 3min)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (1 of 2) A stop job is running for Getty on tty1 (2min 42s / 3min)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (2min 43s / 3min)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for … 38 of User root (2min 43s / 3min)
+M[K[[0m[0;31m*     [0m] (2 of 2) A stop job is running for … 38 of User root (2min 44s / 3min)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for … 38 of User root (2min 44s / 3min)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (2min 45s / 3min)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (1 of 2) A stop job is running for Getty on tty1 (2min 45s / 3min)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (2min 46s / 3min)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for … 38 of User root (2min 46s / 3min)
+M[K[    [0;31m*[0;1;31m*[0m] (2 of 2) A stop job is running for … 38 of User root (2min 47s / 3min)
+M[K[     [0;31m*[0m] (2 of 2) A stop job is running for … 38 of User root (2min 47s / 3min)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (2min 48s / 3min)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (2min 48s / 3min)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (2min 49s / 3min)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for … 38 of User root (2min 49s / 3min)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (2 of 2) A stop job is running for … 38 of User root (2min 50s / 3min)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for … 38 of User root (2min 50s / 3min)
+M[K[[0m[0;31m*     [0m] (1 of 2) A stop job is running for Getty on tty1 (2min 51s / 3min)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (1 of 2) A stop job is running for Getty on tty1 (2min 51s / 3min)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (2min 52s / 3min)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for … 38 of User root (2min 52s / 3min)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (2 of 2) A stop job is running for … 38 of User root (2min 53s / 3min)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for … 38 of User root (2min 53s / 3min)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (2min 54s / 3min)
+M[K[     [0;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (2min 54s / 3min)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (2min 55s / 3min)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for … 38 of User root (2min 55s / 3min)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (2 of 2) A stop job is running for … 38 of User root (2min 56s / 3min)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for … 38 of User root (2min 56s / 3min)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (2min 57s / 3min)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (1 of 2) A stop job is running for Getty on tty1 (2min 57s / 3min)
+M[K[[0m[0;31m*     [0m] (1 of 2) A stop job is running for Getty on tty1 (2min 58s / 3min)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for … 38 of User root (2min 58s / 3min)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (2 of 2) A stop job is running for … 38 of User root (2min 59s / 3min)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for … 38 of User root (2min 59s / 3min)
+M[K[[0;32m  OK  [0m] Stopped [0;1;39mSession 38 of User root[0m.
+[K         Stopping [0;1;39mUser Manager for UID 0[0m...
+[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (3min 2s / 4min 30s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (3min 3s / 4min 30s)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (3min 3s / 4min 30s)
+M[K[     [0;31m*[0m] (2 of 2) A stop job is running for …Manager for UID 0 (3min 4s / 5min)
+M[K[    [0;31m*[0;1;31m*[0m] (2 of 2) A stop job is running for …Manager for UID 0 (3min 4s / 5min)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for …Manager for UID 0 (3min 5s / 5min)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (3min 5s / 4min 30s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (1 of 2) A stop job is running for Getty on tty1 (3min 6s / 4min 30s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (3min 6s / 4min 30s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for …Manager for UID 0 (3min 7s / 5min)
+M[K[[0m[0;31m*     [0m] (2 of 2) A stop job is running for …Manager for UID 0 (3min 7s / 5min)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for …Manager for UID 0 (3min 8s / 5min)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (3min 8s / 4min 30s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (1 of 2) A stop job is running for Getty on tty1 (3min 9s / 4min 30s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (3min 9s / 4min 30s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for …anager for UID 0 (3min 10s / 5min)
+M[K[    [0;31m*[0;1;31m*[0m] (2 of 2) A stop job is running for …anager for UID 0 (3min 10s / 5min)
+M[K[     [0;31m*[0m] (2 of 2) A stop job is running for …nager for UID 0 (495ms / 1min 49s)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (3min 11s / 4min 30s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (3min 12s / 4min 30s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (3min 12s / 4min 30s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for … Manager for UID 0 (2s / 1min 49s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (2 of 2) A stop job is running for … Manager for UID 0 (2s / 1min 49s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for … Manager for UID 0 (3s / 1min 49s)
+M[K[[0m[0;31m*     [0m] (1 of 2) A stop job is running for Getty on tty1 (3min 14s / 4min 30s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (1 of 2) A stop job is running for Getty on tty1 (3min 15s / 4min 30s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (3min 15s / 4min 30s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for … Manager for UID 0 (5s / 1min 49s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (2 of 2) A stop job is running for … Manager for UID 0 (5s / 1min 49s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for … Manager for UID 0 (6s / 1min 49s)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (3min 17s / 4min 30s)
+M[K[     [0;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (3min 18s / 4min 30s)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (3min 18s / 4min 30s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for … Manager for UID 0 (8s / 1min 49s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (2 of 2) A stop job is running for … Manager for UID 0 (8s / 1min 49s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for … Manager for UID 0 (9s / 1min 49s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (3min 20s / 4min 30s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (1 of 2) A stop job is running for Getty on tty1 (3min 21s / 4min 30s)
+M[K[[0m[0;31m*     [0m] (1 of 2) A stop job is running for Getty on tty1 (3min 21s / 4min 30s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for …Manager for UID 0 (11s / 1min 49s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (2 of 2) A stop job is running for …Manager for UID 0 (11s / 1min 49s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for …Manager for UID 0 (12s / 1min 49s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (3min 23s / 4min 30s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (3min 24s / 4min 30s)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (3min 24s / 4min 30s)
+M[K[     [0;31m*[0m] (2 of 2) A stop job is running for …Manager for UID 0 (14s / 1min 49s)
+M[K[    [0;31m*[0;1;31m*[0m] (2 of 2) A stop job is running for …Manager for UID 0 (14s / 1min 49s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for …Manager for UID 0 (15s / 1min 49s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (3min 26s / 4min 30s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (1 of 2) A stop job is running for Getty on tty1 (3min 27s / 4min 30s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (3min 27s / 4min 30s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for …Manager for UID 0 (17s / 1min 49s)
+M[K[[0m[0;31m*     [0m] (2 of 2) A stop job is running for …Manager for UID 0 (17s / 1min 49s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for …Manager for UID 0 (18s / 1min 49s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (3min 29s / 4min 30s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (1 of 2) A stop job is running for Getty on tty1 (3min 30s / 4min 30s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (3min 30s / 4min 30s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for …Manager for UID 0 (20s / 1min 49s)
+M[K[    [0;31m*[0;1;31m*[0m] (2 of 2) A stop job is running for …Manager for UID 0 (20s / 1min 49s)
+M[K[     [0;31m*[0m] (2 of 2) A stop job is running for …Manager for UID 0 (21s / 1min 49s)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (3min 32s / 4min 30s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (3min 33s / 4min 30s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (3min 33s / 4min 30s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for …Manager for UID 0 (23s / 1min 49s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (2 of 2) A stop job is running for …Manager for UID 0 (23s / 1min 49s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for …Manager for UID 0 (24s / 1min 49s)
+M[K[[0m[0;31m*     [0m] (1 of 2) A stop job is running for Getty on tty1 (3min 35s / 4min 30s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (1 of 2) A stop job is running for Getty on tty1 (3min 36s / 4min 30s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (3min 36s / 4min 30s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for …Manager for UID 0 (26s / 1min 49s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (2 of 2) A stop job is running for …Manager for UID 0 (26s / 1min 49s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for …Manager for UID 0 (27s / 1min 49s)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (3min 38s / 4min 30s)
+M[K[     [0;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (3min 39s / 4min 30s)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (3min 39s / 4min 30s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for …Manager for UID 0 (29s / 1min 49s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (2 of 2) A stop job is running for …Manager for UID 0 (29s / 1min 49s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for …Manager for UID 0 (30s / 1min 49s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (3min 41s / 4min 30s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (1 of 2) A stop job is running for Getty on tty1 (3min 42s / 4min 30s)
+M[K[[0m[0;31m*     [0m] (1 of 2) A stop job is running for Getty on tty1 (3min 42s / 4min 30s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for …Manager for UID 0 (32s / 1min 49s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (2 of 2) A stop job is running for …Manager for UID 0 (32s / 1min 49s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for …Manager for UID 0 (33s / 1min 49s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (3min 44s / 4min 30s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (3min 45s / 4min 30s)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (3min 45s / 4min 30s)
+M[K[     [0;31m*[0m] (2 of 2) A stop job is running for …Manager for UID 0 (35s / 1min 49s)
+M[K[    [0;31m*[0;1;31m*[0m] (2 of 2) A stop job is running for …Manager for UID 0 (35s / 1min 49s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for …Manager for UID 0 (36s / 1min 49s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (3min 47s / 4min 30s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (1 of 2) A stop job is running for Getty on tty1 (3min 48s / 4min 30s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (3min 48s / 4min 30s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for …Manager for UID 0 (38s / 1min 49s)
+M[K[[0m[0;31m*     [0m] (2 of 2) A stop job is running for …Manager for UID 0 (38s / 1min 49s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for …Manager for UID 0 (39s / 1min 49s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (3min 50s / 4min 30s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (1 of 2) A stop job is running for Getty on tty1 (3min 51s / 4min 30s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (3min 51s / 4min 30s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for …Manager for UID 0 (41s / 1min 49s)
+M[K[    [0;31m*[0;1;31m*[0m] (2 of 2) A stop job is running for …Manager for UID 0 (41s / 1min 49s)
+M[K[     [0;31m*[0m] (2 of 2) A stop job is running for …Manager for UID 0 (42s / 1min 49s)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (3min 53s / 4min 30s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (3min 54s / 4min 30s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (3min 54s / 4min 30s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for …Manager for UID 0 (44s / 1min 49s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (2 of 2) A stop job is running for …Manager for UID 0 (44s / 1min 49s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for …Manager for UID 0 (45s / 1min 49s)
+M[K[[0m[0;31m*     [0m] (1 of 2) A stop job is running for Getty on tty1 (3min 56s / 4min 30s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (1 of 2) A stop job is running for Getty on tty1 (3min 57s / 4min 30s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (3min 57s / 4min 30s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for …Manager for UID 0 (47s / 1min 49s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (2 of 2) A stop job is running for …Manager for UID 0 (47s / 1min 49s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for …Manager for UID 0 (48s / 1min 49s)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (3min 59s / 4min 30s)
+M[K[     [0;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (4min / 4min 30s)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (4min / 4min 30s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for …Manager for UID 0 (50s / 1min 49s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (2 of 2) A stop job is running for …Manager for UID 0 (50s / 1min 49s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for …Manager for UID 0 (51s / 1min 49s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (4min 2s / 4min 30s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (1 of 2) A stop job is running for Getty on tty1 (4min 3s / 4min 30s)
+M[K[[0m[0;31m*     [0m] (1 of 2) A stop job is running for Getty on tty1 (4min 3s / 4min 30s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for …Manager for UID 0 (53s / 1min 49s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (2 of 2) A stop job is running for …Manager for UID 0 (53s / 1min 49s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for …Manager for UID 0 (54s / 1min 49s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (4min 5s / 4min 30s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (4min 6s / 4min 30s)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (4min 6s / 4min 30s)
+M[K[     [0;31m*[0m] (2 of 2) A stop job is running for …Manager for UID 0 (56s / 1min 49s)
+M[K[    [0;31m*[0;1;31m*[0m] (2 of 2) A stop job is running for …Manager for UID 0 (56s / 1min 49s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for …Manager for UID 0 (57s / 1min 49s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (4min 8s / 4min 30s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (1 of 2) A stop job is running for Getty on tty1 (4min 9s / 4min 30s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (4min 9s / 4min 30s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for …Manager for UID 0 (59s / 1min 49s)
+M[K[[0m[0;31m*     [0m] (2 of 2) A stop job is running for …Manager for UID 0 (59s / 1min 49s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for …anager for UID 0 (1min / 1min 49s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (4min 11s / 4min 30s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (1 of 2) A stop job is running for Getty on tty1 (4min 12s / 4min 30s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (4min 12s / 4min 30s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for …ger for UID 0 (1min 2s / 1min 49s)
+M[K[    [0;31m*[0;1;31m*[0m] (2 of 2) A stop job is running for …ger for UID 0 (1min 2s / 1min 49s)
+M[K[     [0;31m*[0m] (2 of 2) A stop job is running for …ger for UID 0 (1min 3s / 1min 49s)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (4min 14s / 4min 30s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (4min 15s / 4min 30s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (4min 15s / 4min 30s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for …ger for UID 0 (1min 5s / 1min 49s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (2 of 2) A stop job is running for …ger for UID 0 (1min 5s / 1min 49s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for …ger for UID 0 (1min 6s / 1min 49s)
+M[K[[0m[0;31m*     [0m] (1 of 2) A stop job is running for Getty on tty1 (4min 17s / 4min 30s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (1 of 2) A stop job is running for Getty on tty1 (4min 18s / 4min 30s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (4min 18s / 4min 30s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for …ger for UID 0 (1min 8s / 1min 49s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (2 of 2) A stop job is running for …ger for UID 0 (1min 8s / 1min 49s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for …ger for UID 0 (1min 9s / 1min 49s)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (4min 20s / 4min 30s)
+M[K[     [0;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (4min 21s / 4min 30s)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (4min 21s / 4min 30s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for …er for UID 0 (1min 11s / 1min 49s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (2 of 2) A stop job is running for …er for UID 0 (1min 11s / 1min 49s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for …er for UID 0 (1min 12s / 1min 49s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (4min 23s / 4min 30s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (1 of 2) A stop job is running for Getty on tty1 (4min 24s / 4min 30s)
+M[K[[0m[0;31m*     [0m] (1 of 2) A stop job is running for Getty on tty1 (4min 24s / 4min 30s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for …er for UID 0 (1min 14s / 1min 49s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (2 of 2) A stop job is running for …er for UID 0 (1min 14s / 1min 49s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for …er for UID 0 (1min 15s / 1min 49s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (4min 26s / 4min 30s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (4min 27s / 4min 30s)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (4min 27s / 4min 30s)
+M[K[     [0;31m*[0m] (2 of 2) A stop job is running for …er for UID 0 (1min 17s / 1min 49s)
+M[K[    [0;31m*[0;1;31m*[0m] (2 of 2) A stop job is running for …er for UID 0 (1min 17s / 1min 49s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for …er for UID 0 (1min 18s / 1min 49s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (4min 29s / 4min 30s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (1 of 2) A stop job is running for Getty on tty1 (4min 30s / 4min 30s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (4min 30s / 6min)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for …er for UID 0 (1min 20s / 1min 49s)
+M[K[[0m[0;31m*     [0m] (2 of 2) A stop job is running for …er for UID 0 (1min 20s / 1min 49s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for …er for UID 0 (1min 21s / 1min 49s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (4min 32s / 6min)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (1 of 2) A stop job is running for Getty on tty1 (4min 33s / 6min)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (4min 33s / 6min)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for …er for UID 0 (1min 23s / 1min 49s)
+M[K[    [0;31m*[0;1;31m*[0m] (2 of 2) A stop job is running for …er for UID 0 (1min 23s / 1min 49s)
+M[K[     [0;31m*[0m] (2 of 2) A stop job is running for …er for UID 0 (1min 24s / 1min 49s)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (4min 35s / 6min)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (4min 36s / 6min)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (4min 36s / 6min)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for …er for UID 0 (1min 26s / 1min 49s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (2 of 2) A stop job is running for …er for UID 0 (1min 26s / 1min 49s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for …er for UID 0 (1min 27s / 1min 49s)
+M[K[[0m[0;31m*     [0m] (1 of 2) A stop job is running for Getty on tty1 (4min 38s / 6min)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (1 of 2) A stop job is running for Getty on tty1 (4min 39s / 6min)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (4min 39s / 6min)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for …er for UID 0 (1min 29s / 1min 49s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (2 of 2) A stop job is running for …er for UID 0 (1min 29s / 1min 49s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for …er for UID 0 (1min 30s / 1min 49s)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (4min 41s / 6min)
+M[K[     [0;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (4min 42s / 6min)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (4min 42s / 6min)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for …er for UID 0 (1min 32s / 1min 49s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (2 of 2) A stop job is running for …er for UID 0 (1min 32s / 1min 49s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for …er for UID 0 (1min 33s / 1min 49s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (4min 44s / 6min)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (1 of 2) A stop job is running for Getty on tty1 (4min 45s / 6min)
+M[K[[0m[0;31m*     [0m] (1 of 2) A stop job is running for Getty on tty1 (4min 45s / 6min)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for …er for UID 0 (1min 35s / 1min 49s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (2 of 2) A stop job is running for …er for UID 0 (1min 35s / 1min 49s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for …er for UID 0 (1min 36s / 1min 49s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (4min 47s / 6min)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (4min 48s / 6min)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (4min 48s / 6min)
+M[K[     [0;31m*[0m] (2 of 2) A stop job is running for …er for UID 0 (1min 38s / 1min 49s)
+M[K[    [0;31m*[0;1;31m*[0m] (2 of 2) A stop job is running for …er for UID 0 (1min 38s / 1min 49s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for …er for UID 0 (1min 39s / 1min 49s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (4min 50s / 6min)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (1 of 2) A stop job is running for Getty on tty1 (4min 51s / 6min)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (4min 51s / 6min)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for …er for UID 0 (1min 41s / 1min 49s)
+M[K[[0m[0;31m*     [0m] (2 of 2) A stop job is running for …er for UID 0 (1min 41s / 1min 49s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for …er for UID 0 (1min 42s / 1min 49s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (4min 53s / 6min)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (1 of 2) A stop job is running for Getty on tty1 (4min 54s / 6min)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (4min 54s / 6min)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for …er for UID 0 (1min 44s / 1min 49s)
+M[K[    [0;31m*[0;1;31m*[0m] (2 of 2) A stop job is running for …er for UID 0 (1min 44s / 1min 49s)
+M[K[     [0;31m*[0m] (2 of 2) A stop job is running for …er for UID 0 (1min 45s / 1min 49s)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (4min 56s / 6min)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (4min 57s / 6min)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (4min 57s / 6min)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for …er for UID 0 (1min 47s / 1min 49s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (2 of 2) A stop job is running for …er for UID 0 (1min 47s / 1min 49s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for …er for UID 0 (1min 48s / 1min 49s)
+M[K[[0m[0;31m*     [0m] (1 of 2) A stop job is running for Getty on tty1 (4min 59s / 6min)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (1 of 2) A stop job is running for Getty on tty1 (5min / 6min)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (5min / 6min)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for …er for UID 0 (1min 50s / 3min 49s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (2 of 2) A stop job is running for …er for UID 0 (1min 50s / 3min 49s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for …er for UID 0 (1min 51s / 3min 49s)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (5min 2s / 6min)
+M[K[     [0;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (5min 3s / 6min)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (5min 3s / 6min)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for …er for UID 0 (1min 53s / 3min 49s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (2 of 2) A stop job is running for …er for UID 0 (1min 53s / 3min 49s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for …er for UID 0 (1min 54s / 3min 49s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (5min 5s / 6min)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (1 of 2) A stop job is running for Getty on tty1 (5min 6s / 6min)
+M[K[[0m[0;31m*     [0m] (1 of 2) A stop job is running for Getty on tty1 (5min 6s / 6min)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for …er for UID 0 (1min 56s / 3min 49s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (2 of 2) A stop job is running for …er for UID 0 (1min 56s / 3min 49s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for …er for UID 0 (1min 57s / 3min 49s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (5min 8s / 6min)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (5min 9s / 6min)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (5min 9s / 6min)
+M[K[     [0;31m*[0m] (2 of 2) A stop job is running for …er for UID 0 (1min 59s / 3min 49s)
+M[K[    [0;31m*[0;1;31m*[0m] (2 of 2) A stop job is running for …er for UID 0 (1min 59s / 3min 49s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for …anager for UID 0 (2min / 3min 49s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (5min 11s / 6min)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (1 of 2) A stop job is running for Getty on tty1 (5min 12s / 6min)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (5min 12s / 6min)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for …ger for UID 0 (2min 2s / 3min 49s)
+M[K[[0m[0;31m*     [0m] (2 of 2) A stop job is running for …ger for UID 0 (2min 2s / 3min 49s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for …ger for UID 0 (2min 3s / 3min 49s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (5min 14s / 6min)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (1 of 2) A stop job is running for Getty on tty1 (5min 15s / 6min)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (5min 15s / 6min)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for …ger for UID 0 (2min 5s / 3min 49s)
+M[K[    [0;31m*[0;1;31m*[0m] (2 of 2) A stop job is running for …ger for UID 0 (2min 5s / 3min 49s)
+M[K[     [0;31m*[0m] (2 of 2) A stop job is running for …ger for UID 0 (2min 6s / 3min 49s)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (5min 17s / 6min)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (5min 18s / 6min)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (5min 18s / 6min)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for …ger for UID 0 (2min 8s / 3min 49s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (2 of 2) A stop job is running for …ger for UID 0 (2min 8s / 3min 49s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for …ger for UID 0 (2min 9s / 3min 49s)
+M[K[[0m[0;31m*     [0m] (1 of 2) A stop job is running for Getty on tty1 (5min 20s / 6min)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (1 of 2) A stop job is running for Getty on tty1 (5min 21s / 6min)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (5min 21s / 6min)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for …er for UID 0 (2min 11s / 3min 49s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (2 of 2) A stop job is running for …er for UID 0 (2min 11s / 3min 49s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for …er for UID 0 (2min 12s / 3min 49s)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (5min 23s / 6min)
+M[K[     [0;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (5min 24s / 6min)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (5min 24s / 6min)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for …er for UID 0 (2min 14s / 3min 49s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (2 of 2) A stop job is running for …er for UID 0 (2min 14s / 3min 49s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for …er for UID 0 (2min 15s / 3min 49s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (5min 26s / 6min)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (1 of 2) A stop job is running for Getty on tty1 (5min 27s / 6min)
+M[K[[0m[0;31m*     [0m] (1 of 2) A stop job is running for Getty on tty1 (5min 27s / 6min)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for …er for UID 0 (2min 17s / 3min 49s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (2 of 2) A stop job is running for …er for UID 0 (2min 17s / 3min 49s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for …er for UID 0 (2min 18s / 3min 49s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (5min 29s / 6min)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (5min 30s / 6min)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (5min 30s / 6min)
+M[K[     [0;31m*[0m] (2 of 2) A stop job is running for …er for UID 0 (2min 20s / 3min 49s)
+M[K[    [0;31m*[0;1;31m*[0m] (2 of 2) A stop job is running for …er for UID 0 (2min 20s / 3min 49s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for …er for UID 0 (2min 21s / 3min 49s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (5min 32s / 6min)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (1 of 2) A stop job is running for Getty on tty1 (5min 33s / 6min)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (5min 33s / 6min)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for …er for UID 0 (2min 23s / 3min 49s)
+M[K[[0m[0;31m*     [0m] (2 of 2) A stop job is running for …er for UID 0 (2min 23s / 3min 49s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for …er for UID 0 (2min 24s / 3min 49s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (5min 35s / 6min)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (1 of 2) A stop job is running for Getty on tty1 (5min 36s / 6min)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (5min 36s / 6min)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for …er for UID 0 (2min 26s / 3min 49s)
+M[K[    [0;31m*[0;1;31m*[0m] (2 of 2) A stop job is running for …er for UID 0 (2min 26s / 3min 49s)
+M[K[     [0;31m*[0m] (2 of 2) A stop job is running for …er for UID 0 (2min 27s / 3min 49s)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (5min 38s / 6min)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (5min 39s / 6min)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (5min 39s / 6min)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for …er for UID 0 (2min 29s / 3min 49s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (2 of 2) A stop job is running for …er for UID 0 (2min 29s / 3min 49s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for …er for UID 0 (2min 30s / 3min 49s)
+M[K[[0m[0;31m*     [0m] (1 of 2) A stop job is running for Getty on tty1 (5min 41s / 6min)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (1 of 2) A stop job is running for Getty on tty1 (5min 42s / 6min)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (5min 42s / 6min)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for …er for UID 0 (2min 32s / 3min 49s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (2 of 2) A stop job is running for …er for UID 0 (2min 32s / 3min 49s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for …er for UID 0 (2min 33s / 3min 49s)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (5min 44s / 6min)
+M[K[     [0;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (5min 45s / 6min)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (5min 45s / 6min)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for …er for UID 0 (2min 35s / 3min 49s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (2 of 2) A stop job is running for …er for UID 0 (2min 35s / 3min 49s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for …er for UID 0 (2min 36s / 3min 49s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (5min 47s / 6min)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (1 of 2) A stop job is running for Getty on tty1 (5min 48s / 6min)
+M[K[[0m[0;31m*     [0m] (1 of 2) A stop job is running for Getty on tty1 (5min 48s / 6min)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for …er for UID 0 (2min 38s / 3min 49s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (2 of 2) A stop job is running for …er for UID 0 (2min 38s / 3min 49s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (2 of 2) A stop job is running for …er for UID 0 (2min 39s / 3min 49s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (5min 50s / 6min)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (5min 51s / 6min)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (5min 51s / 6min)
+M[K[     [0;31m*[0m] (2 of 2) A stop job is running for …er for UID 0 (2min 41s / 3min 49s)
+M[K[    [0;31m*[0;1;31m*[0m] (2 of 2) A stop job is running for …er for UID 0 (2min 41s / 3min 49s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for …er for UID 0 (2min 42s / 3min 49s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (5min 53s / 6min)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (1 of 2) A stop job is running for Getty on tty1 (5min 54s / 6min)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (5min 54s / 6min)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for …er for UID 0 (2min 44s / 3min 49s)
+M[K[[0m[0;31m*     [0m] (2 of 2) A stop job is running for …er for UID 0 (2min 44s / 3min 49s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] (2 of 2) A stop job is running for …er for UID 0 (2min 45s / 3min 49s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] (1 of 2) A stop job is running for Getty on tty1 (5min 56s / 6min)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] (1 of 2) A stop job is running for Getty on tty1 (5min 57s / 6min)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (5min 57s / 6min)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (2 of 2) A stop job is running for …er for UID 0 (2min 47s / 3min 49s)
+M[K[    [0;31m*[0;1;31m*[0m] (2 of 2) A stop job is running for …er for UID 0 (2min 47s / 3min 49s)
+M[K[     [0;31m*[0m] (2 of 2) A stop job is running for …er for UID 0 (2min 48s / 3min 49s)
+M[K[    [0;31m*[0;1;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (5min 59s / 6min)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] (1 of 2) A stop job is running for Getty on tty1 (6min / 6min)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] (1 of 2) A stop job is running for Getty on tty1 (6min / 6min)
+M[K[[0;32m  OK  [0m] Stopped [0;1;39mGetty on tty1[0m.
+[K[[0;32m  OK  [0m] Removed slice [0;1;39mSlice /system/getty[0m.
+         Stopping [0;1;39mPermit User Sessions[0m...
+[[0;32m  OK  [0m] Stopped [0;1;39mPermit User Sessions[0m.
+[[0;32m  OK  [0m] Stopped target [0;1;39mNetwork[0m.
+[[0;32m  OK  [0m] Stopped target [0;1;39mRemote File Systems[0m.
+         Stopping [0;1;39mNetwork Management[0m...
+[[0;32m  OK  [0m] Stopped [0;1;39mLoad JSON user/group Records from Credentials[0m.
+[[0;32m  OK  [0m] Stopped [0;1;39mNetwork Management[0m.
+[[0;32m  OK  [0m] Stopped target [0;1;39mPreparation for Network[0m.
+[[0;32m  OK  [0m] Stopped [0;1;39mGenerate Network Units from Kernel Command Line[0m.
+[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] A stop job is running for User Manager for UID 0 (2min 52s / 3min 49s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] A stop job is running for User Manager for UID 0 (2min 52s / 3min 49s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] A stop job is running for User Manager for UID 0 (2min 53s / 3min 49s)
+M[K[[0m[0;31m*     [0m] A stop job is running for User Manager for UID 0 (2min 53s / 3min 49s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] A stop job is running for User Manager for UID 0 (2min 54s / 3min 49s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] A stop job is running for User Manager for UID 0 (2min 54s / 3min 49s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] A stop job is running for User Manager for UID 0 (2min 55s / 3min 49s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] A stop job is running for User Manager for UID 0 (2min 55s / 3min 49s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] A stop job is running for User Manager for UID 0 (2min 56s / 3min 49s)
+M[K[    [0;31m*[0;1;31m*[0m] A stop job is running for User Manager for UID 0 (2min 56s / 3min 49s)
+M[K[     [0;31m*[0m] A stop job is running for User Manager for UID 0 (2min 57s / 3min 49s)
+M[K[    [0;31m*[0;1;31m*[0m] A stop job is running for User Manager for UID 0 (2min 57s / 3min 49s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] A stop job is running for User Manager for UID 0 (2min 58s / 3min 49s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] A stop job is running for User Manager for UID 0 (2min 58s / 3min 49s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] A stop job is running for User Manager for UID 0 (2min 59s / 3min 49s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] A stop job is running for User Manager for UID 0 (2min 59s / 3min 49s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] A stop job is running for User Manager for UID 0 (3min / 3min 49s)
+M[K[[0m[0;31m*     [0m] A stop job is running for User Manager for UID 0 (3min / 3min 49s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] A stop job is running for User Manager for UID 0 (3min 1s / 3min 49s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] A stop job is running for User Manager for UID 0 (3min 1s / 3min 49s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] A stop job is running for User Manager for UID 0 (3min 2s / 3min 49s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] A stop job is running for User Manager for UID 0 (3min 2s / 3min 49s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] A stop job is running for User Manager for UID 0 (3min 3s / 3min 49s)
+M[K[    [0;31m*[0;1;31m*[0m] A stop job is running for User Manager for UID 0 (3min 3s / 3min 49s)
+M[K[     [0;31m*[0m] A stop job is running for User Manager for UID 0 (3min 4s / 3min 49s)
+M[K[    [0;31m*[0;1;31m*[0m] A stop job is running for User Manager for UID 0 (3min 4s / 3min 49s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] A stop job is running for User Manager for UID 0 (3min 5s / 3min 49s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] A stop job is running for User Manager for UID 0 (3min 5s / 3min 49s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] A stop job is running for User Manager for UID 0 (3min 6s / 3min 49s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] A stop job is running for User Manager for UID 0 (3min 6s / 3min 49s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] A stop job is running for User Manager for UID 0 (3min 7s / 3min 49s)
+M[K[[0m[0;31m*     [0m] A stop job is running for User Manager for UID 0 (3min 7s / 3min 49s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] A stop job is running for User Manager for UID 0 (3min 8s / 3min 49s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] A stop job is running for User Manager for UID 0 (3min 8s / 3min 49s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] A stop job is running for User Manager for UID 0 (3min 9s / 3min 49s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] A stop job is running for User Manager for UID 0 (3min 9s / 3min 49s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] A stop job is running for User Manager for UID 0 (3min 10s / 3min 49s)
+M[K[    [0;31m*[0;1;31m*[0m] A stop job is running for User Manager for UID 0 (3min 10s / 3min 49s)
+M[K[     [0;31m*[0m] A stop job is running for User Manager for UID 0 (3min 11s / 3min 49s)
+M[K[    [0;31m*[0;1;31m*[0m] A stop job is running for User Manager for UID 0 (3min 11s / 3min 49s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] A stop job is running for User Manager for UID 0 (3min 12s / 3min 49s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] A stop job is running for User Manager for UID 0 (3min 12s / 3min 49s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] A stop job is running for User Manager for UID 0 (3min 13s / 3min 49s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] A stop job is running for User Manager for UID 0 (3min 13s / 3min 49s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] A stop job is running for User Manager for UID 0 (3min 14s / 3min 49s)
+M[K[[0m[0;31m*     [0m] A stop job is running for User Manager for UID 0 (3min 14s / 3min 49s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] A stop job is running for User Manager for UID 0 (3min 15s / 3min 49s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] A stop job is running for User Manager for UID 0 (3min 15s / 3min 49s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] A stop job is running for User Manager for UID 0 (3min 16s / 3min 49s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] A stop job is running for User Manager for UID 0 (3min 16s / 3min 49s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] A stop job is running for User Manager for UID 0 (3min 17s / 3min 49s)
+M[K[    [0;31m*[0;1;31m*[0m] A stop job is running for User Manager for UID 0 (3min 17s / 3min 49s)
+M[K[     [0;31m*[0m] A stop job is running for User Manager for UID 0 (3min 18s / 3min 49s)
+M[K[    [0;31m*[0;1;31m*[0m] A stop job is running for User Manager for UID 0 (3min 18s / 3min 49s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] A stop job is running for User Manager for UID 0 (3min 19s / 3min 49s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] A stop job is running for User Manager for UID 0 (3min 19s / 3min 49s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] A stop job is running for User Manager for UID 0 (3min 20s / 3min 49s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] A stop job is running for User Manager for UID 0 (3min 20s / 3min 49s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] A stop job is running for User Manager for UID 0 (3min 21s / 3min 49s)
+M[K[[0m[0;31m*     [0m] A stop job is running for User Manager for UID 0 (3min 21s / 3min 49s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] A stop job is running for User Manager for UID 0 (3min 22s / 3min 49s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] A stop job is running for User Manager for UID 0 (3min 22s / 3min 49s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] A stop job is running for User Manager for UID 0 (3min 23s / 3min 49s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] A stop job is running for User Manager for UID 0 (3min 23s / 3min 49s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] A stop job is running for User Manager for UID 0 (3min 24s / 3min 49s)
+M[K[    [0;31m*[0;1;31m*[0m] A stop job is running for User Manager for UID 0 (3min 24s / 3min 49s)
+M[K[     [0;31m*[0m] A stop job is running for User Manager for UID 0 (3min 25s / 3min 49s)
+M[K[    [0;31m*[0;1;31m*[0m] A stop job is running for User Manager for UID 0 (3min 25s / 3min 49s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] A stop job is running for User Manager for UID 0 (3min 26s / 3min 49s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] A stop job is running for User Manager for UID 0 (3min 26s / 3min 49s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] A stop job is running for User Manager for UID 0 (3min 27s / 3min 49s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] A stop job is running for User Manager for UID 0 (3min 27s / 3min 49s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] A stop job is running for User Manager for UID 0 (3min 28s / 3min 49s)
+M[K[[0m[0;31m*     [0m] A stop job is running for User Manager for UID 0 (3min 28s / 3min 49s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] A stop job is running for User Manager for UID 0 (3min 29s / 3min 49s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] A stop job is running for User Manager for UID 0 (3min 29s / 3min 49s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] A stop job is running for User Manager for UID 0 (3min 30s / 3min 49s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] A stop job is running for User Manager for UID 0 (3min 30s / 3min 49s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] A stop job is running for User Manager for UID 0 (3min 31s / 3min 49s)
+M[K[    [0;31m*[0;1;31m*[0m] A stop job is running for User Manager for UID 0 (3min 31s / 3min 49s)
+M[K[     [0;31m*[0m] A stop job is running for User Manager for UID 0 (3min 32s / 3min 49s)
+M[K[    [0;31m*[0;1;31m*[0m] A stop job is running for User Manager for UID 0 (3min 32s / 3min 49s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] A stop job is running for User Manager for UID 0 (3min 33s / 3min 49s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] A stop job is running for User Manager for UID 0 (3min 33s / 3min 49s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] A stop job is running for User Manager for UID 0 (3min 34s / 3min 49s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] A stop job is running for User Manager for UID 0 (3min 34s / 3min 49s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] A stop job is running for User Manager for UID 0 (3min 35s / 3min 49s)
+M[K[[0m[0;31m*     [0m] A stop job is running for User Manager for UID 0 (3min 35s / 3min 49s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] A stop job is running for User Manager for UID 0 (3min 36s / 3min 49s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] A stop job is running for User Manager for UID 0 (3min 36s / 3min 49s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] A stop job is running for User Manager for UID 0 (3min 37s / 3min 49s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] A stop job is running for User Manager for UID 0 (3min 37s / 3min 49s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] A stop job is running for User Manager for UID 0 (3min 38s / 3min 49s)
+M[K[    [0;31m*[0;1;31m*[0m] A stop job is running for User Manager for UID 0 (3min 38s / 3min 49s)
+M[K[     [0;31m*[0m] A stop job is running for User Manager for UID 0 (3min 39s / 3min 49s)
+M[K[    [0;31m*[0;1;31m*[0m] A stop job is running for User Manager for UID 0 (3min 39s / 3min 49s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] A stop job is running for User Manager for UID 0 (3min 40s / 3min 49s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] A stop job is running for User Manager for UID 0 (3min 40s / 3min 49s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] A stop job is running for User Manager for UID 0 (3min 41s / 3min 49s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] A stop job is running for User Manager for UID 0 (3min 41s / 3min 49s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] A stop job is running for User Manager for UID 0 (3min 42s / 3min 49s)
+M[K[[0m[0;31m*     [0m] A stop job is running for User Manager for UID 0 (3min 42s / 3min 49s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] A stop job is running for User Manager for UID 0 (3min 43s / 3min 49s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] A stop job is running for User Manager for UID 0 (3min 43s / 3min 49s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] A stop job is running for User Manager for UID 0 (3min 44s / 3min 49s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] A stop job is running for User Manager for UID 0 (3min 44s / 3min 49s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] A stop job is running for User Manager for UID 0 (3min 45s / 3min 49s)
+M[K[    [0;31m*[0;1;31m*[0m] A stop job is running for User Manager for UID 0 (3min 45s / 3min 49s)
+M[K[     [0;31m*[0m] A stop job is running for User Manager for UID 0 (3min 46s / 3min 49s)
+M[K[    [0;31m*[0;1;31m*[0m] A stop job is running for User Manager for UID 0 (3min 46s / 3min 49s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] A stop job is running for User Manager for UID 0 (3min 47s / 3min 49s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] A stop job is running for User Manager for UID 0 (3min 47s / 3min 49s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] A stop job is running for User Manager for UID 0 (3min 48s / 3min 49s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] A stop job is running for User Manager for UID 0 (3min 48s / 3min 49s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] A stop job is running for User Manager for UID 0 (3min 49s / 3min 49s)
+M[K[[0m[0;31m*     [0m] A stop job is running for User Manager for UID 0 (3min 49s / 3min 49s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] A stop job is running for User Manager for UID 0 (3min 50s / 5min 50s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] A stop job is running for User Manager for UID 0 (3min 50s / 5min 50s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] A stop job is running for User Manager for UID 0 (3min 51s / 5min 50s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] A stop job is running for User Manager for UID 0 (3min 51s / 5min 50s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] A stop job is running for User Manager for UID 0 (3min 52s / 5min 50s)
+M[K[    [0;31m*[0;1;31m*[0m] A stop job is running for User Manager for UID 0 (3min 52s / 5min 50s)
+M[K[     [0;31m*[0m] A stop job is running for User Manager for UID 0 (3min 53s / 5min 50s)
+M[K[    [0;31m*[0;1;31m*[0m] A stop job is running for User Manager for UID 0 (3min 53s / 5min 50s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] A stop job is running for User Manager for UID 0 (3min 54s / 5min 50s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] A stop job is running for User Manager for UID 0 (3min 54s / 5min 50s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] A stop job is running for User Manager for UID 0 (3min 55s / 5min 50s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] A stop job is running for User Manager for UID 0 (3min 55s / 5min 50s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] A stop job is running for User Manager for UID 0 (3min 56s / 5min 50s)
+M[K[[0m[0;31m*     [0m] A stop job is running for User Manager for UID 0 (3min 56s / 5min 50s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] A stop job is running for User Manager for UID 0 (3min 57s / 5min 50s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] A stop job is running for User Manager for UID 0 (3min 57s / 5min 50s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] A stop job is running for User Manager for UID 0 (3min 58s / 5min 50s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] A stop job is running for User Manager for UID 0 (3min 58s / 5min 50s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] A stop job is running for User Manager for UID 0 (3min 59s / 5min 50s)
+M[K[    [0;31m*[0;1;31m*[0m] A stop job is running for User Manager for UID 0 (3min 59s / 5min 50s)
+M[K[     [0;31m*[0m] A stop job is running for User Manager for UID 0 (4min / 5min 50s)
+M[K[    [0;31m*[0;1;31m*[0m] A stop job is running for User Manager for UID 0 (4min / 5min 50s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] A stop job is running for User Manager for UID 0 (4min 1s / 5min 50s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] A stop job is running for User Manager for UID 0 (4min 1s / 5min 50s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] A stop job is running for User Manager for UID 0 (4min 2s / 5min 50s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] A stop job is running for User Manager for UID 0 (4min 2s / 5min 50s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] A stop job is running for User Manager for UID 0 (4min 3s / 5min 50s)
+M[K[[0m[0;31m*     [0m] A stop job is running for User Manager for UID 0 (4min 3s / 5min 50s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] A stop job is running for User Manager for UID 0 (4min 4s / 5min 50s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] A stop job is running for User Manager for UID 0 (4min 4s / 5min 50s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] A stop job is running for User Manager for UID 0 (4min 5s / 5min 50s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] A stop job is running for User Manager for UID 0 (4min 5s / 5min 50s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] A stop job is running for User Manager for UID 0 (4min 6s / 5min 50s)
+M[K[    [0;31m*[0;1;31m*[0m] A stop job is running for User Manager for UID 0 (4min 6s / 5min 50s)
+M[K[     [0;31m*[0m] A stop job is running for User Manager for UID 0 (4min 7s / 5min 50s)
+M[K[    [0;31m*[0;1;31m*[0m] A stop job is running for User Manager for UID 0 (4min 7s / 5min 50s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] A stop job is running for User Manager for UID 0 (4min 8s / 5min 50s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] A stop job is running for User Manager for UID 0 (4min 8s / 5min 50s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] A stop job is running for User Manager for UID 0 (4min 9s / 5min 50s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] A stop job is running for User Manager for UID 0 (4min 9s / 5min 50s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] A stop job is running for User Manager for UID 0 (4min 10s / 5min 50s)
+M[K[[0m[0;31m*     [0m] A stop job is running for User Manager for UID 0 (4min 10s / 5min 50s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] A stop job is running for User Manager for UID 0 (4min 11s / 5min 50s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] A stop job is running for User Manager for UID 0 (4min 11s / 5min 50s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] A stop job is running for User Manager for UID 0 (4min 12s / 5min 50s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] A stop job is running for User Manager for UID 0 (4min 12s / 5min 50s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] A stop job is running for User Manager for UID 0 (4min 13s / 5min 50s)
+M[K[    [0;31m*[0;1;31m*[0m] A stop job is running for User Manager for UID 0 (4min 13s / 5min 50s)
+M[K[     [0;31m*[0m] A stop job is running for User Manager for UID 0 (4min 14s / 5min 50s)
+M[K[    [0;31m*[0;1;31m*[0m] A stop job is running for User Manager for UID 0 (4min 14s / 5min 50s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] A stop job is running for User Manager for UID 0 (4min 15s / 5min 50s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] A stop job is running for User Manager for UID 0 (4min 15s / 5min 50s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] A stop job is running for User Manager for UID 0 (4min 16s / 5min 50s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] A stop job is running for User Manager for UID 0 (4min 16s / 5min 50s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] A stop job is running for User Manager for UID 0 (4min 17s / 5min 50s)
+M[K[[0m[0;31m*     [0m] A stop job is running for User Manager for UID 0 (4min 17s / 5min 50s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] A stop job is running for User Manager for UID 0 (4min 18s / 5min 50s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] A stop job is running for User Manager for UID 0 (4min 18s / 5min 50s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] A stop job is running for User Manager for UID 0 (4min 19s / 5min 50s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] A stop job is running for User Manager for UID 0 (4min 19s / 5min 50s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] A stop job is running for User Manager for UID 0 (4min 20s / 5min 50s)
+M[K[    [0;31m*[0;1;31m*[0m] A stop job is running for User Manager for UID 0 (4min 20s / 5min 50s)
+M[K[     [0;31m*[0m] A stop job is running for User Manager for UID 0 (4min 21s / 5min 50s)
+M[K[    [0;31m*[0;1;31m*[0m] A stop job is running for User Manager for UID 0 (4min 21s / 5min 50s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] A stop job is running for User Manager for UID 0 (4min 22s / 5min 50s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] A stop job is running for User Manager for UID 0 (4min 22s / 5min 50s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] A stop job is running for User Manager for UID 0 (4min 23s / 5min 50s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] A stop job is running for User Manager for UID 0 (4min 23s / 5min 50s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] A stop job is running for User Manager for UID 0 (4min 24s / 5min 50s)
+M[K[[0m[0;31m*     [0m] A stop job is running for User Manager for UID 0 (4min 24s / 5min 50s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] A stop job is running for User Manager for UID 0 (4min 25s / 5min 50s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] A stop job is running for User Manager for UID 0 (4min 25s / 5min 50s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] A stop job is running for User Manager for UID 0 (4min 26s / 5min 50s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] A stop job is running for User Manager for UID 0 (4min 26s / 5min 50s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] A stop job is running for User Manager for UID 0 (4min 27s / 5min 50s)
+M[K[    [0;31m*[0;1;31m*[0m] A stop job is running for User Manager for UID 0 (4min 27s / 5min 50s)
+M[K[     [0;31m*[0m] A stop job is running for User Manager for UID 0 (4min 28s / 5min 50s)
+M[K[    [0;31m*[0;1;31m*[0m] A stop job is running for User Manager for UID 0 (4min 28s / 5min 50s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] A stop job is running for User Manager for UID 0 (4min 29s / 5min 50s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] A stop job is running for User Manager for UID 0 (4min 29s / 5min 50s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] A stop job is running for User Manager for UID 0 (4min 30s / 5min 50s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] A stop job is running for User Manager for UID 0 (4min 30s / 5min 50s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] A stop job is running for User Manager for UID 0 (4min 31s / 5min 50s)
+M[K[[0m[0;31m*     [0m] A stop job is running for User Manager for UID 0 (4min 31s / 5min 50s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] A stop job is running for User Manager for UID 0 (4min 32s / 5min 50s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] A stop job is running for User Manager for UID 0 (4min 32s / 5min 50s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] A stop job is running for User Manager for UID 0 (4min 33s / 5min 50s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] A stop job is running for User Manager for UID 0 (4min 33s / 5min 50s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] A stop job is running for User Manager for UID 0 (4min 34s / 5min 50s)
+M[K[    [0;31m*[0;1;31m*[0m] A stop job is running for User Manager for UID 0 (4min 34s / 5min 50s)
+M[K[     [0;31m*[0m] A stop job is running for User Manager for UID 0 (4min 35s / 5min 50s)
+M[K[    [0;31m*[0;1;31m*[0m] A stop job is running for User Manager for UID 0 (4min 35s / 5min 50s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] A stop job is running for User Manager for UID 0 (4min 36s / 5min 50s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] A stop job is running for User Manager for UID 0 (4min 36s / 5min 50s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] A stop job is running for User Manager for UID 0 (4min 37s / 5min 50s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] A stop job is running for User Manager for UID 0 (4min 37s / 5min 50s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] A stop job is running for User Manager for UID 0 (4min 38s / 5min 50s)
+M[K[[0m[0;31m*     [0m] A stop job is running for User Manager for UID 0 (4min 38s / 5min 50s)
+M[K[[0;1;31m*[0m[0;31m*    [0m] A stop job is running for User Manager for UID 0 (4min 39s / 5min 50s)
+M[K[[0;31m*[0;1;31m*[0m[0;31m*   [0m] A stop job is running for User Manager for UID 0 (4min 39s / 5min 50s)
+M[K[ [0;31m*[0;1;31m*[0m[0;31m*  [0m] A stop job is running for User Manager for UID 0 (4min 40s / 5min 50s)
+M[K[  [0;31m*[0;1;31m*[0m[0;31m* [0m] A stop job is running for User Manager for UID 0 (4min 40s / 5min 50s)
+M[K[   [0;31m*[0;1;31m*[0m[0;31m*[0m] A stop job is running for User Manager for UID 0 (4min 41s / 5min 50s)
+M[K[    [0;31m*[0;1;31m*[0m] A stop job is running for User Manager for UID 0 (4min 41s / 5min 50s)
+M[K[     [0;31m*[0m] A stop job is running for User Manager for UID 0 (4min 42s / 5min 50s)

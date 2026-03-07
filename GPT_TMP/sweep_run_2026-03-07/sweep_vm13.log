@@ -1,0 +1,6 @@
+=== SMB2 Sweep: Sat Mar  7 12:19:54 CET 2026 ===
+SSH=23022  SMB=23445
+Output: /tmp/sweep-20260307-121954
+Reset mode: full guest factory reset before every suite
+
+Restarting ksmbd...
