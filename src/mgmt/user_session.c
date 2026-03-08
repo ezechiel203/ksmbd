@@ -1,0 +1,850 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+/*
+ *   Copyright (C) 2018 Samsung Electronics Co., Ltd.
+ */
+
+#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+
+#include <linux/list.h>
+#include <linux/slab.h>
+#include <linux/rwsem.h>
+#include <linux/rcupdate.h>
+#include <linux/mutex.h>
+#include <linux/xarray.h>
+#include <linux/string.h>
+#include <linux/random.h>
+#include <linux/bitmap.h>
+#include <crypto/algapi.h>
+
+#include "ksmbd_ida.h"
+#include "user_session.h"
+#include "user_config.h"
+#include "tree_connect.h"
+#include "ksmbd_witness.h"
+#include "transport_ipc.h"
+#include "connection.h"
+#include "vfs_cache.h"
+
+static DEFINE_IDA(session_ida);
+
+#define SESSION_HASH_BITS		12
+static DEFINE_HASHTABLE(sessions_table, SESSION_HASH_BITS);
+static DEFINE_MUTEX(sessions_table_lock);
+
+struct ksmbd_session_rpc {
+	int			id;
+	unsigned int		method;
+};
+
+void ksmbd_preauth_session_free(struct preauth_session *sess)
+{
+	if (!sess)
+		return;
+
+	memzero_explicit(sess->binding_sess_key,
+			 sizeof(sess->binding_sess_key));
+	kfree(sess);
+}
+
+static const char *ksmbd_rpc_pipe_name(const char *rpc_name)
+{
+	if (!rpc_name)
+		return NULL;
+
+	if (!strncasecmp(rpc_name, "\\PIPE\\", 6))
+		rpc_name += 6;
+
+	if (*rpc_name == '\\')
+		rpc_name++;
+
+	return rpc_name;
+}
+
+static void free_channel_list(struct ksmbd_session *sess)
+{
+	struct channel *chann;
+	unsigned long index;
+
+	xa_for_each(&sess->ksmbd_chann_list, index, chann) {
+		xa_erase(&sess->ksmbd_chann_list, index);
+		memzero_explicit(chann->smb3signingkey, sizeof(chann->smb3signingkey));
+		kfree(chann);
+	}
+
+	xa_destroy(&sess->ksmbd_chann_list);
+}
+
+static void __session_rpc_close(struct ksmbd_session *sess,
+				struct ksmbd_session_rpc *entry)
+{
+	struct ksmbd_rpc_command *resp;
+
+	resp = ksmbd_rpc_close(sess, entry->id);
+	if (!resp)
+		pr_err("Unable to close RPC pipe %d\n", entry->id);
+
+	kvfree(resp);
+	ksmbd_rpc_id_free(entry->id);
+	kfree(entry);
+}
+
+static void ksmbd_session_rpc_clear_list(struct ksmbd_session *sess)
+{
+	struct ksmbd_session_rpc *entry;
+	long index;
+
+	down_write(&sess->rpc_lock);
+	xa_for_each(&sess->rpc_handle_list, index, entry) {
+		xa_erase(&sess->rpc_handle_list, index);
+		__session_rpc_close(sess, entry);
+	}
+	up_write(&sess->rpc_lock);
+
+	xa_destroy(&sess->rpc_handle_list);
+}
+
+#ifdef CONFIG_SMB_INSECURE_SERVER
+static void ksmbd_session_smb1_nttrans_free(struct ksmbd_smb1_nttrans_state *state)
+{
+	if (!state)
+		return;
+
+	kvfree(state->req_hdr);
+	kvfree(state->params);
+	kvfree(state->data);
+	bitmap_free(state->param_bitmap);
+	bitmap_free(state->data_bitmap);
+	kfree(state);
+}
+
+static void ksmbd_session_smb1_nttrans_clear_list(struct ksmbd_session *sess)
+{
+	struct ksmbd_smb1_nttrans_state *state;
+	unsigned long index;
+
+	mutex_lock(&sess->smb1_nttrans_lock);
+	xa_for_each(&sess->smb1_nttrans_list, index, state) {
+		xa_erase(&sess->smb1_nttrans_list, index);
+		ksmbd_session_smb1_nttrans_free(state);
+	}
+	mutex_unlock(&sess->smb1_nttrans_lock);
+
+	xa_destroy(&sess->smb1_nttrans_list);
+}
+#endif
+
+int ksmbd_session_rpc_method_name(const char *rpc_name)
+{
+	rpc_name = ksmbd_rpc_pipe_name(rpc_name);
+	if (!rpc_name || !*rpc_name)
+		return 0;
+
+	if (!strcasecmp(rpc_name, "srvsvc"))
+		return KSMBD_RPC_SRVSVC_METHOD_INVOKE;
+
+	if (!strcasecmp(rpc_name, "wkssvc"))
+		return KSMBD_RPC_WKSSVC_METHOD_INVOKE;
+
+	if (!strcasecmp(rpc_name, "lanman"))
+		return KSMBD_RPC_RAP_METHOD;
+
+	if (!strcasecmp(rpc_name, "samr"))
+		return KSMBD_RPC_SAMR_METHOD_INVOKE;
+
+	if (!strcasecmp(rpc_name, "lsarpc"))
+		return KSMBD_RPC_LSARPC_METHOD_INVOKE;
+
+	pr_err("Unsupported RPC: %s\n", rpc_name);
+	return 0;
+}
+
+int ksmbd_session_rpc_open(struct ksmbd_session *sess, char *rpc_name)
+{
+	struct ksmbd_session_rpc *entry, *old;
+	struct ksmbd_rpc_command *resp;
+	int method, id;
+
+	method = ksmbd_session_rpc_method_name(rpc_name);
+	if (!method)
+		return -EINVAL;
+
+	entry = kzalloc(sizeof(struct ksmbd_session_rpc), KSMBD_DEFAULT_GFP);
+	if (!entry)
+		return -ENOMEM;
+
+	entry->method = method;
+	entry->id = id = ksmbd_ipc_id_alloc();
+	if (id < 0)
+		goto free_entry;
+
+	/* Store the entry first so ksmbd_session_rpc_method() can find it */
+	down_write(&sess->rpc_lock);
+	old = xa_store(&sess->rpc_handle_list, id, entry, KSMBD_DEFAULT_GFP);
+	if (xa_is_err(old)) {
+		up_write(&sess->rpc_lock);
+		goto free_id;
+	}
+	up_write(&sess->rpc_lock);
+
+	/*
+	 * Call ksmbd_rpc_open() without holding rpc_lock — it sleeps
+	 * waiting for an IPC response, and holding a write-semaphore
+	 * across a sleep blocks all concurrent readers (rpc_write,
+	 * rpc_read, rpc_ioctl) for the entire IPC round-trip.
+	 */
+	resp = ksmbd_rpc_open(sess, id);
+	if (!resp) {
+		down_write(&sess->rpc_lock);
+		xa_erase(&sess->rpc_handle_list, entry->id);
+		up_write(&sess->rpc_lock);
+		goto free_id;
+	}
+
+	kvfree(resp);
+	return id;
+free_id:
+	ksmbd_rpc_id_free(entry->id);
+free_entry:
+	kfree(entry);
+	return -EINVAL;
+}
+
+void ksmbd_session_rpc_close(struct ksmbd_session *sess, int id)
+{
+	struct ksmbd_session_rpc *entry;
+
+	down_write(&sess->rpc_lock);
+	entry = xa_erase(&sess->rpc_handle_list, id);
+	if (entry)
+		__session_rpc_close(sess, entry);
+	up_write(&sess->rpc_lock);
+}
+
+int ksmbd_session_rpc_method(struct ksmbd_session *sess, int id)
+{
+	struct ksmbd_session_rpc *entry;
+
+	lockdep_assert_held(&sess->rpc_lock);
+	entry = xa_load(&sess->rpc_handle_list, id);
+
+	return entry ? entry->method : 0;
+}
+
+void ksmbd_session_destroy(struct ksmbd_session *sess)
+{
+	if (!sess)
+		return;
+
+	/* Clean up any witness registrations owned by this session */
+	ksmbd_witness_unregister_session(sess->id);
+
+	if (sess->user)
+		ksmbd_free_user(sess->user);
+
+	ksmbd_tree_conn_session_logoff(sess);
+	ksmbd_destroy_file_table(&sess->file_table);
+	ksmbd_launch_ksmbd_durable_scavenger();
+	ksmbd_session_rpc_clear_list(sess);
+#ifdef CONFIG_SMB_INSECURE_SERVER
+	ksmbd_session_smb1_nttrans_clear_list(sess);
+#endif
+	free_channel_list(sess);
+	memzero_explicit(sess->sess_key, sizeof(sess->sess_key));
+	memzero_explicit(sess->smb3encryptionkey, sizeof(sess->smb3encryptionkey));
+	memzero_explicit(sess->smb3decryptionkey, sizeof(sess->smb3decryptionkey));
+	memzero_explicit(sess->smb3signingkey, sizeof(sess->smb3signingkey));
+	kfree_sensitive(sess->Preauth_HashValue);
+	ksmbd_release_id(&session_ida, sess->id);
+	kfree_sensitive(sess);
+}
+
+static struct ksmbd_session *__session_lookup(unsigned long long id)
+	__must_hold(RCU)
+{
+	struct ksmbd_session *sess;
+
+	lockdep_assert(rcu_read_lock_held());
+
+	hash_for_each_possible_rcu(sessions_table, sess, hlist, id) {
+		if (id == sess->id)
+			return sess;
+	}
+	return NULL;
+}
+
+/**
+ * ksmbd_expire_session() - expire stale sessions on a connection
+ * @conn: connection whose sessions should be checked
+ *
+ * Collects expired sessions in batches to avoid unbounded stack usage.
+ * Loops until all expired sessions have been cleaned up, ensuring that
+ * a burst of stale sessions does not accumulate indefinitely.
+ */
+static void ksmbd_expire_session(struct ksmbd_conn *conn)
+{
+	struct ksmbd_session *expired[16];
+	int nr_expired, i;
+
+again:
+	nr_expired = 0;
+
+	mutex_lock(&sessions_table_lock);
+	down_write(&conn->session_lock);
+	lockdep_assert_held(&sessions_table_lock);
+	{
+		unsigned long id;
+		struct ksmbd_session *sess;
+
+		xa_for_each(&conn->sessions, id, sess) {
+			int state;
+
+			if (nr_expired >= ARRAY_SIZE(expired))
+				break;
+			down_read(&sess->state_lock);
+			state = sess->state;
+			up_read(&sess->state_lock);
+			if (refcount_read(&sess->refcnt) <= 1 &&
+			    (state != SMB2_SESSION_VALID ||
+			     time_after(jiffies,
+				       READ_ONCE(sess->last_active) +
+				       SMB2_SESSION_TIMEOUT))) {
+				xa_erase(&conn->sessions, sess->id);
+#ifdef CONFIG_SMB_INSECURE_SERVER
+				if (hash_hashed(&sess->hlist))
+					hash_del_rcu(&sess->hlist);
+#else
+				hash_del_rcu(&sess->hlist);
+#endif
+				expired[nr_expired++] = sess;
+				continue;
+			}
+		}
+	}
+	up_write(&conn->session_lock);
+	mutex_unlock(&sessions_table_lock);
+
+	if (nr_expired) {
+		synchronize_rcu();
+		for (i = 0; i < nr_expired; i++)
+			ksmbd_session_destroy(expired[i]);
+		/* More expired sessions may remain; loop to drain them all */
+		if (nr_expired >= ARRAY_SIZE(expired))
+			goto again;
+	}
+}
+
+int ksmbd_session_register(struct ksmbd_conn *conn,
+			   struct ksmbd_session *sess)
+{
+	int ret;
+
+	sess->dialect = conn->dialect;
+	sess->cli_sec_mode = conn->cli_sec_mode;
+	sess->srv_sec_mode = conn->srv_sec_mode;
+	memcpy(sess->ClientGUID, conn->ClientGUID, SMB2_CLIENT_GUID_SIZE);
+	ksmbd_expire_session(conn);
+	/* C-04: xa_store into conn->sessions must be done under session_lock */
+	down_write(&conn->session_lock);
+	ret = xa_err(xa_store(&conn->sessions, sess->id, sess, KSMBD_DEFAULT_GFP));
+	up_write(&conn->session_lock);
+	return ret;
+}
+
+static int ksmbd_chann_del(struct ksmbd_conn *conn, struct ksmbd_session *sess)
+{
+	struct channel *chann;
+
+	chann = xa_erase(&sess->ksmbd_chann_list, (long)conn);
+	if (!chann)
+		return -ENOENT;
+
+	memzero_explicit(chann->smb3signingkey,
+			 sizeof(chann->smb3signingkey));
+	kfree(chann);
+	return 0;
+}
+
+void ksmbd_sessions_deregister(struct ksmbd_conn *conn)
+{
+	struct ksmbd_session *sess;
+	struct hlist_node *tmp, *n;
+	HLIST_HEAD(to_destroy);
+	unsigned long id;
+
+	mutex_lock(&sessions_table_lock);
+	lockdep_assert_held(&sessions_table_lock);
+	if (conn->binding) {
+		int bkt;
+
+		hash_for_each_safe(sessions_table, bkt, tmp,
+				   sess, hlist) {
+			if (!ksmbd_chann_del(conn, sess) &&
+			    xa_empty(&sess->ksmbd_chann_list)) {
+#ifdef CONFIG_SMB_INSECURE_SERVER
+				if (hash_hashed(&sess->hlist))
+					hash_del_rcu(&sess->hlist);
+#else
+				hash_del_rcu(&sess->hlist);
+#endif
+				down_write(&conn->session_lock);
+				xa_erase(&conn->sessions, sess->id);
+				up_write(&conn->session_lock);
+				if (refcount_dec_and_test(&sess->refcnt))
+					hlist_add_head(&sess->hlist,
+						       &to_destroy);
+				continue;
+			}
+		}
+	}
+
+	down_write(&conn->session_lock);
+	xa_for_each(&conn->sessions, id, sess) {
+		unsigned long chann_id;
+		struct channel *chann;
+
+		xa_for_each(&sess->ksmbd_chann_list, chann_id, chann) {
+			if (chann->conn != conn)
+				ksmbd_conn_set_exiting(chann->conn);
+		}
+
+		ksmbd_chann_del(conn, sess);
+		if (xa_empty(&sess->ksmbd_chann_list)) {
+			xa_erase(&conn->sessions, sess->id);
+#ifdef CONFIG_SMB_INSECURE_SERVER
+			if (hash_hashed(&sess->hlist))
+				hash_del_rcu(&sess->hlist);
+#else
+			hash_del_rcu(&sess->hlist);
+#endif
+			if (refcount_dec_and_test(&sess->refcnt))
+				hlist_add_head(&sess->hlist, &to_destroy);
+		}
+	}
+	up_write(&conn->session_lock);
+	mutex_unlock(&sessions_table_lock);
+
+	if (!hlist_empty(&to_destroy)) {
+		synchronize_rcu();
+		hlist_for_each_entry_safe(sess, n, &to_destroy, hlist)
+			ksmbd_session_destroy(sess);
+	}
+}
+
+bool is_ksmbd_session_in_connection(struct ksmbd_conn *conn,
+				   unsigned long long id)
+{
+	struct ksmbd_session *sess;
+	bool found;
+
+	down_read(&conn->session_lock);
+	rcu_read_lock();
+	sess = xa_load(&conn->sessions, id);
+	found = !!sess;
+	rcu_read_unlock();
+	up_read(&conn->session_lock);
+
+	return found;
+}
+
+struct ksmbd_session *ksmbd_session_lookup(struct ksmbd_conn *conn,
+					   unsigned long long id)
+{
+	struct ksmbd_session *sess;
+
+	down_read(&conn->session_lock);
+	rcu_read_lock();
+	sess = xa_load(&conn->sessions, id);
+	if (sess) {
+		WRITE_ONCE(sess->last_active, jiffies);
+		ksmbd_user_session_get(sess);
+	}
+	rcu_read_unlock();
+	up_read(&conn->session_lock);
+	return sess;
+}
+
+/**
+ * ksmbd_session_lookup_slowpath() - Look up session by ID from
+ *                                   global table
+ * @id: session ID to look up
+ *
+ * Uses RCU for lock-free read-side lookup of sessions in the
+ * global sessions hash table. Takes a reference on the session
+ * if found.
+ *
+ * Return: session with incremented refcount, or NULL
+ */
+struct ksmbd_session *ksmbd_session_lookup_slowpath(unsigned long long id)
+{
+	struct ksmbd_session *sess;
+
+	rcu_read_lock();
+	sess = __session_lookup(id);
+	if (sess) {
+		if (!refcount_inc_not_zero(&sess->refcnt))
+			sess = NULL;
+		else
+			WRITE_ONCE(sess->last_active, jiffies);
+	}
+	rcu_read_unlock();
+
+	return sess;
+}
+
+struct ksmbd_session *ksmbd_session_lookup_all(struct ksmbd_conn *conn,
+					       unsigned long long id)
+{
+	struct ksmbd_session *sess;
+
+	sess = ksmbd_session_lookup(conn, id);
+	if (!sess && conn->binding)
+		sess = ksmbd_session_lookup_slowpath(id);
+	if (sess) {
+		down_read(&sess->state_lock);
+		if (sess->state != SMB2_SESSION_VALID) {
+			up_read(&sess->state_lock);
+			ksmbd_user_session_put(sess);
+			sess = NULL;
+		} else {
+			up_read(&sess->state_lock);
+		}
+	}
+	return sess;
+}
+
+void ksmbd_user_session_get(struct ksmbd_session *sess)
+{
+	refcount_inc(&sess->refcnt);
+}
+
+void ksmbd_user_session_put(struct ksmbd_session *sess)
+{
+	if (!sess)
+		return;
+
+	if (refcount_read(&sess->refcnt) <= 0) {
+		WARN(1, "ksmbd: session refcnt underflow (sess=%p)\n", sess);
+		return;
+	}
+	if (refcount_dec_and_test(&sess->refcnt))
+		ksmbd_session_destroy(sess);
+}
+
+/*
+ * Caller must hold conn->session_lock for writing.
+ */
+struct preauth_session *ksmbd_preauth_session_alloc(struct ksmbd_conn *conn,
+						    struct ksmbd_session *owner)
+{
+	struct preauth_session *sess;
+
+	sess = kzalloc(sizeof(struct preauth_session), KSMBD_DEFAULT_GFP);
+	if (!sess)
+		return NULL;
+
+	sess->id = owner->id;
+	/*
+	 * MS-SMB2 3.3.5.5.2 initializes PreauthSession.PreauthIntegrityHashValue
+	 * from Connection.PreauthIntegrityHashValue for session binding.
+	 * The binding exchange then hashes the new channel's SESSION_SETUP
+	 * request/response on top of that NEGOTIATE transcript to derive the
+	 * channel signing key.
+	 */
+	memcpy(sess->Preauth_HashValue, conn->preauth_info->Preauth_HashValue,
+	       PREAUTH_HASHVALUE_SIZE);
+	list_add(&sess->preauth_entry, &conn->preauth_sess_table);
+
+	return sess;
+}
+
+int ksmbd_preauth_session_store_sess_key(struct ksmbd_conn *conn,
+					 unsigned long long id,
+					 const __u8 *sess_key,
+					 unsigned int sess_key_len)
+{
+	struct preauth_session *sess;
+
+	if (!sess_key || sess_key_len < SMB2_NTLMV2_SESSKEY_SIZE)
+		return -EINVAL;
+
+	down_write(&conn->session_lock);
+	sess = ksmbd_preauth_session_lookup(conn, id);
+	if (!sess) {
+		up_write(&conn->session_lock);
+		return -ENOENT;
+	}
+
+	memcpy(sess->binding_sess_key, sess_key, SMB2_NTLMV2_SESSKEY_SIZE);
+	sess->binding_sess_key_valid = true;
+	up_write(&conn->session_lock);
+	return 0;
+}
+
+void destroy_previous_session(struct ksmbd_conn *conn,
+			      struct ksmbd_user *user, u64 id)
+{
+	struct ksmbd_session *prev_sess;
+	struct ksmbd_user *prev_user;
+	bool needs_setup_status = false;
+	int err;
+
+	prev_sess = NULL;
+	mutex_lock(&sessions_table_lock);
+	down_write(&conn->session_lock);
+	rcu_read_lock();
+	prev_sess = __session_lookup(id);
+	if (prev_sess && !refcount_inc_not_zero(&prev_sess->refcnt))
+		prev_sess = NULL;
+	rcu_read_unlock();
+	if (!prev_sess)
+		goto out;
+
+	down_write(&prev_sess->state_lock);
+	if (prev_sess->state == SMB2_SESSION_EXPIRED) {
+		up_write(&prev_sess->state_lock);
+		goto out_put;
+	}
+
+	prev_user = prev_sess->user;
+	if (!prev_user ||
+	    strcmp(user->name, prev_user->name) ||
+	    user->passkey_sz != prev_user->passkey_sz ||
+	    crypto_memneq(user->passkey, prev_user->passkey,
+			  user->passkey_sz)) {
+		up_write(&prev_sess->state_lock);
+		goto out_put;
+	}
+
+	ksmbd_all_conn_set_status(id, KSMBD_SESS_NEED_RECONNECT);
+	needs_setup_status = true;
+	up_write(&prev_sess->state_lock);
+	up_write(&conn->session_lock);
+	mutex_unlock(&sessions_table_lock);
+
+	/*
+	 * Destroy the previous session's file table BEFORE waiting for
+	 * in-flight requests to drain.  Pending CHANGE_NOTIFY async works
+	 * keep req_running > 0 (they hold a counted slot until cancelled).
+	 * Closing the files via ksmbd_destroy_file_table triggers
+	 * ksmbd_notify_cleanup_file → cancel_fn → ksmbd_conn_try_dequeue_request
+	 * which decrements req_running and unblocks the idle wait below.
+	 *
+	 * We hold a reference on prev_sess (refcount_inc_not_zero above),
+	 * so the session struct is safe to access even after the lock drop.
+	 * The state is already NEED_RECONNECT so new requests on this session
+	 * will be rejected; destroying the file table here cannot race with
+	 * new file opens for this session.
+	 */
+	ksmbd_destroy_file_table(&prev_sess->file_table);
+
+	/*
+	 * Avoid holding session table/state locks while waiting for
+	 * in-flight requests. Keeping these locks held can block request
+	 * completion paths and cause reconnect stalls.
+	 */
+	err = ksmbd_conn_wait_idle_sess_id(conn, id);
+	if (err) {
+		ksmbd_all_conn_set_status(id, KSMBD_SESS_NEED_SETUP);
+		goto out_session_put;
+	}
+
+	mutex_lock(&sessions_table_lock);
+	down_write(&conn->session_lock);
+	down_write(&prev_sess->state_lock);
+	if (prev_sess->state != SMB2_SESSION_EXPIRED) {
+		/* File table already destroyed above; just mark expired */
+		prev_sess->state = SMB2_SESSION_EXPIRED;
+		ksmbd_launch_ksmbd_durable_scavenger();
+	}
+
+	if (needs_setup_status)
+		ksmbd_all_conn_set_status(id, KSMBD_SESS_NEED_SETUP);
+	up_write(&prev_sess->state_lock);
+	up_write(&conn->session_lock);
+	mutex_unlock(&sessions_table_lock);
+
+out_session_put:
+	ksmbd_user_session_put(prev_sess);
+	return;
+
+out_put:
+	ksmbd_user_session_put(prev_sess);
+out:
+	up_write(&conn->session_lock);
+	mutex_unlock(&sessions_table_lock);
+}
+
+static bool ksmbd_preauth_session_id_match(struct preauth_session *sess,
+					   unsigned long long id)
+{
+	return sess->id == id;
+}
+
+/**
+ * ksmbd_preauth_session_lookup() - look up a preauth session by ID
+ * @conn: connection to search
+ * @id:   session ID to find
+ *
+ * The caller MUST hold conn->session_lock (read or write) for the
+ * lifetime of the returned pointer.  The lock protects the preauth
+ * session list from concurrent modification by session removal or
+ * connection teardown.
+ *
+ * Return: pointer to the preauth session, or NULL if not found
+ */
+struct preauth_session *ksmbd_preauth_session_lookup(struct ksmbd_conn *conn,
+						     unsigned long long id)
+{
+	struct preauth_session *sess = NULL;
+
+	lockdep_assert_held(&conn->session_lock);
+	list_for_each_entry(sess, &conn->preauth_sess_table, preauth_entry) {
+		if (ksmbd_preauth_session_id_match(sess, id))
+			return sess;
+	}
+	return NULL;
+}
+
+int ksmbd_preauth_session_remove(struct ksmbd_conn *conn, unsigned long long id)
+{
+	struct preauth_session *sess;
+
+	down_write(&conn->session_lock);
+	list_for_each_entry(sess, &conn->preauth_sess_table, preauth_entry) {
+		if (ksmbd_preauth_session_id_match(sess, id)) {
+			list_del(&sess->preauth_entry);
+			ksmbd_preauth_session_free(sess);
+			up_write(&conn->session_lock);
+			return 0;
+		}
+	}
+	up_write(&conn->session_lock);
+	return -ENOENT;
+}
+
+#ifdef CONFIG_SMB_INSECURE_SERVER
+static int __init_smb1_session(struct ksmbd_session *sess)
+{
+	int id = ksmbd_acquire_smb1_uid(&session_ida);
+
+	if (id < 0)
+		return -EINVAL;
+	sess->id = id;
+	return 0;
+}
+#endif
+
+static int __init_smb2_session(struct ksmbd_session *sess)
+{
+	/*
+	 * KNOWN ISSUE (P1 security): Session IDs are sequential (IDA-based),
+	 * which allows remote enumeration and prediction of other active
+	 * session IDs.  This aids session-targeted attacks during binding
+	 * operations (ksmbd_session_lookup_all -> slowpath).
+	 *
+	 * Proper fix: XOR the IDA-allocated ID with a per-server random key
+	 * (generated once at module init) so the wire-visible session ID is
+	 * unpredictable while IDA still manages the ID space internally.
+	 * This requires coordinated changes across session lookup, register,
+	 * and destroy paths and is deferred to a dedicated patch.
+	 */
+	int id = ksmbd_acquire_smb2_uid(&session_ida);
+
+	if (id < 0)
+		return -EINVAL;
+	sess->id = id;
+	return 0;
+}
+
+static struct ksmbd_session *__session_create(int protocol)
+{
+	struct ksmbd_session *sess;
+	int ret;
+
+	sess = kzalloc(sizeof(struct ksmbd_session), KSMBD_DEFAULT_GFP);
+	if (!sess)
+		return NULL;
+
+	if (ksmbd_init_file_table(&sess->file_table))
+		goto error;
+
+	WRITE_ONCE(sess->last_active, jiffies);
+	sess->state = SMB2_SESSION_IN_PROGRESS;
+	init_rwsem(&sess->state_lock);
+	set_session_flag(sess, protocol);
+		xa_init(&sess->tree_conns);
+		xa_init(&sess->ksmbd_chann_list);
+		xa_init(&sess->rpc_handle_list);
+#ifdef CONFIG_SMB_INSECURE_SERVER
+		xa_init(&sess->smb1_nttrans_list);
+		mutex_init(&sess->smb1_nttrans_lock);
+#endif
+		sess->sequence_number = 1;
+	rwlock_init(&sess->tree_conns_lock);
+	refcount_set(&sess->refcnt, 2);
+	init_rwsem(&sess->rpc_lock);
+	atomic64_set(&sess->gcm_nonce_counter, 0);
+	get_random_bytes(sess->gcm_nonce_prefix,
+			 sizeof(sess->gcm_nonce_prefix));
+
+	switch (protocol) {
+#ifdef CONFIG_SMB_INSECURE_SERVER
+	case CIFDS_SESSION_FLAG_SMB1:
+		ret = __init_smb1_session(sess);
+		break;
+#endif
+	case CIFDS_SESSION_FLAG_SMB2:
+		ret = __init_smb2_session(sess);
+		break;
+	default:
+		ret = -EINVAL;
+		break;
+	}
+
+	if (ret)
+		goto error;
+
+	ida_init(&sess->tree_conn_ida);
+
+	mutex_lock(&sessions_table_lock);
+	hash_add_rcu(sessions_table, &sess->hlist, sess->id);
+	mutex_unlock(&sessions_table_lock);
+
+	return sess;
+
+error:
+	ksmbd_session_destroy(sess);
+	return NULL;
+}
+
+#ifdef CONFIG_SMB_INSECURE_SERVER
+struct ksmbd_session *ksmbd_smb1_session_create(void)
+{
+	return __session_create(CIFDS_SESSION_FLAG_SMB1);
+}
+#endif
+
+struct ksmbd_session *ksmbd_smb2_session_create(void)
+{
+	return __session_create(CIFDS_SESSION_FLAG_SMB2);
+}
+
+int ksmbd_acquire_tree_conn_id(struct ksmbd_session *sess)
+{
+	int id = -EINVAL;
+
+#ifdef CONFIG_SMB_INSECURE_SERVER
+	if (test_session_flag(sess, CIFDS_SESSION_FLAG_SMB1))
+		id = ksmbd_acquire_smb1_tid(&sess->tree_conn_ida);
+#endif
+	if (test_session_flag(sess, CIFDS_SESSION_FLAG_SMB2))
+		id = ksmbd_acquire_smb2_tid(&sess->tree_conn_ida);
+
+	return id;
+}
+
+void ksmbd_release_tree_conn_id(struct ksmbd_session *sess, int id)
+{
+	if (id >= 0)
+		ksmbd_release_id(&sess->tree_conn_ida, id);
+}
