@@ -19,6 +19,7 @@ SSH=(sshpass -p root ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no \
 
 # Suites to test (comprehensive smb2.* list)
 SUITES=(
+  charset
   compound
   compound_async
   compound_find
@@ -39,6 +40,7 @@ SUITES=(
   maximum_allowed
   mkdir
   mux
+  name-mangling
   notify
   openattr
   oplock
@@ -108,9 +110,17 @@ rm -f /run/ksmbd.fifo* /var/run/ksmbd.fifo* /usr/var/run/ksmbd.fifo* /tmp/ksmbd.
 rm -rf /run/ksmbd /var/run/ksmbd /usr/var/run/ksmbd
 
 rm -f /etc/ksmbd/ksmbd.conf /etc/ksmbd/ksmbdpwd.db /etc/ksmbd/ksmbd.subauth
-rm -rf /srv/smb
 
-mkdir -p /run /var/run /usr/var/run /etc/ksmbd /srv/smb/test
+mkdir -p /run /var/run /usr/var/run /etc/ksmbd /srv/smb
+if findmnt -R -n /srv/smb >/dev/null 2>&1; then
+  while read -r target; do
+    [ "$target" = "/srv/smb" ] && continue
+    umount -l "$target" >/dev/null 2>&1 || true
+  done < <(findmnt -R -n -o TARGET /srv/smb | sort -r)
+fi
+find /srv/smb -mindepth 1 -xdev -delete 2>/dev/null || true
+
+mkdir -p /srv/smb/test
 chmod 0777 /srv/smb /srv/smb/test
 
 find /tmp -maxdepth 1 \
@@ -129,6 +139,7 @@ cat > /etc/ksmbd/ksmbd.conf <<'CONF'
     max ip connections = 256
     smb2 leases = yes
     durable handles = yes
+    smb2 encryption = yes
 
 [test]
     path = /srv/smb/test
@@ -141,7 +152,20 @@ cat > /etc/ksmbd/ksmbd.conf <<'CONF'
     acl xattr = yes
     oplocks = yes
     streams = yes
+    hide dot files = yes
+
+[noperm]
+    path = /srv/smb/noperm
+    comment = No-permissions share for bug14788 test
+    read only = no
+    guest ok = yes
+    browseable = yes
+    create mask = 0777
+    directory mask = 0777
 CONF
+
+mkdir -p /srv/smb/noperm
+chmod 0777 /srv/smb/noperm
 
 printf 'testuser:Ncy6kWix1cpgk7S31Wxhmw==\n' > /etc/ksmbd/ksmbdpwd.db
 chmod 0600 /etc/ksmbd/ksmbdpwd.db
@@ -262,6 +286,13 @@ for suite in "${SUITES[@]}"; do
     lease|oplock|durable-*|replay|session|notify) timeout=180 ;;
   esac
 
+  # Per-suite extra options
+  suite_opts=()
+  case "$suite" in
+    create) suite_opts+=(--target=win7) ;;
+    dir)    suite_opts+=(--target=win7) ;;
+  esac
+
   echo -n "  smb2.${suite} ... "
 
   # Full reset before every suite so each run sees a virgin guest/server state.
@@ -275,6 +306,7 @@ for suite in "${SUITES[@]}"; do
   # Run the suite
   timeout "$timeout" \
     smbtorture "//127.0.0.1/test" -U "testuser%testpass" -p "$SMB_PORT" \
+    "${suite_opts[@]}" \
     "smb2.${suite}" > "$logfile" 2>&1
   rc=$?
 

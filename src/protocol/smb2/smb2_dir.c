@@ -164,16 +164,6 @@ static int dentry_name(struct ksmbd_dir_info *d_info, int info_level)
 		d_info->name_len = le32_to_cpu(fibdinfo->FileNameLength);
 		return 0;
 	}
-	case FILEID_GLOBAL_TX_DIRECTORY_INFORMATION:
-	{
-		struct file_id_both_directory_info *fibdinfo;
-
-		fibdinfo = (struct file_id_both_directory_info *)d_info->rptr;
-		d_info->rptr += le32_to_cpu(fibdinfo->NextEntryOffset);
-		d_info->name = fibdinfo->FileName;
-		d_info->name_len = le32_to_cpu(fibdinfo->FileNameLength);
-		return 0;
-	}
 	case FILEID_EXTD_DIRECTORY_INFORMATION:
 	{
 		struct file_id_extd_dir_info *extdinfo;
@@ -404,7 +394,6 @@ static int smb2_populate_readdir_entry(struct ksmbd_conn *conn, int info_level,
 		break;
 	}
 	case FILEID_BOTH_DIRECTORY_INFORMATION:
-	case FILEID_GLOBAL_TX_DIRECTORY_INFORMATION:
 	{
 		struct file_id_both_directory_info *fibdinfo;
 
@@ -877,7 +866,6 @@ static int reserve_populate_dentry(struct ksmbd_dir_info *d_info,
 		break;
 	}
 	case FILEID_BOTH_DIRECTORY_INFORMATION:
-	case FILEID_GLOBAL_TX_DIRECTORY_INFORMATION:
 	{
 		struct file_id_both_directory_info *fibdinfo;
 
@@ -1012,12 +1000,22 @@ static int __query_dir(struct dir_context *ctx, const char *name, int namlen,
 #else
 		return 0;
 #endif
-	if (!match_pattern(name, namlen, priv->search_pattern))
+	if (!match_pattern(name, namlen, priv->search_pattern)) {
+		/*
+		 * If the search pattern is a mangled 8.3 name, check
+		 * if this directory entry's generated short name matches.
+		 */
+		size_t pat_len = strlen(priv->search_pattern);
+
+		if (!ksmbd_is_mangled_name(priv->search_pattern, pat_len) ||
+		    !ksmbd_match_mangled_name(priv->work->conn, name,
+					      priv->search_pattern, pat_len))
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0)
-		return true;
+			return true;
 #else
-		return 0;
+			return 0;
 #endif
+	}
 
 	d_info->name		= name;
 	d_info->name_len	= namlen;
@@ -1172,9 +1170,9 @@ int smb2_query_dir(struct ksmbd_work *work)
 	}
 
 	/* MS-SMB2 §3.3.5.2.10: validate ChannelSequence for directory queries */
-	if (smb2_check_channel_sequence(work, dir_fp)) {
+	rc = smb2_check_channel_sequence(work, dir_fp);
+	if (rc) {
 		rsp->hdr.Status = STATUS_FILE_NOT_AVAILABLE;
-		rc = -EAGAIN;
 		goto err_out2;
 	}
 

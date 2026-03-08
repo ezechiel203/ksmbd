@@ -18,6 +18,17 @@ MODULE_IMPORT_NS("EXPORTED_FOR_KUNIT_TESTING");
 #include "server.h"
 #include "auth.h"
 
+/* Exported under VISIBLE_IF_KUNIT from smb2_negotiate.c. */
+__le32 decode_preauth_ctxt(struct ksmbd_conn *conn,
+			   struct smb2_preauth_neg_context *pneg_ctxt,
+			   int ctxt_len);
+__le32 decode_compress_ctxt(struct ksmbd_conn *conn,
+			    struct smb2_compression_ctx *pneg_ctxt,
+			    int ctxt_len);
+__le32 decode_sign_cap_ctxt(struct ksmbd_conn *conn,
+			    struct smb2_signing_capabilities *pneg_ctxt,
+			    int ctxt_len);
+
 /*
  * REG-001: Credit charge must always be 1 for non-LARGE_MTU dialects.
  *
@@ -208,6 +219,40 @@ static void reg_compression_algo_count_zero(struct kunit *test)
 	KUNIT_EXPECT_EQ(test, status, STATUS_INVALID_PARAMETER);
 }
 
+/*
+ * REG-032: Compression negotiation must preserve the full common set.
+ *
+ * Regression: only one algorithm was retained, and non-spec LZ4 could
+ * become the negotiated algorithm while spec algorithms were ignored.
+ */
+static void reg_compression_common_set_preserved(struct kunit *test)
+{
+	struct ksmbd_conn conn;
+	struct {
+		struct smb2_compression_ctx ctx;
+		__le16 algorithms[4];
+	} __packed ctxt;
+	__le32 status;
+
+	memset(&conn, 0, sizeof(conn));
+	memset(&ctxt, 0, sizeof(ctxt));
+	ctxt.ctx.ContextType = SMB2_COMPRESSION_CAPABILITIES;
+	ctxt.ctx.DataLength = cpu_to_le16(16);
+	ctxt.ctx.CompressionAlgorithmCount = cpu_to_le16(4);
+	ctxt.ctx.CompressionAlgorithms[0] = SMB3_COMPRESS_LZNT1;
+	ctxt.ctx.CompressionAlgorithms[1] = SMB3_COMPRESS_LZ4;
+	ctxt.ctx.CompressionAlgorithms[2] = SMB3_COMPRESS_LZ77_HUFF;
+	ctxt.ctx.CompressionAlgorithms[3] = SMB3_COMPRESS_PATTERN_V1;
+
+	status = decode_compress_ctxt(&conn, &ctxt.ctx, sizeof(ctxt));
+	KUNIT_EXPECT_EQ(test, status, STATUS_SUCCESS);
+	KUNIT_EXPECT_EQ(test, conn.compress_algorithm, SMB3_COMPRESS_LZNT1);
+	KUNIT_EXPECT_EQ(test, conn.compress_algorithm_count, 3U);
+	KUNIT_EXPECT_EQ(test, conn.compress_algorithms[0], SMB3_COMPRESS_LZNT1);
+	KUNIT_EXPECT_EQ(test, conn.compress_algorithms[1], SMB3_COMPRESS_LZ77_HUFF);
+	KUNIT_EXPECT_EQ(test, conn.compress_algorithms[2], SMB3_COMPRESS_PATTERN_V1);
+}
+
 static struct kunit_case ksmbd_regression_negotiate_test_cases[] = {
 	KUNIT_CASE(reg_smb202_credit_non_large_mtu),
 	KUNIT_CASE(reg_smb202_validate_negotiate_client_guid),
@@ -218,6 +263,7 @@ static struct kunit_case ksmbd_regression_negotiate_test_cases[] = {
 	KUNIT_CASE(reg_duplicate_negotiate_contexts),
 	KUNIT_CASE(reg_signing_algo_count_zero),
 	KUNIT_CASE(reg_compression_algo_count_zero),
+	KUNIT_CASE(reg_compression_common_set_preserved),
 	{}
 };
 

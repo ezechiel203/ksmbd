@@ -1,5 +1,8 @@
 #!/bin/bash
-# T48: TRANSPORT (8 tests)
+# T48: TRANSPORT (9 tests)
+
+: "${QUIC_HOST:=${SMB_HOST:-127.0.0.1}}"
+: "${QUIC_PORT:=${QUIC_SMB_PORT:-14445}}"
 
 register_test "T48.01" "test_transport_tcp_connect" --timeout 15 --description "Basic TCP connection on configured port"
 test_transport_tcp_connect() {
@@ -73,5 +76,32 @@ test_transport_max_packet() {
     assert_status 0 $? "Write at large packet size should succeed" || return 1
     rm -f "$tmpf"
     smb_rm "max_packet_test.dat" 2>/dev/null
+    return 0
+}
+
+register_test "T48.09" "test_transport_security_context_truthful" --timeout 20 \
+    --requires "python3,openssl" --tags "quic" \
+    --description "Raw NEGOTIATE: QUIC emits transport security context, TCP does not"
+test_transport_security_context_truthful() {
+    local probe="${TORTURE_DIR}/lib/raw_negotiate_probe.py"
+
+    python3 "$probe" \
+        --transport tcp \
+        --host "$SMB_HOST" \
+        --port "$SMB_PORT" \
+        --timeout 5 \
+        --expect-transport-context absent || return 1
+
+    python3 "$probe" \
+        --transport quic \
+        --host "$QUIC_HOST" \
+        --port "$QUIC_PORT" \
+        --timeout 8 \
+        --expect-transport-context present
+    local rc=$?
+    if [[ $rc -eq 77 ]]; then
+        skip_test "QUIC transport not available"
+    fi
+    assert_status 0 $rc "QUIC NEGOTIATE should emit transport security context" || return 1
     return 0
 }

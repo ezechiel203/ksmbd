@@ -12,6 +12,7 @@
 #define EXPORT_SYMBOL_IF_KUNIT(sym)
 #endif
 
+#include <linux/filelock.h>
 #include "glob.h"
 #include "oplock.h"
 #include "vfs_cache.h"
@@ -24,6 +25,7 @@
 #include "connection.h"
 #include "server.h"
 #include "smb2fruit.h"
+#include "smb2pdu_internal.h"
 #include "mgmt/user_session.h"
 #include "mgmt/share_config.h"
 #include "mgmt/tree_connect.h"
@@ -31,77 +33,138 @@
 static LIST_HEAD(lease_table_list);
 static DEFINE_RWLOCK(lease_list_lock);
 static struct kmem_cache *opinfo_cache;
+static LIST_HEAD(ksmbd_lease_breaker_tasks);
+static DEFINE_SPINLOCK(ksmbd_lease_breaker_lock);
 
 __u8 smb2_map_lease_to_oplock(__le32 lease_state);
 
 /*
- * Kernel VFS lease integration.
+ * Kernel VFS lease integration for coordination with local openers.
  *
- * When ksmbd grants an oplock/lease to an SMB client, we also register a
- * kernel VFS lease on the underlying file via vfs_setlease().  This way
- * local processes that open the same file trigger a lease break through
- * the kernel's lease mechanism, which we translate into an SMB oplock
- * break notification.
+ * KSMBD-LEASE-02:
+ * - track ksmbd's own dentry_open() callers so the VFS does not treat them as
+ *   foreign lease breakers
+ * - hold a dedicated opinfo reference for the lifetime of the registered VFS
+ *   lease so flc_owner never points at freed memory
  */
+struct ksmbd_lease_breaker_task {
+	struct list_head	entry;
+	struct task_struct	*task;
+	unsigned int		depth;
+};
+
+static struct ksmbd_lease_breaker_task *
+ksmbd_find_lease_breaker_task(struct task_struct *task)
+{
+	struct ksmbd_lease_breaker_task *entry;
+
+	list_for_each_entry(entry, &ksmbd_lease_breaker_tasks, entry) {
+		if (entry->task == task)
+			return entry;
+	}
+
+	return NULL;
+}
+
+void ksmbd_lease_breaker_enter(void)
+{
+	struct ksmbd_lease_breaker_task *entry, *new_entry = NULL;
+	unsigned long flags;
+
+	spin_lock_irqsave(&ksmbd_lease_breaker_lock, flags);
+	entry = ksmbd_find_lease_breaker_task(current);
+	if (entry) {
+		entry->depth++;
+		spin_unlock_irqrestore(&ksmbd_lease_breaker_lock, flags);
+		return;
+	}
+	spin_unlock_irqrestore(&ksmbd_lease_breaker_lock, flags);
+
+	new_entry = kmalloc(sizeof(*new_entry), KSMBD_DEFAULT_GFP);
+	if (!new_entry)
+		return;
+
+	new_entry->task = current;
+	new_entry->depth = 1;
+	INIT_LIST_HEAD(&new_entry->entry);
+
+	spin_lock_irqsave(&ksmbd_lease_breaker_lock, flags);
+	entry = ksmbd_find_lease_breaker_task(current);
+	if (entry) {
+		entry->depth++;
+		spin_unlock_irqrestore(&ksmbd_lease_breaker_lock, flags);
+		kfree(new_entry);
+		return;
+	}
+	list_add(&new_entry->entry, &ksmbd_lease_breaker_tasks);
+	spin_unlock_irqrestore(&ksmbd_lease_breaker_lock, flags);
+}
+
+void ksmbd_lease_breaker_exit(void)
+{
+	struct ksmbd_lease_breaker_task *entry;
+	unsigned long flags;
+
+	spin_lock_irqsave(&ksmbd_lease_breaker_lock, flags);
+	entry = ksmbd_find_lease_breaker_task(current);
+	if (!entry) {
+		spin_unlock_irqrestore(&ksmbd_lease_breaker_lock, flags);
+		return;
+	}
+
+	if (--entry->depth) {
+		spin_unlock_irqrestore(&ksmbd_lease_breaker_lock, flags);
+		return;
+	}
+
+	list_del(&entry->entry);
+	spin_unlock_irqrestore(&ksmbd_lease_breaker_lock, flags);
+	kfree(entry);
+}
 
 static bool ksmbd_lm_break(struct file_lease *fl);
 
+static bool ksmbd_lm_breaker_owns_lease(struct file_lease *fl)
+{
+	struct ksmbd_lease_breaker_task *entry;
+	unsigned long flags;
+	bool owns = false;
+
+	spin_lock_irqsave(&ksmbd_lease_breaker_lock, flags);
+	entry = ksmbd_find_lease_breaker_task(current);
+	if (entry && entry->depth)
+		owns = true;
+	spin_unlock_irqrestore(&ksmbd_lease_breaker_lock, flags);
+
+	return owns;
+}
+
 static const struct lease_manager_operations ksmbd_lease_lm_ops = {
-	.lm_break	= ksmbd_lm_break,
+	.lm_break		= ksmbd_lm_break,
+	.lm_change		= lease_modify,
+	.lm_breaker_owns_lease	= ksmbd_lm_breaker_owns_lease,
 };
 
-/**
- * ksmbd_lm_break() - kernel VFS lease break callback
- * @fl:		file_lease being broken
- *
- * Called by the VFS when a local process opens a file that has a lease held
- * by ksmbd.  This runs in non-sleepable context, so we just trigger the
- * SMB oplock break machinery which will queue the actual break notification.
- *
- * Return: false to indicate the lease should not be removed immediately
- *         (we need to wait for the SMB client to acknowledge).
- */
 static bool ksmbd_lm_break(struct file_lease *fl)
 {
-	struct oplock_info *opinfo = fl->c.flc_owner;
+	struct oplock_info *opinfo;
 
+	opinfo = READ_ONCE(fl->c.flc_owner);
 	if (!opinfo)
 		return true;
 
-	if (!atomic_inc_not_zero(&opinfo->refcount))
+	if (!refcount_inc_not_zero(&opinfo->refcount))
 		return true;
 
-	/*
-	 * The VFS is requesting a lease break.  We mark the oplock as needing
-	 * a break to Level II (read) if it is currently exclusive/batch.
-	 * The actual break notification is sent via oplock_break() which
-	 * queues work to send the SMB2 break notification to the client.
-	 *
-	 * Since lm_break runs in atomic context, we cannot call oplock_break()
-	 * directly.  Instead, we set the pending_break bit so the next
-	 * opener will wait for the break to complete.  The lease break timeout
-	 * in the VFS (fl_break_time) handles the case where the client
-	 * doesn't respond.
-	 */
 	if (opinfo->op_state != OPLOCK_ACK_WAIT) {
 		opinfo->op_state = OPLOCK_ACK_WAIT;
 		wake_up_interruptible_all(&opinfo->oplock_q);
 	}
 
 	opinfo_put(opinfo);
-
-	/* Return false: don't remove the lease yet, wait for client ack */
 	return false;
 }
 
-/**
- * ksmbd_set_kernel_lease() - register a kernel VFS lease for an oplock
- * @opinfo:	oplock info with the granted level
- *
- * Called after an oplock/lease is granted to register a corresponding
- * kernel VFS lease.  Write/exclusive/batch oplocks get F_WRLCK, Level II
- * (read) oplocks get F_RDLCK.
- */
 static void ksmbd_set_kernel_lease(struct oplock_info *opinfo)
 {
 	struct file *filp;
@@ -113,8 +176,6 @@ static void ksmbd_set_kernel_lease(struct oplock_info *opinfo)
 		return;
 
 	filp = opinfo->o_fp->filp;
-
-	/* Don't set kernel leases on directories */
 	if (S_ISDIR(file_inode(filp)->i_mode))
 		return;
 
@@ -127,7 +188,7 @@ static void ksmbd_set_kernel_lease(struct oplock_info *opinfo)
 		lease_type = F_RDLCK;
 		break;
 	default:
-		return; /* No kernel lease for NONE level */
+		return;
 	}
 
 	fl = locks_alloc_lease();
@@ -137,21 +198,20 @@ static void ksmbd_set_kernel_lease(struct oplock_info *opinfo)
 	}
 
 	fl->fl_lmops = &ksmbd_lease_lm_ops;
+	fl->c.flc_file = filp;
 	fl->c.flc_flags = FL_LEASE;
 	fl->c.flc_type = lease_type;
+	fl->c.flc_pid = current->tgid;
+	refcount_inc(&opinfo->refcount);
 	fl->c.flc_owner = (fl_owner_t)opinfo;
 
 	ret = vfs_setlease(filp, lease_type, &fl, NULL);
 	if (ret) {
+		WRITE_ONCE(fl->c.flc_owner, NULL);
+		opinfo_put(opinfo);
 		ksmbd_debug(OPLOCK,
 			    "vfs_setlease failed: %d (level=%d)\n",
 			    ret, opinfo->level);
-		/*
-		 * If vfs_setlease fails (e.g., filesystem doesn't support
-		 * leases), we still keep the SMB oplock working — the only
-		 * consequence is that local processes won't trigger breaks.
-		 * fl may have been freed by vfs_setlease on error.
-		 */
 		return;
 	}
 
@@ -166,23 +226,33 @@ static void ksmbd_release_kernel_lease(struct oplock_info *opinfo)
 {
 	struct file *filp;
 	struct file_lease *fl;
-	int ret;
+	void *owner;
+	int ret = -ENOENT;
 
-	fl = opinfo->fl_lease;
+	fl = xchg(&opinfo->fl_lease, NULL);
 	if (!fl)
 		return;
 
 	if (!opinfo->o_fp || !opinfo->o_fp->filp)
-		goto clear;
+		goto restore;
 
 	filp = opinfo->o_fp->filp;
-
-	ret = vfs_setlease(filp, F_UNLCK, &fl, NULL);
+	owner = opinfo;
+	ret = vfs_setlease(filp, F_UNLCK, NULL, &owner);
 	if (ret)
+		goto restore;
+
+	opinfo_put(opinfo);
+	return;
+
+restore:
+	if (cmpxchg(&opinfo->fl_lease, NULL, fl) == NULL) {
 		ksmbd_debug(OPLOCK,
 			    "vfs_setlease F_UNLCK failed: %d\n", ret);
-clear:
-	opinfo->fl_lease = NULL;
+		return;
+	}
+	ksmbd_debug(OPLOCK,
+		    "lease release raced with another teardown path\n");
 }
 
 /**
@@ -197,7 +267,7 @@ static void ksmbd_downgrade_kernel_lease(struct oplock_info *opinfo)
 	struct file_lease *fl;
 	int ret;
 
-	fl = opinfo->fl_lease;
+	fl = READ_ONCE(opinfo->fl_lease);
 	if (!fl)
 		return;
 
@@ -205,18 +275,12 @@ static void ksmbd_downgrade_kernel_lease(struct oplock_info *opinfo)
 		return;
 
 	filp = opinfo->o_fp->filp;
-
-	/*
-	 * Downgrade from write to read lease.  vfs_setlease with F_RDLCK
-	 * on an existing write lease will downgrade it.
-	 */
 	fl->c.flc_type = F_RDLCK;
 	ret = vfs_setlease(filp, F_RDLCK, &fl, NULL);
 	if (ret) {
 		ksmbd_debug(OPLOCK,
 			    "vfs_setlease F_RDLCK downgrade failed: %d\n",
 			    ret);
-		/* On failure, release the lease entirely */
 		ksmbd_release_kernel_lease(opinfo);
 	}
 }
@@ -283,6 +347,74 @@ static struct ksmbd_conn *opinfo_get_live_conn(struct oplock_info *opinfo)
 		return NULL;
 	}
 	return conn;
+}
+
+/**
+ * lease_get_break_conn() - find the best connection for a lease break
+ * @opinfo:	oplock_info whose lease needs a break notification
+ *
+ * MS-SMB2 §3.3.4.7: Lease break notifications are per-client, not
+ * per-handle.  Windows/Samba send the break on the first available
+ * transport association for the client.
+ *
+ * Strategy: scan the lease table (per-ClientGUID) for the oldest
+ * opinfo entry that has a live connection.  list_add_rcu() adds new
+ * entries at the head, so the tail of the list is the oldest.
+ * We iterate the whole list and keep updating 'best' so that 'best'
+ * ends up pointing to the last (oldest) live entry.
+ *
+ * Falls back to opinfo's own connection if no other is found.
+ *
+ * Return:	connection with refcount incremented, or NULL
+ */
+static struct ksmbd_conn *lease_get_break_conn(struct oplock_info *opinfo,
+					       struct ksmbd_session **sess)
+{
+	struct lease_table *lb;
+	struct oplock_info *iter;
+	struct ksmbd_conn *best = NULL;
+	struct ksmbd_session *best_sess = NULL;
+
+	if (!opinfo->is_lease || !opinfo->o_lease ||
+	    !opinfo->o_lease->l_lb)
+		goto fallback;
+
+	lb = opinfo->o_lease->l_lb;
+
+	rcu_read_lock();
+	list_for_each_entry_rcu(iter, &lb->lease_list, lease_entry) {
+		struct ksmbd_conn *c = READ_ONCE(iter->conn);
+
+		if (!c)
+			continue;
+		/*
+		 * Keep iterating — the last live conn we find is the
+		 * oldest (tail of list_add_rcu list = first inserted).
+		 */
+		if (!refcount_inc_not_zero(&c->refcnt))
+			continue;
+		if (ksmbd_conn_releasing(c) || ksmbd_conn_exiting(c)) {
+			ksmbd_conn_free(c);
+			continue;
+		}
+		/* Drop previous candidate */
+		if (best)
+			ksmbd_conn_free(best);
+		best = c;
+		best_sess = iter->sess;
+	}
+	rcu_read_unlock();
+
+fallback:
+	if (!best) {
+		best = opinfo_get_live_conn(opinfo);
+		best_sess = opinfo->sess;
+	}
+
+	if (sess)
+		*sess = best_sess;
+
+	return best;
 }
 
 static void lease_add_list(struct oplock_info *opinfo)
@@ -903,9 +1035,23 @@ VISIBLE_IF_KUNIT
 int compare_guid_key(struct oplock_info *opinfo,
 				   const char *guid1, const char *key1)
 {
-	const char *guid2, *key2;
+	const char *guid2 = NULL, *key2;
 
-	guid2 = opinfo->conn->ClientGUID;
+	if (opinfo->conn &&
+	    memchr_inv(opinfo->conn->ClientGUID, 0, SMB2_CLIENT_GUID_SIZE))
+		guid2 = opinfo->conn->ClientGUID;
+	else if (opinfo->sess &&
+		 memchr_inv(opinfo->sess->ClientGUID, 0,
+			    SMB2_CLIENT_GUID_SIZE))
+		guid2 = opinfo->sess->ClientGUID;
+	else if (opinfo->o_lease && opinfo->o_lease->l_lb &&
+		 memchr_inv(opinfo->o_lease->l_lb->client_guid, 0,
+			    SMB2_CLIENT_GUID_SIZE))
+		guid2 = opinfo->o_lease->l_lb->client_guid;
+
+	if (!guid2)
+		return 0;
+
 	key2 = opinfo->o_lease->lease_key;
 	if (!memcmp(guid1, guid2, SMB2_CLIENT_GUID_SIZE) &&
 	    !memcmp(key1, key2, SMB2_LEASE_KEY_SIZE))
@@ -1024,6 +1170,8 @@ static void wait_for_break_ack(struct oplock_info *opinfo)
 
 	/* is this a timeout ? */
 	if (!rc) {
+		struct ksmbd_conn *conn;
+
 		if (opinfo->is_lease)
 			opinfo->o_lease->state = SMB2_LEASE_NONE_LE;
 		opinfo->level = SMB2_OPLOCK_LEVEL_NONE;
@@ -1039,6 +1187,15 @@ static void wait_for_break_ack(struct oplock_info *opinfo)
 		 */
 		pr_warn_ratelimited("ksmbd: oplock break ACK timeout on fid %llu\n",
 				    opinfo->fid);
+
+		/*
+		 * MS-SMB2 3.3.4.7: if the client does not acknowledge the
+		 * oplock break within the timeout, the server MUST disconnect
+		 * the client's connection.
+		 */
+		conn = READ_ONCE(opinfo->conn);
+		if (conn)
+			ksmbd_conn_set_exiting(conn);
 	}
 }
 
@@ -1050,12 +1207,24 @@ static void wake_up_oplock_break(struct oplock_info *opinfo)
 	wake_up_bit(&opinfo->pending_break, 0);
 }
 
+/**
+ * oplock_break_pending() - wait for and serialize concurrent breaks
+ * @opinfo:	oplock/lease info
+ * @req_op_level:	requested break level
+ *
+ * Return:	0 = proceed with break (first in sequence),
+ *		2 = proceed with break (follow-up after waiting),
+ *		1 = skip (already broken to target),
+ *		< 0 = error
+ */
 VISIBLE_IF_KUNIT
 int oplock_break_pending(struct oplock_info *opinfo, int req_op_level)
 {
 	int ret;
+	bool waited = false;
 
 	while  (test_and_set_bit(0, &opinfo->pending_break)) {
+		waited = true;
 		ret = wait_on_bit_timeout(&opinfo->pending_break, 0,
 					  TASK_UNINTERRUPTIBLE,
 					  OPLOCK_WAIT_TIME);
@@ -1113,7 +1282,7 @@ int oplock_break_pending(struct oplock_info *opinfo, int req_op_level)
 		wake_up_oplock_break(opinfo);
 		return 1;
 	}
-	return 0;
+	return waited ? 2 : 0;
 }
 EXPORT_SYMBOL_IF_KUNIT(oplock_break_pending);
 
@@ -1267,7 +1436,7 @@ static void __smb2_oplock_break_noti(struct work_struct *wk)
 	rsp_hdr->MessageId = cpu_to_le64(-1);
 	rsp_hdr->Id.SyncId.ProcessId = 0;
 	rsp_hdr->Id.SyncId.TreeId = 0;
-	rsp_hdr->SessionId = 0;
+	rsp_hdr->SessionId = work->sess ? cpu_to_le64(work->sess->id) : 0;
 	memset(rsp_hdr->Signature, 0, 16);
 
 	rsp = smb2_get_msg(work->response_buf);
@@ -1293,6 +1462,7 @@ static void __smb2_oplock_break_noti(struct work_struct *wk)
 		    "sending oplock break v_id %llu p_id = %llu lock level = %d\n",
 		    rsp->VolatileFid, rsp->PersistentFid, rsp->OplockLevel);
 
+	ksmbd_smb2_finalize_async_rsp(work);
 	ksmbd_conn_write(work);
 
 out:
@@ -1380,7 +1550,7 @@ static void __smb2_lease_break_noti(struct work_struct *wk)
 	rsp_hdr->MessageId = cpu_to_le64(-1);
 	rsp_hdr->Id.SyncId.ProcessId = 0;
 	rsp_hdr->Id.SyncId.TreeId = 0;
-	rsp_hdr->SessionId = 0;
+	rsp_hdr->SessionId = work->sess ? cpu_to_le64(work->sess->id) : 0;
 	memset(rsp_hdr->Signature, 0, 16);
 
 	rsp = smb2_get_msg(work->response_buf);
@@ -1404,12 +1574,43 @@ static void __smb2_lease_break_noti(struct work_struct *wk)
 			      sizeof(struct smb2_lease_break)))
 		goto out;
 
+	ksmbd_smb2_finalize_async_rsp(work);
 	ksmbd_conn_write(work);
 
 out:
 	ksmbd_free_work_struct(work);
 	ksmbd_conn_r_count_dec(conn);
 	ksmbd_conn_free(conn);
+}
+
+/**
+ * lease_propagate_epoch() - propagate epoch to all sibling opinfos
+ *     sharing the same lease key in the same lease table.
+ * @opinfo:	opinfo whose epoch was just updated
+ *
+ * Per MS-SMB2 §3.3.4.7, a lease is identified by (ClientGuid, LeaseKey).
+ * All opens sharing the same lease key share the same epoch counter.
+ * After bumping epoch on one opinfo, propagate to siblings so that
+ * subsequent break notifications for the same event carry the same epoch.
+ */
+static void lease_propagate_epoch(struct oplock_info *opinfo)
+{
+	struct lease *lease = opinfo->o_lease;
+	struct lease_table *lb = lease->l_lb;
+	struct oplock_info *sibling;
+
+	if (!lb)
+		return;
+
+	rcu_read_lock();
+	list_for_each_entry_rcu(sibling, &lb->lease_list, lease_entry) {
+		if (sibling == opinfo)
+			continue;
+		if (!memcmp(sibling->o_lease->lease_key, lease->lease_key,
+			    SMB2_LEASE_KEY_SIZE))
+			sibling->o_lease->epoch = lease->epoch;
+	}
+	rcu_read_unlock();
 }
 
 /**
@@ -1421,7 +1622,8 @@ out:
  */
 static int smb2_lease_break_noti(struct oplock_info *opinfo)
 {
-	struct ksmbd_conn *conn = opinfo_get_live_conn(opinfo);
+	struct ksmbd_session *sess = NULL;
+	struct ksmbd_conn *conn = lease_get_break_conn(opinfo, &sess);
 	struct ksmbd_work *work;
 	struct lease_break_info *br_info;
 	struct lease *lease = opinfo->o_lease;
@@ -1443,8 +1645,12 @@ static int smb2_lease_break_noti(struct oplock_info *opinfo)
 
 	br_info->curr_state = lease->state;
 	br_info->new_state = lease->new_state;
+	/*
+	 * Epoch was already bumped (if needed) in oplock_break()
+	 * before calling us.  Just report the current value.
+	 */
 	if (lease->version == 2)
-		br_info->epoch = cpu_to_le16(++lease->epoch);
+		br_info->epoch = cpu_to_le16(lease->epoch);
 	else
 		br_info->epoch = 0;
 	/* M-12: propagate break reason set by the caller (e.g. parent rename) */
@@ -1453,7 +1659,7 @@ static int smb2_lease_break_noti(struct oplock_info *opinfo)
 
 	work->request_buf = (char *)br_info;
 	work->conn = conn;
-	work->sess = opinfo->sess;
+	work->sess = sess ?: opinfo->sess;
 
 	ksmbd_conn_r_count_inc(conn);
 	if (opinfo->op_state == OPLOCK_ACK_WAIT) {
@@ -1497,7 +1703,7 @@ static void wait_lease_breaking(struct oplock_info *opinfo)
 		 */
 		ret = wait_event_interruptible_timeout(opinfo->oplock_brk,
 					 atomic_read(&opinfo->breaking_cnt) == 0,
-					 HZ);
+					 OPLOCK_WAIT_TIME);
 		if (!ret)
 			atomic_set(&opinfo->breaking_cnt, 0);
 	}
@@ -1505,9 +1711,10 @@ static void wait_lease_breaking(struct oplock_info *opinfo)
 
 VISIBLE_IF_KUNIT
 int oplock_break(struct oplock_info *brk_opinfo, int req_op_level,
-			struct ksmbd_work *in_work)
+				struct ksmbd_work *in_work)
 {
 	int err = 0;
+	bool break_in_progress;
 
 	/* Need to break exclusive/batch oplock, write lease or overwrite_if */
 	ksmbd_debug(OPLOCK,
@@ -1516,13 +1723,51 @@ int oplock_break(struct oplock_info *brk_opinfo, int req_op_level,
 
 	if (brk_opinfo->is_lease) {
 		struct lease *lease = brk_opinfo->o_lease;
+		int pending_ret;
+		/*
+		 * Save open_trunc before oplock_break_pending() clears
+		 * it.  We need to know if truncation is pending so that
+		 * Handle-only breaks block for the ACK instead of using
+		 * nowait — otherwise smb_break_all_levII_oplock() would
+		 * fire the next break before the client ACKs this one,
+		 * causing duplicate break notifications (breaking3).
+		 */
+		int caller_is_trunc = brk_opinfo->open_trunc;
 
+		break_in_progress = atomic_read(&brk_opinfo->breaking_cnt) > 0;
 		brk_opinfo->nowait_ack = false;
 		atomic_inc(&brk_opinfo->breaking_cnt);
-		err = oplock_break_pending(brk_opinfo, req_op_level);
-		if (err) {
+
+		/*
+		 * A later conflicting open that arrives while another lease
+		 * break is already outstanding must become cancellable
+		 * immediately, even if this invocation ends up being only the
+		 * follow-up step in the same serialized downgrade sequence.
+		 */
+		if (break_in_progress && in_work && !in_work->asynchronous) {
+			err = setup_async_work(in_work, NULL, NULL);
+			if (!err)
+				smb2_send_interim_resp(in_work, STATUS_PENDING);
+		}
+
+		pending_ret = oplock_break_pending(brk_opinfo, req_op_level);
+		if (pending_ret < 0 || pending_ret == 1) {
 			atomic_dec(&brk_opinfo->breaking_cnt);
-			return err < 0 ? err : 0;
+			return pending_ret < 0 ? pending_ret : 0;
+		}
+
+		/*
+		 * Bump epoch for v2 leases only on a FRESH break
+		 * (pending_ret == 0).  Follow-up breaks within the
+		 * same break sequence (pending_ret == 2, meaning we
+		 * waited for a prior break) reuse the epoch that was
+		 * already bumped by the first break — matching Windows
+		 * and Samba behaviour (v2_breaking3).
+		 */
+		if (lease->version == 2 && pending_ret == 0 &&
+		    !(in_work && in_work->asynchronous)) {
+			lease->epoch++;
+			lease_propagate_epoch(brk_opinfo);
 		}
 
 		if (brk_opinfo->open_trunc) {
@@ -1566,11 +1811,10 @@ int oplock_break(struct oplock_info *brk_opinfo, int req_op_level,
 				 * open must block until the client ACKs
 				 * (MS-SMB2 §3.3.4.7).
 				 */
-				if (in_work) {
+				if (in_work && !in_work->asynchronous) {
 					setup_async_work(in_work, NULL, NULL);
 					smb2_send_interim_resp(in_work,
 							       STATUS_PENDING);
-					release_async_work(in_work);
 				}
 			}
 
@@ -1582,12 +1826,20 @@ int oplock_break(struct oplock_info *brk_opinfo, int req_op_level,
 			 * Handle-only breaks are non-blocking — the
 			 * conflicting open can proceed immediately.
 			 *
-			 * Exception: OPLOCK_BREAK_HANDLE_CACHING_WAIT
+			 * Exception 1: OPLOCK_BREAK_HANDLE_CACHING_WAIT
 			 * is used for rename-into-directory where the
 			 * server must wait for the Handle break ACK
 			 * before proceeding.
+			 *
+			 * Exception 2: When the caller originally set
+			 * open_trunc (OVERWRITE/SUPERSEDE open),
+			 * smb_break_all_levII_oplock() will run right
+			 * after us.  We must wait for the ACK so the
+			 * state is updated before the next break fires.
 			 */
 			if (req_op_level == OPLOCK_BREAK_HANDLE_CACHING_WAIT)
+				brk_opinfo->nowait_ack = false;
+			else if (caller_is_trunc)
 				brk_opinfo->nowait_ack = false;
 			else if (!(lease->state & SMB2_LEASE_WRITE_CACHING_LE) ||
 				 (!in_work &&
@@ -1689,7 +1941,7 @@ again:
 	write_unlock(&lease_list_lock);
 }
 
-int find_same_lease_key(struct ksmbd_session *sess, struct ksmbd_inode *ci,
+int find_same_lease_key(struct ksmbd_session *sess, struct inode *inode,
 			struct lease_ctx_info *lctx)
 {
 	struct oplock_info *opinfo;
@@ -1719,7 +1971,8 @@ found:
 		if (!refcount_inc_not_zero(&opinfo->refcount))
 			continue;
 		rcu_read_unlock();
-		if (opinfo->o_fp->f_ci == ci)
+		if (inode && opinfo->o_fp && opinfo->o_fp->filp &&
+		    file_inode(opinfo->o_fp->filp) == inode)
 			goto op_next;
 		err = compare_guid_key(opinfo, sess->ClientGUID,
 				       lctx->lease_key);
@@ -2352,47 +2605,6 @@ static bool disconnected_have_write(struct ksmbd_inode *ci)
 	return found;
 }
 
-static void downgrade_disconnected_write(struct ksmbd_inode *ci)
-{
-	struct oplock_info *opinfo;
-
-	down_write(&ci->m_lock);
-	list_for_each_entry(opinfo, &ci->m_op_list, op_entry) {
-		struct ksmbd_conn *conn = READ_ONCE(opinfo->conn);
-
-		if (conn && !ksmbd_conn_releasing(conn) &&
-		    !ksmbd_conn_exiting(conn))
-			continue;
-
-		if (opinfo->is_lease) {
-			if (!(opinfo->o_lease->state &
-			      SMB2_LEASE_WRITE_CACHING_LE))
-				continue;
-
-			opinfo->o_lease->state &=
-				~SMB2_LEASE_WRITE_CACHING_LE;
-			if (!opinfo->o_lease->state)
-				opinfo->o_lease->state =
-					SMB2_LEASE_NONE_LE;
-			opinfo->o_lease->new_state =
-				opinfo->o_lease->state;
-			opinfo->level =
-				smb2_map_lease_to_oplock(opinfo->o_lease->state);
-			if (!opinfo->level)
-				opinfo->level = SMB2_OPLOCK_LEVEL_NONE;
-		} else if (opinfo->level == SMB2_OPLOCK_LEVEL_BATCH ||
-			   opinfo->level == SMB2_OPLOCK_LEVEL_EXCLUSIVE) {
-			opinfo->level = SMB2_OPLOCK_LEVEL_II;
-		} else {
-			continue;
-		}
-
-		opinfo->op_state = OPLOCK_STATE_NONE;
-		atomic_set(&opinfo->breaking_cnt, 0);
-	}
-	up_write(&ci->m_lock);
-}
-
 VISIBLE_IF_KUNIT
 void ksmbd_apply_disconnected_only_lease_policy(int *req_op_level,
 						struct lease_ctx_info *lctx)
@@ -2566,8 +2778,16 @@ int smb_grant_oplock(struct ksmbd_work *work, int req_op_level, u64 pid,
 		 */
 		if (opinfo_count(fp) > 0) {
 			bool disconnected_write = disconnected_have_write(ci);
-			bool do_purge = (share_ret < 0) ||
-					(lctx && disconnected_write);
+			/*
+			 * Purge disconnected handles when:
+			 *  - sharing conflict (share_ret < 0), OR
+			 *  - disconnected Write caching (batch/exclusive
+			 *    oplock or Write lease).  A disconnected client
+			 *    cannot ACK a break, so its Write caching is
+			 *    stale regardless of whether the new opener uses
+			 *    leases or oplocks.
+			 */
+			bool do_purge = (share_ret < 0) || disconnected_write;
 
 			if (do_purge) {
 				ksmbd_purge_disconnected_fp(ci);
@@ -2585,8 +2805,6 @@ int smb_grant_oplock(struct ksmbd_work *work, int req_op_level, u64 pid,
 				if (!opinfo_count(fp))
 					goto set_lev;
 			}
-			if (disconnected_write && !lctx)
-				downgrade_disconnected_write(ci);
 			/*
 			 * Case C: keep disconnected RH handles. The new open
 			 * must not gain independent Write caching, but Handle
@@ -2680,12 +2898,11 @@ int smb_grant_oplock(struct ksmbd_work *work, int req_op_level, u64 pid,
 			 * sharing violations require waiting so the
 			 * conflict can be re-evaluated after the break.
 			 */
-			if (work) {
-				setup_async_work(work, NULL, NULL);
-				smb2_send_interim_resp(work,
-						       STATUS_PENDING);
-				release_async_work(work);
-			}
+				if (work && !work->asynchronous) {
+					setup_async_work(work, NULL, NULL);
+					smb2_send_interim_resp(work,
+							       STATUS_PENDING);
+				}
 			err = oplock_break(prev_opinfo,
 					   OPLOCK_BREAK_HANDLE_CACHING,
 					   work);
@@ -2716,13 +2933,13 @@ int smb_grant_oplock(struct ksmbd_work *work, int req_op_level, u64 pid,
 			 * server must wait before returning the sharing
 			 * violation or re-evaluating.
 			 */
-			if (work &&
-			    !(prev_op_state & SMB2_LEASE_WRITE_CACHING_LE)) {
-				setup_async_work(work, NULL, NULL);
-				smb2_send_interim_resp(work,
-						       STATUS_PENDING);
-				release_async_work(work);
-			}
+				if (work &&
+				    !(prev_op_state & SMB2_LEASE_WRITE_CACHING_LE) &&
+				    !work->asynchronous) {
+					setup_async_work(work, NULL, NULL);
+					smb2_send_interim_resp(work,
+							       STATUS_PENDING);
+				}
 			err = oplock_break(prev_opinfo,
 					   OPLOCK_BREAK_HANDLE_CACHING, work);
 			if (!err && !(prev_op_state &
@@ -2758,13 +2975,12 @@ int smb_grant_oplock(struct ksmbd_work *work, int req_op_level, u64 pid,
 		 */
 		int break_level = (share_ret < 0 && prev_op_has_lease) ?
 			OPLOCK_BREAK_HANDLE_CACHING : SMB2_OPLOCK_LEVEL_II;
-		if (share_ret < 0 && prev_op_has_lease &&
-		    !(prev_op_state & SMB2_LEASE_WRITE_CACHING_LE) &&
-		    work) {
-			setup_async_work(work, NULL, NULL);
-			smb2_send_interim_resp(work, STATUS_PENDING);
-			release_async_work(work);
-		}
+			if (share_ret < 0 && prev_op_has_lease &&
+			    !(prev_op_state & SMB2_LEASE_WRITE_CACHING_LE) &&
+			    work && !work->asynchronous) {
+				setup_async_work(work, NULL, NULL);
+				smb2_send_interim_resp(work, STATUS_PENDING);
+			}
 		err = oplock_break(prev_opinfo, break_level, work);
 		if (!err && share_ret < 0 && prev_op_has_lease &&
 		    !(prev_op_state & SMB2_LEASE_WRITE_CACHING_LE))
@@ -2980,6 +3196,33 @@ void smb_break_all_levII_oplock(struct ksmbd_work *work, struct ksmbd_file *fp,
 		    !memcmp(op->o_lease->lease_key, brk_op->o_lease->lease_key,
 			    SMB2_LEASE_KEY_SIZE))
 			goto next;
+
+		/*
+		 * MS-SMB2 §3.3.4.7: a lease is identified by
+		 * (ClientGuid, LeaseKey).  Only send one break
+		 * notification per logical lease — skip opinfos
+		 * that share a lease key with one already collected.
+		 */
+		if (brk_op->is_lease) {
+			int dup = 0, j;
+
+			for (j = 0; j < brk_cnt; j++) {
+				if (!brk_batch[j]->is_lease)
+					continue;
+				if (!memcmp(brk_op->conn->ClientGUID,
+					    brk_batch[j]->conn->ClientGUID,
+					    SMB2_CLIENT_GUID_SIZE) &&
+				    !memcmp(brk_op->o_lease->lease_key,
+					    brk_batch[j]->o_lease->lease_key,
+					    SMB2_LEASE_KEY_SIZE)) {
+					dup = 1;
+					break;
+				}
+			}
+			if (dup)
+				goto next;
+		}
+
 		brk_op->open_trunc = is_trunc;
 		if (brk_cnt < LEVII_BRK_BATCH) {
 			brk_batch[brk_cnt++] = brk_op;
@@ -2996,7 +3239,7 @@ next:
 
 	/* Send break notifications without holding ci->m_lock */
 	for (i = 0; i < brk_cnt; i++) {
-		oplock_break(brk_batch[i], SMB2_OPLOCK_LEVEL_NONE, NULL);
+		oplock_break(brk_batch[i], SMB2_OPLOCK_LEVEL_NONE, work);
 		opinfo_put(brk_batch[i]);
 	}
 
@@ -3087,6 +3330,31 @@ void smb_break_all_handle_lease(struct ksmbd_work *work, struct ksmbd_file *fp,
 			opinfo_put(brk_op);
 			continue;
 		}
+
+		/*
+		 * Deduplicate by lease key: only one break notification
+		 * per (ClientGuid, LeaseKey) per MS-SMB2 §3.3.4.7.
+		 */
+		{
+			int dup = 0, j;
+
+			for (j = 0; j < brk_cnt; j++) {
+				if (!memcmp(brk_op->conn->ClientGUID,
+					    brk_batch[j]->conn->ClientGUID,
+					    SMB2_CLIENT_GUID_SIZE) &&
+				    !memcmp(brk_op->o_lease->lease_key,
+					    brk_batch[j]->o_lease->lease_key,
+					    SMB2_LEASE_KEY_SIZE)) {
+					dup = 1;
+					break;
+				}
+			}
+			if (dup) {
+				opinfo_put(brk_op);
+				continue;
+			}
+		}
+
 		if (brk_cnt < HANDLE_BRK_BATCH) {
 			brk_batch[brk_cnt++] = brk_op;
 			continue;
@@ -3147,6 +3415,31 @@ void smb_break_target_handle_lease(struct ksmbd_work *work,
 			continue;
 		}
 		/* No skip — break ALL handles, including the target's own */
+
+		/*
+		 * Deduplicate by lease key: only one break per
+		 * (ClientGuid, LeaseKey) per MS-SMB2 §3.3.4.7.
+		 */
+		{
+			int dup = 0, j;
+
+			for (j = 0; j < brk_cnt; j++) {
+				if (!memcmp(brk_op->conn->ClientGUID,
+					    brk_batch[j]->conn->ClientGUID,
+					    SMB2_CLIENT_GUID_SIZE) &&
+				    !memcmp(brk_op->o_lease->lease_key,
+					    brk_batch[j]->o_lease->lease_key,
+					    SMB2_LEASE_KEY_SIZE)) {
+					dup = 1;
+					break;
+				}
+			}
+			if (dup) {
+				opinfo_put(brk_op);
+				continue;
+			}
+		}
+
 		if (brk_cnt < TARGET_BRK_BATCH)
 			brk_batch[brk_cnt++] = brk_op;
 		else
@@ -3622,48 +3915,65 @@ int create_fruit_rsp_buf(char *cc, struct ksmbd_conn *conn, size_t *out_size)
  *
  * Return:      opinfo if found matching opinfo, otherwise NULL
  */
-struct oplock_info *lookup_lease_in_table(struct ksmbd_conn *conn,
+struct oplock_info *lookup_lease_in_table(const char *client_guid,
 					  char *lease_key)
 {
 	struct oplock_info *opinfo = NULL, *ret_op = NULL;
 	struct lease_table *lt;
+	bool guid_valid;
 	int ret;
 
+	guid_valid = client_guid &&
+		     memchr_inv(client_guid, 0, SMB2_CLIENT_GUID_SIZE);
+
 	rcu_read_lock();
+	if (guid_valid) {
+		list_for_each_entry_rcu(lt, &lease_table_list, l_entry) {
+			if (!memcmp(lt->client_guid, client_guid,
+				    SMB2_CLIENT_GUID_SIZE))
+				goto found;
+		}
+	}
+
+	/*
+	 * Fall back to scanning every lease table when the caller does not
+	 * have a usable ClientGUID copy. This keeps lease-break ACK lookup
+	 * working on rebound/migrated channels where the session still owns
+	 * the lease key but the current connection GUID is not populated.
+	 */
 	list_for_each_entry_rcu(lt, &lease_table_list, l_entry) {
-		if (!memcmp(lt->client_guid, conn->ClientGUID,
-			    SMB2_CLIENT_GUID_SIZE))
-			goto found;
+found:
+		list_for_each_entry_rcu(opinfo, &lt->lease_list, lease_entry) {
+			if (!refcount_inc_not_zero(&opinfo->refcount))
+				continue;
+			rcu_read_unlock();
+			if (!opinfo->op_state || opinfo->op_state == OPLOCK_CLOSING)
+				goto op_next;
+			if (!(opinfo->o_lease->state &
+			      (SMB2_LEASE_HANDLE_CACHING_LE |
+			       SMB2_LEASE_WRITE_CACHING_LE)))
+				goto op_next;
+			if (guid_valid)
+				ret = compare_guid_key(opinfo, client_guid,
+						       lease_key);
+			else
+				ret = !memcmp(opinfo->o_lease->lease_key, lease_key,
+					      SMB2_LEASE_KEY_SIZE);
+			if (ret) {
+				ksmbd_debug(OPLOCK, "found opinfo\n");
+				ret_op = opinfo;
+				return ret_op;
+			}
+op_next:
+			opinfo_put(opinfo);
+			rcu_read_lock();
+		}
+		if (guid_valid)
+			break;
 	}
 
 	rcu_read_unlock();
 	return NULL;
-
-found:
-	list_for_each_entry_rcu(opinfo, &lt->lease_list, lease_entry) {
-		if (!refcount_inc_not_zero(&opinfo->refcount))
-			continue;
-		rcu_read_unlock();
-		if (!opinfo->op_state || opinfo->op_state == OPLOCK_CLOSING)
-			goto op_next;
-		if (!(opinfo->o_lease->state &
-		      (SMB2_LEASE_HANDLE_CACHING_LE |
-		       SMB2_LEASE_WRITE_CACHING_LE)))
-			goto op_next;
-		ret = compare_guid_key(opinfo, conn->ClientGUID,
-				       lease_key);
-		if (ret) {
-			ksmbd_debug(OPLOCK, "found opinfo\n");
-			ret_op = opinfo;
-			return ret_op;
-		}
-op_next:
-		opinfo_put(opinfo);
-		rcu_read_lock();
-	}
-	rcu_read_unlock();
-
-	return ret_op;
 }
 
 int smb2_check_durable_oplock(struct ksmbd_conn *conn,

@@ -723,6 +723,184 @@ struct fsctl_pipe_peek_rsp {
 #define FILE_PIPE_DISCONNECTED_STATE	1
 #define FILE_PIPE_CONNECTED_STATE	3
 
+struct fsctl_pipe_async_ctx {
+	struct delayed_work	dwork;
+	struct ksmbd_work	*work;
+	u64			id;
+	unsigned int		max_out_len;
+};
+
+static void fsctl_pipe_async_put_conn_ref(struct ksmbd_work *work)
+{
+	if (!work || !work->async_conn_ref || !work->conn)
+		return;
+
+	work->async_conn_ref = false;
+	ksmbd_conn_free(work->conn);
+}
+
+static void fsctl_pipe_poll_reschedule(struct fsctl_pipe_async_ctx *ctx)
+{
+	mod_delayed_work(system_wq, &ctx->dwork, msecs_to_jiffies(25));
+}
+
+static void fsctl_pipe_transceive_finish(struct ksmbd_work *work,
+					 struct fsctl_pipe_async_ctx *ctx,
+					 struct ksmbd_rpc_command *rpc_resp)
+{
+	struct smb2_ioctl_rsp *rsp = smb2_get_msg(work->response_buf);
+	unsigned int nbytes = 0;
+	int rc = 0;
+
+	if (!rpc_resp || rpc_resp->flags == KSMBD_RPC_EBAD_FID) {
+		rsp->hdr.Status = STATUS_PIPE_DISCONNECTED;
+		smb2_set_err_rsp(work);
+	} else if (rpc_resp->flags == KSMBD_RPC_OK) {
+		nbytes = min_t(unsigned int, rpc_resp->payload_sz,
+			       ctx->max_out_len);
+		if (rpc_resp->payload_sz > ctx->max_out_len)
+			rsp->hdr.Status = STATUS_BUFFER_OVERFLOW;
+		if (nbytes)
+			memcpy((char *)rsp->Buffer, rpc_resp->payload,
+			       nbytes);
+
+		rsp->CntCode = cpu_to_le32(FSCTL_PIPE_TRANSCEIVE);
+		rsp->InputCount = cpu_to_le32(0);
+		rsp->InputOffset = cpu_to_le32(112);
+		rsp->OutputOffset = cpu_to_le32(112);
+		rsp->OutputCount = cpu_to_le32(nbytes);
+		rsp->StructureSize = cpu_to_le16(49);
+		rsp->Reserved = cpu_to_le16(0);
+		rsp->Flags = cpu_to_le32(0);
+		rsp->Reserved2 = cpu_to_le32(0);
+		rc = ksmbd_iov_pin_rsp(work, rsp,
+				       sizeof(struct smb2_ioctl_rsp) +
+				       nbytes);
+		if (rc) {
+			rsp->hdr.Status = STATUS_INSUFFICIENT_RESOURCES;
+			smb2_set_err_rsp(work);
+		}
+	} else {
+		rsp->hdr.Status = STATUS_INVALID_PARAMETER;
+		smb2_set_err_rsp(work);
+	}
+
+	kvfree(rpc_resp);
+	spin_lock(&work->conn->request_lock);
+	list_del_init(&work->async_request_entry);
+	spin_unlock(&work->conn->request_lock);
+
+	work->pending_async = 0;
+	work->send_no_response = 0;
+	if (work->sess && work->sess->enc && work->encrypted &&
+	    work->conn->ops->encrypt_resp) {
+		rc = work->conn->ops->encrypt_resp(work);
+		if (rc < 0)
+			pr_err_ratelimited("ksmbd: pipe transceive encrypt failed: %d\n",
+					   rc);
+	}
+	ksmbd_conn_write(work);
+	ksmbd_conn_try_dequeue_request(work);
+	if (READ_ONCE(server_conf.max_async_credits))
+		atomic_dec(&work->conn->outstanding_async);
+	if (work->sess)
+		ksmbd_user_session_put(work->sess);
+	fsctl_pipe_async_put_conn_ref(work);
+	kfree(ctx);
+	ksmbd_free_work_struct(work);
+}
+
+static void fsctl_pipe_transceive_poll_work(struct work_struct *wk)
+{
+	struct delayed_work *dwork = to_delayed_work(wk);
+	struct fsctl_pipe_async_ctx *ctx =
+		container_of(dwork, struct fsctl_pipe_async_ctx, dwork);
+	struct ksmbd_work *work = ctx->work;
+	struct ksmbd_rpc_command *rpc_resp;
+	struct ksmbd_rpc_command *state_resp;
+	struct ksmbd_rpc_pipe_info *pipe_info;
+
+	if (!work || !work->sess || !ksmbd_conn_alive(work->conn) ||
+	    ksmbd_conn_exiting(work->conn) || ksmbd_conn_releasing(work->conn)) {
+		if (work) {
+			spin_lock(&work->conn->request_lock);
+			list_del_init(&work->async_request_entry);
+			spin_unlock(&work->conn->request_lock);
+			ksmbd_conn_try_dequeue_request(work);
+			if (READ_ONCE(server_conf.max_async_credits))
+				atomic_dec(&work->conn->outstanding_async);
+			work->pending_async = 0;
+		}
+		if (work && work->sess)
+			ksmbd_user_session_put(work->sess);
+		fsctl_pipe_async_put_conn_ref(work);
+		kfree(ctx);
+		if (work)
+			ksmbd_free_work_struct(work);
+		return;
+	}
+
+	state_resp = ksmbd_rpc_query(work->sess, ctx->id);
+	if (!state_resp) {
+		fsctl_pipe_poll_reschedule(ctx);
+		return;
+	}
+
+	if (state_resp->flags == KSMBD_RPC_EBAD_FID) {
+		fsctl_pipe_transceive_finish(work, ctx, state_resp);
+		return;
+	}
+
+	if (state_resp->flags != KSMBD_RPC_OK ||
+	    state_resp->payload_sz < sizeof(*pipe_info)) {
+		kvfree(state_resp);
+		fsctl_pipe_poll_reschedule(ctx);
+		return;
+	}
+
+	pipe_info = (struct ksmbd_rpc_pipe_info *)state_resp->payload;
+	if (!pipe_info->read_data_available) {
+		kvfree(state_resp);
+		fsctl_pipe_poll_reschedule(ctx);
+		return;
+	}
+	kvfree(state_resp);
+
+	rpc_resp = ksmbd_rpc_read(work->sess, ctx->id);
+	if (!rpc_resp || (rpc_resp->flags == KSMBD_RPC_OK &&
+			  rpc_resp->payload_sz == 0)) {
+		kvfree(rpc_resp);
+		fsctl_pipe_poll_reschedule(ctx);
+		return;
+	}
+
+	fsctl_pipe_transceive_finish(work, ctx, rpc_resp);
+}
+
+/**
+ * fsctl_pipe_peek_handler() - Handle FSCTL_PIPE_PEEK
+ * @work:	    smb work for this request
+ * @id:		    volatile file id (pipe handle)
+ * @in_buf:	    input buffer (unused for PEEK)
+ * @in_buf_len:    input buffer length
+ * @max_out_len:   maximum output length allowed by client
+ * @rsp:	    pointer to ioctl response structure
+ * @out_len:	    [out] number of output bytes written
+ *
+ * MS-FSCC 2.3.18 (FSCTL_PIPE_PEEK output):
+ *   Offset  Size  Field
+ *   0       4     NamedPipeState
+ *   4       4     ReadDataAvailable
+ *   8       4     NumberOfMessages
+ *   12      4     MessageLength
+ *   16      var   Data (preview of first message, non-destructive)
+ *
+ * The Data field contains a preview of the available pipe data up to
+ * min(ReadDataAvailable, max_out_len - sizeof(header)) bytes.  This
+ * data is NOT consumed from the pipe (peek semantics).
+ *
+ * Return: 0 on success, negative errno on failure
+ */
 static int fsctl_pipe_peek_handler(struct ksmbd_work *work,
 				   u64 id, void *in_buf,
 				   unsigned int in_buf_len,
@@ -731,7 +909,9 @@ static int fsctl_pipe_peek_handler(struct ksmbd_work *work,
 				   unsigned int *out_len)
 {
 	struct fsctl_pipe_peek_rsp *peek_rsp;
-	struct ksmbd_file *fp;
+	struct ksmbd_rpc_command *rpc_resp = NULL;
+	struct ksmbd_rpc_pipe_info *pipe_info;
+	u32 data_avail, data_preview_len, extra_data_len;
 
 	if (max_out_len < sizeof(*peek_rsp)) {
 		rsp->hdr.Status = STATUS_BUFFER_TOO_SMALL;
@@ -741,20 +921,160 @@ static int fsctl_pipe_peek_handler(struct ksmbd_work *work,
 	peek_rsp = (struct fsctl_pipe_peek_rsp *)&rsp->Buffer[0];
 	memset(peek_rsp, 0, sizeof(*peek_rsp));
 
-	/*
-	 * MS-FSCC §2.3.32: NamedPipeState MUST be one of the defined
-	 * states. Return CONNECTED (3) for open pipe handles,
-	 * DISCONNECTED (1) if the handle is not found.
-	 */
-	fp = ksmbd_lookup_fd_fast(work, id);
-	if (fp) {
-		peek_rsp->NamedPipeState = cpu_to_le32(FILE_PIPE_CONNECTED_STATE);
-		ksmbd_fd_put(work, fp);
-	} else {
-		peek_rsp->NamedPipeState = cpu_to_le32(FILE_PIPE_DISCONNECTED_STATE);
+	rpc_resp = ksmbd_rpc_query(work->sess, id);
+	if (!rpc_resp || rpc_resp->flags == KSMBD_RPC_EBAD_FID) {
+		peek_rsp->NamedPipeState =
+			cpu_to_le32(FILE_PIPE_DISCONNECTED_STATE);
+		goto out_no_data;
 	}
 
+	if (rpc_resp->flags != KSMBD_RPC_OK ||
+	    rpc_resp->payload_sz < sizeof(*pipe_info)) {
+		rsp->hdr.Status = STATUS_UNEXPECTED_IO_ERROR;
+		kvfree(rpc_resp);
+		return -EIO;
+	}
+
+	pipe_info = (struct ksmbd_rpc_pipe_info *)rpc_resp->payload;
+	peek_rsp->NamedPipeState = cpu_to_le32(pipe_info->pipe_state);
+	data_avail = pipe_info->read_data_available;
+	peek_rsp->ReadDataAvailable = cpu_to_le32(data_avail);
+	peek_rsp->NumberOfMessages =
+		cpu_to_le32(pipe_info->number_of_messages);
+	peek_rsp->MessageLength = cpu_to_le32(pipe_info->message_length);
+
+	/*
+	 * MS-FSCC 2.3.18: The Data field contains a non-destructive preview
+	 * of the first message.  If the userspace daemon included data beyond
+	 * the pipe_info header in its query response, copy it as the preview.
+	 *
+	 * data_preview_len: how much preview data the daemon sent
+	 * We copy min(data_preview_len, space available in output buffer).
+	 */
+	extra_data_len = rpc_resp->payload_sz - sizeof(*pipe_info);
+	if (extra_data_len > 0 && data_avail > 0) {
+		u32 space = max_out_len - sizeof(*peek_rsp);
+
+		data_preview_len = min3(extra_data_len, data_avail, space);
+		if (data_preview_len > 0) {
+			memcpy((u8 *)peek_rsp + sizeof(*peek_rsp),
+			       rpc_resp->payload + sizeof(*pipe_info),
+			       data_preview_len);
+			kvfree(rpc_resp);
+			*out_len = sizeof(*peek_rsp) + data_preview_len;
+			return 0;
+		}
+	}
+
+	kvfree(rpc_resp);
+out_no_data:
 	*out_len = sizeof(*peek_rsp);
+	return 0;
+}
+
+static void fsctl_pipe_transceive_cancel(void **argv)
+{
+	struct ksmbd_work *work;
+	struct smb2_ioctl_rsp *rsp;
+	struct fsctl_pipe_async_ctx *ctx;
+
+	if (!argv || !argv[0])
+		return;
+
+	work = argv[0];
+	ctx = argv[1];
+	rsp = smb2_get_msg(work->response_buf);
+
+	if (ctx)
+		cancel_delayed_work_sync(&ctx->dwork);
+
+	rsp->hdr.Flags |= SMB2_FLAGS_ASYNC_COMMAND;
+	rsp->hdr.Id.AsyncId = cpu_to_le64(work->async_id);
+	rsp->hdr.Status = STATUS_CANCELLED;
+
+	smb2_set_err_rsp(work);
+	if (ksmbd_iov_pin_rsp(work, rsp, sizeof(struct smb2_hdr) + 8))
+		rsp->hdr.Status = STATUS_INSUFFICIENT_RESOURCES;
+
+	if (work->sess && work->sess->enc && work->encrypted &&
+	    work->conn->ops->encrypt_resp) {
+		int rc = work->conn->ops->encrypt_resp(work);
+
+		if (rc < 0)
+			pr_err_ratelimited("ksmbd: pipe transceive cancel encrypt failed: %d\n",
+					   rc);
+	}
+
+	work->send_no_response = 0;
+	ksmbd_conn_write(work);
+
+	spin_lock(&work->conn->request_lock);
+	list_del_init(&work->async_request_entry);
+	spin_unlock(&work->conn->request_lock);
+
+	ksmbd_conn_try_dequeue_request(work);
+
+	if (READ_ONCE(server_conf.max_async_credits))
+		atomic_dec(&work->conn->outstanding_async);
+
+	if (work->sess)
+		ksmbd_user_session_put(work->sess);
+	fsctl_pipe_async_put_conn_ref(work);
+	kfree(ctx);
+	ksmbd_free_work_struct(work);
+}
+
+static int fsctl_pipe_transceive_async(struct ksmbd_work *work,
+				       struct smb2_ioctl_rsp *rsp,
+				       u64 id, unsigned int max_out_len)
+{
+	struct fsctl_pipe_async_ctx *ctx;
+	void **argv;
+	int rc;
+
+	argv = kcalloc(2, sizeof(void *), KSMBD_DEFAULT_GFP);
+	if (!argv) {
+		rsp->hdr.Status = STATUS_INSUFFICIENT_RESOURCES;
+		smb2_set_err_rsp(work);
+		return -ENOMEM;
+	}
+
+	ctx = kzalloc(sizeof(*ctx), KSMBD_DEFAULT_GFP);
+	if (!ctx) {
+		kfree(argv);
+		rsp->hdr.Status = STATUS_INSUFFICIENT_RESOURCES;
+		smb2_set_err_rsp(work);
+		return -ENOMEM;
+	}
+
+	ctx->work = work;
+	ctx->id = id;
+	ctx->max_out_len = max_out_len;
+	INIT_DELAYED_WORK(&ctx->dwork, fsctl_pipe_transceive_poll_work);
+
+	rc = setup_async_work(work, fsctl_pipe_transceive_cancel, argv);
+	if (rc) {
+		kfree(ctx);
+		kfree(argv);
+		rsp->hdr.Status = STATUS_INSUFFICIENT_RESOURCES;
+		smb2_set_err_rsp(work);
+		return rc;
+	}
+
+	argv[0] = work;
+	argv[1] = ctx;
+	if (work->sess)
+		ksmbd_user_session_get(work->sess);
+	refcount_inc(&work->conn->refcnt);
+	work->async_conn_ref = true;
+	work->pending_async = 1;
+
+	if (work->conn->ops->set_rsp_credits)
+		work->conn->ops->set_rsp_credits(work);
+
+	smb2_send_interim_resp(work, STATUS_PENDING);
+	work->send_no_response = 1;
+	fsctl_pipe_poll_reschedule(ctx);
 	return 0;
 }
 
@@ -985,9 +1305,17 @@ ipv6_retry:
 		nii_rsp = (struct network_interface_info_ioctl_rsp *)&rsp->Buffer[nbytes];
 		nii_rsp->IfIndex = cpu_to_le32(netdev->ifindex);
 		nii_rsp->Capability = 0;
-		if (netdev->real_num_tx_queues > 1)
+		if ((server_conf.flags & KSMBD_GLOBAL_FLAG_SMB3_MULTICHANNEL) &&
+		    netdev->real_num_tx_queues > 1)
 			nii_rsp->Capability |= cpu_to_le32(RSS_CAPABLE);
-		if (ksmbd_rdma_capable_netdev(netdev))
+		/*
+		 * Only advertise RDMA if this interface is RDMA-capable and
+		 * ksmbd is actually listening for SMB Direct connections.
+		 * Hardware capability alone is not enough for
+		 * FSCTL_QUERY_NETWORK_INTERFACE_INFO truthfulness.
+		 */
+		if (ksmbd_rdma_listener_active() &&
+		    ksmbd_rdma_capable_netdev(netdev))
 			nii_rsp->Capability |= cpu_to_le32(RDMA_CAPABLE);
 
 		nii_rsp->Next = cpu_to_le32(152);
@@ -1395,7 +1723,7 @@ static int fsctl_duplicate_extents_handler(struct ksmbd_work *work,
 	fp_in = ksmbd_lookup_fd_slow(work, dup_ext->VolatileFileHandle,
 				     dup_ext->PersistentFileHandle);
 	if (!fp_in) {
-		rsp->hdr.Status = STATUS_INVALID_HANDLE;
+		rsp->hdr.Status = STATUS_FILE_CLOSED;
 		return -ENOENT;
 	}
 
@@ -1533,14 +1861,14 @@ static int fsctl_duplicate_extents_ex_handler(struct ksmbd_work *work,
 	fp_in = ksmbd_lookup_fd_slow(work, dup_ext->VolatileFileHandle,
 				     dup_ext->PersistentFileHandle);
 	if (!fp_in) {
-		rsp->hdr.Status = STATUS_INVALID_HANDLE;
+		rsp->hdr.Status = STATUS_FILE_CLOSED;
 		return -ENOENT;
 	}
 
 	fp_out = ksmbd_lookup_fd_fast(work, id);
 	if (!fp_out) {
 		ksmbd_fd_put(work, fp_in);
-		rsp->hdr.Status = STATUS_INVALID_HANDLE;
+		rsp->hdr.Status = STATUS_FILE_CLOSED;
 		return -ENOENT;
 	}
 
@@ -1937,21 +2265,20 @@ static int fsctl_pipe_transceive_handler(struct ksmbd_work *work,
 					  unsigned int *out_len)
 {
 	struct ksmbd_rpc_command *rpc_resp;
-	struct ksmbd_file *fp;
 	unsigned int capped_out_len;
 	int nbytes = 0;
 
 	/*
-	 * Verify the file handle belongs to the caller's session/tree before
-	 * routing to RPC.  Without this check a client can pass an arbitrary
-	 * volatile_id and route RPC calls to handles opened by other sessions.
+	 * Validate the RPC handle against the session's pipe table.
+	 * IPC$ pipe FIDs are not VFS file-table entries.
 	 */
-	fp = ksmbd_lookup_fd_fast(work, id);
-	if (!fp) {
+	down_read(&work->sess->rpc_lock);
+	if (!ksmbd_session_rpc_method(work->sess, id)) {
+		up_read(&work->sess->rpc_lock);
 		rsp->hdr.Status = STATUS_INVALID_HANDLE;
 		return -ENOENT;
 	}
-	ksmbd_fd_put(work, fp);
+	up_read(&work->sess->rpc_lock);
 
 	capped_out_len = min_t(u32, KSMBD_IPC_MAX_PAYLOAD, max_out_len);
 
@@ -1971,12 +2298,20 @@ static int fsctl_pipe_transceive_handler(struct ksmbd_work *work,
 			 */
 			nbytes = 0;
 			goto out;
+		} else if (rpc_resp->flags == KSMBD_RPC_EBAD_FID) {
+			rsp->hdr.Status = STATUS_PIPE_DISCONNECTED;
+			goto out;
 		} else if (rpc_resp->flags != KSMBD_RPC_OK) {
 			rsp->hdr.Status = STATUS_INVALID_PARAMETER;
 			goto out;
 		}
 
 		nbytes = rpc_resp->payload_sz;
+		if (nbytes == 0) {
+			kvfree(rpc_resp);
+			return fsctl_pipe_transceive_async(work, rsp, id,
+							   capped_out_len);
+		}
 		if (rpc_resp->payload_sz > capped_out_len) {
 			rsp->hdr.Status = STATUS_BUFFER_OVERFLOW;
 			nbytes = capped_out_len;

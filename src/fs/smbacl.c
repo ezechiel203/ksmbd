@@ -17,6 +17,8 @@
 #include <linux/mnt_idmapping.h>
 #endif
 
+#include <linux/sort.h>
+
 #include "smbacl.h"
 #include "smb_common.h"
 #include "server.h"
@@ -247,6 +249,36 @@ static int ksmbd_validate_ace(const struct smb_ace *ace, int remaining,
 
 	if (ace_size)
 		*ace_size = size;
+	return 0;
+}
+
+static int ksmbd_reserve_inherit_aces(char **aces_base, struct smb_ace **aces,
+				      size_t *aces_buf_size, size_t used,
+				      size_t add)
+{
+	char *new_aces_base;
+	size_t needed;
+	size_t new_size;
+
+	if (check_add_overflow(used, add, &needed))
+		return -EOVERFLOW;
+
+	if (needed <= *aces_buf_size) {
+		*aces = (struct smb_ace *)(*aces_base + used);
+		return 0;
+	}
+
+	new_size = needed;
+	if (*aces_buf_size && *aces_buf_size <= SIZE_MAX / 2)
+		new_size = max(new_size, *aces_buf_size * 2);
+
+	new_aces_base = krealloc(*aces_base, new_size, KSMBD_DEFAULT_GFP);
+	if (!new_aces_base)
+		return -ENOMEM;
+
+	*aces_base = new_aces_base;
+	*aces_buf_size = new_size;
+	*aces = (struct smb_ace *)(new_aces_base + used);
 	return 0;
 }
 
@@ -1370,6 +1402,117 @@ posix_default_acl:
 	return 0;
 }
 
+/*
+ * ace_canon_order() - return canonical order key for an ACE.
+ *
+ * MS-DTYP section 2.4.5 canonical ACE ordering:
+ *   0: ACCESS_DENIED, non-inherited
+ *   1: ACCESS_ALLOWED, non-inherited
+ *   2: ACCESS_DENIED, inherited
+ *   3: ACCESS_ALLOWED, inherited
+ */
+static int ace_canon_order(const struct smb_ace *ace)
+{
+	bool inherited = ace->flags & INHERITED_ACE;
+	bool denied = ace->type == ACCESS_DENIED_ACE_TYPE;
+
+	if (!inherited)
+		return denied ? 0 : 1;
+	return denied ? 2 : 3;
+}
+
+/*
+ * canonicalize_dacl_aces() - sort ACEs in MS-DTYP canonical order.
+ *
+ * Uses a simple insertion sort since ACE counts are typically small
+ * and ACEs are variable-sized (can't use kernel sort() directly).
+ */
+static void canonicalize_dacl_aces(struct smb_ace *aces, u16 num_aces,
+				   unsigned short total_size)
+{
+	struct smb_ace *sorted, *cur;
+	struct smb_ace **ace_ptrs;
+	int *order, *perm;
+	int i, j, tmp, tmp_order;
+	unsigned short pos;
+
+	if (num_aces <= 1)
+		return;
+
+	/* Allocate all dynamic arrays together */
+	ace_ptrs = kmalloc_array(num_aces, sizeof(*ace_ptrs), KSMBD_DEFAULT_GFP);
+	if (!ace_ptrs)
+		return;
+
+	order = kmalloc_array(num_aces, sizeof(*order), KSMBD_DEFAULT_GFP);
+	if (!order) {
+		kfree(ace_ptrs);
+		return;
+	}
+
+	perm = kmalloc_array(num_aces, sizeof(*perm), KSMBD_DEFAULT_GFP);
+	if (!perm) {
+		kfree(order);
+		kfree(ace_ptrs);
+		return;
+	}
+
+	/* Build pointer array to each ACE */
+	ace_ptrs[0] = aces;
+	for (i = 1; i < num_aces; i++)
+		ace_ptrs[i] = (struct smb_ace *)((char *)ace_ptrs[i - 1] +
+				le16_to_cpu(ace_ptrs[i - 1]->size));
+
+	/* Compute sort keys */
+	for (i = 0; i < num_aces; i++)
+		order[i] = ace_canon_order(ace_ptrs[i]);
+
+	/* Check if already sorted */
+	for (i = 1; i < num_aces; i++) {
+		if (order[i] < order[i - 1])
+			break;
+	}
+	if (i == num_aces)
+		goto out; /* already canonical */
+
+	sorted = kmalloc(total_size, KSMBD_DEFAULT_GFP);
+	if (!sorted)
+		goto out; /* non-fatal: leave unsorted */
+
+	/* Stable insertion sort by order key */
+	for (i = 0; i < num_aces; i++)
+		perm[i] = i;
+
+	for (i = 1; i < num_aces; i++) {
+		tmp = perm[i];
+		tmp_order = order[tmp];
+		j = i - 1;
+		while (j >= 0 && order[perm[j]] > tmp_order) {
+			perm[j + 1] = perm[j];
+			j--;
+		}
+		perm[j + 1] = tmp;
+	}
+
+	/* Copy ACEs in sorted order to temp buffer */
+	pos = 0;
+	for (i = 0; i < num_aces; i++) {
+		unsigned short sz = le16_to_cpu(ace_ptrs[perm[i]]->size);
+
+		memcpy((char *)sorted + pos, ace_ptrs[perm[i]], sz);
+		pos += sz;
+	}
+
+	/* Copy sorted result back */
+	memcpy(aces, sorted, total_size);
+	kfree(sorted);
+
+out:
+	kfree(perm);
+	kfree(order);
+	kfree(ace_ptrs);
+}
+
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
 static int set_ntacl_dacl(struct mnt_idmap *idmap,
 #else
@@ -1422,6 +1565,10 @@ static int set_ntacl_dacl(struct user_namespace *user_ns,
 					nt_ace_size);
 			num_aces++;
 		}
+
+		/* Sort copied ACEs into MS-DTYP canonical order */
+		if (num_aces > 1)
+			canonicalize_dacl_aces(pndace, num_aces, size);
 	}
 
 	/*
@@ -1691,7 +1838,8 @@ int parse_sec_desc(struct user_namespace *user_ns, struct smb_ntsd *pntsd,
 		return rc;
 	}
 
-	pntsd->type = cpu_to_le16(DACL_PRESENT);
+	pntsd->type = cpu_to_le16(DACL_PRESENT |
+				  (pntsd_type & SELF_RELATIVE));
 
 	/* Preserve SACL flags if present in the incoming descriptor */
 	if (pntsd_type & SACL_PRESENT)
@@ -1747,9 +1895,18 @@ int parse_sec_desc(struct user_namespace *user_ns, struct smb_ntsd *pntsd,
 		}
 	}
 
-	if ((pntsd_type & (DACL_AUTO_INHERITED | DACL_AUTO_INHERIT_REQ)) ==
-	    (DACL_AUTO_INHERITED | DACL_AUTO_INHERIT_REQ))
+	/*
+	 * Preserve DACL control flags from the incoming SD.
+	 * DACL_AUTO_INHERITED indicates the DACL contains auto-inherited
+	 * ACEs; preserve it whenever the client sends it (matching Samba
+	 * behaviour with "acl flag inherited canonicalization = no").
+	 * Previously we required both DACL_AUTO_INHERITED and
+	 * DACL_AUTO_INHERIT_REQ, which caused round-trip failures.
+	 */
+	if (pntsd_type & DACL_AUTO_INHERITED)
 		pntsd->type |= cpu_to_le16(DACL_AUTO_INHERITED);
+	if (pntsd_type & DACL_AUTO_INHERIT_REQ)
+		pntsd->type |= cpu_to_le16(DACL_AUTO_INHERIT_REQ);
 	if (pntsd_type & DACL_PROTECTED)
 		pntsd->type |= cpu_to_le16(DACL_PROTECTED);
 
@@ -1831,8 +1988,17 @@ int build_sec_desc(struct user_namespace *user_ns,
 	pntsd->dacloffset = 0;
 	pntsd->revision = cpu_to_le16(1);
 	pntsd->type = cpu_to_le16(SELF_RELATIVE);
-	if (ppntsd)
+	if (ppntsd) {
 		pntsd->type |= ppntsd->type;
+	} else {
+		/*
+		 * When no stored SD exists the DACL is synthesised from
+		 * POSIX permissions.  Windows marks such DACLs as
+		 * auto-inherited; mirror that so clients see the expected
+		 * flag.
+		 */
+		pntsd->type |= cpu_to_le16(DACL_AUTO_INHERITED);
+	}
 
 	/*
 	 * If a stored NTSD has explicit owner/group SIDs, use them
@@ -2164,6 +2330,7 @@ int smb_inherit_dacl(struct ksmbd_conn *conn,
 		}
 		aces_buf_size = total_ace_bytes;
 	}
+	aces_buf_size = max_t(size_t, aces_buf_size, ksmbd_min_ace_size());
 	aces_base = kmalloc(aces_buf_size, KSMBD_DEFAULT_GFP);
 	if (!aces_base) {
 		rc = -ENOMEM;
@@ -2215,11 +2382,15 @@ int smb_inherit_dacl(struct ksmbd_conn *conn,
 		if (is_dir && creator && flags & CONTAINER_INHERIT_ACE) {
 			__u16 asize = ksmbd_ace_size(psid);
 
-			if (!asize ||
-			    (unsigned int)nt_size + asize > aces_buf_size) {
-				pr_err_ratelimited("inherit ACL overflow\n");
-				break;
+			if (!asize) {
+				rc = -EINVAL;
+				goto free_aces_base;
 			}
+			rc = ksmbd_reserve_inherit_aces(&aces_base, &aces,
+							&aces_buf_size, nt_size,
+							asize);
+			if (rc)
+				goto free_aces_base;
 			smb_set_ace(aces, psid, parent_aces->type,
 				    inherited_flags,
 				    parent_aces->access_req);
@@ -2237,11 +2408,15 @@ int smb_inherit_dacl(struct ksmbd_conn *conn,
 		{
 			__u16 asize = ksmbd_ace_size(psid);
 
-			if (!asize ||
-			    (unsigned int)nt_size + asize > aces_buf_size) {
-				pr_err_ratelimited("inherit ACL overflow\n");
-				break;
+			if (!asize) {
+				rc = -EINVAL;
+				goto free_aces_base;
 			}
+			rc = ksmbd_reserve_inherit_aces(&aces_base, &aces,
+							&aces_buf_size, nt_size,
+							asize);
+			if (rc)
+				goto free_aces_base;
 		}
 		smb_set_ace(aces, psid, parent_aces->type,
 			    flags | inherited_flags,

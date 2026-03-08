@@ -63,10 +63,11 @@ struct smb_direct_data_transfer {
  * which may define CONFIG_SMB_SERVER_SMBDIRECT for the in-tree ksmbd.
  * The ksmbd Makefile sets -DKSMBD_SMBDIRECT only when RDMA is wanted.
  */
-#ifdef KSMBD_SMBDIRECT
+#if defined(KSMBD_SMBDIRECT) || defined(KSMBD_TRANSPORT_RDMA_IMPL)
 int ksmbd_rdma_init(void);
 void ksmbd_rdma_stop_listening(void);
 void ksmbd_rdma_destroy(void);
+bool ksmbd_rdma_listener_active(void);
 bool ksmbd_rdma_capable_netdev(struct net_device *netdev);
 void init_smbd_max_io_size(unsigned int sz);
 unsigned int get_smbd_max_read_write_size(void);
@@ -75,6 +76,7 @@ bool ksmbd_rdma_transform_supported(struct ksmbd_conn *conn, __le16 transform_id
 static inline int ksmbd_rdma_init(void) { return 0; }
 static inline void ksmbd_rdma_stop_listening(void) { }
 static inline void ksmbd_rdma_destroy(void) { }
+static inline bool ksmbd_rdma_listener_active(void) { return false; }
 static inline bool ksmbd_rdma_capable_netdev(struct net_device *netdev) { return false; }
 static inline void init_smbd_max_io_size(unsigned int sz) { }
 static inline unsigned int get_smbd_max_read_write_size(void) { return 0; }

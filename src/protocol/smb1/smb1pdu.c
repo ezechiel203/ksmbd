@@ -9,7 +9,10 @@
 #include <linux/fs.h>
 #include <linux/posix_acl_xattr.h>
 #include <linux/namei.h>
+#include <linux/quota.h>
+#include <linux/quotaops.h>
 #include <linux/statfs.h>
+#include <linux/bitmap.h>
 #include <linux/vmalloc.h>
 #include <linux/version.h>
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
@@ -30,17 +33,173 @@
 #include "smb_common.h"
 #include "smb1pdu.h"
 #include "smbstatus.h"
+#include "smbfsctl.h"
+#include "smberr.h"
+#include "unicode.h"
+#include "ksmbd_fsctl.h"
+#include "smb2pdu.h"
+#include "smb2pdu_internal.h"
+#include "smbacl.h"
+#include "ksmbd_notify.h"
 #include "mgmt/user_config.h"
 #include "mgmt/share_config.h"
 #include "mgmt/tree_connect.h"
 #include "mgmt/user_session.h"
 #include "ndr.h"
-#include "smberr.h"
-#include "unicode.h"
-#include "smb2pdu.h"		/* SECINFO constants, build_sec_desc */
-#include "smb2pdu_internal.h"	/* ksmbd_acls_fattr */
-#include "smbacl.h"		/* smb_ntsd, smb_fattr, set_info_sec, build_sec_desc */
 
+static void smb1_notify_put_work_conn_ref(struct ksmbd_work *work)
+{
+	if (!work || !work->notify_conn_ref || !work->conn)
+		return;
+
+	work->notify_conn_ref = false;
+	ksmbd_conn_free(work->conn);
+}
+
+static void create_trans2_reply(struct ksmbd_work *work, __u16 count);
+
+static int smb1_query_rpc_pipe_info(struct ksmbd_work *work, int handle,
+				    struct ksmbd_rpc_pipe_info *pipe_state)
+{
+	struct ksmbd_rpc_command *rpc_resp;
+
+	rpc_resp = ksmbd_rpc_query(work->sess, handle);
+	if (!rpc_resp || rpc_resp->flags == KSMBD_RPC_EBAD_FID) {
+		kvfree(rpc_resp);
+		return -ENOENT;
+	}
+
+	if (rpc_resp->flags != KSMBD_RPC_OK ||
+	    rpc_resp->payload_sz < sizeof(*pipe_state)) {
+		kvfree(rpc_resp);
+		return -EIO;
+	}
+
+	memcpy(pipe_state, rpc_resp->payload, sizeof(*pipe_state));
+	kvfree(rpc_resp);
+	return 0;
+}
+
+static __le16 smb1_named_pipe_state_flags(void)
+{
+	u16 state = 1;
+
+	state |= NAMED_PIPE_TYPE;
+	state |= PIPE_END_POINT;
+	state |= BLOCKING_NAMED_PIPE;
+	return cpu_to_le16(state);
+}
+
+static const char *smb1_rpc_method_name(int method)
+{
+	switch (method) {
+	case KSMBD_RPC_SRVSVC_METHOD_INVOKE:
+		return "srvsvc";
+	case KSMBD_RPC_WKSSVC_METHOD_INVOKE:
+		return "wkssvc";
+	case KSMBD_RPC_RAP_METHOD:
+		return "lanman";
+	case KSMBD_RPC_SAMR_METHOD_INVOKE:
+		return "samr";
+	case KSMBD_RPC_LSARPC_METHOD_INVOKE:
+		return "lsarpc";
+	default:
+		return "";
+	}
+}
+
+static int smb1_wait_rpc_pipe(struct ksmbd_work *work, const char *pipe_name,
+			      unsigned long timeout_ms)
+{
+	unsigned long wait_jiffies = msecs_to_jiffies(timeout_ms);
+	unsigned long deadline = jiffies + wait_jiffies;
+	int handle;
+
+	if (timeout_ms && !wait_jiffies)
+		wait_jiffies = 1;
+	deadline = jiffies + wait_jiffies;
+
+	for (;;) {
+		handle = ksmbd_session_rpc_open(work->sess, (char *)pipe_name);
+		if (handle >= 0) {
+			ksmbd_session_rpc_close(work->sess, handle);
+			return 0;
+		}
+
+		if (!wait_jiffies || time_after_eq(jiffies, deadline))
+			return -ETIMEDOUT;
+
+		if (msleep_interruptible(min_t(unsigned long,
+					       deadline - jiffies,
+					       msecs_to_jiffies(25))))
+			return -EINTR;
+	}
+}
+
+struct smb1_trans_query_nmpipe_info_rsp {
+	__le16 output_buffer_size;
+	__le16 input_buffer_size;
+	__u8 maximum_instances;
+	__u8 current_instances;
+	__u8 pipe_name_length;
+	char pipe_name[];
+} __packed;
+
+struct smb1_trans_peek_nmpipe_params {
+	__le16 read_data_available;
+	__le16 message_bytes_length;
+	__le16 named_pipe_state;
+} __packed;
+
+#define SMB1_FILE_PIPE_CONNECTED_STATE 3
+
+static int smb1_trans2_get_dfs_referral(struct ksmbd_work *work)
+{
+	struct smb_com_trans2_req *req = work->request_buf;
+	struct smb_com_trans2_rsp *rsp = work->response_buf;
+	struct smb2_ioctl_rsp *dfs_rsp;
+	unsigned int param_off, param_cnt;
+	unsigned int out_len = 0;
+	int ret;
+
+	param_off = le16_to_cpu(req->ParameterOffset);
+	param_cnt = le16_to_cpu(req->ParameterCount);
+	if (param_off > get_rfc1002_len(work->request_buf) ||
+	    param_cnt > get_rfc1002_len(work->request_buf) + RFC1002_HEADER_LEN - param_off) {
+		rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;
+		rsp->hdr.WordCount = 0;
+		rsp->ByteCount = 0;
+		return -EINVAL;
+	}
+
+	dfs_rsp = kvzalloc(sizeof(*dfs_rsp) + le16_to_cpu(req->MaxDataCount),
+			   KSMBD_DEFAULT_GFP);
+	if (!dfs_rsp) {
+		rsp->hdr.Status.CifsError = STATUS_NO_MEMORY;
+		rsp->hdr.WordCount = 0;
+		rsp->ByteCount = 0;
+		return -ENOMEM;
+	}
+
+	ret = ksmbd_dispatch_fsctl(work, FSCTL_DFS_GET_REFERRALS, 0,
+				   (char *)&req->hdr.Protocol + param_off,
+				   param_cnt, le16_to_cpu(req->MaxDataCount),
+				   dfs_rsp, &out_len);
+	if (ret) {
+		rsp->hdr.Status.CifsError = dfs_rsp->hdr.Status;
+		rsp->hdr.WordCount = 0;
+		rsp->ByteCount = 0;
+		kvfree(dfs_rsp);
+		return ret;
+	}
+
+	create_trans2_reply(work, out_len);
+	if (out_len)
+		memcpy(&rsp->Pad + 1, dfs_rsp->Buffer, out_len);
+	rsp->hdr.Status.CifsError = STATUS_SUCCESS;
+	kvfree(dfs_rsp);
+	return 0;
+}
 /*
  * SMB1 wire-format response structs pack variable-length data past their
  * last declared field (Pad[1], Service[1], SecurityBlob[1], etc.).
@@ -53,6 +212,10 @@ static __always_inline void *__smb1_unfence(void *ptr)
 	OPTIMIZER_HIDE_VAR(ptr);
 	return ptr;
 }
+
+#ifdef CONFIG_SMB_INSECURE_SERVER
+static void smb1_nttrans_state_free(struct ksmbd_smb1_nttrans_state *state);
+#endif
 
 static const char *const smb_cmd_str[] = {
 	[SMB_COM_CREATE_DIRECTORY] = "SMB_COM_CREATE_DIRECTORY",
@@ -2461,9 +2624,14 @@ int smb_trans(struct ksmbd_work *work)
 	struct smb_com_trans_rsp *rsp = work->response_buf;
 	struct smb_com_trans_pipe_req *pipe_req = work->request_buf;
 	struct ksmbd_rpc_command *rpc_resp;
+	struct ksmbd_rpc_pipe_info pipe_state;
+	struct smb1_trans_peek_nmpipe_params *peek_params;
+	struct smb1_trans_query_nmpipe_info_rsp *pipe_info_rsp;
 	__u16 subcommand;
+	__le16 *pipe_state_param;
 	char *name, *pipe;
 	char *pipedata;
+	char *transdata;
 	unsigned int setup_bytes_count = 0;
 	unsigned int req_buf_len;
 	unsigned int trans_data_off;
@@ -2473,10 +2641,12 @@ int smb_trans(struct ksmbd_work *work)
 	unsigned int min_param_data_off;
 	int pipe_name_offset = 0;
 	unsigned int str_len_uni;
+	int method;
 	int ret = 0, nbytes = 0;
 	int param_len = 0;
 	int id;
 	size_t max_payload;
+	size_t max_data_payload;
 
 	req_buf_len = get_rfc1002_len(req);
 	trans_data_off = offsetof(struct smb_com_trans_req, Data) - 4;
@@ -2544,8 +2714,12 @@ int smb_trans(struct ksmbd_work *work)
 		pipe_name_offset++;
 
 	pipe = name + pipe_name_offset;
+	method = 0;
+	if (*pipe != '\0' && strncmp(pipe, "LANMAN", sizeof("LANMAN")) != 0)
+		method = ksmbd_session_rpc_method_name(pipe);
 
-	if (*pipe != '\0' && strncmp(pipe, "LANMAN", sizeof("LANMAN")) != 0) {
+	if (*pipe != '\0' && strncmp(pipe, "LANMAN", sizeof("LANMAN")) != 0 &&
+	    !method) {
 		ksmbd_debug(SMB, "Pipe %s not supported request\n", pipe);
 		rsp->hdr.Status.CifsError = STATUS_NOT_SUPPORTED;
 		kfree(name);
@@ -2573,6 +2747,8 @@ int smb_trans(struct ksmbd_work *work)
 		goto out;
 	}
 	pipedata = (char *)&req->hdr.Protocol + param_off;
+	transdata = (char *)&req->hdr.Protocol + data_off;
+	max_payload = work->response_sz - sizeof(struct smb_com_trans_rsp);
 
 	if (!strncmp(pipe, "LANMAN", sizeof("LANMAN"))) {
 		/*
@@ -2607,8 +2783,6 @@ int smb_trans(struct ksmbd_work *work)
 				goto out;
 			}
 
-				max_payload = work->response_sz -
-					sizeof(struct smb_com_trans_rsp);
 				if (rpc_resp->payload_sz > max_payload) {
 					rsp->hdr.Status.CifsError =
 						STATUS_INVALID_PARAMETER;
@@ -2634,10 +2808,11 @@ int smb_trans(struct ksmbd_work *work)
 	switch (subcommand) {
 	case TRANSACT_DCERPCCMD:
 
-		ksmbd_debug(SMB, "GOT TRANSACT_DCERPCCMD\n");
+		ksmbd_debug(SMB, "GOT TRANS_TRANSACT_NMPIPE on fid %u\n", id);
 		ret = -EINVAL;
-		rpc_resp = ksmbd_rpc_ioctl(work->sess, id, pipedata,
-					   data_cnt);
+		rpc_resp = ksmbd_rpc_ioctl(work->sess, id,
+					   data_cnt ? transdata : pipedata,
+					   data_cnt ? data_cnt : param_cnt);
 		if (rpc_resp) {
 			if (rpc_resp->flags == KSMBD_RPC_ENOTIMPLEMENTED) {
 				rsp->hdr.Status.CifsError =
@@ -2651,8 +2826,6 @@ int smb_trans(struct ksmbd_work *work)
 				goto out;
 			}
 
-				max_payload = work->response_sz -
-					sizeof(struct smb_com_trans_rsp);
 				if (rpc_resp->payload_sz > max_payload) {
 					rsp->hdr.Status.CifsError =
 						STATUS_INVALID_PARAMETER;
@@ -2667,6 +2840,271 @@ int smb_trans(struct ksmbd_work *work)
 			kvfree(rpc_resp);
 			ret = 0;
 		}
+		break;
+	case TRANS_RAW_READ_NMPIPE:
+	case TRANS_READ_NMPIPE:
+		ksmbd_debug(SMB, "GOT %s on fid %u\n",
+			    subcommand == TRANS_RAW_READ_NMPIPE ?
+			    "TRANS_RAW_READ_NMPIPE" : "TRANS_READ_NMPIPE",
+			    id);
+		rpc_resp = ksmbd_rpc_read(work->sess, id);
+		if (!rpc_resp || rpc_resp->flags == KSMBD_RPC_EBAD_FID) {
+			rsp->hdr.Status.CifsError = STATUS_INVALID_HANDLE;
+			kvfree(rpc_resp);
+			ret = -EBADF;
+			goto out;
+		}
+		if (rpc_resp->flags != KSMBD_RPC_OK) {
+			rsp->hdr.Status.CifsError = STATUS_UNEXPECTED_IO_ERROR;
+			kvfree(rpc_resp);
+			ret = -EIO;
+			goto out;
+		}
+		if (rpc_resp->payload_sz > max_payload) {
+			rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;
+			kvfree(rpc_resp);
+			ret = -EINVAL;
+			goto out;
+		}
+		nbytes = rpc_resp->payload_sz;
+		if (nbytes)
+			memcpy((char *)rsp + sizeof(struct smb_com_trans_rsp),
+			       rpc_resp->payload, nbytes);
+		kvfree(rpc_resp);
+		ret = 0;
+		break;
+	case TRANS_RAW_WRITE_NMPIPE:
+	case TRANS_WRITE_NMPIPE:
+		ksmbd_debug(SMB, "GOT %s on fid %u\n",
+			    subcommand == TRANS_RAW_WRITE_NMPIPE ?
+			    "TRANS_RAW_WRITE_NMPIPE" : "TRANS_WRITE_NMPIPE",
+			    id);
+		rpc_resp = ksmbd_rpc_write(work->sess, id, transdata, data_cnt);
+		if (!rpc_resp || rpc_resp->flags == KSMBD_RPC_EBAD_FID) {
+			rsp->hdr.Status.CifsError = STATUS_INVALID_HANDLE;
+			kvfree(rpc_resp);
+			ret = -EBADF;
+			goto out;
+		}
+		if (rpc_resp->flags == KSMBD_RPC_ENOTIMPLEMENTED) {
+			rsp->hdr.Status.CifsError = STATUS_NOT_SUPPORTED;
+			kvfree(rpc_resp);
+			ret = -EOPNOTSUPP;
+			goto out;
+		}
+		if (rpc_resp->flags != KSMBD_RPC_OK) {
+			rsp->hdr.Status.CifsError = STATUS_UNEXPECTED_IO_ERROR;
+			kvfree(rpc_resp);
+			ret = -EIO;
+			goto out;
+		}
+		kvfree(rpc_resp);
+		ret = 0;
+		break;
+	case TRANS_CALL_NMPIPE:
+		ksmbd_debug(SMB, "GOT TRANS_CALL_NMPIPE for %s\n", pipe);
+		if (!method) {
+			rsp->hdr.Status.CifsError = STATUS_OBJECT_NAME_NOT_FOUND;
+			ret = -ENOENT;
+			goto out;
+		}
+
+		id = ksmbd_session_rpc_open(work->sess, pipe);
+		if (id < 0) {
+			rsp->hdr.Status.CifsError = STATUS_OBJECT_NAME_NOT_FOUND;
+			ret = id;
+			goto out;
+		}
+
+		rpc_resp = ksmbd_rpc_ioctl(work->sess, id, transdata, data_cnt);
+		if (!rpc_resp) {
+			ksmbd_session_rpc_close(work->sess, id);
+			rsp->hdr.Status.CifsError = STATUS_UNEXPECTED_IO_ERROR;
+			ret = -EIO;
+			goto out;
+		}
+		if (rpc_resp->flags == KSMBD_RPC_ENOTIMPLEMENTED) {
+			ksmbd_session_rpc_close(work->sess, id);
+			rsp->hdr.Status.CifsError = STATUS_NOT_SUPPORTED;
+			kvfree(rpc_resp);
+			ret = -EOPNOTSUPP;
+			goto out;
+		}
+		if (rpc_resp->flags != KSMBD_RPC_OK) {
+			ksmbd_session_rpc_close(work->sess, id);
+			rsp->hdr.Status.CifsError = STATUS_UNEXPECTED_IO_ERROR;
+			kvfree(rpc_resp);
+			ret = -EIO;
+			goto out;
+		}
+		if (rpc_resp->payload_sz > max_payload) {
+			ksmbd_session_rpc_close(work->sess, id);
+			rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;
+			kvfree(rpc_resp);
+			ret = -EINVAL;
+			goto out;
+		}
+		nbytes = rpc_resp->payload_sz;
+		if (nbytes)
+			memcpy((char *)rsp + sizeof(struct smb_com_trans_rsp),
+			       rpc_resp->payload, nbytes);
+		kvfree(rpc_resp);
+		ksmbd_session_rpc_close(work->sess, id);
+		ret = 0;
+		break;
+	case TRANS_WAIT_NMPIPE:
+		ksmbd_debug(SMB, "GOT TRANS_WAIT_NMPIPE for %s\n", pipe);
+		if (!method) {
+			rsp->hdr.Status.CifsError = STATUS_OBJECT_NAME_NOT_FOUND;
+			ret = -ENOENT;
+			goto out;
+		}
+
+		ret = smb1_wait_rpc_pipe(work, pipe,
+					 min_t(unsigned long,
+					       (unsigned long)le32_to_cpu(req->Timeout),
+					       30000));
+		if (ret == -ETIMEDOUT)
+			rsp->hdr.Status.CifsError = STATUS_IO_TIMEOUT;
+		else if (ret == -EINTR)
+			rsp->hdr.Status.CifsError = STATUS_CANCELLED;
+		break;
+	case TRANS_SET_NMPIPE_STATE:
+		ksmbd_debug(SMB, "GOT TRANS_SET_NMPIPE_STATE on fid %u\n", id);
+		if (param_cnt < sizeof(__le16)) {
+			rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;
+			ret = -EINVAL;
+			goto out;
+		}
+
+		/*
+		 * ksmbd exposes RPC pipes as byte-stream, blocking, client-end
+		 * named pipes. Accept requests that keep those semantics and
+		 * reject attempts to switch into unsupported modes.
+		 */
+		{
+			u16 requested = le16_to_cpu(*(__le16 *)pipedata);
+			u16 unsupported = requested &
+				~(ICOUNT_MASK | BLOCKING_NAMED_PIPE |
+				  PIPE_END_POINT | NAMED_PIPE_TYPE);
+
+			if (unsupported || !(requested & BLOCKING_NAMED_PIPE) ||
+			    !(requested & PIPE_END_POINT) ||
+			    !(requested & NAMED_PIPE_TYPE)) {
+				rsp->hdr.Status.CifsError = STATUS_INVALID_PIPE_STATE;
+				ret = -EINVAL;
+				goto out;
+			}
+		}
+		ret = smb1_query_rpc_pipe_info(work, id, &pipe_state);
+		if (ret) {
+			rsp->hdr.Status.CifsError = STATUS_INVALID_HANDLE;
+			goto out;
+		}
+		ret = 0;
+		break;
+	case TRANS_QUERY_NMPIPE_STATE:
+		ksmbd_debug(SMB, "GOT TRANS_QUERY_NMPIPE_STATE on fid %u\n", id);
+		ret = smb1_query_rpc_pipe_info(work, id, &pipe_state);
+		if (ret) {
+			rsp->hdr.Status.CifsError = STATUS_INVALID_HANDLE;
+			goto out;
+		}
+
+		param_len = sizeof(*pipe_state_param);
+		pipe_state_param = (__le16 *)((char *)rsp +
+					      sizeof(struct smb_com_trans_rsp));
+		*pipe_state_param = smb1_named_pipe_state_flags();
+		ret = 0;
+		break;
+	case TRANS_QUERY_NMPIPE_INFO:
+		ksmbd_debug(SMB, "GOT TRANS_QUERY_NMPIPE_INFO on fid %u\n", id);
+		if (param_cnt < sizeof(__le16)) {
+			rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;
+			ret = -EINVAL;
+			goto out;
+		}
+
+		if (le16_to_cpu(*(__le16 *)pipedata) != 1) {
+			rsp->hdr.Status.CifsError = STATUS_INVALID_LEVEL;
+			ret = -EFAULT;
+			goto out;
+		}
+
+		ret = smb1_query_rpc_pipe_info(work, id, &pipe_state);
+		if (ret) {
+			rsp->hdr.Status.CifsError = STATUS_INVALID_HANDLE;
+			goto out;
+		}
+
+		down_read(&work->sess->rpc_lock);
+		method = ksmbd_session_rpc_method(work->sess, id);
+		pipe = (char *)smb1_rpc_method_name(method);
+		up_read(&work->sess->rpc_lock);
+		if (!*pipe) {
+			rsp->hdr.Status.CifsError = STATUS_INVALID_HANDLE;
+			ret = -EBADF;
+			goto out;
+		}
+
+		nbytes = sizeof(*pipe_info_rsp) + strlen(pipe);
+		if (nbytes > max_payload) {
+			rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;
+			ret = -EINVAL;
+			goto out;
+		}
+
+		pipe_info_rsp = (struct smb1_trans_query_nmpipe_info_rsp *)
+			((char *)rsp + sizeof(struct smb_com_trans_rsp));
+		pipe_info_rsp->output_buffer_size = cpu_to_le16(KSMBD_IPC_MAX_PAYLOAD);
+		pipe_info_rsp->input_buffer_size = cpu_to_le16(KSMBD_IPC_MAX_PAYLOAD);
+		pipe_info_rsp->maximum_instances = 1;
+		pipe_info_rsp->current_instances =
+			pipe_state.pipe_state == SMB1_FILE_PIPE_CONNECTED_STATE ? 1 : 0;
+		pipe_info_rsp->pipe_name_length = strlen(pipe);
+		memcpy(pipe_info_rsp->pipe_name, pipe, strlen(pipe));
+		ret = 0;
+		break;
+	case TRANS_PEEK_NMPIPE:
+		ksmbd_debug(SMB, "GOT TRANS_PEEK_NMPIPE on fid %u\n", id);
+		rpc_resp = ksmbd_rpc_query(work->sess, id);
+		if (!rpc_resp || rpc_resp->flags == KSMBD_RPC_EBAD_FID) {
+			kvfree(rpc_resp);
+			rsp->hdr.Status.CifsError = STATUS_INVALID_HANDLE;
+			ret = -EBADF;
+			goto out;
+		}
+
+		if (rpc_resp->flags != KSMBD_RPC_OK ||
+		    rpc_resp->payload_sz < sizeof(pipe_state)) {
+			rsp->hdr.Status.CifsError = STATUS_UNEXPECTED_IO_ERROR;
+			kvfree(rpc_resp);
+			ret = -EIO;
+			goto out;
+		}
+
+		memcpy(&pipe_state, rpc_resp->payload, sizeof(pipe_state));
+		param_len = sizeof(*peek_params);
+		peek_params = (struct smb1_trans_peek_nmpipe_params *)
+			((char *)rsp + sizeof(struct smb_com_trans_rsp));
+		peek_params->read_data_available =
+			cpu_to_le16(min_t(u32, pipe_state.read_data_available, U16_MAX));
+		peek_params->message_bytes_length =
+			cpu_to_le16(min_t(u32, pipe_state.message_length, U16_MAX));
+		peek_params->named_pipe_state = smb1_named_pipe_state_flags();
+
+		max_data_payload = max_payload - param_len;
+		if (rpc_resp->payload_sz > sizeof(pipe_state) &&
+		    max_data_payload > 0) {
+			nbytes = min_t(size_t,
+				       rpc_resp->payload_sz - sizeof(pipe_state),
+				       max_data_payload);
+			memcpy((char *)rsp + sizeof(struct smb_com_trans_rsp) + param_len,
+			       rpc_resp->payload + sizeof(pipe_state), nbytes);
+		}
+
+		kvfree(rpc_resp);
+		ret = 0;
 		break;
 
 	default:
@@ -3466,6 +3904,12 @@ static int smb_read_andx_pipe(struct ksmbd_work *work)
 	rpc_resp = ksmbd_rpc_read(work->sess, req->Fid);
 	if (rpc_resp) {
 		void *aux_buf;
+
+		if (rpc_resp->flags == KSMBD_RPC_EBAD_FID) {
+			rsp->hdr.Status.CifsError = STATUS_PIPE_DISCONNECTED;
+			kvfree(rpc_resp);
+			return -EPIPE;
+		}
 
 		if (rpc_resp->flags != KSMBD_RPC_OK || !rpc_resp->payload_sz) {
 			rsp->hdr.Status.CifsError = STATUS_UNEXPECTED_IO_ERROR;
@@ -7423,6 +7867,14 @@ static int query_file_info_pipe(struct ksmbd_work *work)
 	req_params = (struct smb_trans2_qfi_req_params *)(work->request_buf +
 			le16_to_cpu(req->ParameterOffset) + 4);
 
+	down_read(&work->sess->rpc_lock);
+	if (!ksmbd_session_rpc_method(work->sess, req_params->Fid)) {
+		up_read(&work->sess->rpc_lock);
+		rsp_hdr->Status.CifsError = STATUS_INVALID_HANDLE;
+		return -ENOENT;
+	}
+	up_read(&work->sess->rpc_lock);
+
 	if (le16_to_cpu(req_params->InformationLevel) !=
 	    SMB_QUERY_FILE_STANDARD_INFO) {
 		ksmbd_debug(SMB, "query file info for info %u not supported\n",
@@ -8355,6 +8807,10 @@ int smb_trans2(struct ksmbd_work *work)
 		err = create_dir(work);
 		break;
 	case TRANS2_GET_DFS_REFERRAL:
+		err = smb1_trans2_get_dfs_referral(work);
+		if (err)
+			return 0;
+		break;
 	default:
 		ksmbd_debug(SMB, "sub command 0x%x not implemented yet\n",
 			    sub_command);
@@ -8689,9 +9145,11 @@ int smb_nt_cancel(struct ksmbd_work *work)
 	struct ksmbd_conn *conn = work->conn;
 	struct smb_hdr *hdr = (struct smb_hdr *)work->request_buf;
 	struct smb_hdr *work_hdr;
-	struct ksmbd_work *new_work;
+	struct ksmbd_work *new_work, *cancel_work = NULL;
+	struct ksmbd_smb1_nttrans_state *state;
+	u16 mid = le16_to_cpu(hdr->Mid);
 
-	ksmbd_debug(SMB, "smb cancel called on mid %u\n", hdr->Mid);
+	ksmbd_debug(SMB, "smb cancel called on mid %u\n", mid);
 
 	spin_lock(&conn->request_lock);
 	list_for_each_entry(new_work, &conn->requests, request_entry) {
@@ -8702,10 +9160,47 @@ int smb_nt_cancel(struct ksmbd_work *work)
 			new_work->send_no_response = 1;
 			list_del_init(&new_work->request_entry);
 			new_work->sess->sequence_number--;
+			cancel_work = new_work;
 			break;
 		}
 	}
 	spin_unlock(&conn->request_lock);
+
+	if (!cancel_work) {
+		spin_lock(&conn->request_lock);
+		list_for_each_entry(new_work, &conn->async_requests,
+				    async_request_entry) {
+			if (!new_work->request_buf)
+				continue;
+
+			work_hdr = (struct smb_hdr *)new_work->request_buf;
+			if (work_hdr->Mid != hdr->Mid)
+				continue;
+
+			ksmbd_debug(SMB,
+				    "async smb with mid %u cancelled command = 0x%x\n",
+				    hdr->Mid, work_hdr->Command);
+			cancel_work = new_work;
+			break;
+		}
+		spin_unlock(&conn->request_lock);
+	}
+
+	if (cancel_work && cancel_work->cancel_fn) {
+		void (*cancel_fn)(void **) = cancel_work->cancel_fn;
+		void **cancel_argv = cancel_work->cancel_argv;
+
+		cancel_work->cancel_fn = NULL;
+		cancel_work->cancel_argv = NULL;
+		cancel_fn(cancel_argv);
+	}
+
+	if (work->sess) {
+		mutex_lock(&work->sess->smb1_nttrans_lock);
+		state = xa_erase(&work->sess->smb1_nttrans_list, mid);
+		mutex_unlock(&work->sess->smb1_nttrans_lock);
+		smb1_nttrans_state_free(state);
+	}
 
 	/* For SMB_COM_NT_CANCEL command itself send no response */
 	work->send_no_response = 1;
@@ -9470,94 +9965,6 @@ out:
 }
 
 /**
- * smb_find() - handler for obsolete SMB_COM_FIND and SMB_COM_FIND_UNIQUE
- * @work:	smb work containing find command buffer
- *
- * These commands (0x0C, 0x16) are obsoleted by TRANS2 find equivalents.
- * Return STATUS_NOT_IMPLEMENTED so clients fall back to TRANS2_FIND_FIRST.
- *
- * Return:	0 (error status set in response header)
- */
-int smb_find(struct ksmbd_work *work)
-{
-	struct smb_hdr *rsp_hdr = (struct smb_hdr *)work->response_buf;
-
-	ksmbd_debug(SMB, "SMB_COM_FIND/FIND_UNIQUE - returning NOT_IMPLEMENTED\n");
-	rsp_hdr->WordCount = 0;
-	rsp_hdr->Status.CifsError = STATUS_NOT_IMPLEMENTED;
-	/* ByteCount follows WordCount in the response */
-	*(__le16 *)(rsp_hdr + 1) = 0;
-	inc_rfc1001_len(rsp_hdr, 2);
-	return 0;
-}
-
-/**
- * smb_nt_transact() - dispatcher for SMB_COM_NT_TRANSACT subcommands
- * @work:	smb work containing NT_TRANSACT command buffer
- *
- * MS-CIFS §2.2.7 — NT_TRANSACT provides NT semantics for create, IOCTL,
- * security descriptors, change notify, and quota operations.
- *
- * Return:	0 on success, otherwise error
- */
-int smb_nt_transact(struct ksmbd_work *work)
-{
-	struct smb_com_nt_transact_req *req = work->request_buf;
-	struct smb_com_nt_transact_rsp *rsp = work->response_buf;
-	__le16 function;
-
-	if (req->hdr.WordCount < 19) {
-		rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;
-		return -EINVAL;
-	}
-
-	function = req->Function;
-
-	ksmbd_debug(SMB, "SMB_COM_NT_TRANSACT subcommand: 0x%x\n",
-		    le16_to_cpu(function));
-
-	switch (le16_to_cpu(function)) {
-	case NT_TRANSACT_CREATE:
-		/*
-		 * NT_TRANSACT_CREATE (MS-CIFS §2.2.7.2): full NT create semantics
-		 * including security descriptors and EAs. The basic NT create path
-		 * is already handled by SMB_COM_NT_CREATE_ANDX (smb_nt_create_andx).
-		 * Forward to that handler for the common case (SD/EA are ignored).
-		 */
-		return smb_nt_create_andx(work);
-
-	case NT_TRANSACT_IOCTL:
-		/*
-		 * NT_TRANSACT_IOCTL (MS-CIFS §2.2.7.3): FSCTL/IOCTL pass-through.
-		 * SMB1 IOCTL is a superset of what ksmbd exposes; return
-		 * STATUS_NOT_SUPPORTED for now so clients can try alternative paths.
-		 */
-		ksmbd_debug(SMB, "NT_TRANSACT_IOCTL not fully implemented\n");
-		rsp->hdr.Status.CifsError = STATUS_NOT_SUPPORTED;
-		return 0;
-
-	case NT_TRANSACT_NOTIFY_CHANGE:
-		/* Handled via separate notify infrastructure; not wired in SMB1 */
-		rsp->hdr.Status.CifsError = STATUS_NOT_SUPPORTED;
-		return 0;
-
-	case NT_TRANSACT_QUERY_SECURITY_DESC:
-	case NT_TRANSACT_SET_SECURITY_DESC:
-	case NT_TRANSACT_GET_USER_QUOTA:
-	case NT_TRANSACT_SET_USER_QUOTA:
-	case NT_TRANSACT_RENAME:
-		rsp->hdr.Status.CifsError = STATUS_NOT_SUPPORTED;
-		return 0;
-
-	default:
-		ksmbd_debug(SMB, "Unknown NT_TRANSACT subcommand 0x%x\n",
-			    le16_to_cpu(function));
-		rsp->hdr.Status.CifsError = STATUS_NOT_SUPPORTED;
-		return 0;
-	}
-}
-
-/**
  * smb1_is_sign_req() - handler for checking packet signing status
  * @work:	smb work containing notify command buffer
  *
@@ -9838,9 +10245,9 @@ void smb1_set_sign_rsp(struct ksmbd_work *work)
  *   28B (smb_hdr minus 4B prefix) + 1B WordCount + 36B words + 2B ByteCount
  *   + 1B pad = ParameterOffset 68 (0x44).
  */
-static void *smb_build_ntransact_rsp(struct ksmbd_work *work,
-				     unsigned int param_len,
-				     unsigned int data_len)
+void *smb_build_ntransact_rsp(struct ksmbd_work *work,
+			      unsigned int param_len,
+			      unsigned int data_len)
 {
 	struct smb_com_ntransact_rsp *rsp = work->response_buf;
 	unsigned int param_off, data_off;
@@ -9874,6 +10281,383 @@ static void *smb_build_ntransact_rsp(struct ksmbd_work *work,
 
 	/* return pointer to data area (past parameters) */
 	return (char *)rsp + 4 /* rfc1002 prefix */ + data_off;
+}
+
+#define KSMBD_SMB1_NTTRANS_MAX_BYTES	SZ_1M
+
+struct smb_com_nt_transact_secondary_req {
+	struct smb_hdr hdr;		/* wct = 18 */
+	__u8 Reserved1[3];
+	__le32 TotalParameterCount;
+	__le32 TotalDataCount;
+	__le32 ParameterCount;
+	__le32 ParameterOffset;
+	__le32 ParameterDisplacement;
+	__le32 DataCount;
+	__le32 DataOffset;
+	__le32 DataDisplacement;
+	__u8 Reserved2;
+	__u8 Buffer[];
+} __packed;
+
+struct smb1_query_quota_info {
+	__u8 ReturnSingle;
+	__u8 RestartScan;
+	__le16 Reserved;
+	__le32 SidListLength;
+	__le32 StartSidLength;
+	__le32 StartSidOffset;
+} __packed;
+
+struct smb1_file_get_quota_info {
+	__le32 NextEntryOffset;
+	__le32 SidLength;
+	__u8 Sid[];
+} __packed;
+
+struct smb1_file_quota_info {
+	__le32 NextEntryOffset;
+	__le32 SidLength;
+	__le64 ChangeTime;
+	__le64 QuotaUsed;
+	__le64 QuotaThreshold;
+	__le64 QuotaLimit;
+	__u8 Sid[];
+} __packed;
+
+static void smb1_nttrans_state_free(struct ksmbd_smb1_nttrans_state *state)
+{
+	if (!state)
+		return;
+
+	kvfree(state->req_hdr);
+	kvfree(state->params);
+	kvfree(state->data);
+	bitmap_free(state->param_bitmap);
+	bitmap_free(state->data_bitmap);
+	kfree(state);
+}
+
+static struct ksmbd_smb1_nttrans_state *
+smb1_nttrans_lookup_locked(struct ksmbd_session *sess, __u16 mid)
+{
+	lockdep_assert_held(&sess->smb1_nttrans_lock);
+	return xa_load(&sess->smb1_nttrans_list, mid);
+}
+
+static void smb1_nttrans_erase_locked(struct ksmbd_session *sess,
+				      struct ksmbd_smb1_nttrans_state *state)
+{
+	lockdep_assert_held(&sess->smb1_nttrans_lock);
+	xa_erase(&sess->smb1_nttrans_list, state->mid);
+}
+
+static int smb1_nttrans_mark_received(unsigned long *bitmap, char *dst,
+				      __u32 total, __u32 displacement,
+				      const char *src, __u32 count,
+				      __u32 *received)
+{
+	__u32 i;
+
+	if (count == 0)
+		return 0;
+
+	if (displacement > total || count > total - displacement)
+		return -EINVAL;
+
+	memcpy(dst + displacement, src, count);
+
+	for (i = 0; i < count; i++) {
+		unsigned long bit = displacement + i;
+
+		if (!test_bit(bit, bitmap)) {
+			__set_bit(bit, bitmap);
+			(*received)++;
+		}
+	}
+
+	return 0;
+}
+
+static int smb1_nttrans_validate_primary(struct smb_com_nt_transact_req *req,
+					 unsigned int smb_len,
+					 char **params, char **data)
+{
+	u32 param_off = le32_to_cpu(req->ParameterOffset);
+	u32 param_cnt = le32_to_cpu(req->ParameterCount);
+	u32 data_off = le32_to_cpu(req->DataOffset);
+	u32 data_cnt = le32_to_cpu(req->DataCount);
+
+	if (smb1_validate_nt_transact_buffer(req, smb_len))
+		return -EINVAL;
+
+	if (param_cnt) {
+		if (param_off > smb_len || param_cnt > smb_len - param_off)
+			return -EINVAL;
+		*params = (char *)req + param_off;
+	} else {
+		*params = NULL;
+	}
+
+	if (data_cnt) {
+		if (data_off > smb_len || data_cnt > smb_len - data_off)
+			return -EINVAL;
+		*data = (char *)req + data_off;
+	} else {
+		*data = NULL;
+	}
+
+	return 0;
+}
+
+static int smb1_nttrans_validate_secondary(struct smb_com_nt_transact_secondary_req *req,
+					   unsigned int smb_len,
+					   char **params, char **data)
+{
+	u32 total_param = le32_to_cpu(req->TotalParameterCount);
+	u32 total_data = le32_to_cpu(req->TotalDataCount);
+	u32 param_off = le32_to_cpu(req->ParameterOffset);
+	u32 param_cnt = le32_to_cpu(req->ParameterCount);
+	u32 param_disp = le32_to_cpu(req->ParameterDisplacement);
+	u32 data_off = le32_to_cpu(req->DataOffset);
+	u32 data_cnt = le32_to_cpu(req->DataCount);
+	u32 data_disp = le32_to_cpu(req->DataDisplacement);
+
+	if (total_param > KSMBD_SMB1_NTTRANS_MAX_BYTES ||
+	    total_data > KSMBD_SMB1_NTTRANS_MAX_BYTES)
+		return -E2BIG;
+
+	if (total_param < param_cnt || total_data < data_cnt)
+		return -EINVAL;
+
+	if (param_cnt) {
+		if (param_off > smb_len || param_cnt > smb_len - param_off ||
+		    param_disp > total_param || param_cnt > total_param - param_disp)
+			return -EINVAL;
+		*params = (char *)req + param_off;
+	} else {
+		*params = NULL;
+	}
+
+	if (data_cnt) {
+		if (data_off > smb_len || data_cnt > smb_len - data_off ||
+		    data_disp > total_data || data_cnt > total_data - data_disp)
+			return -EINVAL;
+		*data = (char *)req + data_off;
+	} else {
+		*data = NULL;
+	}
+
+	return 0;
+}
+
+static struct ksmbd_smb1_nttrans_state *
+smb1_nttrans_alloc_primary(struct smb_com_nt_transact_req *req,
+			   unsigned int smb_len)
+{
+	struct ksmbd_smb1_nttrans_state *state;
+	size_t hdr_len;
+	u32 total_param = le32_to_cpu(req->TotalParameterCount);
+	u32 total_data = le32_to_cpu(req->TotalDataCount);
+
+	if (total_param > KSMBD_SMB1_NTTRANS_MAX_BYTES ||
+	    total_data > KSMBD_SMB1_NTTRANS_MAX_BYTES)
+		return ERR_PTR(-E2BIG);
+
+	hdr_len = offsetof(struct smb_com_nt_transact_req, Buffer) +
+		  req->SetupCount * sizeof(__le16);
+	if (hdr_len > smb_len)
+		return ERR_PTR(-EINVAL);
+
+	state = kzalloc(sizeof(*state), KSMBD_DEFAULT_GFP);
+	if (!state)
+		return ERR_PTR(-ENOMEM);
+
+	state->mid = le16_to_cpu(req->hdr.Mid);
+	state->tid = le16_to_cpu(req->hdr.Tid);
+	state->pid = le16_to_cpu(req->hdr.Pid);
+	state->uid = le16_to_cpu(req->hdr.Uid);
+	state->function = le16_to_cpu(req->Function);
+	state->setup_count = req->SetupCount;
+	state->req_hdr_len = hdr_len;
+	state->total_param_count = total_param;
+	state->total_data_count = total_data;
+
+	state->req_hdr = kvmemdup(req, hdr_len, KSMBD_DEFAULT_GFP);
+	if (!state->req_hdr)
+		goto err;
+
+	if (total_param) {
+		state->params = kvmalloc(total_param, KSMBD_DEFAULT_GFP);
+		state->param_bitmap = bitmap_zalloc(total_param, KSMBD_DEFAULT_GFP);
+		if (!state->params || !state->param_bitmap)
+			goto err;
+	}
+
+	if (total_data) {
+		state->data = kvmalloc(total_data, KSMBD_DEFAULT_GFP);
+		state->data_bitmap = bitmap_zalloc(total_data, KSMBD_DEFAULT_GFP);
+		if (!state->data || !state->data_bitmap)
+			goto err;
+	}
+
+	return state;
+
+err:
+	smb1_nttrans_state_free(state);
+	return ERR_PTR(-ENOMEM);
+}
+
+static bool smb1_nttrans_complete(struct ksmbd_smb1_nttrans_state *state)
+{
+	return state->param_received == state->total_param_count &&
+	       state->data_received == state->total_data_count;
+}
+
+static inline unsigned int smb1_sid_byte_len(const struct smb_sid *sid)
+{
+	return CIFS_SID_BASE_SIZE + sizeof(__le32) * sid->num_subauth;
+}
+
+static int smb1_quota_sid_to_uid(const struct smb_sid *sid,
+				 unsigned int sid_len, uid_t *uid_out)
+{
+	if (sid->num_subauth == 0 ||
+	    sid->num_subauth > SID_MAX_SUB_AUTHORITIES)
+		return -EINVAL;
+
+	if (sid_len < smb1_sid_byte_len(sid))
+		return -EINVAL;
+
+	return ksmbd_validate_sid_to_uid((struct smb_sid *)sid, uid_out);
+}
+
+static int smb1_fill_quota_info(struct super_block *sb,
+				const struct smb_sid *sid,
+				unsigned int sid_len, uid_t uid,
+				void *out, unsigned int out_rem,
+				unsigned int *entry_len)
+{
+	struct smb1_file_quota_info *qi;
+	struct qc_dqblk dqblk;
+	struct kqid qid;
+	unsigned int len;
+	int ret;
+
+	len = ALIGN(sizeof(*qi) + sid_len, 8);
+	if (out_rem < len) {
+		*entry_len = 0;
+		return -ENOSPC;
+	}
+
+	memset(out, 0, len);
+	qi = out;
+	qi->SidLength = cpu_to_le32(sid_len);
+
+#ifdef CONFIG_QUOTA
+	qid = make_kqid(&init_user_ns, USRQUOTA, uid);
+	if (!qid_valid(qid)) {
+		*entry_len = 0;
+		return -EINVAL;
+	}
+
+	memset(&dqblk, 0, sizeof(dqblk));
+	ret = dquot_get_dqblk(sb, qid, &dqblk);
+	if (ret)
+		memset(&dqblk, 0, sizeof(dqblk));
+
+	qi->QuotaUsed = cpu_to_le64(dqblk.d_space);
+	qi->QuotaThreshold = cpu_to_le64(dqblk.d_spc_softlimit);
+	qi->QuotaLimit = cpu_to_le64(dqblk.d_spc_hardlimit);
+#endif
+	memcpy(qi->Sid, sid, sid_len);
+	*entry_len = len;
+	return 0;
+}
+
+static void *smb1_nttrans_build_request(struct ksmbd_smb1_nttrans_state *state,
+					size_t *req_len)
+{
+	struct smb_com_nt_transact_req *req;
+	size_t len = state->req_hdr_len + state->total_param_count +
+		     state->total_data_count;
+	u32 param_off = state->req_hdr_len;
+	u32 data_off = param_off + state->total_param_count;
+	void *buf;
+
+	buf = kvzalloc(len, KSMBD_DEFAULT_GFP);
+	if (!buf)
+		return NULL;
+
+	memcpy(buf, state->req_hdr, state->req_hdr_len);
+	req = buf;
+	put_unaligned_be32(cpu_to_be32(len - RFC1002_HEADER_LEN), buf);
+	req->hdr.Command = SMB_COM_NT_TRANSACT;
+	req->TotalParameterCount = cpu_to_le32(state->total_param_count);
+	req->TotalDataCount = cpu_to_le32(state->total_data_count);
+	req->ParameterCount = cpu_to_le32(state->total_param_count);
+	req->ParameterOffset = cpu_to_le32(param_off);
+	req->DataCount = cpu_to_le32(state->total_data_count);
+	req->DataOffset = cpu_to_le32(data_off);
+
+	if (state->total_param_count)
+		memcpy((char *)buf + param_off, state->params,
+		       state->total_param_count);
+	if (state->total_data_count)
+		memcpy((char *)buf + data_off, state->data,
+		       state->total_data_count);
+
+	*req_len = len;
+	return buf;
+}
+
+static int smb1_nttrans_queue_primary(struct ksmbd_work *work)
+{
+	struct ksmbd_session *sess = work->sess;
+	struct smb_com_nt_transact_req *req = work->request_buf;
+	struct ksmbd_smb1_nttrans_state *state, *old;
+	char *params, *data;
+	unsigned int smb_len = get_rfc1002_len(work->request_buf);
+	int ret;
+
+	ret = smb1_nttrans_validate_primary(req, smb_len, &params, &data);
+	if (ret)
+		return ret;
+
+	state = smb1_nttrans_alloc_primary(req, smb_len);
+	if (IS_ERR(state))
+		return PTR_ERR(state);
+
+	ret = smb1_nttrans_mark_received(state->param_bitmap, state->params,
+					 state->total_param_count, 0,
+					 params, le32_to_cpu(req->ParameterCount),
+					 &state->param_received);
+	if (ret)
+		goto err;
+
+	ret = smb1_nttrans_mark_received(state->data_bitmap, state->data,
+					 state->total_data_count, 0,
+					 data, le32_to_cpu(req->DataCount),
+					 &state->data_received);
+	if (ret)
+		goto err;
+
+	mutex_lock(&sess->smb1_nttrans_lock);
+	old = xa_erase(&sess->smb1_nttrans_list, state->mid);
+	if (old)
+		smb1_nttrans_state_free(old);
+	ret = xa_err(xa_store(&sess->smb1_nttrans_list, state->mid, state,
+			      KSMBD_DEFAULT_GFP));
+	mutex_unlock(&sess->smb1_nttrans_lock);
+	if (ret)
+		goto err;
+
+	work->send_no_response = 1;
+	return 0;
+
+err:
+	smb1_nttrans_state_free(state);
+	return ret;
 }
 
 /*
@@ -10033,28 +10817,422 @@ static int smb_nt_transact_create(struct ksmbd_work *work,
 	ksmbd_debug(SMB, "NT_TRANSACT_CREATE: filename='%s'\n", name);
 
 	/*
-	 * We do not have a direct call path into smb_nt_create_andx()
-	 * that accepts pre-parsed parameters.  Return STATUS_NOT_SUPPORTED
-	 * to indicate the client should use NT_CREATE_ANDX instead.
-	 *
-	 * If/when a shared create helper is factored out this stub can be
-	 * wired up fully.
+	 * Full create implementation — mirrors smb_nt_create_andx() logic
+	 * with parameters sourced from the NT_TRANSACT parameter block
+	 * and response written as an NT_TRANSACT parameter block.
 	 */
-	kfree(name);
-	rsp->hdr.Status.CifsError = STATUS_NOT_SUPPORTED;
-	return -EOPNOTSUPP;
+	{
+		struct ksmbd_tree_connect *tcon = work->tcon;
+		struct path path;
+		struct kstat stat;
+		int oplock_flags, file_info, open_flags, may_flags, access_flags;
+		char *conv_name = NULL;
+		bool file_present = true;
+		__u64 time;
+		umode_t mode = 0;
+		int err = 0;
+		int create_directory = 0;
+		struct ksmbd_file *fp = NULL;
+		int oplock_rsp = OPLOCK_NONE;
+		int share_ret;
+		__u32 root_dir_fid;
+		char *root = NULL;
+		bool is_relative_root = false;
+		char *rsp_params;
+
+		root_dir_fid = le32_to_cpu(*(__le32 *)(params + 4));
+
+		if (create_options & FILE_OPEN_BY_FILE_ID_LE) {
+			ksmbd_debug(SMB, "file open with FID is not supported\n");
+			rsp->hdr.Status.CifsError = STATUS_NOT_SUPPORTED;
+			kfree(name);
+			return -EINVAL;
+		}
+
+		if (create_options & FILE_DELETE_ON_CLOSE_LE) {
+			if (desired_access &&
+			    !(le32_to_cpu(desired_access) & DELETE)) {
+				rsp->hdr.Status.CifsError = STATUS_ACCESS_DENIED;
+				kfree(name);
+				return -EPERM;
+			}
+			if (le32_to_cpu(file_attributes) & ATTR_READONLY) {
+				rsp->hdr.Status.CifsError = STATUS_CANNOT_DELETE;
+				kfree(name);
+				return -EPERM;
+			}
+		}
+
+		if (create_options & FILE_DIRECTORY_FILE_LE) {
+			ksmbd_debug(SMB, "GOT Create Directory via NT_TRANSACT_CREATE\n");
+			create_directory = 1;
+		}
+
+		/* Handle RootDirectoryFID-relative paths */
+		if (root_dir_fid) {
+			is_relative_root = true;
+			fp = ksmbd_lookup_fd_fast(work, root_dir_fid);
+			if (fp)
+				root = (char *)fp->filp->f_path.dentry->d_name.name;
+			else {
+				rsp->hdr.Status.CifsError = STATUS_INVALID_HANDLE;
+				kfree(name);
+				return -EINVAL;
+			}
+			ksmbd_fd_put(work, fp);
+			fp = NULL;
+		}
+
+		if (is_relative_root) {
+			char *full_name;
+
+			full_name = kasprintf(KSMBD_DEFAULT_GFP, "\\%s\\%s",
+					      root, name);
+			if (!full_name) {
+				kfree(name);
+				rsp->hdr.Status.CifsError = STATUS_NO_MEMORY;
+				return -ENOMEM;
+			}
+			kfree(name);
+			name = full_name;
+		}
+
+		/* Reject wildcard trailing components */
+		root = strrchr(name, '\\');
+		if (root) {
+			root++;
+			if ((root[0] == '*' || root[0] == '/') &&
+			    root[1] == '\0') {
+				rsp->hdr.Status.CifsError =
+					STATUS_OBJECT_NAME_INVALID;
+				kfree(name);
+				return -EINVAL;
+			}
+		}
+
+		conv_name = smb_get_name(share, name, PATH_MAX, work, true);
+		kfree(name);
+		if (IS_ERR(conv_name)) {
+			rsp->hdr.Status.CifsError = STATUS_OBJECT_NAME_INVALID;
+			return PTR_ERR(conv_name);
+		}
+
+		if (ksmbd_override_fsids(work)) {
+			err = -ENOMEM;
+			goto ntc_out1;
+		}
+
+		err = ksmbd_vfs_kern_path(work, conv_name, LOOKUP_NO_SYMLINKS,
+					  &path,
+					  (req->hdr.Flags & SMBFLG_CASELESS) &&
+					  !create_directory);
+		if (err) {
+			if (err == -EACCES || err == -EXDEV)
+				goto ntc_out;
+			file_present = false;
+		} else {
+			if (d_is_symlink(path.dentry)) {
+				err = -EACCES;
+				goto ntc_free_path;
+			}
+			err = vfs_getattr(&path, &stat, STATX_BASIC_STATS,
+					  AT_STATX_SYNC_AS_STAT);
+			if (err)
+				goto ntc_free_path;
+		}
+
+		if (file_present &&
+		    (create_options & FILE_NON_DIRECTORY_FILE_LE) &&
+		    S_ISDIR(stat.mode)) {
+			rsp->hdr.Status.CifsError =
+				STATUS_OBJECT_NAME_COLLISION;
+			err = -EEXIST;
+			goto ntc_free_path;
+		}
+
+		if (file_present && create_directory && !S_ISDIR(stat.mode)) {
+			rsp->hdr.Status.CifsError = STATUS_NOT_A_DIRECTORY;
+			err = -ENOTDIR;
+			goto ntc_free_path;
+		}
+
+		oplock_flags = le32_to_cpu(*(__le32 *)params) &
+			       (REQ_OPLOCK | REQ_BATCHOPLOCK);
+		open_flags = file_create_dispostion_flags(
+				le32_to_cpu(create_disposition), file_present);
+
+		if (open_flags < 0) {
+			if (file_present) {
+				if (open_flags == -EINVAL)
+					rsp->hdr.Status.CifsError =
+						STATUS_INVALID_PARAMETER;
+				else
+					rsp->hdr.Status.CifsError =
+						STATUS_OBJECT_NAME_COLLISION;
+				err = open_flags;
+				goto ntc_free_path;
+			} else {
+				err = -ENOENT;
+				goto ntc_out;
+			}
+		} else {
+			if (file_present && S_ISFIFO(stat.mode))
+				open_flags |= O_NONBLOCK;
+			if (create_options & FILE_WRITE_THROUGH_LE)
+				open_flags |= O_SYNC;
+		}
+
+		access_flags = convert_generic_access_flags(
+				le32_to_cpu(desired_access),
+				&open_flags, &may_flags,
+				le32_to_cpu(file_attributes));
+
+		mode |= 0777;
+		if (le32_to_cpu(file_attributes) & ATTR_READONLY)
+			mode &= ~0222;
+
+		if (!test_tree_conn_flag(tcon, KSMBD_TREE_CONN_FLAG_WRITABLE)) {
+			if (open_flags & O_CREAT) {
+				err = -EACCES;
+				if (file_present)
+					goto ntc_free_path;
+				else
+					goto ntc_out;
+			}
+		}
+
+		if (!file_present && (open_flags & O_CREAT)) {
+			if (!create_directory)
+				mode |= S_IFREG;
+			err = smb_common_create(work, &path, conv_name,
+						open_flags, mode,
+						create_directory);
+			if (err)
+				goto ntc_out;
+		} else {
+			err = compat_inode_permission(&path,
+						      d_inode(path.dentry),
+						      may_flags);
+			if (err)
+				goto ntc_free_path;
+		}
+
+		err = ksmbd_query_inode_status(path.dentry->d_parent);
+		if (err == KSMBD_INODE_STATUS_PENDING_DELETE) {
+			err = -EBUSY;
+			goto ntc_free_path;
+		}
+
+		err = 0;
+		fp = ksmbd_vfs_dentry_open(work, &path, open_flags,
+					   create_options, file_present);
+		if (IS_ERR(fp)) {
+			err = PTR_ERR(fp);
+			fp = NULL;
+			goto ntc_free_path;
+		}
+		fp->daccess = desired_access;
+		fp->saccess = share_access;
+		fp->pid = le16_to_cpu(req->hdr.Pid);
+
+		down_write(&fp->f_ci->m_lock);
+		list_add(&fp->node, &fp->f_ci->m_fp_list);
+		up_write(&fp->f_ci->m_lock);
+
+		share_ret = ksmbd_smb_check_shared_mode(fp->filp, fp);
+		if (smb1_oplock_enable &&
+		    test_share_config_flag(tcon->share_conf,
+					   KSMBD_SHARE_FLAG_OPLOCKS) &&
+		    !S_ISDIR(file_inode(fp->filp)->i_mode) && oplock_flags) {
+			err = smb_grant_oplock(work, oplock_flags,
+					       fp->volatile_id, fp,
+					       le16_to_cpu(req->hdr.Tid),
+					       NULL, share_ret);
+			if (err)
+				goto ntc_free_path;
+		} else {
+			if (ksmbd_inode_pending_delete(fp)) {
+				err = -EBUSY;
+				goto ntc_free_path;
+			}
+			if (share_ret < 0) {
+				err = -EPERM;
+				goto ntc_free_path;
+			}
+		}
+
+		oplock_rsp = fp->f_opinfo != NULL ? fp->f_opinfo->level : 0;
+
+		if (file_present) {
+			if (!(open_flags & O_TRUNC))
+				file_info = F_OPENED;
+			else
+				file_info = F_OVERWRITTEN;
+		} else {
+			file_info = F_CREATED;
+		}
+
+		if (le32_to_cpu(desired_access) & (DELETE | GENERIC_ALL))
+			fp->is_nt_open = 1;
+		if ((le32_to_cpu(desired_access) & DELETE) &&
+		    (create_options & FILE_DELETE_ON_CLOSE_LE))
+			ksmbd_fd_set_delete_on_close(fp, file_info);
+
+		err = vfs_getattr(&path, &stat, STATX_BASIC_STATS,
+				  AT_STATX_SYNC_AS_STAT);
+		if (err)
+			goto ntc_free_path;
+
+		if (le64_to_cpu(alloc_size) &&
+		    (file_info == F_CREATED || file_info == F_OVERWRITTEN)) {
+			if (le64_to_cpu(alloc_size) > stat.size) {
+				err = ksmbd_vfs_truncate(work, fp,
+							 le64_to_cpu(alloc_size));
+				if (err)
+					goto ntc_free_path;
+			}
+		}
+
+		/*
+		 * Build NT_TRANSACT_CREATE response.
+		 * Parameter block is 69 bytes (MS-SMB §2.2.4.79.2),
+		 * no data block.
+		 */
+		rsp_params = smb_build_ntransact_rsp(work, 69, 0);
+		/* rsp_params points to data area; params start 69 bytes before */
+		rsp_params = (char *)rsp + 4 +
+			     le32_to_cpu(rsp->ParameterOffset);
+
+		memset(rsp_params, 0, 69);
+
+		/* OpLockLevel (1 byte at offset 0) */
+		rsp_params[0] = oplock_rsp;
+		/* Reserved (1 byte at offset 1) = 0 */
+		/* Fid (2 bytes at offset 2) */
+		*(__le16 *)(rsp_params + 2) = cpu_to_le16(fp->volatile_id);
+		/* CreateAction (4 bytes at offset 4) */
+		if ((le32_to_cpu(create_disposition) == FILE_SUPERSEDE) &&
+		    (file_info == F_OVERWRITTEN))
+			*(__le32 *)(rsp_params + 4) = cpu_to_le32(F_SUPERSEDED);
+		else
+			*(__le32 *)(rsp_params + 4) = cpu_to_le32(file_info);
+
+		/* CreationTime */
+		if (stat.result_mask & STATX_BTIME)
+			fp->create_time = ksmbd_UnixTimeToNT(stat.btime);
+		else
+			fp->create_time = ksmbd_UnixTimeToNT(stat.ctime);
+
+		if (file_present &&
+		    test_share_config_flag(tcon->share_conf,
+					   KSMBD_SHARE_FLAG_STORE_DOS_ATTRS)) {
+			struct xattr_dos_attrib da;
+
+			if (compat_ksmbd_vfs_get_dos_attrib_xattr(&path,
+								   path.dentry,
+								   &da) > 0)
+				fp->create_time = da.create_time;
+		} else if (!file_present &&
+			   test_share_config_flag(tcon->share_conf,
+						   KSMBD_SHARE_FLAG_STORE_DOS_ATTRS)) {
+			struct xattr_dos_attrib da = {0};
+
+			da.version = 4;
+			da.attr = smb_get_dos_attr(&stat);
+			da.create_time = fp->create_time;
+			compat_ksmbd_vfs_set_dos_attrib_xattr(&path, &da,
+							       false);
+		}
+
+		*(__le64 *)(rsp_params + 8)  = cpu_to_le64(fp->create_time);
+		time = ksmbd_UnixTimeToNT(stat.atime);
+		*(__le64 *)(rsp_params + 16) = cpu_to_le64(time);
+		time = ksmbd_UnixTimeToNT(stat.mtime);
+		*(__le64 *)(rsp_params + 24) = cpu_to_le64(time);
+		time = ksmbd_UnixTimeToNT(stat.ctime);
+		*(__le64 *)(rsp_params + 32) = cpu_to_le64(time);
+
+		/* ExtFileAttributes (4 bytes at offset 40) */
+		*(__le32 *)(rsp_params + 40) =
+			cpu_to_le32(smb_get_dos_attr(&stat));
+		/* AllocationSize (8 bytes at offset 44) */
+		*(__le64 *)(rsp_params + 44) =
+			cpu_to_le64(stat.blocks << 9);
+		/* EndOfFile (8 bytes at offset 52) */
+		*(__le64 *)(rsp_params + 52) = cpu_to_le64(stat.size);
+		/* ResourceType (2 bytes at offset 60) = 0 (disk) */
+		/* NMPipeStatus (2 bytes at offset 62) = 0 */
+		/* Directory (1 byte at offset 64) */
+		rsp_params[64] = S_ISDIR(stat.mode) ? 1 : 0;
+
+		ksmbd_update_fstate(&work->sess->file_table, fp, FP_INITED);
+		kfree(conv_name);
+		path_put(&path);
+		ksmbd_revert_fsids(work);
+		return 0;
+
+ntc_free_path:
+		path_put(&path);
+ntc_out:
+		ksmbd_revert_fsids(work);
+ntc_out1:
+		switch (err) {
+		case -ENOSPC:
+			rsp->hdr.Status.CifsError = STATUS_DISK_FULL;
+			break;
+		case -EMFILE:
+			rsp->hdr.Status.CifsError = STATUS_TOO_MANY_OPENED_FILES;
+			break;
+		case -EINVAL:
+			if (!rsp->hdr.Status.CifsError)
+				rsp->hdr.Status.CifsError = STATUS_NO_SUCH_USER;
+			break;
+		case -EACCES:
+			rsp->hdr.Status.CifsError = STATUS_ACCESS_DENIED;
+			break;
+		case -EPERM:
+			rsp->hdr.Status.CifsError = STATUS_SHARING_VIOLATION;
+			break;
+		case -ENOENT:
+			rsp->hdr.Status.CifsError = STATUS_OBJECT_NAME_NOT_FOUND;
+			break;
+		case -EBUSY:
+			rsp->hdr.Status.CifsError = STATUS_DELETE_PENDING;
+			break;
+		case -EOPNOTSUPP:
+			rsp->hdr.Status.CifsError = STATUS_NOT_SUPPORTED;
+			break;
+		case -ENOMEM:
+			rsp->hdr.Status.CifsError = STATUS_NO_MEMORY;
+			break;
+		default:
+			if (!rsp->hdr.Status.CifsError)
+				rsp->hdr.Status.CifsError =
+					STATUS_UNEXPECTED_IO_ERROR;
+		}
+
+		if (fp)
+			ksmbd_close_fd(work, fp->volatile_id);
+		kfree(conv_name);
+		return err;
+	}
 }
 
 /* T1 — NT_TRANSACT_IOCTL (subcommand 0x02)
  *
- * Bridges SMB1 FSCTL requests.  The param block layout (MS-SMB §2.2.4.79.2):
+ * Bridges SMB1 FSCTL requests to the existing ksmbd FSCTL dispatch
+ * infrastructure (shared with SMB2 IOCTL).
+ *
+ * Param block layout (MS-SMB §2.2.4.79.2):
  *   0: FunctionCode (4)
  *   4: Fid          (2)
  *   6: IsFsctl      (1)
  *   7: IsFlags      (1)
  *
- * For now we log the request and return STATUS_NOT_SUPPORTED.  A future
- * implementation can dispatch to the FSCTL infrastructure.
+ * Device IOCTLs (IsFsctl == 0) return STATUS_NOT_SUPPORTED.
+ * For FSCTLs, we allocate a temporary smb2_ioctl_rsp buffer, dispatch
+ * through ksmbd_dispatch_fsctl(), and copy output into the NT_TRANSACT
+ * data block.
  */
 static int smb_nt_transact_ioctl(struct ksmbd_work *work,
 				 struct smb_com_ntransact_req *req)
@@ -10080,12 +11258,106 @@ static int smb_nt_transact_ioctl(struct ksmbd_work *work,
 		    (unsigned int)((__u8)params[6]),
 		    (unsigned int)((__u8)params[7]));
 
+	/* Device IOCTLs (IsFsctl == 0) are not supported */
+	if (!((__u8)params[6])) {
+		rsp->hdr.Status.CifsError = STATUS_NOT_SUPPORTED;
+		return -EOPNOTSUPP;
+	}
+
 	/*
-	 * Bridge to ksmbd FSCTL infrastructure is not yet wired for SMB1.
-	 * Return STATUS_NOT_SUPPORTED so the client can fall back.
+	 * Bridge FSCTL to the existing ksmbd_dispatch_fsctl infrastructure.
+	 * The dispatch function writes output into smb2_ioctl_rsp.Buffer[],
+	 * so we allocate a temporary SMB2 response, dispatch, then copy
+	 * the output data into the NT_TRANSACT data block.
 	 */
-	rsp->hdr.Status.CifsError = STATUS_NOT_SUPPORTED;
-	return -EOPNOTSUPP;
+	{
+		struct smb2_ioctl_rsp *tmp_rsp;
+		void *in_buf = NULL;
+		unsigned int in_buf_len = 0;
+		unsigned int data_count = le32_to_cpu(req->DataCount);
+		unsigned int max_out_len;
+		unsigned int nbytes = 0;
+		char *out_data;
+		int ret;
+
+		/*
+		 * Allocate a temporary SMB2 IOCTL response buffer.
+		 * We need sizeof(struct smb2_ioctl_rsp) header plus space
+		 * for output data.  Use a generous 64K which matches
+		 * typical SMB2 buffer limits.
+		 */
+#define NTI_TMP_BUF_SZ	(sizeof(struct smb2_ioctl_rsp) + 65536)
+		tmp_rsp = kvzalloc(NTI_TMP_BUF_SZ, KSMBD_DEFAULT_GFP);
+		if (!tmp_rsp) {
+			rsp->hdr.Status.CifsError = STATUS_NO_MEMORY;
+			return -ENOMEM;
+		}
+
+		/* Input data follows the parameter block in the request */
+		if (data_count > 0) {
+			in_buf = (char *)req + le32_to_cpu(req->DataOffset);
+			in_buf_len = data_count;
+		}
+
+		max_out_len = 65536;
+
+		ret = ksmbd_dispatch_fsctl(work, function_code, (u64)fid,
+					   in_buf, in_buf_len, max_out_len,
+					   tmp_rsp, &nbytes);
+
+		if (ret == -EOPNOTSUPP) {
+			kvfree(tmp_rsp);
+			rsp->hdr.Status.CifsError = STATUS_NOT_SUPPORTED;
+			return -EOPNOTSUPP;
+		}
+
+		if (ret && nbytes == 0) {
+			kvfree(tmp_rsp);
+			/* Map common FSCTL errors to NTSTATUS */
+			if (ret == -EACCES)
+				rsp->hdr.Status.CifsError =
+					STATUS_ACCESS_DENIED;
+			else if (ret == -EBADF)
+				rsp->hdr.Status.CifsError =
+					STATUS_INVALID_HANDLE;
+			else if (ret == -ENOMEM)
+				rsp->hdr.Status.CifsError = STATUS_NO_MEMORY;
+			else
+				rsp->hdr.Status.CifsError =
+					STATUS_UNEXPECTED_IO_ERROR;
+			return ret;
+		}
+
+		/*
+		 * Build NT_TRANSACT response with FSCTL output in data block.
+		 * No parameter block is needed for IOCTL responses.
+		 */
+		out_data = smb_build_ntransact_rsp(work, 0, nbytes);
+		if (nbytes > 0)
+			memcpy(out_data, tmp_rsp->Buffer, nbytes);
+
+		kvfree(tmp_rsp);
+
+		/*
+		 * If the handler returned non-zero but also produced output
+		 * (e.g. copychunk returning server limits on error), preserve
+		 * the NTSTATUS from the handler.  Otherwise set SUCCESS.
+		 */
+		if (ret) {
+			if (ret == -EACCES)
+				rsp->hdr.Status.CifsError =
+					STATUS_ACCESS_DENIED;
+			else if (ret == -EBADF)
+				rsp->hdr.Status.CifsError =
+					STATUS_INVALID_HANDLE;
+			else
+				rsp->hdr.Status.CifsError =
+					STATUS_UNEXPECTED_IO_ERROR;
+		}
+		/* else smb_build_ntransact_rsp already set STATUS_SUCCESS */
+
+		return 0;
+	}
 }
 
 /* T2 — NT_TRANSACT_SET_SECURITY_DESC (subcommand 0x03) */
@@ -10142,26 +11414,23 @@ static int smb_nt_transact_set_security(struct ksmbd_work *work,
  *   6: WatchTree        (1) — non-zero = watch subdirectories
  *   7: Reserved         (1)
  *
- * SMB1 NOTIFY_CHANGE is an asynchronous request: we park the work item
- * (send_no_response = 1) so the connection stays alive.  When the caller
- * no longer needs the watch they cancel the MID via SMB_COM_NT_CANCEL.
- *
- * Full fsnotify integration would require building an SMB1-format
- * NT_TRANSACT response with FILE_NOTIFY_INFORMATION records and queuing
- * it via ksmbd_conn_write().  That infrastructure does not yet exist for
- * SMB1, so we park the request indefinitely.  Windows clients accept this
- * — they re-issue the notify periodically or rely on the cancel path.
+ * SMB1 NOTIFY_CHANGE is asynchronous.  We reuse the shared notify watch
+ * engine so the final NT_TRANSACT response can be emitted on event,
+ * cancel, cleanup, and delete-pending transitions just like SMB2.
  */
 static int smb_nt_transact_notify_change(struct ksmbd_work *work,
 					 struct smb_com_ntransact_req *req)
 {
 	struct smb_com_ntransact_rsp *rsp = work->response_buf;
+	void **argv;
 	u32 param_count = le32_to_cpu(req->ParameterCount);
 	char *params;
 	u32 completion_filter;
+	u32 output_buf_len;
 	u16 fid;
 	u8 watch_tree;
 	struct ksmbd_file *fp;
+	int rc;
 
 	if (param_count < 8) {
 		rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;
@@ -10182,13 +11451,97 @@ static int smb_nt_transact_notify_change(struct ksmbd_work *work,
 		rsp->hdr.Status.CifsError = STATUS_INVALID_HANDLE;
 		return -EBADF;
 	}
-	ksmbd_fd_put(work, fp);
 
 	/*
-	 * Park the request: do not send a response now.  The client will
-	 * either cancel (via SMB_COM_NT_CANCEL) or reconnect.
+	 * CHANGE_NOTIFY is only valid on directories, and only when the
+	 * handle was opened with list-directory access.
 	 */
+	if (!S_ISDIR(file_inode(fp->filp)->i_mode)) {
+		rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;
+		ksmbd_fd_put(work, fp);
+		return -EINVAL;
+	}
+
+	if (!(fp->daccess & FILE_LIST_DIRECTORY_LE)) {
+		rsp->hdr.Status.CifsError = STATUS_ACCESS_DENIED;
+		ksmbd_fd_put(work, fp);
+		return -EACCES;
+	}
+
+	if (!ksmbd_notify_enabled()) {
+		rsp->hdr.Status.CifsError = STATUS_NOT_SUPPORTED;
+		ksmbd_fd_put(work, fp);
+		return -EOPNOTSUPP;
+	}
+
+	if (!completion_filter)
+		completion_filter = 0xFFFFFFFF;
+
+	output_buf_len = le32_to_cpu(req->MaxDataCount);
+	argv = kmalloc(3 * sizeof(void *), KSMBD_DEFAULT_GFP);
+	if (!argv) {
+		rsp->hdr.Status.CifsError = STATUS_INSUFFICIENT_RESOURCES;
+		ksmbd_fd_put(work, fp);
+		return -ENOMEM;
+	}
+
+	argv[0] = NULL;
+	argv[1] = work;
+	argv[2] = fp;
+
+	if (work->sess)
+		ksmbd_user_session_get(work->sess);
+
+	refcount_inc(&work->conn->refcnt);
+	work->notify_conn_ref = true;
+	work->pending_async = 1;
 	work->send_no_response = 1;
+
+	rc = setup_async_work(work, ksmbd_notify_cancel, argv);
+	if (rc) {
+		work->pending_async = 0;
+		work->send_no_response = 0;
+		if (work->sess)
+			ksmbd_user_session_put(work->sess);
+		smb1_notify_put_work_conn_ref(work);
+		kfree(argv);
+		rsp->hdr.Status.CifsError = STATUS_INSUFFICIENT_RESOURCES;
+		ksmbd_fd_put(work, fp);
+		return rc;
+	}
+
+	rc = ksmbd_notify_add_watch(fp, work, completion_filter, watch_tree,
+				    output_buf_len, argv);
+	if (rc == -EIOCBQUEUED) {
+		work->cancel_argv = NULL;
+		work->cancel_fn = NULL;
+		release_async_work(work);
+		work->pending_async = 0;
+		work->send_no_response = 0;
+		if (work->sess)
+			ksmbd_user_session_put(work->sess);
+		smb1_notify_put_work_conn_ref(work);
+		kfree(argv);
+		ksmbd_fd_put(work, fp);
+		return 0;
+	}
+
+	if (rc) {
+		work->cancel_argv = NULL;
+		work->cancel_fn = NULL;
+		release_async_work(work);
+		work->pending_async = 0;
+		work->send_no_response = 0;
+		if (work->sess)
+			ksmbd_user_session_put(work->sess);
+		smb1_notify_put_work_conn_ref(work);
+		kfree(argv);
+		rsp->hdr.Status.CifsError = STATUS_INSUFFICIENT_RESOURCES;
+		ksmbd_fd_put(work, fp);
+		return rc;
+	}
+
+	ksmbd_fd_put(work, fp);
 	return 0;
 }
 
@@ -10391,20 +11744,172 @@ static int smb_nt_transact_get_user_quota(struct ksmbd_work *work,
 					  struct smb_com_ntransact_req *req)
 {
 	struct smb_com_ntransact_rsp *rsp = work->response_buf;
+	struct ksmbd_share_config *share;
+	struct smb1_query_quota_info *qqi;
+	struct super_block *sb;
+	char *params;
+	char *out;
+	unsigned int param_count = le32_to_cpu(req->ParameterCount);
+	unsigned int written = 0;
+	unsigned int out_len = 0;
+	void *prev = NULL;
+	int ret = 0;
 
-	ksmbd_debug(SMB, "NT_TRANSACT_GET_USER_QUOTA - not supported\n");
-	rsp->hdr.Status.CifsError = STATUS_NOT_SUPPORTED;
-	return -EOPNOTSUPP;
+	if (!work->tcon) {
+		rsp->hdr.Status.CifsError = STATUS_NETWORK_NAME_DELETED;
+		return -EINVAL;
+	}
+
+	if (param_count < sizeof(struct smb1_query_quota_info)) {
+		rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;
+		return -EINVAL;
+	}
+
+	params = (char *)req + le32_to_cpu(req->ParameterOffset);
+	qqi = (struct smb1_query_quota_info *)params;
+	share = work->tcon->share_conf;
+	sb = share->vfs_path.dentry->d_sb;
+	out = smb_build_ntransact_rsp(work, 0, le32_to_cpu(req->MaxDataCount));
+
+#ifdef CONFIG_QUOTA
+	if (sb && sb_has_quota_active(sb, USRQUOTA)) {
+		unsigned int sid_list_len = le32_to_cpu(qqi->SidListLength);
+
+		if (sid_list_len) {
+			unsigned int offset = sizeof(*qqi);
+
+			if (sid_list_len > param_count - sizeof(*qqi)) {
+				rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;
+				return -EINVAL;
+			}
+
+			while (offset < sizeof(*qqi) + sid_list_len) {
+				struct smb1_file_get_quota_info *gqi;
+				struct smb_sid *sid;
+				unsigned int sid_len, entry_len, next;
+				uid_t uid;
+
+				if (sizeof(*qqi) + sid_list_len - offset < sizeof(*gqi))
+					break;
+
+				gqi = (struct smb1_file_get_quota_info *)(params + offset);
+				sid_len = le32_to_cpu(gqi->SidLength);
+				next = le32_to_cpu(gqi->NextEntryOffset);
+				if (sid_len < CIFS_SID_BASE_SIZE ||
+				    sizeof(*qqi) + sid_list_len - offset <
+					    sizeof(*gqi) + sid_len) {
+					rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;
+					return -EINVAL;
+				}
+
+				sid = (struct smb_sid *)gqi->Sid;
+				ret = smb1_quota_sid_to_uid(sid, sid_len, &uid);
+				if (!ret) {
+					ret = smb1_fill_quota_info(sb, sid, sid_len, uid,
+								   out + written,
+								   le32_to_cpu(req->MaxDataCount) - written,
+								   &entry_len);
+					if (ret == -ENOSPC)
+						break;
+					if (ret) {
+						rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;
+						return ret;
+					}
+
+					if (prev)
+						((struct smb1_file_quota_info *)prev)->NextEntryOffset =
+							cpu_to_le32((char *)out + written - (char *)prev);
+					prev = out + written;
+					written += entry_len;
+					if (qqi->ReturnSingle)
+						break;
+				}
+
+				if (!next)
+					break;
+				if (next < sizeof(*gqi) || next > sizeof(*qqi) + sid_list_len - offset) {
+					rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;
+					return -EINVAL;
+				}
+				offset += next;
+			}
+		} else if (le32_to_cpu(qqi->StartSidLength)) {
+			unsigned int start_sid_len = le32_to_cpu(qqi->StartSidLength);
+			unsigned int start_sid_off = le32_to_cpu(qqi->StartSidOffset);
+			unsigned int sid_end;
+			struct smb_sid *sid;
+			uid_t uid;
+
+			if (check_add_overflow(start_sid_off, start_sid_len, &sid_end) ||
+			    sid_end > param_count || start_sid_len < CIFS_SID_BASE_SIZE) {
+				rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;
+				return -EINVAL;
+			}
+
+			sid = (struct smb_sid *)(params + start_sid_off);
+			ret = smb1_quota_sid_to_uid(sid, start_sid_len, &uid);
+			if (ret) {
+				rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;
+				return ret;
+			}
+
+			ret = smb1_fill_quota_info(sb, sid, start_sid_len, uid,
+						   out, le32_to_cpu(req->MaxDataCount),
+						   &written);
+			if (ret == -ENOSPC)
+				written = 0;
+			else if (ret) {
+				rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;
+				return ret;
+			}
+		}
+	}
+#endif
+
+	out_len = written;
+	smb_build_ntransact_rsp(work, 0, out_len);
+	return 0;
 }
 
 static int smb_nt_transact_set_user_quota(struct ksmbd_work *work,
 					  struct smb_com_ntransact_req *req)
 {
 	struct smb_com_ntransact_rsp *rsp = work->response_buf;
+	char *data;
+	unsigned int data_count = le32_to_cpu(req->DataCount);
+	unsigned int offset = 0;
 
-	ksmbd_debug(SMB, "NT_TRANSACT_SET_USER_QUOTA - not supported\n");
-	rsp->hdr.Status.CifsError = STATUS_NOT_SUPPORTED;
-	return -EOPNOTSUPP;
+	data = data_count ? (char *)req + le32_to_cpu(req->DataOffset) : NULL;
+
+	while (offset < data_count) {
+		struct smb1_file_quota_info *qi;
+		unsigned int sid_len, next, entry_min;
+
+		if (data_count - offset < sizeof(*qi)) {
+			rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;
+			return -EINVAL;
+		}
+
+		qi = (struct smb1_file_quota_info *)(data + offset);
+		sid_len = le32_to_cpu(qi->SidLength);
+		entry_min = sizeof(*qi) + sid_len;
+		if (sid_len < CIFS_SID_BASE_SIZE || entry_min > data_count - offset) {
+			rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;
+			return -EINVAL;
+		}
+
+		next = le32_to_cpu(qi->NextEntryOffset);
+		if (!next)
+			break;
+		if (next < ALIGN(entry_min, 8) || next > data_count - offset) {
+			rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;
+			return -EINVAL;
+		}
+		offset += next;
+	}
+
+	smb_build_ntransact_rsp(work, 0, 0);
+	return 0;
 }
 
 /**
@@ -10420,6 +11925,10 @@ int smb_nt_transact(struct ksmbd_work *work)
 	struct smb_com_ntransact_req *req = work->request_buf;
 	struct smb_com_ntransact_rsp *rsp = work->response_buf;
 	__u16 function;
+	u32 total_param = le32_to_cpu(req->TotalParameterCount);
+	u32 total_data = le32_to_cpu(req->TotalDataCount);
+	u32 param_count = le32_to_cpu(req->ParameterCount);
+	u32 data_count = le32_to_cpu(req->DataCount);
 
 	function = le16_to_cpu(req->Function);
 	ksmbd_debug(SMB, "SMB_COM_NT_TRANSACT function=0x%x\n", function);
@@ -10427,6 +11936,19 @@ int smb_nt_transact(struct ksmbd_work *work)
 	if (!work->tcon) {
 		rsp->hdr.Status.CifsError = STATUS_NETWORK_NAME_DELETED;
 		return -EINVAL;
+	}
+
+	if (total_param != param_count || total_data != data_count) {
+		int ret;
+
+		ret = smb1_nttrans_queue_primary(work);
+		if (ret == -ENOMEM)
+			rsp->hdr.Status.CifsError = STATUS_NO_MEMORY;
+		else if (ret == -E2BIG)
+			rsp->hdr.Status.CifsError = STATUS_INSUFF_SERVER_RESOURCES;
+		else
+			rsp->hdr.Status.CifsError = STATUS_INVALID_PARAMETER;
+		return ret;
 	}
 
 	switch (function) {
@@ -10455,21 +11977,99 @@ int smb_nt_transact(struct ksmbd_work *work)
 }
 
 /**
- * smb_nt_transact_secondary() - stub for SMB_COM_NT_TRANSACT_SECONDARY (0xA1)
+ * smb_nt_transact_secondary() - continue fragmented SMB_COM_NT_TRANSACT
  * @work:	smb work containing NT_TRANSACT_SECONDARY request buffer
  *
- * Multi-fragment NT_TRANSACT reassembly is not implemented.
- * Returns STATUS_NOT_SUPPORTED.
+ * Reassembles NT_TRANSACT parameter/data fragments stored by the primary
+ * request path and dispatches the completed request through smb_nt_transact().
  *
- * Return:	-EOPNOTSUPP
+ * Return:	0 on success, otherwise error
  */
 int smb_nt_transact_secondary(struct ksmbd_work *work)
 {
+	struct ksmbd_session *sess = work->sess;
+	struct smb_com_nt_transact_secondary_req *req = work->request_buf;
 	struct smb_hdr *rsp = work->response_buf;
+	struct ksmbd_smb1_nttrans_state *state;
+	char *params, *data;
+	void *assembled_req;
+	void *saved_req = work->request_buf;
+	size_t assembled_len;
+	unsigned int smb_len = get_rfc1002_len(work->request_buf);
+	u16 mid = le16_to_cpu(req->hdr.Mid);
+	int ret;
 
-	ksmbd_debug(SMB, "SMB_COM_NT_TRANSACT_SECONDARY - not implemented\n");
-	rsp->Status.CifsError = STATUS_NOT_SUPPORTED;
-	return -EOPNOTSUPP;
+	if (!sess) {
+		rsp->Status.CifsError = STATUS_NETWORK_NAME_DELETED;
+		return -EINVAL;
+	}
+
+	ret = smb1_nttrans_validate_secondary(req, smb_len, &params, &data);
+	if (ret == -E2BIG)
+		rsp->Status.CifsError = STATUS_INSUFF_SERVER_RESOURCES;
+	else if (ret)
+		rsp->Status.CifsError = STATUS_INVALID_PARAMETER;
+	if (ret)
+		return ret;
+
+	mutex_lock(&sess->smb1_nttrans_lock);
+	state = smb1_nttrans_lookup_locked(sess, mid);
+	if (!state) {
+		mutex_unlock(&sess->smb1_nttrans_lock);
+		rsp->Status.CifsError = STATUS_INVALID_PARAMETER;
+		return -ENOENT;
+	}
+
+	if (state->tid != le16_to_cpu(req->hdr.Tid) ||
+	    state->pid != le16_to_cpu(req->hdr.Pid) ||
+	    state->uid != le16_to_cpu(req->hdr.Uid) ||
+	    state->total_param_count != le32_to_cpu(req->TotalParameterCount) ||
+	    state->total_data_count != le32_to_cpu(req->TotalDataCount)) {
+		mutex_unlock(&sess->smb1_nttrans_lock);
+		rsp->Status.CifsError = STATUS_INVALID_PARAMETER;
+		return -EINVAL;
+	}
+
+	ret = smb1_nttrans_mark_received(state->param_bitmap, state->params,
+					 state->total_param_count,
+					 le32_to_cpu(req->ParameterDisplacement),
+					 params, le32_to_cpu(req->ParameterCount),
+					 &state->param_received);
+	if (!ret)
+		ret = smb1_nttrans_mark_received(state->data_bitmap, state->data,
+						 state->total_data_count,
+						 le32_to_cpu(req->DataDisplacement),
+						 data, le32_to_cpu(req->DataCount),
+						 &state->data_received);
+	if (ret) {
+		mutex_unlock(&sess->smb1_nttrans_lock);
+		rsp->Status.CifsError = STATUS_INVALID_PARAMETER;
+		return ret;
+	}
+
+	if (!smb1_nttrans_complete(state)) {
+		mutex_unlock(&sess->smb1_nttrans_lock);
+		work->send_no_response = 1;
+		return 0;
+	}
+
+	smb1_nttrans_erase_locked(sess, state);
+	mutex_unlock(&sess->smb1_nttrans_lock);
+
+	assembled_req = smb1_nttrans_build_request(state, &assembled_len);
+	if (!assembled_req) {
+		smb1_nttrans_state_free(state);
+		rsp->Status.CifsError = STATUS_NO_MEMORY;
+		return -ENOMEM;
+	}
+
+	work->request_buf = assembled_req;
+	ret = smb_nt_transact(work);
+	work->request_buf = saved_req;
+
+	kvfree(assembled_req);
+	smb1_nttrans_state_free(state);
+	return ret;
 }
 
 /**

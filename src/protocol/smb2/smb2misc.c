@@ -539,6 +539,7 @@ validate_credit:
 
 		if (credit_rc)
 			return credit_rc;
+		work->credits_accounted = true;
 	} else {
 		/*
 		 * SMB 2.0.2 doesn't support multi-credit requests
@@ -557,6 +558,7 @@ validate_credit:
 			return 2;
 		}
 		work->conn->outstanding_credits++;
+		work->credits_accounted = true;
 		spin_unlock(&work->conn->credits_lock);
 	}
 

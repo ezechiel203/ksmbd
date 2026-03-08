@@ -1447,9 +1447,12 @@ struct derivation {
 	bool binding;
 };
 
-static int generate_key(struct ksmbd_conn *conn, struct ksmbd_session *sess,
-			struct kvec label, struct kvec context, __u8 *key,
-			unsigned int key_size)
+static int generate_key_from_session_key(struct ksmbd_conn *conn,
+					 const __u8 *session_key,
+					 struct kvec label,
+					 struct kvec context,
+					 __u8 *key,
+					 unsigned int key_size)
 {
 	unsigned char zero = 0x0;
 	__u8 i[4] = {0, 0, 0, 1};
@@ -1470,7 +1473,7 @@ static int generate_key(struct ksmbd_conn *conn, struct ksmbd_session *sess,
 	}
 
 	rc = crypto_shash_setkey(CRYPTO_HMACSHA256_TFM(ctx),
-				 sess->sess_key,
+				 session_key,
 				 SMB2_NTLMV2_SESSKEY_SIZE);
 	if (rc)
 		goto smb3signkey_ret;
@@ -1535,13 +1538,23 @@ smb3signkey_ret:
 	return rc;
 }
 
+static int generate_key(struct ksmbd_conn *conn, struct ksmbd_session *sess,
+			struct kvec label, struct kvec context, __u8 *key,
+			unsigned int key_size)
+{
+	return generate_key_from_session_key(conn, sess->sess_key, label,
+					     context, key, key_size);
+}
+
 static int generate_smb3signingkey(struct ksmbd_session *sess,
 				   struct ksmbd_conn *conn,
-				   const struct derivation *signing)
+				   const struct derivation *signing,
+				   const __u8 *session_key)
 {
 	int rc;
 	struct channel *chann;
 	char *key;
+	const __u8 *base_session_key;
 
 	chann = lookup_chann_list(sess, conn);
 	if (!chann)
@@ -1551,9 +1564,12 @@ static int generate_smb3signingkey(struct ksmbd_session *sess,
 		key = chann->smb3signingkey;
 	else
 		key = sess->smb3signingkey;
+	base_session_key = session_key ? session_key :
+			 (const __u8 *)sess->sess_key;
 
-	rc = generate_key(conn, sess, signing->label, signing->context, key,
-			  SMB3_SIGN_KEY_SIZE);
+	rc = generate_key_from_session_key(conn, base_session_key,
+					   signing->label, signing->context,
+					   key, SMB3_SIGN_KEY_SIZE);
 	if (rc)
 		return rc;
 
@@ -1575,7 +1591,7 @@ int ksmbd_gen_smb30_signingkey(struct ksmbd_session *sess,
 	d.context.iov_len = 8;
 	d.binding = conn->binding;
 
-	return generate_smb3signingkey(sess, conn, &d);
+	return generate_smb3signingkey(sess, conn, &d, NULL);
 }
 
 int ksmbd_gen_smb311_signingkey(struct ksmbd_session *sess,
@@ -1583,6 +1599,7 @@ int ksmbd_gen_smb311_signingkey(struct ksmbd_session *sess,
 {
 	struct derivation d;
 	u8 preauth_hash[PREAUTH_HASHVALUE_SIZE];
+	const __u8 *session_key = sess->sess_key;
 
 	d.label.iov_base = "SMBSigningKey";
 	d.label.iov_len = 14;
@@ -1595,8 +1612,13 @@ int ksmbd_gen_smb311_signingkey(struct ksmbd_session *sess,
 			up_read(&conn->session_lock);
 			return -ENOENT;
 		}
+		if (!preauth_sess->binding_sess_key_valid) {
+			up_read(&conn->session_lock);
+			return -ENOENT;
+		}
 		memcpy(preauth_hash, preauth_sess->Preauth_HashValue,
 		       PREAUTH_HASHVALUE_SIZE);
+		session_key = preauth_sess->binding_sess_key;
 		up_read(&conn->session_lock);
 		d.context.iov_base = preauth_hash;
 	} else {
@@ -1605,7 +1627,7 @@ int ksmbd_gen_smb311_signingkey(struct ksmbd_session *sess,
 	d.context.iov_len = 64;
 	d.binding = conn->binding;
 
-	return generate_smb3signingkey(sess, conn, &d);
+	return generate_smb3signingkey(sess, conn, &d, session_key);
 }
 
 struct derivation_twin {

@@ -53,6 +53,7 @@ int smb2_resp_buf_len(struct ksmbd_work *work, unsigned short hdr2_len);
 int smb2_calc_max_out_buf_len(struct ksmbd_work *work,
 			      unsigned short hdr2_len,
 			      unsigned int out_buf_len);
+void ksmbd_smb2_finalize_async_rsp(struct ksmbd_work *work);
 
 /* Functions from smb2_create.c needed by smb2_query_set.c */
 struct smb_fattr;

@@ -47,7 +47,6 @@ int
 ksmbd_build_ntlmssp_challenge_blob(struct challenge_message *chgblob,
 				   unsigned int max_blob_sz,
 				   struct ksmbd_conn *conn);
-/* TODO: callers must be updated to pass the output buffer size as max_blob_sz */
 int ksmbd_krb5_authenticate(struct ksmbd_session *sess, char *in_blob,
 			    int in_len, char *out_blob, int *out_len);
 #ifdef CONFIG_SMB_INSECURE_SERVER

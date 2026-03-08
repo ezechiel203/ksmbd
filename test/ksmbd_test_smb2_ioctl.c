@@ -45,6 +45,8 @@
 
 /* SMB2 header size */
 #define TEST_SMB2_HEADER_SIZE	64
+#define TEST_RSS_CAPABLE	0x00000001
+#define TEST_RDMA_CAPABLE	0x00000002
 
 /* ---- Replicated logic ---- */
 
@@ -142,6 +144,20 @@ static bool test_validate_negotiate_guid(const u8 *stored, const u8 *received)
 static bool test_set_sparse_default(u32 input_count)
 {
 	return input_count == 0; /* default SetSparse=TRUE */
+}
+
+static u32 test_network_interface_capability(bool multichannel_enabled,
+					     unsigned int tx_queues,
+					     bool rdma_listener_active,
+					     bool rdma_capable)
+{
+	u32 capability = 0;
+
+	if (multichannel_enabled && tx_queues > 1)
+		capability |= TEST_RSS_CAPABLE;
+	if (rdma_listener_active && rdma_capable)
+		capability |= TEST_RDMA_CAPABLE;
+	return capability;
 }
 
 /* ---- Test Cases: IOCTL Request Validation ---- */
@@ -356,9 +372,27 @@ static void test_ioctl_network_interface_info(struct kunit *test)
 
 static void test_ioctl_network_interface_rdma_capable(struct kunit *test)
 {
-	u32 capability = 0x00000002; /* RDMA_CAPABLE */
+	u32 capability = test_network_interface_capability(false, 1, true, true);
 
-	KUNIT_EXPECT_TRUE(test, capability & 0x02);
+	KUNIT_EXPECT_TRUE(test, capability & TEST_RDMA_CAPABLE);
+}
+
+static void test_ioctl_network_interface_rss_requires_multichannel(struct kunit *test)
+{
+	u32 capability = test_network_interface_capability(false, 4, false, false);
+
+	KUNIT_EXPECT_FALSE(test, capability & TEST_RSS_CAPABLE);
+	capability = test_network_interface_capability(true, 4, false, false);
+	KUNIT_EXPECT_TRUE(test, capability & TEST_RSS_CAPABLE);
+}
+
+static void test_ioctl_network_interface_rdma_requires_listener(struct kunit *test)
+{
+	u32 capability = test_network_interface_capability(false, 1, false, true);
+
+	KUNIT_EXPECT_FALSE(test, capability & TEST_RDMA_CAPABLE);
+	capability = test_network_interface_capability(false, 1, true, false);
+	KUNIT_EXPECT_FALSE(test, capability & TEST_RDMA_CAPABLE);
 }
 
 /* ---- Test Cases: Miscellaneous ---- */
@@ -435,6 +469,8 @@ static struct kunit_case ksmbd_smb2_ioctl_test_cases[] = {
 	/* Network Interface */
 	KUNIT_CASE(test_ioctl_network_interface_info),
 	KUNIT_CASE(test_ioctl_network_interface_rdma_capable),
+	KUNIT_CASE(test_ioctl_network_interface_rss_requires_multichannel),
+	KUNIT_CASE(test_ioctl_network_interface_rdma_requires_listener),
 	/* Miscellaneous */
 	KUNIT_CASE(test_ioctl_create_or_get_object_id),
 	KUNIT_CASE(test_ioctl_is_pathname_valid),

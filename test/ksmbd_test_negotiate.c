@@ -115,6 +115,7 @@ static __le32 test_decode_compress_ctxt(struct ksmbd_conn *conn,
 	size_t algos_size;
 
 	conn->compress_algorithm = SMB3_COMPRESS_NONE;
+	conn->compress_algorithm_count = 0;
 
 	if (sizeof(struct smb2_compression_ctx) > (size_t)ctxt_len)
 		return STATUS_INVALID_PARAMETER;
@@ -131,19 +132,35 @@ static __le32 test_decode_compress_ctxt(struct ksmbd_conn *conn,
 		return STATUS_INVALID_PARAMETER;
 
 	for (i = 0; i < algo_cnt; i++) {
-		if (pneg_ctxt->CompressionAlgorithms[i] == SMB3_COMPRESS_LZ4) {
-			conn->compress_algorithm = SMB3_COMPRESS_LZ4;
-			return STATUS_SUCCESS;
+		__le16 algorithm = pneg_ctxt->CompressionAlgorithms[i];
+		bool seen = false;
+		unsigned int j;
+
+		if (algorithm != SMB3_COMPRESS_LZNT1 &&
+		    algorithm != SMB3_COMPRESS_LZ77 &&
+		    algorithm != SMB3_COMPRESS_LZ77_HUFF &&
+		    algorithm != SMB3_COMPRESS_PATTERN_V1)
+			continue;
+
+		for (j = 0; j < conn->compress_algorithm_count; j++) {
+			if (conn->compress_algorithms[j] == algorithm) {
+				seen = true;
+				break;
+			}
 		}
+
+		if (seen)
+			continue;
+		if (conn->compress_algorithm_count >=
+		    ARRAY_SIZE(conn->compress_algorithms))
+			break;
+
+		conn->compress_algorithms[conn->compress_algorithm_count++] =
+			algorithm;
 	}
 
-	for (i = 0; i < algo_cnt; i++) {
-		if (pneg_ctxt->CompressionAlgorithms[i] ==
-		    SMB3_COMPRESS_PATTERN_V1) {
-			conn->compress_algorithm = SMB3_COMPRESS_PATTERN_V1;
-			return STATUS_SUCCESS;
-		}
-	}
+	if (conn->compress_algorithm_count)
+		conn->compress_algorithm = conn->compress_algorithms[0];
 
 	return STATUS_SUCCESS;
 }
@@ -641,7 +658,7 @@ static void test_decode_compress_ctxt_zero_count(struct kunit *test)
 }
 
 /*
- * test_decode_compress_ctxt_lz4 - client offers LZ4
+ * test_decode_compress_ctxt_lz4 - client offers LZ4 only
  */
 static void test_decode_compress_ctxt_lz4(struct kunit *test)
 {
@@ -664,7 +681,8 @@ static void test_decode_compress_ctxt_lz4(struct kunit *test)
 
 	KUNIT_EXPECT_EQ(test, (__le32)STATUS_SUCCESS, status);
 	KUNIT_EXPECT_EQ(test, conn->compress_algorithm,
-			(__le16)SMB3_COMPRESS_LZ4);
+			(__le16)SMB3_COMPRESS_NONE);
+	KUNIT_EXPECT_EQ(test, conn->compress_algorithm_count, 0U);
 
 	destroy_mock_conn(conn);
 }
@@ -694,14 +712,15 @@ static void test_decode_compress_ctxt_pattern_v1(struct kunit *test)
 	KUNIT_EXPECT_EQ(test, (__le32)STATUS_SUCCESS, status);
 	KUNIT_EXPECT_EQ(test, conn->compress_algorithm,
 			(__le16)SMB3_COMPRESS_PATTERN_V1);
+	KUNIT_EXPECT_EQ(test, conn->compress_algorithm_count, 1U);
 
 	destroy_mock_conn(conn);
 }
 
 /*
- * test_decode_compress_ctxt_no_supported - unsupported algorithms only
+ * test_decode_compress_ctxt_lznt1 - client offers LZNT1
  */
-static void test_decode_compress_ctxt_no_supported(struct kunit *test)
+static void test_decode_compress_ctxt_lznt1(struct kunit *test)
 {
 	struct ksmbd_conn *conn;
 	char buf[sizeof(struct smb2_compression_ctx) + sizeof(__le16)];
@@ -716,13 +735,14 @@ static void test_decode_compress_ctxt_no_supported(struct kunit *test)
 	ctx->ContextType = SMB2_COMPRESSION_CAPABILITIES;
 	ctx->DataLength = cpu_to_le16(10);
 	ctx->CompressionAlgorithmCount = cpu_to_le16(1);
-	ctx->CompressionAlgorithms[0] = SMB3_COMPRESS_LZNT1; /* Not fully supported */
+	ctx->CompressionAlgorithms[0] = SMB3_COMPRESS_LZNT1;
 
 	status = test_decode_compress_ctxt(conn, ctx, sizeof(buf));
 
 	KUNIT_EXPECT_EQ(test, (__le32)STATUS_SUCCESS, status);
 	KUNIT_EXPECT_EQ(test, conn->compress_algorithm,
-			(__le16)SMB3_COMPRESS_NONE);
+			(__le16)SMB3_COMPRESS_LZNT1);
+	KUNIT_EXPECT_EQ(test, conn->compress_algorithm_count, 1U);
 
 	destroy_mock_conn(conn);
 }
@@ -864,7 +884,7 @@ static void test_decode_transport_cap_ctxt_supported(struct kunit *test)
 
 	test_decode_transport_cap_ctxt(conn, &ctx, sizeof(ctx));
 
-	KUNIT_EXPECT_TRUE(test, conn->transport_secured);
+	KUNIT_EXPECT_FALSE(test, conn->transport_secured);
 
 	destroy_mock_conn(conn);
 }
@@ -890,6 +910,27 @@ static void test_decode_transport_cap_ctxt_too_short(struct kunit *test)
 
 	/* Should not have been set */
 	KUNIT_EXPECT_FALSE(test, conn->transport_secured);
+
+	destroy_mock_conn(conn);
+}
+
+static void test_decode_transport_cap_ctxt_preserves_secure_transport(struct kunit *test)
+{
+	struct ksmbd_conn *conn;
+	struct smb2_transport_capabilities ctx;
+
+	conn = create_mock_conn();
+	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, conn);
+
+	conn->transport_secured = true;
+
+	memset(&ctx, 0, sizeof(ctx));
+	ctx.ContextType = SMB2_TRANSPORT_CAPABILITIES;
+	ctx.Flags = SMB2_ACCEPT_TRANSPORT_LEVEL_SECURITY;
+
+	test_decode_transport_cap_ctxt(conn, &ctx, sizeof(ctx));
+
+	KUNIT_EXPECT_TRUE(test, conn->transport_secured);
 
 	destroy_mock_conn(conn);
 }
@@ -1065,7 +1106,7 @@ static struct kunit_case ksmbd_negotiate_test_cases[] = {
 	KUNIT_CASE(test_decode_compress_ctxt_zero_count),
 	KUNIT_CASE(test_decode_compress_ctxt_lz4),
 	KUNIT_CASE(test_decode_compress_ctxt_pattern_v1),
-	KUNIT_CASE(test_decode_compress_ctxt_no_supported),
+	KUNIT_CASE(test_decode_compress_ctxt_lznt1),
 	/* decode_sign_cap_ctxt() */
 	KUNIT_CASE(test_decode_sign_cap_ctxt_zero_count),
 	KUNIT_CASE(test_decode_sign_cap_ctxt_aes_cmac),
@@ -1074,6 +1115,7 @@ static struct kunit_case ksmbd_negotiate_test_cases[] = {
 	/* decode_transport_cap_ctxt() */
 	KUNIT_CASE(test_decode_transport_cap_ctxt_supported),
 	KUNIT_CASE(test_decode_transport_cap_ctxt_too_short),
+	KUNIT_CASE(test_decode_transport_cap_ctxt_preserves_secure_transport),
 	/* decode_rdma_transform_ctxt() */
 	KUNIT_CASE(test_decode_rdma_transform_ctxt_valid),
 	KUNIT_CASE(test_decode_rdma_transform_ctxt_zero_count),

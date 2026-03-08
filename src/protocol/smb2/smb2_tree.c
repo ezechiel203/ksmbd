@@ -373,12 +373,12 @@ share_access_fallback:
 	if (ksmbd_dfs_enabled())
 		rsp->Capabilities |= SMB2_SHARE_CAP_DFS;
 	/*
-	 * MULTI-01: Advertise scale-out capability when multichannel is
-	 * enabled so that clients attempt to use additional channels
-	 * (MS-SMB2 §2.2.10, SMB2_SHARE_CAP_SCALEOUT = 0x00000020).
+	 * Note: SMB2_SHARE_CAP_SCALEOUT is for clustered (scale-out)
+	 * file servers.  It must NOT be set for single-node servers,
+	 * even with multichannel enabled.  Clients treat SCALEOUT
+	 * shares specially: downgrading oplocks to Level II and
+	 * skipping pending/replay tests.
 	 */
-	if (server_conf.flags & KSMBD_GLOBAL_FLAG_SMB3_MULTICHANNEL)
-		rsp->Capabilities |= SMB2_SHARE_CAP_SCALEOUT;
 	rsp->Reserved = 0;
 	/* M-10: set caching mode from per-share config; default is MANUAL (0) */
 	if (share)

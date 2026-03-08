@@ -162,9 +162,9 @@ static inline int create_fruit_rsp_buf(char *cc, struct ksmbd_conn *conn,
 { return -EOPNOTSUPP; }
 #endif
 struct create_context *smb2_find_context_vals(void *open_req, const char *tag, int tag_len);
-struct oplock_info *lookup_lease_in_table(struct ksmbd_conn *conn,
+struct oplock_info *lookup_lease_in_table(const char *client_guid,
 					  char *lease_key);
-int find_same_lease_key(struct ksmbd_session *sess, struct ksmbd_inode *ci,
+int find_same_lease_key(struct ksmbd_session *sess, struct inode *inode,
 			struct lease_ctx_info *lctx);
 void destroy_lease_table(struct ksmbd_conn *conn);
 void smb_send_parent_lease_break_noti(struct ksmbd_file *fp,
@@ -185,6 +185,8 @@ int ksmbd_restore_oplock(struct ksmbd_work *work, struct ksmbd_file *fp,
 			 int level, struct lease_ctx_info *lctx);
 int ksmbd_oplock_init(void);
 void ksmbd_oplock_exit(void);
+void ksmbd_lease_breaker_enter(void);
+void ksmbd_lease_breaker_exit(void);
 
 #if IS_ENABLED(CONFIG_KUNIT)
 int alloc_lease(struct oplock_info *opinfo, struct lease_ctx_info *lctx);

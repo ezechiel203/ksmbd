@@ -19,8 +19,14 @@ MODULE_IMPORT_NS("EXPORTED_FOR_KUNIT_TESTING");
 
 #include "smb2pdu.h"
 #include "smbfsctl.h"
+#include "connection.h"
 #include "ksmbd_work.h"
 #include "mgmt/user_session.h"
+
+bool ksmbd_gcm_nonce_limit_reached(struct ksmbd_session *sess);
+int fill_transform_hdr(void *tr_buf, char *old_buf,
+		       __le16 cipher_type,
+		       struct ksmbd_session *sess);
 
 /* Replicate reparse tag constants from smbfsctl.h */
 #define TEST_IO_REPARSE_TAG_LX_SYMLINK	cpu_to_le32(0xA000001D)
@@ -118,11 +124,107 @@ static void test_fill_transform_hdr_ccm(struct kunit *test)
 	kfree(old_buf);
 }
 
+static void setup_credit_test_work(struct kunit *test,
+				   struct ksmbd_work *work,
+				   struct ksmbd_conn *conn,
+				   struct smb_version_values *vals,
+				   char **req_buf,
+				   char **rsp_buf)
+{
+	struct smb2_hdr *req_hdr;
+	struct smb2_hdr *rsp_hdr;
+
+	memset(work, 0, sizeof(*work));
+	memset(conn, 0, sizeof(*conn));
+	memset(vals, 0, sizeof(*vals));
+
+	vals->max_credits = 32;
+	conn->vals = vals;
+	conn->total_credits = 32;
+	spin_lock_init(&conn->credits_lock);
+
+	*req_buf = kunit_kzalloc(test, 4 + sizeof(struct smb2_hdr), GFP_KERNEL);
+	KUNIT_ASSERT_NOT_NULL(test, *req_buf);
+	*rsp_buf = kunit_kzalloc(test, 4 + sizeof(struct smb2_hdr), GFP_KERNEL);
+	KUNIT_ASSERT_NOT_NULL(test, *rsp_buf);
+
+	req_hdr = (struct smb2_hdr *)(*req_buf + 4);
+	rsp_hdr = (struct smb2_hdr *)(*rsp_buf + 4);
+
+	req_hdr->ProtocolId = SMB2_PROTO_NUMBER;
+	req_hdr->StructureSize = SMB2_HEADER_STRUCTURE_SIZE;
+	req_hdr->Command = SMB2_READ;
+	req_hdr->CreditCharge = cpu_to_le16(1);
+	req_hdr->CreditRequest = cpu_to_le16(1);
+
+	rsp_hdr->ProtocolId = SMB2_PROTO_NUMBER;
+	rsp_hdr->StructureSize = SMB2_HEADER_STRUCTURE_SIZE;
+	rsp_hdr->Command = SMB2_READ;
+
+	work->conn = conn;
+	work->request_buf = *req_buf;
+	work->response_buf = *rsp_buf;
+}
+
+static void test_rsp_credits_send_no_response_debits_once(struct kunit *test)
+{
+	struct ksmbd_work work;
+	struct ksmbd_conn conn;
+	struct smb_version_values vals;
+	char *req_buf = NULL;
+	char *rsp_buf = NULL;
+	int rc;
+
+	setup_credit_test_work(test, &work, &conn, &vals, &req_buf, &rsp_buf);
+
+	conn.outstanding_credits = 1;
+	work.credits_accounted = true;
+	work.send_no_response = true;
+
+	rc = smb2_set_rsp_credits(&work);
+	KUNIT_EXPECT_EQ(test, rc, 0);
+	KUNIT_EXPECT_EQ(test, conn.outstanding_credits, 0U);
+	KUNIT_EXPECT_TRUE(test, work.credits_debited);
+
+	rc = smb2_set_rsp_credits(&work);
+	KUNIT_EXPECT_EQ(test, rc, 0);
+	KUNIT_EXPECT_EQ(test, conn.outstanding_credits, 0U);
+}
+
+static void test_rsp_credits_interim_then_final_debits_once(struct kunit *test)
+{
+	struct ksmbd_work work;
+	struct ksmbd_conn conn;
+	struct smb_version_values vals;
+	char *req_buf = NULL;
+	char *rsp_buf = NULL;
+	int rc;
+
+	setup_credit_test_work(test, &work, &conn, &vals, &req_buf, &rsp_buf);
+
+	conn.total_credits = 31;
+	conn.outstanding_credits = 1;
+	work.credits_accounted = true;
+
+	rc = smb2_set_rsp_credits(&work);
+	KUNIT_EXPECT_EQ(test, rc, 0);
+	KUNIT_EXPECT_EQ(test, conn.outstanding_credits, 0U);
+	KUNIT_EXPECT_TRUE(test, work.credits_debited);
+	KUNIT_EXPECT_EQ(test, conn.total_credits, 31U);
+
+	rc = smb2_set_rsp_credits(&work);
+	KUNIT_EXPECT_EQ(test, rc, 0);
+	KUNIT_EXPECT_EQ(test, conn.outstanding_credits, 0U);
+	KUNIT_EXPECT_EQ(test, conn.total_credits, 31U);
+}
+
 static struct kunit_case ksmbd_pdu_common_test_cases[] = {
 	KUNIT_CASE(test_gcm_nonce_zero_not_exhausted),
 	KUNIT_CASE(test_gcm_nonce_at_limit),
 	KUNIT_CASE(test_gcm_nonce_below_limit),
 	KUNIT_CASE(test_fill_transform_hdr_ccm),
+	KUNIT_CASE(test_rsp_credits_send_no_response_debits_once),
+	KUNIT_CASE(test_rsp_credits_interim_then_final_debits_once),
 	{}
 };
 

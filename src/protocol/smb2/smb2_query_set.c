@@ -139,7 +139,8 @@ static int smb2_get_info_file_pipe(struct ksmbd_work *work,
 	down_read(&sess->rpc_lock);
 	if (!ksmbd_session_rpc_method(sess, id)) {
 		up_read(&sess->rpc_lock);
-		return -ENOENT;
+		rsp->hdr.Status = STATUS_INVALID_HANDLE;
+		return -EINVAL;
 	}
 	up_read(&sess->rpc_lock);
 
@@ -156,6 +157,34 @@ static int smb2_get_info_file_pipe(struct ksmbd_work *work,
 		get_internal_info_pipe(rsp, id, rsp_org);
 		rc = buffer_check_err(le32_to_cpu(req->OutputBufferLength),
 				      rsp, rsp_org, 8);
+		break;
+		case FILE_PIPE_INFORMATION:
+			rc = ksmbd_pipe_get_info(work, id, rsp->Buffer,
+						 le32_to_cpu(req->OutputBufferLength),
+						 &qout_len);
+			if (rc == -ENOENT) {
+				rsp->hdr.Status = STATUS_INVALID_HANDLE;
+				rc = -EINVAL;
+			}
+			if (!rc) {
+				rsp->OutputBufferLength = cpu_to_le32(qout_len);
+				rc = buffer_check_err(le32_to_cpu(req->OutputBufferLength),
+					      rsp, rsp_org, 4);
+			}
+			break;
+		case FILE_PIPE_LOCAL_INFORMATION:
+			rc = ksmbd_pipe_get_local_info(work, id, rsp->Buffer,
+					       le32_to_cpu(req->OutputBufferLength),
+					       &qout_len);
+			if (rc == -ENOENT) {
+				rsp->hdr.Status = STATUS_INVALID_HANDLE;
+				rc = -EINVAL;
+			}
+			if (!rc) {
+				rsp->OutputBufferLength = cpu_to_le32(qout_len);
+				rc = buffer_check_err(le32_to_cpu(req->OutputBufferLength),
+					      rsp, rsp_org, 4);
+			}
 		break;
 	default:
 		rc = ksmbd_dispatch_info(work, NULL,
@@ -174,6 +203,44 @@ static int smb2_get_info_file_pipe(struct ksmbd_work *work,
 				    req->FileInfoClass);
 		}
 	}
+	return rc;
+}
+
+static bool smb2_is_pipe_set_info_class(u8 file_info_class)
+{
+	return file_info_class == FILE_PIPE_INFORMATION ||
+	       file_info_class == FILE_PIPE_REMOTE_INFORMATION;
+}
+
+static int smb2_set_info_file_pipe(struct ksmbd_work *work,
+				   struct smb2_set_info_req *req)
+{
+	unsigned int id;
+	char *set_buf;
+	unsigned int set_buf_len;
+	unsigned int consumed_len = 0;
+	int rc;
+
+	id = req->VolatileFileId;
+	set_buf = (char *)req + le16_to_cpu(req->BufferOffset);
+	set_buf_len = le32_to_cpu(req->BufferLength);
+
+	down_read(&work->sess->rpc_lock);
+	if (!ksmbd_session_rpc_method(work->sess, id)) {
+		up_read(&work->sess->rpc_lock);
+		return -EBADF;
+	}
+	up_read(&work->sess->rpc_lock);
+
+	rc = ksmbd_dispatch_info(work, NULL,
+				 SMB2_O_INFO_FILE,
+				 req->FileInfoClass,
+				 KSMBD_INFO_SET,
+				 set_buf, set_buf_len,
+				 &consumed_len);
+	if (!rc && consumed_len > set_buf_len)
+		return -EINVAL;
+
 	return rc;
 }
 
@@ -662,6 +729,16 @@ static int get_file_stream_info(struct ksmbd_work *work,
 
 	/* Zero the response buffer to prevent leaking stale heap data */
 	memset(rsp->Buffer, 0, buf_free_len);
+
+	/*
+	 * Only enumerate alternate data streams (stored as xattrs) if the
+	 * share has KSMBD_SHARE_FLAG_STREAMS enabled.  When streams are
+	 * disabled, skip straight to the default ::$DATA entry.
+	 */
+	if (!work->tcon || !work->tcon->share_conf ||
+	    !test_share_config_flag(work->tcon->share_conf,
+				    KSMBD_SHARE_FLAG_STREAMS))
+		goto out;
 
 	xattr_list_len = ksmbd_vfs_listxattr(path->dentry, &xattr_list);
 	if (xattr_list_len < 0) {
@@ -4014,6 +4091,21 @@ int smb2_set_info(struct ksmbd_work *work)
 		pid = req->PersistentFileId;
 	}
 
+	if (test_share_config_flag(work->tcon->share_conf, KSMBD_SHARE_FLAG_PIPE) &&
+	    req->InfoType == SMB2_O_INFO_FILE &&
+	    smb2_is_pipe_set_info_class(req->FileInfoClass)) {
+		rc = smb2_set_info_file_pipe(work, req);
+		if (rc < 0)
+			goto err_out;
+
+		rsp->StructureSize = cpu_to_le16(2);
+		rc = ksmbd_iov_pin_rsp(work, (void *)rsp,
+				       sizeof(struct smb2_set_info_rsp));
+		if (rc)
+			goto err_out;
+		return 0;
+	}
+
 	fp = ksmbd_lookup_fd_slow(work, id, pid);
 	if (!fp) {
 		ksmbd_debug(SMB, "Invalid id for close: %u\n", id);
@@ -4022,9 +4114,9 @@ int smb2_set_info(struct ksmbd_work *work)
 	}
 
 	/* MS-SMB2 §3.3.5.2.10: validate ChannelSequence */
-	if (smb2_check_channel_sequence(work, fp)) {
+	rc = smb2_check_channel_sequence(work, fp);
+	if (rc) {
 		rsp->hdr.Status = STATUS_FILE_NOT_AVAILABLE;
-		rc = -EAGAIN;
 		goto err_out;
 	}
 
@@ -4123,30 +4215,35 @@ int smb2_set_info(struct ksmbd_work *work)
 	return 0;
 
 err_out:
-	if (rc == -EACCES || rc == -EPERM || rc == -EXDEV)
-		rsp->hdr.Status = STATUS_ACCESS_DENIED;
-	else if (rc == -EINVAL)
-		rsp->hdr.Status = STATUS_INVALID_PARAMETER;
-	else if (rc == -EMSGSIZE)
-		rsp->hdr.Status = STATUS_INFO_LENGTH_MISMATCH;
-	else if (rc == -ESHARE)
-		rsp->hdr.Status = STATUS_SHARING_VIOLATION;
-	else if (rc == -ENOENT)
-		rsp->hdr.Status = STATUS_OBJECT_NAME_INVALID;
-	else if (rc == -EBUSY || rc == -ENOTEMPTY)
-		rsp->hdr.Status = STATUS_DIRECTORY_NOT_EMPTY;
-	else if (rc == -EAGAIN)
-		rsp->hdr.Status = STATUS_FILE_LOCK_CONFLICT;
-	else if (rc == -EBADF || rc == -ESTALE)
-		rsp->hdr.Status = STATUS_INVALID_HANDLE;
-	else if (rc == -EROFS)
-		rsp->hdr.Status = STATUS_CANNOT_DELETE;
-	else if (rc == -EEXIST)
-		rsp->hdr.Status = STATUS_OBJECT_NAME_COLLISION;
-	else if (rsp->hdr.Status == 0 || rc == -EOPNOTSUPP)
-		rsp->hdr.Status = STATUS_INVALID_INFO_CLASS;
+	if (rsp->hdr.Status == 0) {
+		if (rc == -EACCES || rc == -EPERM || rc == -EXDEV)
+			rsp->hdr.Status = STATUS_ACCESS_DENIED;
+		else if (rc == -EINVAL)
+			rsp->hdr.Status = STATUS_INVALID_PARAMETER;
+		else if (rc == -EMSGSIZE)
+			rsp->hdr.Status = STATUS_INFO_LENGTH_MISMATCH;
+		else if (rc == -ESHARE)
+			rsp->hdr.Status = STATUS_SHARING_VIOLATION;
+		else if (rc == -ENOENT)
+			rsp->hdr.Status = STATUS_OBJECT_NAME_INVALID;
+		else if (rc == -EBUSY || rc == -ENOTEMPTY)
+			rsp->hdr.Status = STATUS_DIRECTORY_NOT_EMPTY;
+		else if (rc == -EAGAIN)
+			rsp->hdr.Status = STATUS_FILE_LOCK_CONFLICT;
+		else if (rc == -EBADF || rc == -ESTALE)
+			rsp->hdr.Status = STATUS_INVALID_HANDLE;
+		else if (rc == -EROFS)
+			rsp->hdr.Status = STATUS_CANNOT_DELETE;
+		else if (rc == -EEXIST)
+			rsp->hdr.Status = STATUS_OBJECT_NAME_COLLISION;
+		else if (rc == -EOPNOTSUPP)
+			rsp->hdr.Status = STATUS_INVALID_INFO_CLASS;
+		else
+			rsp->hdr.Status = STATUS_INVALID_INFO_CLASS;
+	}
 	smb2_set_err_rsp(work);
-	ksmbd_fd_put(work, fp);
+	if (fp)
+		ksmbd_fd_put(work, fp);
 	ksmbd_debug(SMB, "error while processing smb2 query rc = %d\n", rc);
 	return rc;
 }

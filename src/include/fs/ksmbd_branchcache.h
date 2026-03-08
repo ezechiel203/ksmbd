@@ -15,13 +15,7 @@
 
 struct ksmbd_file;
 struct ksmbd_work;
-
-/* SRV_READ_HASH constants per MS-SMB2 section 2.2.31.2 */
-#define SRV_HASH_VER_1			0x00000001
-#define SRV_HASH_VER_2			0x00000002
-#define SRV_HASH_TYPE_PEER_DIST		0x00000001
-#define SRV_HASH_RETRIEVE_HASH_BASED	0x00000001
-#define SRV_HASH_RETRIEVE_FILE_BASED	0x00000002
+struct srv_read_hash_req;
 
 /* MS-PCCRC segment size: 64KB per block/segment for hashing */
 #define PCCRC_SEGMENT_SIZE		(64 * 1024)
@@ -31,19 +25,6 @@ struct ksmbd_work;
 
 /* Read buffer size for kernel_read() during hashing */
 #define PCCRC_READ_BUF_SIZE		4096
-
-/*
- * SRV_READ_HASH request structure (MS-SMB2 2.2.31.2)
- *
- * This is the input buffer within FSCTL_SRV_READ_HASH.
- */
-struct srv_read_hash_req {
-	__le32 HashType;		/* Must be SRV_HASH_TYPE_PEER_DIST */
-	__le32 HashVersion;		/* SRV_HASH_VER_1 or SRV_HASH_VER_2 */
-	__le32 HashRetrievalType;	/* FILE_BASED or HASH_BASED */
-	__le32 Length;			/* Length of data range to hash */
-	__le64 Offset;			/* Starting offset in file */
-} __packed;
 
 /*
  * SRV_HASH_RETRIEVE_FILE_BASED response header (MS-SMB2 2.2.32.4.1)

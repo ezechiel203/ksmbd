@@ -1398,6 +1398,22 @@ int smb2_open(struct ksmbd_work *work)
 			goto err_out2;
 		}
 
+		if (strstr(name, "/.") != NULL || !strcmp(name, ".") ||
+		    !strcmp(name, "..")) {
+			char *normalized;
+
+			normalized = ksmbd_normalize_path(name);
+			if (IS_ERR(normalized)) {
+				rsp->hdr.Status = STATUS_OBJECT_PATH_SYNTAX_BAD;
+				rc = PTR_ERR(normalized);
+				goto err_out2;
+			}
+
+			kfree(name);
+			name = normalized;
+			ksmbd_debug(SMB, "normalized create name = %s\n", name);
+		}
+
 		/*
 		 * Handle NTFS metadata fake files:
 		 * $Extend\$Quota:$Q:$INDEX_ALLOCATION is a special
@@ -1424,7 +1440,7 @@ int smb2_open(struct ksmbd_work *work)
 			if (strchr(name, ':')) {
 				if (!test_share_config_flag(work->tcon->share_conf,
 							KSMBD_SHARE_FLAG_STREAMS)) {
-					rc = -EBADF;
+					rc = -ENOENT;
 					goto err_out2;
 				}
 				is_stream_path = true;
@@ -1667,6 +1683,19 @@ int smb2_open(struct ksmbd_work *work)
 
 			fp = dh_info.fp;
 			file_info = FILE_OPENED;
+
+			/*
+			 * MS-SMB2 §3.3.5.9.7 step 14: if the handle
+			 * has DELETE_ON_CLOSE set, clear the durable
+			 * flag so the handle is no longer preserved
+			 * on disconnect.  Suppress the DHnQ/DH2Q
+			 * response context.
+			 */
+			if (fp->is_delete_on_close) {
+				fp->is_durable = false;
+				fp->is_persistent = false;
+				dh_info.type = 0;
+			}
 
 			rc = ksmbd_vfs_getattr(&fp->filp->f_path, &stat);
 			if (rc)
@@ -2109,6 +2138,29 @@ int smb2_open(struct ksmbd_work *work)
 		}
 	}
 
+	/*
+	 * MS-SMB2 §3.3.5.9: Before opening the file, purge any
+	 * disconnected durable handles with DELETE_ON_CLOSE.
+	 * The disconnected handle's close triggers file deletion,
+	 * so the subsequent open creates a fresh file.
+	 */
+	if (file_present &&
+	    ksmbd_purge_disconnected_doc(path.dentry)) {
+		/*
+		 * At least one DOC handle was purged and the file
+		 * may have been deleted.  Re-check file existence.
+		 */
+		if (d_is_negative(path.dentry) || d_unhashed(path.dentry)) {
+			path_put(&path);
+			file_present = false;
+			/* Recompute open_flags for file creation */
+			open_flags = smb2_create_open_flags(false, daccess,
+					req->CreateDisposition,
+					&may_flags,
+					req->CreateOptions, 0);
+		}
+	}
+
 	/*create file if not present */
 	if (!file_present) {
 		/*
@@ -2251,7 +2303,10 @@ int smb2_open(struct ksmbd_work *work)
 	}
 
 	rc = 0;
+
+	ksmbd_lease_breaker_enter();
 	filp = dentry_open(&path, open_flags, current_cred());
+	ksmbd_lease_breaker_exit();
 	if (IS_ERR(filp)) {
 		rc = PTR_ERR(filp);
 		pr_err("dentry open for dir failed, rc %d\n", rc);
@@ -2532,7 +2587,8 @@ int smb2_open(struct ksmbd_work *work)
 			ksmbd_debug(SMB,
 				    "lease req for(%s) req oplock state 0x%x, lease state 0x%x\n",
 				    name, req_op_level, lc->req_state);
-			rc = find_same_lease_key(sess, fp->f_ci, lc);
+			rc = find_same_lease_key(sess, file_inode(fp->filp),
+						 lc);
 			if (rc)
 				goto err_out1;
 		} else if (open_flags == O_RDONLY &&
@@ -2818,6 +2874,25 @@ continue_create: ;
 	else
 		smb2_new_xattrs(tcon, &fp->filp->f_path, fp);
 
+	/*
+	 * MS-SMB2: When "hide dot files" is enabled on the share,
+	 * files whose name starts with '.' get FILE_ATTRIBUTE_HIDDEN
+	 * applied automatically.  This matches Samba behavior and is
+	 * tested by smb2.dosmode.
+	 */
+	if (test_share_config_flag(tcon->share_conf,
+				   KSMBD_SHARE_FLAG_HIDE_DOT_FILES)) {
+		const char *basename = name ? strrchr(name, '/') : NULL;
+
+		if (basename)
+			basename++;
+		else
+			basename = name;
+
+		if (basename && basename[0] == '.')
+			fp->f_ci->m_fattr |= ATTR_HIDDEN_LE;
+	}
+
 	/* CN-SUPPRESS: all init xattr writes are done; clear the suppress flag. */
 	work->notify_suppress = false;
 
@@ -3098,7 +3173,7 @@ err_out2:
 		ksmbd_update_fstate(&work->sess->file_table, fp, FP_INITED);
 		rc = ksmbd_iov_pin_rsp(work, (void *)rsp, iov_len);
 	}
-		if (rc) {
+	if (rc) {
 		/* If status was pre-set (e.g. STATUS_CANNOT_DELETE), keep it */
 		if (rsp->hdr.Status == STATUS_SUCCESS) {
 			if (rc == -EINVAL)

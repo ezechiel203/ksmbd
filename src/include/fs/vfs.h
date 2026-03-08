@@ -17,6 +17,8 @@
 #include "smbacl.h"
 #include "xattr.h"
 
+struct ksmbd_conn;
+
 /*
  * Enumeration for stream type.
  */
@@ -105,6 +107,7 @@ struct ksmbd_readdir_data {
 	unsigned int		dirent_count;
 	unsigned int		file_attr;
 	struct unicode_map	*um;
+	struct ksmbd_conn	*conn;  /* for mangled name resolution */
 };
 
 /* ksmbd kstat wrapper to get valid create time when reading dir entry */

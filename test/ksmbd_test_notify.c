@@ -21,6 +21,9 @@ MODULE_IMPORT_NS("EXPORTED_FOR_KUNIT_TESTING");
 
 extern bool ksmbd_notify_take_work(struct ksmbd_work *work, int state);
 extern bool ksmbd_notify_claim_cancel_work(struct ksmbd_work *work);
+extern size_t ksmbd_notify_max_data(struct ksmbd_work *work, u32 output_buf_len);
+extern bool ksmbd_notify_mark_can_destroy(struct ksmbd_notify_watch *watch,
+					  struct fsnotify_group *group);
 
 /* ═══════════════════════════════════════════════════════════════════
  *  Notify Data Structure Tests
@@ -59,6 +62,8 @@ static void test_notify_watch_struct_init(struct kunit *test)
 	KUNIT_EXPECT_EQ(test, watch->output_buf_len, 4096U);
 	KUNIT_EXPECT_FALSE(test, watch->completed);
 	KUNIT_EXPECT_FALSE(test, watch->has_mark);
+	KUNIT_EXPECT_FALSE(test, watch->mark_cleanup_started);
+	KUNIT_EXPECT_FALSE(test, watch->enum_dir_sticky);
 	KUNIT_EXPECT_EQ(test, watch->buffered_count, 0U);
 }
 
@@ -426,6 +431,96 @@ static void test_notify_claim_cancel_rejects_closed(struct kunit *test)
 	KUNIT_EXPECT_EQ(test, work.state, (unsigned char)KSMBD_WORK_CLOSED);
 }
 
+static void test_notify_max_data_caps_to_output_len(struct kunit *test)
+{
+	struct ksmbd_work work = {};
+
+	work.response_sz = 512;
+	KUNIT_EXPECT_EQ(test, ksmbd_notify_max_data(&work, 64), (size_t)64);
+}
+
+static void test_notify_max_data_caps_to_response_buf(struct kunit *test)
+{
+	struct ksmbd_work work = {};
+
+	work.response_sz = 128;
+	KUNIT_EXPECT_EQ(test, ksmbd_notify_max_data(&work, 4096), (size_t)52);
+}
+
+static void test_notify_max_data_zero_when_buffer_too_small(struct kunit *test)
+{
+	struct ksmbd_work work = {};
+
+	work.response_sz = 76;
+	KUNIT_EXPECT_EQ(test, ksmbd_notify_max_data(&work, 4096), (size_t)0);
+}
+
+static void test_notify_mark_can_destroy_when_attached(struct kunit *test)
+{
+	struct ksmbd_notify_watch watch = {};
+	struct fsnotify_group group = {};
+	struct fsnotify_mark_connector connector = {};
+
+	watch.has_mark = true;
+	spin_lock_init(&watch.mark.lock);
+	watch.mark.group = &group;
+	watch.mark.connector = &connector;
+	watch.mark.flags = FSNOTIFY_MARK_FLAG_ALIVE |
+			   FSNOTIFY_MARK_FLAG_ATTACHED;
+
+	KUNIT_EXPECT_TRUE(test, ksmbd_notify_mark_can_destroy(&watch, &group));
+}
+
+static void test_notify_mark_can_destroy_rejects_detached(struct kunit *test)
+{
+	struct ksmbd_notify_watch watch = {};
+	struct fsnotify_group group = {};
+	struct fsnotify_mark_connector connector = {};
+
+	watch.has_mark = true;
+	spin_lock_init(&watch.mark.lock);
+	watch.mark.group = &group;
+	watch.mark.connector = &connector;
+	watch.mark.flags = FSNOTIFY_MARK_FLAG_ALIVE;
+
+	KUNIT_EXPECT_FALSE(test, ksmbd_notify_mark_can_destroy(&watch, &group));
+}
+
+static void test_notify_mark_can_destroy_rejects_missing_connector(
+		struct kunit *test)
+{
+	struct ksmbd_notify_watch watch = {};
+	struct fsnotify_group group = {};
+
+	watch.has_mark = true;
+	spin_lock_init(&watch.mark.lock);
+	watch.mark.group = &group;
+	watch.mark.flags = FSNOTIFY_MARK_FLAG_ALIVE |
+			   FSNOTIFY_MARK_FLAG_ATTACHED;
+
+	KUNIT_EXPECT_FALSE(test, ksmbd_notify_mark_can_destroy(&watch, &group));
+}
+
+static void test_notify_mark_can_destroy_rejects_group_mismatch(
+		struct kunit *test)
+{
+	struct ksmbd_notify_watch watch = {};
+	struct fsnotify_group mark_group = {};
+	struct fsnotify_group other_group = {};
+	struct fsnotify_mark_connector connector = {};
+
+	watch.has_mark = true;
+	spin_lock_init(&watch.mark.lock);
+	watch.mark.group = &mark_group;
+	watch.mark.connector = &connector;
+	watch.mark.flags = FSNOTIFY_MARK_FLAG_ALIVE |
+			   FSNOTIFY_MARK_FLAG_ATTACHED;
+
+	KUNIT_EXPECT_FALSE(test,
+			   ksmbd_notify_mark_can_destroy(&watch,
+							 &other_group));
+}
+
 /* ═══════════════════════════════════════════════════════════════════
  *  All-Filters Combined Test
  * ═══════════════════════════════════════════════════════════════════ */
@@ -496,6 +591,13 @@ static struct kunit_case ksmbd_notify_test_cases[] = {
 	KUNIT_CASE(test_notify_take_work_only_from_active),
 	KUNIT_CASE(test_notify_claim_cancel_accepts_precancelled),
 	KUNIT_CASE(test_notify_claim_cancel_rejects_closed),
+	KUNIT_CASE(test_notify_max_data_caps_to_output_len),
+	KUNIT_CASE(test_notify_max_data_caps_to_response_buf),
+	KUNIT_CASE(test_notify_max_data_zero_when_buffer_too_small),
+	KUNIT_CASE(test_notify_mark_can_destroy_when_attached),
+	KUNIT_CASE(test_notify_mark_can_destroy_rejects_detached),
+	KUNIT_CASE(test_notify_mark_can_destroy_rejects_missing_connector),
+	KUNIT_CASE(test_notify_mark_can_destroy_rejects_group_mismatch),
 	/* All filters combined */
 	KUNIT_CASE(test_notify_all_filters_combined),
 	{}

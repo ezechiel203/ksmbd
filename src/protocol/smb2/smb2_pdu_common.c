@@ -81,14 +81,14 @@ void __wbuf(struct ksmbd_work *work, void **req, void **rsp)
  * behind the last one seen on this open, the request is stale (e.g. a
  * retransmit after channel failover) and must be rejected.
  *
- * Return: 0 on success, -EAGAIN if the request should return
- *         STATUS_FILE_NOT_AVAILABLE to the client.
+ * Return: 0 on success (process normally),
+ *         -EAGAIN if the request should return STATUS_FILE_NOT_AVAILABLE.
  */
 int smb2_check_channel_sequence(struct ksmbd_work *work, struct ksmbd_file *fp)
 {
 	struct smb2_hdr *hdr = ksmbd_req_buf_next(work);
 	__u16 req_seq;
-	s16 diff;
+	u16 diff;
 
 	/* ChannelSequence only applies to SMB 3.x dialects (MS-SMB2 §3.3.5.2.10) */
 	if (work->conn->dialect < SMB30_PROT_ID)
@@ -102,20 +102,77 @@ int smb2_check_channel_sequence(struct ksmbd_work *work, struct ksmbd_file *fp)
 	req_seq = (__u16)le32_to_cpu(hdr->Status);
 
 	spin_lock(&fp->f_lock);
-	diff = (s16)(req_seq - fp->channel_sequence);
-	if (diff < 0) {
+	/*
+	 * Unsigned modular subtraction: diff wraps correctly for all
+	 * 16-bit sequence numbers.  Values in (0, 0x7FFF] mean req_seq
+	 * is ahead (accept and advance).  Values > 0x7FFF mean req_seq
+	 * is behind (stale / replay).
+	 */
+	diff = (u16)(req_seq - fp->channel_sequence);
+	if (diff > 0x7FFF) {
 		/* Stale request: ChannelSequence is behind the open's last seen */
 		spin_unlock(&fp->f_lock);
 		pr_warn_ratelimited("ChannelSequence stale: req=%u open=%u\n",
 				    req_seq, fp->channel_sequence);
 		return -EAGAIN;
 	}
+	/*
+	 * MS-SMB2 §3.3.5.2.10: For non-CREATE state-modifying requests,
+	 * the REPLAY flag is ignored.  Same CSN (diff==0) means process
+	 * normally; ahead CSN (diff>0) means advance and process normally.
+	 * There is no cached-replay path for WRITE/SET_INFO/LOCK/IOCTL/FLUSH.
+	 */
 	if (diff > 0)
 		fp->channel_sequence = req_seq;
 	spin_unlock(&fp->f_lock);
 	return 0;
 }
 EXPORT_SYMBOL_IF_KUNIT(smb2_check_channel_sequence);
+
+/**
+ * smb2_update_channel_sequence() - advance Open.ChannelSequence for non-state-modifying ops
+ * @work: smb work containing the request
+ * @fp:   open file handle
+ *
+ * MS-SMB2 §3.3.5.2.10: Even for non-state-modifying requests (e.g. READ),
+ * the server must update Open.ChannelSequence when the request carries a
+ * higher sequence number.  Unlike smb2_check_channel_sequence(), stale
+ * CSN is silently ignored (no rejection).
+ */
+void smb2_update_channel_sequence(struct ksmbd_work *work, struct ksmbd_file *fp)
+{
+	struct smb2_hdr *hdr = ksmbd_req_buf_next(work);
+	__u16 req_seq;
+	u16 diff;
+
+	if (work->conn->dialect < SMB30_PROT_ID)
+		return;
+
+	req_seq = (__u16)le32_to_cpu(hdr->Status);
+
+	spin_lock(&fp->f_lock);
+	diff = (u16)(req_seq - fp->channel_sequence);
+	if (diff > 0 && diff <= 0x7FFF)
+		fp->channel_sequence = req_seq;
+	spin_unlock(&fp->f_lock);
+}
+
+/**
+ * smb2_chan_cache_save() - save response status for channel sequence replay
+ * @fp:     open file handle
+ * @status: NT status to cache (in __le32 format)
+ *
+ * Called after successfully processing a state-modifying command to
+ * record the result for future replay detection.
+ */
+void smb2_chan_cache_save(struct ksmbd_file *fp, __le32 status)
+{
+	spin_lock(&fp->chan_cache.lock);
+	fp->chan_cache.seq = fp->channel_sequence;
+	fp->chan_cache.status = status;
+	fp->chan_cache.valid = true;
+	spin_unlock(&fp->chan_cache.lock);
+}
 
 struct channel *lookup_chann_list(struct ksmbd_session *sess, struct ksmbd_conn *conn)
 {
@@ -400,25 +457,48 @@ int init_smb2_neg_rsp(struct ksmbd_work *work)
  */
 int smb2_set_rsp_credits(struct ksmbd_work *work)
 {
-	struct smb2_hdr *req_hdr = ksmbd_req_buf_next(work);
+	struct smb2_hdr *req_hdr;
 	struct smb2_hdr *hdr = ksmbd_resp_buf_next(work);
 	struct ksmbd_conn *conn = work->conn;
 	unsigned short credits_requested;
 	unsigned short credit_charge, credits_granted = 0;
 
+	/*
+	 * Async/generated works (for example helper responses emitted outside
+	 * the normal request dispatch path) do not carry a request buffer and
+	 * therefore cannot participate in the request-credit debit/grant
+	 * accounting. Leave CreditResponse at zero and return quietly.
+	 */
+	if (!work->request_buf) {
+		hdr->CreditRequest = 0;
+		return 0;
+	}
+
+	req_hdr = ksmbd_req_buf_next(work);
+
 	credit_charge = max_t(unsigned short,
 			      le16_to_cpu(req_hdr->CreditCharge), 1);
 
-	/* TC-04: send_no_response means no response is sent, so outstanding_credits
-	 * must be decremented here since smb2_set_rsp_credits won't process credits.
+	/*
+	 * TC-04: send_no_response means no response is sent, so
+	 * outstanding_credits must be decremented here since the normal
+	 * credit grant path won't run.
+	 *
+	 * However, if credits_granted > 0, the handler already called
+	 * set_rsp_credits() for an interim response (e.g. async NOTIFY
+	 * or pipe read) and the credit charge was already debited.
+	 * Skip the debit to avoid underflow.
 	 */
 	if (work->send_no_response) {
-		spin_lock(&conn->credits_lock);
-		if (credit_charge > conn->outstanding_credits)
-			conn->outstanding_credits = 0;
-		else
-			conn->outstanding_credits -= credit_charge;
-		spin_unlock(&conn->credits_lock);
+		if (work->credits_accounted && !work->credits_debited) {
+			spin_lock(&conn->credits_lock);
+			if (credit_charge > conn->outstanding_credits)
+				conn->outstanding_credits = 0;
+			else
+				conn->outstanding_credits -= credit_charge;
+			spin_unlock(&conn->credits_lock);
+			work->credits_debited = true;
+		}
 		return 0;
 	}
 
@@ -444,12 +524,23 @@ int smb2_set_rsp_credits(struct ksmbd_work *work)
 	}
 
 	conn->total_credits -= credit_charge;
-	if (credit_charge > conn->outstanding_credits) {
-		pr_err_ratelimited("Outstanding credits underflow: charge %u, outstanding %u\n",
-		       credit_charge, conn->outstanding_credits);
-		conn->outstanding_credits = 0;
-	} else {
-		conn->outstanding_credits -= credit_charge;
+	/*
+	 * Only debit outstanding_credits once per work.  The validate
+	 * path (smb2_validate_credit_charge) increments outstanding
+	 * once per compound packet, but set_rsp_credits is called for
+	 * each sub-response.  Also, async works call set_rsp_credits
+	 * for both the interim and final response.  Guard with
+	 * credits_debited to prevent underflow in both cases.
+	 */
+	if (work->credits_accounted && !work->credits_debited) {
+		if (credit_charge > conn->outstanding_credits) {
+			pr_err_ratelimited("Outstanding credits underflow: charge %u, outstanding %u\n",
+				credit_charge, conn->outstanding_credits);
+			conn->outstanding_credits = 0;
+		} else {
+			conn->outstanding_credits -= credit_charge;
+		}
+		work->credits_debited = true;
 	}
 	credits_requested = max_t(unsigned short,
 				  le16_to_cpu(req_hdr->CreditRequest), 1);
@@ -772,6 +863,10 @@ int init_smb2_rsp_hdr(struct ksmbd_work *work)
 	rsp_hdr->Id.SyncId.ProcessId = rcv_hdr->Id.SyncId.ProcessId;
 	rsp_hdr->Id.SyncId.TreeId = rcv_hdr->Id.SyncId.TreeId;
 	rsp_hdr->SessionId = rcv_hdr->SessionId;
+	if (work->asynchronous) {
+		rsp_hdr->Flags |= SMB2_FLAGS_ASYNC_COMMAND;
+		rsp_hdr->Id.AsyncId = cpu_to_le64(work->async_id);
+	}
 	memcpy(rsp_hdr->Signature, rcv_hdr->Signature, 16);
 
 	return 0;
@@ -932,6 +1027,14 @@ int setup_async_work(struct ksmbd_work *work, void (*fn)(void **), void **arg)
 	int id;
 	unsigned int max_async = READ_ONCE(server_conf.max_async_credits);
 
+	if (work->asynchronous) {
+		if (!work->cancel_fn)
+			work->cancel_fn = fn;
+		if (!work->cancel_argv)
+			work->cancel_argv = arg;
+		return 0;
+	}
+
 	/*
 	 * Enforce the max async credits limit.  When the number of
 	 * outstanding async operations reaches the limit, reject
@@ -1017,7 +1120,6 @@ void smb2_send_interim_resp(struct ksmbd_work *work, __le32 status)
 	rsp_hdr->Id.AsyncId = cpu_to_le64(work->async_id);
 	smb2_set_err_rsp(in_work);
 	rsp_hdr->Status = status;
-
 	/* Encrypt the interim response if the session requires encryption */
 	if (in_work->sess && in_work->sess->enc && in_work->encrypted &&
 	    conn->ops->encrypt_resp) {
@@ -1069,11 +1171,14 @@ int smb2_get_dos_mode(struct kstat *stat, int attribute)
 		attr = ATTR_DIRECTORY |
 			(attribute & (ATTR_HIDDEN | ATTR_SYSTEM));
 	} else {
-		attr = (attribute & 0x00005137) | ATTR_ARCHIVE;
+		attr = (attribute & 0x00005937) | ATTR_ARCHIVE;
 		attr &= ~(ATTR_DIRECTORY);
 
 		if (smb2_get_reparse_tag_special_file(stat->mode))
 			attr |= ATTR_REPARSE;
+
+		if (!attr)
+			attr = ATTR_NORMAL;
 	}
 
 	return attr;
@@ -1180,8 +1285,12 @@ int smb2_check_sign_req(struct ksmbd_work *work)
 	iov[0].iov_len = len;
 
 	if (ksmbd_sign_smb2_pdu(work->conn, work->sess->sess_key, iov, 1,
-				signature))
+				signature)) {
+		memcpy(hdr->Signature, signature_req, SMB2_SIGNATURE_SIZE);
 		return 0;
+	}
+
+	memcpy(hdr->Signature, signature_req, SMB2_SIGNATURE_SIZE);
 
 	if (crypto_memneq(signature, signature_req, SMB2_SIGNATURE_SIZE)) {
 		pr_err_ratelimited("bad smb2 signature\n");
@@ -1315,21 +1424,25 @@ int smb3_check_sign_req(struct ksmbd_work *work)
 	if (conn->signing_algorithm == SIGNING_ALG_AES_GMAC) {
 		if (ksmbd_sign_smb3_pdu_gmac(conn, signing_key, iov, 1,
 					      signature)) {
+			memcpy(hdr->Signature, signature_req, SMB2_SIGNATURE_SIZE);
 			memzero_explicit(signing_key, SMB3_SIGN_KEY_SIZE);
 			return 0;
 		}
 	} else if (conn->signing_algorithm == SIGNING_ALG_HMAC_SHA256) {
 		if (ksmbd_sign_smb2_pdu(conn, signing_key, iov, 1, signature)) {
+			memcpy(hdr->Signature, signature_req, SMB2_SIGNATURE_SIZE);
 			memzero_explicit(signing_key, SMB3_SIGN_KEY_SIZE);
 			return 0;
 		}
 	} else {
 		if (ksmbd_sign_smb3_pdu(conn, signing_key, iov, 1, signature)) {
+			memcpy(hdr->Signature, signature_req, SMB2_SIGNATURE_SIZE);
 			memzero_explicit(signing_key, SMB3_SIGN_KEY_SIZE);
 			return 0;
 		}
 	}
 
+	memcpy(hdr->Signature, signature_req, SMB2_SIGNATURE_SIZE);
 	memzero_explicit(signing_key, SMB3_SIGN_KEY_SIZE);
 
 	if (crypto_memneq(signature, signature_req, SMB2_SIGNATURE_SIZE)) {
@@ -1358,9 +1471,15 @@ void smb3_set_sign_rsp(struct ksmbd_work *work)
 
 	hdr = ksmbd_resp_buf_curr(work);
 
-	if (conn->binding == false &&
-	    le16_to_cpu(hdr->Command) == SMB2_SESSION_SETUP_HE) {
-		signing_key = work->sess->smb3signingkey;
+	if (le16_to_cpu(hdr->Command) == SMB2_SESSION_SETUP_HE) {
+		if (hdr->Status != STATUS_SUCCESS) {
+			signing_key = work->sess->smb3signingkey;
+		} else {
+			chann = lookup_chann_list(work->sess, work->conn);
+			if (!chann)
+				return;
+			signing_key = chann->smb3signingkey;
+		}
 	} else {
 		chann = lookup_chann_list(work->sess, work->conn);
 		if (!chann) {
@@ -1407,8 +1526,37 @@ void smb3_set_sign_rsp(struct ksmbd_work *work)
 	else
 		rc = ksmbd_sign_smb3_pdu(conn, signing_key, iov, n_vec,
 					 signature);
+
 	if (!rc)
 		memcpy(hdr->Signature, signature, SMB2_SIGNATURE_SIZE);
+}
+
+void ksmbd_smb2_finalize_async_rsp(struct ksmbd_work *work)
+{
+	struct smb2_hdr *hdr;
+
+	if (!work || !work->response_buf || !work->conn || !work->sess)
+		return;
+
+	hdr = ksmbd_resp_buf_curr(work);
+
+	/*
+	 * Unsolicited server->client notifications still belong to a real
+	 * session and must carry that SessionId when signed or encrypted.
+	 */
+	if (!hdr->SessionId)
+		hdr->SessionId = cpu_to_le64(work->sess->id);
+
+	if (work->sess->sign && work->conn->ops->set_sign_rsp)
+		work->conn->ops->set_sign_rsp(work);
+
+	if (work->sess->enc && work->conn->ops->encrypt_resp) {
+		int rc = work->conn->ops->encrypt_resp(work);
+
+		if (rc < 0)
+			pr_err_ratelimited("async SMB2 response encryption failed: %d\n",
+					   rc);
+	}
 }
 
 /**

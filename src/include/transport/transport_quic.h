@@ -74,13 +74,13 @@
  * main ksmbd SMBD_GENL family to keep concerns isolated.
  *
  * Commands:
- *   KSMBD_QUIC_CMD_UNSPEC          - unused placeholder
+ *   KSMBD_QUIC_CMD_REGISTER         - userspace daemon registration
  *   KSMBD_QUIC_CMD_HANDSHAKE_REQ   - kernel → userspace: send ClientHello
  *   KSMBD_QUIC_CMD_HANDSHAKE_RSP   - userspace → kernel: return keys + flight
  *
- * Attribute policy: each command carries a single NLA_BINARY attribute
- * (same index as the command) whose payload is the corresponding struct
- * defined below.
+ * Attribute policy: all commands carry a single NLA_BINARY attribute at
+ * index KSMBD_QUIC_ATTR_PAYLOAD whose payload is the corresponding
+ * struct defined below.
  */
 #define KSMBD_QUIC_GENL_NAME		"SMBD_QUIC"
 #define KSMBD_QUIC_GENL_VERSION		1
@@ -97,6 +97,7 @@
 #define KSMBD_QUIC_MAX_HS_DATA		8192
 
 /* Max key / IV sizes (accommodate AES-128-GCM and AES-256-GCM). */
+#define KSMBD_QUIC_MAX_CID_LEN		20
 #define KSMBD_QUIC_KEY_SIZE		32
 #define KSMBD_QUIC_IV_SIZE		12
 
@@ -116,6 +117,9 @@
  * @conn_id:            64-bit connection identifier (DCID bytes as u64, BE)
  * @peer_addr:          Peer's IPv4-mapped-IPv6 address (16 bytes, net order)
  * @peer_port:          Peer's UDP source port (host order)
+ * @dcid_len:           Length of @dcid[]
+ * @retry_validated:    True if the connection already passed Retry validation
+ * @dcid:               CID the client is using as the server DCID
  * @client_hello_len:   Number of valid bytes in @client_hello[]
  * @client_hello:       Raw TLS record bytes (ClientHello), including the
  *                      TLS record header (type=22, version, length).
@@ -126,6 +130,10 @@ struct ksmbd_quic_handshake_req {
 	__u8	peer_addr[16];
 	__u16	peer_port;
 	__u16	pad;
+	__u8	dcid_len;
+	__u8	retry_validated;
+	__u8	pad2[2];
+	__u8	dcid[KSMBD_QUIC_MAX_CID_LEN];
 	__u32	client_hello_len;
 	__u8	client_hello[KSMBD_QUIC_MAX_CLIENT_HELLO];
 } __packed;
@@ -134,20 +142,33 @@ struct ksmbd_quic_handshake_req {
  * struct ksmbd_quic_handshake_rsp - userspace → kernel: QUIC handshake result
  *
  * Returned by ksmbdctl after performing the TLS 1.3 handshake.  Contains:
- *   - The 1-RTT application traffic secrets (write key/IV from the server's
- *     perspective, read key/IV from the server's perspective).
- *   - The server handshake flight bytes (ServerHello through Finished) that
- *     the kernel must send back to the client inside QUIC Initial/Handshake
- *     packets.
+ *   - Handshake packet-space traffic secrets (server write, client write).
+ *   - 1-RTT application traffic secrets (server write, client write).
+ *   - The server handshake flight bytes (ServerHello through Finished),
+ *     split into the bytes that belong in the QUIC Initial packet number
+ *     space and the bytes that belong in the QUIC Handshake packet number
+ *     space.
  *
  * @handle:             IPC correlation handle (matches the REQ handle)
  * @conn_id:            Connection identifier (must match REQ conn_id)
  * @success:            1 if handshake succeeded, 0 if it failed
  * @cipher:             KSMBD_QUIC_CIPHER_* — which AEAD suite was negotiated
- * @write_key:          Server write key (AEAD key for sending to client)
- * @write_iv:           Server write IV (base nonce)
- * @read_key:           Client write key (AEAD key for receiving from client)
- * @read_iv:            Client write IV (base nonce)
+ * @hs_write_key:       Server Handshake write key
+ * @hs_write_iv:        Server Handshake write IV
+ * @hs_write_hp:        Server Handshake header-protection key
+ * @hs_read_key:        Client Handshake write key
+ * @hs_read_iv:         Client Handshake write IV
+ * @hs_read_hp:         Client Handshake header-protection key
+ * @app_write_key:      Server 1-RTT write key
+ * @app_write_iv:       Server 1-RTT write IV
+ * @app_write_hp:       Server 1-RTT header-protection key
+ * @app_read_key:       Client 1-RTT write key
+ * @app_read_iv:        Client 1-RTT write IV
+ * @app_read_hp:        Client 1-RTT header-protection key
+ * @initial_data_len:   Number of bytes in @hs_data[] that belong in QUIC
+ *                      Initial packets (typically ServerHello)
+ * @handshake_data_len: Number of bytes in @hs_data[] that belong in QUIC
+ *                      Handshake packets (EncryptedExtensions..Finished)
  * @hs_data_len:        Number of valid bytes in @hs_data[]
  * @hs_data:            Server handshake flight (ServerHello + EncryptedExts +
  *                      Certificate + CertificateVerify + Finished).
@@ -160,30 +181,62 @@ struct ksmbd_quic_handshake_rsp {
 	__u8	success;
 	__u8	cipher;
 	__u8	pad[2];
-	__u8	write_key[KSMBD_QUIC_KEY_SIZE];
-	__u8	write_iv[KSMBD_QUIC_IV_SIZE];
-	__u8	read_key[KSMBD_QUIC_KEY_SIZE];
-	__u8	read_iv[KSMBD_QUIC_IV_SIZE];
+	__u8	hs_write_key[KSMBD_QUIC_KEY_SIZE];
+	__u8	hs_write_iv[KSMBD_QUIC_IV_SIZE];
+	__u8	hs_write_hp[KSMBD_QUIC_KEY_SIZE];
+	__u8	hs_read_key[KSMBD_QUIC_KEY_SIZE];
+	__u8	hs_read_iv[KSMBD_QUIC_IV_SIZE];
+	__u8	hs_read_hp[KSMBD_QUIC_KEY_SIZE];
+	__u8	app_write_key[KSMBD_QUIC_KEY_SIZE];
+	__u8	app_write_iv[KSMBD_QUIC_IV_SIZE];
+	__u8	app_write_hp[KSMBD_QUIC_KEY_SIZE];
+	__u8	app_read_key[KSMBD_QUIC_KEY_SIZE];
+	__u8	app_read_iv[KSMBD_QUIC_IV_SIZE];
+	__u8	app_read_hp[KSMBD_QUIC_KEY_SIZE];
+	__u32	initial_data_len;
+	__u32	handshake_data_len;
 	__u32	hs_data_len;
 	__u8	hs_data[KSMBD_QUIC_MAX_HS_DATA];
 } __packed;
 
 /**
  * enum ksmbd_quic_cmd - Generic Netlink commands for SMBD_QUIC family
- * @KSMBD_QUIC_CMD_UNSPEC:        Unused placeholder (genl convention)
+ * @KSMBD_QUIC_CMD_REGISTER:      Userspace daemon registers with kernel
  * @KSMBD_QUIC_CMD_HANDSHAKE_REQ: Kernel sends ClientHello to userspace
  * @KSMBD_QUIC_CMD_HANDSHAKE_RSP: Userspace returns keys + handshake data
  * @__KSMBD_QUIC_CMD_MAX:         Sentinel
+ *
+ * Command IDs start at 1; genl rejects cmd=0 since kernel 6.1.
  */
 enum ksmbd_quic_cmd {
-	KSMBD_QUIC_CMD_UNSPEC = 0,
+	KSMBD_QUIC_CMD_REGISTER = 1,
 	KSMBD_QUIC_CMD_HANDSHAKE_REQ,
 	KSMBD_QUIC_CMD_HANDSHAKE_RSP,
 	__KSMBD_QUIC_CMD_MAX,
 };
 #define KSMBD_QUIC_CMD_MAX (__KSMBD_QUIC_CMD_MAX - 1)
 
-#ifdef CONFIG_SMB_SERVER_QUIC
+/**
+ * enum ksmbd_quic_attr - QUIC genl attribute types
+ * @KSMBD_QUIC_ATTR_UNSPEC: Reserved (must be 0)
+ * @KSMBD_QUIC_ATTR_PAYLOAD: Binary payload (handshake req/rsp struct)
+ * @KSMBD_QUIC_ATTR_WRITE_HP: Optional server write header-protection key
+ * @KSMBD_QUIC_ATTR_READ_HP: Optional client write header-protection key
+ *
+ * The genl policy is indexed by attribute type, not by command number.
+ * All QUIC genl commands carry a single NLA_BINARY attribute at index
+ * KSMBD_QUIC_ATTR_PAYLOAD.
+ */
+enum ksmbd_quic_attr {
+	KSMBD_QUIC_ATTR_UNSPEC = 0,
+	KSMBD_QUIC_ATTR_PAYLOAD,
+	KSMBD_QUIC_ATTR_WRITE_HP,
+	KSMBD_QUIC_ATTR_READ_HP,
+	__KSMBD_QUIC_ATTR_MAX,
+};
+#define KSMBD_QUIC_ATTR_MAX (__KSMBD_QUIC_ATTR_MAX - 1)
+
+#if defined(CONFIG_SMB_SERVER_QUIC) || defined(KSMBD_TRANSPORT_QUIC_IMPL)
 int ksmbd_quic_init(void);
 void ksmbd_quic_destroy(void);
 #else

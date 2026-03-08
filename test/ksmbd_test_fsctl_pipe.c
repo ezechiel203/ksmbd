@@ -53,11 +53,17 @@ struct test_pipe_wait_req {
 static int test_pipe_wait(bool fp_exists, void *in_buf, unsigned int in_buf_len,
 			  __le32 *status)
 {
+	struct test_pipe_wait_req *req;
+
 	*status = 0;
 
 	/* Empty buffer: no-op success */
 	if (in_buf_len == 0)
 		return 0;
+
+	req = in_buf;
+	if (!req->TimeoutSpecified && !fp_exists)
+		return -EINPROGRESS;
 
 	/* Pipe available check */
 	if (fp_exists)
@@ -65,6 +71,14 @@ static int test_pipe_wait(bool fp_exists, void *in_buf, unsigned int in_buf_len,
 
 	*status = cpu_to_le32(0xC00000B5); /* STATUS_IO_TIMEOUT */
 	return -ETIMEDOUT;
+}
+
+static int test_pipe_async_cleanup(bool async_credit_limit_enabled,
+				   int outstanding_async)
+{
+	if (async_credit_limit_enabled && outstanding_async > 0)
+		outstanding_async--;
+	return outstanding_async;
 }
 
 /* ---- Test cases ---- */
@@ -129,7 +143,9 @@ static void test_pipe_wait_pipe_available(struct kunit *test)
 static void test_pipe_wait_pipe_unavailable(struct kunit *test)
 {
 	__le32 status;
-	struct test_pipe_wait_req req = {};
+	struct test_pipe_wait_req req = {
+		.TimeoutSpecified = 1,
+	};
 	int ret;
 
 	ret = test_pipe_wait(false, &req, sizeof(req), &status);
@@ -158,8 +174,8 @@ static void test_pipe_wait_timeout_zero(struct kunit *test)
 	};
 	int ret;
 
-	ret = test_pipe_wait(true, &req, sizeof(req), &status);
-	KUNIT_EXPECT_EQ(test, ret, 0);
+	ret = test_pipe_wait(false, &req, sizeof(req), &status);
+	KUNIT_EXPECT_EQ(test, ret, -EINPROGRESS);
 }
 
 static void test_pipe_transceive_rpc_ok(struct kunit *test)
@@ -180,6 +196,17 @@ static void test_pipe_transceive_not_implemented(struct kunit *test)
 	KUNIT_EXPECT_TRUE(test, true);
 }
 
+static void test_pipe_async_cleanup_decrements_counter(struct kunit *test)
+{
+	KUNIT_EXPECT_EQ(test, test_pipe_async_cleanup(true, 3), 2);
+	KUNIT_EXPECT_EQ(test, test_pipe_async_cleanup(true, 1), 0);
+}
+
+static void test_pipe_async_cleanup_no_limit_keeps_counter(struct kunit *test)
+{
+	KUNIT_EXPECT_EQ(test, test_pipe_async_cleanup(false, 3), 3);
+}
+
 static struct kunit_case ksmbd_fsctl_pipe_test_cases[] = {
 	KUNIT_CASE(test_pipe_peek_connected),
 	KUNIT_CASE(test_pipe_peek_disconnected),
@@ -192,6 +219,8 @@ static struct kunit_case ksmbd_fsctl_pipe_test_cases[] = {
 	KUNIT_CASE(test_pipe_transceive_rpc_ok),
 	KUNIT_CASE(test_pipe_transceive_buffer_overflow),
 	KUNIT_CASE(test_pipe_transceive_not_implemented),
+	KUNIT_CASE(test_pipe_async_cleanup_decrements_counter),
+	KUNIT_CASE(test_pipe_async_cleanup_no_limit_keeps_counter),
 	{}
 };
 

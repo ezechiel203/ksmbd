@@ -153,6 +153,15 @@ static int smb_utf16_bytes(const __le16 *from, int maxbytes,
 			outlen += charlen;
 		else
 			outlen++;
+
+		/*
+		 * Advance past surrogate pairs and IVS sequences,
+		 * matching the logic in smb_from_utf16().
+		 */
+		if (charlen == 4)
+			i++;
+		else if (charlen >= 5)
+			i += 2;
 	}
 
 	return outlen;

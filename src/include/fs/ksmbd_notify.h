@@ -48,6 +48,10 @@ struct ksmbd_notify_change {
  * @buffered_changes: list of ksmbd_notify_change entries
  *                   for events that arrived with no pending NOTIFY
  * @buffered_count:  number of entries in buffered_changes
+ * @enum_dir_sticky: once a handle overflows its notify buffer and returns
+ *                   STATUS_NOTIFY_ENUM_DIR, subsequent CHANGE_NOTIFY requests
+ *                   on the same handle continue to return ENUM_DIR until the
+ *                   handle is closed, matching Windows behaviour.
  * @create_suppress_len: length of create_suppress_name; 0 = none pending
  * @create_suppress_name: filename from the last FS_CREATE event; the
  *                   immediately-following FS_ATTRIB for the same name is
@@ -69,6 +73,7 @@ struct ksmbd_notify_watch {
 	struct ksmbd_work	*pending_work;
 	u32			completion_filter;
 	bool			watch_tree;
+	bool			buffer_tree;
 	u32			output_buf_len;
 	struct ksmbd_conn	*conn;
 	spinlock_t		lock;
@@ -76,10 +81,12 @@ struct ksmbd_notify_watch {
 	bool			completed;
 	bool			has_mark;
 	bool			detached;
+	bool			mark_cleanup_started;
 	struct list_head	list;
 	struct fsnotify_mark	mark;
 	struct list_head	buffered_changes;
 	unsigned int		buffered_count;
+	bool			enum_dir_sticky;
 	u8			create_suppress_len;
 	char			create_suppress_name[NAME_MAX + 1];
 	/*
@@ -101,6 +108,8 @@ struct ksmbd_notify_watch {
 	 */
 	u8			rename_suppress_len;
 	char			rename_suppress_name[NAME_MAX + 1];
+	u8			tree_rename_suppress_len;
+	char			tree_rename_suppress_name[NAME_MAX + 1];
 	/* Batching: delay response to accumulate rapid sequential events */
 	struct delayed_work	batch_work;
 	/*
@@ -193,5 +202,20 @@ void ksmbd_notify_cleanup_file(struct ksmbd_file *fp);
  * Completes any pending CHANGE_NOTIFY with STATUS_DELETE_PENDING.
  */
 void ksmbd_notify_complete_delete_pending(struct ksmbd_inode *ci);
+
+void ksmbd_notify_tree_change(struct ksmbd_work *work,
+			      const struct path *parent_path,
+			      const char *full_name,
+			      u32 action,
+			      bool is_dir);
+
+void ksmbd_notify_tree_rename(struct ksmbd_work *work,
+			      const struct path *old_parent_path,
+			      const char *old_full_name,
+			      const struct path *new_parent_path,
+			      const char *new_full_name,
+			      bool is_dir);
+
+void ksmbd_notify_tree_remove_on_close(struct ksmbd_file *fp);
 
 #endif /* __KSMBD_NOTIFY_H__ */

@@ -33,17 +33,35 @@
 #include "connection.h"
 #include "server.h"
 #include "ksmbd_notify.h"
+#include "misc.h"
 #include "mgmt/user_session.h"
 #include "smb_common.h"
+#include "smb1pdu.h"
 
 /* Forward declarations (defined later in this file) */
 static void ksmbd_notify_send_delete_pending(struct ksmbd_work *work);
 static void ksmbd_notify_batch_work_fn(struct work_struct *w);
+static void ksmbd_notify_build_response_from_buffer(
+		struct ksmbd_notify_watch *watch);
+static bool ksmbd_notify_watch_get(struct ksmbd_notify_watch *watch);
+static void ksmbd_notify_watch_put(struct ksmbd_notify_watch *watch);
+static void ksmbd_notify_schedule_batch_work(struct ksmbd_notify_watch *watch);
+
+static struct ksmbd_conn *ksmbd_notify_detach_work_conn_ref(
+		struct ksmbd_work *work)
+{
+	if (!work || !work->notify_conn_ref || !work->conn)
+		return NULL;
+
+	work->notify_conn_ref = false;
+	return work->conn;
+}
 
 /* Batching delay: wait this many ms after first event to accumulate
  * rapid sequential changes (e.g. unlink + create + write) so they
  * are all returned in one CHANGE_NOTIFY response. */
 #define KSMBD_NOTIFY_BATCH_MS 10
+#define KSMBD_NOTIFY_TREE_BATCH_MS 100
 
 /*
  * fsnotify group flags differ across kernel versions.
@@ -69,6 +87,19 @@ static struct fsnotify_group *ksmbd_notify_group;
  * issuing unlimited concurrent NOTIFY requests on one file handle.
  */
 #define KSMBD_MAX_NOTIFY_PER_HANDLE	4
+#define KSMBD_NOTIFY_UTF16_TMP_UNITS	((NAME_MAX * 2) + 2)
+#define KSMBD_NOTIFY_ALL_FILTERS	0xFFF
+#define KSMBD_NOTIFY_SMB1_PARAM_OFFSET	(offsetof(struct smb_com_nt_transact_rsp, Pad) - 4)
+
+enum ksmbd_notify_proto {
+	KSMBD_NOTIFY_PROTO_NONE = 0,
+	KSMBD_NOTIFY_PROTO_SMB1,
+	KSMBD_NOTIFY_PROTO_SMB2,
+};
+
+static enum ksmbd_notify_proto
+ksmbd_notify_work_proto(struct ksmbd_work *work);
+static bool ksmbd_notify_is_change_notify_work(struct ksmbd_work *work);
 
 /*
  * ksmbd_notify_count_handle_works() - count pending NOTIFY works on @fp.
@@ -80,15 +111,239 @@ static int ksmbd_notify_count_handle_works(struct ksmbd_file *fp)
 	int cnt = 0;
 
 	list_for_each_entry(w, &fp->blocked_works, fp_entry) {
-		struct smb2_hdr *hdr = smb2_get_msg(w->request_buf);
-
-		if (hdr->Command == SMB2_CHANGE_NOTIFY)
+		if (ksmbd_notify_is_change_notify_work(w))
 			cnt++;
 	}
 	return cnt;
 }
 
+/*
+ * ksmbd_notify_has_queued_waiter() - true if @fp has another queued
+ * CHANGE_NOTIFY work beyond @pending_work.
+ * Called without watch->lock held.
+ */
+static bool ksmbd_notify_has_queued_waiter(struct ksmbd_file *fp,
+					   struct ksmbd_work *pending_work)
+{
+	struct ksmbd_work *w;
+	bool queued = false;
+
+	if (!fp)
+		return false;
+
+	spin_lock(&fp->f_lock);
+	list_for_each_entry(w, &fp->blocked_works, fp_entry) {
+		if (w == pending_work)
+			continue;
+		if (!ksmbd_notify_is_change_notify_work(w))
+			continue;
+		queued = true;
+		break;
+	}
+	spin_unlock(&fp->f_lock);
+
+	return queued;
+}
+
+static void ksmbd_notify_apply_work_params(struct ksmbd_notify_watch *watch,
+					   struct ksmbd_work *work)
+{
+	struct smb_com_ntransact_req *smb1_req;
+	struct smb2_notify_req *smb2_req;
+	u32 param_off;
+	char *params;
+
+	if (!watch || !work || !work->request_buf)
+		return;
+
+	switch (ksmbd_notify_work_proto(work)) {
+	case KSMBD_NOTIFY_PROTO_SMB1:
+		smb1_req = work->request_buf;
+		param_off = le32_to_cpu(smb1_req->ParameterOffset);
+		if (le32_to_cpu(smb1_req->ParameterCount) < 8 ||
+		    param_off + 8 > get_rfc1002_len(work->request_buf) +
+				    RFC1002_HEADER_LEN)
+			return;
+
+		params = (char *)smb1_req + param_off;
+		watch->watch_tree = params[6] != 0;
+		watch->buffer_tree |= watch->watch_tree;
+		watch->output_buf_len = le32_to_cpu(smb1_req->MaxDataCount);
+		return;
+	case KSMBD_NOTIFY_PROTO_SMB2:
+		smb2_req = smb2_get_msg(work->request_buf);
+		watch->watch_tree = le16_to_cpu(smb2_req->Flags) & SMB2_WATCH_TREE;
+		watch->buffer_tree |= watch->watch_tree;
+		watch->output_buf_len = le32_to_cpu(smb2_req->OutputBufferLength);
+		return;
+	default:
+		return;
+	}
+}
+
+static void ksmbd_notify_purge_tree_rename_duplicate(
+		struct ksmbd_notify_watch *watch)
+{
+	struct ksmbd_notify_change *chg, *tmp;
+
+	if (!watch || !watch->tree_rename_suppress_len)
+		return;
+
+	list_for_each_entry_safe(chg, tmp, &watch->buffered_changes, entry) {
+		if (chg->name_len != (size_t)watch->tree_rename_suppress_len)
+			continue;
+		if (memcmp(chg->name, watch->tree_rename_suppress_name,
+			   chg->name_len))
+			continue;
+		list_del(&chg->entry);
+		kfree(chg->name);
+		kfree(chg);
+		watch->buffered_count--;
+	}
+}
+
 static atomic_t notify_watch_count = ATOMIC_INIT(0);
+
+static enum ksmbd_notify_proto
+ksmbd_notify_work_proto(struct ksmbd_work *work)
+{
+	struct smb_com_ntransact_req *smb1_req;
+
+	if (!work || !work->request_buf || !work->conn || !work->conn->ops)
+		return KSMBD_NOTIFY_PROTO_NONE;
+
+	switch (work->conn->ops->get_cmd_val(work)) {
+	case SMB2_CHANGE_NOTIFY_HE:
+		return KSMBD_NOTIFY_PROTO_SMB2;
+	case SMB_COM_NT_TRANSACT:
+		smb1_req = work->request_buf;
+		if (le16_to_cpu(smb1_req->Function) == NT_TRANSACT_NOTIFY_CHANGE)
+			return KSMBD_NOTIFY_PROTO_SMB1;
+		break;
+	}
+
+	return KSMBD_NOTIFY_PROTO_NONE;
+}
+
+static bool ksmbd_notify_is_change_notify_work(struct ksmbd_work *work)
+{
+	return ksmbd_notify_work_proto(work) != KSMBD_NOTIFY_PROTO_NONE;
+}
+
+static unsigned int ksmbd_notify_sign_command(struct ksmbd_work *work)
+{
+	switch (ksmbd_notify_work_proto(work)) {
+	case KSMBD_NOTIFY_PROTO_SMB1:
+		return SMB_COM_NT_TRANSACT;
+	case KSMBD_NOTIFY_PROTO_SMB2:
+		return SMB2_CHANGE_NOTIFY_HE;
+	default:
+		return 0;
+	}
+}
+
+static bool ksmbd_notify_should_sign(struct ksmbd_work *work)
+{
+	unsigned int command;
+
+	if (!work || !work->sess || !work->conn || !work->conn->ops)
+		return false;
+
+	if (work->sess->sign)
+		return true;
+
+	if (!work->request_buf)
+		return false;
+
+	command = ksmbd_notify_sign_command(work);
+	if (!command)
+		return false;
+
+	return work->conn->ops->is_sign_req(work, command);
+}
+
+static size_t ksmbd_notify_rsp_overhead(struct ksmbd_work *work)
+{
+	switch (ksmbd_notify_work_proto(work)) {
+	case KSMBD_NOTIFY_PROTO_SMB1:
+		return RFC1002_HEADER_LEN + ALIGN(KSMBD_NOTIFY_SMB1_PARAM_OFFSET, 4);
+	case KSMBD_NOTIFY_PROTO_SMB2:
+		return RFC1002_HEADER_LEN + __SMB2_HEADER_STRUCTURE_SIZE +
+			sizeof(((struct smb2_notify_rsp *)0)->StructureSize) +
+			sizeof(((struct smb2_notify_rsp *)0)->OutputBufferOffset) +
+			sizeof(((struct smb2_notify_rsp *)0)->OutputBufferLength);
+	default:
+		return 0;
+	}
+}
+
+static u8 *ksmbd_notify_rsp_data(struct ksmbd_work *work)
+{
+	return (u8 *)work->response_buf + ksmbd_notify_rsp_overhead(work);
+}
+
+static int ksmbd_notify_finalize_success_rsp(struct ksmbd_work *work,
+					     size_t data_len)
+{
+	struct smb2_notify_rsp *smb2_rsp;
+
+	switch (ksmbd_notify_work_proto(work)) {
+	case KSMBD_NOTIFY_PROTO_SMB1:
+		smb_build_ntransact_rsp(work, 0, data_len);
+		return get_rfc1002_len(work->response_buf) + RFC1002_HEADER_LEN;
+	case KSMBD_NOTIFY_PROTO_SMB2:
+		smb2_rsp = smb2_get_msg(work->response_buf);
+		smb2_rsp->hdr.Status = STATUS_SUCCESS;
+		smb2_rsp->StructureSize = cpu_to_le16(9);
+		smb2_rsp->OutputBufferOffset = cpu_to_le16(
+			sizeof(struct smb2_hdr) +
+			sizeof(smb2_rsp->StructureSize) +
+			sizeof(smb2_rsp->OutputBufferOffset) +
+			sizeof(smb2_rsp->OutputBufferLength));
+		smb2_rsp->OutputBufferLength = cpu_to_le32(data_len);
+		return __SMB2_HEADER_STRUCTURE_SIZE +
+			sizeof(smb2_rsp->StructureSize) +
+			sizeof(smb2_rsp->OutputBufferOffset) +
+			sizeof(smb2_rsp->OutputBufferLength) + data_len;
+	default:
+		return -EINVAL;
+	}
+}
+
+static int ksmbd_notify_build_status_rsp(struct ksmbd_work *work, __le32 status)
+{
+	struct smb2_notify_rsp *smb2_rsp;
+	struct smb_com_ntransact_rsp *smb1_rsp;
+
+	switch (ksmbd_notify_work_proto(work)) {
+	case KSMBD_NOTIFY_PROTO_SMB1:
+		smb1_rsp = work->response_buf;
+		smb_build_ntransact_rsp(work, 0, 0);
+		smb1_rsp->hdr.Status.CifsError = status;
+		return get_rfc1002_len(work->response_buf) + RFC1002_HEADER_LEN;
+	case KSMBD_NOTIFY_PROTO_SMB2:
+		smb2_rsp = smb2_get_msg(work->response_buf);
+		smb2_rsp->hdr.Status = status;
+		smb2_rsp->StructureSize = cpu_to_le16(9);
+		smb2_rsp->OutputBufferOffset = cpu_to_le16(0);
+		smb2_rsp->OutputBufferLength = cpu_to_le32(0);
+		return __SMB2_HEADER_STRUCTURE_SIZE + SMB2_ERROR_STRUCTURE_SIZE2;
+	default:
+		return -EINVAL;
+	}
+}
+
+static void ksmbd_notify_prepare_async_rsp(struct ksmbd_work *work)
+{
+	struct smb2_notify_rsp *rsp;
+
+	if (ksmbd_notify_work_proto(work) != KSMBD_NOTIFY_PROTO_SMB2)
+		return;
+
+	rsp = smb2_get_msg(work->response_buf);
+	rsp->hdr.Flags |= SMB2_FLAGS_ASYNC_COMMAND;
+	rsp->hdr.Id.AsyncId = cpu_to_le64(work->async_id);
+}
 
 /*
  * Mask of all fsnotify events we care about.
@@ -129,7 +384,6 @@ static u32 ksmbd_fsnotify_to_smb2_filter(u32 mask)
 	 * the directory entry (name), attribute timestamps, size bookkeeping,
 	 * etc. on both source and destination.
 	 */
-#define KSMBD_NOTIFY_ALL_FILTERS 0xFFF
 	if (mask & FS_CREATE) {
 		if (mask & FS_ISDIR)
 			filter |= FILE_NOTIFY_CHANGE_DIR_NAME;
@@ -142,28 +396,37 @@ static u32 ksmbd_fsnotify_to_smb2_filter(u32 mask)
 		else
 			filter |= FILE_NOTIFY_CHANGE_FILE_NAME;
 	}
-	if (mask & FS_MODIFY)
-		filter |= FILE_NOTIFY_CHANGE_LAST_WRITE |
-			  FILE_NOTIFY_CHANGE_SIZE;
-	if (mask & FS_ATTRIB)
-		filter |= FILE_NOTIFY_CHANGE_ATTRIBUTES |
-			  FILE_NOTIFY_CHANGE_SECURITY |
-			  FILE_NOTIFY_CHANGE_EA;
-	/* CN-03: MS-FSCC §2.4.42 — stream change bits (0x200/0x400/0x800).
-	 * FS_ATTRIB fires when named stream attributes change; FS_MODIFY fires
-	 * when stream content or size changes.  Map both to the stream filter
-	 * bits so clients watching for stream events get completions.
+	/*
+	 * FS_CREATE/FS_DELETE frequently arrive with side-band fsnotify bits
+	 * from ksmbd's own xattr and inode timestamp updates.  Windows still
+	 * treats those operations as name-only notifications, so do not let a
+	 * create/delete satisfy ATTRIBUTES/LAST_WRITE/SIZE/STREAM watches.
 	 */
-	if (mask & FS_ATTRIB)
-		filter |= FILE_NOTIFY_CHANGE_STREAM_NAME;
-	if (mask & FS_MODIFY)
-		filter |= FILE_NOTIFY_CHANGE_STREAM_SIZE |
-			  FILE_NOTIFY_CHANGE_STREAM_WRITE;
+	if (!(mask & (FS_CREATE | FS_DELETE))) {
+		if (mask & FS_MODIFY)
+			filter |= FILE_NOTIFY_CHANGE_LAST_WRITE |
+				  FILE_NOTIFY_CHANGE_SIZE;
+		if (mask & FS_ATTRIB)
+			filter |= FILE_NOTIFY_CHANGE_ATTRIBUTES |
+				  FILE_NOTIFY_CHANGE_SECURITY |
+				  FILE_NOTIFY_CHANGE_EA;
+		/* CN-03: MS-FSCC §2.4.42 — stream change bits (0x200/0x400/0x800).
+		 * FS_ATTRIB fires when named stream attributes change; FS_MODIFY
+		 * fires when stream content or size changes.  Map both to the
+		 * stream filter bits so clients watching for stream events get
+		 * completions.
+		 */
+		if (mask & FS_ATTRIB)
+			filter |= FILE_NOTIFY_CHANGE_STREAM_NAME;
+		if (mask & FS_MODIFY)
+			filter |= FILE_NOTIFY_CHANGE_STREAM_SIZE |
+				  FILE_NOTIFY_CHANGE_STREAM_WRITE;
+	}
 	if (mask & FS_MOVED_FROM)
 		filter |= KSMBD_NOTIFY_ALL_FILTERS;
 	if (mask & FS_MOVED_TO)
 		filter |= KSMBD_NOTIFY_ALL_FILTERS;
-	if (mask & FS_ACCESS)
+	if (!(mask & (FS_CREATE | FS_DELETE)) && (mask & FS_ACCESS))
 		filter |= FILE_NOTIFY_CHANGE_LAST_ACCESS;
 
 	return filter;
@@ -195,6 +458,11 @@ bool ksmbd_notify_take_work(struct ksmbd_work *work, int state)
 }
 EXPORT_SYMBOL_IF_KUNIT(ksmbd_notify_take_work);
 
+struct ksmbd_notify_tree_flush {
+	struct list_head		entry;
+	struct ksmbd_notify_watch	*watch;
+};
+
 VISIBLE_IF_KUNIT
 bool ksmbd_notify_claim_cancel_work(struct ksmbd_work *work)
 {
@@ -222,10 +490,302 @@ static void ksmbd_notify_release_changes(struct ksmbd_notify_watch *watch)
 	watch->rename_old_len = 0;
 }
 
+static struct ksmbd_notify_watch *
+ksmbd_notify_get_file_watch(struct ksmbd_file *fp)
+{
+	struct ksmbd_notify_watch *watch;
+
+	if (!fp)
+		return NULL;
+
+	spin_lock(&fp->f_lock);
+	watch = fp->notify_watch;
+	if (watch && !ksmbd_notify_watch_get(watch))
+		watch = NULL;
+	spin_unlock(&fp->f_lock);
+
+	return watch;
+}
+
+static void ksmbd_notify_set_file_watch(struct ksmbd_file *fp,
+					struct ksmbd_notify_watch *watch)
+{
+	if (!fp)
+		return;
+
+	spin_lock(&fp->f_lock);
+	fp->notify_watch = watch;
+	spin_unlock(&fp->f_lock);
+}
+
+static struct ksmbd_notify_watch *
+ksmbd_notify_detach_file_watch(struct ksmbd_file *fp)
+{
+	struct ksmbd_notify_watch *watch = NULL;
+
+	if (!fp)
+		return NULL;
+
+	spin_lock(&fp->f_lock);
+	watch = fp->notify_watch;
+	fp->notify_watch = NULL;
+	spin_unlock(&fp->f_lock);
+
+	return watch;
+}
+
+static char *ksmbd_notify_relative_name(struct ksmbd_share_config *share,
+					const struct path *watch_path,
+					const char *full_name)
+{
+	char *watch_name;
+	const char *relative;
+	size_t watch_len;
+
+	if (!share || !watch_path || !full_name)
+		return ERR_PTR(-EINVAL);
+
+	watch_name = convert_to_nt_pathname(share, watch_path);
+	if (IS_ERR(watch_name))
+		return watch_name;
+
+	watch_len = strlen(watch_name);
+	if (!strcmp(watch_name, "\\")) {
+		relative = (*full_name == '\\') ? full_name + 1 : full_name;
+	} else if (!strncmp(full_name, watch_name, watch_len) &&
+		   full_name[watch_len] == '\\') {
+		relative = full_name + watch_len + 1;
+	} else {
+		kfree(watch_name);
+		return ERR_PTR(-EINVAL);
+	}
+
+	if (!*relative) {
+		kfree(watch_name);
+		return ERR_PTR(-EINVAL);
+	}
+
+	watch_len = strlen(relative);
+	kfree(watch_name);
+	return kstrndup(relative, watch_len, KSMBD_DEFAULT_GFP);
+}
+
+static void ksmbd_notify_tree_queue_one(struct ksmbd_notify_watch *watch,
+					u32 smb2_filter,
+					u32 action,
+					const char *name,
+					struct list_head *flush_list)
+{
+	struct ksmbd_notify_change *chg = NULL;
+	char *copy_name = NULL;
+	size_t name_len;
+	u32 effective_action = action;
+	bool queued = false;
+	bool flush_pending = false;
+	bool nested_name;
+
+	if (!watch || !name)
+		return;
+
+	name_len = strlen(name);
+	if (!name_len)
+		return;
+	nested_name = strchr(name, '\\') != NULL;
+
+	copy_name = kstrndup(name, name_len, GFP_ATOMIC);
+	if (!copy_name)
+		return;
+
+	chg = kzalloc(sizeof(*chg), GFP_ATOMIC);
+	if (!chg) {
+		kfree(copy_name);
+		return;
+	}
+
+	spin_lock(&watch->lock);
+	if (watch->detached || !watch->fp || !watch->buffer_tree)
+		goto out_unlock;
+
+	if (!(watch->completion_filter &
+	      (FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_DIR_NAME))) {
+		bool rename_drop =
+			effective_action == FILE_ACTION_RENAMED_OLD_NAME ||
+			(smb2_filter == KSMBD_NOTIFY_ALL_FILTERS &&
+			 effective_action == FILE_ACTION_REMOVED);
+		bool rename_add =
+			effective_action == FILE_ACTION_RENAMED_NEW_NAME ||
+			(smb2_filter == KSMBD_NOTIFY_ALL_FILTERS &&
+			 effective_action == FILE_ACTION_ADDED);
+
+		if (rename_add && !nested_name)
+			goto out_unlock;
+		if (nested_name && (rename_drop || rename_add))
+			goto out_unlock;
+		if (rename_drop)
+			goto out_unlock;
+		if (rename_add) {
+			effective_action = FILE_ACTION_MODIFIED;
+			if (!nested_name) {
+				size_t slen = min_t(size_t, name_len, NAME_MAX);
+
+				memcpy(watch->tree_rename_suppress_name,
+				       name, slen);
+				watch->tree_rename_suppress_len = (u8)slen;
+				memcpy(watch->rename_suppress_name, name, slen);
+				watch->rename_suppress_len = (u8)slen;
+			}
+		}
+	}
+
+	if (!(smb2_filter & watch->completion_filter))
+		goto out_unlock;
+
+	if (watch->buffered_count >= 256)
+		goto maybe_flush;
+
+	chg->action = effective_action;
+	chg->name = copy_name;
+	chg->name_len = name_len;
+	list_add_tail(&chg->entry, &watch->buffered_changes);
+	watch->buffered_count++;
+	queued = true;
+	copy_name = NULL;
+	chg = NULL;
+
+maybe_flush:
+	if (queued && watch->pending_work && !watch->completed) {
+		if (watch->watch_tree &&
+		    !ksmbd_notify_has_queued_waiter(watch->fp,
+						    watch->pending_work)) {
+			ksmbd_notify_schedule_batch_work(watch);
+		} else if (flush_list && ksmbd_notify_watch_get(watch)) {
+			struct ksmbd_notify_tree_flush *flush;
+			bool already = false;
+			struct ksmbd_notify_tree_flush *iter;
+
+			list_for_each_entry(iter, flush_list, entry) {
+				if (iter->watch == watch) {
+					already = true;
+					break;
+				}
+			}
+			if (already) {
+				ksmbd_notify_watch_put(watch);
+			} else {
+				flush = kzalloc(sizeof(*flush), GFP_ATOMIC);
+				if (flush) {
+					flush->watch = watch;
+					list_add_tail(&flush->entry, flush_list);
+					flush_pending = true;
+				} else {
+					ksmbd_notify_watch_put(watch);
+				}
+			}
+		}
+		if (!flush_pending && flush_list) {
+			/* nothing to do */
+		}
+	}
+
+out_unlock:
+	spin_unlock(&watch->lock);
+	kfree(copy_name);
+	kfree(chg);
+}
+
+static void ksmbd_notify_tree_flush_pending(struct list_head *flush_list)
+{
+	struct ksmbd_notify_tree_flush *flush, *tmp;
+
+	list_for_each_entry_safe(flush, tmp, flush_list, entry) {
+		list_del(&flush->entry);
+		ksmbd_notify_build_response_from_buffer(flush->watch);
+		ksmbd_notify_watch_put(flush->watch);
+		kfree(flush);
+	}
+}
+
+static void ksmbd_notify_tree_collect(
+				      const struct ksmbd_share_config *share_conf,
+				      const struct path *parent_path,
+				      const char *full_name,
+				      bool include_self,
+				      u32 smb2_filter,
+				      u32 action,
+				      struct list_head *flush_list)
+{
+	struct dentry *ancestor, *next;
+	struct dentry *share_root;
+
+	if (!share_conf || !parent_path ||
+	    !parent_path->dentry || !full_name)
+		return;
+
+	share_root = share_conf->vfs_path.dentry;
+	if (!include_self && parent_path->dentry == share_root)
+		return;
+
+	ancestor = include_self ? dget(parent_path->dentry) :
+				  dget_parent(parent_path->dentry);
+	while (ancestor) {
+		struct ksmbd_inode *ci;
+		struct ksmbd_file *fp;
+		struct path watch_path = {
+			.mnt = parent_path->mnt,
+			.dentry = ancestor,
+		};
+		char *relative_name;
+
+		relative_name = ksmbd_notify_relative_name(
+			(struct ksmbd_share_config *)share_conf,
+			&watch_path, full_name);
+		if (!IS_ERR(relative_name)) {
+			ci = ksmbd_inode_lookup_lock(ancestor);
+			if (ci) {
+				down_read(&ci->m_lock);
+				list_for_each_entry(fp, &ci->m_fp_list, node) {
+					struct ksmbd_notify_watch *watch;
+
+					watch = ksmbd_notify_get_file_watch(fp);
+					if (!watch)
+						continue;
+
+					ksmbd_notify_tree_queue_one(watch,
+								    smb2_filter,
+								    action,
+								    relative_name,
+								    flush_list);
+					ksmbd_notify_watch_put(watch);
+				}
+				up_read(&ci->m_lock);
+				ksmbd_inode_put(ci);
+			}
+			kfree(relative_name);
+		}
+
+		if (ancestor == share_root) {
+			dput(ancestor);
+			break;
+		}
+
+		next = dget_parent(ancestor);
+		if (next == ancestor) {
+			dput(next);
+			dput(ancestor);
+			break;
+		}
+		dput(ancestor);
+		ancestor = next;
+	}
+}
+
 static void ksmbd_notify_free_watch(struct ksmbd_notify_watch *watch)
 {
 	cancel_delayed_work(&watch->batch_work);
 	ksmbd_notify_release_changes(watch);
+	atomic_dec(&notify_watch_count);
+	if (watch->conn)
+		atomic_dec(&watch->conn->notify_watch_count);
 	kfree(watch);
 }
 
@@ -236,8 +796,132 @@ static bool ksmbd_notify_watch_get(struct ksmbd_notify_watch *watch)
 
 static void ksmbd_notify_watch_put(struct ksmbd_notify_watch *watch)
 {
-	if (!watch->has_mark && refcount_dec_and_test(&watch->refs))
+	if (refcount_dec_and_test(&watch->refs))
 		ksmbd_notify_free_watch(watch);
+}
+
+VISIBLE_IF_KUNIT
+size_t ksmbd_notify_max_data(struct ksmbd_work *work, u32 output_buf_len)
+{
+	size_t rsp_overhead;
+	size_t max_data;
+
+	if (!work)
+		return 0;
+
+	rsp_overhead = ksmbd_notify_rsp_overhead(work);
+	if (work->response_sz <= rsp_overhead)
+		return 0;
+
+	max_data = work->response_sz - rsp_overhead;
+	if (max_data > output_buf_len)
+		max_data = output_buf_len;
+	return max_data;
+}
+EXPORT_SYMBOL_IF_KUNIT(ksmbd_notify_max_data);
+
+static int ksmbd_notify_ensure_rsp_capacity(struct ksmbd_work *work,
+					    u32 output_buf_len)
+{
+	size_t rsp_overhead;
+	size_t needed;
+	void *new_buf;
+
+	if (!work || !work->response_buf)
+		return -EINVAL;
+
+	rsp_overhead = ksmbd_notify_rsp_overhead(work);
+	needed = rsp_overhead + output_buf_len;
+	if (work->response_sz >= needed)
+		return 0;
+
+	new_buf = kvzalloc(needed, KSMBD_DEFAULT_GFP);
+	if (!new_buf)
+		return -ENOMEM;
+
+	memcpy(new_buf, work->response_buf, work->response_sz);
+	kvfree(work->response_buf);
+	work->response_buf = new_buf;
+	work->response_sz = needed;
+	return 0;
+}
+
+static int ksmbd_notify_encode_name(__le16 *target, size_t target_units,
+				    const char *source, size_t source_len,
+				    const struct nls_table *nls)
+{
+	size_t max_src;
+	int units;
+
+	if (!target || target_units < 2)
+		return -ENOSPC;
+
+	max_src = min_t(size_t, source_len, (target_units - 2) / 2);
+	units = smbConvertToUTF16(target, source, max_src, nls, 0);
+	if (units < 0)
+		return units;
+	if ((size_t)units > target_units)
+		return -ENOSPC;
+	return units * sizeof(__le16);
+}
+
+VISIBLE_IF_KUNIT
+bool ksmbd_notify_mark_can_destroy(struct ksmbd_notify_watch *watch,
+				   struct fsnotify_group *group)
+{
+	bool attached, alive, same_group;
+	struct fsnotify_mark_connector *connector;
+
+	if (!watch || !watch->has_mark || !group)
+		return false;
+
+	spin_lock(&watch->mark.lock);
+	same_group = watch->mark.group == group;
+	alive = watch->mark.flags & FSNOTIFY_MARK_FLAG_ALIVE;
+	attached = watch->mark.flags & FSNOTIFY_MARK_FLAG_ATTACHED;
+	connector = watch->mark.connector;
+	spin_unlock(&watch->mark.lock);
+
+	return same_group && alive && attached && connector;
+}
+EXPORT_SYMBOL_IF_KUNIT(ksmbd_notify_mark_can_destroy);
+
+static bool ksmbd_notify_begin_primary_mark_cleanup(
+		struct ksmbd_notify_watch *watch)
+{
+	if (!watch->has_mark || watch->mark_cleanup_started)
+		return false;
+
+	watch->detached = true;
+	watch->mark_cleanup_started = true;
+	return true;
+}
+
+static void ksmbd_notify_cancel_batch_work(struct ksmbd_notify_watch *watch)
+{
+	if (current_work() == &watch->batch_work.work)
+		cancel_delayed_work(&watch->batch_work);
+	else
+		cancel_delayed_work_sync(&watch->batch_work);
+}
+
+static void ksmbd_notify_schedule_batch_work(struct ksmbd_notify_watch *watch)
+{
+	mod_delayed_work(system_wq, &watch->batch_work,
+			 msecs_to_jiffies(watch->watch_tree ?
+					  KSMBD_NOTIFY_TREE_BATCH_MS :
+					  KSMBD_NOTIFY_BATCH_MS));
+}
+
+static void ksmbd_notify_unlink_async_request(struct ksmbd_work *work)
+{
+	if (!work || !work->conn)
+		return;
+
+	spin_lock(&work->conn->request_lock);
+	if (!list_empty(&work->async_request_entry))
+		list_del_init(&work->async_request_entry);
+	spin_unlock(&work->conn->request_lock);
 }
 
 
@@ -255,13 +939,13 @@ static void ksmbd_notify_build_response_from_buffer(
 		struct ksmbd_notify_watch *watch)
 {
 	struct ksmbd_work *work;
-	struct smb2_notify_rsp *rsp;
 	LIST_HEAD(flush_list);
 	struct ksmbd_notify_change *chg, *chg_tmp;
 	u8 *buf_start, *cur;
-	size_t rsp_overhead, max_data, total_written = 0;
+	size_t max_data, total_written = 0;
 	struct file_notify_information *prev_info = NULL;
 	int total_rsp_len;
+	bool overflow = false;
 
 	spin_lock(&watch->lock);
 	work = watch->pending_work;
@@ -307,56 +991,47 @@ static void ksmbd_notify_build_response_from_buffer(
 	work->iov_idx = 0;
 	work->iov_cnt = 0;
 
-	rsp = smb2_get_msg(work->response_buf);
-	rsp->hdr.Flags |= SMB2_FLAGS_ASYNC_COMMAND;
-	rsp->hdr.Id.AsyncId = cpu_to_le64(work->async_id);
+	ksmbd_notify_ensure_rsp_capacity(work, watch->output_buf_len);
+	ksmbd_notify_prepare_async_rsp(work);
 
-	rsp_overhead = 4 + __SMB2_HEADER_STRUCTURE_SIZE +
-		sizeof(rsp->StructureSize) +
-		sizeof(rsp->OutputBufferOffset) +
-		sizeof(rsp->OutputBufferLength);
-	max_data = (work->response_sz > rsp_overhead) ?
-		   work->response_sz - rsp_overhead : 0;
-	if (max_data > watch->output_buf_len)
-		max_data = watch->output_buf_len;
-
-	buf_start = (u8 *)rsp + __SMB2_HEADER_STRUCTURE_SIZE +
-		sizeof(rsp->StructureSize) +
-		sizeof(rsp->OutputBufferOffset) +
-		sizeof(rsp->OutputBufferLength);
+	max_data = ksmbd_notify_max_data(work, watch->output_buf_len);
+	buf_start = ksmbd_notify_rsp_data(work);
 	cur = buf_start;
 
 	list_for_each_entry_safe(chg, chg_tmp, &flush_list, entry) {
 		struct file_notify_information *info;
-		int uni_len;
+		int name_len_bytes;
 		size_t max_rem, rec_sz, rec_sz_al;
+		__le16 tmp_name[KSMBD_NOTIFY_UTF16_TMP_UNITS];
 
 		max_rem = (total_written < max_data) ?
 			  max_data - total_written : 0;
-		if (max_rem < sizeof(*info))
+		if (max_rem < sizeof(*info)) {
+			overflow = true;
 			break;
+		}
 
 		info = (struct file_notify_information *)cur;
-		uni_len = smbConvertToUTF16(
-			info->FileName, chg->name,
-			min_t(size_t, chg->name_len,
-			      (max_rem - sizeof(*info)) / 2),
-			work->conn->local_nls, 0);
-		if (uni_len < 0)
-			uni_len = 0;
-		else
-			uni_len *= 2;
+		name_len_bytes = ksmbd_notify_encode_name(tmp_name,
+							  ARRAY_SIZE(tmp_name),
+							  chg->name,
+							  chg->name_len,
+							  work->conn->local_nls);
+		if (name_len_bytes < 0)
+			name_len_bytes = 0;
 
-		rec_sz = sizeof(*info) + uni_len;
+		rec_sz = sizeof(*info) + name_len_bytes;
 		rec_sz_al = ALIGN(rec_sz, 4);
 
-		if (rec_sz_al > max_rem)
+		if (rec_sz_al > max_rem) {
+			overflow = true;
 			break;
+		}
 
+		memcpy(info->FileName, tmp_name, name_len_bytes);
 		info->Action = cpu_to_le32(chg->action);
-		info->FileNameLength = cpu_to_le32(uni_len);
+		info->FileNameLength = cpu_to_le32(name_len_bytes);
 		info->NextEntryOffset = cpu_to_le32(rec_sz_al);
-
 		prev_info = info;
 		cur += rec_sz_al;
 		total_written += rec_sz_al;
@@ -373,39 +1048,28 @@ static void ksmbd_notify_build_response_from_buffer(
 		kfree(chg);
 	}
 
-	if (total_written == 0) {
-		rsp->hdr.Status = STATUS_NOTIFY_ENUM_DIR;
-		rsp->StructureSize = cpu_to_le16(9);
-		rsp->OutputBufferOffset = cpu_to_le16(0);
-		rsp->OutputBufferLength = cpu_to_le32(0);
-		total_rsp_len = __SMB2_HEADER_STRUCTURE_SIZE +
-				SMB2_ERROR_STRUCTURE_SIZE2;
+	if (total_written == 0)
+		overflow = true;
+
+	if (overflow) {
+		if (watch->output_buf_len) {
+			spin_lock(&watch->lock);
+			watch->enum_dir_sticky = true;
+			spin_unlock(&watch->lock);
+		}
+		total_rsp_len = ksmbd_notify_build_status_rsp(work,
+							      STATUS_NOTIFY_ENUM_DIR);
 	} else {
 		if (prev_info)
 			prev_info->NextEntryOffset = 0;
-
-		rsp->hdr.Status = STATUS_SUCCESS;
-		rsp->StructureSize = cpu_to_le16(9);
-		rsp->OutputBufferOffset = cpu_to_le16(
-			sizeof(struct smb2_hdr) +
-			sizeof(rsp->StructureSize) +
-			sizeof(rsp->OutputBufferOffset) +
-			sizeof(rsp->OutputBufferLength));
-		rsp->OutputBufferLength = cpu_to_le32(total_written);
-		total_rsp_len = __SMB2_HEADER_STRUCTURE_SIZE +
-				sizeof(rsp->StructureSize) +
-				sizeof(rsp->OutputBufferOffset) +
-				sizeof(rsp->OutputBufferLength) +
-				total_written;
+		total_rsp_len = ksmbd_notify_finalize_success_rsp(work,
+								  total_written);
 	}
 
-	if (ksmbd_iov_pin_rsp(work, rsp, total_rsp_len))
-		rsp->hdr.Status = STATUS_INSUFFICIENT_RESOURCES;
+	if (ksmbd_iov_pin_rsp(work, work->response_buf, total_rsp_len))
+		ksmbd_notify_build_status_rsp(work, STATUS_INSUFFICIENT_RESOURCES);
 
-	if (work->sess && work->conn && work->conn->ops &&
-	    (work->sess->sign ||
-	     (work->request_buf &&
-	      work->conn->ops->is_sign_req(work, SMB2_CHANGE_NOTIFY_HE))))
+	if (ksmbd_notify_should_sign(work))
 		work->conn->ops->set_sign_rsp(work);
 
 	if (work->sess && work->conn && work->conn->ops &&
@@ -443,15 +1107,16 @@ static void ksmbd_notify_build_response_from_buffer(
 		if (next_work) {
 			/* fp->f_lock and watch->lock must not be held together */
 			spin_lock(&watch->lock);
-			if (!watch->pending_work)
+			if (!watch->pending_work) {
 				watch->pending_work = next_work;
+				ksmbd_notify_apply_work_params(watch, next_work);
+				ksmbd_notify_purge_tree_rename_duplicate(watch);
+			}
 			spin_unlock(&watch->lock);
 		}
 	}
 
-	spin_lock(&work->conn->request_lock);
-	list_del_init(&work->async_request_entry);
-	spin_unlock(&work->conn->request_lock);
+	ksmbd_notify_unlink_async_request(work);
 
 	if (work->request_buf)
 		ksmbd_conn_try_dequeue_request(work);
@@ -468,20 +1133,17 @@ static void ksmbd_notify_build_response_from_buffer(
 		ksmbd_user_session_put(work->sess);
 
 	{
-		bool is_async = !work->request_buf;
 		struct ksmbd_conn *conn = work->conn;
+		struct ksmbd_conn *notify_conn;
+
+		notify_conn = ksmbd_notify_detach_work_conn_ref(work);
 
 		ksmbd_free_work_struct(work);
 		/* Release the refcnt pin taken at the top of this function. */
 		if (conn)
 			ksmbd_conn_free(conn);
-		/*
-		 * Release the smb2_notify.c refcount_inc taken for compound-
-		 * spawned async works (request_buf == NULL).  Non-compound works
-		 * carry no extra reference.
-		 */
-		if (is_async && conn)
-			ksmbd_conn_free(conn);
+		if (notify_conn)
+			ksmbd_conn_free(notify_conn);
 	}
 }
 
@@ -508,7 +1170,6 @@ static void ksmbd_notify_build_rename_response(
 		const struct qstr *new_name)
 {
 	struct ksmbd_work *work;
-	struct smb2_notify_rsp *rsp;
 	struct file_notify_information *info_old, *info_new;
 	int old_uni_len, new_uni_len;
 	int old_info_len, new_info_len, total_info_len;
@@ -534,9 +1195,8 @@ static void ksmbd_notify_build_rename_response(
 	work->iov_idx = 0;
 	work->iov_cnt = 0;
 
-	rsp = smb2_get_msg(work->response_buf);
-	rsp->hdr.Flags |= SMB2_FLAGS_ASYNC_COMMAND;
-	rsp->hdr.Id.AsyncId = cpu_to_le64(work->async_id);
+	ksmbd_notify_ensure_rsp_capacity(work, watch->output_buf_len);
+	ksmbd_notify_prepare_async_rsp(work);
 
 	/*
 	 * NOTIFY-07/09: compute max_data against the actual response buffer
@@ -545,25 +1205,17 @@ static void ksmbd_notify_build_rename_response(
 	 * records (old name + new name).
 	 */
 	{
-		size_t rsp_overhead = 4 + __SMB2_HEADER_STRUCTURE_SIZE +
-				      sizeof(rsp->StructureSize) +
-				      sizeof(rsp->OutputBufferOffset) +
-				      sizeof(rsp->OutputBufferLength);
-		size_t max_data = (work->response_sz > rsp_overhead) ?
-				   work->response_sz - rsp_overhead : 0;
-		__le16 tmp_name[NAME_MAX + 1];
+		size_t max_data = ksmbd_notify_max_data(work,
+							watch->output_buf_len);
+		__le16 tmp_name[KSMBD_NOTIFY_UTF16_TMP_UNITS];
 
-		out = (u8 *)rsp + rsp_overhead - 4; /* skip RFC1002 4 bytes */
+		out = ksmbd_notify_rsp_data(work);
 
 		/* Check if even the minimum (two empty records) fits */
 		if (2 * sizeof(struct file_notify_information) > max_data ||
 		    2 * sizeof(struct file_notify_information) > watch->output_buf_len) {
-			rsp->hdr.Status = STATUS_NOTIFY_ENUM_DIR;
-			rsp->StructureSize = cpu_to_le16(9);
-			rsp->OutputBufferOffset = cpu_to_le16(0);
-			rsp->OutputBufferLength = cpu_to_le32(0);
-			total_rsp_len = __SMB2_HEADER_STRUCTURE_SIZE +
-					SMB2_ERROR_STRUCTURE_SIZE2;
+			total_rsp_len = ksmbd_notify_build_status_rsp(work,
+							      STATUS_NOTIFY_ENUM_DIR);
 			goto send;
 		}
 
@@ -573,15 +1225,12 @@ static void ksmbd_notify_build_rename_response(
 		 * Encode old name into a temporary buffer first to determine
 		 * its length before writing to the response buffer.
 		 */
-		old_uni_len = smbConvertToUTF16(
-			tmp_name, old_name,
-			min_t(size_t, old_len,
-			      (max_data / 2 - sizeof(struct file_notify_information)) / 2),
-			work->conn->local_nls, 0);
+		old_uni_len = ksmbd_notify_encode_name(tmp_name,
+						       ARRAY_SIZE(tmp_name),
+						       old_name, old_len,
+						       work->conn->local_nls);
 		if (old_uni_len < 0)
 			old_uni_len = 0;
-		else
-			old_uni_len *= 2;
 		old_info_len = sizeof(struct file_notify_information) + old_uni_len;
 		old_info_len = ALIGN(old_info_len, 4);
 
@@ -592,12 +1241,8 @@ static void ksmbd_notify_build_rename_response(
 
 		if ((int)total_info_len > (int)watch->output_buf_len ||
 		    (int)total_info_len > (int)max_data) {
-			rsp->hdr.Status = STATUS_NOTIFY_ENUM_DIR;
-			rsp->StructureSize = cpu_to_le16(9);
-			rsp->OutputBufferOffset = cpu_to_le16(0);
-			rsp->OutputBufferLength = cpu_to_le32(0);
-			total_rsp_len = __SMB2_HEADER_STRUCTURE_SIZE +
-					SMB2_ERROR_STRUCTURE_SIZE2;
+			total_rsp_len = ksmbd_notify_build_status_rsp(work,
+							      STATUS_NOTIFY_ENUM_DIR);
 			goto send;
 		}
 
@@ -608,25 +1253,19 @@ static void ksmbd_notify_build_rename_response(
 		info_old->FileNameLength = cpu_to_le32(old_uni_len);
 
 		info_new = (struct file_notify_information *)(out + old_info_len);
-		new_uni_len = smbConvertToUTF16(
-			tmp_name, new_name->name,
-			min_t(size_t, new_name->len,
-			      (max_data - old_info_len - sizeof(struct file_notify_information)) / 2),
-			work->conn->local_nls, 0);
+		new_uni_len = ksmbd_notify_encode_name(tmp_name,
+						       ARRAY_SIZE(tmp_name),
+						       new_name->name,
+						       new_name->len,
+						       work->conn->local_nls);
 		if (new_uni_len < 0)
 			new_uni_len = 0;
-		else
-			new_uni_len *= 2;
 		new_info_len = sizeof(struct file_notify_information) + new_uni_len;
 
 		if ((int)(old_info_len + new_info_len) > (int)watch->output_buf_len ||
 		    (int)(old_info_len + new_info_len) > (int)max_data) {
-			rsp->hdr.Status = STATUS_NOTIFY_ENUM_DIR;
-			rsp->StructureSize = cpu_to_le16(9);
-			rsp->OutputBufferOffset = cpu_to_le16(0);
-			rsp->OutputBufferLength = cpu_to_le32(0);
-			total_rsp_len = __SMB2_HEADER_STRUCTURE_SIZE +
-					SMB2_ERROR_STRUCTURE_SIZE2;
+			total_rsp_len = ksmbd_notify_build_status_rsp(work,
+							      STATUS_NOTIFY_ENUM_DIR);
 			goto send;
 		}
 
@@ -638,29 +1277,13 @@ static void ksmbd_notify_build_rename_response(
 	}
 
 	total_info_len = old_info_len + new_info_len;
-
-	rsp->hdr.Status = STATUS_SUCCESS;
-	rsp->StructureSize = cpu_to_le16(9);
-	rsp->OutputBufferOffset = cpu_to_le16(
-		sizeof(struct smb2_hdr) +
-		sizeof(rsp->StructureSize) +
-		sizeof(rsp->OutputBufferOffset) +
-		sizeof(rsp->OutputBufferLength));
-	rsp->OutputBufferLength = cpu_to_le32(total_info_len);
-	total_rsp_len = __SMB2_HEADER_STRUCTURE_SIZE +
-			sizeof(rsp->StructureSize) +
-			sizeof(rsp->OutputBufferOffset) +
-			sizeof(rsp->OutputBufferLength) +
-			total_info_len;
+	total_rsp_len = ksmbd_notify_finalize_success_rsp(work, total_info_len);
 
 send:
-	if (ksmbd_iov_pin_rsp(work, rsp, total_rsp_len))
-		rsp->hdr.Status = STATUS_INSUFFICIENT_RESOURCES;
+	if (ksmbd_iov_pin_rsp(work, work->response_buf, total_rsp_len))
+		ksmbd_notify_build_status_rsp(work, STATUS_INSUFFICIENT_RESOURCES);
 
-	if (work->sess && work->conn && work->conn->ops &&
-	    (work->sess->sign ||
-	     (work->request_buf &&
-	      work->conn->ops->is_sign_req(work, SMB2_CHANGE_NOTIFY_HE))))
+	if (ksmbd_notify_should_sign(work))
 		work->conn->ops->set_sign_rsp(work);
 
 	if (work->sess && work->conn && work->conn->ops &&
@@ -670,7 +1293,7 @@ send:
 
 		if (rc < 0) {
 			pr_err_ratelimited("ksmbd: notify rename encrypt failed: %d\n", rc);
-			rsp->hdr.Status = STATUS_DATA_ERROR;
+			ksmbd_notify_build_status_rsp(work, STATUS_DATA_ERROR);
 		}
 	}
 
@@ -683,9 +1306,7 @@ send:
 		spin_unlock(&watch->fp->f_lock);
 	}
 
-	spin_lock(&work->conn->request_lock);
-	list_del_init(&work->async_request_entry);
-	spin_unlock(&work->conn->request_lock);
+	ksmbd_notify_unlink_async_request(work);
 
 	if (work->request_buf)
 		ksmbd_conn_try_dequeue_request(work);
@@ -702,20 +1323,17 @@ send:
 		ksmbd_user_session_put(work->sess);
 
 	{
-		bool is_async = !work->request_buf;
 		struct ksmbd_conn *conn = work->conn;
+		struct ksmbd_conn *notify_conn;
+
+		notify_conn = ksmbd_notify_detach_work_conn_ref(work);
 
 		ksmbd_free_work_struct(work);
 		/* Release the conn reference taken at the top of this function. */
 		if (conn)
 			ksmbd_conn_free(conn);
-		/*
-		 * Release the smb2_notify.c refcount_inc taken for compound-
-		 * spawned async works (request_buf == NULL).  Non-compound works
-		 * carry no extra reference.
-		 */
-		if (is_async && conn)
-			ksmbd_conn_free(conn);
+		if (notify_conn)
+			ksmbd_conn_free(notify_conn);
 	}
 }
 
@@ -734,93 +1352,70 @@ static void ksmbd_notify_complete_piggyback(
 		u32 action,
 		const struct qstr *file_name)
 {
-	struct smb2_notify_rsp *rsp;
+	struct smb_com_ntransact_req *smb1_req;
 	struct file_notify_information *info;
 	int info_len;
 	int total_rsp_len;
 	int uni_len;
 	u8 *out;
+	size_t max_data;
 	u32 output_buf_len;
-	struct smb2_notify_req *req;
+	__le16 tmp_name[KSMBD_NOTIFY_UTF16_TMP_UNITS];
 
 	if (!ksmbd_notify_take_work(work, KSMBD_WORK_CLOSED))
 		return;
 
-	rsp = smb2_get_msg(work->response_buf);
-	req = smb2_get_msg(work->request_buf);
-	output_buf_len = le32_to_cpu(req->OutputBufferLength);
+	switch (ksmbd_notify_work_proto(work)) {
+	case KSMBD_NOTIFY_PROTO_SMB1:
+		smb1_req = work->request_buf;
+		output_buf_len = le32_to_cpu(smb1_req->MaxDataCount);
+		break;
+	case KSMBD_NOTIFY_PROTO_SMB2:
+		output_buf_len = le32_to_cpu(
+			((struct smb2_notify_req *)smb2_get_msg(work->request_buf))->OutputBufferLength);
+		break;
+	default:
+		return;
+	}
 
-	rsp->hdr.Flags |= SMB2_FLAGS_ASYNC_COMMAND;
-	rsp->hdr.Id.AsyncId = cpu_to_le64(work->async_id);
+	max_data = ksmbd_notify_max_data(work, output_buf_len);
+	ksmbd_notify_prepare_async_rsp(work);
 
-	info_len = sizeof(struct file_notify_information) +
-		   file_name->len * 2;
-
-	if (info_len > (int)output_buf_len) {
-		rsp->hdr.Status = STATUS_NOTIFY_ENUM_DIR;
-		rsp->StructureSize = cpu_to_le16(9);
-		rsp->OutputBufferOffset = cpu_to_le16(0);
-		rsp->OutputBufferLength = cpu_to_le32(0);
-		total_rsp_len =
-			__SMB2_HEADER_STRUCTURE_SIZE +
-			SMB2_ERROR_STRUCTURE_SIZE2;
+	if (max_data < sizeof(struct file_notify_information)) {
+		total_rsp_len = ksmbd_notify_build_status_rsp(work,
+							      STATUS_NOTIFY_ENUM_DIR);
 		goto send;
 	}
 
-	out = (u8 *)rsp + __SMB2_HEADER_STRUCTURE_SIZE +
-	      sizeof(rsp->StructureSize) +
-	      sizeof(rsp->OutputBufferOffset) +
-	      sizeof(rsp->OutputBufferLength);
+	out = ksmbd_notify_rsp_data(work);
 	info = (struct file_notify_information *)out;
 
-	uni_len = smbConvertToUTF16(info->FileName, file_name->name,
-				    file_name->len,
-				    work->conn->local_nls, 0);
+	uni_len = ksmbd_notify_encode_name(tmp_name, ARRAY_SIZE(tmp_name),
+					   file_name->name, file_name->len,
+					   work->conn->local_nls);
 	if (uni_len < 0)
 		uni_len = 0;
-	else
-		uni_len *= 2;
 
 	info_len = sizeof(struct file_notify_information) + uni_len;
-	if (info_len > (int)output_buf_len) {
-		rsp->hdr.Status = STATUS_NOTIFY_ENUM_DIR;
-		rsp->StructureSize = cpu_to_le16(9);
-		rsp->OutputBufferOffset = cpu_to_le16(0);
-		rsp->OutputBufferLength = cpu_to_le32(0);
-		total_rsp_len =
-			__SMB2_HEADER_STRUCTURE_SIZE +
-			SMB2_ERROR_STRUCTURE_SIZE2;
+	if (info_len > (int)max_data) {
+		total_rsp_len = ksmbd_notify_build_status_rsp(work,
+							      STATUS_NOTIFY_ENUM_DIR);
 		goto send;
 	}
 
+	memcpy(info->FileName, tmp_name, uni_len);
 	info->NextEntryOffset = cpu_to_le32(0);
 	info->Action = cpu_to_le32(action);
 	info->FileNameLength = cpu_to_le32(uni_len);
 
-	rsp->hdr.Status = STATUS_SUCCESS;
-	rsp->StructureSize = cpu_to_le16(9);
-	rsp->OutputBufferOffset = cpu_to_le16(
-		sizeof(struct smb2_hdr) +
-		sizeof(rsp->StructureSize) +
-		sizeof(rsp->OutputBufferOffset) +
-		sizeof(rsp->OutputBufferLength));
-	rsp->OutputBufferLength = cpu_to_le32(info_len);
-
-	total_rsp_len =
-		__SMB2_HEADER_STRUCTURE_SIZE +
-		sizeof(rsp->StructureSize) +
-		sizeof(rsp->OutputBufferOffset) +
-		sizeof(rsp->OutputBufferLength) + info_len;
+	total_rsp_len = ksmbd_notify_finalize_success_rsp(work, info_len);
 
 send:
-	if (ksmbd_iov_pin_rsp(work, rsp, total_rsp_len))
-		rsp->hdr.Status = STATUS_INSUFFICIENT_RESOURCES;
+	if (ksmbd_iov_pin_rsp(work, work->response_buf, total_rsp_len))
+		ksmbd_notify_build_status_rsp(work, STATUS_INSUFFICIENT_RESOURCES);
 
 	/* Sign if required (before encryption) */
-	if (work->sess && work->conn && work->conn->ops &&
-	    (work->sess->sign ||
-	     (work->request_buf &&
-	      work->conn->ops->is_sign_req(work, SMB2_CHANGE_NOTIFY_HE))))
+	if (ksmbd_notify_should_sign(work))
 		work->conn->ops->set_sign_rsp(work);
 
 	if (work->sess && work->conn && work->conn->ops &&
@@ -829,7 +1424,7 @@ send:
 		int rc = work->conn->ops->encrypt_resp(work);
 
 		if (rc < 0)
-			rsp->hdr.Status = STATUS_DATA_ERROR;
+			ksmbd_notify_build_status_rsp(work, STATUS_DATA_ERROR);
 	}
 
 	/* Clear send_no_response so ksmbd_conn_write transmits */
@@ -837,9 +1432,7 @@ send:
 	ksmbd_conn_write(work);
 
 	/* Remove from async_requests list before freeing */
-	spin_lock(&work->conn->request_lock);
-	list_del_init(&work->async_request_entry);
-	spin_unlock(&work->conn->request_lock);
+	ksmbd_notify_unlink_async_request(work);
 
 	/*
 	 * Only dequeue from the request list if this work was
@@ -858,12 +1451,12 @@ send:
 		ksmbd_user_session_put(work->sess);
 
 	{
-		bool is_async = !work->request_buf;
-		struct ksmbd_conn *conn = work->conn;
+		struct ksmbd_conn *notify_conn;
 
+		notify_conn = ksmbd_notify_detach_work_conn_ref(work);
 		ksmbd_free_work_struct(work);
-		if (is_async && conn)
-			ksmbd_conn_free(conn);
+		if (notify_conn)
+			ksmbd_conn_free(notify_conn);
 	}
 }
 
@@ -1024,6 +1617,18 @@ static int ksmbd_notify_handle_event(
 	 */
 	if (!(watch->completion_filter &
 	      (FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_DIR_NAME))) {
+		if ((action == FILE_ACTION_RENAMED_NEW_NAME ||
+		     action == FILE_ACTION_ADDED) &&
+		    watch->tree_rename_suppress_len > 0 &&
+		    file_name->len ==
+		    (size_t)watch->tree_rename_suppress_len &&
+		    !memcmp(file_name->name,
+			    watch->tree_rename_suppress_name,
+			    file_name->len)) {
+			watch->tree_rename_suppress_len = 0;
+			spin_unlock(&watch->lock);
+			return 0;
+		}
 		if (action == FILE_ACTION_RENAMED_OLD_NAME) {
 			spin_unlock(&watch->lock);
 			return 0;
@@ -1076,11 +1681,15 @@ static int ksmbd_notify_handle_event(
 	    (smb2_filter & watch->completion_filter)) {
 		char *saved_old = watch->rename_old_name;
 		size_t saved_len = watch->rename_old_len;
+		bool batch_recursive = watch->pending_work && watch->watch_tree;
+		size_t slen = min_t(size_t, file_name->len, NAME_MAX);
 
 		watch->rename_old_name = NULL;
 		watch->rename_cookie = 0;
+		memcpy(watch->rename_suppress_name, file_name->name, slen);
+		watch->rename_suppress_len = (u8)slen;
 
-		if (watch->pending_work) {
+		if (watch->pending_work && !batch_recursive) {
 			spin_unlock(&watch->lock);
 			ksmbd_notify_build_rename_response(watch,
 							   saved_old, saved_len,
@@ -1117,6 +1726,9 @@ static int ksmbd_notify_handle_event(
 					list_add_tail(&new_chg->entry,
 						      &watch->buffered_changes);
 					watch->buffered_count += 2;
+					if (batch_recursive && watch->pending_work &&
+					    !watch->completed)
+						ksmbd_notify_schedule_batch_work(watch);
 				} else {
 					kfree(old_chg);
 					kfree(new_chg);
@@ -1137,6 +1749,23 @@ static int ksmbd_notify_handle_event(
 		kfree(watch->rename_old_name);
 		watch->rename_old_name = NULL;
 		watch->rename_cookie = 0;
+	}
+
+	if (action == FILE_ACTION_RENAMED_NEW_NAME && cookie &&
+	    !watch->rename_old_name && watch->buffer_tree) {
+		size_t slen = min_t(size_t, file_name->len, NAME_MAX);
+
+		memcpy(watch->rename_suppress_name, file_name->name, slen);
+		watch->rename_suppress_len = (u8)slen;
+		spin_unlock(&watch->lock);
+		return 0;
+	}
+
+	if (action == FILE_ACTION_RENAMED_NEW_NAME) {
+		size_t slen = min_t(size_t, file_name->len, NAME_MAX);
+
+		memcpy(watch->rename_suppress_name, file_name->name, slen);
+		watch->rename_suppress_len = (u8)slen;
 	}
 
 	/*
@@ -1272,19 +1901,34 @@ static int ksmbd_notify_handle_event(
 		}
 
 		if (watch->pending_work) {
+			struct ksmbd_work *pending_work = watch->pending_work;
+			bool batch_recursive = watch->watch_tree;
+
 			spin_unlock(&watch->lock);
-			/*
-			 * Complete the pending NOTIFY synchronously with the
-			 * buffered event(s).  The former 10 ms debounce timer
-			 * was batching rapid mkdir+rmdir sequences into a single
-			 * response, causing tests to see changes[0]=ADDED when
-			 * they expected changes[0]=REMOVED.  Windows fires the
-			 * pending NOTIFY immediately on the first matching event;
-			 * any events that arrive before the client re-issues
-			 * CHANGE_NOTIFY are buffered and returned by add_watch's
-			 * buffered-changes drain path.
-			 */
-			ksmbd_notify_build_response_from_buffer(watch);
+			if (batch_recursive &&
+			    !ksmbd_notify_has_queued_waiter(watch->fp,
+							    pending_work)) {
+				ksmbd_notify_schedule_batch_work(watch);
+			} else {
+				/*
+				 * Complete the pending NOTIFY synchronously with the
+				 * buffered event(s).  The former 10 ms debounce timer
+				 * was batching rapid mkdir+rmdir sequences into a single
+				 * response, causing tests to see changes[0]=ADDED when
+				 * they expected changes[0]=REMOVED.  Windows fires the
+				 * pending NOTIFY immediately on the first matching event;
+				 * any events that arrive before the client re-issues
+				 * CHANGE_NOTIFY are buffered and returned by add_watch's
+				 * buffered-changes drain path.
+				 *
+				 * Also avoid recursive batching when another CHANGE_NOTIFY
+				 * is already queued on the same handle: sequential delivery
+				 * must let the next waiter observe the next matching event
+				 * instead of draining multiple descendant changes into the
+				 * first request.
+				 */
+				ksmbd_notify_build_response_from_buffer(watch);
+			}
 			/*
 			 * Mark that the primary watch fired so that the legacy
 			 * blocked_works loop (below) is skipped.  Multiple
@@ -1356,10 +2000,13 @@ handle_piggybacks:
 				}
 			}
 			/* Collect for completion if there is a pending work */
-			if (sec->pending_work && !sec->completed &&
-			    n_secs < (int)ARRAY_SIZE(complete_secs)) {
-				complete_secs[n_secs++] = sec;
-				buffered_only = false;
+			if (sec->pending_work && !sec->completed) {
+				if (sec->watch_tree) {
+					ksmbd_notify_schedule_batch_work(sec);
+				} else if (n_secs < (int)ARRAY_SIZE(complete_secs)) {
+					complete_secs[n_secs++] = sec;
+					buffered_only = false;
+				}
 			}
 			spin_unlock(&sec->lock);
 			if (buffered_only)
@@ -1403,10 +2050,7 @@ put_secondary:
 	spin_lock(&fp->f_lock);
 	list_for_each_entry_safe(work, tmp,
 				 &fp->blocked_works, fp_entry) {
-		struct smb2_hdr *hdr;
-
-		hdr = smb2_get_msg(work->request_buf);
-		if (hdr->Command != SMB2_CHANGE_NOTIFY)
+		if (!ksmbd_notify_is_change_notify_work(work))
 			continue;
 
 		/*
@@ -1448,12 +2092,8 @@ static void ksmbd_notify_free_mark(struct fsnotify_mark *mark)
 	/* Cancel any pending (queued but not running) batch work */
 	cancel_delayed_work(&watch->batch_work);
 	WARN_ON_ONCE(!list_empty(&watch->secondary_watches));
-	ksmbd_notify_release_changes(watch);
-
-	atomic_dec(&notify_watch_count);
-	if (watch->conn)
-		atomic_dec(&watch->conn->notify_watch_count);
-	kfree(watch);
+	watch->has_mark = false;
+	ksmbd_notify_watch_put(watch);
 }
 
 static const struct fsnotify_ops ksmbd_notify_ops = {
@@ -1511,9 +2151,12 @@ static int ksmbd_notify_add_secondary(struct ksmbd_file *fp,
 	secondary->conn			= work->conn;
 	secondary->completion_filter	= completion_filter;
 	secondary->watch_tree		= watch_tree;
+	secondary->buffer_tree		= watch_tree;
 	secondary->output_buf_len	= output_buf_len;
 	secondary->has_mark		= false;
 	secondary->detached		= false;
+	secondary->mark_cleanup_started	= false;
+	secondary->enum_dir_sticky	= false;
 	secondary->primary		= primary;
 	spin_lock_init(&secondary->lock);
 	refcount_set(&secondary->refs, 1);
@@ -1536,7 +2179,7 @@ static int ksmbd_notify_add_secondary(struct ksmbd_file *fp,
 	spin_unlock(&primary->lock);
 
 	/* Attach the secondary watch to the fp so re-NOTIFY reuses it */
-	fp->notify_watch = secondary;
+	ksmbd_notify_set_file_watch(fp, secondary);
 
 	if (cancel_argv)
 		cancel_argv[0] = secondary;
@@ -1572,7 +2215,9 @@ int ksmbd_notify_add_watch(struct ksmbd_file *fp,
 	 * events occurring between cancel and the next NOTIFY
 	 * are buffered and can be delivered immediately.
 	 */
+	spin_lock(&fp->f_lock);
 	watch = fp->notify_watch;
+	spin_unlock(&fp->f_lock);
 	if (watch) {
 		spin_lock(&watch->lock);
 
@@ -1585,58 +2230,22 @@ int ksmbd_notify_add_watch(struct ksmbd_file *fp,
 		 * filter are silently ignored per Windows behaviour (as
 		 * tested by smbtorture smb2.notify.mask-change).
 		 */
-		watch->watch_tree = watch_tree;
-		watch->output_buf_len = output_buf_len;
+		if (!watch->pending_work) {
+			watch->watch_tree = watch_tree;
+			watch->output_buf_len = output_buf_len;
+		}
+		watch->buffer_tree |= watch_tree;
 		watch->completed = false;
 
-		/*
-		 * Check for buffered changes.  If present, we can
-		 * respond immediately without going async.
-		 *
-		 * First, check if the total buffered data exceeds the
-		 * client's output buffer.  Per MS-SMB2 3.3.4.4, when
-		 * accumulated changes cannot fit in the buffer, the
-		 * server returns STATUS_NOTIFY_ENUM_DIR.
-		 */
-		if (!list_empty(&watch->buffered_changes)) {
-			struct ksmbd_notify_change *chg;
-			size_t total_size = 0;
-
-			list_for_each_entry(chg, &watch->buffered_changes,
-					    entry) {
-				/* 12-byte header + filename in UTF-16 */
-				total_size +=
-					sizeof(struct file_notify_information) +
-					chg->name_len * 2;
-			}
-			if (total_size > output_buf_len) {
-				/* Overflow: discard all and return ENUM_DIR */
-				struct ksmbd_notify_change *tmp;
-				struct smb2_notify_rsp *rsp;
-
-				list_for_each_entry_safe(chg, tmp,
-							 &watch->buffered_changes,
-							 entry) {
-					list_del(&chg->entry);
-					kfree(chg->name);
-					kfree(chg);
-				}
-				watch->buffered_count = 0;
-				spin_unlock(&watch->lock);
-
-				rsp = smb2_get_msg(work->response_buf);
-				rsp->hdr.Status = STATUS_NOTIFY_ENUM_DIR;
-				rsp->StructureSize = cpu_to_le16(9);
-				rsp->OutputBufferOffset = cpu_to_le16(0);
-				rsp->OutputBufferLength = cpu_to_le32(0);
-				ksmbd_iov_pin_rsp(work, rsp,
-					__SMB2_HEADER_STRUCTURE_SIZE +
-					SMB2_ERROR_STRUCTURE_SIZE2);
-
-				if (cancel_argv)
-					cancel_argv[0] = NULL;
-				return -EIOCBQUEUED;
-			}
+		if (watch->enum_dir_sticky) {
+			spin_unlock(&watch->lock);
+			ksmbd_notify_build_status_rsp(work, STATUS_NOTIFY_ENUM_DIR);
+			ksmbd_iov_pin_rsp(work, work->response_buf,
+					  get_rfc1002_len(work->response_buf) +
+					  RFC1002_HEADER_LEN);
+			if (cancel_argv)
+				cancel_argv[0] = NULL;
+			return -EIOCBQUEUED;
 		}
 
 		if (!list_empty(&watch->buffered_changes)) {
@@ -1649,11 +2258,11 @@ int ksmbd_notify_add_watch(struct ksmbd_file *fp,
 			 */
 			LIST_HEAD(flush_list);
 			struct ksmbd_notify_change *chg, *chg_tmp;
-			struct smb2_notify_rsp *rsp;
 			u8 *buf_start, *cur;
-			size_t rsp_overhead, max_data, total_written = 0;
+			size_t max_data, total_written = 0;
 			struct file_notify_information *prev_info = NULL;
 			int total_rsp_len;
+			bool overflow = false;
 
 			/* Steal all buffered events under the lock */
 			list_splice_init(&watch->buffered_changes,
@@ -1661,54 +2270,45 @@ int ksmbd_notify_add_watch(struct ksmbd_file *fp,
 			watch->buffered_count = 0;
 			spin_unlock(&watch->lock);
 
-			rsp = smb2_get_msg(work->response_buf);
+			ksmbd_notify_ensure_rsp_capacity(work, output_buf_len);
 
-			rsp_overhead = 4 + __SMB2_HEADER_STRUCTURE_SIZE +
-				sizeof(rsp->StructureSize) +
-				sizeof(rsp->OutputBufferOffset) +
-				sizeof(rsp->OutputBufferLength);
-			max_data = (work->response_sz > rsp_overhead) ?
-				   work->response_sz - rsp_overhead : 0;
-			if (max_data > output_buf_len)
-				max_data = output_buf_len;
-
-			buf_start = (u8 *)rsp +
-				__SMB2_HEADER_STRUCTURE_SIZE +
-				sizeof(rsp->StructureSize) +
-				sizeof(rsp->OutputBufferOffset) +
-				sizeof(rsp->OutputBufferLength);
+			max_data = ksmbd_notify_max_data(work, output_buf_len);
+			buf_start = ksmbd_notify_rsp_data(work);
 			cur = buf_start;
 
 			list_for_each_entry_safe(chg, chg_tmp,
 						 &flush_list, entry) {
 				struct file_notify_information *info;
-				int uni_len;
+				int name_len_bytes;
 				size_t max_rem, rec_sz, rec_sz_al;
+				__le16 tmp_name[KSMBD_NOTIFY_UTF16_TMP_UNITS];
 
 				max_rem = (total_written < max_data) ?
 					  max_data - total_written : 0;
-				if (max_rem < sizeof(*info))
+				if (max_rem < sizeof(*info)) {
+					overflow = true;
 					break;
+				}
 
 				info = (struct file_notify_information *)cur;
-				uni_len = smbConvertToUTF16(
-					info->FileName, chg->name,
-					min_t(size_t, chg->name_len,
-					      (max_rem - sizeof(*info)) / 2),
-					work->conn->local_nls, 0);
-				if (uni_len < 0)
-					uni_len = 0;
-				else
-					uni_len *= 2;
+				name_len_bytes = ksmbd_notify_encode_name(
+					tmp_name, ARRAY_SIZE(tmp_name),
+					chg->name, chg->name_len,
+					work->conn->local_nls);
+				if (name_len_bytes < 0)
+					name_len_bytes = 0;
 
-				rec_sz = sizeof(*info) + uni_len;
+				rec_sz = sizeof(*info) + name_len_bytes;
 				rec_sz_al = ALIGN(rec_sz, 4);
 
-				if (rec_sz_al > max_rem)
+				if (rec_sz_al > max_rem) {
+					overflow = true;
 					break;
+				}
 
+				memcpy(info->FileName, tmp_name, name_len_bytes);
 				info->Action = cpu_to_le32(chg->action);
-				info->FileNameLength = cpu_to_le32(uni_len);
+				info->FileNameLength = cpu_to_le32(name_len_bytes);
 				/* Will be zeroed for the last record */
 				info->NextEntryOffset =
 					cpu_to_le32(rec_sz_al);
@@ -1730,37 +2330,26 @@ int ksmbd_notify_add_watch(struct ksmbd_file *fp,
 				kfree(chg);
 			}
 
-			if (total_written == 0) {
-				rsp->hdr.Status = STATUS_NOTIFY_ENUM_DIR;
-				rsp->StructureSize = cpu_to_le16(9);
-				rsp->OutputBufferOffset = cpu_to_le16(0);
-				rsp->OutputBufferLength = cpu_to_le32(0);
-				total_rsp_len =
-					__SMB2_HEADER_STRUCTURE_SIZE +
-					SMB2_ERROR_STRUCTURE_SIZE2;
+			if (total_written == 0)
+				overflow = true;
+
+			if (overflow) {
+				if (output_buf_len) {
+					spin_lock(&watch->lock);
+					watch->enum_dir_sticky = true;
+					spin_unlock(&watch->lock);
+				}
+				total_rsp_len = ksmbd_notify_build_status_rsp(
+					work, STATUS_NOTIFY_ENUM_DIR);
 			} else {
 				/* Zero the last record's NextEntryOffset */
 				if (prev_info)
 					prev_info->NextEntryOffset = 0;
-
-				rsp->hdr.Status = STATUS_SUCCESS;
-				rsp->StructureSize = cpu_to_le16(9);
-				rsp->OutputBufferOffset = cpu_to_le16(
-					sizeof(struct smb2_hdr) +
-					sizeof(rsp->StructureSize) +
-					sizeof(rsp->OutputBufferOffset) +
-					sizeof(rsp->OutputBufferLength));
-				rsp->OutputBufferLength =
-					cpu_to_le32(total_written);
-				total_rsp_len =
-					__SMB2_HEADER_STRUCTURE_SIZE +
-					sizeof(rsp->StructureSize) +
-					sizeof(rsp->OutputBufferOffset) +
-					sizeof(rsp->OutputBufferLength) +
-					total_written;
+				total_rsp_len = ksmbd_notify_finalize_success_rsp(
+					work, total_written);
 			}
 
-			ksmbd_iov_pin_rsp(work, rsp, total_rsp_len);
+			ksmbd_iov_pin_rsp(work, work->response_buf, total_rsp_len);
 
 			if (cancel_argv)
 				cancel_argv[0] = NULL;
@@ -1850,10 +2439,13 @@ retry_new_watch:
 	watch->conn = work->conn;
 	watch->completion_filter = completion_filter;
 	watch->watch_tree = watch_tree;
+	watch->buffer_tree = watch_tree;
 	watch->output_buf_len = output_buf_len;
 	watch->completed = false;
 	watch->has_mark = true;
 	watch->detached = false;
+	watch->mark_cleanup_started = false;
+	watch->enum_dir_sticky = false;
 	watch->primary = NULL;
 	spin_lock_init(&watch->lock);
 	refcount_set(&watch->refs, 1);
@@ -1987,7 +2579,7 @@ retry_new_watch:
 	}
 
 	/* Attach watch to the file handle for persistence */
-	fp->notify_watch = watch;
+	ksmbd_notify_set_file_watch(fp, watch);
 
 	if (cancel_argv)
 		cancel_argv[0] = watch;
@@ -2003,7 +2595,6 @@ void ksmbd_notify_cancel(void **argv)
 {
 	struct ksmbd_notify_watch *watch;
 	struct ksmbd_work *work;
-	struct smb2_hdr *rsp_hdr;
 	bool put_watch = false;
 
 	if (!argv)
@@ -2044,19 +2635,11 @@ void ksmbd_notify_cancel(void **argv)
 		work->iov_idx = 0;
 		work->iov_cnt = 0;
 		work->send_no_response = 0;
-
-		smb2_set_err_rsp(work);
-
-		rsp_hdr = smb2_get_msg(work->response_buf);
-		rsp_hdr->Flags |= SMB2_FLAGS_ASYNC_COMMAND;
-		rsp_hdr->Id.AsyncId = cpu_to_le64(work->async_id);
-		rsp_hdr->Status = STATUS_CANCELLED;
+		ksmbd_notify_prepare_async_rsp(work);
+		ksmbd_notify_build_status_rsp(work, STATUS_CANCELLED);
 
 		/* Sign if required (before encryption) */
-		if (work->sess && work->conn && work->conn->ops &&
-		    (work->sess->sign ||
-		     (work->request_buf &&
-		      work->conn->ops->is_sign_req(work, SMB2_CHANGE_NOTIFY_HE))))
+		if (ksmbd_notify_should_sign(work))
 			work->conn->ops->set_sign_rsp(work);
 
 		if (work->sess && work->conn && work->conn->ops &&
@@ -2073,9 +2656,7 @@ void ksmbd_notify_cancel(void **argv)
 		ksmbd_conn_write(work);
 
 		/* Remove from async_requests list before freeing */
-		spin_lock(&work->conn->request_lock);
-		list_del_init(&work->async_request_entry);
-		spin_unlock(&work->conn->request_lock);
+		ksmbd_notify_unlink_async_request(work);
 
 		/*
 		 * Only dequeue from the request list if this work was
@@ -2098,17 +2679,12 @@ void ksmbd_notify_cancel(void **argv)
 			ksmbd_user_session_put(work->sess);
 
 		{
-			bool is_async = !work->request_buf;
-			struct ksmbd_conn *conn = work->conn;
+			struct ksmbd_conn *notify_conn;
 
+			notify_conn = ksmbd_notify_detach_work_conn_ref(work);
 			ksmbd_free_work_struct(work);
-			/*
-			 * Release r_count for compound-spawned async works
-			 * (request_buf == NULL).  Non-compound works have no
-			 * r_count reference.
-			 */
-			if (is_async && conn)
-				ksmbd_conn_free(conn);
+			if (notify_conn)
+				ksmbd_conn_free(notify_conn);
 		}
 		if (put_watch)
 			ksmbd_notify_watch_put(watch);
@@ -2138,57 +2714,20 @@ void ksmbd_notify_cancel(void **argv)
 	/* Cancel any pending batch timer — the request is being cancelled. */
 	cancel_delayed_work_sync(&watch->batch_work);
 
-	/*
-	 * Build a proper SMB2 error response with STATUS_CANCELLED.
-	 * Use smb2_set_err_rsp() to format the error body correctly
-	 * (StructureSize=9, ErrorContextCount, Reserved, ByteCount)
-	 * and pin the response with the proper wire size (73 bytes).
-	 *
-	 * The main dispatch loop may have already called
-	 * encrypt_resp() and set work->tr_buf.  Free it first
-	 * so we start with a clean IOV state.
-	 */
 	kfree(work->tr_buf);
 	work->tr_buf = NULL;
 	work->iov_idx = 0;
 	work->iov_cnt = 0;
-
-	/*
-	 * smb2_set_err_rsp uses send_no_response on pin failure,
-	 * so clear it first.  We will set it properly below.
-	 */
 	work->send_no_response = 0;
-
-	smb2_set_err_rsp(work);
-
-	/*
-	 * Now set the async flags and STATUS_CANCELLED on the
-	 * response header.  smb2_set_err_rsp left the status
-	 * as whatever it was before (from init_smb2_rsp_hdr).
-	 */
-	rsp_hdr = smb2_get_msg(work->response_buf);
-	rsp_hdr->Flags |= SMB2_FLAGS_ASYNC_COMMAND;
-	rsp_hdr->Id.AsyncId = cpu_to_le64(work->async_id);
-	rsp_hdr->Status = STATUS_CANCELLED;
-
-	ksmbd_debug(SMB,
-		    "notify_cancel: flags=0x%x async_id=%llu mid=%llu cmd=0x%x iov_idx=%d iov_cnt=%d rfc1002=%u\n",
-		    le32_to_cpu(rsp_hdr->Flags),
-		    le64_to_cpu(rsp_hdr->Id.AsyncId),
-		    le64_to_cpu(rsp_hdr->MessageId),
-		    le16_to_cpu(rsp_hdr->Command),
-		    work->iov_idx, work->iov_cnt,
-		    get_rfc1002_len(work->iov[0].iov_base));
+	ksmbd_notify_prepare_async_rsp(work);
+	ksmbd_notify_build_status_rsp(work, STATUS_CANCELLED);
 
 	/*
 	 * Sign the response if the session requires signing.
 	 * Per MS-SMB2 3.3.4.4, the final async response SHOULD
 	 * be signed.  Signing must happen before encryption.
 	 */
-	if (work->sess && work->conn && work->conn->ops &&
-	    (work->sess->sign ||
-	     (work->request_buf &&
-	      work->conn->ops->is_sign_req(work, SMB2_CHANGE_NOTIFY_HE))))
+	if (ksmbd_notify_should_sign(work))
 		work->conn->ops->set_sign_rsp(work);
 
 	/* Encrypt if the session requires it */
@@ -2212,9 +2751,7 @@ void ksmbd_notify_cancel(void **argv)
 	}
 
 	/* Remove from async_requests list before freeing */
-	spin_lock(&work->conn->request_lock);
-	list_del_init(&work->async_request_entry);
-	spin_unlock(&work->conn->request_lock);
+	ksmbd_notify_unlink_async_request(work);
 
 	/*
 	 * Only dequeue from the request list if this work was
@@ -2233,18 +2770,13 @@ void ksmbd_notify_cancel(void **argv)
 		ksmbd_user_session_put(work->sess);
 
 	{
-		bool is_async = !work->request_buf;
-		struct ksmbd_conn *conn = work->conn;
+		struct ksmbd_conn *notify_conn;
 
+		notify_conn = ksmbd_notify_detach_work_conn_ref(work);
 		ksmbd_free_work_struct(work);
-		/*
-		 * Release r_count for compound-spawned async works
-		 * (request_buf == NULL).  Non-compound works have no
-		 * r_count reference.
-		 */
-			if (is_async && conn)
-				ksmbd_conn_free(conn);
-		}
+		if (notify_conn)
+			ksmbd_conn_free(notify_conn);
+	}
 
 	/*
 	 * Do NOT destroy the mark or NULL out fp.  The watch
@@ -2265,7 +2797,6 @@ out_put_watch:
  */
 static void ksmbd_notify_send_cleanup(struct ksmbd_work *work)
 {
-	struct smb2_hdr *hdr;
 	int ret = 0;
 
 	if (!ksmbd_notify_take_work(work, KSMBD_WORK_CLOSED))
@@ -2276,18 +2807,11 @@ static void ksmbd_notify_send_cleanup(struct ksmbd_work *work)
 	work->tr_buf = NULL;
 	work->iov_idx = 0;
 	work->iov_cnt = 0;
-
-	smb2_set_err_rsp(work);
-	hdr = smb2_get_msg(work->response_buf);
-	hdr->Flags |= SMB2_FLAGS_ASYNC_COMMAND;
-	hdr->Id.AsyncId = cpu_to_le64(work->async_id);
-	hdr->Status = STATUS_NOTIFY_CLEANUP;
+	ksmbd_notify_prepare_async_rsp(work);
+	ksmbd_notify_build_status_rsp(work, STATUS_NOTIFY_CLEANUP);
 
 	/* Sign if required (before encryption) */
-	if (work->sess && work->conn && work->conn->ops &&
-	    (work->sess->sign ||
-	     (work->request_buf &&
-	      work->conn->ops->is_sign_req(work, SMB2_CHANGE_NOTIFY_HE))))
+	if (ksmbd_notify_should_sign(work))
 		work->conn->ops->set_sign_rsp(work);
 
 	if (work->sess && work->conn && work->conn->ops &&
@@ -2307,15 +2831,19 @@ static void ksmbd_notify_send_cleanup(struct ksmbd_work *work)
 	if (work->conn && !ksmbd_conn_releasing(work->conn))
 		ret = ksmbd_conn_try_write(work);
 
+	/*
+	 * A live connection still owes the client the async completion.
+	 * Falling back to a blocking write preserves protocol delivery while
+	 * still avoiding teardown deadlocks for already-releasing sessions.
+	 */
+	if (ret == -EAGAIN && work->conn && !ksmbd_conn_releasing(work->conn))
+		ret = ksmbd_conn_write(work);
+
 	if (ret == -EAGAIN)
 		ksmbd_debug(CONN,
 			    "skip STATUS_NOTIFY_CLEANUP on busy connection during teardown\n");
 
-	if (work->conn) {
-		spin_lock(&work->conn->request_lock);
-		list_del_init(&work->async_request_entry);
-		spin_unlock(&work->conn->request_lock);
-	}
+	ksmbd_notify_unlink_async_request(work);
 
 	/*
 	 * Only dequeue if this work was counted in req_running.
@@ -2332,30 +2860,26 @@ static void ksmbd_notify_send_cleanup(struct ksmbd_work *work)
 		ksmbd_user_session_put(work->sess);
 
 	{
-		bool is_async = !work->request_buf;
-		struct ksmbd_conn *conn = work->conn;
+		struct ksmbd_conn *notify_conn;
 
+		notify_conn = ksmbd_notify_detach_work_conn_ref(work);
 		ksmbd_free_work_struct(work);
-		/*
-		 * Release the r_count reference taken in smb2_notify.c for
-		 * compound-spawned async works (request_buf == NULL).
-		 * Non-compound and piggyback works carry no r_count ref.
-		 */
-		if (is_async && conn)
-			ksmbd_conn_free(conn);
+		if (notify_conn)
+			ksmbd_conn_free(notify_conn);
 	}
 }
 
 void ksmbd_notify_cleanup_file(struct ksmbd_file *fp)
 {
+	struct fsnotify_group *notify_group;
 	struct ksmbd_notify_watch *watch;
 	struct ksmbd_notify_watch *primary = NULL;
 	struct ksmbd_work *work, *tmp;
-	struct smb2_hdr *hdr;
 	bool destroy_primary = false;
 	LIST_HEAD(cleanup_list);
 
-	if (!fp || !ksmbd_notify_group)
+	notify_group = READ_ONCE(ksmbd_notify_group);
+	if (!fp || !notify_group)
 		return;
 
 	/*
@@ -2363,29 +2887,14 @@ void ksmbd_notify_cleanup_file(struct ksmbd_file *fp)
 	 * If there is a pending async work on the watch, complete
 	 * it with STATUS_NOTIFY_CLEANUP.  Then destroy the mark.
 	 */
-	watch = fp->notify_watch;
+	watch = ksmbd_notify_detach_file_watch(fp);
 	if (watch) {
-		fp->notify_watch = NULL;
 		work = NULL;
 
 		/*
-		 * Cancel any in-flight batch timer.  We MUST use the
-		 * non-sync variant here.  If ksmbd_notify_cleanup_file
-		 * is called from within the batch_work execution context
-		 * (e.g. ksmbd_notify_build_response_from_buffer →
-		 * ksmbd_user_session_put → ksmbd_session_destroy →
-		 * ksmbd_destroy_file_table → here), then
-		 * cancel_delayed_work_sync would deadlock waiting for the
-		 * very work item that is currently running.
-		 *
-		 * Safety: we already set watch->pending_work = NULL and
-		 * watch->completed = true under watch->lock above.  Any
-		 * concurrent batch_work execution will either:
-		 *  a) Have already captured pending_work before we cleared
-		 *     it → work variable here is NULL → no send_cleanup.
-		 *     The batch_work will complete independently.
-		 *  b) Not yet started → cancel_delayed_work cancels it.
-		 * In neither case is there a double-free or missed cleanup.
+		 * Flush any in-flight batch work before we destroy the primary
+		 * mark. When cleanup runs from that work item itself, we must use
+		 * the non-sync variant or we deadlock waiting on ourselves.
 		 */
 		if (watch->has_mark) {
 			spin_lock(&watch->lock);
@@ -2394,7 +2903,7 @@ void ksmbd_notify_cleanup_file(struct ksmbd_file *fp)
 			watch->completed = true;
 			watch->fp = NULL;
 			spin_unlock(&watch->lock);
-			cancel_delayed_work(&watch->batch_work);
+			ksmbd_notify_cancel_batch_work(watch);
 
 			if (work) {
 				spin_lock(&fp->f_lock);
@@ -2407,9 +2916,9 @@ void ksmbd_notify_cleanup_file(struct ksmbd_file *fp)
 
 			spin_lock(&watch->lock);
 			if (list_empty(&watch->secondary_watches))
-				destroy_primary = true;
-			if (destroy_primary)
-				watch->detached = true;
+				destroy_primary =
+					ksmbd_notify_begin_primary_mark_cleanup(
+						watch);
 			spin_unlock(&watch->lock);
 		} else {
 			primary = watch->primary;
@@ -2428,8 +2937,9 @@ void ksmbd_notify_cleanup_file(struct ksmbd_file *fp)
 
 				if (!primary->fp &&
 				    list_empty(&primary->secondary_watches)) {
-					primary->detached = true;
-					destroy_primary = true;
+					destroy_primary =
+						ksmbd_notify_begin_primary_mark_cleanup(
+							primary);
 				}
 				spin_unlock(&primary->lock);
 			} else {
@@ -2440,7 +2950,7 @@ void ksmbd_notify_cleanup_file(struct ksmbd_file *fp)
 				watch->fp = NULL;
 				spin_unlock(&watch->lock);
 			}
-			cancel_delayed_work(&watch->batch_work);
+			ksmbd_notify_cancel_batch_work(watch);
 
 			if (work) {
 				spin_lock(&fp->f_lock);
@@ -2451,23 +2961,17 @@ void ksmbd_notify_cleanup_file(struct ksmbd_file *fp)
 				ksmbd_notify_send_cleanup(work);
 			}
 
-			ksmbd_notify_watch_put(watch);
-		}
+		ksmbd_notify_watch_put(watch);
+	}
 	}
 
 	if (destroy_primary) {
 		struct ksmbd_notify_watch *mark_owner = primary ?: watch;
 
-		/*
-		 * Guard against stale marks from a previous module
-		 * load/unload cycle: if mark->group is NULL (already
-		 * detached) or doesn't match our current group, skip
-		 * the destroy to avoid a NULL-ptr deref in
-		 * fsnotify_detach_mark().
-		 */
-		if (mark_owner->mark.group == ksmbd_notify_group)
+		ksmbd_notify_cancel_batch_work(mark_owner);
+		if (ksmbd_notify_mark_can_destroy(mark_owner, notify_group))
 			fsnotify_destroy_mark(&mark_owner->mark,
-					      ksmbd_notify_group);
+					      notify_group);
 	}
 
 	/*
@@ -2477,8 +2981,7 @@ void ksmbd_notify_cleanup_file(struct ksmbd_file *fp)
 	spin_lock(&fp->f_lock);
 	list_for_each_entry_safe(work, tmp,
 				 &fp->blocked_works, fp_entry) {
-		hdr = smb2_get_msg(work->request_buf);
-		if (hdr->Command != SMB2_CHANGE_NOTIFY)
+		if (!ksmbd_notify_is_change_notify_work(work))
 			continue;
 
 		list_del_init(&work->fp_entry);
@@ -2506,7 +3009,6 @@ void ksmbd_notify_cleanup_file(struct ksmbd_file *fp)
  */
 static void ksmbd_notify_send_delete_pending(struct ksmbd_work *work)
 {
-	struct smb2_hdr *hdr;
 	int ret = 0;
 
 	if (!ksmbd_notify_take_work(work, KSMBD_WORK_CLOSED))
@@ -2517,18 +3019,11 @@ static void ksmbd_notify_send_delete_pending(struct ksmbd_work *work)
 	work->tr_buf = NULL;
 	work->iov_idx = 0;
 	work->iov_cnt = 0;
-
-	smb2_set_err_rsp(work);
-	hdr = smb2_get_msg(work->response_buf);
-	hdr->Flags |= SMB2_FLAGS_ASYNC_COMMAND;
-	hdr->Id.AsyncId = cpu_to_le64(work->async_id);
-	hdr->Status = STATUS_DELETE_PENDING;
+	ksmbd_notify_prepare_async_rsp(work);
+	ksmbd_notify_build_status_rsp(work, STATUS_DELETE_PENDING);
 
 	/* Sign if required (before encryption) */
-	if (work->sess && work->conn && work->conn->ops &&
-	    (work->sess->sign ||
-	     (work->request_buf &&
-	      work->conn->ops->is_sign_req(work, SMB2_CHANGE_NOTIFY_HE))))
+	if (ksmbd_notify_should_sign(work))
 		work->conn->ops->set_sign_rsp(work);
 
 	if (work->sess && work->conn && work->conn->ops &&
@@ -2539,13 +3034,19 @@ static void ksmbd_notify_send_delete_pending(struct ksmbd_work *work)
 	if (work->conn && !ksmbd_conn_releasing(work->conn))
 		ret = ksmbd_conn_try_write(work);
 
+	/*
+	 * STATUS_DELETE_PENDING is observable protocol state, not optional
+	 * cleanup.  Retry with the regular serialized write path unless the
+	 * connection is already draining.
+	 */
+	if (ret == -EAGAIN && work->conn && !ksmbd_conn_releasing(work->conn))
+		ret = ksmbd_conn_write(work);
+
 	if (ret == -EAGAIN)
 		ksmbd_debug(CONN,
 			    "skip STATUS_DELETE_PENDING on busy connection during teardown\n");
 
-	spin_lock(&work->conn->request_lock);
-	list_del_init(&work->async_request_entry);
-	spin_unlock(&work->conn->request_lock);
+	ksmbd_notify_unlink_async_request(work);
 
 	/*
 	 * Only dequeue if this work was counted in req_running.
@@ -2562,22 +3063,18 @@ static void ksmbd_notify_send_delete_pending(struct ksmbd_work *work)
 		ksmbd_user_session_put(work->sess);
 
 	{
-		bool is_async = !work->request_buf;
-		struct ksmbd_conn *conn = work->conn;
+		struct ksmbd_conn *notify_conn;
 
+		notify_conn = ksmbd_notify_detach_work_conn_ref(work);
 		ksmbd_free_work_struct(work);
 		/*
-		 * Release the r_count reference taken in smb2_notify.c for
-		 * compound-spawned async works (request_buf == NULL).
-		 * Non-compound works (request_buf != NULL) carry no r_count ref.
-		 *
 		 * Note: the FS_DELETE_SELF caller (fsnotify handler) also does
 		 * a refcount_inc(&conn->refcnt) before invoking this function;
 		 * that extra refcnt reference is released by the caller after
 		 * we return via ksmbd_conn_free().
 		 */
-		if (is_async && conn)
-			ksmbd_conn_free(conn);
+		if (notify_conn)
+			ksmbd_conn_free(notify_conn);
 	}
 }
 
@@ -2600,6 +3097,7 @@ void ksmbd_notify_complete_delete_pending(struct ksmbd_inode *ci)
 	struct ksmbd_file *fp;
 	struct ksmbd_notify_watch *watch;
 	struct ksmbd_work *work;
+	struct ksmbd_conn *conn;
 
 	if (!ksmbd_notify_group)
 		return;
@@ -2614,7 +3112,7 @@ void ksmbd_notify_complete_delete_pending(struct ksmbd_inode *ci)
 	 */
 	down_read(&ci->m_lock);
 	list_for_each_entry(fp, &ci->m_fp_list, node) {
-		watch = fp->notify_watch;
+		watch = ksmbd_notify_get_file_watch(fp);
 		if (!watch)
 			continue;
 
@@ -2622,6 +3120,7 @@ void ksmbd_notify_complete_delete_pending(struct ksmbd_inode *ci)
 		work = watch->pending_work;
 		if (!work || watch->completed) {
 			spin_unlock(&watch->lock);
+			ksmbd_notify_watch_put(watch);
 			continue;
 		}
 		/*
@@ -2630,6 +3129,9 @@ void ksmbd_notify_complete_delete_pending(struct ksmbd_inode *ci)
 		 */
 		watch->completed = true;
 		watch->pending_work = NULL;
+		conn = work->conn;
+		if (conn)
+			refcount_inc(&conn->refcnt);
 		spin_unlock(&watch->lock);
 
 		/* Remove from blocked_works */
@@ -2639,8 +3141,88 @@ void ksmbd_notify_complete_delete_pending(struct ksmbd_inode *ci)
 		spin_unlock(&fp->f_lock);
 
 		ksmbd_notify_send_delete_pending(work);
+		if (conn)
+			ksmbd_conn_free(conn);
+		ksmbd_notify_watch_put(watch);
 	}
 	up_read(&ci->m_lock);
+}
+
+void ksmbd_notify_tree_change(struct ksmbd_work *work,
+			      const struct path *parent_path,
+			      const char *full_name,
+			      u32 action,
+			      bool is_dir)
+{
+	LIST_HEAD(flush_list);
+	u32 smb2_filter;
+
+	smb2_filter = is_dir ? FILE_NOTIFY_CHANGE_DIR_NAME :
+			       FILE_NOTIFY_CHANGE_FILE_NAME;
+	ksmbd_notify_tree_collect(work->tcon->share_conf, parent_path,
+				  full_name, false, smb2_filter,
+				  action, &flush_list);
+	ksmbd_notify_tree_flush_pending(&flush_list);
+}
+
+void ksmbd_notify_tree_rename(struct ksmbd_work *work,
+			      const struct path *old_parent_path,
+			      const char *old_full_name,
+			      const struct path *new_parent_path,
+			      const char *new_full_name,
+			      bool is_dir)
+{
+	LIST_HEAD(flush_list);
+	u32 smb2_filter = KSMBD_NOTIFY_ALL_FILTERS;
+	bool same_parent;
+
+	(void)is_dir;
+	same_parent = old_parent_path->dentry == new_parent_path->dentry;
+
+	ksmbd_notify_tree_collect(work->tcon->share_conf,
+				  old_parent_path, old_full_name, false,
+				  smb2_filter,
+				  same_parent ? FILE_ACTION_RENAMED_OLD_NAME :
+						FILE_ACTION_REMOVED,
+				  &flush_list);
+	ksmbd_notify_tree_collect(work->tcon->share_conf,
+				  new_parent_path, new_full_name,
+				  !same_parent,
+				  smb2_filter,
+				  same_parent ? FILE_ACTION_RENAMED_NEW_NAME :
+						FILE_ACTION_ADDED,
+				  &flush_list);
+	ksmbd_notify_tree_flush_pending(&flush_list);
+}
+
+void ksmbd_notify_tree_remove_on_close(struct ksmbd_file *fp)
+{
+	LIST_HEAD(flush_list);
+	struct path parent_path;
+	char *full_name;
+	u32 action;
+	bool is_dir;
+
+	if (!fp || !fp->filp || !fp->tcon)
+		return;
+
+	parent_path.mnt = fp->filp->f_path.mnt;
+	parent_path.dentry = fp->filp->f_path.dentry->d_parent;
+	full_name = convert_to_nt_pathname(fp->tcon->share_conf,
+					   &fp->filp->f_path);
+	if (IS_ERR(full_name))
+		return;
+
+	action = ksmbd_inode_is_smb_delete(fp->filp->f_path.dentry) ?
+		 FILE_ACTION_REMOVED_BY_DELETE : FILE_ACTION_REMOVED;
+	is_dir = S_ISDIR(file_inode(fp->filp)->i_mode);
+	ksmbd_notify_tree_collect(fp->tcon->share_conf, &parent_path,
+				  full_name, false,
+				  is_dir ? FILE_NOTIFY_CHANGE_DIR_NAME :
+					   FILE_NOTIFY_CHANGE_FILE_NAME,
+				  action, &flush_list);
+	ksmbd_notify_tree_flush_pending(&flush_list);
+	kfree(full_name);
 }
 
 /* ------------------------------------------------------------------ */

@@ -205,6 +205,14 @@ struct ksmbd_file {
 	 * must not have a ChannelSequence older than the one already seen.
 	 */
 	__u16				channel_sequence;
+
+	/* Channel sequence response cache for replay detection */
+	struct {
+		__u16	seq;		/* channel sequence of cached response */
+		__le32	status;		/* NT status of cached response */
+		bool	valid;		/* cache entry is populated */
+		spinlock_t lock;
+	} chan_cache;
 };
 
 static inline void set_ctx_actor(struct dir_context *ctx,
@@ -236,9 +244,13 @@ static inline bool ksmbd_stream_fd(struct ksmbd_file *fp)
  * @stat: kstat filled by vfs_getattr
  *
  * On ext4, stat.blocks can include external xattr blocks (e.g., for
- * security.NTACL).  This inflates AllocationSize for empty files.
+ * security.NTACL).  This inflates AllocationSize for files with ACLs.
  * If set_file_allocation_info() has cached an explicit allocation
  * size, use that instead of stat.blocks.
+ *
+ * When no cached value exists, round up the file size to the
+ * filesystem block boundary instead of using stat.blocks directly.
+ * This avoids counting xattr overhead blocks as data allocation.
  *
  * Return: AllocationSize in bytes
  */
@@ -246,6 +258,10 @@ static inline u64 ksmbd_alloc_size(struct ksmbd_file *fp, struct kstat *stat)
 {
 	if (fp && fp->f_ci && fp->f_ci->m_cached_alloc >= 0)
 		return (u64)fp->f_ci->m_cached_alloc;
+	if (stat->blksize > 0 && stat->size > 0)
+		return round_up(stat->size, stat->blksize);
+	if (stat->size == 0)
+		return 0;
 	return stat->blocks << 9;
 }
 
@@ -264,6 +280,7 @@ struct ksmbd_file *ksmbd_lookup_global_fd(unsigned long long id);
 struct ksmbd_file *ksmbd_lookup_durable_fd(unsigned long long id);
 void ksmbd_put_durable_fd(struct ksmbd_file *fp);
 void ksmbd_purge_disconnected_fp(struct ksmbd_inode *ci);
+bool ksmbd_purge_disconnected_doc(struct dentry *d);
 struct ksmbd_file *ksmbd_lookup_fd_cguid(char *cguid);
 #ifdef CONFIG_SMB_INSECURE_SERVER
 struct ksmbd_file *ksmbd_lookup_fd_filename(struct ksmbd_work *work, char *filename);

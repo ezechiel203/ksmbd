@@ -39,6 +39,7 @@
 #include "smbacl.h"
 #include "ndr.h"
 #include "auth.h"
+#include "ksmbd_notify.h"
 #include "misc.h"
 
 #include "smb_common.h"
@@ -92,6 +93,43 @@ static char *extract_last_component(char *path)
 	return p;
 }
 #endif
+
+static char *ksmbd_vfs_nt_child_name(struct ksmbd_share_config *share,
+				     const struct path *parent_path,
+				     const char *name,
+				     size_t name_len)
+{
+	char *parent_name, *full_name;
+	size_t parent_len;
+	size_t total_len;
+
+	if (!share || !parent_path || !name)
+		return ERR_PTR(-EINVAL);
+
+	parent_name = convert_to_nt_pathname(share, parent_path);
+	if (IS_ERR(parent_name))
+		return parent_name;
+
+	parent_len = strlen(parent_name);
+	total_len = parent_len + 1 + name_len + 1;
+	if (parent_len == 1 && parent_name[0] == '\\')
+		total_len--;
+
+	full_name = kmalloc(total_len, KSMBD_DEFAULT_GFP);
+	if (!full_name) {
+		kfree(parent_name);
+		return ERR_PTR(-ENOMEM);
+	}
+
+	if (parent_len == 1 && parent_name[0] == '\\')
+		snprintf(full_name, total_len, "\\%.*s", (int)name_len, name);
+	else
+		snprintf(full_name, total_len, "%s\\%.*s", parent_name,
+			 (int)name_len, name);
+	ksmbd_conv_path_to_windows(full_name);
+	kfree(parent_name);
+	return full_name;
+}
 
 static void ksmbd_vfs_inherit_owner(struct ksmbd_work *work,
 				    struct inode *parent_inode,
@@ -442,6 +480,7 @@ int ksmbd_vfs_create(struct ksmbd_work *work, const char *name, umode_t mode)
 {
 	struct path path;
 	struct dentry *dentry;
+	char *notify_name;
 	int err;
 
 	dentry = ksmbd_vfs_kern_path_create(work, name,
@@ -473,6 +512,15 @@ int ksmbd_vfs_create(struct ksmbd_work *work, const char *name, umode_t mode)
 	if (!err) {
 		ksmbd_vfs_inherit_owner(work, d_inode(path.dentry),
 					d_inode(dentry));
+		notify_name = ksmbd_vfs_nt_child_name(work->tcon->share_conf,
+						      &path,
+						      dentry->d_name.name,
+						      dentry->d_name.len);
+		if (!IS_ERR(notify_name)) {
+			ksmbd_notify_tree_change(work, &path, notify_name,
+						 FILE_ACTION_ADDED, false);
+			kfree(notify_name);
+		}
 	} else {
 		pr_err("File(%s): creation failed (err:%d)\n", name, err);
 	}
@@ -508,6 +556,7 @@ int ksmbd_vfs_mkdir(struct ksmbd_work *work, const char *name, umode_t mode)
 	struct dentry *dentry;
 	int err;
 #endif
+	char *notify_name;
 
 	dentry = ksmbd_vfs_kern_path_create(work, name,
 					    LOOKUP_NO_SYMLINKS | LOOKUP_DIRECTORY,
@@ -580,6 +629,17 @@ int ksmbd_vfs_mkdir(struct ksmbd_work *work, const char *name, umode_t mode)
 
 out_err:
 #endif
+	if (!err) {
+		notify_name = ksmbd_vfs_nt_child_name(work->tcon->share_conf,
+						      &path,
+						      dentry->d_name.name,
+						      dentry->d_name.len);
+		if (!IS_ERR(notify_name)) {
+			ksmbd_notify_tree_change(work, &path, notify_name,
+						 FILE_ACTION_ADDED, true);
+			kfree(notify_name);
+		}
+	}
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 18, 0)
 	end_creating_path(&path, dentry);
 #else
@@ -1480,6 +1540,13 @@ int ksmbd_vfs_remove_file(struct ksmbd_work *work, const struct path *path)
 {
 	struct mnt_idmap *idmap;
 	struct dentry *parent = path->dentry->d_parent;
+	struct path parent_path = {
+		.mnt = path->mnt,
+		.dentry = parent,
+	};
+	char *notify_name = NULL;
+	u32 notify_action;
+	bool is_dir;
 	int err;
 
 	if (ksmbd_override_fsids(work))
@@ -1490,8 +1557,13 @@ int ksmbd_vfs_remove_file(struct ksmbd_work *work, const struct path *path)
 		goto out_err;
 	}
 
+	is_dir = S_ISDIR(d_inode(path->dentry)->i_mode);
+	notify_name = convert_to_nt_pathname(work->tcon->share_conf, path);
+	notify_action = ksmbd_inode_is_smb_delete(path->dentry) ?
+		FILE_ACTION_REMOVED_BY_DELETE : FILE_ACTION_REMOVED;
+
 	idmap = mnt_idmap(path->mnt);
-	if (S_ISDIR(d_inode(path->dentry)->i_mode)) {
+	if (is_dir) {
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 19, 0)
 		err = vfs_rmdir(idmap, d_inode(parent), path->dentry, NULL);
 #else
@@ -1504,6 +1576,11 @@ int ksmbd_vfs_remove_file(struct ksmbd_work *work, const struct path *path)
 		if (err)
 			ksmbd_debug(VFS, "unlink failed, err %d\n", err);
 	}
+	if (!err && !IS_ERR(notify_name))
+		ksmbd_notify_tree_change(work, &parent_path, notify_name,
+					 notify_action, is_dir);
+	if (!IS_ERR_OR_NULL(notify_name))
+		kfree(notify_name);
 
 out_err:
 	ksmbd_revert_fsids(work);
@@ -1525,6 +1602,9 @@ int ksmbd_vfs_remove_file(struct ksmbd_work *work, char *name)
 #endif
 	struct path path;
 	struct dentry *parent;
+	char *notify_name = NULL;
+	u32 notify_action;
+	bool is_dir;
 	int err;
 
 	if (ksmbd_override_fsids(work))
@@ -1560,7 +1640,12 @@ int ksmbd_vfs_remove_file(struct ksmbd_work *work, char *name)
 		goto out_err;
 	}
 
-	if (S_ISDIR(d_inode(path.dentry)->i_mode)) {
+	is_dir = S_ISDIR(d_inode(path.dentry)->i_mode);
+	notify_name = convert_to_nt_pathname(work->tcon->share_conf, &path);
+	notify_action = ksmbd_inode_is_smb_delete(path.dentry) ?
+		FILE_ACTION_REMOVED_BY_DELETE : FILE_ACTION_REMOVED;
+
+	if (is_dir) {
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 12, 0)
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
 		err = vfs_rmdir(idmap, d_inode(parent), path.dentry);
@@ -1587,6 +1672,17 @@ int ksmbd_vfs_remove_file(struct ksmbd_work *work, char *name)
 			ksmbd_debug(VFS, "%s: unlink failed, err %d\n", name,
 				    err);
 	}
+	if (!err && !IS_ERR(notify_name)) {
+		struct path parent_path = {
+			.mnt = path.mnt,
+			.dentry = parent,
+		};
+
+		ksmbd_notify_tree_change(work, &parent_path, notify_name,
+					 notify_action, is_dir);
+	}
+	if (!IS_ERR_OR_NULL(notify_name))
+		kfree(notify_name);
 
 out_err:
 	inode_unlock(d_inode(parent));
@@ -1688,6 +1784,8 @@ int ksmbd_vfs_rename(struct ksmbd_work *work, const struct path *old_path,
 	struct filename *to;
 	struct ksmbd_file *parent_fp;
 	struct ksmbd_share_config *share_conf = work->tcon->share_conf;
+	char *old_notify_name = NULL;
+	char *new_notify_name = NULL;
 	int new_type;
 	int err, lookup_flags = LOOKUP_NO_SYMLINKS;
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 15, 0)
@@ -1756,27 +1854,15 @@ retry:
 	}
 
 	/*
-	 * MS-FSA: if the parent directory has an open that either
-	 * (a) holds DELETE access, or
-	 * (b) does not share delete access (FILE_SHARE_DELETE),
-	 * block the rename with STATUS_SHARING_VIOLATION.
-	 * A rename modifies the directory, which conflicts with
-	 * exclusive (non-shared) directory opens.
+	 * Windows permits renaming children beneath an opened parent
+	 * directory unless that parent handle itself has DELETE access.
+	 * Treating every non-FILE_SHARE_DELETE parent directory open as a
+	 * rename conflict is too strict and breaks notify-driven rename
+	 * workloads such as smb2.notify.mask-change and smb2.notify.rec.
 	 */
 	parent_fp = ksmbd_lookup_fd_inode(old_child->d_parent);
 	if (parent_fp) {
-		/*
-		 * Block rename if the parent directory opener has DELETE
-		 * access, or if the opener has data-level access rights
-		 * without FILE_SHARE_DELETE.  Metadata-only opens
-		 * (SYNCHRONIZE, READ_ATTRIBUTES, READ_CONTROL, etc.)
-		 * do not participate in sharing checks per Windows
-		 * behavior (cf. smb2.rename.msword test).
-		 */
-#define DIR_DATA_ACCESS_MASK	cpu_to_le32(0x0000017F)
-		if ((parent_fp->daccess & FILE_DELETE_LE) ||
-		    ((parent_fp->daccess & DIR_DATA_ACCESS_MASK) &&
-		     !(parent_fp->saccess & FILE_SHARE_DELETE_LE))) {
+		if (parent_fp->daccess & FILE_DELETE_LE) {
 			ksmbd_debug(VFS,
 				    "parent dir open conflicts with rename\n");
 			err = -ESHARE;
@@ -1968,9 +2054,27 @@ retry:
 	rd.new_dentry		= new_dentry,
 	rd.flags		= flags,
 	rd.delegated_inode	= NULL,
+	old_notify_name = convert_to_nt_pathname(share_conf, old_path);
+	new_notify_name = ksmbd_vfs_nt_child_name(share_conf, &new_path,
+						  new_last.name,
+						  new_last.len);
 	err = vfs_rename(&rd);
 	if (err)
 		ksmbd_debug(VFS, "vfs_rename failed err %d\n", err);
+	else if (!IS_ERR(old_notify_name) && !IS_ERR(new_notify_name)) {
+		struct path old_parent_path = {
+			.mnt = old_path->mnt,
+			.dentry = old_parent,
+		};
+
+		ksmbd_notify_tree_rename(work, &old_parent_path,
+					 old_notify_name, &new_path,
+					 new_notify_name, d_is_dir(old_child));
+	}
+	if (!IS_ERR_OR_NULL(old_notify_name))
+		kfree(old_notify_name);
+	if (!IS_ERR_OR_NULL(new_notify_name))
+		kfree(new_notify_name);
 
 out4:
 	dput(new_dentry);
@@ -2152,6 +2256,9 @@ int ksmbd_vfs_fp_rename(struct ksmbd_work *work, struct ksmbd_file *fp,
 	struct dentry *src_dent_parent, *dst_dent_parent;
 	struct dentry *src_dent, *trap_dent, *src_child;
 	char *dst_name;
+	char *old_notify_name = NULL;
+	char *new_notify_name = NULL;
+	struct ksmbd_share_config *share_conf = work->tcon->share_conf;
 	int err;
 
 	dst_name = extract_last_component(newname);
@@ -2205,6 +2312,10 @@ int ksmbd_vfs_fp_rename(struct ksmbd_work *work, struct ksmbd_file *fp,
 	dput(src_child);
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
+	old_notify_name = convert_to_nt_pathname(share_conf, &fp->filp->f_path);
+	new_notify_name = ksmbd_vfs_nt_child_name(share_conf, &dst_path,
+						  dst_name,
+						  strlen(dst_name));
 	err = __ksmbd_vfs_rename(work,
 				 idmap,
 				 src_dent_parent,
@@ -2214,6 +2325,10 @@ int ksmbd_vfs_fp_rename(struct ksmbd_work *work, struct ksmbd_file *fp,
 				 trap_dent,
 				 dst_name);
 #else
+	old_notify_name = convert_to_nt_pathname(share_conf, &fp->filp->f_path);
+	new_notify_name = ksmbd_vfs_nt_child_name(share_conf, &dst_path,
+						  dst_name,
+						  strlen(dst_name));
 	err = __ksmbd_vfs_rename(work,
 				 user_ns,
 				 src_dent_parent,
@@ -2223,6 +2338,20 @@ int ksmbd_vfs_fp_rename(struct ksmbd_work *work, struct ksmbd_file *fp,
 				 trap_dent,
 				 dst_name);
 #endif
+	if (!err && !IS_ERR(old_notify_name) && !IS_ERR(new_notify_name)) {
+		struct path src_parent_path = {
+			.mnt = fp->filp->f_path.mnt,
+			.dentry = src_dent_parent,
+		};
+
+		ksmbd_notify_tree_rename(work, &src_parent_path,
+					 old_notify_name, &dst_path,
+					 new_notify_name, d_is_dir(src_dent));
+	}
+	if (!IS_ERR_OR_NULL(old_notify_name))
+		kfree(old_notify_name);
+	if (!IS_ERR_OR_NULL(new_notify_name))
+		kfree(new_notify_name);
 out_lock:
 	dput(src_dent);
 	dput(dst_dent_parent);
@@ -2273,7 +2402,14 @@ int ksmbd_vfs_truncate(struct ksmbd_work *work,
 		}
 	}
 
+	/*
+	 * Truncate can re-enter the kernel lease bridge for the same handle.
+	 * Mark the current task as a local breaker so VFS lease conflict
+	 * handling does not wait for a client ACK on ksmbd's own mutation.
+	 */
+	ksmbd_lease_breaker_enter();
 	err = vfs_truncate(&filp->f_path, size);
+	ksmbd_lease_breaker_exit();
 	if (err)
 		pr_err("truncate failed, err %d\n", err);
 	return err;
@@ -3457,7 +3593,9 @@ struct ksmbd_file *ksmbd_vfs_dentry_open(struct ksmbd_work *work,
 	int err = 0;
 	struct ksmbd_file *fp = NULL;
 
+	ksmbd_lease_breaker_enter();
 	filp = dentry_open(path, flags | O_LARGEFILE, current_cred());
+	ksmbd_lease_breaker_exit();
 	if (IS_ERR(filp)) {
 		err = PTR_ERR(filp);
 		pr_err("dentry open failed, err %d\n", err);
@@ -3568,11 +3706,8 @@ static int __caseless_lookup(struct dir_context *ctx, const char *name,
 	buf = container_of(ctx, struct ksmbd_readdir_data, ctx);
 
 	if (buf->used != namlen)
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0)
-		return true;
-#else
-		return 0;
-#endif
+		goto try_mangled;
+
 	if (IS_ENABLED(CONFIG_UNICODE) && buf->um) {
 		const struct qstr q_buf = {.name = buf->private,
 					   .len = buf->used};
@@ -3583,53 +3718,100 @@ static int __caseless_lookup(struct dir_context *ctx, const char *name,
 	}
 	if (cmp < 0)
 		cmp = strncasecmp((char *)buf->private, name, namlen);
-	if (!cmp) {
-		memcpy((char *)buf->private, name, buf->used);
-		buf->dirent_count = 1;
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0)
-		return false;
-#else
-		return -EEXIST;
-#endif
+	if (!cmp)
+		goto found;
+
+try_mangled:
+	/*
+	 * If the search name is a mangled 8.3 name (e.g., "ABCDEF~1.TXT"),
+	 * generate the short name for this directory entry and compare.
+	 */
+	if (buf->conn &&
+	    ksmbd_is_mangled_name((char *)buf->private, buf->used)) {
+		if (ksmbd_match_mangled_name(buf->conn, name,
+					    (char *)buf->private,
+					    buf->used))
+			goto found;
 	}
+
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0)
 	return true;
 #else
 	return 0;
+#endif
+
+found:
+	/*
+	 * Copy the actual on-disk name back into the buffer so the
+	 * caller gets the real filename for path construction.
+	 */
+	if (namlen <= NAME_MAX) {
+		memcpy((char *)buf->private, name, namlen);
+		buf->used = namlen;
+	}
+	buf->dirent_count = 1;
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0)
+	return false;
+#else
+	return -EEXIST;
 #endif
 }
 
 /**
  * ksmbd_vfs_lookup_in_dir() - lookup a file in a directory
  * @dir:	path info
- * @name:	filename to lookup
- * @namelen:	filename length
+ * @name:	filename to lookup (modified in place on match)
+ * @namelen:	filename length (updated on mangled name resolution)
  * @um:		&struct unicode_map to use
+ * @conn:	connection (for mangled name resolution, may be NULL)
+ *
+ * Uses a temporary NAME_MAX+1 buffer for the lookup so that mangled
+ * name resolution (which may produce a longer name) does not overflow
+ * the caller's buffer.  On success, the resolved name and length are
+ * copied back to @name / @namelen.
  *
  * Return:	0 on success, otherwise error
  */
 static int ksmbd_vfs_lookup_in_dir(const struct path *dir, char *name,
-				   size_t namelen, struct unicode_map *um)
+				   size_t *namelen, struct unicode_map *um,
+				   struct ksmbd_conn *conn)
 {
 	int ret;
 	struct file *dfilp;
 	int flags = O_RDONLY | O_LARGEFILE;
-	struct ksmbd_readdir_data readdir_data = {
-		.ctx.actor	= __caseless_lookup,
-		.private	= name,
-		.used		= namelen,
-		.dirent_count	= 0,
-		.um		= um,
-	};
+	char *tmpbuf;
+	struct ksmbd_readdir_data readdir_data;
 
+	tmpbuf = kmalloc(NAME_MAX + 1, KSMBD_DEFAULT_GFP);
+	if (!tmpbuf)
+		return -ENOMEM;
+
+	memcpy(tmpbuf, name, *namelen);
+	tmpbuf[*namelen] = '\0';
+
+	memset(&readdir_data, 0, sizeof(readdir_data));
+	set_ctx_actor(&readdir_data.ctx, __caseless_lookup);
+	readdir_data.private	= tmpbuf;
+	readdir_data.used	= *namelen;
+	readdir_data.um		= um;
+	readdir_data.conn	= conn;
+
+	ksmbd_lease_breaker_enter();
 	dfilp = dentry_open(dir, flags, current_cred());
-	if (IS_ERR(dfilp))
+	ksmbd_lease_breaker_exit();
+	if (IS_ERR(dfilp)) {
+		kfree(tmpbuf);
 		return PTR_ERR(dfilp);
+	}
 
 	ret = iterate_dir(dfilp, &readdir_data.ctx);
-	if (readdir_data.dirent_count > 0)
+	if (readdir_data.dirent_count > 0) {
+		memcpy(name, tmpbuf, readdir_data.used);
+		*namelen = readdir_data.used;
 		ret = 0;
+	}
 	fput(dfilp);
+	kfree(tmpbuf);
 	return ret;
 }
 
@@ -3641,16 +3823,27 @@ int __ksmbd_vfs_kern_path(struct ksmbd_work *work, char *filepath,
 {
 	struct ksmbd_share_config *share_conf = work->tcon->share_conf;
 	struct path parent_path;
-	size_t path_len, remain_len;
 	int err;
+	char *resolved_path = NULL;
+	size_t path_len, remain_len;
+	size_t rp_pos;
 
-retry:
 	err = ksmbd_vfs_path_lookup(share_conf, filepath, flags, path, do_lock);
 	if (!err || !caseless)
 		return err;
 
+	/*
+	 * Allocate a PATH_MAX buffer for the resolved path.
+	 * This handles mangled name resolution where the resolved
+	 * component can be longer than the original.
+	 */
+	resolved_path = kmalloc(PATH_MAX, KSMBD_DEFAULT_GFP);
+	if (!resolved_path)
+		return -ENOMEM;
+
 	path_len = strlen(filepath);
 	remain_len = path_len;
+	rp_pos = 0;
 
 	parent_path = share_conf->vfs_path;
 	path_get(&parent_path);
@@ -3664,24 +3857,54 @@ retry:
 		if (filename_len == 0)
 			break;
 
-		err = ksmbd_vfs_lookup_in_dir(&parent_path, filename,
-					      filename_len,
-					      work->conn->um);
-		path_put(&parent_path);
-		if (err)
+		/* Copy this component into a temp buffer for lookup */
+		if (filename_len > NAME_MAX) {
+			err = -ENAMETOOLONG;
+			path_put(&parent_path);
 			goto out;
-		if (is_last) {
-			caseless = false;
-			goto retry;
 		}
-		next[0] = '\0';
 
+		{
+			char comp[NAME_MAX + 1];
+			size_t comp_len = filename_len;
+
+			memcpy(comp, filename, comp_len);
+			comp[comp_len] = '\0';
+
+			err = ksmbd_vfs_lookup_in_dir(&parent_path, comp,
+						      &comp_len,
+						      work->conn->um,
+						      work->conn);
+			path_put(&parent_path);
+			if (err)
+				goto out;
+
+			/* Append resolved component to resolved_path */
+			if (rp_pos + comp_len + 2 > PATH_MAX) {
+				err = -ENAMETOOLONG;
+				goto out;
+			}
+			memcpy(resolved_path + rp_pos, comp, comp_len);
+			rp_pos += comp_len;
+		}
+
+		if (is_last) {
+			resolved_path[rp_pos] = '\0';
+			/* Retry with the fully resolved path */
+			err = ksmbd_vfs_path_lookup(share_conf, resolved_path,
+						    flags, path, do_lock);
+			goto out;
+		}
+
+		resolved_path[rp_pos++] = '/';
+
+		/* Look up the partial resolved path so far */
+		resolved_path[rp_pos] = '\0';
 		err = vfs_path_lookup(share_conf->vfs_path.dentry,
 				      share_conf->vfs_path.mnt,
-				      filepath,
+				      resolved_path,
 				      flags | LOOKUP_BENEATH,
 				      &parent_path);
-		next[0] = '/';
 		if (err)
 			goto out;
 
@@ -3691,6 +3914,7 @@ retry:
 	err = -EINVAL;
 	path_put(&parent_path);
 out:
+	kfree(resolved_path);
 	return err;
 }
 
@@ -3770,58 +3994,85 @@ int ksmbd_vfs_kern_path(struct ksmbd_work *work, char *name,
 		return 0;
 
 	if (caseless) {
-		char *filepath;
+		char *resolved_path;
 		struct path parent;
 		size_t path_len, remain_len;
+		size_t rp_pos;
 
-		filepath = kstrdup(name, KSMBD_DEFAULT_GFP);
-		if (!filepath)
+		path_len = strlen(name);
+		resolved_path = kmalloc(PATH_MAX, KSMBD_DEFAULT_GFP);
+		if (!resolved_path)
 			return -ENOMEM;
 
-		path_len = strlen(filepath);
 		remain_len = path_len;
+		rp_pos = 0;
 
 		parent = share_conf->vfs_path;
 		path_get(&parent);
 
 		while (d_can_lookup(parent.dentry)) {
-			char *filename = filepath + path_len - remain_len;
+			char *filename = (char *)name + path_len - remain_len;
 			char *next = strchrnul(filename, '/');
 			size_t filename_len = next - filename;
 			bool is_last = !next[0];
+			char comp[NAME_MAX + 1];
+			size_t comp_len;
 
 			if (filename_len == 0)
 				break;
 
-			err = ksmbd_vfs_lookup_in_dir(&parent, filename,
-						      filename_len,
-						      work->conn->um);
+			if (filename_len > NAME_MAX) {
+				err = -ENAMETOOLONG;
+				path_put(&parent);
+				goto out;
+			}
+
+			comp_len = filename_len;
+			memcpy(comp, filename, comp_len);
+			comp[comp_len] = '\0';
+
+			err = ksmbd_vfs_lookup_in_dir(&parent, comp,
+						      &comp_len,
+						      work->conn->um,
+						      work->conn);
 			path_put(&parent);
 			if (err)
 				goto out;
 
-			next[0] = '\0';
+			if (rp_pos + comp_len + 2 > PATH_MAX) {
+				err = -ENAMETOOLONG;
+				goto out;
+			}
+			memcpy(resolved_path + rp_pos, comp, comp_len);
+			rp_pos += comp_len;
+
+			if (is_last) {
+				resolved_path[rp_pos] = '\0';
+				err = vfs_path_lookup(
+					share_conf->vfs_path.dentry,
+					share_conf->vfs_path.mnt,
+					resolved_path, flags, path);
+				goto out;
+			}
+
+			resolved_path[rp_pos++] = '/';
+			resolved_path[rp_pos] = '\0';
 
 			err = vfs_path_lookup(share_conf->vfs_path.dentry,
 					      share_conf->vfs_path.mnt,
-					      filepath,
+					      resolved_path,
 					      flags,
 					      &parent);
 			if (err)
 				goto out;
-			else if (is_last) {
-				*path = parent;
-				goto out;
-			}
 
-			next[0] = '/';
 			remain_len -= filename_len + 1;
 		}
 
 		path_put(&parent);
 		err = -EINVAL;
 out:
-		kfree(filepath);
+		kfree(resolved_path);
 	}
 	return err;
 }
@@ -3843,63 +4094,95 @@ int ksmbd_vfs_kern_path(struct ksmbd_work *work, char *name,
 	}
 
 	if (caseless) {
-		char *filepath;
+		char *resolved_path;
 		struct path parent;
 		size_t path_len, remain_len;
+		size_t rp_pos;
+		/*
+		 * abs_name starts with '/' followed by the share path
+		 * and then the relative path. We need to track positions
+		 * carefully. Use the abs_name length minus 1 to skip '/'.
+		 */
+		path_len = strlen(abs_name);
+		remain_len = path_len - 1;
 
-		filepath = kstrdup(abs_name, KSMBD_DEFAULT_GFP);
-		if (!filepath) {
+		resolved_path = kmalloc(PATH_MAX, KSMBD_DEFAULT_GFP);
+		if (!resolved_path) {
 			err = -ENOMEM;
 			goto free_abs_name;
 		}
 
-		path_len = strlen(filepath);
-		remain_len = path_len - 1;
+		/* Start with "/" */
+		resolved_path[0] = '/';
+		rp_pos = 1;
 
 		err = kern_path("/", flags, &parent);
 		if (err)
 			goto out;
 
 		while (d_can_lookup(parent.dentry)) {
-			char *filename = filepath + path_len - remain_len;
+			char *filename = abs_name + path_len - remain_len;
 			char *next = strchrnul(filename, '/');
 			size_t filename_len = next - filename;
 			bool is_last = !next[0];
+			char comp[NAME_MAX + 1];
+			size_t comp_len;
 
 			if (filename_len == 0)
 				break;
 
-			err = ksmbd_vfs_lookup_in_dir(&parent, filename,
-						      filename_len,
-						      work->conn->um);
+			if (filename_len > NAME_MAX) {
+				err = -ENAMETOOLONG;
+				path_put(&parent);
+				goto out;
+			}
+
+			comp_len = filename_len;
+			memcpy(comp, filename, comp_len);
+			comp[comp_len] = '\0';
+
+			err = ksmbd_vfs_lookup_in_dir(&parent, comp,
+						      &comp_len,
+						      work->conn->um,
+						      work->conn);
 			if (err) {
 				path_put(&parent);
 				goto out;
 			}
 
 			path_put(&parent);
-			next[0] = '\0';
 
-			err = kern_path(filepath,
+			if (rp_pos + comp_len + 2 > PATH_MAX) {
+				err = -ENAMETOOLONG;
+				goto out;
+			}
+			memcpy(resolved_path + rp_pos, comp, comp_len);
+			rp_pos += comp_len;
+
+			if (is_last) {
+				resolved_path[rp_pos] = '\0';
+				err = kern_path(resolved_path,
+						flags | LOOKUP_BENEATH,
+						path);
+				goto out;
+			}
+
+			resolved_path[rp_pos++] = '/';
+			resolved_path[rp_pos] = '\0';
+
+			err = kern_path(resolved_path,
 					flags | LOOKUP_BENEATH,
 					&parent);
 			if (err)
 				goto out;
 
-			if (is_last) {
-				path->mnt = parent.mnt;
-				path->dentry = parent.dentry;
-				goto out;
-			}
-
-			next[0] = '/';
 			remain_len -= filename_len + 1;
 		}
 
 		path_put(&parent);
 		err = -EINVAL;
 out:
-		kfree(filepath);
+		kfree(resolved_path);
 	}
 
 free_abs_name:
@@ -4249,20 +4532,19 @@ int ksmbd_vfs_copy_file_ranges(struct ksmbd_work *work,
 
 int ksmbd_vfs_posix_lock_wait(struct file_lock *flock)
 {
+	int ret;
+
 	/*
 	 * Use interruptible wait to avoid D-state if the lock holder
 	 * disconnects.  The caller (smb2_lock) already handles retry
 	 * on signal/timeout.
 	 */
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 9, 0)
-	wait_event_interruptible(flock->c.flc_wait, !flock->c.flc_blocker);
+	ret = wait_event_interruptible(flock->c.flc_wait,
+				       !flock->c.flc_blocker);
 #else
-	wait_event_interruptible(flock->fl_wait, !flock->fl_blocker);
+	ret = wait_event_interruptible(flock->fl_wait, !flock->fl_blocker);
 #endif
-	if (ret == 0) {
-		pr_warn("Posix lock wait timed out after 300s\n");
-		return -EDEADLK;
-	}
 	if (ret < 0)
 		return ret;
 	return 0;

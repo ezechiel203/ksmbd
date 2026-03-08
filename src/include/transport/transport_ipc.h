@@ -11,7 +11,7 @@
 #define KSMBD_IPC_MAX_PAYLOAD	4096
 
 struct ksmbd_login_response *
-ksmbd_ipc_login_request(const char *account);
+ksmbd_ipc_login_request(const char *account, __u32 flags);
 struct ksmbd_login_response_ext *
 ksmbd_ipc_login_request_ext(const char *account);
 
@@ -39,6 +39,7 @@ struct ksmbd_rpc_command *ksmbd_rpc_close(struct ksmbd_session *sess, int handle
 struct ksmbd_rpc_command *ksmbd_rpc_write(struct ksmbd_session *sess, int handle,
 					  void *payload, size_t payload_sz);
 struct ksmbd_rpc_command *ksmbd_rpc_read(struct ksmbd_session *sess, int handle);
+struct ksmbd_rpc_command *ksmbd_rpc_query(struct ksmbd_session *sess, int handle);
 struct ksmbd_rpc_command *ksmbd_rpc_ioctl(struct ksmbd_session *sess, int handle,
 					  void *payload, size_t payload_sz);
 struct ksmbd_rpc_command *ksmbd_rpc_rap(struct ksmbd_session *sess, void *payload,

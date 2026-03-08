@@ -10,6 +10,7 @@
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
 
 #define SUBMOD_NAME	"smb_direct"
+#define KSMBD_TRANSPORT_RDMA_IMPL
 
 #include <linux/kthread.h>
 #include <linux/list.h>
@@ -95,6 +96,11 @@ static struct smb_direct_listener {
 } smb_direct_listener;
 
 static struct workqueue_struct *smb_direct_wq;
+
+bool ksmbd_rdma_listener_active(void)
+{
+	return smb_direct_listener.cm_id != NULL;
+}
 
 enum smb_direct_status {
 	SMB_DIRECT_CS_NEW = 0,
@@ -1789,8 +1795,8 @@ static bool smb_direct_rdma_transform_needed(struct ksmbd_conn *conn)
 	if (!conn)
 		return false;
 
-	/* RDMA transform is needed when SMB3 encryption is negotiated */
-	return conn->cipher_type != 0;
+	return ksmbd_rdma_transform_supported(conn,
+					      SMB2_RDMA_TRANSFORM_ENCRYPTION);
 }
 
 /**
@@ -1813,172 +1819,10 @@ static int smb_direct_rdma_encrypt(struct smb_direct_transport *t,
 				   void *buf, int buf_len,
 				   void **out_buf, int *out_len)
 {
-	struct ksmbd_conn *conn = KSMBD_TRANS(t)->conn;
-	struct smb2_rdma_transform_hdr *transform_hdr;
-	struct smb2_rdma_transform *transform;
-	int hdr_len;
-	int total_len;
-	void *wrapped;
-	struct smb2_transform_hdr *crypt_hdr;
-	int crypt_hdr_offset;
-	struct kvec iov[2];
-	struct ksmbd_work *work;
-	int rc;
-
-	if (!conn || !conn->cipher_type) {
-		*out_buf = buf;
-		*out_len = buf_len;
-		return 0;
-	}
-
-	hdr_len = sizeof(struct smb2_rdma_transform_hdr) +
-		  sizeof(struct smb2_rdma_transform);
-	crypt_hdr_offset = hdr_len;
-	total_len = hdr_len + sizeof(struct smb2_transform_hdr) + buf_len;
-
-	wrapped = kzalloc(total_len, KSMBD_DEFAULT_GFP);
-	if (!wrapped)
-		return -ENOMEM;
-
-	/* Fill RDMA Transform Header */
-	transform_hdr = (struct smb2_rdma_transform_hdr *)wrapped;
-	transform_hdr->ProtocolId = SMB2_RDMA_TRANSFORM_PROTO_ID;
-	transform_hdr->StructureSize = cpu_to_le16(SMB2_RDMA_TRANSFORM_HDR_SIZE);
-	transform_hdr->TransformCount = cpu_to_le16(1);
-
-	/* Fill Transform Entry */
-	transform = (struct smb2_rdma_transform *)(wrapped +
-		     sizeof(struct smb2_rdma_transform_hdr));
-	transform->Type = cpu_to_le16(SMB2_RDMA_TRANSFORM_TYPE_ENCRYPTION);
-	transform->Reserved = 0;
-	transform->DataOffset = cpu_to_le32(sizeof(struct smb2_transform_hdr));
-	transform->DataLength = cpu_to_le32(buf_len);
-	transform->RdmaDescriptorOffset = 0;
-	transform->RdmaDescriptorLength = 0;
-
-	/* Fill SMB2 Transform Header for crypto */
-	crypt_hdr = (struct smb2_transform_hdr *)(wrapped + crypt_hdr_offset);
-	crypt_hdr->ProtocolId = SMB2_TRANSFORM_PROTO_NUM;
-	crypt_hdr->OriginalMessageSize = cpu_to_le32(buf_len);
-	crypt_hdr->Flags = cpu_to_le16(0x0001); /* Encrypted */
-	if (conn->binding)
-		crypt_hdr->SessionId = 0;
-
-	/* Generate nonce */
-	get_random_bytes(crypt_hdr->Nonce, 16);
-
-	/* Copy plaintext data after transform header */
-	memcpy(wrapped + crypt_hdr_offset + sizeof(struct smb2_transform_hdr),
-	       buf, buf_len);
-
-	/*
-	 * Use ksmbd_crypt_message to encrypt.
-	 * We need a temporary ksmbd_work to pass to the crypto function.
-	 */
-	work = kzalloc(sizeof(struct ksmbd_work), KSMBD_DEFAULT_GFP);
-	if (!work) {
-		kfree(wrapped);
-		return -ENOMEM;
-	}
-	work->conn = conn;
-	work->sess = NULL;
-
-	/* Find the session for encryption key lookup.
-	 * For RDMA transforms, we use the current session from the
-	 * connection. The session must have been established already.
-	 */
-	if (conn->binding) {
-		kfree(work);
-		kfree(wrapped);
-		return -EINVAL;
-	}
-
-	/* Set up iov for ksmbd_crypt_message:
-	 * iov[0] = transform header (includes 4-byte RFC1002 length prefix)
-	 * iov[1] = plaintext data
-	 *
-	 * ksmbd_crypt_message expects the first iov to contain the
-	 * transform header accessible via smb2_get_msg (skip 4 bytes).
-	 * For RDMA we don't have RFC1002, so we simulate it by adjusting.
-	 */
-
-	/* We need to use the crypto directly since ksmbd_crypt_message
-	 * is tightly coupled to the SMB2 TCP transform header flow.
-	 * Instead, we set the SessionId and call ksmbd_crypt_message
-	 * with a fake 4-byte prefix.
-	 */
-
-	/* Allocate buffer with 4-byte prefix for compatibility */
-	{
-		void *crypt_buf;
-		int crypt_total = 4 + sizeof(struct smb2_transform_hdr) + buf_len;
-
-		crypt_buf = kzalloc(crypt_total, KSMBD_DEFAULT_GFP);
-		if (!crypt_buf) {
-			kfree(work);
-			kfree(wrapped);
-			return -ENOMEM;
-		}
-
-		/* Copy transform header and data */
-		memcpy(crypt_buf + 4, crypt_hdr,
-		       sizeof(struct smb2_transform_hdr));
-		memcpy(crypt_buf + 4 + sizeof(struct smb2_transform_hdr),
-		       buf, buf_len);
-
-		/* Look up session from the connection.
-		 * We need a valid session to get encryption keys.
-		 */
-		{
-			struct smb2_transform_hdr *th =
-				(struct smb2_transform_hdr *)(crypt_buf + 4);
-			struct ksmbd_session *sess;
-			unsigned long id;
-
-			/* Find any active session on this connection */
-			down_read(&conn->session_lock);
-			xa_for_each(&conn->sessions, id, sess) {
-				th->SessionId = cpu_to_le64(sess->id);
-				work->sess = sess;
-				break;
-			}
-			up_read(&conn->session_lock);
-
-			if (!work->sess) {
-				kfree(crypt_buf);
-				kfree(work);
-				kfree(wrapped);
-				return -EINVAL;
-			}
-		}
-
-		iov[0].iov_base = crypt_buf;
-		iov[0].iov_len = 4 + sizeof(struct smb2_transform_hdr);
-		iov[1].iov_base = crypt_buf + 4 +
-				   sizeof(struct smb2_transform_hdr);
-		iov[1].iov_len = buf_len;
-
-		rc = ksmbd_crypt_message(work, iov, 2, 1);
-		if (rc) {
-			pr_err("RDMA transform encryption failed: %d\n", rc);
-			kfree(crypt_buf);
-			kfree(work);
-			kfree(wrapped);
-			return rc;
-		}
-
-		/* Copy encrypted data and updated transform header back */
-		memcpy(wrapped + crypt_hdr_offset,
-		       crypt_buf + 4,
-		       sizeof(struct smb2_transform_hdr) + buf_len);
-		kfree(crypt_buf);
-	}
-
-	kfree(work);
-
-	*out_buf = wrapped;
-	*out_len = total_len;
-	return 0;
+	*out_buf = buf;
+	*out_len = buf_len;
+	pr_err_ratelimited("RDMA encryption transform was negotiated but is not implemented\n");
+	return -EOPNOTSUPP;
 }
 
 /**
@@ -2000,133 +1844,10 @@ static int smb_direct_rdma_decrypt(struct smb_direct_transport *t,
 				   void *buf, int buf_len,
 				   void **out_buf, int *out_len)
 {
-	struct ksmbd_conn *conn = KSMBD_TRANS(t)->conn;
-	struct smb2_rdma_transform_hdr *transform_hdr;
-	struct smb2_rdma_transform *transform;
-	int hdr_len;
-	u32 data_offset, data_length;
-	int crypt_hdr_offset;
-	struct kvec iov[2];
-	struct ksmbd_work *work;
-	int rc;
-
-	if (!conn || !conn->cipher_type) {
-		/* No encryption negotiated, data is plaintext */
-		*out_buf = buf;
-		*out_len = buf_len;
-		return 0;
-	}
-
-	hdr_len = sizeof(struct smb2_rdma_transform_hdr) +
-		  sizeof(struct smb2_rdma_transform);
-
-	if (buf_len < hdr_len) {
-		pr_err("RDMA transform: buffer too small for header (%d < %d)\n",
-		       buf_len, hdr_len);
-		return -EINVAL;
-	}
-
-	/* Validate transform header */
-	transform_hdr = (struct smb2_rdma_transform_hdr *)buf;
-	if (transform_hdr->ProtocolId != SMB2_RDMA_TRANSFORM_PROTO_ID) {
-		pr_err("RDMA transform: invalid protocol ID %#x\n",
-		       le32_to_cpu(transform_hdr->ProtocolId));
-		return -EINVAL;
-	}
-
-	if (le16_to_cpu(transform_hdr->TransformCount) != 1) {
-		pr_err("RDMA transform: unsupported transform count %u\n",
-		       le16_to_cpu(transform_hdr->TransformCount));
-		return -EINVAL;
-	}
-
-	/* Parse transform entry */
-	transform = (struct smb2_rdma_transform *)(buf +
-		     sizeof(struct smb2_rdma_transform_hdr));
-
-	if (le16_to_cpu(transform->Type) != SMB2_RDMA_TRANSFORM_TYPE_ENCRYPTION) {
-		pr_err("RDMA transform: unsupported type %u\n",
-		       le16_to_cpu(transform->Type));
-		return -EINVAL;
-	}
-
-	data_offset = le32_to_cpu(transform->DataOffset);
-	data_length = le32_to_cpu(transform->DataLength);
-
-	crypt_hdr_offset = hdr_len;
-
-	if (buf_len < crypt_hdr_offset + (int)sizeof(struct smb2_transform_hdr) +
-	    (int)data_length) {
-		pr_err("RDMA transform: buffer too small for encrypted data\n");
-		return -EINVAL;
-	}
-
-	/* Decrypt using ksmbd_crypt_message with a temporary work struct */
-	work = kzalloc(sizeof(struct ksmbd_work), KSMBD_DEFAULT_GFP);
-	if (!work)
-		return -ENOMEM;
-	work->conn = conn;
-
-	{
-		void *crypt_buf;
-		struct smb2_transform_hdr *th;
-		int crypt_total = 4 + sizeof(struct smb2_transform_hdr) +
-				  data_length;
-
-		crypt_buf = kzalloc(crypt_total, KSMBD_DEFAULT_GFP);
-		if (!crypt_buf) {
-			kfree(work);
-			return -ENOMEM;
-		}
-
-		memcpy(crypt_buf + 4,
-		       buf + crypt_hdr_offset,
-		       sizeof(struct smb2_transform_hdr) + data_length);
-
-		th = (struct smb2_transform_hdr *)(crypt_buf + 4);
-
-		/* Look up session for decryption key */
-		{
-			struct ksmbd_session *sess;
-
-			sess = ksmbd_session_lookup_all(conn,
-					le64_to_cpu(th->SessionId));
-			if (!sess) {
-				pr_err("RDMA transform: session not found for decrypt\n");
-				kfree(crypt_buf);
-				kfree(work);
-				return -EINVAL;
-			}
-			work->sess = sess;
-			ksmbd_user_session_put(sess);
-		}
-
-		iov[0].iov_base = crypt_buf;
-		iov[0].iov_len = 4 + sizeof(struct smb2_transform_hdr);
-		iov[1].iov_base = crypt_buf + 4 +
-				   sizeof(struct smb2_transform_hdr);
-		iov[1].iov_len = data_length;
-
-		rc = ksmbd_crypt_message(work, iov, 2, 0);
-		if (rc) {
-			pr_err("RDMA transform decryption failed: %d\n", rc);
-			kfree(crypt_buf);
-			kfree(work);
-			return rc;
-		}
-
-		/* Copy decrypted data back to original buffer position */
-		memcpy(buf + crypt_hdr_offset + sizeof(struct smb2_transform_hdr),
-		       crypt_buf + 4 + sizeof(struct smb2_transform_hdr),
-		       data_length);
-		kfree(crypt_buf);
-	}
-
-	kfree(work);
-
-	*out_buf = buf + crypt_hdr_offset + data_offset;
-	*out_len = data_length;
-	return 0;
+	*out_buf = buf;
+	*out_len = buf_len;
+	pr_err_ratelimited("RDMA decryption transform was negotiated but is not implemented\n");
+	return -EOPNOTSUPP;
 }
 
 static int smb_direct_rdma_xmit(struct smb_direct_transport *t,
@@ -2151,42 +1872,17 @@ static int smb_direct_rdma_xmit(struct smb_direct_transport *t,
 		return -EINVAL;
 
 	/*
-	 * J.4 (BUG-R01 / BUG-R02): RDMA transform enforcement check.
-	 *
-	 * MS-SMB2 §2.2.43 and §3.3.5.2 require that when RDMA encryption or
-	 * signing transforms are negotiated, the server MUST apply the
-	 * negotiated transform to all RDMA read/write data.
-	 *
-	 * Currently ksmbd does NOT implement the RDMA Transform Header
-	 * (ProtocolId 0xFB534D42, MS-SMB2 §2.2.43).
-	 * ksmbd_rdma_transform_supported() is exported but has no callers;
-	 * conn->rdma_transform_ids[] is populated at negotiate time but the
-	 * transforms are never applied to RDMA payloads.
-	 *
-	 * This is a silent security regression: clients that negotiate
-	 * SMB2_RDMA_TRANSFORM_ENCRYPTION believe their data is protected
-	 * but the server transmits it in plaintext over the RDMA fabric.
-	 *
-	 * A full fix requires:
-	 *   1. Defining struct smb2_rdma_transform_hdr (ProtocolId 0xFB534D42).
-	 *   2. Wrapping buf in the RDMA Transform Header before posting.
-	 *   3. Applying SMB2 encryption (ENCRYPTION) or HMAC-SHA256/AES-CMAC
-	 *      (SIGNING) over the payload.
-	 *   4. For reads: verifying and stripping the transform on receipt.
-	 *
-	 * Until the full implementation is in place, emit a rate-limited
-	 * warning.  ksmbd_rdma_transform_supported() is called here so the
-	 * function is exercised and callers can be added incrementally.
+	 * RDMA signing and encryption transforms are not yet implemented.
+	 * Only TRANSFORM_NONE is advertised during negotiate.  If a
+	 * transform was somehow negotiated (should not happen), refuse
+	 * the operation rather than silently sending data unprotected.
 	 */
 	{
 		struct ksmbd_conn *conn = KSMBD_TRANS(t)->conn;
 
-		if (ksmbd_rdma_transform_supported(conn,
-					SMB2_RDMA_TRANSFORM_ENCRYPTION)) {
-			pr_warn_ratelimited("ksmbd: RDMA encryption transform negotiated but not applied — data sent plaintext (BUG-R01)\n");
-		} else if (ksmbd_rdma_transform_supported(conn,
-					SMB2_RDMA_TRANSFORM_SIGNING)) {
-			pr_warn_ratelimited("ksmbd: RDMA signing transform negotiated but not applied — data sent unsigned (BUG-R01)\n");
+		if (conn && conn->rdma_transform_count > 0) {
+			pr_err("ksmbd: RDMA transform negotiated but not implemented — refusing RDMA R/W\n");
+			return -EOPNOTSUPP;
 		}
 	}
 
@@ -2322,13 +2018,10 @@ static int smb_direct_rdma_write(struct ksmbd_transport *t,
 	 * the RDMA Transform Header per MS-SMB2 2.2.43 before posting.
 	 */
 	if (smb_direct_rdma_transform_needed(t->conn)) {
-		ret = smb_direct_rdma_encrypt(st, buf, buflen,
-					      &xmit_buf, &xmit_len);
-		if (ret) {
-			pr_err("RDMA write: transform encryption failed: %d\n",
-			       ret);
+		ret = smb_direct_rdma_encrypt(st, buf, buflen, &xmit_buf,
+					      &xmit_len);
+		if (ret)
 			return ret;
-		}
 	}
 
 	ret = smb_direct_rdma_xmit(st, xmit_buf, xmit_len,
@@ -2356,18 +2049,6 @@ static int smb_direct_rdma_read(struct ksmbd_transport *t,
 	if (smb_direct_rdma_transform_needed(t->conn)) {
 		void *plain_buf;
 		int plain_len;
-		int transform_overhead;
-
-		/*
-		 * When the client sends encrypted RDMA data, the buffer
-		 * is larger than the plaintext: it includes the RDMA
-		 * transform header + SMB2 transform header + signature.
-		 * We need to allocate a buffer large enough to hold
-		 * the wrapped data, read it, then decrypt in place.
-		 */
-		transform_overhead = sizeof(struct smb2_rdma_transform_hdr) +
-				     sizeof(struct smb2_rdma_transform) +
-				     sizeof(struct smb2_transform_hdr);
 
 		ret = smb_direct_rdma_xmit(st, buf, buflen,
 					    desc, desc_len, true);
@@ -3263,18 +2944,18 @@ out:
 
 bool ksmbd_rdma_capable_netdev(struct net_device *netdev)
 {
-        struct net_device *lower_dev;
-        struct list_head *iter;
+	struct net_device *lower_dev;
+	struct list_head *iter;
 
-        if (ksmbd_find_rdma_capable_netdev(netdev))
-                return true;
+	if (ksmbd_find_rdma_capable_netdev(netdev))
+		return true;
 
-        /* check if netdev is bridge or VLAN */
-        if (netif_is_bridge_master(netdev) ||
-            netdev->priv_flags & IFF_802_1Q_VLAN)
-                netdev_for_each_lower_dev(netdev, lower_dev, iter)
-                        if (ksmbd_find_rdma_capable_netdev(lower_dev))
-                                return true;
+	/* check if netdev is bridge or VLAN */
+	if (netif_is_bridge_master(netdev) ||
+	    netdev->priv_flags & IFF_802_1Q_VLAN)
+		netdev_for_each_lower_dev(netdev, lower_dev, iter)
+			if (ksmbd_find_rdma_capable_netdev(lower_dev))
+				return true;
 
 	/* check if netdev is IPoIB safely without layer violation */
 	if (netdev->type == ARPHRD_INFINIBAND)

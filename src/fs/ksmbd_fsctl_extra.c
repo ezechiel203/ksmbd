@@ -23,6 +23,7 @@
 #include <linux/delay.h>
 #include <linux/math64.h>
 
+#include "unicode.h"
 #include "ksmbd_fsctl_extra.h"
 #include "ksmbd_fsctl.h"
 #include "smb2pdu.h"
@@ -36,6 +37,7 @@
 #include "oplock.h"
 #include "connection.h"
 #include "mgmt/tree_connect.h"
+#include "mgmt/user_session.h"
 
 /*
  * FSCTL_FILE_LEVEL_TRIM (0x00098208) is not defined in smbfsctl.h,
@@ -176,17 +178,6 @@ static int ksmbd_fsctl_file_level_trim(struct ksmbd_work *work,
 	return 0;
 }
 
-/*
- * MS-FSCC §2.3.30 FSCTL_PIPE_WAIT request structure
- */
-struct fsctl_pipe_wait_req {
-	__le64	Timeout;		/* 100ns units; 0 = use server default */
-	__u8	TimeoutSpecified;
-	__u8	Padding;
-	__le16	NameLength;		/* byte count of Name[] */
-	/* __u8 Name[] follows */
-} __packed;
-
 /**
  * ksmbd_fsctl_pipe_wait() - Handle FSCTL_PIPE_WAIT
  * @work:	    smb work for this request
@@ -197,12 +188,17 @@ struct fsctl_pipe_wait_req {
  * @rsp:	    pointer to ioctl response structure
  * @out_len:	    [out] number of output bytes written
  *
- * MS-FSCC §2.3.30: The server waits up to Timeout (100ns units) for a named
- * pipe instance to become available.  ksmbd does not implement blocking pipe
- * listener queues, so we check if a pipe FID is already open and return
- * STATUS_IO_TIMEOUT if the pipe is not available.
+ * MS-FSCC 2.3.30: The server waits up to Timeout (100-ns units) for a named
+ * pipe instance to become available.  ksmbd exposes a fixed RPC pipe surface
+ * through IPC$, so supported pipe names are always single-instance and
+ * immediately available.  Unsupported names are rejected with
+ * STATUS_OBJECT_NAME_NOT_FOUND.
  *
- * Return: 0 on success, -ETIMEDOUT when pipe is not available
+ * Timeout semantics (per MS-FSCC):
+ *   - TimeoutSpecified == 1: use the client-supplied Timeout value
+ *   - TimeoutSpecified == 0: wait indefinitely
+ *
+ * Return: 0 on success, negative errno on failure
  */
 static int ksmbd_fsctl_pipe_wait(struct ksmbd_work *work,
 				 u64 id, void *in_buf,
@@ -212,60 +208,94 @@ static int ksmbd_fsctl_pipe_wait(struct ksmbd_work *work,
 				 unsigned int *out_len)
 {
 	struct fsctl_pipe_wait_req *req;
-	s64 timeout_100ns;
-	unsigned int wait_ms;
+	char *name;
+	u32 name_len;
+	u64 timeout_100ns = 0;
+	unsigned long wait_jiffies;
+	unsigned long sleep_jiffies;
+	bool infinite_wait;
+	int handle;
+	int method;
 
 	*out_len = 0;
 
 	if (in_buf_len < sizeof(*req)) {
-		/* No valid request structure; succeed unconditionally */
-		ksmbd_debug(SMB, "FSCTL_PIPE_WAIT: no request data, success\n");
-		return 0;
+		rsp->hdr.Status = STATUS_INVALID_PARAMETER;
+		return -EINVAL;
 	}
 
 	req = (struct fsctl_pipe_wait_req *)in_buf;
-	timeout_100ns = (s64)le64_to_cpu(req->Timeout);
-
-	/*
-	 * Compute wait in ms.  Use 50ms if no timeout was specified.
-	 * Cap at 500ms to avoid blocking the worker thread excessively.
-	 */
-	if (!req->TimeoutSpecified || timeout_100ns == 0) {
-		wait_ms = 50;
-	} else {
-		wait_ms = (unsigned int)min_t(s64,
-					      div_s64(timeout_100ns, 10000LL),
-					      500LL);
-		if (wait_ms == 0)
-			wait_ms = 1;
-	}
-
-	ksmbd_debug(SMB, "FSCTL_PIPE_WAIT: NameLength=%u timeout=%u ms\n",
-		    le16_to_cpu(req->NameLength), wait_ms);
-
-	/*
-	 * Check if the pipe handle (id) is already open.
-	 * If a valid FID exists, the pipe is connected — return success.
-	 */
-	if (has_file_id(id)) {
-		struct ksmbd_file *fp = ksmbd_lookup_fd_fast(work, id);
-
-		if (fp) {
-			ksmbd_fd_put(work, fp);
-			ksmbd_debug(SMB,
-				    "FSCTL_PIPE_WAIT: pipe FID open, success\n");
-			return 0;
-		}
+	name_len = le32_to_cpu(req->NameLength);
+	if (!name_len ||
+	    name_len > in_buf_len - offsetof(struct fsctl_pipe_wait_req, Name)) {
+		rsp->hdr.Status = STATUS_INVALID_PARAMETER;
+		return -EINVAL;
 	}
 
 	/*
-	 * No open pipe found.  Sleep briefly (up to 50ms) then return
-	 * STATUS_IO_TIMEOUT as required by the spec.
+	 * MS-FSCC 2.3.30:
+	 *   TimeoutSpecified == 1 -> use req->Timeout
+	 *   TimeoutSpecified == 0 -> wait indefinitely
 	 */
-	msleep_interruptible(min_t(unsigned int, wait_ms, 50));
+	infinite_wait = !req->TimeoutSpecified;
+	if (!infinite_wait)
+		timeout_100ns = le64_to_cpu(req->Timeout);
+
+	name = smb_strndup_from_utf16(req->Name, name_len, 1,
+				      work->conn->local_nls);
+	if (IS_ERR(name)) {
+		rsp->hdr.Status = STATUS_INVALID_PARAMETER;
+		return PTR_ERR(name);
+	}
+
+	method = ksmbd_session_rpc_method_name(name);
+	if (!method) {
+		ksmbd_debug(SMB,
+			    "FSCTL_PIPE_WAIT: unknown pipe '%s'\n", name);
+		kfree(name);
+		rsp->hdr.Status = STATUS_OBJECT_NAME_NOT_FOUND;
+		return -ENOENT;
+	}
 
 	ksmbd_debug(SMB,
-		    "FSCTL_PIPE_WAIT: pipe unavailable, STATUS_IO_TIMEOUT\n");
+		    "FSCTL_PIPE_WAIT: wait on pipe '%s' (timeout=%s%lluns, specified=%u)\n",
+		    name, infinite_wait ? "infinite/" : "", timeout_100ns,
+		    req->TimeoutSpecified);
+
+	if (infinite_wait) {
+		wait_jiffies = MAX_SCHEDULE_TIMEOUT;
+		sleep_jiffies = msecs_to_jiffies(25);
+	} else {
+		wait_jiffies = msecs_to_jiffies(div_u64(timeout_100ns, 10000));
+		if (timeout_100ns && !wait_jiffies)
+			wait_jiffies = 1;
+		sleep_jiffies = wait_jiffies;
+	}
+
+	for (;;) {
+		handle = ksmbd_session_rpc_open(work->sess, name);
+		if (handle >= 0) {
+			ksmbd_session_rpc_close(work->sess, handle);
+			kfree(name);
+			return 0;
+		}
+
+		if (!wait_jiffies)
+			break;
+
+		if (msleep_interruptible(min_t(unsigned long, sleep_jiffies,
+					       msecs_to_jiffies(25)))) {
+			kfree(name);
+			rsp->hdr.Status = STATUS_CANCELLED;
+			return -EINTR;
+		}
+
+		if (!infinite_wait)
+			wait_jiffies -= min_t(unsigned long, wait_jiffies,
+					      msecs_to_jiffies(25));
+	}
+
+	kfree(name);
 	rsp->hdr.Status = STATUS_IO_TIMEOUT;
 	return -ETIMEDOUT;
 }

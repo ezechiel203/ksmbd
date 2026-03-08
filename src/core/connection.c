@@ -121,7 +121,7 @@ static void ksmbd_conn_cleanup(struct ksmbd_conn *conn)
 	list_for_each_entry_safe(p, tmp, &conn->preauth_sess_table,
 				 preauth_entry) {
 		list_del(&p->preauth_entry);
-		kfree(p);
+		ksmbd_preauth_session_free(p);
 	}
 
 	kvfree(conn->request_buf);
@@ -381,6 +381,10 @@ static int __ksmbd_conn_writev(struct ksmbd_work *work, bool try_lock,
 		return -EINVAL;
 	}
 
+	if (!conn || !conn->transport || !conn->transport->ops ||
+	    !conn->transport->ops->writev)
+		return -ENOTCONN;
+
 	if (work->send_no_response)
 		return 0;
 
@@ -498,7 +502,8 @@ static int __ksmbd_conn_write(struct ksmbd_work *work, bool try_lock)
 	}
 
 	/* Send file data via zero-copy after the header */
-	if (work->sendfile && conn->transport->ops->sendfile) {
+	if (work->sendfile && conn->transport && conn->transport->ops &&
+	    conn->transport->ops->sendfile) {
 		loff_t offset = work->sendfile_offset;
 
 		ksmbd_conn_lock(conn);

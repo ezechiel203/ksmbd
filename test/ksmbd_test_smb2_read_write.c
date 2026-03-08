@@ -30,6 +30,7 @@
 /* RDMA channels */
 #define TEST_SMB2_CHANNEL_NONE		0x00000000
 #define TEST_SMB2_CHANNEL_RDMA_V1	0x00000001
+#define TEST_SMB2_CHANNEL_RDMA_TRANSFORM	0x00000003
 
 /* Access mask bits */
 #define TEST_FILE_READ_DATA		0x00000001
@@ -124,6 +125,13 @@ static int test_check_channel_sequence(u16 curr_seq, u16 req_seq)
 
 	if (diff < 0)
 		return -EAGAIN; /* STATUS_FILE_NOT_AVAILABLE */
+	return 0;
+}
+
+static int test_validate_rdma_transform_channel(bool negotiated)
+{
+	if (!negotiated)
+		return -EINVAL;
 	return 0;
 }
 
@@ -229,6 +237,16 @@ static void test_read_rdma_channel(struct kunit *test)
 	u32 channel = TEST_SMB2_CHANNEL_RDMA_V1;
 
 	KUNIT_EXPECT_NE(test, channel, TEST_SMB2_CHANNEL_NONE);
+}
+
+static void test_read_rdma_transform_requires_negotiate(struct kunit *test)
+{
+	KUNIT_EXPECT_EQ(test,
+			test_validate_rdma_transform_channel(false),
+			-EINVAL);
+	KUNIT_EXPECT_EQ(test,
+			test_validate_rdma_transform_channel(true),
+			0);
 }
 
 static void test_read_channel_sequence_stale(struct kunit *test)
@@ -357,6 +375,16 @@ static void test_write_rdma_channel(struct kunit *test)
 	KUNIT_EXPECT_EQ(test, channel, TEST_SMB2_CHANNEL_RDMA_V1);
 }
 
+static void test_write_rdma_transform_requires_negotiate(struct kunit *test)
+{
+	u32 channel = TEST_SMB2_CHANNEL_RDMA_TRANSFORM;
+
+	KUNIT_EXPECT_EQ(test, channel, TEST_SMB2_CHANNEL_RDMA_TRANSFORM);
+	KUNIT_EXPECT_EQ(test,
+			test_validate_rdma_transform_channel(false),
+			-EINVAL);
+}
+
 static void test_write_channel_sequence(struct kunit *test)
 {
 	/* Valid sequence advances */
@@ -469,6 +497,7 @@ static struct kunit_case ksmbd_smb2_read_write_test_cases[] = {
 	KUNIT_CASE(test_read_pipe_cancel),
 	KUNIT_CASE(test_read_compound_fid),
 	KUNIT_CASE(test_read_rdma_channel),
+	KUNIT_CASE(test_read_rdma_transform_requires_negotiate),
 	KUNIT_CASE(test_read_channel_sequence_stale),
 	KUNIT_CASE(test_read_unbuffered_flag),
 	KUNIT_CASE(test_read_minimum_count),
@@ -484,6 +513,7 @@ static struct kunit_case ksmbd_smb2_read_write_test_cases[] = {
 	KUNIT_CASE(test_write_invalid_fid),
 	KUNIT_CASE(test_write_compound_fid),
 	KUNIT_CASE(test_write_rdma_channel),
+	KUNIT_CASE(test_write_rdma_transform_requires_negotiate),
 	KUNIT_CASE(test_write_channel_sequence),
 	KUNIT_CASE(test_write_unbuffered_flag),
 	KUNIT_CASE(test_write_data_offset_validation),

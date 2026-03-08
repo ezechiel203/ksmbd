@@ -195,14 +195,27 @@ int ksmbd_verify_smb_message(struct ksmbd_work *work)
 bool ksmbd_smb_request(struct ksmbd_conn *conn)
 {
 	__le32 *proto;
+	unsigned int i;
+	bool compression_enabled = false;
 
 	if (conn->request_buf[0] != 0)
 		return false;
 
 	proto = (__le32 *)smb2_get_msg(conn->request_buf);
 	if (*proto == SMB2_COMPRESSION_TRANSFORM_ID) {
-		/* Accept compression transform if compression negotiated */
-		if (conn->compress_algorithm == SMB3_COMPRESS_NONE)
+		/*
+		 * A negotiate response containing only COMPRESSION_FORMAT_NONE
+		 * means "no usable compression algorithm overlap", not
+		 * "accept compressed payloads".  Only accept transform
+		 * packets if at least one real algorithm was negotiated.
+		 */
+		for (i = 0; i < conn->compress_algorithm_count; i++) {
+			if (conn->compress_algorithms[i] != SMB3_COMPRESS_NONE) {
+				compression_enabled = true;
+				break;
+			}
+		}
+		if (!compression_enabled)
 			return false;
 		return true;
 	}
@@ -597,7 +610,7 @@ int ksmbd_extract_shortname(struct ksmbd_conn *conn, const char *longname,
 			    char *shortname)
 {
 	const char *p;
-	char base[7], extension[4];
+	char base[9], extension[4];
 	char out[13] = {0};
 	int baselen = 0;
 	int extlen = 0, len = 0;
@@ -610,6 +623,69 @@ int ksmbd_extract_shortname(struct ksmbd_conn *conn, const char *longname,
 	if ((*p == '.') || (!(strcmp(p, "..")))) {
 		/* no mangling required */
 		return 0;
+	}
+
+	/*
+	 * Check if the name already satisfies 8.3 rules:
+	 * - base <= 8 chars, ext <= 3 chars
+	 * - no invalid 8.3 characters
+	 * - no embedded spaces
+	 * If so, uppercase and return directly without ~N suffix.
+	 */
+	{
+		const char *dot = strrchr(longname, '.');
+		const char *q;
+		int blen, elen;
+		bool valid_83 = true;
+
+		if (dot && dot == longname)
+			valid_83 = false; /* starts with dot */
+		else if (dot) {
+			blen = dot - longname;
+			elen = strlen(dot + 1);
+			if (blen < 1 || blen > 8 || elen > 3)
+				valid_83 = false;
+			else {
+				for (q = longname; q < dot && valid_83; q++) {
+					if (is_shortname_invalid_char(*q))
+						valid_83 = false;
+				}
+				for (q = dot + 1; *q && valid_83; q++) {
+					if (is_shortname_invalid_char(*q))
+						valid_83 = false;
+				}
+			}
+		} else {
+			blen = strlen(longname);
+			if (blen < 1 || blen > 8)
+				valid_83 = false;
+			else {
+				for (q = longname; *q && valid_83; q++) {
+					if (is_shortname_invalid_char(*q))
+						valid_83 = false;
+				}
+			}
+		}
+
+		if (valid_83) {
+			int oi = 0;
+
+			if (dot) {
+				for (q = longname; q < dot; q++)
+					out[oi++] = toupper(*q);
+				out[oi++] = '.';
+				for (q = dot + 1; *q; q++)
+					out[oi++] = toupper(*q);
+			} else {
+				for (q = longname; *q; q++)
+					out[oi++] = toupper(*q);
+			}
+			out[oi] = '\0';
+
+			smbConvertToUTF16((__le16 *)shortname, out,
+					  strlen(out), conn->local_nls, 0);
+			return strlen(out) * 2;
+		}
 	}
 
 	/* Extract extension: characters after the last dot */
@@ -672,10 +748,120 @@ int ksmbd_extract_shortname(struct ksmbd_conn *conn, const char *longname,
 		out[baselen + 2] = '\0';
 	}
 
-	smbConvertToUTF16((__le16 *)shortname, out, PATH_MAX,
+	smbConvertToUTF16((__le16 *)shortname, out, strlen(out),
 			  conn->local_nls, 0);
 	len = strlen(out) * 2;
 	return len;
+}
+
+/**
+ * ksmbd_is_mangled_name() - detect if a name is a mangled 8.3 name
+ * @name:	filename to check (UTF-8)
+ * @len:	length of filename
+ *
+ * A mangled name matches the pattern: BASE~N or BASE~N.EXT
+ * where BASE is 1-6 uppercase chars/digits, N is 1+ digit, and EXT
+ * is 0-3 chars. The key indicator is the '~' followed by digit(s).
+ *
+ * Return:	true if name looks like a mangled 8.3 name
+ */
+bool ksmbd_is_mangled_name(const char *name, size_t len)
+{
+	const char *p;
+	const char *tilde = NULL;
+	const char *dot;
+	size_t base_len;
+
+	if (!name || len == 0 || len > 12)
+		return false;
+
+	/*
+	 * Find the last '~' in the name.  The mangling suffix ~N is
+	 * always appended after the base, so the last '~' followed by
+	 * digits is the one we care about.  Earlier '~' characters may
+	 * be part of the original filename's base.
+	 */
+	for (p = name + len - 1; p >= name; p--) {
+		if (*p == '~') {
+			tilde = p;
+			break;
+		}
+	}
+	if (!tilde)
+		return false;
+
+	base_len = tilde - name;
+	if (base_len < 1 || base_len > 6)
+		return false;
+
+	/* After '~' must be at least one digit (1-9 for first) */
+	p = tilde + 1;
+	if (p >= name + len || *p < '1' || *p > '9')
+		return false;
+
+	/* Skip digits */
+	while (p < name + len && *p >= '0' && *p <= '9')
+		p++;
+
+	/* Either end of string or a dot followed by extension */
+	if (p == name + len)
+		return true;
+
+	if (*p != '.')
+		return false;
+
+	dot = p;
+	p++;
+	/* Extension must be 1-3 chars */
+	if (name + len - p < 1 || name + len - p > 3)
+		return false;
+
+	return true;
+}
+
+/**
+ * ksmbd_match_mangled_name() - check if a longname generates the given
+ *				mangled short name
+ * @conn:		connection (for NLS codepage)
+ * @longname:		long filename to test (UTF-8)
+ * @mangled_name:	mangled name to match against (UTF-8, uppercased)
+ * @mangled_len:	length of mangled_name
+ *
+ * Generates the 8.3 short name for @longname and compares it
+ * case-insensitively with @mangled_name.
+ *
+ * Return:	true if the generated short name matches
+ */
+bool ksmbd_match_mangled_name(struct ksmbd_conn *conn,
+			      const char *longname,
+			      const char *mangled_name,
+			      size_t mangled_len)
+{
+	char shortname_buf[24 * 2 + 2]; /* UTF-16LE short name */
+	char shortname_utf8[28];
+	int short_len;
+	int i;
+
+	short_len = ksmbd_extract_shortname(conn, longname, shortname_buf);
+	if (short_len <= 0)
+		return false;
+
+	/*
+	 * Convert UTF-16LE short name back to UTF-8 for comparison.
+	 * Short names are always ASCII-range, so each UTF-16 code
+	 * unit is simply the low byte.
+	 */
+	if (short_len / 2 >= sizeof(shortname_utf8))
+		return false;
+
+	for (i = 0; i < short_len / 2; i++)
+		shortname_utf8[i] = shortname_buf[i * 2];
+	shortname_utf8[i] = '\0';
+
+	if (strlen(shortname_utf8) != mangled_len)
+		return false;
+
+	return !strncasecmp(shortname_utf8, mangled_name, mangled_len);
 }
 
 static int __smb2_negotiate(struct ksmbd_conn *conn)

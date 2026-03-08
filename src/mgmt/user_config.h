@@ -61,7 +61,11 @@ static inline unsigned int user_gid(struct ksmbd_user *user)
 	return user->gid;
 }
 
-struct ksmbd_user *ksmbd_login_user(const char *account);
+struct ksmbd_user *ksmbd_login_user_flags(const char *account, __u32 flags);
+static inline struct ksmbd_user *ksmbd_login_user(const char *account)
+{
+	return ksmbd_login_user_flags(account, 0);
+}
 struct ksmbd_user *ksmbd_alloc_user(struct ksmbd_login_response *resp,
 		struct ksmbd_login_response_ext *resp_ext);
 void ksmbd_free_user(struct ksmbd_user *user);

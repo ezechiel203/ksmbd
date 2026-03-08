@@ -122,6 +122,12 @@ int ksmbd_info_get_file_stat_lx(struct ksmbd_work *work,
 				void *buf,
 				unsigned int buf_len,
 				unsigned int *out_len);
+int ksmbd_pipe_get_info(struct ksmbd_work *work, u64 id,
+			void *buf, unsigned int buf_len,
+			unsigned int *out_len);
+int ksmbd_pipe_get_local_info(struct ksmbd_work *work, u64 id,
+			      void *buf, unsigned int buf_len,
+			      unsigned int *out_len);
 
 /**
  * ksmbd_info_init() - Initialize the info-level dispatch table

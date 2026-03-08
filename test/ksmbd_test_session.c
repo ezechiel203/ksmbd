@@ -157,6 +157,7 @@ static void test_preauth_session_alloc_lookup(struct kunit *test)
 {
 	struct ksmbd_conn *conn;
 	struct preauth_session *preauth;
+	struct ksmbd_session owner = { 0 };
 	struct preauth_integrity_info preauth_info;
 
 	conn = create_mock_conn();
@@ -166,9 +167,10 @@ static void test_preauth_session_alloc_lookup(struct kunit *test)
 	memset(&preauth_info, 0, sizeof(preauth_info));
 	memset(preauth_info.Preauth_HashValue, 0xAA, PREAUTH_HASHVALUE_SIZE);
 	conn->preauth_info = &preauth_info;
+	owner.id = 42;
 
 	down_write(&conn->session_lock);
-	preauth = ksmbd_preauth_session_alloc(conn, 42);
+	preauth = ksmbd_preauth_session_alloc(conn, &owner);
 	up_write(&conn->session_lock);
 
 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, preauth);
@@ -190,6 +192,46 @@ static void test_preauth_session_alloc_lookup(struct kunit *test)
 	}
 
 	/* Cleanup */
+	list_del(&preauth->preauth_entry);
+	kfree(preauth);
+	conn->preauth_info = NULL;
+	destroy_mock_conn(conn);
+}
+
+/*
+ * test_preauth_session_alloc_binding_uses_connection_hash - binding
+ * preauth transcript starts from the binding connection NEGOTIATE hash
+ */
+static void test_preauth_session_alloc_binding_uses_connection_hash(struct kunit *test)
+{
+	struct ksmbd_conn *conn;
+	struct preauth_session *preauth;
+	struct ksmbd_session owner = { 0 };
+	struct preauth_integrity_info preauth_info;
+	u8 owner_hash[PREAUTH_HASHVALUE_SIZE];
+
+	conn = create_mock_conn();
+	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, conn);
+
+	memset(&preauth_info, 0, sizeof(preauth_info));
+	memset(preauth_info.Preauth_HashValue, 0x11, PREAUTH_HASHVALUE_SIZE);
+	memset(owner_hash, 0x22, sizeof(owner_hash));
+	conn->preauth_info = &preauth_info;
+	conn->binding = true;
+	owner.id = 77;
+	owner.Preauth_HashValue = owner_hash;
+
+	down_write(&conn->session_lock);
+	preauth = ksmbd_preauth_session_alloc(conn, &owner);
+	up_write(&conn->session_lock);
+
+	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, preauth);
+	KUNIT_EXPECT_EQ(test, memcmp(preauth->Preauth_HashValue,
+				     preauth_info.Preauth_HashValue,
+				     PREAUTH_HASHVALUE_SIZE), 0);
+	KUNIT_EXPECT_NE(test, memcmp(preauth->Preauth_HashValue, owner_hash,
+				     PREAUTH_HASHVALUE_SIZE), 0);
+
 	list_del(&preauth->preauth_entry);
 	kfree(preauth);
 	conn->preauth_info = NULL;
@@ -223,6 +265,7 @@ static void test_preauth_session_remove(struct kunit *test)
 {
 	struct ksmbd_conn *conn;
 	struct preauth_session *preauth;
+	struct ksmbd_session owner = { 0 };
 	struct preauth_integrity_info preauth_info;
 	int rc;
 
@@ -231,9 +274,10 @@ static void test_preauth_session_remove(struct kunit *test)
 
 	memset(&preauth_info, 0, sizeof(preauth_info));
 	conn->preauth_info = &preauth_info;
+	owner.id = 100;
 
 	down_write(&conn->session_lock);
-	preauth = ksmbd_preauth_session_alloc(conn, 100);
+	preauth = ksmbd_preauth_session_alloc(conn, &owner);
 	up_write(&conn->session_lock);
 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, preauth);
 
@@ -403,6 +447,7 @@ static struct kunit_case ksmbd_session_test_cases[] = {
 	KUNIT_CASE(test_session_flag_set_clear),
 	KUNIT_CASE(test_session_put_null),
 	KUNIT_CASE(test_preauth_session_alloc_lookup),
+	KUNIT_CASE(test_preauth_session_alloc_binding_uses_connection_hash),
 	KUNIT_CASE(test_preauth_session_lookup_nonexistent),
 	KUNIT_CASE(test_preauth_session_remove),
 	KUNIT_CASE(test_preauth_session_remove_nonexistent),

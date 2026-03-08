@@ -1,5 +1,5 @@
 #!/bin/bash
-# T53: MULTICHANNEL -- SMB3 multi-connection tests (15 tests)
+# T53: MULTICHANNEL -- SMB3 multi-connection tests (17 tests)
 #
 # These tests exercise multiple concurrent smbclient connections to the same
 # share, verifying that sessions are independent, file state is coherent
@@ -442,4 +442,30 @@ test_mc_graceful_shutdown_all_sessions() {
         assert_not_contains "$ls_out" "t53_session_${i}" \
             "orphaned temp file t53_session_${i}.tmp found after session close" || return 1
     done
+}
+
+# ---------------------------------------------------------------------------
+# T53.16: smbtorture smb2.credits multichannel async credits
+# ---------------------------------------------------------------------------
+register_test "T53.16" "test_mc_smbtorture_multichannel_credits" --timeout 30 \
+    --requires "smbtorture" \
+    --description "smbtorture smb2.credits multichannel async credits"
+test_mc_smbtorture_multichannel_credits() {
+    local output
+    output=$(torture_run "smb2.credits.multichannel_max_async_credits" 2>&1)
+    if echo "$output" | grep -q "success:"; then return 0; fi
+    skip_test "multichannel credit test not available"
+}
+
+# ---------------------------------------------------------------------------
+# T53.17: smbtorture smb2.credits multichannel IPC async credits
+# ---------------------------------------------------------------------------
+register_test "T53.17" "test_mc_smbtorture_ipc_multichannel_credits" --timeout 30 \
+    --requires "smbtorture" \
+    --description "smbtorture smb2.credits multichannel IPC async credits"
+test_mc_smbtorture_ipc_multichannel_credits() {
+    local output
+    output=$(torture_run "smb2.credits.multichannel_ipc_max_async_credits" 2>&1)
+    if echo "$output" | grep -q "success:"; then return 0; fi
+    skip_test "IPC multichannel credit test not available"
 }

@@ -1,46 +1,45 @@
 #!/bin/bash
-# Run inside VM: prepare ksmbd module/config/users without launching daemon
+# Run inside VM: prepare ksmbd config/users and restart daemon
+# Does NOT do rmmod/insmod - the module is loaded at boot by start-ksmbd.sh.
+# Prefer copied /root artifacts so guest setup does not depend on executing
+# binaries from the shared source mount.
 
 set -euo pipefail
 
-# Graceful shutdown: tell kernel to close all SMB sessions, then stop daemon.
-# Using ksmbdctl stop avoids a race where rmmod fails because the kernel module
-# is still holding references from active connections.  pgrep -x matches the
-# exact process name so it cannot accidentally kill this script's shell even
-# when the script path contains 'ksmbdctl' in its argument list.
-ksmbdctl stop 2>/dev/null || true
+# Kill existing daemon (serial-getty may restart it, but we'll race it)
+killall -9 ksmbdctl 2>/dev/null || true
 sleep 1
-kill $(pgrep -x ksmbdctl) 2>/dev/null || true
-sleep 1
-timeout -s KILL 5s rmmod ksmbd 2>/dev/null || true
 
-modprobe libdes 2>/dev/null || true
-modprobe lz4_compress 2>/dev/null || true
-modprobe crypto_user 2>/dev/null || true
-modprobe hkdf 2>/dev/null || insmod /mnt/ksmbd/vm/hkdf.ko.zst 2>/dev/null || true
-
-# Optional transport dependencies when ksmbd is built with
-# SMB Direct (RDMA) support.
-modprobe ib_core 2>/dev/null || true
-modprobe ib_uverbs 2>/dev/null || true
-modprobe ib_umad 2>/dev/null || true
-modprobe rdma_ucm 2>/dev/null || true
-modprobe rdma_cm 2>/dev/null || true
-modprobe ib_cm 2>/dev/null || true
-modprobe iw_cm 2>/dev/null || true
-
-if ! insmod /mnt/ksmbd/ksmbd.ko 2>/dev/null; then
-    lsmod | grep -q '^ksmbd ' || exit 1
+# Ensure module is loaded (start-ksmbd.sh should have done this at boot)
+if ! lsmod | grep -q '^ksmbd '; then
+    modprobe libdes 2>/dev/null || true
+    modprobe lz4_compress 2>/dev/null || true
+    modprobe crypto_user 2>/dev/null || true
+    modprobe hkdf 2>/dev/null ||
+        insmod /root/hkdf.ko.zst 2>/dev/null ||
+        insmod /mnt/ksmbd/vm/hkdf.ko.zst 2>/dev/null || true
+    insmod /root/ksmbd.ko 2>/dev/null ||
+        insmod /mnt/ksmbd/ksmbd.ko 2>/dev/null || true
 fi
 
-mkdir -p /run /var/run /usr/var/run
-rm -f /run/ksmbd.lock /var/run/ksmbd.lock /usr/var/run/ksmbd.lock
+mkdir -p /run /var/run /usr/var/run /var/local/run
+rm -f /run/ksmbd.lock /var/run/ksmbd.lock /usr/var/run/ksmbd.lock /var/local/run/ksmbd.lock
 rm -f /run/ksmbd.fifo*
 
+# Use the freshest copied ksmbdctl first, then fall back to the shared tree.
+if [ -x /root/ksmbdctl ]; then
+    KSMBDCTL=/root/ksmbdctl
+elif [ -x /mnt/ksmbd/ksmbd-tools/build-codex/tools/ksmbdctl ]; then
+    KSMBDCTL=/mnt/ksmbd/ksmbd-tools/build-codex/tools/ksmbdctl
+elif [ -x /mnt/ksmbd/ksmbd-tools/tools/ksmbdctl ]; then
+    KSMBDCTL=/mnt/ksmbd/ksmbd-tools/tools/ksmbdctl
+else
+    KSMBDCTL=ksmbdctl
+fi
+
 mkdir -p /srv/smb/test /etc/ksmbd
-# Clean stale test files so each run starts with a fresh share state.
-# This prevents leftover DACLs / security xattrs from previous runs from
-# causing spurious OBJECT_NAME_NOT_FOUND / ACCESS_DENIED failures.
+
+# Clean stale test files
 find /srv/smb/test -mindepth 1 -delete 2>/dev/null || true
 chmod 0777 /srv/smb/test
 
@@ -53,8 +52,11 @@ cat > /etc/ksmbd/ksmbd.conf << 'CONF'
     server max protocol = SMB3_11
     map to guest = bad user
     max ip connections = 256
+    server multi channel support = yes
     smb2 leases = yes
     durable handles = yes
+    max async credits = 512
+    quic handshake delegate = no
 
 [test]
     path = /srv/smb/test
@@ -69,9 +71,11 @@ cat > /etc/ksmbd/ksmbd.conf << 'CONF'
     streams = yes
 CONF
 
-printf 'testpass\ntestpass\n' | ksmbdctl user add testuser 2>/dev/null || true
-# Write the correct NT hash BEFORE starting the daemon.
+# Write the correct NT hash directly (avoids piped-stdin hash bug)
 # NT hash = MD4(UTF-16LE("testpass")) = base64("Ncy6kWix1cpgk7S31Wxhmw==")
-# ksmbdctl user add via piped stdin produces a wrong hash, so we overwrite.
 printf 'testuser:Ncy6kWix1cpgk7S31Wxhmw==\n' > /etc/ksmbd/ksmbdpwd.db
-ksmbdctl start
+
+# Install new ksmbdctl as system binary so serial-getty also uses it
+cp "$KSMBDCTL" /usr/bin/ksmbdctl 2>/dev/null || true
+
+$KSMBDCTL -C /etc/ksmbd/ksmbd.conf -P /etc/ksmbd/ksmbdpwd.db start

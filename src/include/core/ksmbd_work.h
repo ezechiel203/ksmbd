@@ -95,6 +95,10 @@ struct ksmbd_work {
 	bool                            sendfile:1;
 	/* Async work owned by subsystem (notify), worker must not free */
 	bool                            pending_async:1;
+	/* Async notify work owns an extra connection lifetime reference */
+	bool                            notify_conn_ref:1;
+	/* Other async work owns an extra connection lifetime reference */
+	bool                            async_conn_ref:1;
 	/*
 	 * True while smb2_open is writing init xattrs (DOS attrs, POSIX ACL,
 	 * NT SD) for a newly created file/dir.  ksmbd_notify.c reads this via
@@ -102,6 +106,19 @@ struct ksmbd_work {
 	 * that these internal writes generate (CN-SUPPRESS).
 	 */
 	bool                            notify_suppress:1;
+	/*
+	 * True once the request ingress path has successfully reserved
+	 * outstanding credits for this work. Generated or synthetic works
+	 * can still carry a request buffer, but they must not debit the
+	 * outstanding balance again on response.
+	 */
+	bool                            credits_accounted:1;
+	/*
+	 * True after the first smb2_set_rsp_credits() call debits
+	 * outstanding_credits for this work.  Prevents double-debit
+	 * for compound sub-responses and async interim+final pairs.
+	 */
+	bool                            credits_debited:1;
 
 	unsigned int                    remote_key;
 

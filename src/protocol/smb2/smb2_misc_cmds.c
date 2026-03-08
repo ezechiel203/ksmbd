@@ -441,12 +441,19 @@ static void smb21_lease_break_ack(struct ksmbd_work *work)
 	unsigned int lease_change_type;
 	__le32 lease_state;
 	struct lease *lease;
+	const char *client_guid = conn->ClientGUID;
 
 	WORK_BUFFERS(work, req, rsp);
 
 	ksmbd_debug(OPLOCK, "smb21 lease break, lease state(0x%x)\n",
 		    le32_to_cpu(req->LeaseState));
-	opinfo = lookup_lease_in_table(conn, req->LeaseKey);
+	if ((!client_guid ||
+	     !memchr_inv(client_guid, 0, SMB2_CLIENT_GUID_SIZE)) &&
+	    work->sess &&
+	    memchr_inv(work->sess->ClientGUID, 0, SMB2_CLIENT_GUID_SIZE))
+		client_guid = work->sess->ClientGUID;
+
+	opinfo = lookup_lease_in_table(client_guid, req->LeaseKey);
 	if (!opinfo) {
 		pr_err("lease break ack: lookup FAILED\n");
 		smb2_set_err_rsp(work);
@@ -701,6 +708,7 @@ void smb2_send_session_closed_notification(struct ksmbd_work *work)
 		ksmbd_debug(SMB,
 			    "sending NOTIFY_SESSION_CLOSED to chann conn %p for sess %llu\n",
 			    ch_conn, sess->id);
+		ksmbd_smb2_finalize_async_rsp(noti_work);
 		ksmbd_conn_write(noti_work);
 		ksmbd_conn_r_count_dec(ch_conn);
 		ksmbd_free_work_struct(noti_work);

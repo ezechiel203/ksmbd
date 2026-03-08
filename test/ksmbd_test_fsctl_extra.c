@@ -431,13 +431,13 @@ static int test_validate_pipe_wait(void *in_buf,
 	req = (struct test_fsctl_pipe_wait_req *)in_buf;
 	timeout_100ns = (s64)le64_to_cpu(req->Timeout);
 
-	if (!req->TimeoutSpecified || timeout_100ns == 0) {
-		wait_ms = 50;
+	if (!req->TimeoutSpecified) {
+		wait_ms = 0xffffffffu;
+	} else if (timeout_100ns == 0) {
+		wait_ms = 0;
 	} else {
 		s64 computed = timeout_100ns / 10000LL;
 
-		if (computed > 500LL)
-			computed = 500LL;
 		wait_ms = (unsigned int)computed;
 		if (wait_ms == 0)
 			wait_ms = 1;
@@ -1438,12 +1438,12 @@ static void test_pipe_wait_timeout_not_specified(struct kunit *test)
 	u32 status;
 	int ret;
 
-	/* Pipe not open, timeout not specified -> default 50ms */
+	/* Pipe not open, timeout not specified -> wait indefinitely */
 	ret = test_validate_pipe_wait(&req, sizeof(req), false, &out_len,
 				      &status, &wait_ms);
 	KUNIT_EXPECT_EQ(test, ret, -ETIMEDOUT);
 	KUNIT_EXPECT_EQ(test, status, (u32)STATUS_IO_TIMEOUT);
-	KUNIT_EXPECT_EQ(test, wait_ms, (unsigned int)50);
+	KUNIT_EXPECT_EQ(test, wait_ms, (unsigned int)0xffffffffu);
 }
 
 static void test_pipe_wait_timeout_zero(struct kunit *test)
@@ -1458,11 +1458,11 @@ static void test_pipe_wait_timeout_zero(struct kunit *test)
 	u32 status;
 	int ret;
 
-	/* Timeout=0 with TimeoutSpecified: use default 50ms */
+	/* Timeout=0 with TimeoutSpecified: immediate timeout */
 	ret = test_validate_pipe_wait(&req, sizeof(req), false, &out_len,
 				      &status, &wait_ms);
 	KUNIT_EXPECT_EQ(test, ret, -ETIMEDOUT);
-	KUNIT_EXPECT_EQ(test, wait_ms, (unsigned int)50);
+	KUNIT_EXPECT_EQ(test, wait_ms, (unsigned int)0);
 }
 
 static void test_pipe_wait_small_timeout(struct kunit *test)
@@ -1484,10 +1484,10 @@ static void test_pipe_wait_small_timeout(struct kunit *test)
 	KUNIT_EXPECT_EQ(test, wait_ms, (unsigned int)1);
 }
 
-static void test_pipe_wait_large_timeout_capped(struct kunit *test)
+static void test_pipe_wait_large_timeout(struct kunit *test)
 {
 	struct test_fsctl_pipe_wait_req req = {
-		/* 10 seconds = 100000000 * 100ns, should be capped at 500ms */
+		/* 10 seconds = 100000000 * 100ns */
 		.Timeout = cpu_to_le64(100000000LL),
 		.TimeoutSpecified = 1,
 		.NameLength = 0,
@@ -1500,7 +1500,7 @@ static void test_pipe_wait_large_timeout_capped(struct kunit *test)
 	ret = test_validate_pipe_wait(&req, sizeof(req), false, &out_len,
 				      &status, &wait_ms);
 	KUNIT_EXPECT_EQ(test, ret, -ETIMEDOUT);
-	KUNIT_EXPECT_EQ(test, wait_ms, (unsigned int)500);
+	KUNIT_EXPECT_EQ(test, wait_ms, (unsigned int)10000);
 }
 
 static void test_pipe_wait_very_small_timeout_rounds_up(struct kunit *test)
@@ -1695,7 +1695,7 @@ static struct kunit_case ksmbd_fsctl_extra_test_cases[] = {
 	KUNIT_CASE(test_pipe_wait_timeout_not_specified),
 	KUNIT_CASE(test_pipe_wait_timeout_zero),
 	KUNIT_CASE(test_pipe_wait_small_timeout),
-	KUNIT_CASE(test_pipe_wait_large_timeout_capped),
+	KUNIT_CASE(test_pipe_wait_large_timeout),
 	KUNIT_CASE(test_pipe_wait_very_small_timeout_rounds_up),
 	/* Dispatch routing */
 	KUNIT_CASE(test_extra_register_file_level_trim),

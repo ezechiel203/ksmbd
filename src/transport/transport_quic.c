@@ -84,6 +84,8 @@
 #include <net/tls.h>
 #endif
 
+#define KSMBD_TRANSPORT_QUIC_IMPL
+
 #include "glob.h"
 #include "connection.h"
 #include "smb_common.h"
@@ -229,17 +231,23 @@ struct ksmbd_quic_crypto {
  *
  * @write_key:	Server write key (used to encrypt packets sent to client)
  * @write_iv:	Server write IV (base nonce for AEAD)
+ * @write_hp:	Server write header-protection key
  * @read_key:	Client write key (used to decrypt packets received from client)
  * @read_iv:	Client write IV
+ * @read_hp:	Client write header-protection key
  * @key_len:	Key length in bytes (16 for AES-128-GCM, 32 for AES-256-GCM)
- * @ready:	true once keys have been installed from the handshake result
+ * @hp_ready:	true once header-protection keys have been installed
+ * @ready:	true once AEAD keys have been installed from the handshake result
  */
 struct ksmbd_quic_app_crypto {
 	u8	write_key[KSMBD_QUIC_KEY_SIZE];
 	u8	write_iv[KSMBD_QUIC_IV_SIZE];
+	u8	write_hp[KSMBD_QUIC_KEY_SIZE];
 	u8	read_key[KSMBD_QUIC_KEY_SIZE];
 	u8	read_iv[KSMBD_QUIC_IV_SIZE];
+	u8	read_hp[KSMBD_QUIC_KEY_SIZE];
 	u8	key_len;
+	bool	hp_ready;
 	bool	ready;
 };
 
@@ -259,6 +267,8 @@ struct ksmbd_quic_app_crypto {
  * @scid_len:	Length of @scid
  * @initial_tx:	TX crypto for Initial packet number space
  * @initial_rx:	RX crypto for Initial packet number space
+ * @handshake_tx: TX crypto for QUIC Handshake packet number space
+ * @handshake_rx: RX crypto for QUIC Handshake packet number space
  * @app_crypto:	1-RTT application traffic keys (installed after TLS handshake)
  * @send_pkt_num: Next packet number to use (monotonically increasing)
  * @recv_pkt_num: Largest received packet number (for ACK generation)
@@ -273,6 +283,7 @@ struct ksmbd_quic_app_crypto {
  * @smb_conn:	ksmbd connection object (non-NULL once CONNECTED)
  * @udp_sock:	Shared UDP listener socket (we send via this)
  * @ipc_handle:	IPC correlation handle for the pending HANDSHAKE_REQ
+ * @retry_validated: True if the connection completed Retry-token validation
  */
 struct ksmbd_quic_conn {
 	struct hlist_node		hlist;
@@ -285,6 +296,8 @@ struct ksmbd_quic_conn {
 	u8				scid_len;
 	struct ksmbd_quic_crypto	initial_tx;
 	struct ksmbd_quic_crypto	initial_rx;
+	struct ksmbd_quic_crypto	handshake_tx;
+	struct ksmbd_quic_crypto	handshake_rx;
 	struct ksmbd_quic_app_crypto	app_crypto;
 	u64				send_pkt_num;
 	u64				recv_pkt_num;
@@ -299,6 +312,7 @@ struct ksmbd_quic_conn {
 	/* Handshake IPC synchronisation */
 	struct completion		hs_done;
 	int				ipc_handle;
+	bool				retry_validated;
 	wait_queue_head_t		wait;
 	struct ksmbd_conn		*smb_conn;
 	struct socket			*udp_sock;
@@ -337,6 +351,7 @@ static const struct ksmbd_transport_ops ksmbd_quic_transport_ops;
 static struct task_struct	*quic_listener_kthread;
 static struct socket		*quic_udp_sock;		/* shared UDP socket */
 static atomic_t			 quic_active_conns;
+static DEFINE_MUTEX(quic_listener_lock);
 
 /* Hash table for active QUIC connections, keyed on DCID bytes */
 #define QUIC_CONN_HASH_BITS	8
@@ -360,6 +375,58 @@ static DEFINE_SPINLOCK(quic_conn_table_lock);
 #define QUIC_RETRY_TOKEN_LEN	32	/* HMAC-SHA256 output */
 static u8 quic_retry_secret[32];
 static bool quic_retry_secret_ready;
+
+/* RFC 9001 Appendix A.4: Retry Integrity protection for QUIC v1 */
+static const u8 quic_retry_integrity_key[QUIC_AEAD_KEY_SIZE] = {
+	0xbe, 0x0c, 0x69, 0x0b, 0x9f, 0x66, 0x57, 0x5a,
+	0x1d, 0x76, 0x6b, 0x54, 0xe3, 0x68, 0xc8, 0x4e,
+};
+
+static const u8 quic_retry_integrity_nonce[QUIC_AEAD_IV_SIZE] = {
+	0x46, 0x15, 0x99, 0xd3, 0x5d, 0x63, 0x2b, 0xf2,
+	0x23, 0x98, 0x25, 0xbb,
+};
+
+static int __maybe_unused
+ksmbd_quic_aead_crypt(const u8 *key, const u8 *iv, u64 pkt_num,
+		      const u8 *aad, size_t aad_len,
+		      const u8 *in, size_t in_len,
+		      u8 *out, size_t *out_len,
+		      bool encrypt);
+
+static int quic_compute_retry_integrity_tag(const u8 *odcid, u8 odcid_len,
+					    const u8 *retry_pkt,
+					    size_t retry_pkt_len,
+					    u8 tag[QUIC_AEAD_TAG_SIZE])
+{
+	u8 pseudo[1 + QUIC_MAX_CID_LEN +
+		  1 + 4 + 1 + QUIC_MAX_CID_LEN + 1 + QUIC_MAX_CID_LEN +
+		  QUIC_RETRY_TOKEN_LEN];
+	u8 empty[1] = { 0 };
+	u8 *p = pseudo;
+	size_t tag_len = QUIC_AEAD_TAG_SIZE;
+	int ret;
+
+	if (odcid_len > QUIC_MAX_CID_LEN)
+		return -EINVAL;
+	if (1 + odcid_len + retry_pkt_len > sizeof(pseudo))
+		return -E2BIG;
+
+	*p++ = odcid_len;
+	memcpy(p, odcid, odcid_len);
+	p += odcid_len;
+	memcpy(p, retry_pkt, retry_pkt_len);
+	p += retry_pkt_len;
+
+	ret = ksmbd_quic_aead_crypt(quic_retry_integrity_key,
+				    quic_retry_integrity_nonce, 0,
+				    pseudo, p - pseudo,
+				    empty, 0, tag, &tag_len, true);
+	if (ret)
+		return ret;
+
+	return tag_len == QUIC_AEAD_TAG_SIZE ? 0 : -EINVAL;
+}
 
 /* =========================================================================
  * QUIC variable-length integer encoding/decoding (RFC 9000 §16)
@@ -951,7 +1018,11 @@ ksmbd_quic_install_ktls_keys(struct socket *sock,
 
 /* Forward declaration needed by the IPC response handler (defined below) */
 static void quic_send_handshake_data(struct ksmbd_quic_conn *qconn,
-				     const u8 *data, size_t len);
+				     const u8 *data,
+				     size_t initial_len,
+				     size_t handshake_len);
+static int ksmbd_quic_start_listener(void);
+static void ksmbd_quic_stop_listener(void);
 
 /* =========================================================================
  * QUIC Handshake IPC — dedicated Generic Netlink family (SMBD_QUIC)
@@ -1005,27 +1076,18 @@ static int quic_hs_ipc_handle_rsp(struct sk_buff *skb, struct genl_info *info);
 static int quic_hs_ipc_handle_register(struct sk_buff *skb,
 				       struct genl_info *info);
 
-static const struct nla_policy quic_hs_nl_policy[KSMBD_QUIC_CMD_MAX + 1] = {
-	[KSMBD_QUIC_CMD_UNSPEC] = { .len = 0 },
-	[KSMBD_QUIC_CMD_HANDSHAKE_REQ] = {
-		.type = NLA_BINARY,
-		.len  = sizeof(struct ksmbd_quic_handshake_req),
-	},
-	[KSMBD_QUIC_CMD_HANDSHAKE_RSP] = {
-		.type = NLA_BINARY,
-		.len  = sizeof(struct ksmbd_quic_handshake_rsp),
-	},
+static const struct nla_policy quic_hs_nl_policy[KSMBD_QUIC_ATTR_MAX + 1] = {
+	[KSMBD_QUIC_ATTR_PAYLOAD] = { .type = NLA_BINARY },
+	[KSMBD_QUIC_ATTR_WRITE_HP] = { .type = NLA_BINARY,
+				       .len = KSMBD_QUIC_KEY_SIZE },
+	[KSMBD_QUIC_ATTR_READ_HP] = { .type = NLA_BINARY,
+				      .len = KSMBD_QUIC_KEY_SIZE },
 };
 
 static const struct genl_ops quic_hs_genl_ops[] = {
 	{
-		.cmd   = KSMBD_QUIC_CMD_UNSPEC,
+		.cmd   = KSMBD_QUIC_CMD_REGISTER,
 		.doit  = quic_hs_ipc_handle_register,
-		.flags = GENL_ADMIN_PERM,
-	},
-	{
-		.cmd   = KSMBD_QUIC_CMD_HANDSHAKE_REQ,
-		/* kernel sends; not a valid incoming command from userspace */
 		.flags = GENL_ADMIN_PERM,
 	},
 	{
@@ -1039,13 +1101,13 @@ static struct genl_family quic_hs_genl_family = {
 	.name		= KSMBD_QUIC_GENL_NAME,
 	.version	= KSMBD_QUIC_GENL_VERSION,
 	.hdrsize	= 0,
-	.maxattr	= KSMBD_QUIC_CMD_MAX,
+	.maxattr	= KSMBD_QUIC_ATTR_MAX,
 	.netnsok	= true,
 	.module		= THIS_MODULE,
 	.ops		= quic_hs_genl_ops,
 	.n_ops		= ARRAY_SIZE(quic_hs_genl_ops),
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0)
-	.resv_start_op	= KSMBD_QUIC_CMD_HANDSHAKE_REQ,
+	.resv_start_op	= KSMBD_QUIC_CMD_REGISTER,
 #endif
 	.policy		= quic_hs_nl_policy,
 };
@@ -1055,7 +1117,7 @@ static struct genl_family quic_hs_genl_family = {
  * @skb:	Incoming netlink message
  * @info:	Parsed genl info
  *
- * The ksmbdctl daemon sends KSMBD_QUIC_CMD_UNSPEC when it starts, telling
+ * The ksmbdctl daemon sends KSMBD_QUIC_CMD_REGISTER when it starts, telling
  * us its PID so we can send handshake requests to it.
  *
  * Return: 0 always (non-fatal if it fails — we just won't do handshakes)
@@ -1063,8 +1125,14 @@ static struct genl_family quic_hs_genl_family = {
 static int quic_hs_ipc_handle_register(struct sk_buff *skb,
 					struct genl_info *info)
 {
+	int ret;
+
 	if (!netlink_capable(skb, CAP_NET_ADMIN))
 		return -EPERM;
+
+	ret = ksmbd_quic_start_listener();
+	if (ret)
+		return ret;
 
 	spin_lock(&quic_tools_pid_lock);
 	quic_tools_pid = info->snd_portid;
@@ -1088,6 +1156,8 @@ static int quic_hs_ipc_handle_register(struct sk_buff *skb,
 static int quic_hs_ipc_handle_rsp(struct sk_buff *skb, struct genl_info *info)
 {
 	struct nlattr *attr;
+	struct nlattr *write_hp_attr;
+	struct nlattr *read_hp_attr;
 	struct ksmbd_quic_handshake_rsp *rsp;
 	struct quic_hs_pending *entry = NULL, *iter;
 	unsigned long flags;
@@ -1095,9 +1165,11 @@ static int quic_hs_ipc_handle_rsp(struct sk_buff *skb, struct genl_info *info)
 	if (!netlink_capable(skb, CAP_NET_ADMIN))
 		return -EPERM;
 
-	attr = info->attrs[KSMBD_QUIC_CMD_HANDSHAKE_RSP];
+	attr = info->attrs[KSMBD_QUIC_ATTR_PAYLOAD];
 	if (!attr)
 		return -EINVAL;
+	write_hp_attr = info->attrs[KSMBD_QUIC_ATTR_WRITE_HP];
+	read_hp_attr = info->attrs[KSMBD_QUIC_ATTR_READ_HP];
 
 	if (nla_len(attr) < (int)sizeof(struct ksmbd_quic_handshake_rsp))
 		return -EINVAL;
@@ -1132,13 +1204,38 @@ static int quic_hs_ipc_handle_rsp(struct sk_buff *skb, struct genl_info *info)
 				? 32 : 16;
 
 		spin_lock_irqsave(&qconn->lock, qflags);
-		memcpy(qconn->app_crypto.write_key, rsp->write_key, key_len);
-		memcpy(qconn->app_crypto.write_iv, rsp->write_iv,
+		memcpy(qconn->handshake_tx.key, rsp->hs_write_key, key_len);
+		memcpy(qconn->handshake_tx.iv, rsp->hs_write_iv,
 		       KSMBD_QUIC_IV_SIZE);
-		memcpy(qconn->app_crypto.read_key, rsp->read_key, key_len);
-		memcpy(qconn->app_crypto.read_iv, rsp->read_iv,
+		memcpy(qconn->handshake_tx.hp, rsp->hs_write_hp, key_len);
+		qconn->handshake_tx.key_len = key_len;
+		qconn->handshake_tx.ready = true;
+
+		memcpy(qconn->handshake_rx.key, rsp->hs_read_key, key_len);
+		memcpy(qconn->handshake_rx.iv, rsp->hs_read_iv,
+		       KSMBD_QUIC_IV_SIZE);
+		memcpy(qconn->handshake_rx.hp, rsp->hs_read_hp, key_len);
+		qconn->handshake_rx.key_len = key_len;
+		qconn->handshake_rx.ready = true;
+
+		memcpy(qconn->app_crypto.write_key, rsp->app_write_key, key_len);
+		memcpy(qconn->app_crypto.write_iv, rsp->app_write_iv,
+		       KSMBD_QUIC_IV_SIZE);
+		memcpy(qconn->app_crypto.read_key, rsp->app_read_key, key_len);
+		memcpy(qconn->app_crypto.read_iv, rsp->app_read_iv,
 		       KSMBD_QUIC_IV_SIZE);
 		qconn->app_crypto.key_len = key_len;
+		qconn->app_crypto.hp_ready = true;
+		memcpy(qconn->app_crypto.write_hp, rsp->app_write_hp, key_len);
+		memcpy(qconn->app_crypto.read_hp, rsp->app_read_hp, key_len);
+		if (write_hp_attr && read_hp_attr &&
+		    nla_len(write_hp_attr) >= key_len &&
+		    nla_len(read_hp_attr) >= key_len) {
+			memcpy(qconn->app_crypto.write_hp,
+			       nla_data(write_hp_attr), key_len);
+			memcpy(qconn->app_crypto.read_hp,
+			       nla_data(read_hp_attr), key_len);
+		}
 		qconn->app_crypto.ready = true;
 		spin_unlock_irqrestore(&qconn->lock, qflags);
 
@@ -1148,19 +1245,34 @@ static int quic_hs_ipc_handle_rsp(struct sk_buff *skb, struct genl_info *info)
 		 * via netlink workqueue), which is safe for sendmsg.
 		 * Declared below; body implemented in the send-handshake section.
 		 */
-		if (rsp->hs_data_len > 0) {
+		if (rsp->initial_data_len + rsp->handshake_data_len >
+		    rsp->hs_data_len) {
+			pr_warn_ratelimited("QUIC IPC: invalid handshake flight split (%u + %u > %u)\n",
+					    rsp->initial_data_len,
+					    rsp->handshake_data_len,
+					    rsp->hs_data_len);
+		} else if (rsp->hs_data_len > 0) {
 			quic_send_handshake_data(qconn, rsp->hs_data,
-						 rsp->hs_data_len);
+						 rsp->initial_data_len,
+						 rsp->handshake_data_len);
 		}
 	}
 
 	entry->success = !!rsp->success;
 
 	/* Scrub key material from the response buffer on the stack */
-	memzero_explicit(rsp->write_key, sizeof(rsp->write_key));
-	memzero_explicit(rsp->write_iv, sizeof(rsp->write_iv));
-	memzero_explicit(rsp->read_key, sizeof(rsp->read_key));
-	memzero_explicit(rsp->read_iv, sizeof(rsp->read_iv));
+	memzero_explicit(rsp->hs_write_key, sizeof(rsp->hs_write_key));
+	memzero_explicit(rsp->hs_write_iv, sizeof(rsp->hs_write_iv));
+	memzero_explicit(rsp->hs_write_hp, sizeof(rsp->hs_write_hp));
+	memzero_explicit(rsp->hs_read_key, sizeof(rsp->hs_read_key));
+	memzero_explicit(rsp->hs_read_iv, sizeof(rsp->hs_read_iv));
+	memzero_explicit(rsp->hs_read_hp, sizeof(rsp->hs_read_hp));
+	memzero_explicit(rsp->app_write_key, sizeof(rsp->app_write_key));
+	memzero_explicit(rsp->app_write_iv, sizeof(rsp->app_write_iv));
+	memzero_explicit(rsp->app_write_hp, sizeof(rsp->app_write_hp));
+	memzero_explicit(rsp->app_read_key, sizeof(rsp->app_read_key));
+	memzero_explicit(rsp->app_read_iv, sizeof(rsp->app_read_iv));
+	memzero_explicit(rsp->app_read_hp, sizeof(rsp->app_read_hp));
 
 	complete(&entry->done);
 	return 0;
@@ -1254,15 +1366,19 @@ static int quic_hs_ipc_send_req(struct ksmbd_quic_conn *qconn, int handle)
 		req->peer_addr[10] = 0xff;
 		req->peer_addr[11] = 0xff;
 		memcpy(req->peer_addr + 12, &sin->sin_addr, 4);
-		req->peer_port = ntohs(sin->sin_port);
+	req->peer_port = ntohs(sin->sin_port);
 	}
+
+	req->dcid_len = qconn->dcid_len;
+	req->retry_validated = qconn->retry_validated;
+	memcpy(req->dcid, qconn->dcid, qconn->dcid_len);
 
 	/* ClientHello bytes */
 	req->client_hello_len = (u32)min_t(size_t, qconn->crypto_len,
 					   KSMBD_QUIC_MAX_CLIENT_HELLO);
 	memcpy(req->client_hello, qconn->crypto_buf, req->client_hello_len);
 
-	ret = nla_put(skb, KSMBD_QUIC_CMD_HANDSHAKE_REQ, sizeof(*req), req);
+	ret = nla_put(skb, KSMBD_QUIC_ATTR_PAYLOAD, sizeof(*req), req);
 	kfree(req);
 	if (ret) {
 		genlmsg_cancel(skb, hdr);
@@ -1819,19 +1935,10 @@ static void quic_send_ack(struct ksmbd_quic_conn *qconn, u64 largest_acked)
  * QUIC Initial packet using the server Initial TX keys.
  */
 
-/**
- * quic_send_handshake_data() - send server TLS flight to the client
- * @qconn:	QUIC connection
- * @data:	Server handshake flight bytes (TLS records)
- * @len:	Number of bytes in @data
- *
- * Wraps @data in a QUIC CRYPTO frame inside a QUIC Initial long-header
- * packet and sends it to @qconn->peer.
- *
- * Called from quic_hs_ipc_handle_rsp() (genl receive path, process context).
- */
-static void quic_send_handshake_data(struct ksmbd_quic_conn *qconn,
-				     const u8 *data, size_t len)
+static int quic_send_crypto_packet(struct ksmbd_quic_conn *qconn,
+				   struct ksmbd_quic_crypto *tx_crypto,
+				   u8 packet_type, u64 *crypto_offset,
+				   const u8 *data, size_t len)
 {
 	/*
 	 * QUIC-02: Build, AEAD-encrypt, and header-protect each Initial packet.
@@ -1855,11 +1962,11 @@ static void quic_send_handshake_data(struct ksmbd_quic_conn *qconn,
 	 */
 	const size_t max_data_per_pkt = QUIC_MAX_PKT_SIZE - 80 -
 					QUIC_AEAD_TAG_SIZE;
-	size_t offset_in_crypto = 0;
 
-	if (!qconn->initial_tx.ready) {
-		pr_warn_ratelimited("QUIC: no TX Initial keys for handshake send\n");
-		return;
+	if (!tx_crypto->ready) {
+		pr_warn_ratelimited("QUIC: no TX keys for packet type 0x%x\n",
+				    packet_type);
+		return -EINVAL;
 	}
 
 	while (len > 0) {
@@ -1871,10 +1978,10 @@ static void quic_send_handshake_data(struct ksmbd_quic_conn *qconn,
 		 * After AEAD we concatenate hdr_buf + ciphertext (+ tag).
 		 */
 		u8 hdr_buf[80];		/* long header (AAD) */
-		u8 plaintext_buf[QUIC_MAX_PKT_SIZE];
-		u8 ciphertext_buf[QUIC_MAX_PKT_SIZE + QUIC_AEAD_TAG_SIZE];
+		u8 *plaintext_buf;
+		u8 *ciphertext_buf;
 		u8 *p = hdr_buf;
-		u8 *pp = plaintext_buf;
+		u8 *pp;
 		size_t hdr_len, plaintext_len, ciphertext_len;
 		size_t frame_hdr_overhead;
 		size_t payload_len_field;	/* the Length varint value */
@@ -1882,8 +1989,18 @@ static void quic_send_handshake_data(struct ksmbd_quic_conn *qconn,
 		u64 pkt_num;
 		struct msghdr msg = {};
 		struct kvec iov[2];
-		int vl, ret;
+		int vl, ret = 0;
 		/* scratch: compute frame header size to get accurate payload_len */
+
+		plaintext_buf = kvmalloc(QUIC_MAX_PKT_SIZE, GFP_KERNEL);
+		ciphertext_buf = kvmalloc(QUIC_MAX_PKT_SIZE +
+					  QUIC_AEAD_TAG_SIZE, GFP_KERNEL);
+		if (!plaintext_buf || !ciphertext_buf) {
+			kvfree(plaintext_buf);
+			kvfree(ciphertext_buf);
+			return -ENOMEM;
+		}
+		pp = plaintext_buf;
 
 		/*
 		 * Frame header max size: type(1) + offset(8) + length(8) = 17.
@@ -1895,9 +2012,9 @@ static void quic_send_handshake_data(struct ksmbd_quic_conn *qconn,
 				    + QUIC_AEAD_TAG_SIZE;
 
 		/* ---- Build Long Header (AAD) ---- */
-		/* first byte: Long=1, Fixed=1, type=Initial(0x00), pkt_num_len-1=0 */
+		/* first byte: Long=1, Fixed=1, type packet_type, pkt_num_len-1=0 */
 		*p++ = QUIC_HDR_FORM_LONG | QUIC_HDR_FIXED_BIT
-			| QUIC_LONG_TYPE_INITIAL | 0x00;
+			| packet_type | 0x00;
 		put_unaligned_be32(QUIC_VERSION_1, p); p += 4;
 
 		/* DCID = peer's SCID */
@@ -1910,12 +2027,14 @@ static void quic_send_handshake_data(struct ksmbd_quic_conn *qconn,
 		memcpy(p, qconn->dcid, qconn->dcid_len);
 		p += qconn->dcid_len;
 
-		/* Token length = 0 */
-		*p++ = 0x00;
+		if (packet_type == QUIC_LONG_TYPE_INITIAL)
+			*p++ = 0x00;
 
 		/* Length field = pkt_num(1) + actual_frame_hdr + chunk + tag(16) */
-		if (ksmbd_quic_put_varint(p, payload_len_field, &vl))
-			return;
+		if (ksmbd_quic_put_varint(p, payload_len_field, &vl)) {
+			ret = -EINVAL;
+			goto out_free_pkt;
+		}
 		p += vl;
 		hdr_len = p - hdr_buf;
 
@@ -1927,24 +2046,30 @@ static void quic_send_handshake_data(struct ksmbd_quic_conn *qconn,
 		*pp++ = (u8)(pkt_num & 0xFF);		/* 1-byte packet number */
 
 		*pp++ = QUIC_FRAME_CRYPTO;		/* frame type */
-		if (ksmbd_quic_put_varint(pp, offset_in_crypto, &vl))
-			return;
+		if (ksmbd_quic_put_varint(pp, *crypto_offset, &vl)) {
+			ret = -EINVAL;
+			goto out_free_pkt;
+		}
 		pp += vl;
-		if (ksmbd_quic_put_varint(pp, chunk, &vl))
-			return;
+		if (ksmbd_quic_put_varint(pp, chunk, &vl)) {
+			ret = -EINVAL;
+			goto out_free_pkt;
+		}
 		pp += vl;
 
-		if ((size_t)(pp - plaintext_buf) + chunk > sizeof(plaintext_buf))
-			return;
+		if ((size_t)(pp - plaintext_buf) + chunk > QUIC_MAX_PKT_SIZE) {
+			ret = -E2BIG;
+			goto out_free_pkt;
+		}
 		memcpy(pp, data, chunk);
 		pp += chunk;
 		plaintext_len = pp - plaintext_buf;
 
 		/* ---- AEAD encrypt ---- */
-		ciphertext_len = sizeof(ciphertext_buf);
+		ciphertext_len = QUIC_MAX_PKT_SIZE + QUIC_AEAD_TAG_SIZE;
 		ret = ksmbd_quic_aead_crypt(
-			qconn->initial_tx.key,
-			qconn->initial_tx.iv,
+			tx_crypto->key,
+			tx_crypto->iv,
 			pkt_num,
 			hdr_buf, hdr_len,	/* AAD = long header */
 			plaintext_buf, plaintext_len,
@@ -1953,7 +2078,7 @@ static void quic_send_handshake_data(struct ksmbd_quic_conn *qconn,
 		if (ret) {
 			pr_warn_ratelimited("QUIC: handshake AEAD encrypt failed: %d\n",
 					    ret);
-			return;
+			goto out_free_pkt;
 		}
 
 		/*
@@ -1966,7 +2091,7 @@ static void quic_send_handshake_data(struct ksmbd_quic_conn *qconn,
 			ksmbd_quic_apply_header_protection(
 				ciphertext_buf,		/* packet number at byte 0 */
 				1,			/* 1-byte packet number */
-				qconn->initial_tx.hp,
+				tx_crypto->hp,
 				ciphertext_buf + 4);	/* sample at offset 4 */
 			/* Also protect the low bits of the first byte in hdr_buf */
 			{
@@ -1980,8 +2105,8 @@ static void quic_send_handshake_data(struct ksmbd_quic_conn *qconn,
 
 					memcpy(sample, ciphertext_buf + 4, 16);
 					if (!crypto_cipher_setkey(hp_tfm,
-							qconn->initial_tx.hp,
-							QUIC_HP_KEY_SIZE)) {
+							tx_crypto->hp,
+							tx_crypto->key_len)) {
 						crypto_cipher_encrypt_one(
 							hp_tfm, mask, sample);
 						mask_byte = mask[0];
@@ -2009,14 +2134,57 @@ static void quic_send_handshake_data(struct ksmbd_quic_conn *qconn,
 
 		memzero_explicit(plaintext_buf, plaintext_len);
 		memzero_explicit(ciphertext_buf, ciphertext_len);
+out_free_pkt:
+		kvfree(plaintext_buf);
+		kvfree(ciphertext_buf);
+		if (ret)
+			return ret;
 
 		data             += chunk;
 		len              -= chunk;
-		offset_in_crypto += chunk;
+		*crypto_offset   += chunk;
+	}
+
+	return 0;
+}
+
+/**
+ * quic_send_handshake_data() - send server TLS flight to the client
+ * @qconn:	QUIC connection
+ * @data:	Server handshake flight bytes (TLS records)
+ * @initial_len:Number of bytes from @data that belong in Initial packets
+ * @handshake_len:Number of bytes from @data + @initial_len that belong in
+ *		Handshake packets
+ */
+static void quic_send_handshake_data(struct ksmbd_quic_conn *qconn,
+				     const u8 *data,
+				     size_t initial_len,
+				     size_t handshake_len)
+{
+	u64 crypto_offset = 0;
+	int ret;
+
+	if (initial_len) {
+		ret = quic_send_crypto_packet(qconn, &qconn->initial_tx,
+					      QUIC_LONG_TYPE_INITIAL,
+					      &crypto_offset, data,
+					      initial_len);
+		if (ret)
+			return;
+	}
+
+	if (handshake_len) {
+		ret = quic_send_crypto_packet(qconn, &qconn->handshake_tx,
+					      QUIC_LONG_TYPE_HANDSHAKE,
+					      &crypto_offset,
+					      data + initial_len,
+					      handshake_len);
+		if (ret)
+			return;
 	}
 
 	ksmbd_debug(CONN, "QUIC: sent encrypted handshake flight (%zu bytes)\n",
-		    offset_in_crypto);
+		    initial_len + handshake_len);
 }
 
 /* =========================================================================
@@ -2887,16 +3055,10 @@ static void quic_send_retry(struct socket *udp_sock,
 	 *   byte:        SCID Length (= new random SCID we choose, or our DCID)
 	 *   bytes ...:   SCID (= our chosen SCID for this retry)
 	 *   bytes ...:   Retry Token (our HMAC-based token)
-	 *   bytes [last 16]: Retry Integrity Tag (RFC 9001 §5.8)
-	 *
-	 * For simplicity we omit the Integrity Tag (requires AES-128-GCM with
-	 * well-known key from RFC 9001 §A.4).  A production implementation
-	 * MUST include it.
-	 *
-	 * TODO: Add Retry Integrity Tag (RFC 9001 §A.4) for full compliance.
+	 *   bytes [last 16]: Retry Integrity Tag (RFC 9001 §5.8 / A.4)
 	 */
 	u8 pkt[1 + 4 + 1 + QUIC_MAX_CID_LEN + 1 + QUIC_MAX_CID_LEN +
-	       QUIC_RETRY_TOKEN_LEN];
+	       QUIC_RETRY_TOKEN_LEN + QUIC_AEAD_TAG_SIZE];
 	u8 *p = pkt;
 	u8 token[QUIC_RETRY_TOKEN_LEN];
 	struct msghdr msg = {};
@@ -2938,6 +3100,14 @@ static void quic_send_retry(struct socket *udp_sock,
 		return;
 	memcpy(p, token, sizeof(token));
 	p += sizeof(token);
+
+	ret = quic_compute_retry_integrity_tag(dcid, dcid_len, pkt, p - pkt, p);
+	if (ret) {
+		pr_warn_ratelimited("QUIC: Retry integrity tag generation failed: %d\n",
+				    ret);
+		return;
+	}
+	p += QUIC_AEAD_TAG_SIZE;
 
 	msg.msg_name    = peer;
 	msg.msg_namelen = peer_len;
@@ -3167,6 +3337,7 @@ static void quic_process_initial_packet(struct socket *udp_sock,
 	memcpy(&qconn->peer, peer, peer_len);
 	qconn->peer_addrlen = peer_len;
 	qconn->udp_sock = udp_sock;
+	qconn->retry_validated = quic_retry_secret_ready && token_len != 0;
 
 	/* Derive Initial packet keys (RFC 9001 §A.1) */
 	ret = ksmbd_quic_derive_initial_secrets(qconn);
@@ -3357,7 +3528,6 @@ static void quic_process_short_header_packet(struct socket *udp_sock,
 	int bkt;
 	/* Decrypted payload buffer (for AEAD path) */
 	u8 *decrypted_buf = NULL;
-	size_t decrypted_len = 0;
 	unsigned long lock_flags;
 
 	/* Scan the connection table for a matching DCID prefix */
@@ -3405,19 +3575,14 @@ static void quic_process_short_header_packet(struct socket *udp_sock,
 
 		hp_tfm = crypto_alloc_cipher("aes", 0, 0);
 		if (!IS_ERR(hp_tfm)) {
-			/*
-			 * The 1-RTT HP key is not separately stored in
-			 * ksmbd_quic_app_crypto.  For a complete implementation
-			 * the HP key would need its own field derived alongside
-			 * the write_key/read_key during TLS 1.3 key expansion.
-			 *
-			 * TODO: Store the 1-RTT HP keys separately and use
-			 * them here.  For now we use the read_key as an
-			 * approximation (not RFC-correct but allows the path
-			 * to be exercised; a real deployment must fix this).
-			 */
+			if (!qconn->app_crypto.hp_ready) {
+				crypto_free_cipher(hp_tfm);
+				pr_warn_ratelimited("QUIC: 1-RTT HP keys not installed, dropping short-header packet\n");
+				return;
+			}
+
 			if (!crypto_cipher_setkey(hp_tfm,
-					qconn->app_crypto.read_key,
+					qconn->app_crypto.read_hp,
 					qconn->app_crypto.key_len)) {
 				crypto_cipher_encrypt_one(hp_tfm, mask, sample);
 				first_byte ^= (mask[0] & 0x1F);
@@ -3807,6 +3972,55 @@ static int create_udp_listener(void)
 	return 0;
 }
 
+static int ksmbd_quic_start_listener(void)
+{
+	int ret;
+
+	mutex_lock(&quic_listener_lock);
+	if (quic_udp_sock && quic_listener_kthread) {
+		mutex_unlock(&quic_listener_lock);
+		return 0;
+	}
+
+	ret = create_udp_listener();
+	if (ret)
+		goto out;
+
+	quic_listener_kthread = kthread_run(ksmbd_quic_rx_thread, NULL,
+					    "ksmbd-quic-rx");
+	if (IS_ERR(quic_listener_kthread)) {
+		ret = PTR_ERR(quic_listener_kthread);
+		quic_listener_kthread = NULL;
+		pr_err("QUIC: cannot start RX thread: %d\n", ret);
+		sock_release(quic_udp_sock);
+		quic_udp_sock = NULL;
+		goto out;
+	}
+
+	pr_info("ksmbd: QUIC listener active on UDP port %u\n",
+		KSMBD_QUIC_PORT);
+	ret = 0;
+out:
+	mutex_unlock(&quic_listener_lock);
+	return ret;
+}
+
+static void ksmbd_quic_stop_listener(void)
+{
+	mutex_lock(&quic_listener_lock);
+	if (quic_listener_kthread) {
+		kthread_stop(quic_listener_kthread);
+		quic_listener_kthread = NULL;
+	}
+
+	if (quic_udp_sock) {
+		kernel_sock_shutdown(quic_udp_sock, SHUT_RDWR);
+		sock_release(quic_udp_sock);
+		quic_udp_sock = NULL;
+	}
+	mutex_unlock(&quic_listener_lock);
+}
+
 /* =========================================================================
  * Public init / destroy
  * =========================================================================
@@ -3837,27 +4051,9 @@ int ksmbd_quic_init(void)
 		return ret;
 	}
 
-	ret = create_udp_listener();
-	if (ret) {
-		genl_unregister_family(&quic_hs_genl_family);
-		return ret;
-	}
-
-	quic_listener_kthread = kthread_run(ksmbd_quic_rx_thread, NULL,
-					    "ksmbd-quic-rx");
-	if (IS_ERR(quic_listener_kthread)) {
-		ret = PTR_ERR(quic_listener_kthread);
-		quic_listener_kthread = NULL;
-		pr_err("QUIC: cannot start RX thread: %d\n", ret);
-		sock_release(quic_udp_sock);
-		quic_udp_sock = NULL;
-		genl_unregister_family(&quic_hs_genl_family);
-		return ret;
-	}
-
 	pr_info("ksmbd: kernel-native QUIC transport initialized (RFC 9000/9001)\n");
 	pr_info("ksmbd: QUIC: HKDF-SHA256 + AES-128-GCM + header protection enabled\n");
-	pr_info("ksmbd: QUIC: TLS 1.3 handshake delegation via genl family '%s'\n",
+	pr_info("ksmbd: QUIC: waiting for handshake daemon registration on genl family '%s'\n",
 		KSMBD_QUIC_GENL_NAME);
 #if IS_ENABLED(CONFIG_TLS)
 	pr_info("ksmbd: QUIC: kTLS acceleration available\n");
@@ -3876,16 +4072,7 @@ void ksmbd_quic_destroy(void)
 	struct ksmbd_quic_conn *qconn;
 	int bkt;
 
-	if (quic_listener_kthread) {
-		kthread_stop(quic_listener_kthread);
-		quic_listener_kthread = NULL;
-	}
-
-	if (quic_udp_sock) {
-		kernel_sock_shutdown(quic_udp_sock, SHUT_RDWR);
-		sock_release(quic_udp_sock);
-		quic_udp_sock = NULL;
-	}
+	ksmbd_quic_stop_listener();
 
 	/* Clean up any remaining QUIC connections */
 	spin_lock(&quic_conn_table_lock);

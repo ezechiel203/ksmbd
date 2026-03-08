@@ -59,6 +59,162 @@
 #include "ksmbd_buffer.h"
 #include "smb2pdu_internal.h"
 
+struct smb2_pipe_async_ctx {
+	struct delayed_work	dwork;
+	struct ksmbd_work	*work;
+	u64			id;
+	unsigned int		length;
+};
+
+static void smb2_pipe_async_put_conn_ref(struct ksmbd_work *work)
+{
+	if (!work || !work->async_conn_ref || !work->conn)
+		return;
+
+	work->async_conn_ref = false;
+	ksmbd_conn_free(work->conn);
+}
+
+static void smb2_pipe_read_reschedule(struct smb2_pipe_async_ctx *ctx)
+{
+	mod_delayed_work(system_wq, &ctx->dwork, msecs_to_jiffies(25));
+}
+
+static void smb2_pipe_read_complete(struct ksmbd_work *work,
+				    struct smb2_pipe_async_ctx *ctx,
+				    struct ksmbd_rpc_command *rpc_resp)
+{
+	struct smb2_read_rsp *rsp = smb2_get_msg(work->response_buf);
+	unsigned int remain_bytes = 0;
+	unsigned int nbytes;
+	int rc;
+	void *aux_payload_buf;
+
+	if (!rpc_resp || rpc_resp->flags != KSMBD_RPC_OK)
+		goto out_free_resp;
+
+	nbytes = rpc_resp->payload_sz;
+	if (ctx->length == 0 || nbytes == 0) {
+		kvfree(rpc_resp);
+		smb2_pipe_read_reschedule(ctx);
+		return;
+	}
+
+	if (nbytes > ctx->length) {
+		rsp->hdr.Status = STATUS_BUFFER_OVERFLOW;
+		remain_bytes = nbytes - ctx->length;
+		nbytes = ctx->length;
+	}
+
+	aux_payload_buf = kvmalloc(nbytes, KSMBD_DEFAULT_GFP);
+	if (!aux_payload_buf) {
+		rsp->hdr.Status = STATUS_INSUFFICIENT_RESOURCES;
+		smb2_set_err_rsp(work);
+		goto out_free_resp;
+	}
+
+	memcpy(aux_payload_buf, rpc_resp->payload, nbytes);
+	rc = ksmbd_iov_pin_rsp_read(work, rsp,
+				    offsetof(struct smb2_read_rsp, Buffer),
+				    aux_payload_buf, nbytes);
+	if (rc) {
+		kvfree(aux_payload_buf);
+		rsp->hdr.Status = STATUS_INSUFFICIENT_RESOURCES;
+		smb2_set_err_rsp(work);
+		goto out_free_resp;
+	}
+
+	rsp->StructureSize = cpu_to_le16(17);
+	rsp->DataOffset = offsetof(struct smb2_read_rsp, Buffer);
+	rsp->Reserved = 0;
+	rsp->DataLength = cpu_to_le32(nbytes);
+	rsp->DataRemaining = cpu_to_le32(remain_bytes);
+	rsp->Reserved2 = 0;
+
+out_free_resp:
+	kvfree(rpc_resp);
+	spin_lock(&work->conn->request_lock);
+	list_del_init(&work->async_request_entry);
+	spin_unlock(&work->conn->request_lock);
+
+	work->pending_async = 0;
+	work->send_no_response = 0;
+	if (work->sess && work->sess->enc && work->encrypted &&
+	    work->conn->ops->encrypt_resp) {
+		rc = work->conn->ops->encrypt_resp(work);
+		if (rc < 0)
+			pr_err_ratelimited("ksmbd: pipe read encrypt failed: %d\n",
+					   rc);
+	}
+	ksmbd_conn_write(work);
+	ksmbd_conn_try_dequeue_request(work);
+	if (READ_ONCE(server_conf.max_async_credits))
+		atomic_dec(&work->conn->outstanding_async);
+	if (work->sess)
+		ksmbd_user_session_put(work->sess);
+	smb2_pipe_async_put_conn_ref(work);
+	kfree(ctx);
+	ksmbd_free_work_struct(work);
+}
+
+static void smb2_pipe_read_poll_work(struct work_struct *wk)
+{
+	struct delayed_work *dwork = to_delayed_work(wk);
+	struct smb2_pipe_async_ctx *ctx =
+		container_of(dwork, struct smb2_pipe_async_ctx, dwork);
+	struct ksmbd_work *work = ctx->work;
+	struct ksmbd_rpc_command *rpc_resp;
+	struct smb2_read_rsp *rsp;
+
+	if (!work || !work->sess || !ksmbd_conn_alive(work->conn) ||
+	    ksmbd_conn_exiting(work->conn) || ksmbd_conn_releasing(work->conn)) {
+		if (work) {
+			spin_lock(&work->conn->request_lock);
+			list_del_init(&work->async_request_entry);
+			spin_unlock(&work->conn->request_lock);
+			ksmbd_conn_try_dequeue_request(work);
+			if (READ_ONCE(server_conf.max_async_credits))
+				atomic_dec(&work->conn->outstanding_async);
+			work->pending_async = 0;
+		}
+		if (work && work->sess)
+			ksmbd_user_session_put(work->sess);
+		smb2_pipe_async_put_conn_ref(work);
+		kfree(ctx);
+		if (work)
+			ksmbd_free_work_struct(work);
+		return;
+	}
+
+	rpc_resp = ksmbd_rpc_read(work->sess, ctx->id);
+	if (!rpc_resp) {
+		smb2_pipe_read_reschedule(ctx);
+		return;
+	}
+
+	rsp = smb2_get_msg(work->response_buf);
+	if (rpc_resp->flags == KSMBD_RPC_EBAD_FID) {
+		rsp->hdr.Status = STATUS_PIPE_DISCONNECTED;
+		smb2_set_err_rsp(work);
+		smb2_pipe_read_complete(work, ctx, rpc_resp);
+		return;
+	}
+
+	if (rpc_resp->flags == KSMBD_RPC_ENOTIMPLEMENTED) {
+		kvfree(rpc_resp);
+		smb2_pipe_read_reschedule(ctx);
+		return;
+	}
+
+	if (rpc_resp->flags != KSMBD_RPC_OK || rpc_resp->payload_sz == 0) {
+		kvfree(rpc_resp);
+		smb2_pipe_read_reschedule(ctx);
+		return;
+	}
+
+	smb2_pipe_read_complete(work, ctx, rpc_resp);
+}
+
 /**
  * smb2_read_pipe_cancel() - cancel callback for async pipe read
  * @argv: cancel argument array (argv[0] is unused/NULL for pipe reads)
@@ -70,6 +226,7 @@ static void smb2_read_pipe_cancel(void **argv)
 {
 	struct ksmbd_work *work;
 	struct smb2_read_rsp *rsp;
+	struct smb2_pipe_async_ctx *ctx;
 
 	/*
 	 * argv[0] contains the work pointer for pipe read cancellation.
@@ -79,7 +236,11 @@ static void smb2_read_pipe_cancel(void **argv)
 		return;
 
 	work = argv[0];
+	ctx = argv[1];
 	rsp = smb2_get_msg(work->response_buf);
+
+	if (ctx)
+		cancel_delayed_work_sync(&ctx->dwork);
 
 	rsp->hdr.Flags |= SMB2_FLAGS_ASYNC_COMMAND;
 	rsp->hdr.Id.AsyncId = cpu_to_le64(work->async_id);
@@ -119,6 +280,10 @@ static void smb2_read_pipe_cancel(void **argv)
 	if (READ_ONCE(server_conf.max_async_credits))
 		atomic_dec(&work->conn->outstanding_async);
 
+	if (work->sess)
+		ksmbd_user_session_put(work->sess);
+	smb2_pipe_async_put_conn_ref(work);
+	kfree(ctx);
 	ksmbd_free_work_struct(work);
 }
 
@@ -136,19 +301,34 @@ static void smb2_read_pipe_cancel(void **argv)
  */
 static int smb2_read_pipe_async(struct ksmbd_work *work)
 {
+	struct smb2_read_req *req = smb2_get_msg(work->request_buf);
 	struct smb2_read_rsp *rsp = smb2_get_msg(work->response_buf);
+	struct smb2_pipe_async_ctx *ctx;
 	void **argv;
 	int rc;
 
-	argv = kmalloc(sizeof(void *), KSMBD_DEFAULT_GFP);
+	argv = kcalloc(2, sizeof(void *), KSMBD_DEFAULT_GFP);
 	if (!argv) {
 		rsp->hdr.Status = STATUS_INSUFFICIENT_RESOURCES;
 		smb2_set_err_rsp(work);
 		return -ENOMEM;
 	}
 
+	ctx = kzalloc(sizeof(*ctx), KSMBD_DEFAULT_GFP);
+	if (!ctx) {
+		kfree(argv);
+		rsp->hdr.Status = STATUS_INSUFFICIENT_RESOURCES;
+		smb2_set_err_rsp(work);
+		return -ENOMEM;
+	}
+
+	ctx->work = work;
+	ctx->id = req->VolatileFileId;
+	INIT_DELAYED_WORK(&ctx->dwork, smb2_pipe_read_poll_work);
+
 	rc = setup_async_work(work, smb2_read_pipe_cancel, argv);
 	if (rc) {
+		kfree(ctx);
 		kfree(argv);
 		rsp->hdr.Status = STATUS_INSUFFICIENT_RESOURCES;
 		smb2_set_err_rsp(work);
@@ -157,8 +337,13 @@ static int smb2_read_pipe_async(struct ksmbd_work *work)
 
 	/* Store work pointer in cancel argv so cancel can find it */
 	argv[0] = work;
+	argv[1] = ctx;
 
 	/* Transfer work ownership to async subsystem */
+	if (work->sess)
+		ksmbd_user_session_get(work->sess);
+	refcount_inc(&work->conn->refcnt);
+	work->async_conn_ref = true;
 	work->pending_async = 1;
 
 	/*
@@ -176,6 +361,8 @@ static int smb2_read_pipe_async(struct ksmbd_work *work)
 
 	/* Suppress the normal response path */
 	work->send_no_response = 1;
+	ctx->length = le32_to_cpu(req->Length);
+	smb2_pipe_read_reschedule(ctx);
 	return 0;
 }
 
@@ -208,6 +395,12 @@ static noinline int smb2_read_pipe(struct ksmbd_work *work)
 			kvfree(rpc_resp);
 			rpc_resp = NULL;
 			goto no_data;
+		}
+
+		if (rpc_resp->flags == KSMBD_RPC_EBAD_FID) {
+			rsp->hdr.Status = STATUS_PIPE_DISCONNECTED;
+			kvfree(rpc_resp);
+			return -EPIPE;
 		}
 
 		if (rpc_resp->flags != KSMBD_RPC_OK) {
@@ -472,6 +665,17 @@ int smb2_read(struct ksmbd_work *work)
 		max_read_size = get_smbd_max_read_write_size();
 	}
 
+	if (req->Channel == SMB2_CHANNEL_RDMA_TRANSFORM) {
+		/*
+		 * RDMA transform channels require explicit negotiate
+		 * support. ksmbd currently suppresses RDMA transform
+		 * negotiation, so reject transformed reads instead of
+		 * silently processing them as inline traffic.
+		 */
+		err = -EINVAL;
+		goto out;
+	}
+
 	if (is_rdma_channel == true) {
 		unsigned int ch_offset = le16_to_cpu(req->ReadChannelInfoOffset);
 		unsigned int ch_len = le16_to_cpu(req->ReadChannelInfoLength);
@@ -505,12 +709,12 @@ int smb2_read(struct ksmbd_work *work)
 		goto out;
 	}
 
-	/* MS-SMB2 §3.3.5.2.10: validate ChannelSequence (read is state-dependent) */
-	if (smb2_check_channel_sequence(work, fp)) {
-		rsp->hdr.Status = STATUS_FILE_NOT_AVAILABLE;
-		err = -EAGAIN;
-		goto out;
-	}
+	/*
+	 * MS-SMB2 §3.3.5.2.10: READ is not state-modifying, so stale CSN
+	 * is not rejected.  But we still advance Open.ChannelSequence if
+	 * the request carries a higher sequence number.
+	 */
+	smb2_update_channel_sequence(work, fp);
 
 	offset = le64_to_cpu(req->Offset);
 	if (offset < 0 || offset > MAX_LFS_FILESIZE) {
@@ -944,6 +1148,15 @@ int smb2_write(struct ksmbd_work *work)
 		length = le32_to_cpu(req->RemainingBytes);
 	}
 
+	if (req->Channel == SMB2_CHANNEL_RDMA_TRANSFORM) {
+		/*
+		 * See smb2_read(): reject transformed RDMA writes until
+		 * RDMA transform negotiation and crypto are implemented.
+		 */
+		err = -EINVAL;
+		goto out;
+	}
+
 	if (is_rdma_channel == true) {
 		unsigned int ch_offset = le16_to_cpu(req->WriteChannelInfoOffset);
 		unsigned int ch_len = le16_to_cpu(req->WriteChannelInfoLength);
@@ -998,9 +1211,9 @@ int smb2_write(struct ksmbd_work *work)
 	}
 
 	/* MS-SMB2 §3.3.5.2.10: validate ChannelSequence */
-	if (smb2_check_channel_sequence(work, fp)) {
+	err = smb2_check_channel_sequence(work, fp);
+	if (err) {
 		rsp->hdr.Status = STATUS_FILE_NOT_AVAILABLE;
-		err = -EAGAIN;
 		goto out;
 	}
 
@@ -1158,22 +1371,24 @@ int smb2_write(struct ksmbd_work *work)
 	return 0;
 
 out:
-	if (err == -EAGAIN)
-		rsp->hdr.Status = STATUS_FILE_LOCK_CONFLICT;
-	else if (err == -ENOSPC || err == -EFBIG)
-		rsp->hdr.Status = STATUS_DISK_FULL;
-	else if (err == -ENOENT)
-		rsp->hdr.Status = STATUS_FILE_CLOSED;
-	else if (err == -EACCES)
-		rsp->hdr.Status = STATUS_ACCESS_DENIED;
-	else if (err == -ESHARE)
-		rsp->hdr.Status = STATUS_SHARING_VIOLATION;
-	else if (err == -EINVAL)
-		rsp->hdr.Status = STATUS_INVALID_PARAMETER;
-	else if (err == -EBUSY)
-		rsp->hdr.Status = STATUS_DELETE_PENDING;
-	else
-		rsp->hdr.Status = STATUS_INVALID_HANDLE;
+	if (rsp->hdr.Status == 0) {
+		if (err == -EAGAIN)
+			rsp->hdr.Status = STATUS_FILE_LOCK_CONFLICT;
+		else if (err == -ENOSPC || err == -EFBIG)
+			rsp->hdr.Status = STATUS_DISK_FULL;
+		else if (err == -ENOENT)
+			rsp->hdr.Status = STATUS_FILE_CLOSED;
+		else if (err == -EACCES)
+			rsp->hdr.Status = STATUS_ACCESS_DENIED;
+		else if (err == -ESHARE)
+			rsp->hdr.Status = STATUS_SHARING_VIOLATION;
+		else if (err == -EINVAL)
+			rsp->hdr.Status = STATUS_INVALID_PARAMETER;
+		else if (err == -EBUSY)
+			rsp->hdr.Status = STATUS_DELETE_PENDING;
+		else
+			rsp->hdr.Status = STATUS_INVALID_HANDLE;
+	}
 
 	smb2_set_err_rsp(work);
 	ksmbd_fd_put(work, fp);

@@ -67,6 +67,7 @@ struct ksmbd_ipc_msg {
 struct ipc_msg_table_entry {
 	unsigned int		handle;
 	unsigned int		type;
+	bool			stale;
 	wait_queue_head_t	wait;
 	struct hlist_node	ipc_table_hlist;
 
@@ -372,13 +373,24 @@ static int handle_response(int type, void *payload, size_t sz)
 	/* Prevent 4-byte read beyond declared payload size */
 	if (sz < sizeof(unsigned int))
 		return -EINVAL;
+	if (sz > KSMBD_IPC_MAX_PAYLOAD)
+		return -EINVAL;
 
 	handle = *(unsigned int *)payload;
+	if (type == KSMBD_EVENT_RPC_RESPONSE) {
+		struct ksmbd_rpc_command *resp = payload;
+
+		if (sz < sizeof(struct ksmbd_rpc_command))
+			return -EINVAL;
+		handle = resp->xid;
+	}
 
 	ipc_update_last_active();
 	down_read(&ipc_msg_table_lock);
 	hash_for_each_possible(ipc_msg_table, entry, ipc_table_hlist, handle) {
 		if (handle != entry->handle)
+			continue;
+		if (entry->stale)
 			continue;
 
 		entry->response = NULL;
@@ -407,6 +419,20 @@ static int handle_response(int type, void *payload, size_t sz)
 	up_read(&ipc_msg_table_lock);
 
 	return ret;
+}
+
+static void ipc_msg_table_mark_stale(void)
+{
+	struct ipc_msg_table_entry *entry;
+	struct hlist_node *tmp;
+	int bkt;
+
+	down_write(&ipc_msg_table_lock);
+	hash_for_each_safe(ipc_msg_table, bkt, tmp, entry, ipc_table_hlist) {
+		entry->stale = true;
+		wake_up_interruptible(&entry->wait);
+	}
+	up_write(&ipc_msg_table_lock);
 }
 
 static int ipc_server_config_on_startup(struct ksmbd_startup_request *req)
@@ -520,22 +546,30 @@ static int handle_startup_event(struct sk_buff *skb, struct genl_info *info)
 		return -EINVAL;
 	}
 
-	if (ksmbd_tools_pid) {
-		if (ksmbd_ipc_heartbeat_request() == 0) {
-			ret = -EINVAL;
-			goto out;
-		}
-
-		pr_err("Reconnect to a new user space daemon\n");
-		ksmbd_share_configs_flush();
-	} else {
+	{
 		struct ksmbd_startup_request *req;
+		bool is_reconnect = false;
 
 		req = nla_data(info->attrs[info->genlhdr->cmd]);
+
+		if (ksmbd_tools_pid) {
+			if (ksmbd_ipc_heartbeat_request() == 0) {
+				ret = -EINVAL;
+				goto out;
+			}
+			pr_err("Reconnect to a new user space daemon\n");
+			ipc_msg_table_mark_stale();
+			ksmbd_share_configs_flush();
+			is_reconnect = true;
+		}
+
+		/* Always update server config from new daemon's startup request */
 		ret = ipc_server_config_on_startup(req);
 		if (ret)
 			goto out;
-		server_queue_ctrl_init_work();
+
+		if (!is_reconnect)
+			server_queue_ctrl_init_work();
 	}
 
 	ksmbd_tools_pid = info->snd_portid;
@@ -756,6 +790,7 @@ static void *ipc_msg_send_request(struct ksmbd_ipc_msg *msg, unsigned int handle
 		return NULL;
 
 	entry->type = msg->type;
+	entry->stale = false;
 	entry->response = NULL;
 	init_waitqueue_head(&entry->wait);
 
@@ -771,11 +806,12 @@ static void *ipc_msg_send_request(struct ksmbd_ipc_msg *msg, unsigned int handle
 	}
 
 	ret = wait_event_interruptible_timeout(entry->wait,
-					       entry->response != NULL,
+					       entry->response != NULL ||
+					       entry->stale,
 					       IPC_WAIT_TIMEOUT);
 
 	down_write(&ipc_msg_table_lock);
-	if (entry->response) {
+	if (!entry->stale && entry->response) {
 		ret = ipc_validate_msg(entry);
 		if (ret) {
 			kvfree(entry->response);
@@ -805,7 +841,8 @@ static int ksmbd_ipc_heartbeat_request(void)
 	return ret;
 }
 
-struct ksmbd_login_response *ksmbd_ipc_login_request(const char *account)
+struct ksmbd_login_response *ksmbd_ipc_login_request(const char *account,
+						     __u32 flags)
 {
 	struct ksmbd_ipc_msg *msg;
 	struct ksmbd_login_request *req;
@@ -821,6 +858,7 @@ struct ksmbd_login_response *ksmbd_ipc_login_request(const char *account)
 	msg->type = KSMBD_EVENT_LOGIN_REQUEST;
 	req = (struct ksmbd_login_request *)msg->payload;
 	req->handle = ksmbd_acquire_id(&ipc_ida);
+	req->flags = flags;
 	strscpy(req->account, account, KSMBD_REQ_MAX_ACCOUNT_NAME_SZ);
 	resp = ipc_msg_send_request(msg, req->handle);
 	ipc_msg_handle_free(req->handle);
@@ -994,10 +1032,17 @@ struct ksmbd_rpc_command *ksmbd_rpc_open(struct ksmbd_session *sess, int handle)
 	struct ksmbd_ipc_msg *msg;
 	struct ksmbd_rpc_command *req;
 	struct ksmbd_rpc_command *resp;
+	int xid;
 
 	msg = ipc_msg_alloc(sizeof(struct ksmbd_rpc_command));
 	if (!msg)
 		return NULL;
+
+	xid = ksmbd_acquire_id(&ipc_ida);
+	if (xid < 0) {
+		ipc_msg_free(msg);
+		return NULL;
+	}
 
 	lockdep_assert_not_held(&sess->rpc_lock);
 
@@ -1005,12 +1050,14 @@ struct ksmbd_rpc_command *ksmbd_rpc_open(struct ksmbd_session *sess, int handle)
 	msg->type = KSMBD_EVENT_RPC_REQUEST;
 	req = (struct ksmbd_rpc_command *)msg->payload;
 	req->handle = handle;
+	req->xid = xid;
 	req->flags = ksmbd_session_rpc_method(sess, handle);
 	req->flags |= KSMBD_RPC_OPEN_METHOD;
 	req->payload_sz = 0;
 	up_read(&sess->rpc_lock);
 
-	resp = ipc_msg_send_request(msg, req->handle);
+	resp = ipc_msg_send_request(msg, req->xid);
+	ipc_msg_handle_free(req->xid);
 	ipc_msg_free(msg);
 	return resp;
 }
@@ -1020,19 +1067,28 @@ struct ksmbd_rpc_command *ksmbd_rpc_close(struct ksmbd_session *sess, int handle
 	struct ksmbd_ipc_msg *msg;
 	struct ksmbd_rpc_command *req;
 	struct ksmbd_rpc_command *resp;
+	int xid;
 
 	msg = ipc_msg_alloc(sizeof(struct ksmbd_rpc_command));
 	if (!msg)
 		return NULL;
 
+	xid = ksmbd_acquire_id(&ipc_ida);
+	if (xid < 0) {
+		ipc_msg_free(msg);
+		return NULL;
+	}
+
 	msg->type = KSMBD_EVENT_RPC_REQUEST;
 	req = (struct ksmbd_rpc_command *)msg->payload;
 	req->handle = handle;
+	req->xid = xid;
 	req->flags = ksmbd_session_rpc_method(sess, handle);
 	req->flags |= KSMBD_RPC_CLOSE_METHOD;
 	req->payload_sz = 0;
 
-	resp = ipc_msg_send_request(msg, req->handle);
+	resp = ipc_msg_send_request(msg, req->xid);
+	ipc_msg_handle_free(req->xid);
 	ipc_msg_free(msg);
 	return resp;
 }
@@ -1043,6 +1099,7 @@ struct ksmbd_rpc_command *ksmbd_rpc_write(struct ksmbd_session *sess, int handle
 	struct ksmbd_ipc_msg *msg;
 	struct ksmbd_rpc_command *req;
 	struct ksmbd_rpc_command *resp;
+	int xid;
 
 	if (payload_sz > KSMBD_IPC_MAX_PAYLOAD)
 		return NULL;
@@ -1051,12 +1108,19 @@ struct ksmbd_rpc_command *ksmbd_rpc_write(struct ksmbd_session *sess, int handle
 	if (!msg)
 		return NULL;
 
+	xid = ksmbd_acquire_id(&ipc_ida);
+	if (xid < 0) {
+		ipc_msg_free(msg);
+		return NULL;
+	}
+
 	lockdep_assert_not_held(&sess->rpc_lock);
 
 	down_read(&sess->rpc_lock);
 	msg->type = KSMBD_EVENT_RPC_REQUEST;
 	req = (struct ksmbd_rpc_command *)msg->payload;
 	req->handle = handle;
+	req->xid = xid;
 	req->flags = ksmbd_session_rpc_method(sess, handle);
 	req->flags |= rpc_context_flags(sess);
 	req->flags |= KSMBD_RPC_WRITE_METHOD;
@@ -1064,7 +1128,8 @@ struct ksmbd_rpc_command *ksmbd_rpc_write(struct ksmbd_session *sess, int handle
 	memcpy(req->payload, payload, payload_sz);
 	up_read(&sess->rpc_lock);
 
-	resp = ipc_msg_send_request(msg, req->handle);
+	resp = ipc_msg_send_request(msg, req->xid);
+	ipc_msg_handle_free(req->xid);
 	ipc_msg_free(msg);
 	return resp;
 }
@@ -1074,10 +1139,17 @@ struct ksmbd_rpc_command *ksmbd_rpc_read(struct ksmbd_session *sess, int handle)
 	struct ksmbd_ipc_msg *msg;
 	struct ksmbd_rpc_command *req;
 	struct ksmbd_rpc_command *resp;
+	int xid;
 
 	msg = ipc_msg_alloc(sizeof(struct ksmbd_rpc_command));
 	if (!msg)
 		return NULL;
+
+	xid = ksmbd_acquire_id(&ipc_ida);
+	if (xid < 0) {
+		ipc_msg_free(msg);
+		return NULL;
+	}
 
 	lockdep_assert_not_held(&sess->rpc_lock);
 
@@ -1085,13 +1157,51 @@ struct ksmbd_rpc_command *ksmbd_rpc_read(struct ksmbd_session *sess, int handle)
 	msg->type = KSMBD_EVENT_RPC_REQUEST;
 	req = (struct ksmbd_rpc_command *)msg->payload;
 	req->handle = handle;
+	req->xid = xid;
 	req->flags = ksmbd_session_rpc_method(sess, handle);
 	req->flags |= rpc_context_flags(sess);
 	req->flags |= KSMBD_RPC_READ_METHOD;
 	req->payload_sz = 0;
 	up_read(&sess->rpc_lock);
 
-	resp = ipc_msg_send_request(msg, req->handle);
+	resp = ipc_msg_send_request(msg, req->xid);
+	ipc_msg_handle_free(req->xid);
+	ipc_msg_free(msg);
+	return resp;
+}
+
+struct ksmbd_rpc_command *ksmbd_rpc_query(struct ksmbd_session *sess, int handle)
+{
+	struct ksmbd_ipc_msg *msg;
+	struct ksmbd_rpc_command *req;
+	struct ksmbd_rpc_command *resp;
+	int xid;
+
+	msg = ipc_msg_alloc(sizeof(struct ksmbd_rpc_command));
+	if (!msg)
+		return NULL;
+
+	xid = ksmbd_acquire_id(&ipc_ida);
+	if (xid < 0) {
+		ipc_msg_free(msg);
+		return NULL;
+	}
+
+	lockdep_assert_not_held(&sess->rpc_lock);
+
+	down_read(&sess->rpc_lock);
+	msg->type = KSMBD_EVENT_RPC_REQUEST;
+	req = (struct ksmbd_rpc_command *)msg->payload;
+	req->handle = handle;
+	req->xid = xid;
+	req->flags = ksmbd_session_rpc_method(sess, handle);
+	req->flags |= rpc_context_flags(sess);
+	req->flags |= KSMBD_RPC_QUERY_METHOD;
+	req->payload_sz = 0;
+	up_read(&sess->rpc_lock);
+
+	resp = ipc_msg_send_request(msg, req->xid);
+	ipc_msg_handle_free(req->xid);
 	ipc_msg_free(msg);
 	return resp;
 }
@@ -1102,6 +1212,7 @@ struct ksmbd_rpc_command *ksmbd_rpc_ioctl(struct ksmbd_session *sess, int handle
 	struct ksmbd_ipc_msg *msg;
 	struct ksmbd_rpc_command *req;
 	struct ksmbd_rpc_command *resp;
+	int xid;
 
 	if (payload_sz > KSMBD_IPC_MAX_PAYLOAD)
 		return NULL;
@@ -1110,12 +1221,19 @@ struct ksmbd_rpc_command *ksmbd_rpc_ioctl(struct ksmbd_session *sess, int handle
 	if (!msg)
 		return NULL;
 
+	xid = ksmbd_acquire_id(&ipc_ida);
+	if (xid < 0) {
+		ipc_msg_free(msg);
+		return NULL;
+	}
+
 	lockdep_assert_not_held(&sess->rpc_lock);
 
 	down_read(&sess->rpc_lock);
 	msg->type = KSMBD_EVENT_RPC_REQUEST;
 	req = (struct ksmbd_rpc_command *)msg->payload;
 	req->handle = handle;
+	req->xid = xid;
 	req->flags = ksmbd_session_rpc_method(sess, handle);
 	req->flags |= rpc_context_flags(sess);
 	req->flags |= KSMBD_RPC_IOCTL_METHOD;
@@ -1123,7 +1241,8 @@ struct ksmbd_rpc_command *ksmbd_rpc_ioctl(struct ksmbd_session *sess, int handle
 	memcpy(req->payload, payload, payload_sz);
 	up_read(&sess->rpc_lock);
 
-	resp = ipc_msg_send_request(msg, req->handle);
+	resp = ipc_msg_send_request(msg, req->xid);
+	ipc_msg_handle_free(req->xid);
 	ipc_msg_free(msg);
 	return resp;
 }
@@ -1145,6 +1264,7 @@ struct ksmbd_rpc_command *ksmbd_rpc_rap(struct ksmbd_session *sess, void *payloa
 	msg->type = KSMBD_EVENT_RPC_REQUEST;
 	req = (struct ksmbd_rpc_command *)msg->payload;
 	req->handle = ksmbd_acquire_id(&ipc_ida);
+	req->xid = req->handle;
 	req->flags = rpc_context_flags(sess);
 	req->flags |= KSMBD_RPC_RAP_METHOD;
 	req->payload_sz = payload_sz;

@@ -28,6 +28,7 @@
  * within reasonable kernel memory limits.
  */
 #define KSMBD_SOCKET_BACKLOG		64
+#define KSMBD_COMPRESSION_MAX_IDS	4
 
 enum {
 	KSMBD_SESS_NEW = 0,
@@ -120,6 +121,9 @@ struct ksmbd_conn {
 
 	__le16				cipher_type;
 	__le16				compress_algorithm;
+	__le16				compress_algorithms[KSMBD_COMPRESSION_MAX_IDS];
+	unsigned int			compress_algorithm_count;
+	u32				compress_flags;
 	bool				posix_ext_supported;
 	bool				signing_negotiated;
 	__le16				signing_algorithm;

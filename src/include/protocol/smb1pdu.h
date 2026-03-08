@@ -136,6 +136,19 @@ struct smb_com_nt_transact_rsp {
 	__u8 Pad;
 } __packed;
 
+#ifdef CONFIG_SMB_INSECURE_SERVER
+void *smb_build_ntransact_rsp(struct ksmbd_work *work,
+			      unsigned int param_len,
+			      unsigned int data_len);
+#else
+static inline void *smb_build_ntransact_rsp(struct ksmbd_work *work,
+					    unsigned int param_len,
+					    unsigned int data_len)
+{
+	return NULL;
+}
+#endif
+
 /**
  * smb1_validate_nt_transact_buffer() - Validate NT_TRANSACT parameter/data
  * regions within the SMB request buffer. Uses 32-bit counts (unlike TRANS2).
@@ -188,45 +201,6 @@ static inline int smb1_validate_nt_transact_buffer(const void *request_buf,
 
 	return 0;
 }
-
-/*
- * NT_TRANSACT request header (MS-CIFS §2.2.7).
- * WordCount=19 for the primary request.
- */
-struct smb_com_nt_transact_req {
-	struct smb_hdr hdr;		/* wct = 19 */
-	__u8  MaxSetupCount;
-	__u16 Reserved;
-	__le32 TotalParameterCount;
-	__le32 TotalDataCount;
-	__le32 MaxParameterCount;
-	__le32 MaxDataCount;
-	__le32 ParameterCount;
-	__le32 ParameterOffset;
-	__le32 DataCount;
-	__le32 DataOffset;
-	__u8  SetupCount;
-	__le16 Function;		/* NT_TRANSACT_* subcommand */
-	__le16 ByteCount;
-	__u8  Pad[3];
-	/* variable: Setup words, Parameters, Data */
-} __packed;
-
-struct smb_com_nt_transact_rsp {
-	struct smb_hdr hdr;		/* wct = 18 */
-	__u8  Reserved[3];
-	__le32 TotalParameterCount;
-	__le32 TotalDataCount;
-	__le32 ParameterCount;
-	__le32 ParameterOffset;
-	__le32 ParameterDisplacement;
-	__le32 DataCount;
-	__le32 DataOffset;
-	__le32 DataDisplacement;
-	__u8  SetupCount;		/* 0 */
-	__le16 ByteCount;
-	__u8  Pad;
-} __packed;
 
 /*
  * SMB flag definitions

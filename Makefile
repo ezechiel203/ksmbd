@@ -141,15 +141,16 @@ endif
 ARCH ?= $(LOCAL_ARCH)
 EXTERNAL_SMBDIRECT ?= n
 
-# Enable all features by default for external module builds.
-# Set to 'n' on the command line to disable individual features.
-CONFIG_SMB_INSECURE_SERVER ?= y
+# Enable production-safe defaults for external module builds.
+# SMB1/legacy dialect support stays opt-in until its compatibility
+# surface is fully completed and proven.
+CONFIG_SMB_INSECURE_SERVER ?= n
 CONFIG_KSMBD_FRUIT ?= y
 CONFIG_SMB_SERVER_QUIC ?= y
 CONFIG_KSMBD_KUNIT_TEST ?= n
 
 export CONFIG_SMB_SERVER := m
-export CONFIG_SMB_INSECURE_SERVER := y
+export CONFIG_SMB_INSECURE_SERVER := $(CONFIG_SMB_INSECURE_SERVER)
 
 check-pkgver:
 	@if ! printf '%s\n' "$(PKGVER)" | grep -Eq '$(PKGVER_RE)'; then \
@@ -172,6 +173,7 @@ all: check-kdir
 		CONFIG_KSMBD_FRUIT=$(CONFIG_KSMBD_FRUIT) \
 		CONFIG_SMB_SERVER_QUIC=$(CONFIG_SMB_SERVER_QUIC) \
 		CONFIG_KSMBD_KUNIT_TEST=$(CONFIG_KSMBD_KUNIT_TEST) \
+		CONFIG_DEBUG_INFO_BTF_MODULES=n \
 		modules
 
 clean:
@@ -182,6 +184,7 @@ clean:
 			CONFIG_KSMBD_FRUIT=$(CONFIG_KSMBD_FRUIT) \
 			CONFIG_SMB_SERVER_QUIC=$(CONFIG_SMB_SERVER_QUIC) \
 			CONFIG_KSMBD_KUNIT_TEST=$(CONFIG_KSMBD_KUNIT_TEST) \
+			CONFIG_DEBUG_INFO_BTF_MODULES=n \
 			clean; \
 	fi
 	rm -rf .tmp_versions

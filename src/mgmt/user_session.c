@@ -13,6 +13,7 @@
 #include <linux/xarray.h>
 #include <linux/string.h>
 #include <linux/random.h>
+#include <linux/bitmap.h>
 #include <crypto/algapi.h>
 
 #include "ksmbd_ida.h"
@@ -34,6 +35,30 @@ struct ksmbd_session_rpc {
 	int			id;
 	unsigned int		method;
 };
+
+void ksmbd_preauth_session_free(struct preauth_session *sess)
+{
+	if (!sess)
+		return;
+
+	memzero_explicit(sess->binding_sess_key,
+			 sizeof(sess->binding_sess_key));
+	kfree(sess);
+}
+
+static const char *ksmbd_rpc_pipe_name(const char *rpc_name)
+{
+	if (!rpc_name)
+		return NULL;
+
+	if (!strncasecmp(rpc_name, "\\PIPE\\", 6))
+		rpc_name += 6;
+
+	if (*rpc_name == '\\')
+		rpc_name++;
+
+	return rpc_name;
+}
 
 static void free_channel_list(struct ksmbd_session *sess)
 {
@@ -78,21 +103,55 @@ static void ksmbd_session_rpc_clear_list(struct ksmbd_session *sess)
 	xa_destroy(&sess->rpc_handle_list);
 }
 
-static int __rpc_method(char *rpc_name)
+#ifdef CONFIG_SMB_INSECURE_SERVER
+static void ksmbd_session_smb1_nttrans_free(struct ksmbd_smb1_nttrans_state *state)
 {
-	if (!strcmp(rpc_name, "\\srvsvc") || !strcmp(rpc_name, "srvsvc"))
+	if (!state)
+		return;
+
+	kvfree(state->req_hdr);
+	kvfree(state->params);
+	kvfree(state->data);
+	bitmap_free(state->param_bitmap);
+	bitmap_free(state->data_bitmap);
+	kfree(state);
+}
+
+static void ksmbd_session_smb1_nttrans_clear_list(struct ksmbd_session *sess)
+{
+	struct ksmbd_smb1_nttrans_state *state;
+	unsigned long index;
+
+	mutex_lock(&sess->smb1_nttrans_lock);
+	xa_for_each(&sess->smb1_nttrans_list, index, state) {
+		xa_erase(&sess->smb1_nttrans_list, index);
+		ksmbd_session_smb1_nttrans_free(state);
+	}
+	mutex_unlock(&sess->smb1_nttrans_lock);
+
+	xa_destroy(&sess->smb1_nttrans_list);
+}
+#endif
+
+int ksmbd_session_rpc_method_name(const char *rpc_name)
+{
+	rpc_name = ksmbd_rpc_pipe_name(rpc_name);
+	if (!rpc_name || !*rpc_name)
+		return 0;
+
+	if (!strcasecmp(rpc_name, "srvsvc"))
 		return KSMBD_RPC_SRVSVC_METHOD_INVOKE;
 
-	if (!strcmp(rpc_name, "\\wkssvc") || !strcmp(rpc_name, "wkssvc"))
+	if (!strcasecmp(rpc_name, "wkssvc"))
 		return KSMBD_RPC_WKSSVC_METHOD_INVOKE;
 
-	if (!strcmp(rpc_name, "LANMAN") || !strcmp(rpc_name, "lanman"))
+	if (!strcasecmp(rpc_name, "lanman"))
 		return KSMBD_RPC_RAP_METHOD;
 
-	if (!strcmp(rpc_name, "\\samr") || !strcmp(rpc_name, "samr"))
+	if (!strcasecmp(rpc_name, "samr"))
 		return KSMBD_RPC_SAMR_METHOD_INVOKE;
 
-	if (!strcmp(rpc_name, "\\lsarpc") || !strcmp(rpc_name, "lsarpc"))
+	if (!strcasecmp(rpc_name, "lsarpc"))
 		return KSMBD_RPC_LSARPC_METHOD_INVOKE;
 
 	pr_err("Unsupported RPC: %s\n", rpc_name);
@@ -105,7 +164,7 @@ int ksmbd_session_rpc_open(struct ksmbd_session *sess, char *rpc_name)
 	struct ksmbd_rpc_command *resp;
 	int method, id;
 
-	method = __rpc_method(rpc_name);
+	method = ksmbd_session_rpc_method_name(rpc_name);
 	if (!method)
 		return -EINVAL;
 
@@ -186,6 +245,9 @@ void ksmbd_session_destroy(struct ksmbd_session *sess)
 	ksmbd_destroy_file_table(&sess->file_table);
 	ksmbd_launch_ksmbd_durable_scavenger();
 	ksmbd_session_rpc_clear_list(sess);
+#ifdef CONFIG_SMB_INSECURE_SERVER
+	ksmbd_session_smb1_nttrans_clear_list(sess);
+#endif
 	free_channel_list(sess);
 	memzero_explicit(sess->sess_key, sizeof(sess->sess_key));
 	memzero_explicit(sess->smb3encryptionkey, sizeof(sess->smb3encryptionkey));
@@ -277,6 +339,7 @@ int ksmbd_session_register(struct ksmbd_conn *conn,
 	int ret;
 
 	sess->dialect = conn->dialect;
+	sess->cli_sec_mode = conn->cli_sec_mode;
 	sess->srv_sec_mode = conn->srv_sec_mode;
 	memcpy(sess->ClientGUID, conn->ClientGUID, SMB2_CLIENT_GUID_SIZE);
 	ksmbd_expire_session(conn);
@@ -471,20 +534,50 @@ void ksmbd_user_session_put(struct ksmbd_session *sess)
  * Caller must hold conn->session_lock for writing.
  */
 struct preauth_session *ksmbd_preauth_session_alloc(struct ksmbd_conn *conn,
-						    u64 sess_id)
+						    struct ksmbd_session *owner)
 {
 	struct preauth_session *sess;
 
-	sess = kmalloc(sizeof(struct preauth_session), KSMBD_DEFAULT_GFP);
+	sess = kzalloc(sizeof(struct preauth_session), KSMBD_DEFAULT_GFP);
 	if (!sess)
 		return NULL;
 
-	sess->id = sess_id;
+	sess->id = owner->id;
+	/*
+	 * MS-SMB2 3.3.5.5.2 initializes PreauthSession.PreauthIntegrityHashValue
+	 * from Connection.PreauthIntegrityHashValue for session binding.
+	 * The binding exchange then hashes the new channel's SESSION_SETUP
+	 * request/response on top of that NEGOTIATE transcript to derive the
+	 * channel signing key.
+	 */
 	memcpy(sess->Preauth_HashValue, conn->preauth_info->Preauth_HashValue,
 	       PREAUTH_HASHVALUE_SIZE);
 	list_add(&sess->preauth_entry, &conn->preauth_sess_table);
 
 	return sess;
+}
+
+int ksmbd_preauth_session_store_sess_key(struct ksmbd_conn *conn,
+					 unsigned long long id,
+					 const __u8 *sess_key,
+					 unsigned int sess_key_len)
+{
+	struct preauth_session *sess;
+
+	if (!sess_key || sess_key_len < SMB2_NTLMV2_SESSKEY_SIZE)
+		return -EINVAL;
+
+	down_write(&conn->session_lock);
+	sess = ksmbd_preauth_session_lookup(conn, id);
+	if (!sess) {
+		up_write(&conn->session_lock);
+		return -ENOENT;
+	}
+
+	memcpy(sess->binding_sess_key, sess_key, SMB2_NTLMV2_SESSKEY_SIZE);
+	sess->binding_sess_key_valid = true;
+	up_write(&conn->session_lock);
+	return 0;
 }
 
 void destroy_previous_session(struct ksmbd_conn *conn,
@@ -620,7 +713,7 @@ int ksmbd_preauth_session_remove(struct ksmbd_conn *conn, unsigned long long id)
 	list_for_each_entry(sess, &conn->preauth_sess_table, preauth_entry) {
 		if (ksmbd_preauth_session_id_match(sess, id)) {
 			list_del(&sess->preauth_entry);
-			kfree(sess);
+			ksmbd_preauth_session_free(sess);
 			up_write(&conn->session_lock);
 			return 0;
 		}
@@ -679,10 +772,14 @@ static struct ksmbd_session *__session_create(int protocol)
 	sess->state = SMB2_SESSION_IN_PROGRESS;
 	init_rwsem(&sess->state_lock);
 	set_session_flag(sess, protocol);
-	xa_init(&sess->tree_conns);
-	xa_init(&sess->ksmbd_chann_list);
-	xa_init(&sess->rpc_handle_list);
-	sess->sequence_number = 1;
+		xa_init(&sess->tree_conns);
+		xa_init(&sess->ksmbd_chann_list);
+		xa_init(&sess->rpc_handle_list);
+#ifdef CONFIG_SMB_INSECURE_SERVER
+		xa_init(&sess->smb1_nttrans_list);
+		mutex_init(&sess->smb1_nttrans_lock);
+#endif
+		sess->sequence_number = 1;
 	rwlock_init(&sess->tree_conns_lock);
 	refcount_set(&sess->refcnt, 2);
 	init_rwsem(&sess->rpc_lock);

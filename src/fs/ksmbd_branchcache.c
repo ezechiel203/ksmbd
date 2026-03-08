@@ -24,6 +24,7 @@
 #include <crypto/hash.h>
 
 #include "glob.h"
+#include "smb2pdu.h"
 #include "ksmbd_branchcache.h"
 #include "crypto_ctx.h"
 #include "vfs_cache.h"
@@ -666,7 +667,7 @@ int ksmbd_branchcache_read_hash(struct ksmbd_work *work,
 {
 	const struct srv_read_hash_req *req;
 	u32 hash_type, hash_version, hash_retrieval;
-	u32 length;
+	u64 length;
 	u64 offset;
 	loff_t file_size;
 
@@ -680,11 +681,11 @@ int ksmbd_branchcache_read_hash(struct ksmbd_work *work,
 	hash_type = le32_to_cpu(req->HashType);
 	hash_version = le32_to_cpu(req->HashVersion);
 	hash_retrieval = le32_to_cpu(req->HashRetrievalType);
-	length = le32_to_cpu(req->Length);
+	length = le64_to_cpu(req->Length);
 	offset = le64_to_cpu(req->Offset);
 
 	ksmbd_debug(SMB, "branchcache: type=%u ver=%u retrieval=%u "
-		    "off=%llu len=%u\n",
+		    "off=%llu len=%llu\n",
 		    hash_type, hash_version, hash_retrieval, offset, length);
 
 	/* Validate HashType - must be SRV_HASH_TYPE_PEER_DIST */
@@ -715,16 +716,18 @@ int ksmbd_branchcache_read_hash(struct ksmbd_work *work,
 	/* Validate range against file size */
 	file_size = i_size_read(file_inode(fp->filp));
 	if (offset >= (u64)file_size || length == 0) {
-		ksmbd_debug(SMB, "branchcache: invalid range off=%llu len=%u "
+		ksmbd_debug(SMB, "branchcache: invalid range off=%llu len=%llu "
 			    "filesize=%lld\n", offset, length, file_size);
 		return -EINVAL;
 	}
 
 	/* Clamp length to file extent */
 	if (offset + length > (u64)file_size)
-		length = (u32)(file_size - offset);
+		length = (u64)file_size - offset;
+	if (length > U32_MAX)
+		length = U32_MAX;
 
-	return build_content_info_v1(fp, (loff_t)offset, length,
+	return build_content_info_v1(fp, (loff_t)offset, (u32)length,
 				     out_buf, out_len);
 }
 

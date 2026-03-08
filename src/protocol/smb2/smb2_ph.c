@@ -225,14 +225,18 @@ struct ksmbd_file *ksmbd_ph_restore(struct ksmbd_work *work,
 
 	err = kern_path(fp_path, LOOKUP_FOLLOW, &fkp);
 	if (err) goto out_free;
+	ksmbd_lease_breaker_enter();
 	filp = dentry_open(&fkp, O_RDWR, current_cred());
+	ksmbd_lease_breaker_exit();
 	path_put(&fkp);
 	if (IS_ERR(filp)) {
 		if (needs_write)
 			goto out_free;
 		err = kern_path(fp_path, LOOKUP_FOLLOW, &fkp);
 		if (err) goto out_free;
+		ksmbd_lease_breaker_enter();
 		filp = dentry_open(&fkp, O_RDONLY, current_cred());
+		ksmbd_lease_breaker_exit();
 		path_put(&fkp);
 		if (IS_ERR(filp)) goto out_free;
 	}

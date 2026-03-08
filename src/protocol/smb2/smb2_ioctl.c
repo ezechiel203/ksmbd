@@ -102,20 +102,32 @@ int smb2_ioctl(struct ksmbd_work *work)
 		goto out;
 	}
 
-	/* MS-SMB2 §3.3.5.2.10: validate ChannelSequence when a file handle is given */
+	/* MS-SMB2 §3.3.5.2.10: validate ChannelSequence when a disk file handle is given */
 	if (has_file_id(id)) {
-		struct ksmbd_file *fp = ksmbd_lookup_fd_fast(work, id);
+		if (test_share_config_flag(work->tcon->share_conf,
+					   KSMBD_SHARE_FLAG_PIPE)) {
+			down_read(&work->sess->rpc_lock);
+			if (!ksmbd_session_rpc_method(work->sess, id)) {
+				up_read(&work->sess->rpc_lock);
+				rsp->hdr.Status = STATUS_FILE_CLOSED;
+				ret = -ENOENT;
+				goto out;
+			}
+			up_read(&work->sess->rpc_lock);
+		} else {
+			struct ksmbd_file *fp = ksmbd_lookup_fd_fast(work, id);
 
-		if (!fp) {
-			rsp->hdr.Status = STATUS_FILE_CLOSED;
-			ret = -ENOENT;
-			goto out;
-		}
-		ret = smb2_check_channel_sequence(work, fp);
-		ksmbd_fd_put(work, fp);
-		if (ret) {
-			rsp->hdr.Status = STATUS_FILE_NOT_AVAILABLE;
-			goto out;
+			if (!fp) {
+				rsp->hdr.Status = STATUS_FILE_CLOSED;
+				ret = -ENOENT;
+				goto out;
+			}
+			ret = smb2_check_channel_sequence(work, fp);
+			ksmbd_fd_put(work, fp);
+			if (ret) {
+				rsp->hdr.Status = STATUS_FILE_NOT_AVAILABLE;
+				goto out;
+			}
 		}
 	}
 
@@ -153,8 +165,11 @@ int smb2_ioctl(struct ksmbd_work *work)
 	/* Try registered FSCTL handlers first */
 	ret = ksmbd_dispatch_fsctl(work, cnt_code, id, buffer,
 				   in_buf_len, out_buf_len, rsp, &nbytes);
-	if (ret == 0)
+	if (ret == 0) {
+		if (work->send_no_response || work->pending_async)
+			return 0;
 		goto done;
+	}
 	if (ret != -EOPNOTSUPP) {
 		/*
 		 * MS-FSCC §2.3: some FSCTL handlers (e.g. SRV_COPYCHUNK)

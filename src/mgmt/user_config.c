@@ -12,13 +12,13 @@
 #include "user_config.h"
 #include "transport_ipc.h"
 
-struct ksmbd_user *ksmbd_login_user(const char *account)
+struct ksmbd_user *ksmbd_login_user_flags(const char *account, __u32 flags)
 {
 	struct ksmbd_login_response *resp;
 	struct ksmbd_login_response_ext *resp_ext = NULL;
 	struct ksmbd_user *user = NULL;
 
-	resp = ksmbd_ipc_login_request(account);
+	resp = ksmbd_ipc_login_request(account, flags);
 	if (!resp)
 		return NULL;
 

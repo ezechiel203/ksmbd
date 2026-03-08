@@ -33,11 +33,93 @@
 #include "misc.h"
 #include "oplock.h"
 #include "server.h"
+#include "transport_ipc.h"
 #include "mgmt/share_config.h"
 #include "smb_common.h"
 #include "vfs_cache.h"
 #include "xattr.h"
 #include "compat.h"
+
+#define FILE_PIPE_BYTE_STREAM_MODE	0
+#define FILE_PIPE_QUEUE_OPERATION	0
+#define FILE_PIPE_BYTE_STREAM_TYPE	0
+#define FILE_PIPE_FULL_DUPLEX		2
+#define FILE_PIPE_CLIENT_END		0
+
+static int ksmbd_query_rpc_pipe_info(struct ksmbd_work *work, u64 id,
+				     struct ksmbd_rpc_pipe_info *pipe_state)
+{
+	struct ksmbd_rpc_command *rpc_resp;
+
+	rpc_resp = ksmbd_rpc_query(work->sess, id);
+	if (!rpc_resp || rpc_resp->flags == KSMBD_RPC_EBAD_FID) {
+		kvfree(rpc_resp);
+		return -ENOENT;
+	}
+
+	if (rpc_resp->flags != KSMBD_RPC_OK ||
+	    rpc_resp->payload_sz < sizeof(*pipe_state)) {
+		kvfree(rpc_resp);
+		return -EIO;
+	}
+
+	memcpy(pipe_state, rpc_resp->payload, sizeof(*pipe_state));
+	kvfree(rpc_resp);
+	return 0;
+}
+
+int ksmbd_pipe_get_info(struct ksmbd_work *work, u64 id,
+			void *buf, unsigned int buf_len,
+			unsigned int *out_len)
+{
+	struct smb2_file_pipe_info *pipe_info;
+	struct ksmbd_rpc_pipe_info pipe_state;
+	int rc;
+
+	if (buf_len < sizeof(*pipe_info))
+		return -ENOSPC;
+
+	rc = ksmbd_query_rpc_pipe_info(work, id, &pipe_state);
+	if (rc)
+		return rc;
+
+	pipe_info = (struct smb2_file_pipe_info *)buf;
+	pipe_info->ReadMode = cpu_to_le32(FILE_PIPE_BYTE_STREAM_MODE);
+	pipe_info->CompletionMode = cpu_to_le32(FILE_PIPE_QUEUE_OPERATION);
+	*out_len = sizeof(*pipe_info);
+	return 0;
+}
+
+int ksmbd_pipe_get_local_info(struct ksmbd_work *work, u64 id,
+			      void *buf, unsigned int buf_len,
+			      unsigned int *out_len)
+{
+	struct smb2_file_pipe_local_info *pipe_info;
+	struct ksmbd_rpc_pipe_info pipe_state;
+	int rc;
+
+	if (buf_len < sizeof(*pipe_info))
+		return -ENOSPC;
+
+	rc = ksmbd_query_rpc_pipe_info(work, id, &pipe_state);
+	if (rc)
+		return rc;
+
+	pipe_info = (struct smb2_file_pipe_local_info *)buf;
+	pipe_info->NamedPipeType = cpu_to_le32(FILE_PIPE_BYTE_STREAM_TYPE);
+	pipe_info->NamedPipeConfiguration = cpu_to_le32(FILE_PIPE_FULL_DUPLEX);
+	pipe_info->MaximumInstances = cpu_to_le32(0xFFFFFFFF);
+	pipe_info->CurrentInstances = cpu_to_le32(1);
+	pipe_info->InboundQuota = cpu_to_le32(KSMBD_IPC_MAX_PAYLOAD);
+	pipe_info->ReadDataAvailable =
+		cpu_to_le32(pipe_state.read_data_available);
+	pipe_info->OutboundQuota = cpu_to_le32(KSMBD_IPC_MAX_PAYLOAD);
+	pipe_info->WriteQuotaAvailable = cpu_to_le32(KSMBD_IPC_MAX_PAYLOAD);
+	pipe_info->NamedPipeState = cpu_to_le32(pipe_state.pipe_state);
+	pipe_info->NamedPipeEnd = cpu_to_le32(FILE_PIPE_CLIENT_END);
+	*out_len = sizeof(*pipe_info);
+	return 0;
+}
 #include "vfs.h"
 
 /* 256 buckets (2^8) -- sufficient for all SMB2 info classes */
@@ -739,8 +821,10 @@ static int ksmbd_info_get_hard_link(struct ksmbd_work *work,
 	parent_path.mnt = fp->filp->f_path.mnt;
 	parent_path.dentry = dget_parent(fp->filp->f_path.dentry);
 
+	ksmbd_lease_breaker_enter();
 	parent_filp = dentry_open(&parent_path, O_RDONLY | O_DIRECTORY,
 				  current_cred());
+	ksmbd_lease_breaker_exit();
 	dput(parent_path.dentry);
 	if (IS_ERR(parent_filp)) {
 		/*

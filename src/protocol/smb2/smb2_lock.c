@@ -561,9 +561,9 @@ int smb2_lock(struct ksmbd_work *work)
 	}
 
 	/* MS-SMB2 §3.3.5.2.10: validate ChannelSequence */
-	if (smb2_check_channel_sequence(work, fp)) {
+	err = smb2_check_channel_sequence(work, fp);
+	if (err) {
 		rsp->hdr.Status = STATUS_FILE_NOT_AVAILABLE;
-		err = -EAGAIN;
 		goto out2;
 	}
 

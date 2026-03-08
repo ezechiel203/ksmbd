@@ -995,6 +995,7 @@ struct smb2_buffer_desc_v1 {
 #define SMB2_CHANNEL_NONE		cpu_to_le32(0x00000000)
 #define SMB2_CHANNEL_RDMA_V1		cpu_to_le32(0x00000001)
 #define SMB2_CHANNEL_RDMA_V1_INVALIDATE cpu_to_le32(0x00000002)
+#define SMB2_CHANNEL_RDMA_TRANSFORM	cpu_to_le32(0x00000003)
 
 struct smb2_read_req {
 	struct smb2_hdr hdr;
@@ -2015,6 +2016,8 @@ bool smb3_encryption_negotiated(struct ksmbd_conn *conn);
 
 struct ksmbd_file;
 int smb2_check_channel_sequence(struct ksmbd_work *work, struct ksmbd_file *fp);
+void smb2_update_channel_sequence(struct ksmbd_work *work, struct ksmbd_file *fp);
+void smb2_chan_cache_save(struct ksmbd_file *fp, __le32 status);
 
 /* smb2 compression functions */
 bool smb2_is_compression_transform_hdr(void *buf);
@@ -2134,7 +2137,6 @@ void init_chained_smb2_rsp(struct ksmbd_work *work);
 struct ksmbd_session;
 struct ksmbd_file;
 bool ksmbd_gcm_nonce_limit_reached(struct ksmbd_session *sess);
-int smb2_check_channel_sequence(struct ksmbd_work *work, struct ksmbd_file *fp);
 int fill_transform_hdr(void *tr_buf, char *old_buf,
 		       __le16 cipher_type,
 		       struct ksmbd_session *sess);

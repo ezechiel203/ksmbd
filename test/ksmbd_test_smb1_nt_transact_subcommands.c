@@ -7,7 +7,7 @@
  *   - NT_TRANSACT dispatcher (Function field routing)
  *   - Per-subcommand minimum ParameterCount checks
  *   - Buffer boundary validation for parameter/data blocks
- *   - NT_TRANSACT_SECONDARY stub behavior
+ *   - NT_TRANSACT_SECONDARY consistency checks
  *   - Response builder (smb_build_ntransact_rsp) field layout
  */
 

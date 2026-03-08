@@ -510,6 +510,7 @@ static void __ksmbd_inode_close(struct ksmbd_file *fp)
 		up_write(&ci->m_lock);
 
 		if (do_unlink) {
+			ksmbd_notify_tree_remove_on_close(fp);
 #if LINUX_VERSION_CODE < KERNEL_VERSION(6, 4, 0)
 			dentry = filp->f_path.dentry;
 			dir = dentry->d_parent;
@@ -714,8 +715,37 @@ int ksmbd_close_fd(struct ksmbd_work *work, u64 id)
 		return -EINVAL;
 
 	atomic_dec(&work->conn->stats.open_files_count);
-	if (!last)
+
+	/*
+	 * If there is a pending oplock break on this fp and the refcount
+	 * hasn't reached zero yet (e.g., the break notification worker
+	 * holds a reference via ksmbd_lookup_global_fd), we must still
+	 * wake up the break waiter immediately.  Otherwise the waiter
+	 * blocks for the full OPLOCK_WAIT_TIME (35s) timeout, causing
+	 * batch3/batch7 test failures where the client closes the file
+	 * instead of sending an oplock break ACK.
+	 *
+	 * close_id_del_oplock() (called from __ksmbd_close_fd when
+	 * refcount hits 0) also sets OPLOCK_CLOSING and wakes the queue,
+	 * but that may happen too late if another reference is held.
+	 */
+	if (!last) {
+		struct oplock_info *opinfo = opinfo_get(fp);
+
+		if (opinfo) {
+			if (opinfo->op_state == OPLOCK_ACK_WAIT) {
+				opinfo->op_state = OPLOCK_CLOSING;
+				wake_up_interruptible_all(&opinfo->oplock_q);
+				if (opinfo->is_lease) {
+					atomic_set(&opinfo->breaking_cnt, 0);
+					wake_up_interruptible_all(
+						&opinfo->oplock_brk);
+				}
+			}
+			opinfo_put(opinfo);
+		}
 		return 0;
+	}
 
 	/*
 	 * Notify cleanup sends STATUS_NOTIFY_CLEANUP responses over
@@ -1002,6 +1032,134 @@ restart:
 #undef PURGE_BATCH
 }
 
+/**
+ * ksmbd_purge_disconnected_doc() - purge disconnected handles with
+ *     DELETE_ON_CLOSE before a new open.
+ * @d: dentry of the file about to be opened
+ *
+ * MS-SMB2 §3.3.5.9.6: when a durable handle with DELETE_ON_CLOSE
+ * disconnects, the server should close it when a conflicting open
+ * arrives.  This function looks up the ksmbd_inode for @d and purges
+ * any disconnected durable handles that have DELETE_ON_CLOSE set.
+ *
+ * Called from smb2_open() before dentry_open() so that the file can
+ * be deleted before the new open happens — the caller must re-check
+ * whether the file still exists on the filesystem.
+ *
+ * Return: true if any handles were purged (caller should re-check
+ *         file existence), false otherwise.
+ */
+bool ksmbd_purge_disconnected_doc(struct dentry *d)
+{
+	struct ksmbd_inode *ci;
+	struct ksmbd_file *fp, *purge_list[8];
+	int i, cnt = 0;
+	bool purged = false;
+	bool lookup_ref_dropped = false;
+
+	ci = ksmbd_inode_lookup_lock(d);
+	if (!ci)
+		return false;
+
+	down_read(&ci->m_lock);
+	list_for_each_entry(fp, &ci->m_fp_list, node) {
+		struct ksmbd_conn *fconn;
+
+		if (!fp->is_durable || !fp->is_delete_on_close)
+			continue;
+		if (fp->is_scavenger_claimed)
+			continue;
+
+		fconn = READ_ONCE(fp->conn);
+		if (fconn && !ksmbd_conn_releasing(fconn) &&
+		    !ksmbd_conn_exiting(fconn))
+			continue;
+
+		if (!refcount_inc_not_zero(&fp->refcount))
+			continue;
+		purge_list[cnt++] = fp;
+		if (cnt >= 8)
+			break;
+	}
+	up_read(&ci->m_lock);
+
+	for (i = 0; i < cnt; i++) {
+		struct ksmbd_conn *fconn;
+
+		fp = purge_list[i];
+
+		write_lock(&global_ft.lock);
+		fconn = READ_ONCE(fp->conn);
+		if (fp->is_scavenger_claimed ||
+		    (fconn && !ksmbd_conn_releasing(fconn) &&
+		     !ksmbd_conn_exiting(fconn))) {
+			write_unlock(&global_ft.lock);
+			refcount_dec(&fp->refcount);
+			continue;
+		}
+		fp->is_scavenger_claimed = true;
+		__ksmbd_remove_durable_fd(fp);
+		write_unlock(&global_ft.lock);
+
+		fconn = xchg(&fp->conn, NULL);
+		if (fconn) {
+			if (!list_empty(&fp->lock_list)) {
+				struct ksmbd_lock *lk;
+
+				spin_lock(&fconn->llist_lock);
+				list_for_each_entry(lk, &fp->lock_list,
+						    flist)
+					list_del_init(&lk->clist);
+				spin_unlock(&fconn->llist_lock);
+			}
+			ksmbd_durable_unbind_opinfo_conn(fp, fconn);
+			fp->tcon = NULL;
+			fp->volatile_id = KSMBD_NO_FID;
+		}
+
+		down_write(&ci->m_lock);
+		list_del_init(&fp->node);
+		up_write(&ci->m_lock);
+
+		ksmbd_debug(VFS,
+			    "purging disconnected DOC durable fd %llu\n",
+			    fp->persistent_id);
+
+		if (!refcount_dec_and_test(&fp->refcount)) {
+			if (refcount_dec_and_test(&fp->refcount)) {
+				ksmbd_cleanup_file_closing_state(fp);
+				/*
+				 * Drop the lookup m_count ref BEFORE the
+				 * final close so __ksmbd_inode_close sees
+				 * m_count reaching zero and triggers the
+				 * unlink.  After this, ci may be freed.
+				 */
+				if (!lookup_ref_dropped) {
+					ksmbd_inode_put(ci);
+					lookup_ref_dropped = true;
+				}
+				__ksmbd_close_fd(NULL, fp);
+			} else {
+				fp->is_scavenger_claimed = false;
+			}
+		} else {
+			ksmbd_cleanup_file_closing_state(fp);
+			if (!lookup_ref_dropped) {
+				ksmbd_inode_put(ci);
+				lookup_ref_dropped = true;
+			}
+			__ksmbd_close_fd(NULL, fp);
+		}
+		purged = true;
+	}
+
+	/* Drop the m_count ref from ksmbd_inode_lookup_lock if not yet */
+	if (!lookup_ref_dropped)
+		ksmbd_inode_put(ci);
+
+	return purged;
+}
+
 struct ksmbd_file *ksmbd_lookup_fd_cguid(char *cguid)
 {
 	struct ksmbd_file	*fp = NULL;
@@ -1218,6 +1376,7 @@ struct ksmbd_file *ksmbd_open_fd(struct ksmbd_work *work, struct file *filp)
 	INIT_LIST_HEAD(&fp->lock_list);
 	spin_lock_init(&fp->f_lock);
 	spin_lock_init(&fp->lock_seq_lock);
+	spin_lock_init(&fp->chan_cache.lock);
 	memset(fp->lock_seq, 0xFF, sizeof(fp->lock_seq));
 	refcount_set(&fp->refcount, 1);
 	/* C.5: initialize durable handle expiry timer */
@@ -1408,16 +1567,6 @@ static inline bool is_reconnectable(struct ksmbd_file *fp)
 		return false;
 
 	if (opinfo->op_state != OPLOCK_STATE_NONE) {
-		opinfo_put(opinfo);
-		return false;
-	}
-
-	/*
-	 * MS-SMB2 §3.3.5.9.7: a durable handle with FILE_DELETE_ON_CLOSE
-	 * set MUST NOT be preserved across disconnect — the file should be
-	 * deleted as if the handle were closed normally.
-	 */
-	if (fp->is_delete_on_close) {
 		opinfo_put(opinfo);
 		return false;
 	}
